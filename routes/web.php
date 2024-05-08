@@ -25,6 +25,11 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // BR
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
+    Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
+
+
+    //Policy
+    Route::get('/policy', [RelationController::class, 'index'])->name('policy');
 });
 
 require __DIR__ . '/auth.php';
