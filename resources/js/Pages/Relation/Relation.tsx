@@ -9,8 +9,20 @@ import InputLabel from '@/Components/InputLabel';
 import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
 import { useState } from 'react';
+import { InertiaFormProps } from '@inertiajs/react/types/useForm';
 
 export default function Relation({ auth }: PageProps) {
+
+    interface FormInterface {
+        group_id: string,
+        name_relation: string,
+        parent_id: string,
+        abbreviation: string,
+        relation_aka: string,
+        relation_email: string,
+        relation_description: string,
+        relation_type_id: any
+    }
     
     const {flash, relation, relationType, custom_menu}: any = usePage().props
 
@@ -36,7 +48,7 @@ export default function Relation({ auth }: PageProps) {
 
     const [isSuccess, setIsSuccess] = useState<string>('')
 
-    const {data, setData, errors, reset} = useForm({
+    const {data, setData, errors, reset}: InertiaFormProps<FormInterface> = useForm({
         group_id: '',
         name_relation: '',
         parent_id: '',
@@ -44,7 +56,7 @@ export default function Relation({ auth }: PageProps) {
         relation_aka:'',
         relation_email:'',
         relation_description:'',
-        relation_type_id:''
+        relation_type_id: []
     });
 
     const handleSuccess = (message: string) => {
@@ -58,25 +70,26 @@ export default function Relation({ auth }: PageProps) {
             relation_aka:'',
             relation_email:'',
             relation_description:'',
-            relation_type_id:''
+            relation_type_id: []
         })
         setIsSuccess(message)
     }
 
-    const handleCheckbox = (e) => {
-        // console.log(e.target);
-        let id = e.target.value;
-        if (e.target.checked) {
-            setData("relation_type_id", [...data.relation_type_id, id]);
+    const handleCheckbox = (e: any) => {
+        const {value, checked} = e.target
+
+        if (checked) {
+            setData('relation_type_id', [
+                ...data.relation_type_id,
+                {
+                    id: value
+                }
+            ])
         } else {
-            setData(
-                "relation_type_id",
-                data.relation_type_id.filter((item) => {
-                    return item !== id;
-                })
-            );
+            const updatedData = data.relation_type_id.filter((d: any) => d.id !== value)
+            setData('relation_type_id', updatedData)
         }
-        console.log(data.relation_type_id);
+
     };
     
     function classNames(...classes) {
@@ -229,7 +242,7 @@ export default function Relation({ auth }: PageProps) {
                                                             name="relation_type_id[]" 
                                                             id={typeRelation.RELATION_TYPE_ID} 
                                                             value={typeRelation.RELATION_TYPE_ID} 
-                                                            onChange={handleCheckbox} 
+                                                            onChange={(e) => handleCheckbox(e)} 
                                                             />
                                                         </div>
                                                         <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">

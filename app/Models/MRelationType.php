@@ -14,10 +14,10 @@ class MRelationType extends Model
 
     public $timestamps = false;
 
-    // public $fillable = [
-    //     'role_id',
-    //     'menu_id'
-    // ];
+    public $fillable = [
+        'RELATION_ORGANIZATION_ID',
+        'RELATION_TYPE_ID'
+    ];
 
     public function relation()
     {

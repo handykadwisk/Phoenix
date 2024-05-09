@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MRelationType;
 use App\Models\Relation;
 use App\Models\RelationType;
 use Illuminate\Http\JsonResponse;
@@ -45,8 +46,10 @@ class RelationController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request);
-        Relation::create([
+        // print_r($request->relation_type_id[0]["id"]);
+        // die;
+        // Created Relation
+        $relation = Relation::insertGetId([
             'RELATION_ORGANIZATION_NAME' => $request->name_relation,
             'RELATION_ORGANIZATION_PARENT_ID' => $request->parent_id,
             'RELATION_ORGANIZATION_ABBREVIATION' => $request->abbreviation,
@@ -69,6 +72,15 @@ class RelationController extends Controller
             'RELATION_LOB_ID' => NULL
 
         ]);
+
+        // Created Mapping Relation Type
+        for ($i = 0; $i < sizeof($request->relation_type_id); $i++) {
+            $idRelationType = $request->relation_type_id[$i]["id"];
+            MRelationType::create([
+                'RELATION_ORGANIZATION_ID' => $relation,
+                'RELATION_TYPE_ID' => $idRelationType
+            ]);
+        }
 
         return new JsonResponse([
             'New policy added.'
