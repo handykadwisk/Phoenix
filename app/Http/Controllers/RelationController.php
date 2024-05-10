@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\MRelationType;
 use App\Models\Relation;
+use App\Models\RelationLob;
 use App\Models\RelationType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
@@ -33,6 +35,10 @@ class RelationController extends Controller
         // call data relation
         $relation = Relation::get();
 
+        $relationLob = RelationLob::get();
+        // print_r($relationLob);
+        // die;
+
         // call data relation type
         $relationTypeAll = $this->getAllRelatioType();
 
@@ -40,22 +46,38 @@ class RelationController extends Controller
 
         return Inertia::render('Relation/Relation', [
             'relation' => $relation,
-            'relationType' => $relationTypeAll
+            'relationType' => $relationTypeAll,
+            'relationLOB' => $relationLob
         ]);
+    }
+
+    public function get_mapping(Request $request)
+    {
+        $data = DB::select('call sp_combo_relation_organization(?)', [$request->name]);
+        return response()->json($data);
     }
 
     public function store(Request $request)
     {
-        // print_r($request->relation_type_id[0]["id"]);
+        // $xx = '';
+        // DB::select('call sp_set_mapping_relation_organization(2)');
+        // print_r($xx);
         // die;
+
+        // Cek Relation Perent Id 
+        $parentID = $request->parent_id;
+        if ($request->parent_id == '' || $request->parent_id == NULL) {
+            $parentID = "0";
+        }
+
         // Created Relation
         $relation = Relation::insertGetId([
             'RELATION_ORGANIZATION_NAME' => $request->name_relation,
-            'RELATION_ORGANIZATION_PARENT_ID' => $request->parent_id,
+            'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
             'RELATION_ORGANIZATION_ABBREVIATION' => $request->abbreviation,
             'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
-            'RELATION_ORGANIZATION_MAPPING' => $request->parent_id . ".",
+            'RELATION_ORGANIZATION_MAPPING' => NULL,
             'RELATION_IS_MANAGED_HR' => NULL,
             'RELATION_ORGANIZATION_CREATED_BY' => NULL,
             'RELATION_ORGANIZATION_UPDATED_BY' => NULL,
@@ -69,9 +91,14 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_SIGNATURE_TITLE' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME' => NULL,
-            'RELATION_LOB_ID' => NULL
+            'RELATION_LOB_ID' => $request->relation_lob_id
 
         ]);
+
+        // Mapping Parent Id and Update
+        // if ($parentID == 0 || $parentID == null) {
+        DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
+        // }
 
         // Created Mapping Relation Type
         for ($i = 0; $i < sizeof($request->relation_type_id); $i++) {

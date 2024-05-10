@@ -10,6 +10,7 @@ import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
 import { useState } from 'react';
 import { InertiaFormProps } from '@inertiajs/react/types/useForm';
+import axios from 'axios';
 
 export default function Relation({ auth }: PageProps) {
 
@@ -24,7 +25,11 @@ export default function Relation({ auth }: PageProps) {
         relation_type_id: any
     }
     
-    const {flash, relation, relationType, custom_menu}: any = usePage().props
+    const [mappingParent, setMappingParent] = useState<any>({
+        mapping_parent: [],
+    })
+
+    const {flash, relation, relationType, relationLOB, custom_menu}: any = usePage().props
 
     const group = [
         { id: '1', stat: 'FRESNEL' },
@@ -47,8 +52,29 @@ export default function Relation({ auth }: PageProps) {
     ]
 
     const [isSuccess, setIsSuccess] = useState<string>('')
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const {data, setData, errors, reset}: InertiaFormProps<FormInterface> = useForm({
+    const getMappingParent = async (name: string, column: string) => {
+
+        // setIsLoading(true)
+        
+        if (name) {
+            await axios.post(`/getMappingParent`, {name, column})
+            .then((res:any) => {
+                setMappingParent({
+                    mapping_parent: res.data,
+                })
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+        }
+
+        // setIsLoading(false)
+
+    }
+
+    const {data, setData, errors, reset} = useForm({
         group_id: '',
         name_relation: '',
         parent_id: '',
@@ -56,6 +82,7 @@ export default function Relation({ auth }: PageProps) {
         relation_aka:'',
         relation_email:'',
         relation_description:'',
+        relation_lob_id:'',
         relation_type_id: []
     });
 
@@ -70,6 +97,7 @@ export default function Relation({ auth }: PageProps) {
             relation_aka:'',
             relation_email:'',
             relation_description:'',
+            relation_lob_id:'',
             relation_type_id: []
         })
         setIsSuccess(message)
@@ -146,7 +174,10 @@ export default function Relation({ auth }: PageProps) {
                                     <select
                                         className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
                                         value={data.group_id}
-                                        onChange={(e) => setData('group_id', e.target.value)}
+                                        onChange={(e) => {
+                                            setData('group_id', e.target.value)
+                                            getMappingParent(e.target.value, 'group_id')
+                                        }}
                                     >
                                         <option>-- Choose Group --</option>
                                         {
@@ -180,9 +211,9 @@ export default function Relation({ auth }: PageProps) {
                                     >
                                         <option>-- Choose Parent --</option>
                                         {
-                                            parent.map((parents: any, i: number) => {
+                                            mappingParent.mapping_parent.map((parents: any, i: number) => {
                                                 return (
-                                                    <option key={i} value={parents.id}>{parents.stat}</option>
+                                                    <option key={i} value={parents.RELATION_ORGANIZATION_ID}>{parents.text_combo}</option>
                                                 )
                                             })
                                         }
@@ -259,6 +290,23 @@ export default function Relation({ auth }: PageProps) {
                                         }
                                     </ul>
                                     </div>
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="relation_lob_id" value="Relation Lob" />
+                                    <select
+                                        className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                        value={data.relation_lob_id}
+                                        onChange={(e) => setData('relation_lob_id', e.target.value)}
+                                    >
+                                        <option>-- Choose Relation Lob --</option>
+                                        {
+                                            relationLOB.map((rLob: any, i: number) => {
+                                                return (
+                                                    <option key={i} value={rLob.RELATION_LOB_ID}>{rLob.RELATION_LOB_NAME}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel htmlFor="relation_description" value="Relation Description" />
