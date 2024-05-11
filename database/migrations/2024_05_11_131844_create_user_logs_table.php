@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_relation_types', function (Blueprint $table) {
+        Schema::create('t_user_log', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->integer('created_by');
+            $table->timestamp('created_date')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->text('action');
+            $table->string('action_by');
         });
     }
 
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_relation_types');
+        Schema::dropIfExists('t_user_log');
     }
 };

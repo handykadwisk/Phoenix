@@ -4,22 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\MRelationType;
 use App\Models\Relation;
+use App\Models\RelationGroup;
 use App\Models\RelationLob;
+use App\Models\RelationStatus;
 use App\Models\RelationType;
+use App\Models\Salutation;
+use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 
 class RelationController extends Controller
 {
-    // get All data Relation
-    // public function getRelationAllData()
-    // {
-    //     return Relation::orderBy('relation_id', 'desc')
-    //         ->orderBy('relation_id', 'desc');
-    // }
 
     // Get All Relation Type 
     public function getAllRelatioType()
@@ -34,20 +34,26 @@ class RelationController extends Controller
     {
         // call data relation
         $relation = Relation::get();
-
+        // call data relation group
+        $relationGroup = RelationGroup::get();
+        // call data relation lob
         $relationLob = RelationLob::get();
-        // print_r($relationLob);
-        // die;
-
         // call data relation type
         $relationTypeAll = $this->getAllRelatioType();
+        // call data salutation
+        $salutation = Salutation::get();
+        // call data relation status
+        $relationStatus = RelationStatus::get();
 
 
 
         return Inertia::render('Relation/Relation', [
             'relation' => $relation,
             'relationType' => $relationTypeAll,
-            'relationLOB' => $relationLob
+            'relationLOB' => $relationLob,
+            'salutation' => $salutation,
+            'relationStatus' => $relationStatus,
+            'relationGroup' => $relationGroup
         ]);
     }
 
@@ -59,10 +65,6 @@ class RelationController extends Controller
 
     public function store(Request $request)
     {
-        // $xx = '';
-        // DB::select('call sp_set_mapping_relation_organization(2)');
-        // print_r($xx);
-        // die;
 
         // Cek Relation Perent Id 
         $parentID = $request->parent_id;
@@ -79,7 +81,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
             'RELATION_IS_MANAGED_HR' => NULL,
-            'RELATION_ORGANIZATION_CREATED_BY' => NULL,
+            'RELATION_ORGANIZATION_CREATED_BY' => Auth::user()->id,
             'RELATION_ORGANIZATION_UPDATED_BY' => NULL,
             'RELATION_ORGANIZATION_CREATED_DATE' => now(),
             'RELATION_ORGANIZATION_UPDATED_DATE' => NULL,
@@ -91,14 +93,14 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_SIGNATURE_TITLE' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME' => NULL,
-            'RELATION_LOB_ID' => $request->relation_lob_id
+            'RELATION_LOB_ID' => $request->relation_lob_id,
+            'salutation_id' => $request->salutation_id,
+            'relation_status_id' => $request->relation_status_id
 
         ]);
 
         // Mapping Parent Id and Update
-        // if ($parentID == 0 || $parentID == null) {
         DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
-        // }
 
         // Created Mapping Relation Type
         for ($i = 0; $i < sizeof($request->relation_type_id); $i++) {
@@ -109,8 +111,20 @@ class RelationController extends Controller
             ]);
         }
 
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Created (Relation).",
+                "module"      => "Relation",
+                "id"          => $relation
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        FacadesAlert::success('Hore!', 'Post Created Successfully');
         return new JsonResponse([
-            'New policy added.'
+            'New relation added.'
         ], 201, [
             'X-Inertia' => true
         ]);

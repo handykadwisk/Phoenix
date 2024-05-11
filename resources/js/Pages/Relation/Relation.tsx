@@ -6,6 +6,7 @@ import ModalToAdd from '@/Components/Modal/ModalToAdd';
 import ToastMessage from '@/Components/ToastMessage';
 import Button from '@/Components/Button/Button';
 import InputLabel from '@/Components/InputLabel';
+import TextArea from '@/Components/TextArea';
 import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
 import { useState } from 'react';
@@ -29,7 +30,15 @@ export default function Relation({ auth }: PageProps) {
         mapping_parent: [],
     })
 
-    const {flash, relation, relationType, relationLOB, custom_menu}: any = usePage().props
+    const {
+        flash, 
+        relation, 
+        relationGroup, 
+        salutation, 
+        relationType, 
+        relationStatus, 
+        relationLOB, 
+        custom_menu}: any = usePage().props
 
     const group = [
         { id: '1', stat: 'FRESNEL' },
@@ -83,6 +92,8 @@ export default function Relation({ auth }: PageProps) {
         relation_email:'',
         relation_description:'',
         relation_lob_id:'',
+        salutation_id:'',
+        relation_status_id:'',
         relation_type_id: []
     });
 
@@ -98,6 +109,8 @@ export default function Relation({ auth }: PageProps) {
             relation_email:'',
             relation_description:'',
             relation_lob_id:'',
+            salutation_id:'',
+            relation_status_id:'',
             relation_type_id: []
         })
         setIsSuccess(message)
@@ -149,7 +162,7 @@ export default function Relation({ auth }: PageProps) {
             }
 
             <div>
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-0">
+                <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
                     <div className="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                         {/* button add relation */}
@@ -190,6 +203,25 @@ export default function Relation({ auth }: PageProps) {
                                     </select>
                                 </div>
                                 <div className="mb-4">
+                                <InputLabel htmlFor="relation_status_id" value="Relation Status" />
+                                    <select
+                                        className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                        value={data.relation_status_id}
+                                        onChange={(e) => {
+                                            setData('relation_status_id', e.target.value)
+                                        }}
+                                    >
+                                        <option>-- Choose Relation Status --</option>
+                                        {
+                                            relationStatus.map((relationStatus: any, i: number) => {
+                                                return (
+                                                    <option key={i} value={relationStatus.relation_status_id}>{relationStatus.relation_status_name}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                                <div className="mb-4">
                                     <InputLabel htmlFor="name_relation" value="Name Relation" />
                                     <TextInput
                                         id="name_relation"
@@ -201,6 +233,25 @@ export default function Relation({ auth }: PageProps) {
                                         onChange={(e) => setData('name_relation', e.target.value)}
                                         required
                                     />
+                                </div>
+                                <div className="mb-4">
+                                <InputLabel htmlFor="salutation_id" value="Salutation" />
+                                    <select
+                                        className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                        value={data.salutation_id}
+                                        onChange={(e) => {
+                                            setData('salutation_id', e.target.value)
+                                        }}
+                                    >
+                                        <option>-- Choose Salutation --</option>
+                                        {
+                                            salutation.map((salutations: any, i: number) => {
+                                                return (
+                                                    <option key={i} value={salutations.salutation_id}>{salutations.salutation_name}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel htmlFor="parent_id" value="Parent" />
@@ -278,9 +329,9 @@ export default function Relation({ auth }: PageProps) {
                                                         </div>
                                                         <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
                                                             <div className="flex-1 truncate px-1 py-2 text-xs">
-                                                                <a href={typeRelation.RELATION_TYPE_ID} className="text-gray-900 hover:text-gray-600">
+                                                                <span className="text-gray-900">
                                                                 {typeRelation.RELATION_TYPE_NAME}
-                                                                </a>
+                                                                </span>
                                                             </div>
                                                         
                                                         </div>
@@ -310,20 +361,27 @@ export default function Relation({ auth }: PageProps) {
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel htmlFor="relation_description" value="Relation Description" />
-                                    <TextInput
-                                        id="relation_description"
-                                        type="text"
-                                        name="relation_description"
-                                        value={data.relation_description}
-                                        className=""
-                                        autoComplete="relation_description"
-                                        onChange={(e) => setData('relation_description', e.target.value)}
-                                        required
+                                    <TextArea
+                                    id="relation_description"
+                                    name="relation_description"
+                                    defaultValue={data.relation_description}
+                                    onChange={(e:any) => setData('relation_description', e.target.value)}
+                                    required
                                     />
                                 </div>
                             </>
                             }
                         />
+
+                        <div>
+                            <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                                {relationGroup.map((item:any) => (
+                                <div key={item.RELATION_GROUP_ID} className="overflow-hidden rounded-lg bg-white shadow sm:p-6">
+                                    <dd className="text-2xl font-semibold tracking-tight text-gray-900">{item.RELATION_GROUP_NAME}</dd>
+                                </div>
+                                ))}
+                            </dl>
+                        </div>
                         {/* end Modal add Relation */}
                         {/* table relation in here */}
                         {/* <div className="mt-8 flow-root">
