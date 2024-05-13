@@ -9,11 +9,15 @@ import InputLabel from '@/Components/InputLabel';
 import TextArea from '@/Components/TextArea';
 import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { InertiaFormProps } from '@inertiajs/react/types/useForm';
 import axios from 'axios';
 
 export default function Relation({ auth }: PageProps) {
+
+    useEffect(() => {
+        getRelation()
+    }, [])
 
     interface FormInterface {
         group_id: string,
@@ -29,6 +33,18 @@ export default function Relation({ auth }: PageProps) {
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     })
+    const [relations, setRelations] = useState<any>([])
+
+    const getRelation = async (pageNumber = "page=1") => {
+        await axios.get(`/getPolicy?${pageNumber}`)
+        .then((res) => {
+            setRelations(res.data)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+        // setPolicies(policy)
+    }
 
     const {
         flash, 
@@ -394,73 +410,35 @@ export default function Relation({ auth }: PageProps) {
                                 <div key={item.RELATION_ORGANIZATION_ID} className="overflow-hidden rounded-lg bg-white shadow sm:p-6">
                                     <a href="">
                                         <dt className="truncate text-sm font-medium text-gray-500">{"Relation"}</dt>
-                                        <dd className="text-2xl font-semibold tracking-tight text-gray-900 hover:text-red-600">{item.RELATION_ORGANIZATION_NAME}</dd>
+                                        <dd className="text-sm font-semibold tracking-tight text-gray-900 hover:text-red-600">{(item.RELATION_ORGANIZATION_NAME).toUpperCase()}</dd>
                                     </a>
                                 </div>
                                 ))}
                             </dl>
                         </div>
 
-                        <nav className="flex items-center justify-between border-t border-gray-200 px-4 mt-10 sm:px-0">
-                            <div className="-mt-px flex w-0 flex-1">
+                        <nav
+                            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 mt-10 sm:px-6"
+                            aria-label="Pagination"
+                            >
+                            <div className="hidden sm:block">
+                                <p className="text-sm text-gray-700">
+                                Showing <span className="font-medium">{relation.from}</span> to <span className="font-medium">10</span> of{' '}
+                                <span className="font-medium">20</span> results
+                                </p>
+                            </div>
+                            <div className="flex flex-1 justify-between sm:justify-end">
                                 <a
                                 href="#"
-                                className="inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset  ring-red-400 hover:bg-red-600 hover:text-white  focus-visible:outline-offset-0"
                                 >
-                                <ArrowLongLeftIcon className="mr-3 h-5 w-5 text-gray-400" aria-hidden="true" />
                                 Previous
                                 </a>
-                            </div>
-                            <div className="hidden md:-mt-px md:flex">
                                 <a
                                 href="#"
-                                className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                                >
-                                1
-                                </a>
-                                {/* Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
-                                <a
-                                href="#"
-                                className="inline-flex items-center border-t-2 border-indigo-500 px-4 pt-4 text-sm font-medium text-indigo-600"
-                                aria-current="page"
-                                >
-                                2
-                                </a>
-                                <a
-                                href="#"
-                                className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                                >
-                                3
-                                </a>
-                                <span className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">
-                                ...
-                                </span>
-                                <a
-                                href="#"
-                                className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                                >
-                                8
-                                </a>
-                                <a
-                                href="#"
-                                className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                                >
-                                9
-                                </a>
-                                <a
-                                href="#"
-                                className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                                >
-                                10
-                                </a>
-                            </div>
-                            <div className="-mt-px flex w-0 flex-1 justify-end">
-                                <a
-                                href="#"
-                                className="inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-red-400 hover:bg-red-600 hover:text-white focus-visible:outline-offset-0"
                                 >
                                 Next
-                                <ArrowLongRightIcon className="ml-3 h-5 w-5 text-gray-400" aria-hidden="true" />
                                 </a>
                             </div>
                         </nav>

@@ -35,7 +35,9 @@ class RelationController extends Controller
     public function index(Request $request)
     {
         // call data relation
-        $relation = Relation::get();
+        $relation = Relation::where('RELATION_ORGANIZATION_PARENT_ID', "0")->paginate(3);
+        // print_r($relation);
+        // die;
         // call data relation group
         $relationGroup = RelationGroup::get();
         // call data relation lob
@@ -115,7 +117,7 @@ class RelationController extends Controller
 
         // created tagging
         $tagging = Tag::insertGetId([
-            'TAG_NAME' => $request->tagging,
+            'TAG_NAME' => $request->tagging_name,
             'CREATED_BY' => Auth::user()->id,
             'CREATED_DATE' => now(),
             'UPDATED_BY' => NULL,
