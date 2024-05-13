@@ -6,6 +6,7 @@ use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\RelationController;
+use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,9 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // BR
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
+    // policy
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
+    Route::post('/policy', [PolicyController::class, 'store'])->name('policy.store');
 });
 
 require __DIR__ . '/auth.php';
