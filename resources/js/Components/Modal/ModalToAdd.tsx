@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import PrimaryButton from '../Button/PrimaryButton';
 import axios from 'axios';
 import Alert from '../Alert';
+// import Alert from '../Alert';
 
 export default function ModalToAdd({
     show = false,
@@ -39,7 +40,7 @@ export default function ModalToAdd({
         e.preventDefault()
 
         setIsProcessing(true)
-        
+        // console.log(data);
         await axios.post(url, data, {
             headers: {
                 "Content-type": "multipart/form-data",
