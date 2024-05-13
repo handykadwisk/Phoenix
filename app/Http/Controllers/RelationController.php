@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\MRelationType;
+use App\Models\MTag;
 use App\Models\Relation;
 use App\Models\RelationGroup;
 use App\Models\RelationLob;
 use App\Models\RelationStatus;
 use App\Models\RelationType;
 use App\Models\Salutation;
+use App\Models\Tag;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -111,6 +113,24 @@ class RelationController extends Controller
             ]);
         }
 
+        // created tagging
+        $tagging = Tag::insertGetId([
+            'TAG_NAME' => $request->tagging,
+            'CREATED_BY' => Auth::user()->id,
+            'CREATED_DATE' => now(),
+            'UPDATED_BY' => NULL,
+            'UPDATED_DATE' => NULL
+        ]);
+
+        // created mapping tagging
+        if ($tagging) {
+            MTag::create([
+                'TAG_ID' => $tagging,
+                'RELATION_ORGANIZATION_ID' => $relation
+            ]);
+        }
+
+
         // Created Log
         UserLog::create([
             'created_by' => Auth::user()->id,
@@ -122,7 +142,7 @@ class RelationController extends Controller
             'action_by'  => Auth::user()->email
         ]);
 
-        FacadesAlert::success('Hore!', 'Post Created Successfully');
+
         return new JsonResponse([
             'New relation added.'
         ], 201, [
