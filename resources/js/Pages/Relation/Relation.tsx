@@ -209,6 +209,7 @@ export default function Relation({ auth }: PageProps) {
                             url={`/relation`}
                             data={data}
                             onSuccess={handleSuccess}
+                            panelWidth={"75%"}
                             body={
                             <>
                                 <div className="mb-4">
