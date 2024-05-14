@@ -15,9 +15,9 @@ class Tag extends Model
 
     public $fillable = [
         'TAG_NAME',
-        'CREATED_BY',
-        'CREATED_DATE',
-        'UPDATED_BY',
-        'UPDATED_DATE'
+        'TAG_CREATED_BY',
+        'TAG_CREATED_DATE',
+        'TAG_UPDATED_BY',
+        'TAG_UPDATED_DATE'
     ];
 }

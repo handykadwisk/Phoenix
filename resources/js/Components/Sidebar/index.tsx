@@ -239,6 +239,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarDesktopOpen, setSidebarDe
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
+                    {/* DASHBOARD */}
+                    <NavLink
+                        href={route(`dashboard`)} active={route().current(`dashboard`)}
+                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
+                      >
+                        {"Dashboard"}
+                      </NavLink>
                   {auth.menu?.filter((m: any) => m.menu_parent_id === null).map((menu: any, index: number) => (
                     menu.menu_url !== null ?
                     <li key={index}>

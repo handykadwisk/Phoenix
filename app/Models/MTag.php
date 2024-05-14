@@ -9,7 +9,7 @@ class MTag extends Model
 {
     use HasFactory;
 
-    protected $table = 'm_tagging';
+    protected $table = 'm_tag_relation';
 
     public $timestamps = false;
 

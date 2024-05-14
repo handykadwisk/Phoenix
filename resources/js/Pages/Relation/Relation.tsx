@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { ArrowLongLeftIcon, ArrowLongRightIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { ArrowLongLeftIcon, ArrowLongRightIcon, EllipsisHorizontalIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import ModalToAdd from '@/Components/Modal/ModalToAdd';
 import ToastMessage from '@/Components/ToastMessage';
 import Button from '@/Components/Button/Button';
@@ -9,9 +9,12 @@ import InputLabel from '@/Components/InputLabel';
 import TextArea from '@/Components/TextArea';
 import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, Fragment, useEffect, useState } from 'react';
 import { InertiaFormProps } from '@inertiajs/react/types/useForm';
 import axios from 'axios';
+import { link } from 'fs';
+import dateFormat from 'dateformat';
+import { Menu, Transition } from '@headlessui/react';
 
 export default function Relation({ auth }: PageProps) {
 
@@ -22,7 +25,7 @@ export default function Relation({ auth }: PageProps) {
     interface FormInterface {
         group_id: string,
         name_relation: string,
-        parent_id: string,
+        parent_id: BigInteger,
         abbreviation: string,
         relation_aka: string,
         relation_email: string,
@@ -36,9 +39,10 @@ export default function Relation({ auth }: PageProps) {
     const [relations, setRelations] = useState<any>([])
 
     const getRelation = async (pageNumber = "page=1") => {
-        await axios.get(`/getPolicy?${pageNumber}`)
+        await axios.get(`/getRelation?${pageNumber}`)
         .then((res) => {
             setRelations(res.data)
+            // console.log(res.data.links);
         })
         .catch((err) => {
             console.log(err)
@@ -55,26 +59,6 @@ export default function Relation({ auth }: PageProps) {
         relationStatus, 
         relationLOB, 
         custom_menu}: any = usePage().props
-
-    const group = [
-        { id: '1', stat: 'FRESNEL' },
-        { id: '2', stat: 'FRESNEL 1' },
-        { id: '3', stat: 'FRESNEL 2' },
-    ];
-
-    const parent = [
-        { id: '1', stat: 'KILLAN' },
-        { id: '2', stat: 'FRENSEL' },
-        { id: '3', stat: 'TEKNOLOGI' },
-    ];
-
-    const projects = [
-        { name: 'Insurance', initials: 'GA', href: '#', members: 16, bgColor: 'bg-pink-600' },
-        { name: 'Agent', initials: 'CD', href: '#', members: 12, bgColor: 'bg-purple-600' },
-        { name: 'Broker', initials: 'T', href: '#', members: 16, bgColor: 'bg-yellow-500' },
-        { name: 'Autoworkshop', initials: 'RC', href: '#', members: 8, bgColor: 'bg-green-500' },
-        { name: 'Other', initials: 'RCS', href: '#', members: 1, bgColor: 'bg-red-500' },
-    ]
 
     const [isSuccess, setIsSuccess] = useState<string>('')
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -111,8 +95,31 @@ export default function Relation({ auth }: PageProps) {
         salutation_id:'',
         relation_status_id:'',
         tagging_name: '',
-        relation_type_id: []
+        relation_type_id: [
+            {
+                id:''
+            }
+        ]
     });
+
+    const [dataById, setDataById] = useState<any>({
+        group_id: '',
+        name_relation: '',
+        parent_id: '',
+        abbreviation: '',
+        relation_aka:'',
+        relation_email:'',
+        relation_description:'',
+        relation_lob_id:'',
+        salutation_id:'',
+        relation_status_id:'',
+        tagging_name: '',
+        relation_type_id: [
+            {
+                id:''
+            }
+        ]
+    })
 
     const handleSuccess = (message: string) => {
         setIsSuccess('')
@@ -129,9 +136,25 @@ export default function Relation({ auth }: PageProps) {
             salutation_id:'',
             relation_status_id:'',
             tagging_name: '',
-            relation_type_id: []
+            relation_type_id: [
+                {
+                    id:''
+                }
+            ]
         })
+        getRelation();
         setIsSuccess(message)
+    }
+
+    // edit
+    const handleEditModal = async (e: FormEvent, id: number) => {
+        e.preventDefault()
+
+        await axios.get(`/getRelation/${id}`)
+        .then((res) => setDataById(res.data))
+        .catch((err) => console.log(err))
+
+        setModal({add: false, delete: false, edit: !modal.edit, view: false, document: false})
     }
 
     const handleCheckbox = (e: any) => {
@@ -151,7 +174,7 @@ export default function Relation({ auth }: PageProps) {
 
     };
     
-    function classNames(...classes) {
+    function classNames(...classes:any) {
         return classes.filter(Boolean).join(' ')
     }
 
@@ -278,7 +301,7 @@ export default function Relation({ auth }: PageProps) {
                                         value={data.parent_id}
                                         onChange={(e) => setData('parent_id', e.target.value)}
                                     >
-                                        <option>-- Choose Parent --</option>
+                                        <option value={''}>-- Choose Parent --</option>
                                         {
                                             mappingParent.mapping_parent.map((parents: any, i: number) => {
                                                 return (
@@ -404,18 +427,76 @@ export default function Relation({ auth }: PageProps) {
                             }
                         />
 
-                        <div>
-                            <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                                {relation.map((item:any) => (
-                                <div key={item.RELATION_ORGANIZATION_ID} className="overflow-hidden rounded-lg bg-white shadow sm:p-6">
-                                    <a href="">
-                                        <dt className="truncate text-sm font-medium text-gray-500">{"Relation"}</dt>
-                                        <dd className="text-sm font-semibold tracking-tight text-gray-900 hover:text-red-600">{(item.RELATION_ORGANIZATION_NAME).toUpperCase()}</dd>
-                                    </a>
-                                </div>
-                                ))}
-                            </dl>
-                        </div>
+                        <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8">
+                        {
+                            relations.data?.map((getRelations: any, i: number) => {
+                                return (
+                                    <li key={i} className="overflow-hidden rounded-xl border border-gray-200 hover:shadow-md hover:cursor-pointer">
+                                        {/* <a href=""> */}
+                                            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+                                            {/* <img
+                                                src={client.imageUrl}
+                                                alt={client.name}
+                                                className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
+                                            /> */}
+                                            <a href="">
+                                                <div className="text-sm font-medium leading-6 text-gray-900">{getRelations.RELATION_ORGANIZATION_NAME.toUpperCase()}</div>
+                                            </a>
+                                            <Menu as="div" className="relative ml-auto">
+                                                <Menu.Button className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
+                                                <span className="sr-only">Open options</span>
+                                                <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
+                                                </Menu.Button>
+                                                <Transition
+                                                as={Fragment}
+                                                enter="transition ease-out duration-100"
+                                                enterFrom="transform opacity-0 scale-95"
+                                                enterTo="transform opacity-100 scale-100"
+                                                leave="transition ease-in duration-75"
+                                                leaveFrom="transform opacity-100 scale-100"
+                                                leaveTo="transform opacity-0 scale-95"
+                                                >
+                                                <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                                                    <Menu.Item>
+                                                    {({ active }) => (
+                                                        <button
+                                                        // href="#"
+                                                        className={classNames(
+                                                            active ? 'bg-gray-50' : '',
+                                                            'block px-3 py-1 text-sm leading-6 text-gray-900 w-full z-999999'
+                                                        )}
+                                                        onClick={(e) => handleEditModal(e, getRelations.RELATION_ORGANIZATION_ID)}
+                                                        >
+                                                        Edit
+                                                        </button>
+                                                    )}
+                                                    </Menu.Item>
+                                                </Menu.Items>
+                                                </Transition>
+                                            </Menu>
+                                            </div>
+                                            <a href="">
+                                            <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+                                                <div className="flex justify-between gap-x-4 py-3">
+                                                    <dt className="text-gray-500">Lorem Ipsum</dt>
+                                                    <dd className="text-gray-700">
+                                                    <div className="font-medium text-gray-900">{"Lorem Ipsum"}</div>
+                                                    </dd>
+                                                </div>
+                                                <div className="flex justify-between gap-x-4 py-3">
+                                                    <dt className="text-gray-500">Lorem Ipsum</dt>
+                                                    <dd className="flex items-start gap-x-2">
+                                                    <div className="font-medium text-gray-900">{"Lorem Ipsum"}</div>
+                                                    
+                                                    </dd>
+                                                </div>
+                                            </dl>
+                                            </a>
+                                    </li>
+                                )
+                            })
+                        }
+                        </ul>
 
                         <nav
                             className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 mt-10 sm:px-6"
@@ -423,23 +504,39 @@ export default function Relation({ auth }: PageProps) {
                             >
                             <div className="hidden sm:block">
                                 <p className="text-sm text-gray-700">
-                                Showing <span className="font-medium">{relation.from}</span> to <span className="font-medium">10</span> of{' '}
-                                <span className="font-medium">20</span> results
+                                Showing <span className="font-medium">{relations.from}</span> to <span className="font-medium">{relations.to}</span> of{' '}
+                                <span className="font-medium">{relations.total}</span> results
                                 </p>
                             </div>
                             <div className="flex flex-1 justify-between sm:justify-end">
-                                <a
-                                href="#"
-                                className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset  ring-red-400 hover:bg-red-600 hover:text-white  focus-visible:outline-offset-0"
-                                >
-                                Previous
-                                </a>
-                                <a
-                                href="#"
-                                className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-red-400 hover:bg-red-600 hover:text-white focus-visible:outline-offset-0"
-                                >
-                                Next
-                                </a>
+                                {
+                                    relations.links?.map((Link:any) =>{
+                                        if ((Link.label).includes('&laquo')) {
+                                            return <a key={Link.label}
+                                            href=""
+                                            className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset  ring-red-400 hover:bg-red-600 hover:text-white  focus-visible:outline-offset-0"
+                                            
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                getRelation(Link.url.split('?').pop())
+                                            }}
+                                            >
+                                            Previous
+                                            </a>
+                                        } else if ((Link.label).includes('&raquo;')) {
+                                            return <a key={Link.label}
+                                            href=""
+                                            className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-red-400 hover:bg-red-600 hover:text-white focus-visible:outline-offset-0"
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                getRelation(Link.url.split('?').pop())
+                                            }}
+                                            >
+                                            Next
+                                            </a>
+                                        }   
+                                    })
+                                }
                             </div>
                         </nav>
                         {/* end Modal add Relation */}

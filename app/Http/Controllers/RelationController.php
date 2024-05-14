@@ -23,12 +23,29 @@ use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 class RelationController extends Controller
 {
 
+    public function getRelationData($dataPerPage = 2)
+    {
+
+        return Relation::orderBy('RELATION_ORGANIZATION_ID', 'asc')
+            // ->where('RELATION_ORGANIZATION_PARENT_ID', "0")
+            ->paginate($dataPerPage);
+    }
+
     // Get All Relation Type 
     public function getAllRelatioType()
     {
         $relationType = RelationType::get();
 
         return $relationType;
+    }
+
+
+    public function getRelationJson()
+    {
+        $data = $this->getRelationData(3);
+        // print_r($data);
+        // die;
+        return response()->json($data);
     }
 
     // show interface relation when click menu relation
@@ -69,7 +86,6 @@ class RelationController extends Controller
 
     public function store(Request $request)
     {
-
         // Cek Relation Perent Id 
         $parentID = $request->parent_id;
         if ($request->parent_id == '' || $request->parent_id == NULL) {
@@ -84,7 +100,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
-            'RELATION_IS_MANAGED_HR' => NULL,
+            'HR_MANAGED_BY_APP' => NULL,
             'RELATION_ORGANIZATION_CREATED_BY' => Auth::user()->id,
             'RELATION_ORGANIZATION_UPDATED_BY' => NULL,
             'RELATION_ORGANIZATION_CREATED_DATE' => now(),
@@ -118,10 +134,10 @@ class RelationController extends Controller
         // created tagging
         $tagging = Tag::insertGetId([
             'TAG_NAME' => $request->tagging_name,
-            'CREATED_BY' => Auth::user()->id,
-            'CREATED_DATE' => now(),
-            'UPDATED_BY' => NULL,
-            'UPDATED_DATE' => NULL
+            'TAG_CREATED_BY' => Auth::user()->id,
+            'TAG_CREATED_DATE' => now(),
+            'TAG_UPDATED_BY' => NULL,
+            'TAG_UPDATED_DATE' => NULL
         ]);
 
         // created mapping tagging
