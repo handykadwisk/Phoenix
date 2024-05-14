@@ -95,11 +95,7 @@ export default function Relation({ auth }: PageProps) {
         salutation_id:'',
         relation_status_id:'',
         tagging_name: '',
-        relation_type_id: [
-            {
-                id:''
-            }
-        ]
+        relation_type_id: []
     });
 
     const [dataById, setDataById] = useState<any>({
@@ -114,11 +110,7 @@ export default function Relation({ auth }: PageProps) {
         salutation_id:'',
         relation_status_id:'',
         tagging_name: '',
-        relation_type_id: [
-            {
-                id:''
-            }
-        ]
+        relation_type_id: []
     })
 
     const handleSuccess = (message: string) => {
@@ -136,11 +128,7 @@ export default function Relation({ auth }: PageProps) {
             salutation_id:'',
             relation_status_id:'',
             tagging_name: '',
-            relation_type_id: [
-                {
-                    id:''
-                }
-            ]
+            relation_type_id: []
         })
         getRelation();
         setIsSuccess(message)
