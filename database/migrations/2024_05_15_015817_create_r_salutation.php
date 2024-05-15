@@ -15,7 +15,7 @@ return new class extends Migration
             $table->increments('salutation_id')->primary();
             $table->string('salutation_name')->nullable();
             $table->string('salutation_desc')->nullable();
-            $table->int('relation_status_id')->nullable();
+            $table->integer('relation_status_id')->nullable();
         });
     }
 
