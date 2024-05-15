@@ -133,19 +133,19 @@ class DatabaseSeeder extends Seeder
         Salutation::create([
             'salutation_name' => 'CV',
             'salutation_desc' => NULL,
-            'salutation_status_id' => '1'
+            'relation_status_id' => '1'
         ]);
 
         Salutation::create([
             'salutation_name' => 'PT',
             'salutation_desc' => NULL,
-            'salutation_status_id' => '1'
+            'relation_status_id' => '1'
         ]);
 
         Salutation::create([
             'salutation_name' => 'PD',
             'salutation_desc' => NULL,
-            'salutation_status_id' => '1'
+            'relation_status_id' => '1'
         ]);
 
         // created ralation status
