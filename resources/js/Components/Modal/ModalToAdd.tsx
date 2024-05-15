@@ -94,7 +94,7 @@ export default function ModalToAdd({
                                         <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
                                             {title}
                                         </Dialog.Title>
-                                        <hr className="my-3" />
+                                        {/* <hr className="my-3" /> */}
                                         {
                                             isError && <Alert body={isError} />
                                         }

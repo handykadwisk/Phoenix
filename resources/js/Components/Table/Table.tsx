@@ -20,7 +20,7 @@ export default function Table({
     pagination: any;
  }>) {
     return (
-        <div className="rounded-md border border-stroke bg-white px-5 pt-3 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        <div className="rounded-md bg-white px-5 pt-3 pb-90 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
             <div className='md:grid md:grid-cols-8 md:gap-4'>
                 <Button
                     className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2"
@@ -43,7 +43,7 @@ export default function Table({
                     Clear Search
                 </Button>
             </div>
-            <div className="max-w-full overflow-x-auto lg:h-115 md:h-full h-75 ring-1 ring-gray-300 rounded-lg custom-table overflow-visible">
+            <div className="max-w-full overflow-x-auto lg:h-96 md:h-full h-75 ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible">
                 <table className="w-full table-auto divide-y divide-gray-300">
                     <thead className='bg-gray-100'>
                         <tr className="bg-gray-2 text-left dark:bg-meta-4">

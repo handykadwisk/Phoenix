@@ -48,6 +48,12 @@ class RelationController extends Controller
         return response()->json($data);
     }
 
+    public function getSalutation(Request $request)
+    {
+        $data = Salutation::where('relation_status_id', 'like', '%' . $request->id . '%')->get();
+        return response()->json($data);
+    }
+
     // show interface relation when click menu relation
     public function index(Request $request)
     {

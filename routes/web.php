@@ -28,10 +28,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
     Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
+    Route::post('/getSalutationById', [RelationController::class, 'getSalutation'])->name('getSalutationById.getSalutation');
 
 
     //Policy
-    Route::get('/policy', [RelationController::class, 'index'])->name('policy');
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
 });
 
 require __DIR__ . '/auth.php';
