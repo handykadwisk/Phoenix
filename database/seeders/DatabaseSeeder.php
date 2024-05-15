@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             [
                 'menu_name'       => 'Dashboard',
                 'menu_url'        => 'dashboard',
-                'menu_is_deleted' => 0,
+                'menu_is_deleted' => 1,
                 'menu_created_by' => 'admin'
             ]
         );
