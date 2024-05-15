@@ -25,32 +25,15 @@ class DatabaseSeeder extends Seeder
                 'menu_created_by' => 'admin'
             ]
         );
-        $settings = Menu::create(
+        $dashboard = Menu::create(
             [
-                'menu_name'       => 'Settings',
+                'menu_name'       => 'Relation',
+                'menu_url'        => 'relation',
                 'menu_is_deleted' => 0,
                 'menu_created_by' => 'admin'
             ]
         );
-        $aclmenu = Menu::create(
-            [
-                'menu_name'       => 'ACL - Menu',
-                'menu_parent_id'  => $settings->id,
-                'menu_url'        => 'settings/menu',
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $aclrole = Menu::create(
-            [
-                'menu_name'       => 'ACL - Role',
-                'menu_parent_id'  => $settings->id,
-                'menu_url'        => 'settings/role',
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $policy = Menu::create(
+        $dashboard = Menu::create(
             [
                 'menu_name'       => 'Policy',
                 'menu_url'        => 'policy',
