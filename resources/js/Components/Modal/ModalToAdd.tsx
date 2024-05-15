@@ -90,7 +90,7 @@ export default function ModalToAdd({
                             >
                             <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" style={{ maxWidth: panelWidth }}>
                                 <form onSubmit={action}>
-                                    <div className="bg-white px-4 pb-4 pt-3 sm:pb-4">
+                                    <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                         <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
                                             {title}
                                         </Dialog.Title>

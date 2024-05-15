@@ -236,7 +236,7 @@ export default function Relation({ auth }: PageProps) {
                                     <div>
                                         <InputLabel htmlFor="group_id" value="Group" />
                                             <select
-                                                className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                                className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
                                                 value={data.group_id}
                                                 onChange={(e) => {
                                                     setData('group_id', e.target.value)
@@ -256,7 +256,7 @@ export default function Relation({ auth }: PageProps) {
                                     <div>
                                         <InputLabel htmlFor="relation_status_id" value="Relation Status" />
                                         <select
-                                            className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                            className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
                                             value={data.relation_status_id}
                                             onChange={(e) => {
                                                 setData('relation_status_id', e.target.value)
@@ -276,7 +276,7 @@ export default function Relation({ auth }: PageProps) {
                                     <div>
                                         <InputLabel htmlFor="salutation_id" value="Salutation" />
                                         <select
-                                            className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                            className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
                                             value={data.salutation_id}
                                             onChange={(e) => {
                                                 setData('salutation_id', e.target.value)
@@ -308,7 +308,7 @@ export default function Relation({ auth }: PageProps) {
                                     <div className='col-span-full'>
                                         <InputLabel htmlFor="parent_id" value="Parent" />
                                         <select
-                                            className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                            className='block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
                                             value={data.parent_id}
                                             onChange={(e) => setData('parent_id', e.target.value)}
                                         >
@@ -383,7 +383,7 @@ export default function Relation({ auth }: PageProps) {
                                                     return (
                                                         <li key={typeRelation.RELATION_TYPE_ID} className="col-span-1 flex rounded-md shadow-sm">
                                                             <div
-                                                            className='flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white'
+                                                            className='flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white'
                                                             >
                                                             <Checkbox 
                                                                 name="relation_type_id[]" 
@@ -410,7 +410,7 @@ export default function Relation({ auth }: PageProps) {
                                     <div className='col-span-full'>
                                         <InputLabel htmlFor="relation_lob_id" value="Relation Lob" />
                                         <select
-                                            className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                            className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
                                             value={data.relation_lob_id}
                                             onChange={(e) => setData('relation_lob_id', e.target.value)}
                                         >
