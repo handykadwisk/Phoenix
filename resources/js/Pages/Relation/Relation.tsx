@@ -303,6 +303,7 @@ export default function Relation({ auth }: PageProps) {
                                             autoComplete="name_relation"
                                             onChange={(e) => setData('name_relation', e.target.value)}
                                             required
+                                            placeholder='Name Relation'
                                         />
                                     </div>
                                     <div className='col-span-full'>
@@ -333,6 +334,7 @@ export default function Relation({ auth }: PageProps) {
                                             autoComplete="abbreviation"
                                             onChange={(e) => setData('abbreviation', e.target.value)}
                                             required
+                                            placeholder='Abbreviation'
                                         />
                                     </div>
                                     <div>
@@ -346,6 +348,7 @@ export default function Relation({ auth }: PageProps) {
                                             autoComplete="relation_aka"
                                             onChange={(e) => setData('relation_aka', e.target.value)}
                                             required
+                                            placeholder='AKA'
                                         />
                                     </div>
                                     <div>
@@ -359,6 +362,7 @@ export default function Relation({ auth }: PageProps) {
                                             autoComplete="relation_email"
                                             onChange={(e) => setData('relation_email', e.target.value)}
                                             required
+                                            placeholder='example@gmail.com'
                                         />
                                     </div>
                                     <div>
@@ -372,6 +376,7 @@ export default function Relation({ auth }: PageProps) {
                                             autoComplete="tagging_name"
                                             onChange={(e) => setData('tagging_name', e.target.value)}
                                             required
+                                            placeholder='Tag'
                                         />
                                     </div>
                                     <div className='col-span-full'>
