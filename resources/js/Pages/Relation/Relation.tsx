@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { ArrowLongLeftIcon, ArrowLongRightIcon, EllipsisHorizontalIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
+import { ArrowLongLeftIcon, ArrowLongRightIcon, EllipsisHorizontalIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/react/20/solid'
 import ModalToAdd from '@/Components/Modal/ModalToAdd';
 import ToastMessage from '@/Components/ToastMessage';
 import Button from '@/Components/Button/Button';
@@ -11,10 +11,14 @@ import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
 import { FormEvent, Fragment, useEffect, useState } from 'react';
 import { InertiaFormProps } from '@inertiajs/react/types/useForm';
+import TablePage from '@/Components/Table/Table';
 import axios from 'axios';
 import { link } from 'fs';
 import dateFormat from 'dateformat';
-import { Menu, Transition } from '@headlessui/react';
+import { Menu, Tab, Transition } from '@headlessui/react';
+import TableTH from '@/Components/Table/TableTH';
+import TableTD from '@/Components/Table/TableTD';
+import Dropdown from '@/Components/Dropdown';
 
 export default function Relation({ auth }: PageProps) {
 
@@ -195,12 +199,12 @@ export default function Relation({ auth }: PageProps) {
                     <div className="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                         {/* button add relation */}
-                        <Button
+                        {/* <Button
                             className="text-sm font-semibold px-3 py-2 mb-5"
                             onClick={() => setModal({add: true, delete: false, edit: false, view: false, document: false})}
                         >
                             Add Relation
-                        </Button>
+                        </Button> */}
                         {/* modal add relation */}
                         <ModalToAdd
                             show={modal.add}
@@ -415,88 +419,80 @@ export default function Relation({ auth }: PageProps) {
                             </>
                             }
                         />
-
-                        <div className="mt-8 flow-root">
-                                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                                    <table className="min-w-full divide-y divide-gray-300">
-                                    <thead>
-                                        <tr>
-                                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3">
-                                            Name Relation
-                                        </th>
-                                        <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-3">
-                                            <span className="sr-only">Edit</span>
-                                        </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white">
-                                        {
-                                            relations.data?.map((getRelations: any, i: number) => {
-                                                return(
-                                                    <tr key={i} className="even:bg-gray-50">
-                                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                        {getRelations.RELATION_ORGANIZATION_NAME.toUpperCase()}
-                                                        </td>
-                                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                                                            Edit<span className="sr-only">, {getRelations.RELATION_ORGANIZATION_NAME.toUpperCase()}</span>
-                                                        </a>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            })
-                                        }
-                                        
-                                    </tbody>
-                                    </table>
-                                </div>
-                                </div>
-                            </div>
                         
-                        {/* end Modal add Relation */}
-                        {/* table relation in here */}
-                        {/* <div className="mt-8 flow-root">
-                            <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                                <table className="min-w-full divide-y divide-gray-300">
-                                <thead>
-                                    <tr>
-                                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3">
-                                        Name
-                                    </th>
-                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Abbreviation
-                                    </th>
-                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        AKA
-                                    </th>
-                                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-3">
-                                        <span className="sr-only">Edit</span>
-                                    </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white">
-                                    {relation?.map((d: any, i: number) => (
-                                    <tr key={i} className="even:bg-gray-50">
-                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {d.RELATION_ORGANIZATION_NAME}
-                                        </td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{d.RELATION_ORGANIZATION_ABBREVIATION}</td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{d.RELATION_ORGANIZATION_AKA}</td>
-                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                                            Action<span className="sr-only">, {d.name}</span>
-                                        </a>
-                                        </td>
-                                    </tr>
-                                    ))}
-                                </tbody>
-                                </table>
-                            </div>
-                            </div>
-                        </div> */}
-                        {/* end table relaton in here */}
+
+                        {/* table page*/}
+                            <TablePage
+                                addButtonLabel={"Add Relation"}
+                                addButtonModalState={() => setModal({add: true, delete: false, edit: false, view: false, document: false, search: false})}
+                                searchButtonModalState={() => setModal({add: false, delete: false, edit: false, view: false, document: false, search: !modal.search})}
+                                // clearSearchButtonAction={() => clearSearchPolicy()}
+                                tableHead={ 
+                                    <>
+                                        <TableTH
+                                            className={"min-w-[50px]"}
+                                            label={"No"}
+                                        />
+                                        <TableTH 
+                                            className={"min-w-[50px]"}
+                                            label={"Name Relation"}
+                                        />
+                                        <TableTH 
+                                            className={"min-w-[50px]"}
+                                            label={"Action"}
+                                        />
+                                    </>
+                                }
+                                tableBody={
+                                    relations.data?.map((policy: any, i: number) => {
+                                        return (
+                                            <tr key={i} className={
+                                                i % 2 === 0 ? "" : "bg-gray-100"
+                                            }>
+                                                <TableTD
+                                                    value={relations.from + i}
+                                                    className={''}
+                                                />
+                                                <TableTD
+                                                    value={
+                                                        <>
+                                                            {policy.RELATION_ORGANIZATION_NAME}
+                                                        </>
+                                                    }
+                                                    className={
+                                                    ""
+                                                    }
+                                                />
+                                                <TableTD
+                                                    value={
+                                                        <Dropdown
+                                                            title='Actions' 
+                                                            children={
+                                                                <>
+                                                                    <a 
+                                                                        href="" 
+                                                                        className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                        // onClick={(e) => handleViewModal(e, policy.policy_id)}
+                                                                    >
+                                                                        Detail
+                                                                    </a>
+                                                                </>
+                                                            } 
+                                                        />
+                                                    }
+                                                    className={''}
+                                                />
+                                            </tr>
+                                        )
+                                    })
+                                }
+                            
+                            
+                            />
+
+
+                        {/* end table page */}
+
                         </div>
                     </div>
                 </div>
