@@ -416,118 +416,44 @@ export default function Relation({ auth }: PageProps) {
                             }
                         />
 
-                        <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8">
-                        {
-                            relations.data?.map((getRelations: any, i: number) => {
-                                return (
-                                    <li key={i} className="overflow-hidden rounded-xl border border-gray-200 hover:shadow-md hover:cursor-pointer">
-                                        {/* <a href=""> */}
-                                            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-                                            {/* <img
-                                                src={client.imageUrl}
-                                                alt={client.name}
-                                                className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
-                                            /> */}
-                                            <a href="">
-                                                <div className="text-sm font-medium leading-6 text-gray-900">{getRelations.RELATION_ORGANIZATION_NAME.toUpperCase()}</div>
-                                            </a>
-                                            <Menu as="div" className="relative ml-auto">
-                                                <Menu.Button className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
-                                                <span className="sr-only">Open options</span>
-                                                <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
-                                                </Menu.Button>
-                                                <Transition
-                                                as={Fragment}
-                                                enter="transition ease-out duration-100"
-                                                enterFrom="transform opacity-0 scale-95"
-                                                enterTo="transform opacity-100 scale-100"
-                                                leave="transition ease-in duration-75"
-                                                leaveFrom="transform opacity-100 scale-100"
-                                                leaveTo="transform opacity-0 scale-95"
-                                                >
-                                                <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                                                    <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                        // href="#"
-                                                        className={classNames(
-                                                            active ? 'bg-gray-50' : '',
-                                                            'block px-3 py-1 text-sm leading-6 text-gray-900 w-full z-999999'
-                                                        )}
-                                                        onClick={(e) => handleEditModal(e, getRelations.RELATION_ORGANIZATION_ID)}
-                                                        >
-                                                        Edit
-                                                        </button>
-                                                    )}
-                                                    </Menu.Item>
-                                                </Menu.Items>
-                                                </Transition>
-                                            </Menu>
-                                            </div>
-                                            <a href="">
-                                            <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-                                                <div className="flex justify-between gap-x-4 py-3">
-                                                    <dt className="text-gray-500">Lorem Ipsum</dt>
-                                                    <dd className="text-gray-700">
-                                                    <div className="font-medium text-gray-900">{"Lorem Ipsum"}</div>
-                                                    </dd>
-                                                </div>
-                                                <div className="flex justify-between gap-x-4 py-3">
-                                                    <dt className="text-gray-500">Lorem Ipsum</dt>
-                                                    <dd className="flex items-start gap-x-2">
-                                                    <div className="font-medium text-gray-900">{"Lorem Ipsum"}</div>
-                                                    
-                                                    </dd>
-                                                </div>
-                                            </dl>
-                                            </a>
-                                    </li>
-                                )
-                            })
-                        }
-                        </ul>
-
-                        <nav
-                            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 mt-10 sm:px-6"
-                            aria-label="Pagination"
-                            >
-                            <div className="hidden sm:block">
-                                <p className="text-sm text-gray-700">
-                                Showing <span className="font-medium">{relations.from}</span> to <span className="font-medium">{relations.to}</span> of{' '}
-                                <span className="font-medium">{relations.total}</span> results
-                                </p>
+                        <div className="mt-8 flow-root">
+                                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                    <table className="min-w-full divide-y divide-gray-300">
+                                    <thead>
+                                        <tr>
+                                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3">
+                                            Name Relation
+                                        </th>
+                                        <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-3">
+                                            <span className="sr-only">Edit</span>
+                                        </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white">
+                                        {
+                                            relations.data?.map((getRelations: any, i: number) => {
+                                                return(
+                                                    <tr key={i} className="even:bg-gray-50">
+                                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                        {getRelations.RELATION_ORGANIZATION_NAME.toUpperCase()}
+                                                        </td>
+                                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                                                            Edit<span className="sr-only">, {getRelations.RELATION_ORGANIZATION_NAME.toUpperCase()}</span>
+                                                        </a>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        }
+                                        
+                                    </tbody>
+                                    </table>
+                                </div>
+                                </div>
                             </div>
-                            <div className="flex flex-1 justify-between sm:justify-end">
-                                {
-                                    relations.links?.map((Link:any) =>{
-                                        if ((Link.label).includes('&laquo')) {
-                                            return <a key={Link.label}
-                                            href=""
-                                            className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset  ring-red-400 hover:bg-red-600 hover:text-white  focus-visible:outline-offset-0"
-                                            
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                getRelation(Link.url.split('?').pop())
-                                            }}
-                                            >
-                                            Previous
-                                            </a>
-                                        } else if ((Link.label).includes('&raquo;')) {
-                                            return <a key={Link.label}
-                                            href=""
-                                            className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-red-400 hover:bg-red-600 hover:text-white focus-visible:outline-offset-0"
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                getRelation(Link.url.split('?').pop())
-                                            }}
-                                            >
-                                            Next
-                                            </a>
-                                        }   
-                                    })
-                                }
-                            </div>
-                        </nav>
+                        
                         {/* end Modal add Relation */}
                         {/* table relation in here */}
                         {/* <div className="mt-8 flow-root">
