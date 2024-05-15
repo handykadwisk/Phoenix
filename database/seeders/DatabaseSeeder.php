@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
                 'menu_created_by' => 'admin'
             ]
         );
-        $dashboard = Menu::create(
+        $relation = Menu::create(
             [
                 'menu_name'       => 'Relation',
                 'menu_url'        => 'relation',
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
                 'menu_created_by' => 'admin'
             ]
         );
-        $dashboard = Menu::create(
+        $policy = Menu::create(
             [
                 'menu_name'       => 'Policy',
                 'menu_url'        => 'policy',
@@ -57,26 +57,10 @@ class DatabaseSeeder extends Seeder
         ]);
         RoleAccessMenu::create([
             'role_id' => $admin->id,
-            'menu_id' => $settings->id
+            'menu_id' => $relation->id
         ]);
         RoleAccessMenu::create([
             'role_id' => $admin->id,
-            'menu_id' => $aclmenu->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $aclrole->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $user->id,
-            'menu_id' => $dashboard->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $policy->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $user->id,
             'menu_id' => $policy->id
         ]);
 
