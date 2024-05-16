@@ -12,8 +12,6 @@ MySQL - 5.7.12 : Database - phoenix_app_dev
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-USE `phoenix_app_dev`;
-
 /*Table structure for table `r_currency` */
 
 DROP TABLE IF EXISTS `r_currency`;
