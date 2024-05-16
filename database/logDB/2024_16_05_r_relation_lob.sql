@@ -1,0 +1,35 @@
+/*
+SQLyog Ultimate v11.33 (64 bit)
+MySQL - 5.7.12 : Database - phoenix_app_dev
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+USE `phoenix_app_dev`;
+
+/*Table structure for table `r_relation_lob` */
+
+DROP TABLE IF EXISTS `r_relation_lob`;
+
+CREATE TABLE `r_relation_lob` (
+  `RELATION_LOB_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `RELATION_LOB_NAME` text,
+  `RELATION_LOB_DESC` text,
+  PRIMARY KEY (`RELATION_LOB_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=latin1;
+
+/*Data for the table `r_relation_lob` */
+
+insert  into `r_relation_lob`(`RELATION_LOB_ID`,`RELATION_LOB_NAME`,`RELATION_LOB_DESC`) values (1,'Pertanian Tanaman, Peternakan, Perburuan dan Kegiatan ybdi',NULL),(2,'Kehutanan dan Penebangan Kayu',NULL),(3,'Perikanan',NULL),(4,'Pertambangan dan Penggalian',NULL),(5,'Pertambangan Batu Bara dan Lignit',NULL),(6,'Pertambangan Minyak Bumi dan Gas Alam dan Panas Bumi',NULL),(7,'Pertambangan Bijih Logam',NULL),(8,'Pertambangan dan Penggalian Lainnya',NULL),(9,'Jasa Pertambangan',NULL),(10,'Industri Pengolahan',NULL),(11,'Industri Minuman',NULL),(12,'Industri Pengolahan Tembakau',NULL),(13,'Industri Tekstil',NULL),(14,'Industri Pakaian Jadi',NULL),(15,'Industri Kulit, Barang dari Kulit dan Alas Kaki',NULL),(16,'Industri Kayu, Barang dari Kayu dan Gabus (Tidak Termasuk Furnitur) dan Barang Anyaman dari Bambu, Rotan dan Sejenisnya',NULL),(17,'Industri Kertas dan Barang dari Kertas',NULL),(18,'Industri Pencetakan dan Reproduksi Media Rekaman',NULL),(19,'Industri Produk dari Batu Bara dan Pengilangan Minyak Bumi',NULL),(20,'Industri Bahan Kimia dan Barang dari Bahan Kimia',NULL),(21,'Industri Farmasi, Produk Obat dan Jamu',NULL),(22,'Industri Karet, Barang dari Karet dan Plastik',NULL),(23,'Industri Barang Galian Bukan Logam',NULL),(24,'Industri Logam Dasar',NULL),(25,'Industri Barang Logam, kecuali Mesin dan Peralatannya',NULL),(26,'Industri Komputer, Barang Elektronik dan Optik',NULL),(27,'Klasifikasi Bak  u Lapangan Usaha Indonesia (KBLI)',NULL),(28,'Industri Peralatan Listrik',NULL),(29,'Industri Mesin dan Perlengkapan ytdl',NULL),(30,'Industri Kendaraan Bermotor, Trailer dan Semi Trailer',NULL),(31,'Industri Alat Angkutan Lainnya',NULL),(32,'Industri Furnitur',NULL),(33,'Industri Pengolahan Lainnya',NULL),(34,'Jasa Reparasi dan Pemasangan Mesin dan Peralatan',NULL),(35,'Pengadaan Listrik, Gas, Uap/Air Panas dan Udara Dingin',NULL),(36,'Pengadaan Air, Pengelolaan Sampah dan Daur Ulang',NULL),(37,'Pembuangan dan Pembersihan Limbah dan Sampah',NULL),(38,'Pengadaan Air',NULL),(39,'Pengelolaan Limbah',NULL),(40,'Pengelolaan Sampah dan Daur Ulang',NULL),(41,'Jasa Pembersihan dan Pengelolaan Sampah Lainnya',NULL),(43,'Konstruksi Gedung',NULL),(44,'Konstruksi Bangunan Sipil',NULL),(45,'Konstruksi Khusus',NULL),(46,'Perdagangan Besar dan Eceran; Reparasi dan Perawatan Mobil dan Sepeda motor',NULL),(47,'Perdagangan, Reparasi dan Perawatan Mobil dan Sepeda Motor',NULL),(48,'Perdagangan Besar, Kecuali Mobil dan Sepeda Motor',NULL),(49,'Perdagangan Eceran, Kecuali Mobil dan Motor',NULL),(50,'Transportasi dan Pergudangan',NULL),(51,'Angkutan Darat dan Angkutan Melalui Saluran Pipa',NULL),(52,'Angkutan Air',NULL),(53,'Angkutan Udara',NULL),(54,'Pergudangan dan Jasa Penunjang Angkutan',NULL),(55,'Pos dan Kurir',NULL),(56,'Penyediaan Akomodasi dan Penyediaan Makan Minum',NULL),(58,'Penyediaan Makanan dan Minuman',NULL),(59,'Informasi dan Komunikasi',NULL),(60,'Penerbitan',NULL),(61,'Produksi Gambar Bergerak, Video dan Program Televisi',NULL),(62,'Perekaman Suara dan Penerbitan Musik',NULL),(63,'Penyiaran dan Pemrograman',NULL),(64,'Klasifikasi Baku Lapangan Usaha Indonesia (KBLI)',NULL),(65,'Telekomunikasi',NULL),(66,'Kegiatan Pemrograman, Konsultansi Komputer dan Kegiatan',NULL),(67,'Kegiatan Jasa Informasi',NULL),(68,'Jasa Keuangan dan Asuransi',NULL),(69,'Kegiatan Jasa Keuangan, kecuali Asuransi dan Dana Pensiun',NULL),(70,'Asuransi, Reasuransi dan Dana Pensiun, kecuali Jaminan',NULL),(71,'Sosial Wajib',NULL),(72,'Jasa Penunjang Untuk Jasa Keuangan, Asuransi Dan Dana',NULL),(73,'Pensiun dan Lainnya',NULL),(74,'Real Estat',NULL),(75,'Jasa Profesional, Ilmiah dan Teknis',NULL),(76,'Jasa Hukum dan Akuntansi',NULL),(77,'Kegiatan Kantor Pusat dan Konsultansi Manajemen',NULL),(78,'Jasa Arsitektur dan Teknik Sipil; Analisis dan Uji Teknis',NULL),(79,'Penelitian dan Pengembangan Ilmu Pengetahuan',NULL),(80,'Periklanan dan Penelitian Pasar',NULL),(81,'Jasa Profesional, Ilmiah dan Teknis Lainnya',NULL),(82,'Jasa Dokter Hewan',NULL),(83,'Jasa Persewaan, Ketenagakerjaan, Agen Perjalanan dan Penunjang Usaha Lainnya',NULL),(84,'Jasa Persewaan',NULL),(85,'Jasa Ketenagakerjaan',NULL),(86,'Jasa Agen Perjalanan, Penyelenggara Tur dan Jasa Reservasi Lainnya',NULL),(87,'Jasa Keamanan dan Penyelidikan',NULL),(88,'Jasa Untuk Gedung dan Pertamanan',NULL),(89,'Jasa Administrasi Kantor, Jasa Penunjang Kantor dan Jasa Penunjang Usaha Lainnya',NULL),(90,'Administrasi Pemerintahan, Pertahanan dan Jaminan Sosial Wajib',NULL),(91,'Jasa Pendidikan',NULL),(92,'Jasa Kesehatan dan Kegiatan Sosial',NULL),(93,'Klasifikasi Lapangan Usaha Indonesia (KBLI)',NULL),(94,'Jasa Kegiatan Sosial di Dalam Panti',NULL),(95,'Jasa Kegiatan Sosial di Luar Panti',NULL),(96,'Kebudayaan, Hiburan dan Rekreasi',NULL),(97,'Kegiatan Hiburan, Seni dan Kreativitas',NULL),(98,'Perpustakaan, Arsip, Museum dan Kegiatan Kebudayaan Lainnya',NULL),(99,'Kegiatan Perjudian dan Pertaruhan',NULL),(100,'Kegiatan Olahraga dan Rekreasi Lainnya',NULL),(101,'Kegiatan Keanggotaan Organisasi',NULL),(102,'Jasa Reparasi Komputer Dan Barang Keperluan Pribadi dan',NULL),(103,'Perlengkapan Rumah Tangga',NULL),(104,'Jasa Perorangan Lainnya',NULL),(106,'Jasa Perorangan yang Melayani Rumah Tangga',NULL),(107,'Kegiatan yang Menghasilkan Barang dan Jasa Oleh Rumah Tangga yang Digunakan Sendiri Untuk Memenuhi Kebutuhan',NULL),(109,'Kegiatan Badan Internasional dan Badan Ekstra Internasional Lainnya',NULL);
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
