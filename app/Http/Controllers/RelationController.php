@@ -106,7 +106,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
-            'HR_MANAGED_BY_APP' => NULL,
+            'HR_MANAGED_BY_APP' => $request->is_managed,
             'RELATION_ORGANIZATION_CREATED_BY' => Auth::user()->id,
             'RELATION_ORGANIZATION_UPDATED_BY' => NULL,
             'RELATION_ORGANIZATION_CREATED_DATE' => now(),

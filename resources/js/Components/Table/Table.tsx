@@ -20,7 +20,7 @@ export default function Table({
     pagination: any;
  }>) {
     return (
-        <div className="rounded-md bg-white px-5 pt-3 pb-90 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        <div className="rounded-md bg-white px-0 pt-3 pb-90 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
             <div className='md:grid md:grid-cols-8 md:gap-4'>
                 <Button
                     className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2"
