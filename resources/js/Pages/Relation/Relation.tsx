@@ -475,7 +475,7 @@
 
             <div>
                 <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
-                    <div className="bg-white overflow-hidden shadow-2xl sm:rounded-lg">
+                    {/* <div className="overflow-hidden shadow-2xl sm:rounded-lg"> */}
                         <div className="p-6 text-gray-900 mb-60">
 
                         {/* table page*/}
@@ -551,7 +551,7 @@
                         {/* end table page */}
 
                         </div>
-                    </div>
+                    {/* </div> */}
                 </div>
             </div>
         </AuthenticatedLayout>

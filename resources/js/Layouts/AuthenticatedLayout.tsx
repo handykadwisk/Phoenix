@@ -8,7 +8,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
     const [sidebarDesktopOpen, setSidebarDesktopOpen] = useState(true);
 
     return (
-        <div className="dark:bg-boxdark-2 dark:text-bodydark">
+        <div className="dark:bg-boxdark-2 dark:text-bodydark bg-gray-100">
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex h-screen overflow-hidden">
         {/* <!-- ===== Sidebar Start ===== --> */}
