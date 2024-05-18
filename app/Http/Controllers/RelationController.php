@@ -173,4 +173,10 @@ class RelationController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function getRelationById($id)
+    {
+        $data = Relation::find($id);
+        return response()->json($data);
+    }
 }

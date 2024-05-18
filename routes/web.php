@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
     Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
     Route::post('/getSalutationById', [RelationController::class, 'getSalutation'])->name('getSalutationById.getSalutation');
+    Route::get('/getRelation/{id}', [RelationController::class, 'getRelationById'])->name('relation.getRelationById');
 
 
     //Policy
