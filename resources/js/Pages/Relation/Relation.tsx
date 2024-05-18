@@ -66,6 +66,7 @@ export default function Relation({ auth }: PageProps) {
         relationType,
         relationStatus,
         relationLOB,
+        mRelationType,
         custom_menu }: any = usePage().props
 
     const [isSuccess, setIsSuccess] = useState<string>('')
@@ -122,17 +123,17 @@ export default function Relation({ auth }: PageProps) {
 
     const [dataById, setDataById] = useState<any>({
         RELATION_ORGANIZATION_GROUP: '',
-        name_relation: '',
-        parent_id: '',
+        RELATION_ORGANIZATION_NAME: '',
+        RELATION_ORGANIZATION_PARENT_ID: '',
         abbreviation: '',
-        relation_aka: '',
-        relation_email: '',
+        RELATION_ORGANIZATION_AKA: '',
+        RELATION_ORGANIZATION_EMAIL: '',
         relation_description: '',
-        relation_lob_id: '',
+        RELATION_LOB_ID: '',
         salutation_id: '',
         relation_status_id: '',
-        tagging_name: '',
-        is_managed: '',
+        TAG_NAME: '',
+        HR_MANAGED_BY_APP: '',
         relation_type_id: []
     })
 
@@ -166,11 +167,26 @@ export default function Relation({ auth }: PageProps) {
             .then((res) => {
                 setDataById(res.data)
                 getSalutationById(res.data.relation_status_id, 'relation_status_id')
+                getMappingParent(res.data.RELATION_ORGANIZATION_GROUP, 'RELATION_ORGANIZATION_GROUP')
             
             })
             .catch((err) => console.log(err))
 
         setModal({ add: false, delete: false, edit: !modal.edit, view: false, document: false })
+    }
+
+    const checkChecked = (id: number) => {
+        if (id === 1) {
+            return true
+        }else{
+            return false
+        }
+    }
+
+    const checkCheckedMRelation = (id: number, idr: number) => {
+        if (mRelationType.find((f: any) => f.RELATION_ORGANIZATION_ID === id && f.RELATION_TYPE_ID === idr)) {
+            return true
+        }
     }
 
     const handleCheckbox = (e: any) => {
@@ -198,6 +214,18 @@ export default function Relation({ auth }: PageProps) {
             setData('is_managed', "1")
         } else {
             setData('is_managed', "0")
+        }
+
+    };
+
+    const handleCheckboxHREdit = (e: any) => {
+        // alert('aloo');
+        const { value, checked } = e.target
+
+        if (checked) {
+            setDataById({...dataById, HR_MANAGED_BY_APP: "1"})
+        } else {
+            setDataById({...dataById, HR_MANAGED_BY_APP: "0"})
         }
 
     };
@@ -484,7 +512,7 @@ export default function Relation({ auth }: PageProps) {
                 show={modal.edit}
                 onClose={() => setModal({ add: false, delete: false, edit: false, view: false, document: false, search: false })}
                 title={"Edit Relation"}
-                url=''
+                url={`/editRelation/${dataById.RELATION_ORGANIZATION_ID}`}
                 data={dataById}
                 onSuccess={handleSuccess}
                 method={'patch'}
@@ -552,6 +580,181 @@ export default function Relation({ auth }: PageProps) {
                                     }
                                 </select>
                             </div>
+                        </div>
+                        <div className='grid gap-4 grid-cols-2'>
+                            <div className='mt-4'>
+                                <InputLabel htmlFor="RELATION_ORGANIZATION_NAME" value="Name Relation" />
+                                <TextInput
+                                    id="RELATION_ORGANIZATION_NAME"
+                                    type="text"
+                                    name="RELATION_ORGANIZATION_NAME"
+                                    value={dataById.RELATION_ORGANIZATION_NAME}
+                                    className="mt-2"
+                                    autoComplete="RELATION_ORGANIZATION_NAME"
+                                    onChange={(e) => setDataById({...dataById, RELATION_ORGANIZATION_NAME: e.target.value})}
+                                    required
+                                    placeholder='Name Relation'
+                                />
+                            </div>
+                            <div className='mt-4'>
+                                <InputLabel htmlFor="RELATION_ORGANIZATION_ABBREVIATION" value="Abbreviation" />
+                                <TextInput
+                                    id="RELATION_ORGANIZATION_ABBREVIATION"
+                                    type="text"
+                                    name="RELATION_ORGANIZATION_ABBREVIATION"
+                                    value={dataById.RELATION_ORGANIZATION_ABBREVIATION}
+                                    className="mt-2"
+                                    autoComplete="RELATION_ORGANIZATION_ABBREVIATION"
+                                    onChange={(e) => setDataById({...dataById, RELATION_ORGANIZATION_ABBREVIATION: e.target.value})}
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className='grid gap-4 grid-cols-2'>
+                            <div className='mt-4'>
+                                <InputLabel htmlFor="RELATION_ORGANIZATION_AKA" value="AKA" />
+                                <TextInput
+                                    id="RELATION_ORGANIZATION_AKA"
+                                    type="text"
+                                    name="RELATION_ORGANIZATION_AKA"
+                                    value={dataById.RELATION_ORGANIZATION_AKA}
+                                    className="mt-2"
+                                    autoComplete="RELATION_ORGANIZATION_AKA"
+                                    onChange={(e) => setDataById({...dataById, RELATION_ORGANIZATION_AKA: e.target.value})}
+                                    required
+                                    placeholder='AKA'
+                                />
+                            </div>
+                            <div className='mt-4'>
+                                <InputLabel htmlFor="is_managed" value="HR MANAGED" />
+                                <ul role="list" className="mt-2">
+                                    <li className="col-span-1 flex rounded-md shadow-sm">
+                                        <div className="flex flex-1 items-center justify-between truncate rounded-md shadow-md bg-white">
+                                            <div className="flex-1 truncate px-1 py-2 text-xs h-9">
+                                                <span className="px-2 mt-9">
+                                                    <Checkbox
+                                                        name=""
+                                                        id={""}
+                                                        value={dataById.HR_MANAGED_BY_APP}
+                                                        defaultChecked={checkChecked(dataById.HR_MANAGED_BY_APP)}
+                                                        onChange={(e) => handleCheckboxHREdit(e)}
+                                                        className='mr-2'
+                                                    />
+                                                    HR MANAGED APPS
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className='mt-4'>
+                            <InputLabel htmlFor="RELATION_ORGANIZATION_PARENT_ID" value="Parent" />
+                            <select
+                                className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                value={dataById.RELATION_ORGANIZATION_PARENT_ID}
+                                onChange={(e) => setDataById({ ...dataById, RELATION_ORGANIZATION_PARENT_ID: e.target.value })}
+                            >
+                                <option value={''} className='text-white'>-- Choose Parent --</option>
+                                {
+                                    mappingParent.mapping_parent.map((parents: any, i: number) => {
+                                        return (
+                                            <option key={i} value={parents.RELATION_ORGANIZATION_ID}>{parents.text_combo}</option>
+                                        )
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className='grid gap-4 grid-cols-2'>
+                            <div className='mt-4'>
+                                <InputLabel htmlFor="RELATION_ORGANIZATION_EMAIL" value="Email" />
+                                <TextInput
+                                    id="RELATION_ORGANIZATION_EMAIL"
+                                    type="email"
+                                    name="RELATION_ORGANIZATION_EMAIL"
+                                    value={dataById.RELATION_ORGANIZATION_EMAIL}
+                                    className="mt-2"
+                                    autoComplete="RELATION_ORGANIZATION_EMAIL"
+                                    onChange={(e) => setDataById({...dataById, RELATION_ORGANIZATION_EMAIL: e.target.value})}
+                                    required
+                                    placeholder='example@gmail.com'
+                                />
+                            </div>
+                            <div className='mt-4'>
+                                <InputLabel htmlFor="TAG_NAME" value="Tag" />
+                                <TextInput
+                                    id="TAG_NAME"
+                                    type="text"
+                                    name="TAG_NAME"
+                                    value={dataById.TAG_NAME}
+                                    className="mt-2"
+                                    autoComplete="TAG_NAME"
+                                    onChange={(e) => setDataById({...dataById, TAG_NAME: e.target.value})}
+                                    required
+                                    placeholder='Tag'
+                                />
+                            </div>
+                        </div>
+                        <div className='mt-4'>
+                            <InputLabel htmlFor="relation_type_id" value="Relation Type" />
+                            <div>
+                                <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+                                    {
+                                        relationType.map((typeRelation: any, i: number) => {
+                                            return (
+                                                <li key={typeRelation.RELATION_TYPE_ID} className="col-span-1 flex rounded-md shadow-sm">
+                                                    <div
+                                                        className='flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white'
+                                                    >
+                                                        <Checkbox
+                                                            value={typeRelation.RELATION_TYPE_ID}
+                                                            defaultChecked={checkCheckedMRelation(dataById.RELATION_ORGANIZATION_ID, typeRelation.RELATION_TYPE_ID)}
+                                                            onChange={(e) => handleCheckbox(e)}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
+                                                        <div className="flex-1 truncate px-1 py-2 text-xs">
+                                                            <span className="text-gray-900">
+                                                                {typeRelation.RELATION_TYPE_NAME}
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </li>
+                                            )
+                                        })
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div className='mt-4'>
+                            <InputLabel htmlFor="RELATION_LOB_ID" value="Relation Lob" />
+                            <select
+                                className='mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6'
+                                value={dataById.RELATION_LOB_ID}
+                                onChange={(e) => setDataById({ ...dataById, RELATION_LOB_ID: e.target.value })}
+                            >
+                                <option>-- Choose Relation Lob --</option>
+                                {
+                                    relationLOB.map((rLob: any, i: number) => {
+                                        return (
+                                            <option key={i} value={rLob.RELATION_LOB_ID}>{rLob.RELATION_LOB_NAME}</option>
+                                        )
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className="mt-4">
+                            <InputLabel htmlFor="RELATION_ORGANIZATION_DESCRIPTION" value="Relation Description" />
+                            <TextArea
+                                className='mt-2'
+                                id="RELATION_ORGANIZATION_DESCRIPTION"
+                                name="RELATION_ORGANIZATION_DESCRIPTION"
+                                defaultValue={dataById.RELATION_ORGANIZATION_DESCRIPTION}
+                                onChange={(e) => setDataById({ ...dataById, RELATION_ORGANIZATION_DESCRIPTION: e.target.value })}
+                                required
+                            />
                         </div>
                     </>
                 }

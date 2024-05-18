@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
     Route::post('/getSalutationById', [RelationController::class, 'getSalutation'])->name('getSalutationById.getSalutation');
     Route::get('/getRelation/{id}', [RelationController::class, 'getRelationById'])->name('relation.getRelationById');
+    Route::patch('/editRelation/{id}', [RelationController::class, 'edit'])->name('relation.edit');
 
 
     //Policy

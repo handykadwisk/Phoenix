@@ -42,7 +42,7 @@ class RelationController extends Controller
 
     public function getRelationJson()
     {
-        $data = $this->getRelationData(3);
+        $data = $this->getRelationData(10);
         // print_r($data);
         // die;
         return response()->json($data);
@@ -71,6 +71,8 @@ class RelationController extends Controller
         $salutation = Salutation::get();
         // call data relation status
         $relationStatus = RelationStatus::get();
+        // call mapping relation Type
+        $mRelationType = MRelationType::get();
 
 
 
@@ -80,7 +82,8 @@ class RelationController extends Controller
             'relationLOB' => $relationLob,
             'salutation' => $salutation,
             'relationStatus' => $relationStatus,
-            'relationGroup' => $relationGroup
+            'relationGroup' => $relationGroup,
+            'mRelationType' => $mRelationType
         ]);
     }
 
@@ -176,7 +179,13 @@ class RelationController extends Controller
 
     public function getRelationById($id)
     {
-        $data = Relation::find($id);
+        $data = Relation::join('m_tag_relation', 'm_tag_relation.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
+            ->join('t_tag', 't_tag.TAG_ID', '=', 'm_tag_relation.TAG_ID')->where('t_relation.RELATION_ORGANIZATION_ID', $id)->first();
         return response()->json($data);
+    }
+
+    public function edit(Request $request)
+    {
+        dd($request);
     }
 }
