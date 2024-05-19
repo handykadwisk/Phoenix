@@ -255,4 +255,14 @@ class RelationController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function detail($id)
+    {
+        $test = 'aaa';
+
+
+        return Inertia::render('Relation/DetailRelation', [
+            'test' => $test,
+        ]);
+    }
 }

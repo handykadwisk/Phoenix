@@ -128,7 +128,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarDesktopOpen, setSidebarDe
                               menu.menu_url !== null ?
                                 <li key={index}>
                                   <NavLink
-                                    href={route(`${menu.menu_url}`)} active={route().current(`${menu.menu_url}`)}
+                                    href={route(`${menu.menu_url}`)} active={route().current(`${menu.menu_url}.*`) || route().current(`${menu.menu_url}`)}
                                     className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
                                   >
                                     {menu.menu_name}
@@ -250,7 +250,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarDesktopOpen, setSidebarDe
                     menu.menu_url !== null ?
                     <li key={index}>
                       <NavLink
-                        href={route(`${menu.menu_url}`)} active={route().current(`${menu.menu_url}`)}
+                        href={route(`${menu.menu_url}`)} active={route().current(`${menu.menu_url}.*`) || route().current(`${menu.menu_url}`)}
                         className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
                       >
                         {menu.menu_name}

@@ -847,6 +847,13 @@ export default function Relation({ auth }: PageProps) {
                                                                 >
                                                                     Edit
                                                                 </a>
+                                                                <a 
+                                                                    href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
+                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                    // onClick={(e) => handleView(e, dataRelation.RELATION_ORGANIZATION_ID)}
+                                                                >
+                                                                    Detail
+                                                                </a>
                                                             </>
                                                         }
                                                     />
