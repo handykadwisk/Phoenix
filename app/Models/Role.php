@@ -18,7 +18,7 @@ class Role extends Model
 
     public function menu()
     {
-        return $this->belongsToMany(Menu::class, 'm_role_access_menu')->where('menu_is_deleted', 0);
+        return $this->belongsToMany(Menu::class, 'm_role_access_menu')->where('menu_is_deleted', 0)->orderBy('menu_sequence', 'asc');
     }
 
     public $timestamps = false;

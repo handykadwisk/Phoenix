@@ -31,6 +31,11 @@ class Menu extends Model
 
     public function children()
     {
-        return $this->hasMany(Menu::class, 'menu_parent_id')->where('menu_is_deleted', 0);
+        return $this->hasMany(Menu::class, 'menu_parent_id')->where('menu_is_deleted', 0)->orderBy('menu_sequence', 'asc');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'menu_parent_id')->where('menu_is_deleted', 0)->orderBy('menu_sequence', 'asc');
     }
 }

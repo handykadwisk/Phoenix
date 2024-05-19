@@ -13,6 +13,7 @@ export default function ModalToAction({
     body,
     url,
     data,
+    addOns,
     method,
     onSuccess,
     headers,
@@ -25,6 +26,7 @@ export default function ModalToAction({
     body: any;
     url: string;
     data: any | null;
+    addOns: any | null;
     method: string;
     onSuccess: any;
     headers: any|null|undefined;
@@ -45,6 +47,7 @@ export default function ModalToAction({
     })
 
     const action = async (e: any) => {
+        console.log(data);
         e.preventDefault()
 
         setIsProcessing(true)

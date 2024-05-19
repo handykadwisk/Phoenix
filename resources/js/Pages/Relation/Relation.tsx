@@ -13,6 +13,7 @@ import TextInput from '@/Components/TextInput';
 import { FormEvent, Fragment, useEffect, useState } from 'react';
 import { InertiaFormProps } from '@inertiajs/react/types/useForm';
 import TablePage from '@/Components/Table/Table';
+import Pagination from '@/Components/Pagination';
 import axios from 'axios';
 import { link } from 'fs';
 import dateFormat from 'dateformat';
@@ -71,6 +72,7 @@ export default function Relation({ auth }: PageProps) {
 
     const [isSuccess, setIsSuccess] = useState<string>('')
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [mRelation, setMRelation] = useState<any>([])
 
     const getMappingParent = async (name: string, column: string) => {
 
@@ -125,7 +127,7 @@ export default function Relation({ auth }: PageProps) {
         RELATION_ORGANIZATION_GROUP: '',
         RELATION_ORGANIZATION_NAME: '',
         RELATION_ORGANIZATION_PARENT_ID: '',
-        abbreviation: '',
+        RELATION_ORGANIZATION_ABBREVIATION: '',
         RELATION_ORGANIZATION_AKA: '',
         RELATION_ORGANIZATION_EMAIL: '',
         relation_description: '',
@@ -134,7 +136,11 @@ export default function Relation({ auth }: PageProps) {
         relation_status_id: '',
         TAG_NAME: '',
         HR_MANAGED_BY_APP: '',
-        relation_type_id: []
+        m_relation_type: [{
+            RELATION_ORGANIZATION_TYPE_ID:'',
+            RELATION_ORGANIZATION_ID:'',
+            RELATION_TYPE_ID:'',
+        }]
     })
 
     const handleSuccess = (message: string) => {
@@ -166,6 +172,7 @@ export default function Relation({ auth }: PageProps) {
         await axios.get(`/getRelation/${id}`)
             .then((res) => {
                 setDataById(res.data)
+                setMRelation(res.data.m_relation_type)
                 getSalutationById(res.data.relation_status_id, 'relation_status_id')
                 getMappingParent(res.data.RELATION_ORGANIZATION_GROUP, 'RELATION_ORGANIZATION_GROUP')
             
@@ -173,6 +180,24 @@ export default function Relation({ auth }: PageProps) {
             .catch((err) => console.log(err))
 
         setModal({ add: false, delete: false, edit: !modal.edit, view: false, document: false })
+    }
+
+    const handleCheckboxEdit = (e: any) => {
+        const {value, checked} = e.target
+
+        if (checked) {
+            setDataById({...dataById, m_relation_type: [
+                ...dataById.m_relation_type,
+                {
+                    RELATION_ORGANIZATION_TYPE_ID:'',
+                    RELATION_ORGANIZATION_ID:dataById.RELATION_ORGANIZATION_ID,
+                    RELATION_TYPE_ID:value,
+                }
+            ]})
+        } else {
+            const updatedData = dataById.m_relation_type.filter((data: any) => data.RELATION_TYPE_ID !== parseInt(value))
+            setDataById({...dataById, m_relation_type: updatedData})   
+        }
     }
 
     const checkChecked = (id: number) => {
@@ -184,7 +209,7 @@ export default function Relation({ auth }: PageProps) {
     }
 
     const checkCheckedMRelation = (id: number, idr: number) => {
-        if (mRelationType.find((f: any) => f.RELATION_ORGANIZATION_ID === id && f.RELATION_TYPE_ID === idr)) {
+        if (dataById.m_relation_type.find((f: any) => f.RELATION_ORGANIZATION_ID === id && f.RELATION_TYPE_ID === idr)) {
             return true
         }
     }
@@ -514,6 +539,7 @@ export default function Relation({ auth }: PageProps) {
                 title={"Edit Relation"}
                 url={`/editRelation/${dataById.RELATION_ORGANIZATION_ID}`}
                 data={dataById}
+                addOns={mRelation}
                 onSuccess={handleSuccess}
                 method={'patch'}
                 headers={null}
@@ -710,7 +736,7 @@ export default function Relation({ auth }: PageProps) {
                                                         <Checkbox
                                                             value={typeRelation.RELATION_TYPE_ID}
                                                             defaultChecked={checkCheckedMRelation(dataById.RELATION_ORGANIZATION_ID, typeRelation.RELATION_TYPE_ID)}
-                                                            onChange={(e) => handleCheckbox(e)}
+                                                            onChange={(e) => handleCheckboxEdit(e)}
                                                         />
                                                     </div>
                                                     <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
@@ -831,8 +857,15 @@ export default function Relation({ auth }: PageProps) {
                                     )
                                 })
                             }
-
-
+                            pagination={
+                                <Pagination 
+                                links={relations.links} 
+                                fromData={relations.from} 
+                                toData={relations.to} 
+                                totalData={relations.total} 
+                                clickHref={(url: string) => getRelation(url.split('?').pop())}
+                                />
+                                }
                         />
 
 

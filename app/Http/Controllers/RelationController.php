@@ -22,6 +22,11 @@ use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 
 class RelationController extends Controller
 {
+    public function getOldRelation($id)
+    {
+        $oldRelation = Relation::where('RELATION_ORGANIZATION_ID', $id)->get();
+        return $oldRelation;
+    }
 
     public function getRelationData($dataPerPage = 2)
     {
@@ -42,7 +47,7 @@ class RelationController extends Controller
 
     public function getRelationJson()
     {
-        $data = $this->getRelationData(10);
+        $data = $this->getRelationData(5);
         // print_r($data);
         // die;
         return response()->json($data);
@@ -186,6 +191,68 @@ class RelationController extends Controller
 
     public function edit(Request $request)
     {
-        dd($request);
+        // cek apakah ganti group apa engga
+        $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
+        $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
+        if ($oldGroup != $request->RELATION_ORGANIZATION_GROUP) {
+            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+                ->update([
+                    'RELATION_ORGANIZATION_GROUP'         => $request->RELATION_ORGANIZATION_GROUP,
+                ]);
+        }
+
+
+        // Cek Relation Perent Id 
+        $parentID = $request->parent_id;
+        if ($request->parent_id == '' || $request->parent_id == NULL) {
+            $parentID = "0";
+        }
+
+        // Update Relation
+        $relation = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+            ->update([
+                'RELATION_ORGANIZATION_NAME' => $request->RELATION_ORGANIZATION_NAME,
+                'RELATION_ORGANIZATION_PARENT_ID' => $request->RELATION_ORGANIZATION_PARENT_ID,
+                'RELATION_ORGANIZATION_ABBREVIATION' => $request->RELATION_ORGANIZATION_ABBREVIATION,
+                'RELATION_ORGANIZATION_AKA' => $request->RELATION_ORGANIZATION_AKA,
+                'RELATION_ORGANIZATION_MAPPING' => NULL,
+                'HR_MANAGED_BY_APP' => $request->HR_MANAGED_BY_APP,
+                'RELATION_ORGANIZATION_UPDATED_BY' => Auth::user()->id,
+                'RELATION_ORGANIZATION_UPDATED_DATE' => now(),
+                'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
+                'RELATION_ORGANIZATION_ALIAS' => $request->RELATION_ORGANIZATION_NAME,
+                'RELATION_ORGANIZATION_EMAIL' => $request->RELATION_ORGANIZATION_EMAIL,
+                'RELATION_LOB_ID' => $request->RELATION_LOB_ID,
+                'salutation_id' => $request->salutation_id,
+                'relation_status_id' => $request->relation_status_id
+            ]);
+
+        // Mapping Parent Id and Update
+        DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
+
+        // check existing relation_type_id in m_relation_type, if exists, delete first
+        $existingData = MRelationType::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
+
+        if ($existingData->count() > 0) {
+            MRelationType::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->delete();
+        }
+
+        // print_r($request->m_relation_type);
+        // die;
+
+        // Created Mapping Relation Type
+        for ($i = 0; $i < sizeof($request->m_relation_type); $i++) {
+            $idRelationType = $request->m_relation_type[$i]["RELATION_TYPE_ID"];
+            MRelationType::create([
+                'RELATION_ORGANIZATION_ID' => $request->RELATION_ORGANIZATION_ID,
+                'RELATION_TYPE_ID' => $idRelationType
+            ]);
+        }
+
+        return new JsonResponse([
+            'New relation edited.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

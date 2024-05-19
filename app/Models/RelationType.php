@@ -14,4 +14,9 @@ class RelationType extends Model
     protected $table = 't_relation_type';
 
     public $timestamps = false;
+
+    public function relation()
+    {
+        return $this->belongsToMany(Relation::class, 'm_relation_type');
+    }
 }
