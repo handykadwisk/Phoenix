@@ -2,7 +2,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { PropsWithChildren } from "react";
 import Button from "../Button/Button";
 
-export default function Table({ 
+export default function Index({ 
     addButtonLabel,
     addButtonModalState = () => {},
     searchButtonModalState = () => {},

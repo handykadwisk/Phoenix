@@ -37,7 +37,8 @@ class Relation extends Model
         'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME',
         'RELATION_LOB_ID',
         'salutation_id',
-        'relation_status_id'
+        'relation_status_id',
+        'is_deleted'
     ];
 
     public $timestamps = false;

@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 import defaultImage from '../../Images/user/default.jpg';
+import BreadcrumbPage from '@/Components/Breadcrumbs/BreadcrumbPage';
 import { PageProps } from '@/types';
 
 export default function DetailRelation({ auth }: PageProps) {
@@ -15,11 +16,20 @@ export default function DetailRelation({ auth }: PageProps) {
         >
             <Head title="Detail Relation" />
 
-            <div>
-            <dl className="mt-5">
+            <BreadcrumbPage
+                firstPage=""
+                secondPage="Relation"
+                threePage="Detail Relation"
+                urlFirstPage="/dashboard"
+                urlSecondPage="/relation"
+                urlThreePage=""
+            />
 
+            <div>
+            <dl className="mt-0">
+                {/* Top */}
                 <div className='grid grid-cols-3 gap-4 xs:grid-cols-1 md:grid-cols-3'>
-                    <div className="rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+                    <div className="rounded-lg bg-white px-4 py-5 shadow-md sm:p-6">
                         {/* profile */}
                         <div className=''>
                             <div className="p-5">
@@ -37,47 +47,167 @@ export default function DetailRelation({ auth }: PageProps) {
                         </div>
                         {/* end profile */}
                     </div>
-                    <div className="rounded-lg bg-white px-4 py-5 shadow col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
+                    {/* All Information */}
+                    <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
                         <div className='bg-red-600 w-44 p-2 text-center rounded-md text-white'>
                             <span>
                                 Offical Information
                             </span>
                         </div>
                         <div className='grid gap-x-2 gap-y-2 grid-cols-3 mt-4 ml-3'>
-                            <div className='bg-red-300'>
+                            <div className=''>
                                 <span>Group</span><br></br>
                                 <span className='font-normal text-gray-500'>FRESNEL</span>
                             </div>
-                            <div className='bg-red-300'>
+                            <div className=''>
                                 <span>Email</span><br></br>
                                 <span className='font-normal text-gray-500'>fresnel@gmail.co.id</span>
                             </div>
-                            <div className='bg-red-300'>
+                            <div className=''>
                                 <span>Address</span><br></br>
                                 <span className='font-normal text-gray-500'>Jl.Gatot Subroto, Kuningan, Mampang Perampatan, Jakarta Selatan</span>
                             </div>
                         </div>
-                        <div className='bg-red-600 w-44 p-2 text-center rounded-md text-white mt-2'>
+                        <hr className='mt-5'/>
+                        <div className='bg-red-600 w-44 p-2 text-center rounded-md text-white mt-10'>
                             <span>
                                 Tags
                             </span>
                         </div>
-                        <div className='grid gap-x-2 gap-y-2 grid-cols-3 mt-4 ml-3'>
-                            <div className='bg-red-300'>
-                                <span>Group</span><br></br>
-                                <span className='font-normal text-gray-500'>FRESNEL</span>
-                            </div>
-                            <div className='bg-red-300'>
-                                <span>Email</span><br></br>
-                                <span className='font-normal text-gray-500'>fresnel@gmail.co.id</span>
-                            </div>
-                            <div className='bg-red-300'>
-                                <span>Address</span><br></br>
-                                <span className='font-normal text-gray-500'>Jl.Gatot Subroto, Kuningan, Mampang Perampatan, Jakarta Selatan</span>
+                        <div className='grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+                            <div className='grid grid-cols-5 col-span-2 gap-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4'>
+                                <div className='bg-red-400 p-2 rounded-full w-full'>
+                                    <div className='grid gap-4 grid-cols-2 ml-2'>
+                                        <div className='text-white xs:text-sm'>Tagging</div>
+                                        <a href="">
+                                            <div className='flex justify-center place-items-end text-white'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className='bg-red-400 p-2 rounded-full w-full'>
+                                    <div className='grid gap-4 grid-cols-2 ml-2'>
+                                        <div className='text-white xs:text-sm'>Tagging</div>
+                                        <a href="">
+                                            <div className='flex justify-center place-items-end text-white'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className='bg-red-400 p-2 rounded-full w-full'>
+                                    <div className='grid gap-4 grid-cols-2 ml-2'>
+                                        <div className='text-white xs:text-sm'>Tagging</div>
+                                        <a href="">
+                                            <div className='flex justify-center place-items-end text-white'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className='bg-red-400 p-2 rounded-full w-full'>
+                                    <div className='grid gap-4 grid-cols-2 ml-2'>
+                                        <div className='text-white xs:text-sm'>Tagging</div>
+                                        <a href="">
+                                            <div className='flex justify-center place-items-end text-white'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className='bg-red-400 p-2 rounded-full w-full'>
+                                    <div className='grid gap-4 grid-cols-2 ml-2'>
+                                        <div className='text-white xs:text-sm'>Tagging</div>
+                                        <a href="">
+                                            <div className='flex justify-center place-items-end text-white'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className='bg-red-400 p-2 rounded-full w-full'>
+                                    <div className='grid gap-4 grid-cols-2 ml-2'>
+                                        <div className='text-white xs:text-sm'>Tagging</div>
+                                        <a href="">
+                                            <div className='flex justify-center place-items-end text-white'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    {/* end all information */}
                 </div>
+                {/* End Top */}
+
+                {/* Structure */}
+                <div className='grid gap-x-8 gap-y-4 grid-cols-4 mt-6 xs:grid-cols-2 xs:gap-x-3 lg:grid-cols-4'>
+                    <div className='bg-white p-5 shadow-md rounded-lg'>
+                        <div className='flex justify-center items-center'>
+                            <img
+                            className="h-24 w-24 rounded-full border-2 bg-gray-50"
+                            src={defaultImage}
+                            alt=""
+                            />
+                        </div>
+                        <div className='flex justify-center items-center mt-5'>
+                            <span>Person</span>
+                        </div>
+                    </div>
+                    <div className='bg-white p-5 shadow-md rounded-lg'>
+                        <div className='flex justify-center items-center'>
+                            <img
+                            className="h-24 w-24 rounded-full border-2 bg-gray-50"
+                            src={defaultImage}
+                            alt=""
+                            />
+                        </div>
+                        <div className='flex justify-center items-center mt-5'>
+                            <span>Person</span>
+                        </div>
+                    </div>
+                    <div className='bg-white p-5 shadow-md rounded-lg'>
+                        <div className='flex justify-center items-center'>
+                            <img
+                            className="h-24 w-24 rounded-full border-2 bg-gray-50"
+                            src={defaultImage}
+                            alt=""
+                            />
+                        </div>
+                        <div className='flex justify-center items-center mt-5'>
+                            <span>Person</span>
+                        </div>
+                    </div>
+                    <div className='bg-white p-5 shadow-md rounded-lg'>
+                        <div className='flex justify-center items-center'>
+                            <img
+                            className="h-24 w-24 rounded-full border-2 bg-gray-50"
+                            src={defaultImage}
+                            alt=""
+                            />
+                        </div>
+                        <div className='flex justify-center items-center mt-5'>
+                            <span>Person</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* end Structure */}
                 
             </dl>
             </div>

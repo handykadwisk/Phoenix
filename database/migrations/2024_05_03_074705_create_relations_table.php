@@ -34,6 +34,7 @@ return new class extends Migration
             $table->timestamp('RELATION_LOB_ID')->nullable();
             $table->bigInteger('salutation_id')->nullable();
             $table->bigInteger('relation_status_id')->nullable();
+            $table->bigInteger('is_deleted')->nullable();
         });
     }
 
