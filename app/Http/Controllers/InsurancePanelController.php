@@ -8,17 +8,25 @@ use App\Models\MPolicyInitialPremium;
 use App\Models\Policy;
 use App\Models\RInsuranceType;
 use App\Models\UserLog;
+// use Dotenv\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+// use Nette\Utils\Validators;
 
 class InsurancePanelController extends Controller
 {
     public function getInsurancPanelData ($dataPerPage = 10, $searchQuery = null) {
         
-        $data = InsurancePanel::orderBy('IP_ID', 'desc');
+        // $data = InsurancePanel::orderBy('IP_ID', 'desc');
+        $data = InsurancePanel::leftJoin('t_policy', 't_insurance_panel.POLICY_ID', '=', 't_policy.POLICY_ID')
+        ->leftJoin('t_relation', 't_insurance_panel.INSURANCE_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
+        ->leftJoin('r_currency', 't_insurance_panel.IP_CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
+        ->orderBy('IP_ID', 'desc');
+        // dd($data->paginate(10));
 
         if ($searchQuery) {
             // if ($searchQuery->input('policy_number')) {
@@ -79,7 +87,7 @@ class InsurancePanelController extends Controller
 
     public function store(Request $request) {
 
-        dd($request);
+        // dd($request);
         
         // Create Policy
         $insurancePanel = InsurancePanel::insertGetId([
@@ -156,75 +164,100 @@ class InsurancePanelController extends Controller
 
     }
 
-    public function edit(Request $request, MPolicyInitialPremium $insurancePanel) {
+    public function edit(Request $request, InsurancePanel $insurancePanel) {
 
-        $validateData = Validator::make($request->all(), [
-            'RELATION_ID'           => 'required',
-            'POLICY_NUMBER'         => 'required',
-            'INSURANCE_TYPE_ID'     => 'required',
-            'POLICY_THE_INSURED'    => 'required|string',
-            'POLICY_INCEPTION_DATE' => 'required|date',
-            'POLICY_DUE_DATE'       => 'required|date',
-            'POLICY_INSURANCE_PANEL' => 'required|number',
-            'POLICY_SHARE'          => 'required|number',
-            'policy_initial_premium.*.CURRENCY_ID'        => 'required',
-        ], [
-            'required'                                        => ':attribute is required.',
-            'policy_initial_premium.*.CURRENCY_ID.required'        => 'Currency in Initial Premium is required.',
-            // 'insurance_panel.*.insurance_panel_share.required' => 'Share in Insurance Panel is required.',
-        ]);
+        // dd($request);
+        // $validateData = Validator::make($request->all(), [
+        //     'POLICY_ID'                     =>  'required',
+        //     // 'POLICY_INITIAL_PREMIUM_ID'     =>  'required', // Belum ada isi
+        //     'IP_PREMIUM_TYPE'               =>  'required',
+        //     'INSURANCE_ID'                  =>  'required',
+        //     // 'IP_POLICY_LEADER'              =>  'required', // Belum ada isi
+        //     // 'IP_CURRENCY_ID'                =>  'required', // Belum ada isi
+        //     'IP_TERM'                       =>  'required',
+        //     'IP_POLICY_INITIAL_PREMIUM'     =>  'required',
+        //     'IP_POLICY_SHARE'               =>  'required',
+        //     'IP_DISC_INSURANCE'             =>  'required',
+        //     'IP_PIP_AFTER_DISC'             =>  'required',
+        //     'IP_POLICY_BF'                  =>  'required',
+        //     'IP_BF_AMOUNT'                  =>  'required',
+        //     'IP_VAT'                        =>  'required',
+        //     'IP_PPH_23'                     =>  'required',
+        //     'IP_NET_BF'                     =>  'required',
+        //     // 'IP_PAYMENT_METHOD'             =>  'required', // Belum ada isi
+        //     // 'IP_VAT_AMOUNT'                 =>  'required', // Belum ada isi
+        //     // 'IP_CREATED_BY'                 =>  'required',// Belum ada isi
+            
+        // ], [
+        //     'required'                                        => ':attribute is required.',
+        //     'installment.*.INSTALLMENT_TERM.required'        => 'Currency in Initial Premium is required.',
+        //     // 'insurance_panel.*.insurance_panel_share.required' => 'Share in Insurance Panel is required.',
+        // ]);
         
-        $policy = Policy::where('policy_id', $request->id)
+        $insurancePanel = InsurancePanel::where('IP_ID', $request->id)
                         ->update([
-                            'RELATION_ID'           => $request->RELATION_ID,
-                            'POLICY_NUMBER'         => $request->POLICY_NUMBER,
-                            'INSURANCE_TYPE_ID'     => $request->INSURANCE_TYPE_ID,
-                            'POLICY_THE_INSURED'    => $request->POLICY_THE_INSURED,
-                            'POLICY_INCEPTION_DATE' => $request->POLICY_INCEPTION_DATE,
-                            'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
-                            'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
-                            'POLICY_INSURANCE_PANEL' => $request->POLICY_INSURANCE_PANEL,
-                            'POLICY_SHARE'          => $request->POLICY_SHARE,
-                            'POLICY_UPDATED_BY'      => Auth::user()->id,
-                            'POLICY_UPDATED_DATE'   => now()
+                            'POLICY_ID'                     => $request->POLICY_ID,
+                            'POLICY_INITIAL_PREMIUM_ID'     => $request->POLICY_INITIAL_PREMIUM_ID, // Belum ada isi
+                            'IP_PREMIUM_TYPE'               => $request->IP_PREMIUM_TYPE,
+                            'INSURANCE_ID'                  => $request->INSURANCE_ID,
+                            'IP_POLICY_LEADER'              => $request->IP_POLICY_LEADER, // Belum ada isi
+                            'IP_CURRENCY_ID'                => $request->IP_CURRENCY_ID, // Belum ada isi
+                            'IP_TERM'                       => $request->IP_TERM,
+                            'IP_POLICY_INITIAL_PREMIUM'     => $request->IP_POLICY_INITIAL_PREMIUM,
+                            'IP_POLICY_SHARE'               => $request->IP_POLICY_SHARE,
+                            'IP_DISC_INSURANCE'             => $request->IP_DISC_INSURANCE,
+                            'IP_PIP_AFTER_DISC'             => $request->IP_PIP_AFTER_DISC,
+                            'IP_POLICY_BF'                  => $request->IP_POLICY_BF,
+                            'IP_BF_AMOUNT'                  => $request->IP_BF_AMOUNT,
+                            'IP_VAT'                        => $request->IP_VAT,
+                            'IP_PPH_23'                     => $request->IP_PPH_23,
+                            'IP_NET_BF'                     => $request->IP_NET_BF,
+                            'IP_PAYMENT_METHOD'             => $request->IP_PAYMENT_METHOD, // Belum ada isi
+                            'IP_VAT_AMOUNT'                 => $request->IP_VAT_AMOUNT, // Belum ada isi
+                            'IP_UPDATED_BY'                 => Auth::user()->id,
+                            'IP_UPDATED_DATE'               => now()
                         ]);
                         
-        foreach ($request->policy_initial_premium as $req) {
-            MPolicyInitialPremium::updateOrCreate(
+        foreach ($request->installment as $req) {
+            Installment::updateOrCreate(
                 [
-                    'POLICY_INITIAL_PREMIUM_ID'    => $req['POLICY_INITIAL_PREMIUM_ID']
+                    'INSTALLMENT_ID'    => $req['INSTALLMENT_ID']
                 ],
                 [
-                    'POLICY_ID' => $req['POLICY_ID'],
-                    'CURRENCY_ID' => $req['CURRENCY_ID'],
-                    'SUM_INSURED' => $req['SUM_INSURED'],
-                    'RATE' => $req['RATE'],
-                    'INITIAL_PREMIUM' => $req['INITIAL_PREMIUM'],
-                    'INSTALLMENT' => $req['INSTALLMENT'],
-                    'UPDATED_BY' => Auth::user()->id,
-                    'UPDATED_DATE' => now()
+                    // 'INSURANCE_PANEL_ID'        => $insurancePanel,
+                    'INSTALLMENT_TERM'          => $req['INSTALLMENT_TERM'], // Belum ada isi
+                    'INSTALLMENT_PERCENTAGE'    => $req['INSTALLMENT_PERCENTAGE'],
+                    'INSTALLMENT_DUE_DATE'      => $req['INSTALLMENT_DUE_DATE'],
+                    'INSTALLMENT_AR'            => $req['INSTALLMENT_AR'],
+                    'INSTALLMENT_AP'            => $req['INSTALLMENT_AP'],
+                    'INSTALLMENT_GROSS_BF'      => $req['INSTALLMENT_GROSS_BF'],
+                    'INSTALLMENT_VAT'           => $req['INSTALLMENT_VAT'],
+                    'INSTALLMENT_PPH_23'        => $req['INSTALLMENT_PPH_23'],
+                    'INSTALLMENT_NET_BF'        => $req['INSTALLMENT_NET_BF'],
+                    'INSTALLMENT_ADMIN_COST'    => $req['INSTALLMENT_ADMIN_COST'],
+                    'INSTALLMENT_POLICY_COST'   => $req['INSTALLMENT_POLICY_COST']
                 ]
             );
         }
         
-        if ($request->deletedInitialPremium) {
-            foreach ($request->deletedInitialPremium as $del) {
-                MPolicyInitialPremium::where('POLICY_INITIAL_PREMIUM_ID', $del['policy_initial_premium_id'])->delete();
+        if ($request->deleteInstallment) {
+            foreach ($request->deleteInstallment as $del) {
+                Installment::where('INSTALLMENT_ID', $del['INSTALLMENT_ID'])->delete();
             }
         }
 
         UserLog::create([
             'created_by' => Auth::user()->id,
             'action'     => json_encode([
-                "description" => "Edit policy.",
-                "module"      => "Policy",
+                "description" => "Edit Insurance Panel.",
+                "module"      => "Insurance Panel",
                 "id"          => $request->id
             ]),
             'action_by'  => Auth::user()->email
         ]);
 
         return new JsonResponse([
-            'Policy updated.'
+            'Insurance Panel updated.'
         ], 200, [
             'X-Inertia' => true
         ]);

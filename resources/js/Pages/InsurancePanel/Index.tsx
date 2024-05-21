@@ -66,7 +66,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             });
     };
 
-    // console.log(insurance);
+    console.log(insurancePanels);
     const client = [
         { id: "1", stat: "CHUBB" },
         { id: "2", stat: "BRINS" },
@@ -124,42 +124,42 @@ export default function PolicyIndex({ auth }: PageProps) {
         ],
     });
     const [dataById, setDataById] = useState<any>({
-        policy_id: "",
-        policy_initial_premium_id: "",
-        ip_premium_type: "",
-        insurance_id: "",
-        ip_policy_leader: "",
-        ip_currency_id: "",
-        ip_term: "",
-        ip_policy_initial_premium: "",
-        ip_policy_share: "",
-        ip_disc_insurance: "",
-        ip_pip_after_disc: "",
-        ip_policy_bf: "",
-        ip_bf_amount: "",
-        ip_vat: "",
-        ip_pph_23: "",
-        ip_net_bf: "",
-        ip_payment_method: "",
-        ip_vat_amount: "",
+        POLICY_ID: "",
+        POLICY_INITIAL_PREMIUM_ID: "",
+        IP_PREMIUM_TYPE: "",
+        INSURANCE_ID: "",
+        IP_POLICY_LEADER: "",
+        IP_CURRENCY_ID: "",
+        IP_TERM: "",
+        IP_POLICY_INITIAL_PREMIUM: "",
+        IP_POLICY_SHARE: "",
+        IP_DISC_INSURANCE: "",
+        IP_PIP_AFTER_DISC: "",
+        IP_POLICY_BF: "",
+        IP_BF_AMOUNT: "",
+        IP_VAT: "",
+        IP_PPH_23: "",
+        IP_NET_BF: "",
+        IP_PAYMENT_METHOD: "",
+        IP_VAT_AMOUNT: "",
         installment: [
             {
-                installment_term: "",
-                installment_percentage: "",
-                installment_due_date: "",
-                installment_ar: "",
-                installment_ap: "",
-                installment_gross_bf: "",
-                installment_vat: "",
-                installment_pph_23: "",
-                installment_net_bf: "",
-                installment_admin_cost: "",
-                installment_policy_cost: "",
+                INSTALLMENT_TERM: "",
+                INSTALLMENT_PERCENTAGE: "",
+                INSTALLMENT_DUE_DATE: "",
+                INSTALLMENT_AR: "",
+                INSTALLMENT_AP: "",
+                INSTALLMENT_GROSS_BF: "",
+                INSTALLMENT_VAT: "",
+                INSTALLMENT_PPH_23: "",
+                INSTALLMENT_NET_BF: "",
+                INSTALLMENT_ADMIN_COST: "",
+                INSTALLMENT_POLICY_COST: "",
             },
         ],
         deletedInstallment: [
             {
-                policy_iniinstatial_premium_id: "",
+                INSTALLMENT_ID: "",
             },
         ],
     });
@@ -176,22 +176,37 @@ export default function PolicyIndex({ auth }: PageProps) {
         setIsSuccess("");
         reset();
         setData({
-            relation_id: "",
-            policy_number: "",
-            insurance_type_id: "",
-            policy_the_insured: "",
-            policy_inception_date: "",
-            policy_due_date: "",
-            policy_status_id: "",
-            policy_insurance_panel: "",
-            policy_share: "",
-            initialPremium: [
+            policy_id: "",
+            policy_initial_premium_id: "",
+            ip_premium_type: "",
+            insurance_id: "",
+            ip_policy_leader: "",
+            ip_currency_id: "",
+            ip_term: "",
+            ip_policy_initial_premium: "",
+            ip_policy_share: "",
+            ip_disc_insurance: "",
+            ip_pip_after_disc: "",
+            ip_policy_bf: "",
+            ip_bf_amount: "",
+            ip_vat: "",
+            ip_pph_23: "",
+            ip_net_bf: "",
+            ip_payment_method: "",
+            ip_vat_amount: "",
+            installment: [
                 {
-                    currency_id: "",
-                    sum_insured: "",
-                    rate: "",
-                    initial_premium: "",
-                    installment: "",
+                    installment_term: "",
+                    installment_percentage: "",
+                    installment_due_date: "",
+                    installment_ar: "",
+                    installment_ap: "",
+                    installment_gross_bf: "",
+                    installment_vat: "",
+                    installment_pph_23: "",
+                    installment_net_bf: "",
+                    installment_admin_cost: "",
+                    installment_policy_cost: "",
                 },
             ],
         });
@@ -296,17 +311,17 @@ export default function PolicyIndex({ auth }: PageProps) {
             installment: [
                 ...dataById.installment,
                 {
-                    installment_term: "",
-                    installment_percentage: "",
-                    installment_due_date: "",
-                    installment_ar: "",
-                    installment_ap: "",
-                    installment_gross_bf: "",
-                    installment_vat: "",
-                    installment_pph_23: "",
-                    installment_net_bf: "",
-                    installment_admin_cost: "",
-                    installment_policy_cost: "",
+                    INSTALLMENT_TERM: "",
+                    INSTALLMENT_PERCENTAGE: "",
+                    INSTALLMENT_DUE_DATE: "",
+                    INSTALLMENT_AR: "",
+                    INSTALLMENT_AP: "",
+                    INSTALLMENT_GROSS_BF: "",
+                    INSTALLMENT_VAT: "",
+                    INSTALLMENT_PPH_23: "",
+                    INSTALLMENT_NET_BF: "",
+                    INSTALLMENT_ADMIN_COST: "",
+                    INSTALLMENT_POLICY_COST: "",
                 },
             ],
         });
@@ -319,17 +334,17 @@ export default function PolicyIndex({ auth }: PageProps) {
             dataById.installment[i].installment_id !==
             null
         ) {
-            if (dataById.deletedInitialPremium) {
+            if (dataById.deletedInstallment) {
                 // alert("a");
                 setDataById({
                     ...dataById,
                     installment: val,
-                    deletedInitialPremium: [
-                        ...dataById.deletedInitialPremium,
+                    deletedInstallment: [
+                        ...dataById.deletedInstallment,
                         {
-                            installment_id:
+                            INSTALLMENT_ID:
                                 dataById.installment[i]
-                                    .installment_ID,
+                                    .INSTALLMENT_ID,
                         },
                     ],
                 });
@@ -338,11 +353,10 @@ export default function PolicyIndex({ auth }: PageProps) {
                 setDataById({
                     ...dataById,
                     installment: val,
-                    deletedInitialPremium: [
+                    deletedInstallment: [
                         {
-                            installment_id:
-                                dataById.installment[i]
-                                    .installment_ID,
+                            INSTALLMENT_ID:
+                                dataById.installment[i].INSTALLMENT_ID,
                         },
                     ],
                 });
@@ -420,7 +434,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                 body={
                                     <>
                                         <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="policy_number"
                                                     value="Policy Number"
@@ -428,22 +442,18 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 <select
                                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     value={data.policy_id}
-                                                    onChange={(e) =>{
-                                                            // console.log((e.target.value).split('|')[0])
-                                                            setData(
-                                                                "policy_id",
-                                                                (e.target.value).split('|')[0]
-                                                            ),
-                                                            setData(
-                                                                "policy_initial_premium_id",
-                                                                (e.target.value).split('|')[1]
-                                                            )
-                                                        }
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "policy_id",
+                                                            e.target.value
+                                                        )
                                                     }
                                                 >
                                                     <option>
                                                         --{" "}
-                                                        <i>Choose Policy Number</i>{" "}
+                                                        <i>
+                                                            Choose Policy Number
+                                                        </i>{" "}
                                                         --
                                                     </option>
                                                     {listInitialPremium.map(
@@ -455,7 +465,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                 <option
                                                                     key={i}
                                                                     value={
-                                                                        initialPremium.POLICY_ID +"|"+ initialPremium.POLICY_INITIAL_PREMIUM_ID
+                                                                        initialPremium.POLICY_ID
                                                                     }
                                                                 >
                                                                     {initialPremium.POLICY_NUMBER +
@@ -467,14 +477,14 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     )}
                                                 </select>
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="premium_type"
                                                     value="Premium Type"
                                                 />
                                                 <select
                                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                    value={dataById.ip_premium_type}
+                                                    value={data.ip_premium_type}
                                                     onChange={(e) =>
                                                         setData(
                                                             "ip_premium_type",
@@ -483,7 +493,8 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     }
                                                 >
                                                     <option>
-                                                        -- <i>Choose Status</i> --
+                                                        -- <i>Choose Status</i>{" "}
+                                                        --
                                                     </option>
                                                     {premiumType?.map(
                                                         (status: any) => {
@@ -493,7 +504,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                         status.id
                                                                     }
                                                                 >
-                                                                    {status.stat}
+                                                                    {
+                                                                        status.stat
+                                                                    }
                                                                 </option>
                                                             );
                                                         }
@@ -502,7 +515,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
                                         <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="insurance_id"
                                                     value="Insurance"
@@ -518,7 +531,10 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     }
                                                 >
                                                     <option>
-                                                        -- <i>Choose Client Name</i>{" "}
+                                                        --{" "}
+                                                        <i>
+                                                            Choose Client Name
+                                                        </i>{" "}
                                                         --
                                                     </option>
                                                     {insurance.map(
@@ -542,7 +558,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     )}
                                                 </select>
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="policy_leader"
                                                     value="Policy Leader"
@@ -560,7 +576,8 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                             onChange={(e) =>
                                                                 setData(
                                                                     "ip_policy_leader",
-                                                                    e.target.value
+                                                                    e.target
+                                                                        .value
                                                                 )
                                                             }
                                                             className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
@@ -584,7 +601,8 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                             onChange={(e) =>
                                                                 setData(
                                                                     "ip_policy_leader",
-                                                                    e.target.value
+                                                                    e.target
+                                                                        .value
                                                                 )
                                                             }
                                                             className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
@@ -600,7 +618,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
                                         <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_term"
                                                     value="Installment"
@@ -621,7 +639,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     required
                                                 />
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_policy_initial_premium"
                                                     value="Policy Initial Premium"
@@ -646,7 +664,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
                                         <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_policy_share"
                                                     value="Policy Share (%)"
@@ -667,7 +685,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     required
                                                 />
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_disc_insurance"
                                                     value="Discount Insurance (%)"
@@ -676,7 +694,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     id="ip_disc_insurance"
                                                     type="text"
                                                     name="ip_disc_insurance"
-                                                    value={data.ip_disc_insurance}
+                                                    value={
+                                                        data.ip_disc_insurance
+                                                    }
                                                     className=""
                                                     autoComplete="ip_disc_insurance"
                                                     onChange={(e) =>
@@ -689,8 +709,8 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 />
                                             </div>
                                         </div>
-                                            <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_pip_after_disc"
                                                     value="PIP After Disc (Share)"
@@ -699,7 +719,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     id="ip_pip_after_disc"
                                                     type="text"
                                                     name="ip_pip_after_disc"
-                                                    value={data.ip_pip_after_disc}
+                                                    value={
+                                                        data.ip_pip_after_disc
+                                                    }
                                                     className=""
                                                     autoComplete="ip_pip_after_disc"
                                                     onChange={(e) =>
@@ -711,7 +733,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     required
                                                 />
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_policy_bf"
                                                     value="Policy BF (%)"
@@ -734,7 +756,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
                                         <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_bf_amount"
                                                     value="BF Amount"
@@ -755,21 +777,21 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     required
                                                 />
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
-                                                    htmlFor="ip_vat"
+                                                    htmlFor="ip_vat_amount"
                                                     value="VAT (2.2%)"
                                                 />
                                                 <TextInput
-                                                    id="ip_vat"
+                                                    id="ip_vat_amount"
                                                     type="text"
-                                                    name="ip_vat"
-                                                    value={data.ip_vat}
+                                                    name="ip_vat_amount"
+                                                    value={data.ip_vat_amount}
                                                     className=""
-                                                    autoComplete="ip_vat"
+                                                    autoComplete="ip_vat_amount"
                                                     onChange={(e) =>
                                                         setData(
-                                                            "ip_vat",
+                                                            "ip_vat_amount",
                                                             e.target.value
                                                         )
                                                     }
@@ -778,7 +800,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
                                         <div className="grid grid-rows grid-flow-col gap-4 mb-4">
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_pph_23"
                                                     value="PPh 23 (2%)"
@@ -799,7 +821,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     required
                                                 />
                                             </div>
-                                            <div >
+                                            <div>
                                                 <InputLabel
                                                     htmlFor="ip_net_bf"
                                                     value="Net BF"
@@ -1261,7 +1283,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                     })
                                 }
                                 title={"Edit Insurance Panel"}
-                                url={`/editPolicy/${dataById.POLICY_ID}`}
+                                url={`/editInsurancePanel/${dataById.IP_ID}`}
                                 data={dataById}
                                 onSuccess={handleSuccess}
                                 method={"patch"}
@@ -1280,7 +1302,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        policy_id:
+                                                        POLICY_ID:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1322,7 +1344,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_premium_type:
+                                                        IP_PREMIUM_TYPE:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1356,7 +1378,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        insurance_id:
+                                                        INSURANCE_ID:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1404,7 +1426,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                         onChange={(e) =>
                                                             setDataById({
                                                                 ...dataById,
-                                                                ip_policy_leader:
+                                                                IP_POLICY_LEADER:
                                                                     e.target
                                                                         .value,
                                                             })
@@ -1436,7 +1458,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                         onChange={(e) =>
                                                             setDataById({
                                                                 ...dataById,
-                                                                ip_policy_leader:
+                                                                IP_POLICY_LEADER:
                                                                     e.target
                                                                         .value,
                                                             })
@@ -1473,7 +1495,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_term: e.target.value,
+                                                        IP_TERM: e.target.value,
                                                     })
                                                 }
                                                 required
@@ -1496,7 +1518,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_policy_initial_premium:
+                                                        IP_POLICY_INITIAL_PREMIUM:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1518,7 +1540,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_policy_share:
+                                                        IP_POLICY_SHARE:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1542,7 +1564,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_disc_insurance:
+                                                        IP_DISC_INSURANCE:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1566,7 +1588,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_pip_after_disc:
+                                                        IP_PIP_AFTER_DISC:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1588,7 +1610,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_policy_bf:
+                                                        IP_POLICY_BF:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1610,7 +1632,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_bf_amount:
+                                                        IP_BF_AMOUNT:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1619,20 +1641,21 @@ export default function PolicyIndex({ auth }: PageProps) {
                                         </div>
                                         <div className="mb-4">
                                             <InputLabel
-                                                htmlFor="ip_vat"
+                                                htmlFor="ip_vat_amount"
                                                 value="VAT (2.2%)"
                                             />
                                             <TextInput
-                                                id="ip_vat"
+                                                id="ip_vat_amount"
                                                 type="text"
-                                                name="ip_vat"
-                                                value={dataById.IP_VAT}
+                                                name="ip_vat_amount"
+                                                value={dataById.IP_VAT_AMOUNT}
                                                 className=""
-                                                autoComplete="ip_vat"
+                                                autoComplete="ip_vat_amount"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_vat: e.target.value,
+                                                        IP_VAT_AMOUNT:
+                                                            e.target.value,
                                                     })
                                                 }
                                                 required
@@ -1653,7 +1676,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_pph_23:
+                                                        IP_PPH_23:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1675,7 +1698,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        ip_net_bf:
+                                                        IP_NET_BF:
                                                             e.target.value,
                                                     })
                                                 }
@@ -1752,7 +1775,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_term",
+                                                                                    "INSTALLMENT_TERM",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1768,7 +1791,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_percentage"
                                                                             name="installment_percentage"
                                                                             value={
-                                                                                inst.installment_percentage
+                                                                                inst.INSTALLMENT_PERCENTAGE
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1781,7 +1804,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_percentage",
+                                                                                    "INSTALLMENT_PERCENTAGE",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1797,7 +1820,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_due_date"
                                                                             name="installment_due_date"
                                                                             value={
-                                                                                inst.installment_due_date
+                                                                                inst.INSTALLMENT_DUE_DATE
                                                                             }
                                                                             type="date"
                                                                             // decimalScale={
@@ -1811,7 +1834,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_due_date",
+                                                                                    "INSTALLMENT_DUE_DATE",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1827,7 +1850,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_ar"
                                                                             name="installment_ar"
                                                                             value={
-                                                                                inst.installment_ar
+                                                                                inst.INSTALLMENT_AR
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1840,7 +1863,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_ar",
+                                                                                    "INSTALLMENT_AR",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1856,7 +1879,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_gross_bf"
                                                                             name="installment_gross_bf"
                                                                             value={
-                                                                                inst.installment_gross_bf
+                                                                                inst.INSTALLMENT_GROSS_BF
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1869,7 +1892,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_gross_bf",
+                                                                                    "INSTALLMENT_GROSS_BF",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1885,7 +1908,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_vat"
                                                                             name="installment_vat"
                                                                             value={
-                                                                                inst.installment_vat
+                                                                                inst.INSTALLMENT_VAT
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1898,7 +1921,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_vat",
+                                                                                    "INSTALLMENT_VAT",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1914,7 +1937,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_pph_23"
                                                                             name="installment_pph_23"
                                                                             value={
-                                                                                inst.installment_pph_23
+                                                                                inst.INSTALLMENT_PPH_23
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1927,7 +1950,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_pph_23",
+                                                                                    "INSTALLMENT_PPH_23",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1943,7 +1966,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_net_bf"
                                                                             name="installment_net_bf"
                                                                             value={
-                                                                                inst.installment_net_bf
+                                                                                inst.INSTALLMENT_NET_BF
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1956,7 +1979,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_net_bf",
+                                                                                    "INSTALLMENT_NET_BF",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -1972,7 +1995,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_admin_cost"
                                                                             name="installment_admin_cost"
                                                                             value={
-                                                                                inst.installment_admin_cost
+                                                                                inst.INSTALLMENT_ADMIN_COST
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -1985,7 +2008,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_admin_cost",
+                                                                                    "INSTALLMENT_ADMIN_COST",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -2001,7 +2024,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_policy_cost"
                                                                             name="installment_policy_cost"
                                                                             value={
-                                                                                inst.installment_policy_cost
+                                                                                inst.INSTALLMENT_POLICY_COST
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -2014,7 +2037,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_policy_cost",
+                                                                                    "INSTALLMENT_POLICY_COST",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -2030,7 +2053,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             id="installment_ap"
                                                                             name="installment_ap"
                                                                             value={
-                                                                                inst.installment_ap
+                                                                                inst.INSTALLMENT_AP
                                                                             }
                                                                             // decimalScale={
                                                                             //     2
@@ -2043,7 +2066,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 e
                                                                             ) =>
                                                                                 editInstallment(
-                                                                                    "installment_ap",
+                                                                                    "INSTALLMENT_AP",
                                                                                     e
                                                                                         .target
                                                                                         .value,
@@ -2056,7 +2079,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                     </td>
 
                                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                        {data
+                                                                        {dataById
                                                                             .installment
                                                                             .length !==
                                                                             1 && (
@@ -2069,7 +2092,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                                 stroke="currentColor"
                                                                                 className="mx-auto h-6 text-red-500 cursor-pointer"
                                                                                 onClick={() =>
-                                                                                    deleteRowInstallment(
+                                                                                    deleteRowEditInstallment(
                                                                                         i
                                                                                     )
                                                                                 }
@@ -2092,7 +2115,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                             href=""
                                                             className="text-xs mt-1 text-primary ms-1 w-auto"
                                                             onClick={(e) =>
-                                                                addRowInstallment(
+                                                                addRowEditInstallment(
                                                                     e
                                                                 )
                                                             }
@@ -2193,9 +2216,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                         search: !modal.search,
                                     })
                                 }
-                                // clearSearchButtonAction={() =>
-                                //     clearSearchPolicy()
-                                // }
+                                clearSearchButtonAction={
+                                    () => null //clearSearchPolicy()
+                                }
                                 tableHead={
                                     <>
                                         <TableTH
@@ -2266,19 +2289,27 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className={""}
                                                 />
                                                 <TableTD
-                                                    value={<>{ip.POLICY_ID}</>}
+                                                    value={
+                                                        <>{ip.POLICY_NUMBER}</>
+                                                    }
                                                     className={""}
                                                 />
                                                 <TableTD
-                                                    value={ip.INSURANCE_ID}
+                                                    value={
+                                                        ip.RELATION_ORGANIZATION_NAME
+                                                    }
                                                     className={""}
                                                 />
                                                 <TableTD
-                                                    value={ip.IP_POLICY_LEADER}
+                                                    value={
+                                                        ip.IP_POLICY_LEADER == 0
+                                                            ? "No"
+                                                            : "Yes"
+                                                    }
                                                     className={""}
                                                 />
                                                 <TableTD
-                                                    value={ip.IP_CURRENCY_ID}
+                                                    value={ip.CURRENCY_SYMBOL}
                                                     className={""}
                                                 />
                                                 <TableTD
