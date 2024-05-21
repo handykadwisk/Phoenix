@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('t_tag', function (Blueprint $table) {
-            $table->increments('TAG_ID')->primary();
+            $table->bigIncrements('TAG_ID')->unique()->primary();
             $table->string('TAG_NAME')->nullable();
             $table->bigInteger('TAG_CREATED_BY')->nullable();
             $table->timestamp('TAG_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'));

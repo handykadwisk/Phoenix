@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('m_tag_relation', function (Blueprint $table) {
-            $table->increments('TAG_RELATION_ID')->primary();
-            $table->bigInteger('TAG_ID')->nullable();
-            $table->bigInteger('RELATION_ORGANIZATION_ID')->nullable();
+            $table->increments('TAG_RELATION_ID');
+            $table->unsignedBigInteger('TAG_ID')->nullable();
+            $table->unsignedBigInteger('RELATION_ORGANIZATION_ID')->nullable();
             $table->foreign('RELATION_ORGANIZATION_ID')->references('RELATION_ORGANIZATION_ID')->on('t_relation')->onDelete('cascade');
             $table->foreign('TAG_ID')->references('TAG_ID')->on('t_tag')->onDelete('cascade');
         });
