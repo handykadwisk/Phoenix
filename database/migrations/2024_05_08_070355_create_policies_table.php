@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     */
+     */ 
     public function up(): void
     {
         Schema::create('t_policy', function (Blueprint $table) {
@@ -17,14 +17,14 @@ return new class extends Migration
             $table->string('POLICY_NUMBER')->nullable();
             $table->integer('INSURANCE_TYPE_ID')->nullable();
             $table->string('POLICY_THE_INSURED')->nullable();
-            $table->time('POLICY_INCEPTION_DATE')->nullable();
-            $table->time('POLICY_DUE_DATE')->nullable();
+            $table->date('POLICY_INCEPTION_DATE')->nullable();
+            $table->date('POLICY_DUE_DATE')->nullable();
             $table->unsignedBigInteger('POLICY_STATUS_ID')->nullable();
             $table->integer('POLICY_INSURANCE_PANEL')->nullable();
             $table->integer('POLICY_SHARE')->nullable();
-            $table->string('POLICY_CREATED_BY')->nullable();
+            $table->integer('POLICY_CREATED_BY')->nullable();
             $table->timestamp('POLICY_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'));
-            $table->string('POLICY_UPDATED_BY')->nullable();
+            $table->integer('POLICY_UPDATED_BY')->nullable();
             $table->timestamp('POLICY_UPDATED_DATE')->nullable();
         });
 
