@@ -15,6 +15,8 @@ return new class extends Migration
             $table->increments('TAG_RELATION_ID')->primary();
             $table->bigInteger('TAG_ID')->nullable();
             $table->bigInteger('RELATION_ORGANIZATION_ID')->nullable();
+            $table->foreign('RELATION_ORGANIZATION_ID')->references('RELATION_ORGANIZATION_ID')->on('t_relation')->onDelete('cascade');
+            $table->foreign('TAG_ID')->references('TAG_ID')->on('t_tag')->onDelete('cascade');
         });
     }
 

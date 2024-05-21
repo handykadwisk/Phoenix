@@ -26,12 +26,13 @@ return new class extends Migration
             $table->string('RELATION_ORGANIZATION_ALIAS')->nullable();
             $table->string('RELATION_ORGANIZATION_EMAIL')->nullable();
             $table->string('RELATION_ORGANIZATION_MAPPING')->nullable();
+            $table->bigInteger('HR_MANAGED_BY_APP')->nullable();
             $table->bigInteger('RELATION_ORGANIZATION_LOGO_ID')->nullable();
             $table->string('RELATION_ORGANIZATION_SIGNATURE_NAME')->nullable();
             $table->string('RELATION_ORGANIZATION_SIGNATURE_TITLE')->nullable();
             $table->string('RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER')->nullable();
             $table->string('RELATION_ORGANIZATION_BANK_ACCOUNT_NAME')->nullable();
-            $table->timestamp('RELATION_LOB_ID')->nullable();
+            $table->bigInteger('RELATION_LOB_ID')->nullable();
             $table->bigInteger('salutation_id')->nullable();
             $table->bigInteger('relation_status_id')->nullable();
             $table->bigInteger('is_deleted')->nullable();
