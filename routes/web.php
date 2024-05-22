@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
 
     // Group
     Route::get('group', [RelationGroupController::class, 'index'])->name('group');
+    Route::get('/getRelationGroup', [RelationGroupController::class, 'getRelationGroupJson'])->name('getRelationGroup.getRelationGroupJson');
 });
 
 require __DIR__ . '/auth.php';

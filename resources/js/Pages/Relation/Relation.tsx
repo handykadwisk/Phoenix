@@ -196,7 +196,6 @@ export default function Relation({ auth }: PageProps) {
             .get(`/getRelation/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
                 setMRelation(res.data.m_relation_type);
                 getSalutationById(
                     res.data.relation_status_id,
