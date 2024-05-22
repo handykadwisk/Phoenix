@@ -7,6 +7,7 @@ use App\Models\MTag;
 use App\Models\Relation;
 use App\Models\RelationGroup;
 use App\Models\RelationLob;
+use App\Models\RelationProfession;
 use App\Models\RelationStatus;
 use App\Models\RelationType;
 use App\Models\Salutation;
@@ -64,8 +65,7 @@ class RelationController extends Controller
     {
         // call data relation
         $relation = Relation::where('RELATION_ORGANIZATION_PARENT_ID', "0")->paginate(3);
-        // print_r($relation);
-        // die;
+        
         // call data relation group
         $relationGroup = RelationGroup::get();
         // call data relation lob
@@ -79,6 +79,9 @@ class RelationController extends Controller
         // call mapping relation Type
         $mRelationType = MRelationType::get();
 
+        // cal profession
+        $profession = RelationProfession::get();
+
 
 
         return Inertia::render('Relation/Relation', [
@@ -88,7 +91,8 @@ class RelationController extends Controller
             'salutation' => $salutation,
             'relationStatus' => $relationStatus,
             'relationGroup' => $relationGroup,
-            'mRelationType' => $mRelationType
+            'mRelationType' => $mRelationType,
+            'profession'   => $profession
         ]);
     }
 
@@ -127,6 +131,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_SIGNATURE_TITLE' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME' => NULL,
+            'RELATION_PROFESSION_ID' => $request->profession_id,
             'RELATION_LOB_ID' => $request->relation_lob_id,
             'salutation_id' => $request->salutation_id,
             'relation_status_id' => $request->relation_status_id
@@ -157,8 +162,8 @@ class RelationController extends Controller
         // created mapping tagging
         if ($tagging) {
             MTag::create([
-                'TAG_ID' => $tagging,
-                'RELATION_ORGANIZATION_ID' => $relation
+                'RELATION_ORGANIZATION_ID' => $relation,
+                'TAG_ID' => $tagging
             ]);
         }
 
@@ -184,8 +189,9 @@ class RelationController extends Controller
 
     public function getRelationById($id)
     {
-        $data = Relation::join('m_tag_relation', 'm_tag_relation.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
-            ->join('t_tag', 't_tag.TAG_ID', '=', 'm_tag_relation.TAG_ID')->where('t_relation.RELATION_ORGANIZATION_ID', $id)->first();
+        $data = Relation::leftJoin('m_tag_relation', 'm_tag_relation.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
+        ->leftJoin('t_tag', 'm_tag_relation.TAG_ID', '=', 't_tag.TAG_ID')->where('t_relation.RELATION_ORGANIZATION_ID', $id)->first();
+            // print_r($data);die;
         return response()->json($data);
     }
 
@@ -212,7 +218,7 @@ class RelationController extends Controller
         $relation = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
             ->update([
                 'RELATION_ORGANIZATION_NAME' => $request->RELATION_ORGANIZATION_NAME,
-                'RELATION_ORGANIZATION_PARENT_ID' => $request->RELATION_ORGANIZATION_PARENT_ID,
+                'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
                 'RELATION_ORGANIZATION_ABBREVIATION' => $request->RELATION_ORGANIZATION_ABBREVIATION,
                 'RELATION_ORGANIZATION_AKA' => $request->RELATION_ORGANIZATION_AKA,
                 'RELATION_ORGANIZATION_MAPPING' => NULL,
@@ -248,6 +254,23 @@ class RelationController extends Controller
                 'RELATION_TYPE_ID' => $idRelationType
             ]);
         }
+
+        // // created tagging
+        // $tagging = Tag::insertGetId([
+        //     'TAG_NAME' => $request->TAG_NAME,
+        //     'TAG_CREATED_BY' => Auth::user()->id,
+        //     'TAG_CREATED_DATE' => now(),
+        //     'TAG_UPDATED_BY' => NULL,
+        //     'TAG_UPDATED_DATE' => NULL
+        // ]);
+
+        // // created mapping tagging
+        // if ($tagging) {
+        //     MTag::create([
+        //         'RELATION_ORGANIZATION_ID' => $relation,
+        //         'TAG_ID' => $tagging
+        //     ]);
+        // }
 
         return new JsonResponse([
             'New relation edited.'

@@ -14,7 +14,7 @@ class MTag extends Model
     public $timestamps = false;
 
     public $fillable = [
-        'TAG_ID',
         'RELATION_ORGANIZATION_ID',
+        'TAG_ID',
     ];
 }

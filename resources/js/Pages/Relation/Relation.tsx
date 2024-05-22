@@ -75,6 +75,7 @@ export default function Relation({ auth }: PageProps) {
         relationStatus,
         relationLOB,
         mRelationType,
+        profession,
         custom_menu,
     }: any = usePage().props;
 
@@ -113,6 +114,15 @@ export default function Relation({ auth }: PageProps) {
                     console.log(err);
                 });
         }
+
+        if (id == "1") {
+            // jika corporate
+            document.getElementById("relationLob").style.display = "";
+            document.getElementById("relationJobs").style.display = "none";
+        } else if (id == "2") {
+            document.getElementById("relationLob").style.display = "none";
+            document.getElementById("relationJobs").style.display = "";
+        }
     };
 
     const { data, setData, errors, reset } = useForm({
@@ -128,6 +138,7 @@ export default function Relation({ auth }: PageProps) {
         relation_status_id: "",
         tagging_name: "",
         is_managed: "",
+        profession_id: "",
         relation_type_id: [],
     });
 
@@ -139,6 +150,7 @@ export default function Relation({ auth }: PageProps) {
         RELATION_ORGANIZATION_AKA: "",
         RELATION_ORGANIZATION_EMAIL: "",
         relation_description: "",
+        RELATION_PROFESSION_ID: "",
         RELATION_LOB_ID: "",
         salutation_id: "",
         relation_status_id: "",
@@ -169,6 +181,7 @@ export default function Relation({ auth }: PageProps) {
             relation_status_id: "",
             tagging_name: "",
             is_managed: "",
+            profession_id: "",
             relation_type_id: [],
         });
         getRelation();
@@ -183,6 +196,7 @@ export default function Relation({ auth }: PageProps) {
             .get(`/getRelation/${id}`)
             .then((res) => {
                 setDataById(res.data);
+                console.log(res.data);
                 setMRelation(res.data.m_relation_type);
                 getSalutationById(
                     res.data.relation_status_id,
@@ -192,6 +206,11 @@ export default function Relation({ auth }: PageProps) {
                     res.data.RELATION_ORGANIZATION_GROUP,
                     "RELATION_ORGANIZATION_GROUP"
                 );
+                if (res.data.HR_MANAGED_BY_APP == "1") {
+                    setSwitchPage(true);
+                } else {
+                    setSwitchPage(false);
+                }
             })
             .catch((err) => console.log(err));
 
@@ -229,6 +248,7 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const checkChecked = (id: number) => {
+        // return true;
         if (id === 1) {
             return true;
         } else {
@@ -303,11 +323,12 @@ export default function Relation({ auth }: PageProps) {
 
     const handleCheckboxHREdit = (e: any) => {
         // alert('aloo');
-        const { value, checked } = e.target;
-
-        if (checked) {
+        // const { value, checked } = e.target;
+        if (e == true) {
+            setSwitchPage(true);
             setDataById({ ...dataById, HR_MANAGED_BY_APP: "1" });
         } else {
+            setSwitchPage(false);
             setDataById({ ...dataById, HR_MANAGED_BY_APP: "0" });
         }
     };
@@ -526,7 +547,6 @@ export default function Relation({ auth }: PageProps) {
                                 <ul role="list" className="mt-8">
                                     <li className="col-span-1 flex rounded-md shadow-sm">
                                         <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            {/* <div className="flex-1 truncate mt-2 ml-2 text-xs h-9"> */}
                                             <span className="mt-1 ml-2">
                                                 <Switch
                                                     enabled={switchPage}
@@ -534,18 +554,10 @@ export default function Relation({ auth }: PageProps) {
                                                         handleCheckboxHR(e)
                                                     }
                                                 />
-                                                {/* <Checkbox
-                                                        name=""
-                                                        id={""}
-                                                        value={""}
-                                                        onChange={(e) => handleCheckboxHR(e)}
-                                                        className='mr-2'
-                                                    /> */}
                                             </span>
                                             <span className="ml-2 text-sm">
                                                 HR MANAGED BY APP
                                             </span>
-                                            {/* </div> */}
                                         </div>
                                     </li>
                                 </ul>
@@ -673,29 +685,29 @@ export default function Relation({ auth }: PageProps) {
                         </div>
                         <div className="mt-4" id="relationJobs">
                             <InputLabel
-                                htmlFor="relation_jobs_id"
+                                htmlFor="profession_id"
                                 value="Relation Profession"
                             />
                             <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={""}
-                                // onChange={(e) =>
-                                //     setData("relation_lob_id", e.target.value)
-                                // }
+                                value={data.profession_id}
+                                onChange={(e) =>
+                                    setData("profession_id", e.target.value)
+                                }
                             >
                                 <option>
                                     -- Choose Relation Profession --
                                 </option>
-                                {/* {relationLOB.map((rLob: any, i: number) => {
+                                {profession?.map((rProf: any, i: number) => {
                                     return (
                                         <option
                                             key={i}
-                                            value={rLob.RELATION_LOB_ID}
+                                            value={rProf.RELATION_PROFESSION_ID}
                                         >
-                                            {rLob.RELATION_LOB_NAME}
+                                            {rProf.RELATION_PROFESSION_NAME}
                                         </option>
                                     );
-                                })} */}
+                                })}
                             </select>
                         </div>
                         <div className="mt-4" id="relationLob">
@@ -823,6 +835,7 @@ export default function Relation({ auth }: PageProps) {
                                             e.target.value,
                                             "relation_status_id"
                                         );
+                                        disableLob(e.target.value);
                                     }}
                                 >
                                     <option>
@@ -955,34 +968,20 @@ export default function Relation({ auth }: PageProps) {
                                 />
                             </div>
                             <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED"
-                                />
-                                <ul role="list" className="mt-2">
+                                <ul role="list" className="mt-8">
                                     <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center justify-between truncate rounded-md shadow-md bg-white">
-                                            <div className="flex-1 truncate px-1 py-2 text-xs h-9">
-                                                <span className="px-2 mt-9">
-                                                    <Checkbox
-                                                        name=""
-                                                        id={""}
-                                                        value={
-                                                            dataById.HR_MANAGED_BY_APP
-                                                        }
-                                                        defaultChecked={checkChecked(
-                                                            dataById.HR_MANAGED_BY_APP
-                                                        )}
-                                                        onChange={(e) =>
-                                                            handleCheckboxHREdit(
-                                                                e
-                                                            )
-                                                        }
-                                                        className="mr-2"
-                                                    />
-                                                    HR MANAGED APPS
-                                                </span>
-                                            </div>
+                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
+                                            <span className="mt-1 ml-2">
+                                                <Switch
+                                                    enabled={switchPage}
+                                                    onChangeButton={(e: any) =>
+                                                        handleCheckboxHREdit(e)
+                                                    }
+                                                />
+                                            </span>
+                                            <span className="ml-2 text-sm">
+                                                HR MANAGED BY APP
+                                            </span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1043,7 +1042,6 @@ export default function Relation({ auth }: PageProps) {
                                                 e.target.value,
                                         })
                                     }
-                                    required
                                     placeholder="example@gmail.com"
                                 />
                             </div>
@@ -1062,7 +1060,6 @@ export default function Relation({ auth }: PageProps) {
                                             TAG_NAME: e.target.value,
                                         })
                                     }
-                                    required
                                     placeholder="Tag"
                                 />
                             </div>
@@ -1118,7 +1115,38 @@ export default function Relation({ auth }: PageProps) {
                                 </ul>
                             </div>
                         </div>
-                        <div className="mt-4">
+                        <div className="mt-4" id="relationJobs">
+                            <InputLabel
+                                htmlFor="profession_id"
+                                value="Relation Profession"
+                            />
+                            <select
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                value={dataById.RELATION_PROFESSION_ID}
+                                onChange={(e) =>
+                                    setDataById({
+                                        ...dataById,
+                                        RELATION_PROFESSION_ID: e.target.value,
+                                    })
+                                }
+                            >
+                                <option>
+                                    -- Choose Relation Profession --
+                                </option>
+                                <option>-- Choose Relation Lob --</option>
+                                {profession.map((rProf: any, i: number) => {
+                                    return (
+                                        <option
+                                            key={i}
+                                            value={rProf.RELATION_PROFESSION_ID}
+                                        >
+                                            {rProf.RELATION_PROFESSION_NAME}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="mt-4" id="relationLob">
                             <InputLabel
                                 htmlFor="RELATION_LOB_ID"
                                 value="Relation Lob"
@@ -1165,7 +1193,6 @@ export default function Relation({ auth }: PageProps) {
                                             e.target.value,
                                     })
                                 }
-                                required
                             />
                         </div>
                     </>
@@ -1180,7 +1207,8 @@ export default function Relation({ auth }: PageProps) {
                         {/* table page*/}
                         <TablePage
                             addButtonLabel={"Add Relation"}
-                            addButtonModalState={() =>
+                            addButtonModalState={() => {
+                                setSwitchPage(false);
                                 setModal({
                                     add: true,
                                     delete: false,
@@ -1188,8 +1216,8 @@ export default function Relation({ auth }: PageProps) {
                                     view: false,
                                     document: false,
                                     search: false,
-                                })
-                            }
+                                });
+                            }}
                             searchButtonModalState={() =>
                                 setModal({
                                     add: false,

@@ -35,6 +35,7 @@ class Relation extends Model
         'RELATION_ORGANIZATION_SIGNATURE_TITLE',
         'RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER',
         'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME',
+        'RELATION_PROFESSION_ID',
         'RELATION_LOB_ID',
         'salutation_id',
         'relation_status_id',

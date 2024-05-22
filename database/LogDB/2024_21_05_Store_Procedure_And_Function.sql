@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.33 (64 bit)
-MySQL - 5.7.12 : Database - phoenix_app_dev
+MySQL - 8.2.0 : Database - phoenix
 *********************************************************************
 */
 
@@ -72,10 +72,10 @@ DELIMITER ;
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_organization` */;
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_path_relation_organization`(`input_relation_group_id` INT, `input` INT) RETURNS text CHARSET latin1
-BEGIN
-  CALL `sp_path_relation_organization`(input_relation_group_id,input, @path);
-  RETURN @path;
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_organization`(`input_relation_group_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_relation_organization`(input_relation_group_id,input, @path);
+  RETURN @path;
 END */$$
 DELIMITER ;
 
@@ -342,7 +342,7 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_combo_relation_organization`(IN `input_relation_group_id` INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_relation_organization`(IN `input_relation_group_id` INT)
 BEGIN
   SET `max_sp_recursion_depth` = 5000 ;
   IF input_relation_group_id IS NULL 
@@ -629,7 +629,7 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_path_relation_organization`(IN `input_relation_group_id` INT, IN `input` INT, OUT `output` TEXT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_relation_organization`(IN `input_relation_group_id` INT, IN `input` INT, OUT `output` TEXT)
 BEGIN
   DECLARE _id INT ;
   DECLARE _parent INT ;
@@ -771,7 +771,7 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_set_mapping_relation_organization`(IN `input_group_id` INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_organization`(IN `input_group_id` INT)
 BEGIN
 if input_group_id is null then
 UPDATE t_relation SET RELATION_ORGANIZATION_MAPPING=f_get_path_relation_organization(input_group_id, RELATION_ORGANIZATION_ID); 

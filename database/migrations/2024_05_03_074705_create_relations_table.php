@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('RELATION_ORGANIZATION_SIGNATURE_TITLE')->nullable();
             $table->string('RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER')->nullable();
             $table->string('RELATION_ORGANIZATION_BANK_ACCOUNT_NAME')->nullable();
+            $table->bigInteger('RELATION_PROFESSION_ID')->nullable();
             $table->bigInteger('RELATION_LOB_ID')->nullable();
             $table->bigInteger('salutation_id')->nullable();
             $table->bigInteger('relation_status_id')->nullable();

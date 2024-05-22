@@ -15,9 +15,9 @@ return new class extends Migration
             $table->bigIncrements('TAG_ID')->unique()->primary();
             $table->string('TAG_NAME')->nullable();
             $table->bigInteger('TAG_CREATED_BY')->nullable();
-            $table->timestamp('TAG_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('TAG_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable();
             $table->bigInteger('TAG_UPDATED_BY')->nullable();
-            $table->timestamp('TAG_UPDATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('TAG_UPDATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable();
         });
     }
 

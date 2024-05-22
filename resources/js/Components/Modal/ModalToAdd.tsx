@@ -88,7 +88,10 @@ export default function ModalToAdd({
                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
-                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all my-10 xl:max-w-3xl lg:max-w-3xl md:max-w-3xl">
+                                <Dialog.Panel
+                                    className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                                    // style={{ maxWidth: "65%" }}
+                                >
                                     <form onSubmit={action}>
                                         <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                             <Dialog.Title
