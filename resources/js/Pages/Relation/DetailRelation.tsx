@@ -237,7 +237,7 @@ export default function DetailRelation({ auth }: PageProps) {
                     {/* End Top */}
 
                     {/* Structure */}
-                    <div className="grid gap-x-8 gap-y-4 grid-cols-4 mt-6 xs:grid-cols-2 xs:gap-x-3 lg:grid-cols-4">
+                    <div className="grid gap-9 grid-cols-3 mt-6 xs:grid-cols-2 xs:gap-x-3 lg:grid-cols-4 lg:gap-9">
                         <div className="bg-white p-5 shadow-md rounded-lg">
                             <div className="flex justify-center items-center">
                                 {/* <img

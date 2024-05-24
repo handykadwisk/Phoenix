@@ -368,7 +368,9 @@ export default function Relation({ auth }: PageProps) {
                 url={`/relation`}
                 data={data}
                 onSuccess={handleSuccess}
-                panelWidth={"60%"}
+                className={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                }
                 body={
                     <>
                         <div className="mt-4">
@@ -777,6 +779,9 @@ export default function Relation({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 method={"patch"}
                 headers={null}
+                className={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                }
                 submitButtonName={"Submit"}
                 body={
                     <>

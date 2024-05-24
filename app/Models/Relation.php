@@ -13,7 +13,7 @@ class Relation extends Model
 
     protected $table = 't_relation';
 
-    public $with = ['mRelationType'];
+    public $with = ['mRelationType', 'children'];
 
     protected $fillable = [
         'RELATION_ORGANIZATION_NAME',
@@ -47,5 +47,9 @@ class Relation extends Model
     public function mRelationType()
     {
         return $this->hasMany(MRelationType::class, 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function children() {
+        return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_PARENT_ID');
     }
 }

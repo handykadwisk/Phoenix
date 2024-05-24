@@ -16,6 +16,7 @@ import ToastMessage from "@/Components/ToastMessage";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
+import TextArea from "@/Components/TextArea";
 
 export default function Group({ auth }: PageProps) {
     useEffect(() => {
@@ -33,51 +34,32 @@ export default function Group({ auth }: PageProps) {
             .get(`/getRelationGroup?${pageNumber}`)
             .then((res) => {
                 setRelationsGroup(res.data);
-                // console.log(relationsGroup.links);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
             });
         // setPolicies(policy)
     };
+    const testReturn = (props: any) => {
+        const testrun = <span>aaaa</span>;
+
+        return testrun;
+    };
 
     const { xxx }: any = usePage().props;
 
     const { data, setData, errors, reset } = useForm({
-        group_id: "",
-        name_relation: "",
-        parent_id: "",
-        abbreviation: "",
-        relation_aka: "",
-        relation_email: "",
-        relation_description: "",
-        relation_lob_id: "",
-        salutation_id: "",
-        relation_status_id: "",
-        tagging_name: "",
-        is_managed: "",
-        profession_id: "",
-        relation_type_id: [],
+        RELATION_GROUP_NAME: "",
+        RELATION_GROUP_DESCRIPTION: "",
     });
 
     const handleSuccess = (message: string) => {
         setIsSuccess("");
         reset();
         setData({
-            group_id: "",
-            name_relation: "",
-            parent_id: "",
-            abbreviation: "",
-            relation_aka: "",
-            relation_email: "",
-            relation_description: "",
-            relation_lob_id: "",
-            salutation_id: "",
-            relation_status_id: "",
-            tagging_name: "",
-            is_managed: "",
-            profession_id: "",
-            relation_type_id: [],
+            RELATION_GROUP_NAME: "",
+            RELATION_GROUP_DESCRIPTION: "",
         });
         getRelationGroup();
         setIsSuccess(message);
@@ -122,31 +104,57 @@ export default function Group({ auth }: PageProps) {
                         search: false,
                     })
                 }
-                title={"Add Relation"}
-                url={`/relation`}
+                title={"Add Group"}
+                url={`/group`}
                 data={data}
                 onSuccess={handleSuccess}
-                panelWidth={"60%"}
+                className={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
                 body={
                     <>
                         <div>
                             <div className="mt-4">
                                 <InputLabel
-                                    htmlFor="name_relation"
-                                    value="Name Relation"
+                                    htmlFor="RELATION_GROUP_NAME"
+                                    value="Name Relation Group"
                                 />
                                 <TextInput
-                                    id="name_relation"
+                                    id="RELATION_GROUP_NAME"
                                     type="text"
-                                    name="name_relation"
-                                    value={data.name_relation}
+                                    name="RELATION_GROUP_NAME"
+                                    value={data.RELATION_GROUP_NAME}
                                     className="mt-2"
-                                    autoComplete="name_relation"
+                                    autoComplete="RELATION_GROUP_NAME"
                                     onChange={(e) =>
-                                        setData("name_relation", e.target.value)
+                                        setData(
+                                            "RELATION_GROUP_NAME",
+                                            e.target.value
+                                        )
                                     }
                                     required
-                                    placeholder="Name Relation"
+                                    placeholder="Name Relation Group"
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <InputLabel
+                                    htmlFor="RELATION_GROUP_DESCRIPTION"
+                                    value="Relation Group Description"
+                                />
+                                <TextArea
+                                    className="mt-2"
+                                    id="RELATION_GROUP_DESCRIPTION"
+                                    name="RELATION_GROUP_DESCRIPTION"
+                                    defaultValue={
+                                        data.RELATION_GROUP_DESCRIPTION
+                                    }
+                                    onChange={(e: any) =>
+                                        setData({
+                                            ...data,
+                                            RELATION_GROUP_DESCRIPTION:
+                                                e.target.value,
+                                        })
+                                    }
                                 />
                             </div>
                         </div>
@@ -205,7 +213,7 @@ export default function Group({ auth }: PageProps) {
                                             key={i}
                                             className="overflow-hidden rounded-xl border border-gray-200"
                                         >
-                                            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+                                            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 mb-5">
                                                 <img
                                                     src={defaultImage}
                                                     alt={defaultImage}
@@ -285,31 +293,99 @@ export default function Group({ auth }: PageProps) {
                                                     </Transition>
                                                 </Menu>
                                             </div>
-                                            <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-                                                <div className="flex justify-between gap-x-4 py-3">
-                                                    <dt className="text-gray-500">
-                                                        Last invoice
-                                                    </dt>
-                                                    <dd className="text-gray-700">
-                                                        <time dateTime={""}>
-                                                            {""}
-                                                        </time>
-                                                    </dd>
-                                                </div>
-                                                <div className="flex justify-between gap-x-4 py-3">
-                                                    <dt className="text-gray-500">
-                                                        Amount
-                                                    </dt>
-                                                    <dd className="flex items-start gap-x-2">
-                                                        <div className="font-medium text-gray-900">
-                                                            {""}
-                                                        </div>
-                                                        <div className={""}>
-                                                            {""}
-                                                        </div>
-                                                    </dd>
-                                                </div>
-                                            </dl>
+                                            {dataRelationGroup.r_group
+                                                .length === 0 ? (
+                                                <dl className="-my-3 divide-y divide-gray-100 px-6 py-2 text-sm leading-6">
+                                                    <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
+                                                        {"Relation Not found"}
+                                                    </summary>
+                                                </dl>
+                                            ) : (
+                                                dataRelationGroup.r_group?.map(
+                                                    (
+                                                        rg: any,
+                                                        index: number
+                                                    ) => (
+                                                        <dl
+                                                            key={index}
+                                                            className="-my-3 divide-y divide-gray-100 px-6 py-2 text-sm leading-6"
+                                                        >
+                                                            {rg.RELATION_ORGANIZATION_PARENT_ID ===
+                                                                0 &&
+                                                            rg.children
+                                                                .length ===
+                                                                0 ? (
+                                                                <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
+                                                                    {
+                                                                        rg.RELATION_ORGANIZATION_NAME
+                                                                    }
+                                                                </summary>
+                                                            ) : (
+                                                                <>
+                                                                    {rg.RELATION_ORGANIZATION_PARENT_ID !==
+                                                                    0 ? (
+                                                                        ""
+                                                                    ) : (
+                                                                        <details className="mb-2">
+                                                                            <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
+                                                                                <span>
+                                                                                    {
+                                                                                        rg.RELATION_ORGANIZATION_NAME
+                                                                                    }
+                                                                                </span>
+                                                                            </summary>
+                                                                            {rg.children?.map(
+                                                                                (
+                                                                                    c: any,
+                                                                                    a: number
+                                                                                ) => (
+                                                                                    <ul
+                                                                                        key={
+                                                                                            a
+                                                                                        }
+                                                                                        className="ml-4"
+                                                                                    >
+                                                                                        <li>
+                                                                                            <details className="mb-2">
+                                                                                                <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
+                                                                                                    <span>
+                                                                                                        {
+                                                                                                            c.RELATION_ORGANIZATION_NAME
+                                                                                                        }
+                                                                                                    </span>
+                                                                                                </summary>
+                                                                                                {c.children?.map(
+                                                                                                    (
+                                                                                                        z: any,
+                                                                                                        b: number
+                                                                                                    ) => (
+                                                                                                        <summary
+                                                                                                            key={
+                                                                                                                b
+                                                                                                            }
+                                                                                                            className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4 ml-5"
+                                                                                                        >
+                                                                                                            <span>
+                                                                                                                {
+                                                                                                                    z.RELATION_ORGANIZATION_NAME
+                                                                                                                }
+                                                                                                            </span>
+                                                                                                        </summary>
+                                                                                                    )
+                                                                                                )}
+                                                                                            </details>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                )
+                                                                            )}
+                                                                        </details>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </dl>
+                                                    )
+                                                )
+                                            )}
                                         </li>
                                     );
                                 }
@@ -326,6 +402,7 @@ export default function Group({ auth }: PageProps) {
                             }
                         />
                     </div>
+                    {testReturn()}
                 </div>
             </div>
         </AuthenticatedLayout>

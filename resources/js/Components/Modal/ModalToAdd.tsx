@@ -15,7 +15,7 @@ export default function ModalToAdd({
     url,
     data,
     onSuccess,
-    panelWidth,
+    className = "",
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -24,7 +24,7 @@ export default function ModalToAdd({
     body: any;
     url: string;
     data: any;
-    panelWidth: any;
+    className: any;
     onSuccess: any;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -89,7 +89,7 @@ export default function ModalToAdd({
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                                    className={className}
                                     // style={{ maxWidth: "65%" }}
                                 >
                                     <form onSubmit={action}>

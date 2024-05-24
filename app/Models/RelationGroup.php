@@ -13,6 +13,8 @@ class RelationGroup extends Model
 
     protected $table = 't_relation_group';
 
+    public $with = ['rGroup'];
+
     protected $fillable = [
         'RELATION_GROUP_NAME',
         'RELATION_GROUP_DESCRIPTION',
@@ -23,4 +25,9 @@ class RelationGroup extends Model
         'RELATION_GROUP_PARENT',
         'RELATION_GROUP_ALIAS',
     ];
+
+    public function rGroup()
+    {
+        return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_GROUP');
+    }
 }

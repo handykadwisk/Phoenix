@@ -23,7 +23,7 @@ const Breadcrumb = ({
         >
             <ol
                 role="list"
-                className="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8"
+                className="mx-auto flex w-full space-x-4 px-4 sm:px-6 lg:px-8"
             >
                 <li className="flex">
                     <div className="flex items-center">

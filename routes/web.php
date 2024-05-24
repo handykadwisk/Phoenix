@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
     // Group
     Route::get('group', [RelationGroupController::class, 'index'])->name('group');
     Route::get('/getRelationGroup', [RelationGroupController::class, 'getRelationGroupJson'])->name('getRelationGroup.getRelationGroupJson');
+    Route::post('/group', [RelationGroupController::class, 'store'])->name('group.store');
+    Route::post('/getRelationById', [RelationGroupController::class, 'getRelationByIdGroup'])->name('getRelationById.getRelationByIdGroup');
 });
 
 require __DIR__ . '/auth.php';
