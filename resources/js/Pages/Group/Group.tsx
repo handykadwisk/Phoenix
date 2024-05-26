@@ -41,11 +41,6 @@ export default function Group({ auth }: PageProps) {
             });
         // setPolicies(policy)
     };
-    const testReturn = (props: any) => {
-        const testrun = <span>aaaa</span>;
-
-        return testrun;
-    };
 
     const { xxx }: any = usePage().props;
 
@@ -63,6 +58,15 @@ export default function Group({ auth }: PageProps) {
         });
         getRelationGroup();
         setIsSuccess(message);
+    };
+
+    const clickDetailRelation = async (e: FormEvent, id: number) => {
+        e.preventDefault();
+        window.open(`/relation/detailRelation/${id}`, "_self");
+        // await axios
+        //     .get(`/relation/detailRelation/${id}`)
+        //     .then((res) => {})
+        //     .catch((err) => console.log(err));
     };
 
     // Modal Button Handle
@@ -315,7 +319,17 @@ export default function Group({ auth }: PageProps) {
                                                             rg.children
                                                                 .length ===
                                                                 0 ? (
-                                                                <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
+                                                                <summary
+                                                                    className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        clickDetailRelation(
+                                                                            e,
+                                                                            rg.RELATION_ORGANIZATION_ID
+                                                                        )
+                                                                    }
+                                                                >
                                                                     {
                                                                         rg.RELATION_ORGANIZATION_NAME
                                                                     }
@@ -402,7 +416,6 @@ export default function Group({ auth }: PageProps) {
                             }
                         />
                     </div>
-                    {testReturn()}
                 </div>
             </div>
         </AuthenticatedLayout>
