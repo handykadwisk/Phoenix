@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
                 'menu_name'       => 'Policy',
                 'menu_url'        => 'policy',
                 'menu_is_deleted' => 0,
-                'menu_sequence'   => 3,
+                'menu_sequence'   => 4,
                 'menu_created_by' => 'admin'
             ]
         );
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 'menu_name'       => 'Group',
                 'menu_url'        => 'group',
                 'menu_is_deleted' => 0,
-                'menu_sequence'   => 4,
+                'menu_sequence'   => 3,
                 'menu_created_by' => 'admin'
             ]
         );
