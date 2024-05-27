@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MPolicyInitialPremium;
 use App\Models\Policy;
+use App\Models\PolicyInstallment;
 use App\Models\RCurrency;
 use App\Models\RInsuranceType;
 use App\Models\UserLog;
@@ -100,6 +101,7 @@ class PolicyController extends Controller
     public function store(Request $request) {
 
         // dd($request);
+        // dd($request->policyInstallment);
         
         // Create Policy
         $policy = Policy::insertGetId([
@@ -112,6 +114,7 @@ class PolicyController extends Controller
             'POLICY_STATUS_ID'      => $request->policy_status_id,
             'POLICY_INSURANCE_PANEL' => $request->policy_insurance_panel,
             'POLICY_SHARE'          => $request->policy_share,
+            'POLICY_INSTALLMENT'    => $request->policy_installment,
             'POLICY_CREATED_BY'      => Auth::user()->id
         ]);
 
@@ -124,12 +127,24 @@ class PolicyController extends Controller
                 'SUM_INSURED' => $req['sum_insured'],
                 'RATE' => $req['rate'],
                 'INITIAL_PREMIUM' => $req['initial_premium'],
-                'INSTALLMENT' => $req['installment'],
+                // 'INSTALLMENT' => $req['installment'],
                 'CREATED_BY' => Auth::user()->id
             ];
         };
         MPolicyInitialPremium::insert($initialPremiumData);
         // $policy->policyInitialPremium()->saveMany($initialPremiumData);
+
+        // Create Policy Installment
+        $policyInstallmentData = [];
+        foreach ($request->policyInstallment as $req) {
+            $policyInstallmentData[] = [
+                'POLICY_ID' => $policy,
+                'POLICY_INSTALLMENT_TERM' => $req['policy_installment_term'],
+                'POLICY_INSTALLMENT_PERCENTAGE' => $req['policy_installment_percentage'],
+                'INSTALLMENT_DUE_DATE' => $req['installment_due_date']
+            ];
+        };
+        PolicyInstallment::insert($policyInstallmentData);
 
          // Created Log
         UserLog::create([
@@ -158,7 +173,9 @@ class PolicyController extends Controller
 
     }
 
-    public function edit(Request $request, MPolicyInitialPremium $insurancePanel) {
+    // public function edit(Request $request, MPolicyInitialPremium $insurancePanel) {
+    public function edit(Request $request) {
+
 
         $validateData = Validator::make($request->all(), [
             'RELATION_ID'           => 'required',
@@ -169,6 +186,7 @@ class PolicyController extends Controller
             'POLICY_DUE_DATE'       => 'required|date',
             'POLICY_INSURANCE_PANEL' => 'required|number',
             'POLICY_SHARE'          => 'required|number',
+            'POLICY_INSTALLMENT'          => 'required|number',
             'policy_initial_premium.*.CURRENCY_ID'        => 'required',
         ], [
             'required'                                        => ':attribute is required.',
@@ -187,6 +205,7 @@ class PolicyController extends Controller
                             'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
                             'POLICY_INSURANCE_PANEL' => $request->POLICY_INSURANCE_PANEL,
                             'POLICY_SHARE'          => $request->POLICY_SHARE,
+                            'POLICY_INSTALLMENT'          => $request->POLICY_INSTALLMENT,
                             'POLICY_UPDATED_BY'      => Auth::user()->id,
                             'POLICY_UPDATED_DATE'   => now()
                         ]);
@@ -212,6 +231,26 @@ class PolicyController extends Controller
         if ($request->deletedInitialPremium) {
             foreach ($request->deletedInitialPremium as $del) {
                 MPolicyInitialPremium::where('POLICY_INITIAL_PREMIUM_ID', $del['policy_initial_premium_id'])->delete();
+            }
+        }
+
+        foreach ($request->policy_installment as $req2) {
+            PolicyInstallment::updateOrCreate(
+                [
+                    'POLICY_INSTALLMENT_ID'    => $req2['POLICY_INSTALLMENT_ID']
+                ],
+                [
+                    'POLICY_ID' => $req2['POLICY_ID'],
+                    'POLICY_INSTALLMENT_TERM' => $req2['POLICY_INSTALLMENT_TERM'],
+                    'POLICY_INSTALLMENT_PERCENTAGE' => $req2['POLICY_INSTALLMENT_PERCENTAGE'],
+                    'INSTALLMENT_DUE_DATE' => $req2['INSTALLMENT_DUE_DATE']
+                ]
+            );
+        }
+        
+        if ($request->deletedInstallment) {
+            foreach ($request->deletedInstallment as $del2) {
+                PolicyInstallment::where('POLICY_INSTALLMENT_ID', $del2['POLICY_INSTALLMENT_ID'])->delete();
             }
         }
 

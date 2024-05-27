@@ -91,6 +91,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         policy_status_id: "",
         policy_insurance_panel: "",
         policy_share: "",
+        policy_installment:"",
         initialPremium: [
             {
                 currency_id: "",
@@ -100,6 +101,16 @@ export default function PolicyIndex({ auth }: PageProps) {
                 installment: "",
             },
         ],
+        policyInstallment: [
+            {
+                policy_installment_id: "",
+                policy_id: "",
+                policy_installment_term: "",
+                policy_installment_percentage: "",
+                policy_installment_amount: "",
+                installment_due_date:"",
+            },
+        ]
     });
     const [dataById, setDataById] = useState<any>({
         relation_id: "",
@@ -111,13 +122,9 @@ export default function PolicyIndex({ auth }: PageProps) {
         policy_status_id: "",
         policy_insurance_panel: "",
         policy_share: "",
+        policy_installment: "",
         policy_initial_premium: [
             {
-                // currency_id: "",
-                // sum_insured: "",
-                // rate: "",
-                // initial_premium: "",
-                // installment: "",
                 CURRENCY_ID: "",
                 SUM_INSURED: "",
                 RATE: "",
@@ -125,9 +132,24 @@ export default function PolicyIndex({ auth }: PageProps) {
                 INSTALLMENT: "",
             },
         ],
+        policyInstallment: [
+            {
+                POLICY_INSTALLMENT_ID: "",
+                POLICY_ID: "",
+                POLICY_INSTALLMENT_TERM: "",
+                POLICY_INSTALLMENT_PERCENTAGE: "",
+                INSTALLMENT_DUE_DATE: "",
+                POLICY_INSTALLMENT_AMOUNT: "",
+            },
+        ],
         deletedInitialPremium: [
             {
                 policy_initial_premium_id: "",
+            },
+        ],
+        deletedInstallment: [
+            {
+                policy_installment_id: "",
             },
         ],
     });
@@ -153,6 +175,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             policy_status_id: "",
             policy_insurance_panel: "",
             policy_share: "",
+            policy_installment: "",
             initialPremium: [
                 {
                     currency_id: "",
@@ -160,6 +183,16 @@ export default function PolicyIndex({ auth }: PageProps) {
                     rate: "",
                     initial_premium: "",
                     installment: "",
+                },
+            ],
+            policyInstallment: [
+                {
+                    policy_installment_id: "",
+                    policy_id: "",
+                    policy_installment_term: "",
+                    policy_installment_percentage: "",
+                    policy_installment_amount: "",
+                    installment_due_date: "",
                 },
             ],
         });
@@ -220,6 +253,34 @@ export default function PolicyIndex({ auth }: PageProps) {
         const val = [...data.initialPremium];
         val.splice(i, 1);
         setData("initialPremium", val);
+    };
+
+    const inputPolicyInstallment = (name: string, value: any, i: number) => {
+        const changeVal: any = [...data.policyInstallment];
+        changeVal[i][name] = value;
+        setData("policyInstallment", changeVal);
+    };
+
+    const addRowPolicyInstallment = (e: FormEvent) => {
+        e.preventDefault();
+        setData("policyInstallment", [
+            ...data.policyInstallment,
+            {
+                policy_installment_id: "",
+                policy_id: "",
+                policy_installment_term: "",
+                policy_installment_percentage: "",
+                policy_installment_amount: "",
+                installment_due_date: "",
+            },
+        ]);
+    };
+    // console.log(insuranceType);
+
+    const deleteRowPolicyInstallment = (i: number) => {
+        const val = [...data.policyInstallment];
+        val.splice(i, 1);
+        setData("policyInstallment", val);
     };
 
     // edit
@@ -312,6 +373,78 @@ export default function PolicyIndex({ auth }: PageProps) {
             });
         }
     };
+
+    const editPolicyInstallment = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...dataById.policyInstallment];
+        changeVal[i][name] = value;
+        setDataById({ ...dataById, policyInstallment: changeVal });
+    };
+
+    const addRowEditInstallment = (e: FormEvent) => {
+        e.preventDefault();
+        // console.log(dataById);
+        setDataById({
+            ...dataById,
+            policyInstallment: [
+                ...dataById.policyInstallment,
+                {
+                    POLICY_INSTALLMENT_ID: null,
+                    POLICY_ID: dataById.POLICY_ID,
+                    POLICY_INSTALLMENT_TERM: "",
+                    POLICY_INSTALLMENT_PERCENTAGE: "",
+                    INSTALLMENT_DUE_DATE: "",
+                    POLICY_INSTALLMENT_AMOUNT: "",
+                },
+            ],
+        });
+    };
+
+    const deleteRowEditInstallment = (i: number) => {
+        const val = [...dataById.policyInstallment];
+        val.splice(i, 1);
+        if (
+            dataById.policyInstallment[i].policy_installment_id !==
+            null
+        ) {
+            if (dataById.deletedInstallment) {
+                // alert("a");
+                setDataById({
+                    ...dataById,
+                    policyInstallment: val,
+                    deletedInitialPremium: [
+                        ...dataById.deletedInstallment,
+                        {
+                            policy_installment_id:
+                                dataById.policyInstallment[i]
+                                    .POLICY_INISTALLMENT_ID,
+                        },
+                    ],
+                });
+            } else {
+                // alert("b");
+                setDataById({
+                    ...dataById,
+                    policyInstallment: val,
+                    deletedInitialPremium: [
+                        {
+                            policy_installment_id:
+                                dataById.policyInstallment[i]
+                                    .POLICY_INSTALLMENT_ID,
+                        },
+                    ],
+                });
+            }
+        } else {
+            setDataById({
+                ...dataById,
+                policyInstallment: val,
+            });
+        }
+    };
     // end edit
 
     // view
@@ -377,7 +510,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                 onSuccess={handleSuccess}
                                 body={
                                     <>
-                                        <div className="mb-4">
+                                        <div className="mb-4 ml-4 mr-4">
                                             <InputLabel
                                                 htmlFor="client_name"
                                                 value="Client Name"
@@ -417,7 +550,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 )}
                                             </select>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="policy_number"
@@ -486,7 +619,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="mb-4">
+                                        <div className="mb-4 ml-4 mr-4">
                                             <InputLabel
                                                 htmlFor="the_insured"
                                                 value="The Insured"
@@ -507,7 +640,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 required
                                             />
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="inception_date"
@@ -553,7 +686,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="insurance_panel"
@@ -599,25 +732,51 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="mt-10">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="policy_installment"
+                                                    value="Policy Installment"
+                                                />
+                                                <TextInput
+                                                    id="policy_installment"
+                                                    type="text"
+                                                    name="policy_installment"
+                                                    value={
+                                                        data.policy_installment
+                                                    }
+                                                    className=""
+                                                    autoComplete="policy_installment"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "policy_installment",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div></div>
+                                        </div>
+                                        <div className="mt-10 ml-4 mr-4">
                                             <h3 className="text-xl font-semibold leading-6 text-gray-900">
                                                 Policy Initial Premium
                                             </h3>
                                             <hr className="my-3" />
                                         </div>
-                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
                                             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                     <tr className="bg-gray-2 dark:bg-meta-4">
-                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[10px] py-4 px-4 text-sm text-black dark:text-white">
                                                             No.
                                                         </th>
                                                         <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
                                                             Currency
                                                         </th>
-                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        {/* <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
                                                             Installment
-                                                        </th>
+                                                        </th> */}
                                                         <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
                                                             Sum Insured
                                                         </th>
@@ -692,7 +851,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             )}
                                                                         </select>
                                                                     </td>
-                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                    {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                         <TextInput
                                                                             id="installment"
                                                                             name="installment"
@@ -720,7 +879,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
                                                                             required
                                                                         />
-                                                                    </td>
+                                                                    </td> */}
                                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                         <TextInput
                                                                             id="sum_insured"
@@ -856,6 +1015,177 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 </tbody>
                                             </table>
                                         </div>
+                                        {/* Policy Installment add */}
+                                        <div className="mt-10">
+                                            <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4">
+                                                Policy Installment
+                                            </h3>
+                                            <hr className="my-3" />
+                                        </div>
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
+                                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                    <tr className="bg-gray-2 dark:bg-meta-4">
+                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Installment
+                                                        </th>
+                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Term Rate
+                                                        </th>
+                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Due Date
+                                                        </th>
+
+                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Delete
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {data.policyInstallment.map(
+                                                        (
+                                                            pI: any,
+                                                            i: number
+                                                        ) => {
+                                                            return (
+                                                                <tr key={i}>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        <TextInput
+                                                                            id="policy_installment_term"
+                                                                            name="policy_installment_term"
+                                                                            value={
+                                                                                pI.policy_installment_term
+                                                                            }
+                                                                            // decimalScale={
+                                                                            //     2
+                                                                            // }
+                                                                            // decimalsLimit={
+                                                                            //     2
+                                                                            // }
+                                                                            // decimalSeparator={','}
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                inputPolicyInstallment(
+                                                                                    "policy_installment_term",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i
+                                                                                )
+                                                                            }
+                                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        <TextInput
+                                                                            id="policy_installment_percentage"
+                                                                            name="policy_installment_percentage"
+                                                                            value={
+                                                                                pI.policy_installment_percentage
+                                                                            }
+                                                                            // decimalScale={
+                                                                            //     2
+                                                                            // }
+                                                                            // decimalsLimit={
+                                                                            //     2
+                                                                            // }
+                                                                            // decimalSeparator={','}
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                inputPolicyInstallment(
+                                                                                    "policy_installment_percentage",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i
+                                                                                )
+                                                                            }
+                                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        <TextInput
+                                                                            type="date"
+                                                                            id="installment_due_date"
+                                                                            name="installment_due_date"
+                                                                            value={
+                                                                                pI.installment_due_date
+                                                                            }
+                                                                            // decimalScale={
+                                                                            //     2
+                                                                            // }
+                                                                            // decimalsLimit={
+                                                                            //     2
+                                                                            // }
+                                                                            // decimalSeparator={','}
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                inputPolicyInstallment(
+                                                                                    "installment_due_date",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i
+                                                                                )
+                                                                            }
+                                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                                            required
+                                                                        />
+                                                                    </td>
+
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        {data
+                                                                            .policyInstallment
+                                                                            .length !==
+                                                                            1 && (
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 24 24"
+                                                                                strokeWidth={
+                                                                                    1.5
+                                                                                }
+                                                                                stroke="currentColor"
+                                                                                className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                                onClick={() =>
+                                                                                    deleteRowPolicyInstallment(
+                                                                                        i
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                <path
+                                                                                    fill="#AB7C94"
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                                />
+                                                                            </svg>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        }
+                                                    )}
+                                                    <div className="w-40 mb-2 mt-2">
+                                                        <a
+                                                            href=""
+                                                            className="text-xs mt-1 text-primary ms-1 w-auto"
+                                                            onClick={(e) =>
+                                                                addRowPolicyInstallment(
+                                                                    e
+                                                                )
+                                                            }
+                                                        >
+                                                            + Add Row
+                                                        </a>
+                                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </>
                                 }
                             />
@@ -883,7 +1213,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                 submitButtonName={"Submit"}
                                 body={
                                     <>
-                                        <div className="mb-4">
+                                        <div className="mb-4 ml-4 mr-4">
                                             <InputLabel
                                                 htmlFor="edit_relation"
                                                 value="Client Name"
@@ -919,7 +1249,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 )}
                                             </select>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 ml-4 mr-4">
                                             <div className="mb-4">
                                                 <InputLabel
                                                     htmlFor="edit_policy_number"
@@ -988,7 +1318,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="mb-4">
+                                        <div className="mb-4 ml-4 mr-4">
                                             <InputLabel
                                                 htmlFor="edit_the_insured"
                                                 value="Policy The Insured"
@@ -1013,7 +1343,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             />
                                         </div>
 
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="edit_policy_inception_date"
@@ -1064,7 +1394,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div className="mb-4">
                                                 <InputLabel
                                                     htmlFor="edit_insurance_panel"
@@ -1115,13 +1445,41 @@ export default function PolicyIndex({ auth }: PageProps) {
                                             </div>
                                         </div>
 
-                                        <div className="mt-8">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="edit_policy_installment"
+                                                    value="Policy Installment"
+                                                />
+                                                <TextInput
+                                                    id="edit_policy_installment"
+                                                    type="text"
+                                                    name="edit_policy_installment"
+                                                    value={
+                                                        dataById.POLICY_INSTALLMENT
+                                                    }
+                                                    className=""
+                                                    autoComplete="edit_policy_installment"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            POLICY_INSTALLMENT:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div></div>
+                                        </div>
+
+                                        <div className="mt-8 ml-4 mr-4">
                                             <h3 className="text-xl font-semibold leading-6 text-gray-900">
                                                 Initial Premium
                                             </h3>
                                             <hr className="my-3" />
                                         </div>
-                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
                                             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border">
                                                     <tr className="bg-gray-2 dark:bg-meta-4">
@@ -1131,9 +1489,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                         <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
                                                             Currency
                                                         </th>
-                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        {/* <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
                                                             Installment
-                                                        </th>
+                                                        </th> */}
                                                         <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
                                                             Sum Insured
                                                         </th>
@@ -1208,7 +1566,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             )}
                                                                         </select>
                                                                     </td>
-                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                    {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                         <TextInput
                                                                             id="installment"
                                                                             name="INSTALLMENT"
@@ -1229,7 +1587,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                             className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
                                                                             required
                                                                         />
-                                                                    </td>
+                                                                    </td> */}
                                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                         <TextInput
                                                                             id="sum_insured"
@@ -1344,6 +1702,156 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 </tbody>
                                             </table>
                                         </div>
+
+                                        {/* Policy Installment add */}
+                                        <div className="mt-10 ml-4 mr-4">
+                                            <h3 className="text-xl font-semibold leading-6 text-gray-900">
+                                                Policy Installment
+                                            </h3>
+                                            <hr className="my-3" />
+                                        </div>
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
+                                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                    <tr className="bg-gray-2 dark:bg-meta-4">
+                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Installment
+                                                        </th>
+                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Term Rate
+                                                        </th>
+                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Due Date
+                                                        </th>
+
+                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            Delete
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {dataById.policyInstallment?.map(
+                                                        (
+                                                            pI: any,
+                                                            i: number
+                                                        ) => {
+                                                            return (
+                                                                <tr key={i}>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        <TextInput
+                                                                            id="policy_installment_term"
+                                                                            name="POLICY_INSTALLMENT_TERM"
+                                                                            value={
+                                                                                pI.POLICY_INSTALLMENT_TERM
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                editPolicyInstallment(
+                                                                                    "POLICY_INSTALLMENT_TERM",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i
+                                                                                )
+                                                                            }
+                                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        <TextInput
+                                                                            id="policy_installment_percentage"
+                                                                            name="POLICY_INSTALLMENT_PERCENTAGE"
+                                                                            value={
+                                                                                pI.POLICY_INSTALLMENT_PERCENTAGE
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                editPolicyInstallment(
+                                                                                    "POLICY_INSTALLMENT_PERCENTAGE",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i
+                                                                                )
+                                                                            }
+                                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        <TextInput
+                                                                            type="date"
+                                                                            id="installment_due_date"
+                                                                            name="INSTALLMENT_DUE_DATE"
+                                                                            value={
+                                                                                pI.INSTALLMENT_DUE_DATE
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                editPolicyInstallment(
+                                                                                    "INSTALLMENT_DUE_DATE",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i
+                                                                                )
+                                                                            }
+                                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        {dataById
+                                                                            .policyInstallment
+                                                                            .length !==
+                                                                            1 && (
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 24 24"
+                                                                                strokeWidth={
+                                                                                    1.5
+                                                                                }
+                                                                                stroke="currentColor"
+                                                                                className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                                onClick={() =>
+                                                                                    deleteRowEditInstallment(
+                                                                                        i
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                <path
+                                                                                    fill="#AB7C94"
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                                />
+                                                                            </svg>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        }
+                                                    )}
+                                                    <div className="w-40 mb-2 mt-2">
+                                                        <a
+                                                            href=""
+                                                            className="text-xs mt-1 text-primary-pelindo ms-1"
+                                                            onClick={(e) =>
+                                                                addRowEditInstallment(
+                                                                    e
+                                                                )
+                                                            }
+                                                        >
+                                                            + Add Row
+                                                        </a>
+                                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </>
                                 }
                             />
@@ -1434,9 +1942,10 @@ export default function PolicyIndex({ auth }: PageProps) {
                                         search: !modal.search,
                                     })
                                 }
-                                // clearSearchButtonAction={() =>
-                                //     clearSearchPolicy()
-                                // }
+                                clearSearchButtonAction={() =>
+                                    // clearSearchPolicy()
+                                    null
+                                }
                                 tableHead={
                                     <>
                                         <TableTH

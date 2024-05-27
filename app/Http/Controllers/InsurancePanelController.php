@@ -52,23 +52,26 @@ class InsurancePanelController extends Controller
         return $data->paginate($dataPerPage);
 
     }
-    
-    public function initialPremium($id=null) {
-        $query = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
-        ->leftJoin('r_currency', 'm_policy_initial_premium.CURRENCY_ID', '=', 'r_currency.CURRENCY_ID');
-        if ($id) {
-            $query->where('m_policy_initial_premium.policy_initial_premium_id', '=', $id);
-        }
-        return $query->orderBy('m_policy_initial_premium.POLICY_ID', 'desc')
-        ->get();
-    }
 
+     public function initialPremium($id) {
+        
+        $data = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
+        ->where('POLICY_INITIAL_PREMIUM_ID', $id)->first();
+        // dd($data);
+        return response()->json($data);
+
+    }
 
     public function index()
     {        
+        $listInitialPremium = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
+                ->leftJoin('r_currency', 'm_policy_initial_premium.CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
+                ->orderBy('m_policy_initial_premium.POLICY_ID', 'desc')
+                ->get();
         // dd($policyIinitialPremium->toArray());
         return Inertia::render('InsurancePanel/Index', [
-            'listInitialPremium' => $this->initialPremium(),
+            
+            'listInitialPremium' => $listInitialPremium,
             // 'currency' => RCurrency::get(),
             // 'insuranceType' => RInsuranceType::where('INSURANCE_TYPE_STATUS', '=', 1)->get(),
             'insurance' => DB::table('t_relation')

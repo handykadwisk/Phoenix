@@ -15,7 +15,7 @@ class Policy extends Model
     protected $table = 't_policy';
 
     public $timestamps = false;
-    public $with = ['policyInitialPremium','insuranceType', 'relation'];
+    public $with = ['policyInitialPremium', 'policyInstallment', 'insuranceType', 'relation'];
 
     protected $fillable = [
         'POLICY_ID',
@@ -31,11 +31,16 @@ class Policy extends Model
         'POLICY_CREATED_BY',
         'POLICY_CREATED_DATE',
         'POLICY_UPDATED_BY',
-        'POLICY_UPDATED_DATE'
+        'POLICY_UPDATED_DATE',
+        'POLICY_INSTALLMENT'
     ];
 
     public function policyInitialPremium() {
         return $this->hasMany(MPolicyInitialPremium::class, 'POLICY_ID', 'POLICY_ID');
+    }
+
+    public function policyInstallment() {
+        return $this->hasMany(policyInstallment::class, 'POLICY_ID', 'POLICY_ID');
     }
 
     public function insuranceType() {

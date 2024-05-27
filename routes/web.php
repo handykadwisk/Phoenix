@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getInsurancePanel/{id}', [InsurancePanelController::class, 'get_id'])->name('insurancePanel.get_id');
     Route::post('/getInsurancePanel', [InsurancePanelController::class, 'getInsurancePanelJson'])->name('insurancePanel.getInsurancePanelJson');
     Route::patch('/editInsurancePanel/{id}', [InsurancePanelController::class, 'edit'])->name('insurancePanel.edit');
+    Route::get('/getInitialPremium/{id}', [InsurancePanelController::class, 'initialPremium'])->name('insurancePanel.initialPremium');
     
 });
 

@@ -24,6 +24,44 @@ export default function PolicyIndex({ auth }: PageProps) {
         getInsurancePanel();
     }, []);
 
+    const [dataNew, setDataNew] = useState<any>({
+        policy_id: "",
+        policy_initial_premium_id: "",
+        ip_premium_type: "",
+        insurance_id: "",
+        ip_policy_leader: "",
+        ip_currency_id: "",
+        ip_term: "",
+        ip_policy_initial_premium: "",
+        ip_policy_share: "",
+        ip_disc_insurance: "",
+        ip_pip_after_disc: "",
+        ip_policy_bf: "",
+        ip_bf_amount: "",
+        ip_vat: "",
+        ip_pph_23: "",
+        ip_net_bf: "",
+        ip_payment_method: "",
+        ip_vat_amount: "",
+        installment: [
+            {
+                installment_term: "",
+                installment_percentage: "",
+                installment_due_date: "",
+                installment_ar: "",
+                installment_ap: "",
+                installment_gross_bf: "",
+                installment_vat: "",
+                installment_pph_23: "",
+                installment_net_bf: "",
+                installment_admin_cost: "",
+                installment_policy_cost: "",
+            },
+        ],
+    });
+    const [dataInitialPremium, setDataInitialPremium] = useState<any>([]);
+    const [test, setTest] = useState<string>('');
+    // const [test, setTest] = useState<string>("aaa");
     const [insurancePanels, setInsurancePanels] = useState<any>([]);
     const { flash, policy, custom_menu }: any = usePage().props;
     const { currency }: any = usePage().props;
@@ -66,7 +104,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             });
     };
 
-    console.log(insurancePanels);
+    // console.log(insurancePanels);
     const client = [
         { id: "1", stat: "CHUBB" },
         { id: "2", stat: "BRINS" },
@@ -88,7 +126,8 @@ export default function PolicyIndex({ auth }: PageProps) {
         search: false,
     });
 
-    const { data, setData, errors, reset } = useForm({
+    // const { data, setData, errors, reset } = useForm({
+    const [data, setData] = useState<any>({
         policy_id: "",
         policy_initial_premium_id: "",
         ip_premium_type: "",
@@ -164,7 +203,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         ],
     });
     // console.log(dataById);
-    console.log(insurancePanels.data);
+    // console.log(insurancePanels.data);
 
     const [dataToDeactivate, setDataToDeactivate] = useState<any>({
         id: "",
@@ -174,7 +213,7 @@ export default function PolicyIndex({ auth }: PageProps) {
 
     const handleSuccess = (message: string) => {
         setIsSuccess("");
-        reset();
+        // reset();
         setData({
             policy_id: "",
             policy_initial_premium_id: "",
@@ -245,34 +284,58 @@ export default function PolicyIndex({ auth }: PageProps) {
     const inputInstallment = (name: string, value: any, i: number) => {
         const changeVal: any = [...data.installment];
         changeVal[i][name] = value;
-        setData("installment", changeVal);
+        // setData("installment", changeVal);
+        setData({
+            ...data,
+            installment: changeVal,
+        });
     };
 
     const addRowInstallment = (e: FormEvent) => {
         e.preventDefault();
-        setData("installment", [
-            ...data.installment,
-            {
-                installment_term: "",
-                installment_percentage: "",
-                installment_due_date: "",
-                installment_ar: "",
-                installment_ap: "",
-                installment_gross_bf: "",
-                installment_vat: "",
-                installment_pph_23: "",
-                installment_net_bf: "",
-                installment_admin_cost: "",
-                installment_policy_cost: "",
-            },
-        ]);
+        // setData("installment", [
+        //     ...data.installment,
+        //     {
+        //         installment_term: "",
+        //         installment_percentage: "",
+        //         installment_due_date: "",
+        //         installment_ar: "",
+        //         installment_ap: "",
+        //         installment_gross_bf: "",
+        //         installment_vat: "",
+        //         installment_pph_23: "",
+        //         installment_net_bf: "",
+        //         installment_admin_cost: "",
+        //         installment_policy_cost: "",
+        //     },
+        // ]);
+        setData({
+            ...data,
+            installment: [
+                ...data.installment,
+                {
+                    installment_term: "",
+                    installment_percentage: "",
+                    installment_due_date: "",
+                    installment_ar: "",
+                    installment_ap: "",
+                    installment_gross_bf: "",
+                    installment_vat: "",
+                    installment_pph_23: "",
+                    installment_net_bf: "",
+                    installment_admin_cost: "",
+                    installment_policy_cost: "",
+                },
+            ],
+        });
     };
     // console.log(insuranceType);
 
     const deleteRowInstallment = (i: number) => {
         const val = [...data.installment];
         val.splice(i, 1);
-        setData("installment", val);
+        // setData("installment", val);
+        setData({ ...data, installment: val });
     };
 
     // edit
@@ -330,10 +393,7 @@ export default function PolicyIndex({ auth }: PageProps) {
     const deleteRowEditInstallment = (i: number) => {
         const val = [...dataById.installment];
         val.splice(i, 1);
-        if (
-            dataById.installment[i].installment_id !==
-            null
-        ) {
+        if (dataById.installment[i].installment_id !== null) {
             if (dataById.deletedInstallment) {
                 // alert("a");
                 setDataById({
@@ -343,8 +403,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                         ...dataById.deletedInstallment,
                         {
                             INSTALLMENT_ID:
-                                dataById.installment[i]
-                                    .INSTALLMENT_ID,
+                                dataById.installment[i].INSTALLMENT_ID,
                         },
                     ],
                 });
@@ -390,10 +449,79 @@ export default function PolicyIndex({ auth }: PageProps) {
     };
     // end view
 
+    const getInitialPremium = async (id: string) => {
+        // e.preventDefault();
+
+        await axios
+            .get(`/getInitialPremium/${id}`)
+            .then((res) => {
+                // console.log("res: ", res.data);
+                setDataInitialPremium(res.data);
+                // console.log(dataInitialPremium)
+                // console.log("data initial premium a: ", dataInitialPremium);
+            })
+            .catch((err) => console.log(err));
+            // setTest("zzzz");
+            // console.log('test: ',test)
+            // dataInitialPremium.forceUpdate();
+        // console.log("data initial premium: ", dataInitialPremium);
+    };
+    // console.log("data initial premium: ", dataInitialPremium);
+    const print = (event:any) => {
+        // console.log(event.target.value)
+        setTest(event.target.value);
+        // console.log("test: ", test);
+        // if (dataInitialPremium.length > 0) {
+        //     console.log("id print: ", id);
+        //     console.log("data initial premium x: ", dataInitialPremium);
+        // }
+    };
+     console.log("data: ", data);
+    // useEffect( () => {
+    //     if (test) {
+    //         console.log('useEffect: ', test);
+    //     }
+    // }, [test])
+
+    useEffect(() => {
+        // if (dataInitialPremium.length > 0) {
+            // setTest('zzz');
+            // console.log("useEffect: ", dataInitialPremium);
+            setData({
+                ...data,
+                policy_id: dataInitialPremium.POLICY_ID,
+                ip_policy_initial_premium: dataInitialPremium.INITIAL_PREMIUM,
+                ip_currency_id: dataInitialPremium.CURRENCY_ID,
+                ip_term: dataInitialPremium.POLICY_INSTALLMENT
+            });
+            // setData("policy_id", dataInitialPremium.POLICY_ID);
+            // setData("ip_term", dataInitialPremium.INSTALLMENT);
+            // setData(
+            //     "ip_policy_initial_premium",
+            //     dataInitialPremium.INITIAL_PREMIUM
+            // );
+            // setData("ip_currency_id", dataInitialPremium.CURRENCY_ID);
+            // console.log(dataNew);
+        // }
+    }, [dataInitialPremium]);
+
+    
     return (
         <AuthenticatedLayout user={auth.user} header={"Insurance Panel"}>
             <Head title="Insurance Panel" />
-
+            {/* <div>
+                <InputLabel htmlFor="ip_term" value="Installment" />
+                <TextInput
+                    id="ip_term"
+                    type="text"
+                    name="ip_term"
+                    value={test}
+                    className=""
+                    autoComplete="ip_term"
+                    onChange={print}
+                    required
+                />
+            </div> */}
             <div>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-0">
                     <div className="bg-white overflow-hidden shadow-lg sm:rounded-lg">
@@ -417,7 +545,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                             {/* modal add policy */}
                             <ModalToAdd
                                 show={modal.add}
-                                onClose={() =>
+                                onClose={() => {
                                     setModal({
                                         add: false,
                                         delete: false,
@@ -425,15 +553,19 @@ export default function PolicyIndex({ auth }: PageProps) {
                                         view: false,
                                         document: false,
                                         search: false,
-                                    })
-                                }
+                                    });
+                                    handleSuccess("");
+                                }}
                                 title={"Add Insurance Panel"}
                                 url={`/insurancePanel`}
                                 data={data}
                                 onSuccess={handleSuccess}
+                                classPanel={
+                                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                                }
                                 body={
                                     <>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="policy_number"
@@ -441,13 +573,24 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 />
                                                 <select
                                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    value={data.policy_id}
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "policy_id",
-                                                            e.target.value
-                                                        )
+                                                    value={
+                                                        data.policy_initial_premium_id
                                                     }
+                                                    onChange={(e) => {
+                                                        // setData(
+                                                        //     "policy_initial_premium_id",
+                                                        //     e.target.value
+                                                        // );
+                                                        setData({
+                                                            ...data,
+                                                            policy_initial_premium_id:
+                                                                e.target.value,
+                                                        });
+                                                        getInitialPremium(
+                                                            e.target.value
+                                                        );
+                                                        // print(e.target.value);
+                                                    }}
                                                 >
                                                     <option>
                                                         --{" "}
@@ -465,7 +608,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                 <option
                                                                     key={i}
                                                                     value={
-                                                                        initialPremium.POLICY_ID
+                                                                        initialPremium.POLICY_INITIAL_PREMIUM_ID
                                                                     }
                                                                 >
                                                                     {initialPremium.POLICY_NUMBER +
@@ -486,10 +629,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                     value={data.ip_premium_type}
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_premium_type",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_premium_type",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_premium_type:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                 >
                                                     <option>
@@ -514,7 +662,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="insurance_id"
@@ -524,10 +672,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     value={data.insurance_id}
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "insurance_id",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "insurance_id",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            insurance_id:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                 >
                                                     <option>
@@ -574,11 +727,17 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                 1
                                                             }
                                                             onChange={(e) =>
-                                                                setData(
-                                                                    "ip_policy_leader",
-                                                                    e.target
-                                                                        .value
-                                                                )
+                                                                // setData(
+                                                                //     "ip_policy_leader",
+                                                                //     e.target
+                                                                //         .value
+                                                                // )
+                                                                setData({
+                                                                    ...data,
+                                                                    ip_policy_leader:
+                                                                        e.target
+                                                                            .value,
+                                                                })
                                                             }
                                                             className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                                         />
@@ -599,11 +758,17 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                                 0
                                                             }
                                                             onChange={(e) =>
-                                                                setData(
-                                                                    "ip_policy_leader",
-                                                                    e.target
-                                                                        .value
-                                                                )
+                                                                // setData(
+                                                                //     "ip_policy_leader",
+                                                                //     e.target
+                                                                //         .value
+                                                                // )
+                                                                setData({
+                                                                    ...data,
+                                                                    ip_policy_leader:
+                                                                        e.target
+                                                                            .value,
+                                                                })
                                                             }
                                                             className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                                         />
@@ -617,7 +782,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="ip_term"
@@ -631,10 +796,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_term"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_term",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_term",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_term:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
@@ -654,16 +824,21 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_policy_initial_premium"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_policy_initial_premium",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_policy_initial_premium",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_policy_initial_premium:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="ip_policy_share"
@@ -677,10 +852,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_policy_share"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_policy_share",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_policy_share",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_policy_share:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
@@ -700,16 +880,21 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_disc_insurance"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_disc_insurance",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_disc_insurance",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_disc_insurance:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="ip_pip_after_disc"
@@ -725,10 +910,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_pip_after_disc"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_pip_after_disc",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_pip_after_disc",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_pip_after_disc:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
@@ -746,16 +936,21 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_policy_bf"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_policy_bf",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_policy_bf",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_policy_bf:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="ip_bf_amount"
@@ -769,10 +964,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_bf_amount"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_bf_amount",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_bf_amount",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_bf_amount:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
@@ -790,16 +990,21 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_vat_amount"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_vat_amount",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_vat_amount",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_vat_amount:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
                                             </div>
                                         </div>
-                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4">
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                                             <div>
                                                 <InputLabel
                                                     htmlFor="ip_pph_23"
@@ -813,10 +1018,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_pph_23"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_pph_23",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_pph_23",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_pph_23:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
@@ -834,10 +1044,15 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     className=""
                                                     autoComplete="ip_net_bf"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            "ip_net_bf",
-                                                            e.target.value
-                                                        )
+                                                        // setData(
+                                                        //     "ip_net_bf",
+                                                        //     e.target.value
+                                                        // )
+                                                        setData({
+                                                            ...data,
+                                                            ip_net_bf:
+                                                                e.target.value,
+                                                        })
                                                     }
                                                     required
                                                 />
@@ -845,12 +1060,12 @@ export default function PolicyIndex({ auth }: PageProps) {
                                         </div>
 
                                         <div className="mt-10">
-                                            <h3 className="text-xl font-semibold leading-6 text-gray-900">
+                                            <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4">
                                                 Installment
                                             </h3>
                                             <hr className="my-3" />
                                         </div>
-                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
                                             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                     <tr className="bg-gray-2 dark:bg-meta-4">
@@ -1289,430 +1504,470 @@ export default function PolicyIndex({ auth }: PageProps) {
                                 method={"patch"}
                                 headers={null}
                                 submitButtonName={"Submit"}
+                                classPanel={
+                                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                                }
                                 body={
                                     <>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="policy_number"
-                                                value="Policy Number"
-                                            />
-                                            <select
-                                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                value={dataById.POLICY_ID}
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        POLICY_ID:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            >
-                                                <option>
-                                                    --{" "}
-                                                    <i>Choose Policy Number</i>{" "}
-                                                    --
-                                                </option>
-                                                {listInitialPremium.map(
-                                                    (
-                                                        initialPremium: any,
-                                                        i: number
-                                                    ) => {
-                                                        return (
-                                                            <option
-                                                                key={i}
-                                                                value={
-                                                                    initialPremium.POLICY_ID
-                                                                }
-                                                            >
-                                                                {initialPremium.POLICY_NUMBER +
-                                                                    " - " +
-                                                                    initialPremium.CURRENCY_SYMBOL}
-                                                            </option>
-                                                        );
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="policy_number"
+                                                    value="Policy Number"
+                                                />
+                                                <select
+                                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    value={
+                                                        dataById.POLICY_INITIAL_PREMIUM_ID
                                                     }
-                                                )}
-                                            </select>
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="premium_type"
-                                                value="Premium Type"
-                                            />
-                                            <select
-                                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                value={dataById.IP_PREMIUM_TYPE}
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_PREMIUM_TYPE:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            >
-                                                <option>
-                                                    -- <i>Choose Status</i> --
-                                                </option>
-                                                {premiumType?.map(
-                                                    (status: any) => {
-                                                        return (
-                                                            <option
-                                                                value={
-                                                                    status.id
-                                                                }
-                                                            >
-                                                                {status.stat}
-                                                            </option>
-                                                        );
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            POLICY_INITIAL_PREMIUM_ID:
+                                                                e.target.value,
+                                                        })
                                                     }
-                                                )}
-                                            </select>
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="insurance_id"
-                                                value="Insurance"
-                                            />
-                                            <select
-                                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                value={dataById.INSURANCE_ID}
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        INSURANCE_ID:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            >
-                                                <option>
-                                                    -- <i>Choose Client Name</i>{" "}
-                                                    --
-                                                </option>
-                                                {insurance.map(
-                                                    (
-                                                        insurances: any,
-                                                        i: number
-                                                    ) => {
-                                                        return (
-                                                            <option
-                                                                key={i}
-                                                                value={
-                                                                    insurances.RELATION_ORGANIZATION_ID
-                                                                }
-                                                            >
-                                                                {
-                                                                    insurances.RELATION_ORGANIZATION_NAME
-                                                                }
-                                                            </option>
-                                                        );
+                                                >
+                                                    <option>
+                                                        --{" "}
+                                                        <i>
+                                                            Choose Policy Number
+                                                        </i>{" "}
+                                                        --
+                                                    </option>
+                                                    {listInitialPremium.map(
+                                                        (
+                                                            initialPremium: any,
+                                                            i: number
+                                                        ) => {
+                                                            return (
+                                                                <option
+                                                                    key={i}
+                                                                    value={
+                                                                        initialPremium.POLICY_INITIAL_PREMIUM_ID
+                                                                    }
+                                                                >
+                                                                    {initialPremium.POLICY_NUMBER +
+                                                                        " - " +
+                                                                        initialPremium.CURRENCY_SYMBOL}
+                                                                </option>
+                                                            );
+                                                        }
+                                                    )}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="premium_type"
+                                                    value="Premium Type"
+                                                />
+                                                <select
+                                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                    value={
+                                                        dataById.IP_PREMIUM_TYPE
                                                     }
-                                                )}
-                                            </select>
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_PREMIUM_TYPE:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                >
+                                                    <option>
+                                                        -- <i>Choose Status</i>{" "}
+                                                        --
+                                                    </option>
+                                                    {premiumType?.map(
+                                                        (status: any) => {
+                                                            return (
+                                                                <option
+                                                                    value={
+                                                                        status.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        status.stat
+                                                                    }
+                                                                </option>
+                                                            );
+                                                        }
+                                                    )}
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="policy_leader"
-                                                value="Policy Leader"
-                                            />
-                                            <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                                                <div className="flex items-center">
-                                                    <input
-                                                        id="radio1"
-                                                        name="ip_policy_leader"
-                                                        type="radio"
-                                                        value={
-                                                            dataById.IP_POLICY_LEADER
-                                                            // 1
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="insurance_id"
+                                                    value="Insurance"
+                                                />
+                                                <select
+                                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    value={
+                                                        dataById.INSURANCE_ID
+                                                    }
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            INSURANCE_ID:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                >
+                                                    <option>
+                                                        --{" "}
+                                                        <i>
+                                                            Choose Client Name
+                                                        </i>{" "}
+                                                        --
+                                                    </option>
+                                                    {insurance.map(
+                                                        (
+                                                            insurances: any,
+                                                            i: number
+                                                        ) => {
+                                                            return (
+                                                                <option
+                                                                    key={i}
+                                                                    value={
+                                                                        insurances.RELATION_ORGANIZATION_ID
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        insurances.RELATION_ORGANIZATION_NAME
+                                                                    }
+                                                                </option>
+                                                            );
                                                         }
-                                                        onChange={(e) =>
-                                                            setDataById({
-                                                                ...dataById,
-                                                                IP_POLICY_LEADER:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        defaultChecked={
-                                                            dataById.IP_POLICY_LEADER ==
-                                                            "1"
-                                                                ? true
-                                                                : false
-                                                        }
-                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                                    />
-                                                    <label
-                                                        htmlFor="radio1"
-                                                        className="ml-3 block text-sm font-medium leading-6 text-gray-900"
-                                                    >
-                                                        Yes
-                                                    </label>
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <input
-                                                        id="radio2"
-                                                        name="ip_policy_leader"
-                                                        type="radio"
-                                                        value={
-                                                            dataById.IP_POLICY_LEADER
-                                                            // 0
-                                                        }
-                                                        onChange={(e) =>
-                                                            setDataById({
-                                                                ...dataById,
-                                                                IP_POLICY_LEADER:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        defaultChecked={
-                                                            dataById.IP_POLICY_LEADER ==
-                                                            "0"
-                                                                ? true
-                                                                : false
-                                                        }
-                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                                    />
-                                                    <label
-                                                        htmlFor="radio2"
-                                                        className="ml-3 block text-sm font-medium leading-6 text-gray-900"
-                                                    >
-                                                        no
-                                                    </label>
+                                                    )}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="policy_leader"
+                                                    value="Policy Leader"
+                                                />
+                                                <div className="mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            id="radio1"
+                                                            name="ip_policy_leader"
+                                                            type="radio"
+                                                            value={
+                                                                dataById.IP_POLICY_LEADER
+                                                                // 1
+                                                            }
+                                                            onChange={(e) =>
+                                                                setDataById({
+                                                                    ...dataById,
+                                                                    IP_POLICY_LEADER:
+                                                                        e.target
+                                                                            .value,
+                                                                })
+                                                            }
+                                                            defaultChecked={
+                                                                dataById.IP_POLICY_LEADER ==
+                                                                "1"
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                        />
+                                                        <label
+                                                            htmlFor="radio1"
+                                                            className="ml-3 block text-sm font-medium leading-6 text-gray-900"
+                                                        >
+                                                            Yes
+                                                        </label>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            id="radio2"
+                                                            name="ip_policy_leader"
+                                                            type="radio"
+                                                            value={
+                                                                dataById.IP_POLICY_LEADER
+                                                                // 0
+                                                            }
+                                                            onChange={(e) =>
+                                                                setDataById({
+                                                                    ...dataById,
+                                                                    IP_POLICY_LEADER:
+                                                                        e.target
+                                                                            .value,
+                                                                })
+                                                            }
+                                                            defaultChecked={
+                                                                dataById.IP_POLICY_LEADER ==
+                                                                "0"
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                        />
+                                                        <label
+                                                            htmlFor="radio2"
+                                                            className="ml-3 block text-sm font-medium leading-6 text-gray-900"
+                                                        >
+                                                            no
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_term"
-                                                value="Installment"
-                                            />
-                                            <TextInput
-                                                id="ip_term"
-                                                type="text"
-                                                name="ip_term"
-                                                value={dataById.IP_TERM}
-                                                className=""
-                                                autoComplete="ip_term"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_TERM: e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_term"
+                                                    value="Installment"
+                                                />
+                                                <TextInput
+                                                    id="ip_term"
+                                                    type="text"
+                                                    name="ip_term"
+                                                    value={dataById.IP_TERM}
+                                                    className=""
+                                                    autoComplete="ip_term"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_TERM:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_policy_initial_premium"
+                                                    value="Policy Initial Premium"
+                                                />
+                                                <TextInput
+                                                    id="ip_policy_initial_premium"
+                                                    type="text"
+                                                    name="ip_policy_initial_premium"
+                                                    value={
+                                                        dataById.IP_POLICY_INITIAL_PREMIUM
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_policy_initial_premium"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_POLICY_INITIAL_PREMIUM:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_policy_initial_premium"
-                                                value="Policy Initial Premium"
-                                            />
-                                            <TextInput
-                                                id="ip_policy_initial_premium"
-                                                type="text"
-                                                name="ip_policy_initial_premium"
-                                                value={
-                                                    dataById.IP_POLICY_INITIAL_PREMIUM
-                                                }
-                                                className=""
-                                                autoComplete="ip_policy_initial_premium"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_POLICY_INITIAL_PREMIUM:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_policy_share"
+                                                    value="Policy Share (%)"
+                                                />
+                                                <TextInput
+                                                    id="ip_policy_share"
+                                                    type="text"
+                                                    name="ip_policy_share"
+                                                    value={
+                                                        dataById.IP_POLICY_SHARE
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_policy_share"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_POLICY_SHARE:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_disc_insurance"
+                                                    value="Discount Insurance (%)"
+                                                />
+                                                <TextInput
+                                                    id="ip_disc_insurance"
+                                                    type="text"
+                                                    name="ip_disc_insurance"
+                                                    value={
+                                                        dataById.IP_DISC_INSURANCE
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_disc_insurance"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_DISC_INSURANCE:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_policy_share"
-                                                value="Policy Share (%)"
-                                            />
-                                            <TextInput
-                                                id="ip_policy_share"
-                                                type="text"
-                                                name="ip_policy_share"
-                                                value={dataById.IP_POLICY_SHARE}
-                                                className=""
-                                                autoComplete="ip_policy_share"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_POLICY_SHARE:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_pip_after_disc"
+                                                    value="PIP After Disc (Share)"
+                                                />
+                                                <TextInput
+                                                    id="ip_pip_after_disc"
+                                                    type="text"
+                                                    name="ip_pip_after_disc"
+                                                    value={
+                                                        dataById.IP_PIP_AFTER_DISC
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_pip_after_disc"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_PIP_AFTER_DISC:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_policy_bf"
+                                                    value="Policy BF (%)"
+                                                />
+                                                <TextInput
+                                                    id="ip_policy_bf"
+                                                    type="text"
+                                                    name="ip_policy_bf"
+                                                    value={
+                                                        dataById.IP_POLICY_BF
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_policy_bf"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_POLICY_BF:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_disc_insurance"
-                                                value="Discount Insurance (%)"
-                                            />
-                                            <TextInput
-                                                id="ip_disc_insurance"
-                                                type="text"
-                                                name="ip_disc_insurance"
-                                                value={
-                                                    dataById.IP_DISC_INSURANCE
-                                                }
-                                                className=""
-                                                autoComplete="ip_disc_insurance"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_DISC_INSURANCE:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_bf_amount"
+                                                    value="BF Amount"
+                                                />
+                                                <TextInput
+                                                    id="ip_bf_amount"
+                                                    type="text"
+                                                    name="ip_bf_amount"
+                                                    value={
+                                                        dataById.IP_BF_AMOUNT
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_bf_amount"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_BF_AMOUNT:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_vat_amount"
+                                                    value="VAT (2.2%)"
+                                                />
+                                                <TextInput
+                                                    id="ip_vat_amount"
+                                                    type="text"
+                                                    name="ip_vat_amount"
+                                                    value={
+                                                        dataById.IP_VAT_AMOUNT
+                                                    }
+                                                    className=""
+                                                    autoComplete="ip_vat_amount"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_VAT_AMOUNT:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_pip_after_disc"
-                                                value="PIP After Disc (Share)"
-                                            />
-                                            <TextInput
-                                                id="ip_pip_after_disc"
-                                                type="text"
-                                                name="ip_pip_after_disc"
-                                                value={
-                                                    dataById.IP_PIP_AFTER_DISC
-                                                }
-                                                className=""
-                                                autoComplete="ip_pip_after_disc"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_PIP_AFTER_DISC:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_policy_bf"
-                                                value="Policy BF (%)"
-                                            />
-                                            <TextInput
-                                                id="ip_policy_bf"
-                                                type="text"
-                                                name="ip_policy_bf"
-                                                value={dataById.IP_POLICY_BF}
-                                                className=""
-                                                autoComplete="ip_policy_bf"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_POLICY_BF:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_bf_amount"
-                                                value="BF Amount"
-                                            />
-                                            <TextInput
-                                                id="ip_bf_amount"
-                                                type="text"
-                                                name="ip_bf_amount"
-                                                value={dataById.IP_BF_AMOUNT}
-                                                className=""
-                                                autoComplete="ip_bf_amount"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_BF_AMOUNT:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_vat_amount"
-                                                value="VAT (2.2%)"
-                                            />
-                                            <TextInput
-                                                id="ip_vat_amount"
-                                                type="text"
-                                                name="ip_vat_amount"
-                                                value={dataById.IP_VAT_AMOUNT}
-                                                className=""
-                                                autoComplete="ip_vat_amount"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_VAT_AMOUNT:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_pph_23"
-                                                value="PPh 23 (2%)"
-                                            />
-                                            <TextInput
-                                                id="ip_pph_23"
-                                                type="text"
-                                                name="ip_pph_23"
-                                                value={dataById.IP_PPH_23}
-                                                className=""
-                                                autoComplete="ip_pph_23"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_PPH_23:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <InputLabel
-                                                htmlFor="ip_net_bf"
-                                                value="Net BF"
-                                            />
-                                            <TextInput
-                                                id="ip_net_bf"
-                                                type="text"
-                                                name="ip_net_bf"
-                                                value={dataById.IP_NET_BF}
-                                                className=""
-                                                autoComplete="ip_net_bf"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        IP_NET_BF:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
+                                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_pph_23"
+                                                    value="PPh 23 (2%)"
+                                                />
+                                                <TextInput
+                                                    id="ip_pph_23"
+                                                    type="text"
+                                                    name="ip_pph_23"
+                                                    value={dataById.IP_PPH_23}
+                                                    className=""
+                                                    autoComplete="ip_pph_23"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_PPH_23:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="ip_net_bf"
+                                                    value="Net BF"
+                                                />
+                                                <TextInput
+                                                    id="ip_net_bf"
+                                                    type="text"
+                                                    name="ip_net_bf"
+                                                    value={dataById.IP_NET_BF}
+                                                    className=""
+                                                    autoComplete="ip_net_bf"
+                                                    onChange={(e) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            IP_NET_BF:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
                                         </div>
 
-                                        <div className="mt-10">
+                                        <div className="mt-10 ml-4 mr-4">
                                             <h3 className="text-xl font-semibold leading-6 text-gray-900">
                                                 Installment
                                             </h3>
                                             <hr className="my-3" />
                                         </div>
-                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
                                             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                     <tr className="bg-gray-2 dark:bg-meta-4">
@@ -2151,6 +2406,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                 onSuccess={handleSuccessDelete}
                                 headers={null}
                                 submitButtonName={"Submit"}
+                                classPanel={
+                                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                                }
                                 body={
                                     <>
                                         <div className="mb-4">
