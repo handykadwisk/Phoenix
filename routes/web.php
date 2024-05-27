@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
@@ -33,6 +34,12 @@ Route::middleware('auth')->group(function () {
 
     //Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
+
+    // Finance > Operasional
+    Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
+
+    // Finance > Operasional
+    Route::get('/finance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
 });
 
 require __DIR__ . '/auth.php';

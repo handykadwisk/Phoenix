@@ -11,7 +11,7 @@ import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
 import { FormEvent, Fragment, useEffect, useState } from 'react';
 import { InertiaFormProps } from '@inertiajs/react/types/useForm';
-import TablePage from '@/Components/Table/Table';
+import TablePage from '@/Components/Table/Index';
 import axios from 'axios';
 import { link } from 'fs';
 import dateFormat from 'dateformat';
