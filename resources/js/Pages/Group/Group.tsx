@@ -112,7 +112,7 @@ export default function Group({ auth }: PageProps) {
                 url={`/group`}
                 data={data}
                 onSuccess={handleSuccess}
-                className={
+                classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
                 }
                 body={
