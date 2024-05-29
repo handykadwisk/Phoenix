@@ -33,7 +33,6 @@ class DatabaseSeeder extends Seeder
         $relation = Menu::create(
             [
                 'menu_name'       => 'Relation',
-                'menu_url'        => 'relation',
                 'menu_is_deleted' => 0,
                 'menu_sequence'   => 2,
                 'menu_created_by' => 'admin'
@@ -44,16 +43,27 @@ class DatabaseSeeder extends Seeder
                 'menu_name'       => 'Policy',
                 'menu_url'        => 'policy',
                 'menu_is_deleted' => 0,
-                'menu_sequence'   => 4,
+                'menu_sequence'   => 3,
                 'menu_created_by' => 'admin'
             ]
         );
         $group = Menu::create(
             [
                 'menu_name'       => 'Group',
+                'menu_parent_id'  => $relation->id,
                 'menu_url'        => 'group',
                 'menu_is_deleted' => 0,
-                'menu_sequence'   => 3,
+                'menu_sequence'   => 4,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $childRelation = Menu::create(
+            [
+                'menu_name'       => 'Relation',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 5,
                 'menu_created_by' => 'admin'
             ]
         );
@@ -82,6 +92,10 @@ class DatabaseSeeder extends Seeder
         RoleAccessMenu::create([
             'role_id' => $admin->id,
             'menu_id' => $group->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childRelation->id
         ]);
 
         // create user

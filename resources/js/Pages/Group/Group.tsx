@@ -5,7 +5,12 @@ import Button from "@/Components/Button/Button";
 import defaultImage from "../../Images/user/default.jpg";
 import {
     EllipsisHorizontalIcon,
+    EnvelopeIcon,
+    EyeIcon,
     MagnifyingGlassIcon,
+    PencilIcon,
+    PencilSquareIcon,
+    PhoneIcon,
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react/jsx-runtime";
@@ -17,6 +22,7 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
+import ModalToAction from "@/Components/Modal/ModalToAction";
 
 export default function Group({ auth }: PageProps) {
     useEffect(() => {
@@ -25,6 +31,8 @@ export default function Group({ auth }: PageProps) {
 
     // variabel relation Group
     const [relationsGroup, setRelationsGroup] = useState<any>([]);
+    // detail Group
+    const [detailGroup, setDetailGroup] = useState<any>([]);
     // variabel succes
     const [isSuccess, setIsSuccess] = useState<string>("");
 
@@ -34,7 +42,6 @@ export default function Group({ auth }: PageProps) {
             .get(`/getRelationGroup?${pageNumber}`)
             .then((res) => {
                 setRelationsGroup(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -67,6 +74,27 @@ export default function Group({ auth }: PageProps) {
         //     .get(`/relation/detailRelation/${id}`)
         //     .then((res) => {})
         //     .catch((err) => console.log(err));
+    };
+
+    const handleViewModal = async (e: FormEvent, id: number) => {
+        e.preventDefault();
+
+        await axios
+            .get(`/getGroup/${id}`)
+            .then((res) => {
+                console.log(res.data);
+                setDetailGroup(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !modal.view,
+            document: false,
+            search: false,
+        });
     };
 
     // Modal Button Handle
@@ -166,6 +194,34 @@ export default function Group({ auth }: PageProps) {
                 }
             />
             {/* End Modal Add Group */}
+
+            {/* Modal Detail Group */}
+            <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                addOns={""}
+                title={"View Policy"}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-7xl"
+                }
+                url={``}
+                data={null}
+                onSuccess={null}
+                method={""}
+                headers={null}
+                submitButtonName={null}
+                body={<></>}
+            />
+            {/* End Modal Detail Group */}
             <div>
                 <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
                     <div className="md:grid md:grid-cols-8 md:gap-4">
@@ -207,7 +263,7 @@ export default function Group({ auth }: PageProps) {
                     <div>
                         <ul
                             role="list"
-                            className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
+                            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
                         >
                             {/* {clients.map((client) => ( */}
                             {relationsGroup.data?.map(
@@ -215,191 +271,58 @@ export default function Group({ auth }: PageProps) {
                                     return (
                                         <li
                                             key={i}
-                                            className="overflow-hidden rounded-xl border border-gray-200"
+                                            className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow-lg border"
                                         >
-                                            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 mb-5">
-                                                <img
-                                                    src={defaultImage}
-                                                    alt={defaultImage}
-                                                    className="h-13 w-14 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
-                                                />
-                                                <div className="text-sm font-medium leading-6 text-gray-900">
-                                                    {
-                                                        dataRelationGroup.RELATION_GROUP_NAME
-                                                    }
+                                            <div className="flex w-full items-center justify-between space-x-6 p-6">
+                                                <div className="flex-1 truncate">
+                                                    <div className="flex items-center space-x-3">
+                                                        <h3 className="mt-1 truncate text-sm text-gray-500 ">
+                                                            Group
+                                                        </h3>
+                                                    </div>
+                                                    <p className="truncate text-xl font-medium text-gray-900">
+                                                        {
+                                                            dataRelationGroup.RELATION_GROUP_NAME
+                                                        }
+                                                    </p>
                                                 </div>
-                                                <Menu
-                                                    as="div"
-                                                    className="relative ml-auto"
-                                                >
-                                                    <Menu.Button className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
-                                                        <span className="sr-only">
-                                                            Open options
-                                                        </span>
-                                                        <EllipsisHorizontalIcon
-                                                            className="h-5 w-5"
-                                                            aria-hidden="true"
-                                                        />
-                                                    </Menu.Button>
-                                                    <Transition
-                                                        as={Fragment}
-                                                        enter="transition ease-out duration-100"
-                                                        enterFrom="transform opacity-0 scale-95"
-                                                        enterTo="transform opacity-100 scale-100"
-                                                        leave="transition ease-in duration-75"
-                                                        leaveFrom="transform opacity-100 scale-100"
-                                                        leaveTo="transform opacity-0 scale-95"
-                                                    >
-                                                        <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                                                            <Menu.Item>
-                                                                {({
-                                                                    active,
-                                                                }) => (
-                                                                    <a
-                                                                        href="#"
-                                                                        className={classNames(
-                                                                            active
-                                                                                ? "bg-gray-50"
-                                                                                : "",
-                                                                            "block px-3 py-1 text-sm leading-6 text-gray-900"
-                                                                        )}
-                                                                    >
-                                                                        View
-                                                                        <span className="sr-only">
-                                                                            ,{" "}
-                                                                            {""}
-                                                                        </span>
-                                                                    </a>
-                                                                )}
-                                                            </Menu.Item>
-                                                            <Menu.Item>
-                                                                {({
-                                                                    active,
-                                                                }) => (
-                                                                    <a
-                                                                        href="#"
-                                                                        className={classNames(
-                                                                            active
-                                                                                ? "bg-gray-50"
-                                                                                : "",
-                                                                            "block px-3 py-1 text-sm leading-6 text-gray-900"
-                                                                        )}
-                                                                    >
-                                                                        Edit
-                                                                        <span className="sr-only">
-                                                                            ,{" "}
-                                                                            {""}
-                                                                        </span>
-                                                                    </a>
-                                                                )}
-                                                            </Menu.Item>
-                                                        </Menu.Items>
-                                                    </Transition>
-                                                </Menu>
+                                                <img
+                                                    className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
+                                                    src={defaultImage}
+                                                    alt="Relation Group"
+                                                />
                                             </div>
-                                            {dataRelationGroup.r_group
-                                                .length === 0 ? (
-                                                <dl className="-my-3 divide-y divide-gray-100 px-6 py-2 text-sm leading-6">
-                                                    <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
-                                                        {"Relation Not found"}
-                                                    </summary>
-                                                </dl>
-                                            ) : (
-                                                dataRelationGroup.r_group?.map(
-                                                    (
-                                                        rg: any,
-                                                        index: number
-                                                    ) => (
-                                                        <dl
-                                                            key={index}
-                                                            className="-my-3 divide-y divide-gray-100 px-6 py-2 text-sm leading-6"
+                                            <div>
+                                                <div className="-mt-px flex divide-x divide-gray-200">
+                                                    <div className="flex w-0 flex-1">
+                                                        <a
+                                                            href={`/group/detailGroup/${dataRelationGroup.RELATION_GROUP_ID}`}
+                                                            className="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:text-red-600"
+                                                            // onClick={(e) =>
+                                                            //     handleViewModal(
+                                                            //         e,
+                                                            //         dataRelationGroup.RELATION_GROUP_ID
+                                                            //     )
+                                                            // }
                                                         >
-                                                            {rg.RELATION_ORGANIZATION_PARENT_ID ===
-                                                                0 &&
-                                                            rg.children
-                                                                .length ===
-                                                                0 ? (
-                                                                <summary
-                                                                    className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) =>
-                                                                        clickDetailRelation(
-                                                                            e,
-                                                                            rg.RELATION_ORGANIZATION_ID
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        rg.RELATION_ORGANIZATION_NAME
-                                                                    }
-                                                                </summary>
-                                                            ) : (
-                                                                <>
-                                                                    {rg.RELATION_ORGANIZATION_PARENT_ID !==
-                                                                    0 ? (
-                                                                        ""
-                                                                    ) : (
-                                                                        <details className="mb-2">
-                                                                            <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
-                                                                                <span>
-                                                                                    {
-                                                                                        rg.RELATION_ORGANIZATION_NAME
-                                                                                    }
-                                                                                </span>
-                                                                            </summary>
-                                                                            {rg.children?.map(
-                                                                                (
-                                                                                    c: any,
-                                                                                    a: number
-                                                                                ) => (
-                                                                                    <ul
-                                                                                        key={
-                                                                                            a
-                                                                                        }
-                                                                                        className="ml-4"
-                                                                                    >
-                                                                                        <li>
-                                                                                            <details className="mb-2">
-                                                                                                <summary className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4">
-                                                                                                    <span>
-                                                                                                        {
-                                                                                                            c.RELATION_ORGANIZATION_NAME
-                                                                                                        }
-                                                                                                    </span>
-                                                                                                </summary>
-                                                                                                {c.children?.map(
-                                                                                                    (
-                                                                                                        z: any,
-                                                                                                        b: number
-                                                                                                    ) => (
-                                                                                                        <summary
-                                                                                                            key={
-                                                                                                                b
-                                                                                                            }
-                                                                                                            className="bg-gray-50 p-4 rounded-lg cursor-pointer shadow-md mb-4 ml-5"
-                                                                                                        >
-                                                                                                            <span>
-                                                                                                                {
-                                                                                                                    z.RELATION_ORGANIZATION_NAME
-                                                                                                                }
-                                                                                                            </span>
-                                                                                                        </summary>
-                                                                                                    )
-                                                                                                )}
-                                                                                            </details>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                )
-                                                                            )}
-                                                                        </details>
-                                                                    )}
-                                                                </>
-                                                            )}
-                                                        </dl>
-                                                    )
-                                                )
-                                            )}
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                                className="size-4"
+                                                            >
+                                                                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                                                <path
+                                                                    fillRule="evenodd"
+                                                                    d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
+                                                                    clipRule="evenodd"
+                                                                />
+                                                            </svg>
+                                                            Detail
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </li>
                                     );
                                 }

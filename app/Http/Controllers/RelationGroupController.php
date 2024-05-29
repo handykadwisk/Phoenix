@@ -68,4 +68,22 @@ class RelationGroupController extends Controller
         $data = Relation::where('RELATION_ORGANIZATION_GROUP', 'like', '%' . $request->id . '%')->get();
         return response()->json($data);
     }
+
+    public function getGroupById($id){
+        $data = RelationGroup::find($id);
+        return response()->json($data);
+    }
+
+    public function detailGroup($id)
+    {
+        $test = 'aaa';
+        $relationGroup = RelationGroup::find($id);
+        // print_r($relationGroup);die;
+
+
+        return Inertia::render('Group/DetailGroup', [
+            'test' => $test,
+            'relationGroup' => $relationGroup
+        ]);
+    }
 }

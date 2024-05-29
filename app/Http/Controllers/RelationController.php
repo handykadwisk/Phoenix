@@ -29,12 +29,18 @@ class RelationController extends Controller
         return $oldRelation;
     }
 
-    public function getRelationData($dataPerPage = 2)
+    public function getRelationData($dataPerPage = 5, $searchQuery = null)
     {
 
-        return Relation::orderBy('RELATION_ORGANIZATION_ID', 'asc')
-            // ->where('RELATION_ORGANIZATION_PARENT_ID', "0")
-            ->paginate($dataPerPage);
+        // dd($searchQuery->RELATION_ORGANIZATION_NAME);
+        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc');
+            if ($searchQuery) {
+                if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
+                    $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
+                }
+            }
+
+            return $data->paginate($dataPerPage);
     }
 
     // Get All Relation Type 
@@ -46,9 +52,9 @@ class RelationController extends Controller
     }
 
 
-    public function getRelationJson()
+    public function getRelationJson(Request $request)
     {
-        $data = $this->getRelationData(5);
+        $data = $this->getRelationData(5, $request);
         // print_r($data);
         // die;
         return response()->json($data);

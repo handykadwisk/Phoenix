@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
-    Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
+    Route::post('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
     Route::post('/getSalutationById', [RelationController::class, 'getSalutation'])->name('getSalutationById.getSalutation');
     Route::get('/getRelation/{id}', [RelationController::class, 'getRelationById'])->name('relation.getRelationById');
     Route::patch('/editRelation/{id}', [RelationController::class, 'edit'])->name('relation.edit');
@@ -43,6 +43,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelationGroup', [RelationGroupController::class, 'getRelationGroupJson'])->name('getRelationGroup.getRelationGroupJson');
     Route::post('/group', [RelationGroupController::class, 'store'])->name('group.store');
     Route::post('/getRelationById', [RelationGroupController::class, 'getRelationByIdGroup'])->name('getRelationById.getRelationByIdGroup');
+    Route::get('/getGroup/{id}', [RelationGroupController::class, 'getGroupById'])->name('group.getGroupById');
+    Route::get('/group/detailGroup/{id}', [RelationGroupController::class, 'detailGroup'])->name('group.detailGroup.Group');
+
 });
 
 require __DIR__ . '/auth.php';

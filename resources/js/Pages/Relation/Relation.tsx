@@ -7,17 +7,19 @@ import {
     EllipsisHorizontalIcon,
     EllipsisVerticalIcon,
     TrashIcon,
+    XMarkIcon,
 } from "@heroicons/react/20/solid";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import ToastMessage from "@/Components/ToastMessage";
+import ModalSearch from "@/Components/Modal/ModalSearch";
 import Button from "@/Components/Button/Button";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
 import Checkbox from "@/Components/Checkbox";
 import TextInput from "@/Components/TextInput";
 import Switch from "@/Components/Switch";
-import { FormEvent, Fragment, useEffect, useState } from "react";
+import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { InertiaFormProps } from "@inertiajs/react/types/useForm";
 import TablePage from "@/Components/Table/Index";
 import Pagination from "@/Components/Pagination";
@@ -29,11 +31,12 @@ import TableTH from "@/Components/Table/TableTH";
 import TableTD from "@/Components/Table/TableTD";
 import Dropdown from "@/Components/Dropdown";
 import { Console } from "console";
+import Swal from "sweetalert2";
 
 export default function Relation({ auth }: PageProps) {
-    useEffect(() => {
-        getRelation();
-    }, []);
+    // useEffect(() => {
+    //     getRelation();
+    // }, []);
 
     interface FormInterface {
         group_id: string;
@@ -52,12 +55,28 @@ export default function Relation({ auth }: PageProps) {
 
     const [relations, setRelations] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
+    const [searchRelation, setSearchRelation] = useState<any>({
+        RELATION_ORGANIZATION_NAME: "",
+    });
 
     const getRelation = async (pageNumber = "page=1") => {
         await axios
-            .get(`/getRelation?${pageNumber}`)
+            .post(`/getRelation?${pageNumber}`, {
+                RELATION_ORGANIZATION_NAME:
+                    searchRelation.RELATION_ORGANIZATION_NAME,
+            })
             .then((res) => {
                 setRelations(res.data);
+                if (modal.search) {
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }
                 // console.log(res.data.links);
             })
             .catch((err) => {
@@ -119,9 +138,11 @@ export default function Relation({ auth }: PageProps) {
             // jika corporate
             document.getElementById("relationLob").style.display = "";
             document.getElementById("relationJobs").style.display = "none";
+            document.getElementById("abbr").style.display = "";
         } else if (id == "2") {
             document.getElementById("relationLob").style.display = "none";
             document.getElementById("relationJobs").style.display = "";
+            document.getElementById("abbr").style.display = "none";
         }
     };
 
@@ -130,7 +151,11 @@ export default function Relation({ auth }: PageProps) {
         name_relation: "",
         parent_id: "",
         abbreviation: "",
-        relation_aka: "",
+        relation_aka: [
+            {
+                nama_aka: "",
+            },
+        ],
         relation_email: "",
         relation_description: "",
         relation_lob_id: "",
@@ -173,7 +198,11 @@ export default function Relation({ auth }: PageProps) {
             name_relation: "",
             parent_id: "",
             abbreviation: "",
-            relation_aka: "",
+            relation_aka: [
+                {
+                    nama_aka: "",
+                },
+            ],
             relation_email: "",
             relation_description: "",
             relation_lob_id: "",
@@ -196,6 +225,7 @@ export default function Relation({ auth }: PageProps) {
             .get(`/getRelation/${id}`)
             .then((res) => {
                 setDataById(res.data);
+                console.log(res.data);
                 setMRelation(res.data.m_relation_type);
                 getSalutationById(
                     res.data.relation_status_id,
@@ -219,6 +249,7 @@ export default function Relation({ auth }: PageProps) {
             edit: !modal.edit,
             view: false,
             document: false,
+            search: false,
         });
     };
 
@@ -278,9 +309,11 @@ export default function Relation({ auth }: PageProps) {
             // jika corporate
             document.getElementById("relationLob").style.display = "";
             document.getElementById("relationJobs").style.display = "none";
+            document.getElementById("abbr").style.display = "";
         } else if (id == "2") {
             document.getElementById("relationLob").style.display = "none";
             document.getElementById("relationJobs").style.display = "";
+            document.getElementById("abbr").style.display = "none";
         }
     };
 
@@ -338,7 +371,46 @@ export default function Relation({ auth }: PageProps) {
         edit: false,
         view: false,
         document: false,
+        search: false,
     });
+
+    // new haris
+    const [query, setQuery] = useState("");
+    const [selected, setSelected] = useState<any>([]);
+    const [menuOpen, setMenuOpen] = useState(true);
+
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const tags = [
+        "Tutorial",
+        "HowTo",
+        "DIY",
+        "Review",
+        "Tech",
+        "Gaming",
+        "Travel",
+        "Fitness",
+        "Cooking",
+        "Vlog",
+    ];
+
+    const filteredTags = tags.filter(
+        (item) =>
+            item
+                ?.toLocaleLowerCase()
+                ?.includes(query.toLocaleLowerCase()?.trim()) &&
+            !selected.includes(item)
+    );
+
+    const isDisable =
+        !query?.trim() ||
+        selected.filter(
+            (item: any) =>
+                item?.toLocaleLowerCase()?.trim() ===
+                query?.toLocaleLowerCase()?.trim()
+        )?.length;
+
+    console.log(data.relation_aka);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
@@ -362,6 +434,7 @@ export default function Relation({ auth }: PageProps) {
                         edit: false,
                         view: false,
                         document: false,
+                        search: false,
                     })
                 }
                 title={"Add Relation"}
@@ -480,7 +553,13 @@ export default function Relation({ auth }: PageProps) {
                                 </select>
                             </div>
                         </div>
-                        <div className="grid gap-4 grid-cols-2">
+                        <div
+                            className={
+                                data.relation_status_id === "1"
+                                    ? "grid gap-4 grid-cols-2"
+                                    : "grid gap-4"
+                            }
+                        >
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="name_relation"
@@ -500,7 +579,7 @@ export default function Relation({ auth }: PageProps) {
                                     placeholder="Name Relation"
                                 />
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-4" id="abbr">
                                 <InputLabel
                                     htmlFor="abbreviation"
                                     value="Abbreviation"
@@ -522,30 +601,127 @@ export default function Relation({ auth }: PageProps) {
                         </div>
                         <div className="grid gap-4 grid-cols-2">
                             <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="relation_aka"
-                                    value="AKA"
-                                />
+                                {data.relation_aka?.length ? (
+                                    <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-md">
+                                        {data.relation_aka?.map(
+                                            (tag: any, i: number) => {
+                                                return (
+                                                    // <>
+                                                    <div
+                                                        key={i}
+                                                        className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
+                                                    >
+                                                        {tag}
+                                                        <div>
+                                                            {/* <a href=""> */}
+                                                            <div
+                                                                className="text-red-600"
+                                                                onMouseDown={(
+                                                                    e
+                                                                ) =>
+                                                                    e.preventDefault()
+                                                                }
+                                                                onClick={() =>
+                                                                    setSelected(
+                                                                        selected.filter(
+                                                                            (
+                                                                                i: any
+                                                                            ) =>
+                                                                                i !==
+                                                                                tag
+                                                                        )
+                                                                    )
+                                                                }
+                                                            >
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    strokeWidth={
+                                                                        1.5
+                                                                    }
+                                                                    stroke="currentColor"
+                                                                    className="w-6 h-6"
+                                                                >
+                                                                    <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M6 18 18 6M6 6l12 12"
+                                                                    />
+                                                                </svg>
+                                                            </div>
+                                                            {/* </a> */}
+                                                        </div>
+                                                    </div>
+                                                    // </>
+                                                );
+                                            }
+                                        )}
+                                        <div className="w-full text-right">
+                                            <span
+                                                className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
+                                                onClick={() => {
+                                                    setSelected([]);
+                                                    inputRef.current?.focus();
+                                                }}
+                                            >
+                                                Clear all
+                                            </span>
+                                        </div>
+                                    </div>
+                                ) : null}
                                 <TextInput
-                                    id="relation_aka"
+                                    ref={inputRef}
                                     type="text"
-                                    name="relation_aka"
-                                    value={data.relation_aka}
-                                    className="mt-2"
-                                    autoComplete="relation_aka"
+                                    value={query}
                                     onChange={(e) =>
-                                        setData("relation_aka", e.target.value)
+                                        setQuery(e.target.value.trimStart())
                                     }
+                                    placeholder="Create AKA"
+                                    className=""
+                                    autoComplete="relation_aka"
                                     required
-                                    placeholder="AKA"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && !isDisable) {
+                                            setData({
+                                                ...data,
+                                                relation_aka: [
+                                                    ...data.relation_aka,
+                                                    {
+                                                        nama_aka: query,
+                                                    },
+                                                ],
+                                            });
+                                            setQuery("");
+                                            setMenuOpen(true);
+                                        }
+                                    }}
                                 />
+                                <button
+                                    className="text-sm disabled:text-gray-300 text-rose-500 disabled:cursor-not-allowed"
+                                    disabled={isDisable}
+                                    onClick={() => {
+                                        if (isDisable) {
+                                            return;
+                                        }
+                                        setSelected((prev: any) => [
+                                            ...prev,
+                                            query,
+                                        ]);
+                                        setQuery("");
+                                        inputRef.current?.focus();
+                                        setMenuOpen(true);
+                                    }}
+                                >
+                                    + Add
+                                </button>
                             </div>
                             <div className="mt-4">
                                 {/* <InputLabel
                                     htmlFor="is_managed"
                                     value="HR MANAGED BY APP"
                                 /> */}
-                                <ul role="list" className="mt-8">
+                                <ul role="list" className="">
                                     <li className="col-span-1 flex rounded-md shadow-sm">
                                         <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
                                             <span className="mt-1 ml-2">
@@ -590,6 +766,36 @@ export default function Relation({ auth }: PageProps) {
                                         );
                                     }
                                 )}
+                            </select>
+                        </div>
+                        <div className="mt-4">
+                            <InputLabel
+                                htmlFor="group_id"
+                                value="Group"
+                                className="block"
+                            />
+                            <select
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                value={data.group_id}
+                                onChange={(e) => {
+                                    setData("group_id", e.target.value);
+                                    getMappingParent(
+                                        e.target.value,
+                                        "group_id"
+                                    );
+                                }}
+                            >
+                                <option>-- Choose Group --</option>
+                                {relationGroup.map((groups: any, i: number) => {
+                                    return (
+                                        <option
+                                            key={i}
+                                            value={groups.RELATION_GROUP_ID}
+                                        >
+                                            {groups.RELATION_GROUP_NAME}
+                                        </option>
+                                    );
+                                })}
                             </select>
                         </div>
                         <div className="grid gap-4 grid-cols-2">
@@ -898,7 +1104,13 @@ export default function Relation({ auth }: PageProps) {
                                 </select>
                             </div>
                         </div>
-                        <div className="grid gap-4 grid-cols-2">
+                        <div
+                            className={
+                                dataById.relation_status_id === "1"
+                                    ? "grid gap-4 grid-cols-2"
+                                    : "grid gap-4"
+                            }
+                        >
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="RELATION_ORGANIZATION_NAME"
@@ -922,7 +1134,7 @@ export default function Relation({ auth }: PageProps) {
                                     placeholder="Name Relation"
                                 />
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-4" id="abbr">
                                 <InputLabel
                                     htmlFor="RELATION_ORGANIZATION_ABBREVIATION"
                                     value="Abbreviation"
@@ -1199,14 +1411,147 @@ export default function Relation({ auth }: PageProps) {
                                 }
                             />
                         </div>
+                        {selected?.length ? (
+                            <div className="bg-white w-80 relative text-xs flex flex-wrap gap-1 p-2 mb-2">
+                                {selected.map((tag: any) => {
+                                    return (
+                                        <div
+                                            key={tag}
+                                            className="rounded-full w-fit py-1.5 px-3 border border-gray-400 bg-gray-50 text-gray-500
+                  flex items-center gap-2"
+                                        >
+                                            {tag}
+                                            <div
+                                                onMouseDown={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                                onClick={() =>
+                                                    setSelected(
+                                                        selected.filter(
+                                                            (i: any) =>
+                                                                i !== tag
+                                                        )
+                                                    )
+                                                }
+                                            >
+                                                {/* <Icons.Close /> */}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <div className="w-full text-right">
+                                    <span
+                                        className="text-gray-400 cursor-pointer"
+                                        onClick={() => {
+                                            setSelected([]);
+                                            inputRef.current?.focus();
+                                        }}
+                                    >
+                                        Clear all
+                                    </span>
+                                </div>
+                            </div>
+                        ) : null}
+                        <div className="card flex items-center justify-between p-3 w-80 gap-2.5">
+                            {/* <Icons.Search /> */}
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={query}
+                                onChange={(e) =>
+                                    setQuery(e.target.value.trimStart())
+                                }
+                                placeholder="Search or Create tags"
+                                className="bg-transparent text-sm flex-1 caret-rose-600"
+                                onFocus={() => setMenuOpen(true)}
+                                onBlur={() => setMenuOpen(false)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !isDisable) {
+                                        setSelected((prev: any) => [
+                                            ...prev,
+                                            query,
+                                        ]);
+                                        setQuery("");
+                                        setMenuOpen(true);
+                                    }
+                                }}
+                            />
+                            <button
+                                className="text-sm disabled:text-gray-300 text-rose-500 disabled:cursor-not-allowed"
+                                disabled={isDisable}
+                                onClick={() => {
+                                    if (isDisable) {
+                                        return;
+                                    }
+                                    setSelected((prev: any) => [
+                                        ...prev,
+                                        query,
+                                    ]);
+                                    setQuery("");
+                                    inputRef.current?.focus();
+                                    setMenuOpen(true);
+                                }}
+                            >
+                                + Add
+                            </button>
+                        </div>
                     </>
                 }
             />
             {/* end modal edit relation */}
 
+            {/* Modal Search */}
+            {/* modal search */}
+            <ModalSearch
+                show={modal.search}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Search Relation"}
+                submitButtonName={"Search"}
+                onAction={() => {
+                    getRelation();
+                }}
+                isLoading={isLoading}
+                body={
+                    <>
+                        <div className="mb-4">
+                            <InputLabel
+                                htmlFor="RELATION_ORGANIZATION_NAME"
+                                value="Relation Name"
+                            />
+                            <TextInput
+                                id="RELATION_ORGANIZATION_NAME"
+                                type="text"
+                                name="RELATION_ORGANIZATION_NAME"
+                                value={
+                                    searchRelation.RELATION_ORGANIZATION_NAME
+                                }
+                                className=""
+                                onChange={(e) =>
+                                    setSearchRelation({
+                                        ...searchRelation,
+                                        RELATION_ORGANIZATION_NAME:
+                                            e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal search */}
+            {/* Modal End search */}
+
             <div>
                 <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
-                    {/* <div className="overflow-hidden shadow-2xl sm:rounded-lg"> */}
                     <div className="p-6 text-gray-900 mb-60">
                         {/* table page*/}
                         <TablePage
@@ -1232,7 +1577,6 @@ export default function Relation({ auth }: PageProps) {
                                     search: !modal.search,
                                 })
                             }
-                            // clearSearchButtonAction={() => clearSearchPolicy()}
                             tableHead={
                                 <>
                                     <TableTH
@@ -1295,7 +1639,6 @@ export default function Relation({ auth }: PageProps) {
                                                                 <a
                                                                     href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
                                                                     className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                    // onClick={(e) => handleView(e, dataRelation.RELATION_ORGANIZATION_ID)}
                                                                 >
                                                                     Detail
                                                                 </a>
@@ -1324,7 +1667,6 @@ export default function Relation({ auth }: PageProps) {
 
                         {/* end table page */}
                     </div>
-                    {/* </div> */}
                 </div>
             </div>
         </AuthenticatedLayout>
