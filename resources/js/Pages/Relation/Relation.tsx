@@ -146,16 +146,12 @@ export default function Relation({ auth }: PageProps) {
         }
     };
 
-    const { data, setData, errors, reset } = useForm({
+    const { data, setData, errors, reset } = useForm<any>({
         group_id: "",
         name_relation: "",
         parent_id: "",
         abbreviation: "",
-        relation_aka: [
-            {
-                nama_aka: "",
-            },
-        ],
+        relation_aka: [],
         relation_email: "",
         relation_description: "",
         relation_lob_id: "",
@@ -198,11 +194,7 @@ export default function Relation({ auth }: PageProps) {
             name_relation: "",
             parent_id: "",
             abbreviation: "",
-            relation_aka: [
-                {
-                    nama_aka: "",
-                },
-            ],
+            relation_aka: [],
             relation_email: "",
             relation_description: "",
             relation_lob_id: "",
@@ -410,8 +402,6 @@ export default function Relation({ auth }: PageProps) {
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
 
-    console.log(data.relation_aka);
-
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -611,7 +601,7 @@ export default function Relation({ auth }: PageProps) {
                                                         key={i}
                                                         className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
                                                     >
-                                                        {tag}
+                                                        {tag.name_aka}
                                                         <div>
                                                             {/* <a href=""> */}
                                                             <div
@@ -683,15 +673,12 @@ export default function Relation({ auth }: PageProps) {
                                     required
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter" && !isDisable) {
-                                            setData({
-                                                ...data,
-                                                relation_aka: [
-                                                    ...data.relation_aka,
-                                                    {
-                                                        nama_aka: query,
-                                                    },
-                                                ],
-                                            });
+                                            setData("relation_aka", [
+                                                ...data.relation_aka,
+                                                {
+                                                    name_aka: query,
+                                                },
+                                            ]);
                                             setQuery("");
                                             setMenuOpen(true);
                                         }
@@ -704,9 +691,11 @@ export default function Relation({ auth }: PageProps) {
                                         if (isDisable) {
                                             return;
                                         }
-                                        setSelected((prev: any) => [
-                                            ...prev,
-                                            query,
+                                        setData("relation_aka", [
+                                            ...data.relation_aka,
+                                            {
+                                                name_aka: query,
+                                            },
                                         ]);
                                         setQuery("");
                                         inputRef.current?.focus();
