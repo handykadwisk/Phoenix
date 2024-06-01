@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MRelationAka;
 use App\Models\MRelationType;
 use App\Models\MTag;
 use App\Models\Relation;
@@ -121,7 +122,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_NAME' => $request->name_relation,
             'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
             'RELATION_ORGANIZATION_ABBREVIATION' => $request->abbreviation,
-            'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
+            // 'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
             'HR_MANAGED_BY_APP' => $request->is_managed,
@@ -147,6 +148,16 @@ class RelationController extends Controller
         // Mapping Parent Id and Update
         DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
 
+        // Created Mapping Relation AKA
+        for ($i=0; $i < sizeof($request->relation_aka); $i++) { 
+            $nameRelationAka = $request->relation_aka[$i]["name_aka"];
+            MRelationAka::create([
+                "RELATION_ORGANIZATION_ID" => $relation,
+                "RELATION_AKA_NAME" => $nameRelationAka
+            ]);
+        }
+
+
         // Created Mapping Relation Type
         for ($i = 0; $i < sizeof($request->relation_type_id); $i++) {
             $idRelationType = $request->relation_type_id[$i]["id"];
@@ -157,20 +168,23 @@ class RelationController extends Controller
         }
 
         // created tagging
-        $tagging = Tag::insertGetId([
-            'TAG_NAME' => $request->tagging_name,
-            'TAG_CREATED_BY' => Auth::user()->id,
-            'TAG_CREATED_DATE' => now(),
-            'TAG_UPDATED_BY' => NULL,
-            'TAG_UPDATED_DATE' => NULL
-        ]);
-
-        // created mapping tagging
-        if ($tagging) {
-            MTag::create([
-                'RELATION_ORGANIZATION_ID' => $relation,
-                'TAG_ID' => $tagging
+        for ($i=0; $i < sizeof($request->tagging_name); $i++) { 
+            $tagName = $request->tagging_name[$i]["name_tag"];
+            $tagging = Tag::insertGetId([
+                'TAG_NAME' => $tagName,
+                'TAG_CREATED_BY' => Auth::user()->id,
+                'TAG_CREATED_DATE' => now(),
+                'TAG_UPDATED_BY' => NULL,
+                'TAG_UPDATED_DATE' => NULL
             ]);
+
+            // created mapping tagging
+            if ($tagging) {
+                MTag::create([
+                    'RELATION_ORGANIZATION_ID' => $relation,
+                    'TAG_ID' => $tagging
+                ]);
+            }
         }
 
 
@@ -229,6 +243,7 @@ class RelationController extends Controller
                 'RELATION_ORGANIZATION_AKA' => $request->RELATION_ORGANIZATION_AKA,
                 'RELATION_ORGANIZATION_MAPPING' => NULL,
                 'HR_MANAGED_BY_APP' => $request->HR_MANAGED_BY_APP,
+                'MARK_TBK_RELATION' => $request->MARK_TBK_RELATION,
                 'RELATION_ORGANIZATION_UPDATED_BY' => Auth::user()->id,
                 'RELATION_ORGANIZATION_UPDATED_DATE' => now(),
                 'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
@@ -241,6 +256,21 @@ class RelationController extends Controller
 
         // Mapping Parent Id and Update
         DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
+
+        // check existing relation AKA
+        $existingRelationAKA = MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
+        if ($existingRelationAKA->count()>0) {
+            MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->delete();
+        }
+
+        // Created Mapping Relation AKA
+        for ($i=0; $i < sizeof($request->m_relation_aka); $i++) { 
+            $nameRelationAka = $request->m_relation_aka[$i]["RELATION_AKA_NAME"];
+            MRelationAka::create([
+                "RELATION_ORGANIZATION_ID" => $request->RELATION_ORGANIZATION_ID,
+                "RELATION_AKA_NAME" => $nameRelationAka
+            ]);
+        }
 
         // check existing relation_type_id in m_relation_type, if exists, delete first
         $existingData = MRelationType::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
@@ -288,6 +318,11 @@ class RelationController extends Controller
     public function detail($id)
     {
         $test = 'aaa';
+        if ($id !== "") {
+            dd("aaa");
+        }else{
+            dd("bbb");
+        }
 
 
         return Inertia::render('Relation/DetailRelation', [

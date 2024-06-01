@@ -11,10 +11,16 @@ class MTag extends Model
 
     protected $table = 'm_tag_relation';
 
+    protected $with = ['tagging'];
+
     public $timestamps = false;
 
     public $fillable = [
         'RELATION_ORGANIZATION_ID',
         'TAG_ID',
     ];
+
+    public function tagging(){
+        return $this->hasOne(Tag::class, 'TAG_ID', 'TAG_ID');
+    }
 }

@@ -17,6 +17,7 @@ export default function ModalToAdd({
     data,
     onSuccess,
     classPanel = "",
+    idRelation = "",
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -27,6 +28,7 @@ export default function ModalToAdd({
     data: any;
     classPanel: any;
     onSuccess: any;
+    idRelation: any;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -50,15 +52,12 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
+                console.log(res);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data[0]);
                 close();
-                Swal.fire({
-                    title: "Success",
-                    text: res.data[0],
-                    icon: "success",
-                });
+                // idRelation(res);
             })
             .catch((err) => {
                 setIsProcessing(false);

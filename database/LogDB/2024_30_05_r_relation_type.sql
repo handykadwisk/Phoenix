@@ -12,9 +12,9 @@ MySQL - 5.7.12 : Database - phoenix_app_dev
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/*Data for the table `t_relation_type` */
+/*Data for the table `r_relation_type` */
 
-insert  into `t_relation_type`(`RELATION_TYPE_ID`,`RELATION_TYPE_NAME`,`RELATION_TYPE_DESCRIPTION`) values (1,'Insurance',NULL),(2,'Agent',NULL),(3,'Financial Institution',NULL),(4,'Loss Adjuster',NULL),(5,'Hospital',NULL),(6,'Autoworkshop',NULL),(7,'Supplier',NULL),(8,'Broker',NULL),(9,'Third Party Administrator',NULL);
+insert  into `r_relation_type`(`RELATION_TYPE_ID`,`RELATION_TYPE_NAME`,`RELATION_TYPE_DESCRIPTION`) values (1,'Client',NULL),(2,'Insurance',NULL),(3,'Agent',NULL),(4,'Financial Institution',NULL),(5,'Loss Adjuster',NULL),(6,'Hospital',NULL),(7,'Autoworkshop',NULL),(8,'Supplier',NULL),(9,'Broker',NULL),(10,'Third Party Administrator',NULL),(11,'Reinsurance',NULL);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_relation_type', function (Blueprint $table) {
-            $table->increments('RELATION_ORGANIZATION_TYPE_ID');
+        Schema::create('m_relation_aka', function (Blueprint $table) {
+            $table->increments('RELATION_AKA_ID');
             $table->unsignedBigInteger('RELATION_ORGANIZATION_ID');
-            $table->unsignedBigInteger('RELATION_TYPE_ID');
+            $table->string('RELATION_AKA_NAME');
             $table->foreign('RELATION_ORGANIZATION_ID')->references('RELATION_ORGANIZATION_ID')->on('t_relation')->onDelete('cascade');
-            $table->foreign('RELATION_TYPE_ID')->references('RELATION_TYPE_ID')->on('r_relation_type')->onDelete('cascade');
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_relation_type');
+        Schema::dropIfExists('m_relation_aka');
     }
 };

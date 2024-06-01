@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
+import Swal from "sweetalert2";
 
 export default function ModalToAction({
     show = false,
@@ -59,6 +60,11 @@ export default function ModalToAction({
                 setIsError("");
                 onSuccess(res.data[0]);
                 close();
+                Swal.fire({
+                    title: "Success",
+                    text: res.data[0],
+                    icon: "success",
+                });
             })
             .catch((err) => {
                 setIsProcessing(false);

@@ -11,12 +11,12 @@ class RelationType extends Model
 
     protected $primaryKey = 'relation_type_id';
 
-    protected $table = 't_relation_type';
+    protected $table = 'r_relation_type';
 
     public $timestamps = false;
 
     public function relation()
     {
-        return $this->belongsToMany(Relation::class, 'm_relation_type');
+        return $this->belongsToMany(Relation::class, 'r_relation_type');
     }
 }
