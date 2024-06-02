@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('RELATION_ORGANIZATION_EMAIL')->nullable();
             $table->string('RELATION_ORGANIZATION_MAPPING')->nullable();
             $table->bigInteger('HR_MANAGED_BY_APP')->nullable();
+            $table->bigInteger('IS_TBK')->nullable();
             $table->bigInteger('RELATION_ORGANIZATION_LOGO_ID')->nullable();
             $table->string('RELATION_ORGANIZATION_SIGNATURE_NAME')->nullable();
             $table->string('RELATION_ORGANIZATION_SIGNATURE_TITLE')->nullable();

@@ -17,7 +17,6 @@ export default function ModalToAdd({
     data,
     onSuccess,
     classPanel = "",
-    idRelation = "",
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -28,7 +27,6 @@ export default function ModalToAdd({
     data: any;
     classPanel: any;
     onSuccess: any;
-    idRelation: any;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");

@@ -117,15 +117,22 @@ class RelationController extends Controller
             $parentID = "0";
         }
 
+
+        $addTBK = $request->name_relation;
+        if ($request->mark_tbk_relation === "1") {
+            $addTBK = $request->name_relation." Tbk.";
+        }
+
         // Created Relation
         $relation = Relation::insertGetId([
-            'RELATION_ORGANIZATION_NAME' => $request->name_relation,
+            'RELATION_ORGANIZATION_NAME' => $addTBK,
             'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
             'RELATION_ORGANIZATION_ABBREVIATION' => $request->abbreviation,
             // 'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
             'HR_MANAGED_BY_APP' => $request->is_managed,
+            'IS_TBK' => $request->mark_tbk_relation,
             'RELATION_ORGANIZATION_CREATED_BY' => Auth::user()->id,
             'RELATION_ORGANIZATION_UPDATED_BY' => NULL,
             'RELATION_ORGANIZATION_CREATED_DATE' => now(),
@@ -217,6 +224,11 @@ class RelationController extends Controller
 
     public function edit(Request $request)
     {
+        // for ($i=0; $i < sizeof($request->m_tagging); $i++) { 
+        //     $xx = $request->m_tagging[$i]['tagging']['TAG_NAME'];
+        //     print_r($xx);
+        // }
+        // die;
         // cek apakah ganti group apa engga
         $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
         $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
@@ -243,7 +255,7 @@ class RelationController extends Controller
                 'RELATION_ORGANIZATION_AKA' => $request->RELATION_ORGANIZATION_AKA,
                 'RELATION_ORGANIZATION_MAPPING' => NULL,
                 'HR_MANAGED_BY_APP' => $request->HR_MANAGED_BY_APP,
-                'MARK_TBK_RELATION' => $request->MARK_TBK_RELATION,
+                'IS_TBK' => $request->MARK_TBK_RELATION,
                 'RELATION_ORGANIZATION_UPDATED_BY' => Auth::user()->id,
                 'RELATION_ORGANIZATION_UPDATED_DATE' => now(),
                 'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
@@ -291,22 +303,43 @@ class RelationController extends Controller
             ]);
         }
 
-        // // created tagging
-        // $tagging = Tag::insertGetId([
-        //     'TAG_NAME' => $request->TAG_NAME,
-        //     'TAG_CREATED_BY' => Auth::user()->id,
-        //     'TAG_CREATED_DATE' => now(),
-        //     'TAG_UPDATED_BY' => NULL,
-        //     'TAG_UPDATED_DATE' => NULL
-        // ]);
+        // check existing relation_organization_id in m_tag, if exists, delete first
+        $existingData = MTag::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
 
-        // // created mapping tagging
-        // if ($tagging) {
-        //     MTag::create([
-        //         'RELATION_ORGANIZATION_ID' => $relation,
-        //         'TAG_ID' => $tagging
-        //     ]);
-        // }
+        if ($existingData->count() > 0) {
+            MTag::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->delete();
+        }
+
+        // created mtag
+        for ($i=0; $i < sizeof($request->m_tagging); $i++) { 
+            $tagName = $request->m_tagging[$i]['tagging']['TAG_NAME'];  // catetan mau di hapus apa engga di tag data sebelumnyaa
+            $tagging = Tag::insertGetId([
+                'TAG_NAME' => $tagName,
+                'TAG_CREATED_BY' => Auth::user()->id,
+                'TAG_CREATED_DATE' => now(),
+                'TAG_UPDATED_BY' => NULL,
+                'TAG_UPDATED_DATE' => NULL
+            ]);
+
+            // created mapping tagging
+            if ($tagging) {
+                MTag::create([
+                    'RELATION_ORGANIZATION_ID' => $request->RELATION_ORGANIZATION_ID,
+                    'TAG_ID' => $tagging
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Edit (Relation).",
+                "module"      => "Relation",
+                "id"          => $relation
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
 
         return new JsonResponse([
             'New relation edited.'

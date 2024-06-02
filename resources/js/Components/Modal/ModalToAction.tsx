@@ -60,11 +60,11 @@ export default function ModalToAction({
                 setIsError("");
                 onSuccess(res.data[0]);
                 close();
-                Swal.fire({
-                    title: "Success",
-                    text: res.data[0],
-                    icon: "success",
-                });
+                // Swal.fire({
+                //     title: "Success",
+                //     text: res.data[0],
+                //     icon: "success",
+                // });
             })
             .catch((err) => {
                 setIsProcessing(false);
