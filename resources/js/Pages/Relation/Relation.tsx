@@ -441,14 +441,6 @@ export default function Relation({ auth }: PageProps) {
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
 
-    const isDisableTag =
-        !query?.trim() ||
-        data.tagging_name.filter(
-            (item: any) =>
-                item.name_tag?.toLocaleLowerCase()?.trim() ===
-                query?.toLocaleLowerCase()?.trim()
-        )?.length;
-
     const isDisableEdit =
         !query?.trim() ||
         dataById.m_relation_aka.filter(
@@ -457,7 +449,21 @@ export default function Relation({ auth }: PageProps) {
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
 
-    console.log(dataById);
+    const isDisableTag =
+        !query?.trim() ||
+        data.tagging_name.filter(
+            (item: any) =>
+                item.name_tag?.toLocaleLowerCase()?.trim() ===
+                query?.toLocaleLowerCase()?.trim()
+        )?.length;
+
+    const isDisableTagEdit =
+        !query?.trim() ||
+        dataById.m_tagging.filter(
+            (item: any) =>
+                item.tagging.TAG_NAME?.toLocaleLowerCase()?.trim() ===
+                query?.toLocaleLowerCase()?.trim()
+        )?.length;
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -1747,11 +1753,14 @@ export default function Relation({ auth }: PageProps) {
                                 onChange={(e) =>
                                     setQuery(e.target.value.trimStart())
                                 }
-                                placeholder="Create AKA"
+                                placeholder="Create Tags"
                                 className=""
-                                autoComplete="relation_aka"
+                                autoComplete="tagging"
                                 onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !isDisableEdit) {
+                                    if (
+                                        e.key === "Enter" &&
+                                        !isDisableTagEdit
+                                    ) {
                                         setDataById({
                                             ...dataById,
                                             m_tagging: [
@@ -1770,9 +1779,9 @@ export default function Relation({ auth }: PageProps) {
                             />
                             <button
                                 className="text-sm disabled:text-gray-300 text-rose-500 disabled:cursor-not-allowed"
-                                disabled={isDisableEdit}
+                                disabled={isDisableTagEdit}
                                 onClick={() => {
-                                    if (isDisableEdit) {
+                                    if (isDisableTagEdit) {
                                         return;
                                     }
                                     setDataById({
