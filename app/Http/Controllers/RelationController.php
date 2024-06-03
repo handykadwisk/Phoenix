@@ -225,7 +225,7 @@ class RelationController extends Controller
     public function edit(Request $request)
     {
         // for ($i=0; $i < sizeof($request->m_tagging); $i++) { 
-        //     $xx = $request->m_tagging[$i]['tagging']['TAG_NAME'];
+        //     $xx = $request->m_tagging[$i]['tagging']['TAG_ID'];
         //     print_r($xx);
         // }
         // die;
@@ -312,6 +312,14 @@ class RelationController extends Controller
 
         // created mtag
         for ($i=0; $i < sizeof($request->m_tagging); $i++) { 
+            // cek existing tagging
+            $existingDataTag = Tag::where('TAG_ID', $request->m_tagging[$i]['tagging']['TAG_ID'])->get();
+            if ($existingDataTag->count() > 0) {
+                Tag::where('TAG_ID', $request->m_tagging[$i]['tagging']['TAG_ID'])->delete();
+            }
+
+
+
             $tagName = $request->m_tagging[$i]['tagging']['TAG_NAME'];  // catetan mau di hapus apa engga di tag data sebelumnyaa
             $tagging = Tag::insertGetId([
                 'TAG_NAME' => $tagName,
