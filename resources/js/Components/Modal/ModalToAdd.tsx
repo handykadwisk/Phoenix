@@ -4,8 +4,6 @@ import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
-import Swal from "sweetalert2";
-// import Alert from '../Alert';
 
 export default function ModalToAdd({
     show = false,
@@ -30,7 +28,6 @@ export default function ModalToAdd({
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
-    // const [isSuccess, setIsSuccess] = useState<string>('')
 
     const close = () => {
         if (closeable) {
@@ -42,7 +39,6 @@ export default function ModalToAdd({
         e.preventDefault();
 
         setIsProcessing(true);
-        // console.log(data);
         await axios
             .post(url, data, {
                 headers: {
@@ -55,7 +51,6 @@ export default function ModalToAdd({
                 setIsError("");
                 onSuccess(res.data[0]);
                 close();
-                // idRelation(res);
             })
             .catch((err) => {
                 setIsProcessing(false);

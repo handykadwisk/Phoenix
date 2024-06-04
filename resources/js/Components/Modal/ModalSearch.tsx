@@ -65,7 +65,7 @@ export default function ModalSearch({
                             >
                                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                     <>
-                                        <div className="bg-white px-4 pb-4 pt-3 sm:pb-4">
+                                        <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                             <Dialog.Title
                                                 as="h3"
                                                 className="text-xl font-semibold leading-6 text-gray-900"
@@ -75,7 +75,7 @@ export default function ModalSearch({
                                             <hr className="my-3" />
                                             {body}
                                         </div>
-                                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                        <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             {submitButtonName && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"

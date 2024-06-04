@@ -6,10 +6,11 @@ import {
     ArrowLongRightIcon,
     EllipsisHorizontalIcon,
     EllipsisVerticalIcon,
+    MagnifyingGlassIcon,
     TrashIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
-import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import ModalToAdd from "@/Components/Modal/ModalToAddRelation";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import ToastMessage from "@/Components/ToastMessage";
 import ModalSearch from "@/Components/Modal/ModalSearch";
@@ -54,6 +55,7 @@ export default function Relation({ auth }: PageProps) {
     });
 
     const [relations, setRelations] = useState<any>([]);
+    const [showTable, setShowTable] = useState<boolean>(false);
     const [salutations, setSalutations] = useState<any>([]);
     const [searchRelation, setSearchRelation] = useState<any>({
         RELATION_ORGANIZATION_NAME: "",
@@ -77,12 +79,11 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     });
                 }
-                // console.log(res.data.links);
+                setShowTable(true);
             })
             .catch((err) => {
                 console.log(err);
             });
-        // setPolicies(policy)
     };
 
     const {
@@ -118,9 +119,6 @@ export default function Relation({ auth }: PageProps) {
             .catch((err) => {
                 console.log(err);
             });
-        // }
-
-        // setIsLoading(false)
     };
 
     const getSalutationById = async (id: string, column: string) => {
@@ -213,19 +211,8 @@ export default function Relation({ auth }: PageProps) {
             profession_id: "",
             relation_type_id: [],
         });
-        const aa: string = "12";
         getRelation();
         setIsSuccess(message);
-        Swal.fire({
-            title: "Success",
-            text: message,
-            icon: "success",
-        }).then((result: any) => {
-            // console.log(result);
-            if (result.value) {
-                window.open(`/relation/detailRelation/${aa}`);
-            }
-        });
     };
 
     // edit
@@ -236,7 +223,6 @@ export default function Relation({ auth }: PageProps) {
             .get(`/getRelation/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                // console.log(res.data);
                 setMRelation(res.data.m_relation_type);
                 getSalutationById(
                     res.data.relation_status_id,
@@ -314,12 +300,6 @@ export default function Relation({ auth }: PageProps) {
         }
     };
 
-    // const disableLob = (){
-    //     const element = document.getElementById("relationLob");
-
-    //     console.log(element);
-    // }
-
     const disableLob = async (id: string) => {
         if (id == "1") {
             // jika corporate
@@ -350,7 +330,6 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const handleCheckboxHR = (e: any) => {
-        // console.log(e);
         if (e == true) {
             setSwitchPage(true);
             setData("is_managed", "1");
@@ -361,7 +340,6 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const handleCheckboxTBK = (e: any) => {
-        // console.log(e);
         if (e == true) {
             setSwitchPageTBK(true);
             setData("mark_tbk_relation", "1");
@@ -464,17 +442,34 @@ export default function Relation({ auth }: PageProps) {
                 item.tagging.TAG_NAME?.toLocaleLowerCase()?.trim() ===
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
+
+    // search
+    const clearSearchRelation = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getRelation?${pageNumber}`)
+            .then((res) => {
+                setRelations(res.data);
+                setSearchRelation({
+                    ...searchRelation,
+                    RELATION_ORGANIZATION_NAME: "",
+                });
+                setShowTable(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
 
-            {isSuccess && (
+            {/* {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
                     isShow={true}
                     isSuccess={true}
                 />
-            )}
+            )} */}
 
             {/* modal add relation */}
             <ModalToAdd
@@ -1842,7 +1837,7 @@ export default function Relation({ auth }: PageProps) {
                                 value={
                                     searchRelation.RELATION_ORGANIZATION_NAME
                                 }
-                                className=""
+                                className="mt-2"
                                 onChange={(e) =>
                                     setSearchRelation({
                                         ...searchRelation,
@@ -1850,6 +1845,11 @@ export default function Relation({ auth }: PageProps) {
                                             e.target.value,
                                     })
                                 }
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        getRelation();
+                                    }
+                                }}
                             />
                         </div>
                     </>
@@ -1861,119 +1861,203 @@ export default function Relation({ auth }: PageProps) {
             <div>
                 <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
                     <div className="p-6 text-gray-900 mb-60">
-                        {/* table page*/}
-                        <TablePage
-                            addButtonLabel={"Add Relation"}
-                            addButtonModalState={() => {
-                                setSwitchPage(false);
-                                setModal({
-                                    add: true,
-                                    delete: false,
-                                    edit: false,
-                                    view: false,
-                                    document: false,
-                                    search: false,
-                                });
-                            }}
-                            searchButtonModalState={() =>
-                                setModal({
-                                    add: false,
-                                    delete: false,
-                                    edit: false,
-                                    view: false,
-                                    document: false,
-                                    search: !modal.search,
-                                })
-                            }
-                            tableHead={
+                        <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                            {/* header table */}
+                            <div className="md:grid md:grid-cols-8 md:gap-4">
+                                <Button
+                                    className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2"
+                                    onClick={() => {
+                                        setSwitchPage(false);
+                                        setModal({
+                                            add: true,
+                                            delete: false,
+                                            edit: false,
+                                            view: false,
+                                            document: false,
+                                            search: false,
+                                        });
+                                    }}
+                                >
+                                    {"Add Relation"}
+                                </Button>
+                                <hr className="mb-3 md:mb-0 md:hidden" />
+                                <button
+                                    className="md:mb-4 mb-2 relative md:ml-auto lg:w-1/2 md:w-3/4 w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4"
+                                    onClick={() => {
+                                        setModal({
+                                            add: false,
+                                            delete: false,
+                                            edit: false,
+                                            view: false,
+                                            document: false,
+                                            search: !modal.search,
+                                        });
+                                    }}
+                                >
+                                    <MagnifyingGlassIcon
+                                        className="mx-2 h-5 w-5 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+                                    Search...
+                                </button>
+                                <Button
+                                    className="mb-4 md:col-span-2 lg:col-span-1 w-full py-1.5 px-2"
+                                    onClick={() => clearSearchRelation()}
+                                >
+                                    Clear Search
+                                </Button>
+                            </div>
+
+                            {/* table */}
+                            {showTable ? (
                                 <>
-                                    <TableTH
-                                        className={"max-w-[0px] text-center"}
-                                        label={"No"}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px]"}
-                                        label={"Name Relation"}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] text-center"}
-                                        label={"Action"}
+                                    <div className="max-w-full overflow-x-auto mb-10 mt-5 md:h-full h-75 ring-1 ring-gray-200 shadow-xl rounded-lg custom-table overflow-visible">
+                                        <table className="w-full table-auto divide-y divide-gray-300">
+                                            <thead className="bg-gray-100">
+                                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                                    <TableTH
+                                                        className={
+                                                            "max-w-[0px] text-center"
+                                                        }
+                                                        label={"No"}
+                                                    />
+                                                    <TableTH
+                                                        className={
+                                                            "min-w-[50px]"
+                                                        }
+                                                        label={"Name Relation"}
+                                                    />
+                                                    <TableTH
+                                                        className={
+                                                            "min-w-[50px] text-center"
+                                                        }
+                                                        label={"Action"}
+                                                    />
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {relations.data?.map(
+                                                    (
+                                                        dataRelation: any,
+                                                        i: number
+                                                    ) => {
+                                                        return (
+                                                            <tr
+                                                                key={i}
+                                                                className={
+                                                                    i % 2 === 0
+                                                                        ? ""
+                                                                        : "bg-gray-100"
+                                                                }
+                                                            >
+                                                                <TableTD
+                                                                    value={
+                                                                        relations.from +
+                                                                        i
+                                                                    }
+                                                                    className={
+                                                                        "text-center"
+                                                                    }
+                                                                />
+                                                                <TableTD
+                                                                    value={
+                                                                        <>
+                                                                            {
+                                                                                dataRelation.RELATION_ORGANIZATION_NAME
+                                                                            }
+                                                                        </>
+                                                                    }
+                                                                    className={
+                                                                        ""
+                                                                    }
+                                                                />
+                                                                <TableTD
+                                                                    value={
+                                                                        <>
+                                                                            <a
+                                                                                href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
+                                                                            >
+                                                                                <div
+                                                                                    className="flex justify-center items-center"
+                                                                                    title="Detail"
+                                                                                >
+                                                                                    <svg
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                        fill="none"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        strokeWidth={
+                                                                                            1.5
+                                                                                        }
+                                                                                        stroke="currentColor"
+                                                                                        className="size-6 text-red-700 cursor-pointer"
+                                                                                    >
+                                                                                        <path
+                                                                                            strokeLinecap="round"
+                                                                                            strokeLinejoin="round"
+                                                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                                                        />
+                                                                                        <path
+                                                                                            strokeLinecap="round"
+                                                                                            strokeLinejoin="round"
+                                                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                                                        />
+                                                                                    </svg>
+                                                                                </div>
+                                                                            </a>
+                                                                        </>
+
+                                                                        // <Dropdown
+                                                                        //     title="Actions"
+                                                                        //     children={
+                                                                        //         <>
+                                                                        //             <a
+                                                                        //                 href=""
+                                                                        //                 className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                        //                 onClick={(
+                                                                        //                     e
+                                                                        //                 ) =>
+                                                                        //                     handleEditModel(
+                                                                        //                         e,
+                                                                        //                         dataRelation.RELATION_ORGANIZATION_ID
+                                                                        //                     )
+                                                                        //                 }
+                                                                        //             >
+                                                                        //                 Edit
+                                                                        //             </a>
+                                                                        //             <a
+                                                                        //                 href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
+                                                                        //                 className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                        //             >
+                                                                        //                 Detail
+                                                                        //             </a>
+                                                                        //         </>
+                                                                        //     }
+                                                                        // />
+                                                                    }
+                                                                    className={
+                                                                        ""
+                                                                    }
+                                                                />
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <Pagination
+                                        links={relations.links}
+                                        fromData={relations.from}
+                                        toData={relations.to}
+                                        totalData={relations.total}
+                                        clickHref={(url: string) =>
+                                            getRelation(url.split("?").pop())
+                                        }
                                     />
                                 </>
-                            }
-                            tableBody={relations.data?.map(
-                                (dataRelation: any, i: number) => {
-                                    return (
-                                        <tr
-                                            key={i}
-                                            className={
-                                                i % 2 === 0 ? "" : "bg-gray-100"
-                                            }
-                                        >
-                                            <TableTD
-                                                value={relations.from + i}
-                                                className={"text-center"}
-                                            />
-                                            <TableTD
-                                                value={
-                                                    <>
-                                                        {
-                                                            dataRelation.RELATION_ORGANIZATION_NAME
-                                                        }
-                                                    </>
-                                                }
-                                                className={""}
-                                            />
-                                            <TableTD
-                                                value={
-                                                    <Dropdown
-                                                        title="Actions"
-                                                        children={
-                                                            <>
-                                                                <a
-                                                                    href=""
-                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleEditModel(
-                                                                            e,
-                                                                            dataRelation.RELATION_ORGANIZATION_ID
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Edit
-                                                                </a>
-                                                                <a
-                                                                    href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
-                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                >
-                                                                    Detail
-                                                                </a>
-                                                            </>
-                                                        }
-                                                    />
-                                                }
-                                                className={"text-center"}
-                                            />
-                                        </tr>
-                                    );
-                                }
-                            )}
-                            pagination={
-                                <Pagination
-                                    links={relations.links}
-                                    fromData={relations.from}
-                                    toData={relations.to}
-                                    totalData={relations.total}
-                                    clickHref={(url: string) =>
-                                        getRelation(url.split("?").pop())
-                                    }
-                                />
-                            }
-                        />
-
-                        {/* end table page */}
+                            ) : null}
+                        </div>
+                        {/* table page*/}
                     </div>
                 </div>
             </div>

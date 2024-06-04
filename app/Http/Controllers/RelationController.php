@@ -208,7 +208,7 @@ class RelationController extends Controller
 
 
         return new JsonResponse([
-            'New relation added.'
+            $relation
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -358,16 +358,13 @@ class RelationController extends Controller
 
     public function detail($id)
     {
-        $test = 'aaa';
-        if ($id !== "") {
-            dd("aaa");
-        }else{
-            dd("bbb");
-        }
+        // get detail relation
+        $detailRelation = Relation::find($id);
+        // dd($detailRelation);
 
 
         return Inertia::render('Relation/DetailRelation', [
-            'test' => $test,
+            'detailRelation' => $detailRelation,
         ]);
     }
 }
