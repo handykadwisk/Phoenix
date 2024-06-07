@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\InsurancePanelController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RoleController;
@@ -33,9 +34,11 @@ Route::middleware('auth')->group(function () {
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
+    Route::get('/detailPolicy/{id}', [PolicyController::class, 'detailPolicy'])->name('detailPolicy');
     Route::post('/policy', [PolicyController::class, 'store'])->name('policy.store');
     Route::get('/getPolicy/{id}', [PolicyController::class, 'get_id'])->name('policy.get_id');
     Route::post('/getPolicy', [PolicyController::class, 'getPolicyDataForJSON'])->name('policy.getPolicyDataForJSON');
+    Route::get('/getRelation/{id}', [PolicyController::class, 'getRelationById'])->name('policy.getRelationById');
     Route::patch('/editPolicy/{id}', [PolicyController::class, 'edit'])->name('policy.edit');
     Route::patch('/deactivatePolicy/{id}', [PolicyController::class, 'deactivate'])->name('policy.deactivate');
 
@@ -46,6 +49,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/getInsurancePanel', [InsurancePanelController::class, 'getInsurancePanelJson'])->name('insurancePanel.getInsurancePanelJson');
     Route::patch('/editInsurancePanel/{id}', [InsurancePanelController::class, 'edit'])->name('insurancePanel.edit');
     Route::get('/getInitialPremium/{id}', [InsurancePanelController::class, 'initialPremium'])->name('insurancePanel.initialPremium');
+    Route::get('/getPolicyInstallment/{id}', [InsurancePanelController::class, 'policyInstallment'])->name('insurancePanel.policyInstallment');
+    Route::get('/insurancePanelByPolicyId/{id}', [InsurancePanelController::class, 'getInsurancPanelByPolicyId'])->name('insurancePanel.getInsurancPanelByPolicyId');
+
+    // Debit Note
+    Route::get('/debitNote', [DebitNoteController::class, 'index'])->name('debitNote');
+    // Route::get('/getPolicyInstallment/{id}', [DebitNoteController::class, 'policyInstallment'])->name('debitNote.policyInstallment');
+    
     
 });
 

@@ -14,7 +14,7 @@ class InsurancePanel extends Model
     protected $table = 't_insurance_panel';
 
     public $timestamps = false;
-    public $with = ['installment'];
+    public $with = ['installment', 'insurance', 'currency', 'policy'];
 
     protected $fillable = [
         'IP_ID',
@@ -44,6 +44,18 @@ class InsurancePanel extends Model
 
     public function installment() {
         return $this->hasMany(Installment::class, 'INSURANCE_PANEL_ID', 'IP_ID');
+    }
+
+    public function insurance() {
+        return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID', 'INSURANCE_ID');
+    }
+
+    public function currency() {
+        return $this->hasOne(RCurrency::class, 'CURRENCY_ID', 'IP_CURRENCY_ID');
+    }
+
+    public function policy() {
+        return $this->hasOne(Policy::class, 'POLICY_ID', 'POLICY_ID');
     }
 
     // public function insuranceType() {

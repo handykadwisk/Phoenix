@@ -12,7 +12,7 @@ class MPolicyInitialPremium extends Model
     protected $table = 'm_policy_initial_premium';
 
     public $timestamps = false;
-    // public $with = ['policy'];
+    public $with = ['currency'];
 
     protected $fillable = [
         'POLICY_INITIAL_PREMIUM_ID',
@@ -28,9 +28,9 @@ class MPolicyInitialPremium extends Model
         'UPDATED_DATE'
     ];
 
-    // public function currency() {
-    //     return $this->hasOne(RCurrency::class, 'CURRENCY_ID', 'CURRENCY_ID');
-    // }
+    public function currency() {
+        return $this->hasOne(RCurrency::class, 'CURRENCY_ID', 'CURRENCY_ID');
+    }
 
     // public function policy() {
     //     return $this->belongsTo(Policy::class, 'POLICY_ID', 'POLICY_ID');

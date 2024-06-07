@@ -9,7 +9,7 @@ class Relation extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'relation_id';
+    protected $primaryKey = 'RELATION_ORGANIZATION_ID';
 
     protected $table = 't_relation';
 

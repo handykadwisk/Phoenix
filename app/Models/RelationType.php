@@ -11,7 +11,7 @@ class RelationType extends Model
 
     protected $primaryKey = 'relation_type_id';
 
-    protected $table = 't_relation_type';
+    protected $table = 'r_relation_type';
 
     public $timestamps = false;
 }

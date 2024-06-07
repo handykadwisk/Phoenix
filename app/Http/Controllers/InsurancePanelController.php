@@ -6,6 +6,7 @@ use App\Models\Installment;
 use App\Models\InsurancePanel;
 use App\Models\MPolicyInitialPremium;
 use App\Models\Policy;
+use App\Models\PolicyInstallment;
 use App\Models\RInsuranceType;
 use App\Models\UserLog;
 // use Dotenv\Validator;
@@ -21,17 +22,17 @@ class InsurancePanelController extends Controller
 {
     public function getInsurancPanelData ($dataPerPage = 10, $searchQuery = null) {
         
-        // $data = InsurancePanel::orderBy('IP_ID', 'desc');
-        $data = InsurancePanel::leftJoin('t_policy', 't_insurance_panel.POLICY_ID', '=', 't_policy.POLICY_ID')
-        ->leftJoin('t_relation', 't_insurance_panel.INSURANCE_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
-        ->leftJoin('r_currency', 't_insurance_panel.IP_CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
-        ->orderBy('IP_ID', 'desc');
-        // dd($data->paginate(10));
-
+        // $data = InsurancePanel::leftJoin('t_policy', 't_insurance_panel.POLICY_ID', '=', 't_policy.POLICY_ID')
+        // ->leftJoin('t_relation', 't_insurance_panel.INSURANCE_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
+        // ->leftJoin('r_currency', 't_insurance_panel.IP_CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
+        // ->orderBy('IP_ID', 'desc');
+        $data = InsurancePanel::orderBy('IP_ID', 'desc');
+        
         if ($searchQuery) {
-            // if ($searchQuery->input('policy_number')) {
-            //     $data->where('policy_number', 'like', '%'.$searchQuery->policy_number.'%');
-            // }
+            // print('b');
+            if ($searchQuery->input('policy_id')) {
+                $data->where('t_policy.POLICY_ID', 'like', '%'.$searchQuery->policy_id.'%');
+            }
             // if ($searchQuery->input('policy_insurance_type_name')) {
             //     $data->where('policy_insurance_type_name', 'like', '%'.$searchQuery->policy_insurance_type_name.'%');
             // }
@@ -53,11 +54,19 @@ class InsurancePanelController extends Controller
 
     }
 
-     public function initialPremium($id) {
+    public function initialPremium($id) {
         
         $data = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
         ->where('POLICY_INITIAL_PREMIUM_ID', $id)->first();
         // dd($data);
+        return response()->json($data);
+
+    }
+
+    public function policyInstallment($id) {
+        
+        $data = PolicyInstallment::where('POLICY_ID',$id)->get();
+        // dd(response()->json($data));
         return response()->json($data);
 
     }
@@ -82,7 +91,7 @@ class InsurancePanelController extends Controller
     }
 
     public function getInsurancePanelJson(Request $request) {
-// dd('xxx');
+// dd($request);
         $data = $this->getInsurancPanelData(10, $request);
         return response()->json($data);
 
@@ -102,7 +111,7 @@ class InsurancePanelController extends Controller
             'INSURANCE_ID'                  => $request->insurance_id,
             'IP_POLICY_LEADER'              => $request->ip_policy_leader, // Belum ada isi
             'IP_CURRENCY_ID'                => $request->ip_currency_id, // Belum ada isi
-            'IP_TERM'                       => $request->ip_term,
+            // 'IP_TERM'                       => $request->ip_term,
             'IP_POLICY_INITIAL_PREMIUM'     => $request->ip_policy_initial_premium,
             'IP_POLICY_SHARE'               => $request->ip_policy_share,
             'IP_DISC_INSURANCE'             => $request->ip_disc_insurance,
@@ -167,6 +176,11 @@ class InsurancePanelController extends Controller
 
     }
 
+    public function getInsurancPanelByPolicyId($policy_id) {
+        $data = InsurancePanel::where('POLICY_ID', $policy_id)->get();
+        return response()->json($data);        
+    }
+
     public function edit(Request $request, InsurancePanel $insurancePanel) {
 
         // dd($request);
@@ -205,7 +219,7 @@ class InsurancePanelController extends Controller
                             'INSURANCE_ID'                  => $request->INSURANCE_ID,
                             'IP_POLICY_LEADER'              => $request->IP_POLICY_LEADER, // Belum ada isi
                             'IP_CURRENCY_ID'                => $request->IP_CURRENCY_ID, // Belum ada isi
-                            'IP_TERM'                       => $request->IP_TERM,
+                            // 'IP_TERM'                       => $request->IP_TERM,
                             'IP_POLICY_INITIAL_PREMIUM'     => $request->IP_POLICY_INITIAL_PREMIUM,
                             'IP_POLICY_SHARE'               => $request->IP_POLICY_SHARE,
                             'IP_DISC_INSURANCE'             => $request->IP_DISC_INSURANCE,
