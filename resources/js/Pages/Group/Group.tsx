@@ -23,25 +23,47 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import ModalToAction from "@/Components/Modal/ModalToAction";
+import TableTH from "@/Components/Table/TableTH";
+import TableTD from "@/Components/Table/TableTD";
+import ModalSearch from "@/Components/Modal/ModalSearch";
+import ModalDetailGroup from "./DetailGroup";
+import Swal from "sweetalert2";
 
 export default function Group({ auth }: PageProps) {
-    useEffect(() => {
-        getRelationGroup();
-    }, []);
+    // useEffect(() => {
+    //     getRelationGroup();
+    // }, []);
 
     // variabel relation Group
     const [relationsGroup, setRelationsGroup] = useState<any>([]);
+    const [searchGroup, setSearchGroup] = useState<any>({
+        RELATION_GROUP_NAME: "",
+    });
+    const [idGroup, setIdGroup] = useState<string>("");
     // detail Group
     const [detailGroup, setDetailGroup] = useState<any>([]);
     // variabel succes
     const [isSuccess, setIsSuccess] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     // Get Relation Group
     const getRelationGroup = async (pageNumber = "page=1") => {
         await axios
-            .get(`/getRelationGroup?${pageNumber}`)
+            .post(`/getRelationGroup?${pageNumber}`, {
+                RELATION_GROUP_NAME: searchGroup.RELATION_GROUP_NAME,
+            })
             .then((res) => {
                 setRelationsGroup(res.data);
+                if (modal.search) {
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -49,7 +71,18 @@ export default function Group({ auth }: PageProps) {
         // setPolicies(policy)
     };
 
-    const { xxx }: any = usePage().props;
+    const {
+        flash,
+        relation,
+        relationGroup,
+        salutation,
+        relationType,
+        relationStatus,
+        relationLOB,
+        mRelationType,
+        profession,
+        custom_menu,
+    }: any = usePage().props;
 
     const { data, setData, errors, reset } = useForm({
         RELATION_GROUP_NAME: "",
@@ -63,7 +96,25 @@ export default function Group({ auth }: PageProps) {
             RELATION_GROUP_NAME: "",
             RELATION_GROUP_DESCRIPTION: "",
         });
-        getRelationGroup();
+        // getRelationGroup();
+        Swal.fire({
+            title: "Success",
+            text: "New Group Added",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                setIdGroup(message);
+                setModal({
+                    add: false,
+                    delete: false,
+                    edit: false,
+                    view: true,
+                    document: false,
+                    search: false,
+                });
+            }
+        });
         setIsSuccess(message);
     };
 
@@ -107,6 +158,22 @@ export default function Group({ auth }: PageProps) {
         search: false,
     });
 
+    // search
+    const clearSearchGroup = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getRelationGroup?${pageNumber}`)
+            .then((res) => {
+                setRelationsGroup([]);
+                setSearchGroup({
+                    ...searchGroup,
+                    RELATION_GROUP_NAME: "",
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     function classNames(...classes: any) {
         return classes.filter(Boolean).join(" ");
     }
@@ -115,13 +182,13 @@ export default function Group({ auth }: PageProps) {
         <AuthenticatedLayout user={auth.user} header={"Group"}>
             <Head title="Group" />
 
-            {isSuccess && (
+            {/* {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
                     isShow={true}
                     isSuccess={true}
                 />
-            )}
+            )} */}
 
             {/* Modal Add Group */}
             <ModalToAdd
@@ -195,7 +262,7 @@ export default function Group({ auth }: PageProps) {
             />
             {/* End Modal Add Group */}
 
-            {/* Modal Detail Group */}
+            {/* Modal Detail Group
             <ModalToAction
                 show={modal.view}
                 onClose={() =>
@@ -219,11 +286,115 @@ export default function Group({ auth }: PageProps) {
                 method={""}
                 headers={null}
                 submitButtonName={null}
-                body={<></>}
+                body={
+                    <>
+                        <ModalDetailGroup auth={auth} idGroup={idGroup} />
+                    </>
+                }
+            /> */}
+
+            {/* modal search */}
+            <ModalSearch
+                show={modal.search}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Search Group"}
+                submitButtonName={"Search"}
+                onAction={() => {
+                    if (searchGroup.RELATION_GROUP_NAME !== "") {
+                        getRelationGroup();
+                    }
+                }}
+                isLoading={isLoading}
+                body={
+                    <>
+                        <div className="mb-4">
+                            <InputLabel
+                                htmlFor="RELATION_GROUP_NAME"
+                                value="Relation Group"
+                            />
+                            <TextInput
+                                // id="RELATION_GROUP_NAME"
+                                type="text"
+                                value={searchGroup.RELATION_GROUP_NAME}
+                                className="mt-2"
+                                onChange={(e) =>
+                                    setSearchGroup({
+                                        ...searchGroup,
+                                        RELATION_GROUP_NAME: e.target.value,
+                                    })
+                                }
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        if (
+                                            searchGroup.RELATION_GROUP_NAME !==
+                                            ""
+                                        ) {
+                                            getRelationGroup();
+                                            setSearchGroup({
+                                                ...searchGroup,
+                                                RELATION_GROUP_NAME: "",
+                                            });
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
+                    </>
+                }
             />
+            {/* end modal search */}
+
+            {/* modal detail */}
+            <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Detail Group"}
+                url={""}
+                data={""}
+                addOns={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <ModalDetailGroup
+                            idGroup={idGroup}
+                            relationStatus={relationStatus}
+                            relationGroup={relationGroup}
+                            relationType={relationType}
+                            profession={profession}
+                            relationLOB={relationLOB}
+                        />
+                    </>
+                }
+            />
+            {/* modal end detail  */}
+
             {/* End Modal Detail Group */}
             <div>
-                <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+                <div className="overflow-hidden rounded-lg bg-white p-10 shadow-md">
                     <div className="md:grid md:grid-cols-8 md:gap-4">
                         <Button
                             className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2"
@@ -240,106 +411,177 @@ export default function Group({ auth }: PageProps) {
                         >
                             Add Group
                         </Button>
-                        <hr className="mb-3 md:mb-0 md:hidden" />
-                        <button
-                            className="md:mb-4 mb-2 relative md:ml-auto lg:w-1/2 md:w-3/4 w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4"
-                            // onClick={() => searchButtonModalState()}
-                        >
-                            <MagnifyingGlassIcon
-                                className="mx-2 h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                            />
-                            Search...
-                        </button>
-                        <Button
-                            className="mb-4 md:col-span-2 lg:col-span-1 w-full py-1.5 px-2"
-                            // onClick={() => clearSearchButtonAction()}
-                        >
-                            Clear Search
-                        </Button>
-                    </div>
-
-                    {/* card Group */}
-                    <div>
-                        <ul
-                            role="list"
-                            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                        >
-                            {/* {clients.map((client) => ( */}
-                            {relationsGroup.data?.map(
-                                (dataRelationGroup: any, i: number) => {
-                                    return (
-                                        <li
-                                            key={i}
-                                            className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow-lg border"
-                                        >
-                                            <div className="flex w-full items-center justify-between space-x-6 p-6">
-                                                <div className="flex-1 truncate">
-                                                    <div className="flex items-center space-x-3">
-                                                        <h3 className="mt-1 truncate text-sm text-gray-500 ">
-                                                            Group
-                                                        </h3>
-                                                    </div>
-                                                    <p className="truncate text-xl font-medium text-gray-900">
-                                                        {
-                                                            dataRelationGroup.RELATION_GROUP_NAME
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <img
-                                                    className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
-                                                    src={defaultImage}
-                                                    alt="Relation Group"
-                                                />
-                                            </div>
-                                            <div>
-                                                <div className="-mt-px flex divide-x divide-gray-200">
-                                                    <div className="flex w-0 flex-1">
-                                                        <a
-                                                            href={`/group/detailGroup/${dataRelationGroup.RELATION_GROUP_ID}`}
-                                                            className="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:text-red-600"
-                                                            // onClick={(e) =>
-                                                            //     handleViewModal(
-                                                            //         e,
-                                                            //         dataRelationGroup.RELATION_GROUP_ID
-                                                            //     )
-                                                            // }
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 24 24"
-                                                                fill="currentColor"
-                                                                className="size-4"
-                                                            >
-                                                                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                                                                <path
-                                                                    fillRule="evenodd"
-                                                                    d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                                                                    clipRule="evenodd"
-                                                                />
-                                                            </svg>
-                                                            Detail
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    );
-                                }
-                            )}
-                            {/* ))} */}
-                        </ul>
-                        <Pagination
-                            links={relationsGroup.links}
-                            fromData={relationsGroup.from}
-                            toData={relationsGroup.to}
-                            totalData={relationsGroup.total}
-                            clickHref={(url: string) =>
-                                getRelationGroup(url.split("?").pop())
-                            }
-                        />
                     </div>
                 </div>
+                {/* search dan table */}
+                <div className="grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 xs:gap-0 lg:grid-cols-3 lg:gap-4">
+                    <div className="bg-white p-10 rounded-md shadow-md mb-5 lg:mb-0">
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="col-span-2 xs:col-span-3 lg:col-span-2">
+                                <button
+                                    className=" w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4 hover:ring-red-500"
+                                    onClick={() => {
+                                        setModal({
+                                            add: false,
+                                            delete: false,
+                                            edit: false,
+                                            view: false,
+                                            document: false,
+                                            search: !modal.search,
+                                        });
+                                    }}
+                                >
+                                    <MagnifyingGlassIcon
+                                        className="mx-2 h-5 w-5 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+                                    Search Group
+                                </button>
+                            </div>
+                            <div className="flex justify-center items-center xs:col-span-3 lg:col-auto">
+                                <Button
+                                    className="mb-4 w-full py-1.5 px-2"
+                                    onClick={() => clearSearchGroup()}
+                                >
+                                    Clear Search
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white p-10 rounded-md shadow-md col-span-2">
+                        {relationsGroup.length === 0 ? (
+                            <div className="text-center text-lg">
+                                <span>No Data Available</span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                                    <table className="w-full table-auto divide-y divide-gray-300">
+                                        <thead className="bg-gray-100">
+                                            <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                                <TableTH
+                                                    className={
+                                                        "max-w-[0px] text-center"
+                                                    }
+                                                    label={"No"}
+                                                />
+                                                <TableTH
+                                                    className={"min-w-[50px]"}
+                                                    label={"Name Group"}
+                                                />
+                                                <TableTH
+                                                    className={
+                                                        "min-w-[50px] text-center"
+                                                    }
+                                                    label={"Action"}
+                                                />
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {relationsGroup.data?.map(
+                                                (dataGroup: any, i: number) => {
+                                                    return (
+                                                        <tr
+                                                            key={i}
+                                                            className={
+                                                                i % 2 === 0
+                                                                    ? ""
+                                                                    : "bg-gray-100"
+                                                            }
+                                                        >
+                                                            <TableTD
+                                                                value={
+                                                                    relationsGroup.from +
+                                                                    i
+                                                                }
+                                                                className={
+                                                                    "text-center"
+                                                                }
+                                                            />
+                                                            <TableTD
+                                                                value={
+                                                                    <>
+                                                                        {
+                                                                            dataGroup.RELATION_GROUP_NAME
+                                                                        }
+                                                                    </>
+                                                                }
+                                                                className={""}
+                                                            />
+                                                            <TableTD
+                                                                value={
+                                                                    <>
+                                                                        <a
+                                                                            onClick={() => {
+                                                                                setModal(
+                                                                                    {
+                                                                                        add: false,
+                                                                                        delete: false,
+                                                                                        edit: false,
+                                                                                        view: true,
+                                                                                        document:
+                                                                                            false,
+                                                                                        search: false,
+                                                                                    }
+                                                                                );
+                                                                                setIdGroup(
+                                                                                    dataGroup.RELATION_GROUP_ID
+                                                                                );
+                                                                            }}
+                                                                            // href={`/group/detailGroup/${dataGroup.RELATION_GROUP_ID}`}
+                                                                        >
+                                                                            <div
+                                                                                className="flex justify-center items-center"
+                                                                                title="Detail"
+                                                                            >
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    fill="none"
+                                                                                    viewBox="0 0 24 24"
+                                                                                    strokeWidth={
+                                                                                        1.5
+                                                                                    }
+                                                                                    stroke="currentColor"
+                                                                                    className="size-6 text-red-700 cursor-pointer"
+                                                                                >
+                                                                                    <path
+                                                                                        strokeLinecap="round"
+                                                                                        strokeLinejoin="round"
+                                                                                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                                                    />
+                                                                                    <path
+                                                                                        strokeLinecap="round"
+                                                                                        strokeLinejoin="round"
+                                                                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                                                    />
+                                                                                </svg>
+                                                                            </div>
+                                                                        </a>
+                                                                    </>
+                                                                }
+                                                                className={""}
+                                                            />
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <Pagination
+                                    links={relationsGroup.links}
+                                    fromData={relationsGroup.from}
+                                    toData={relationsGroup.to}
+                                    totalData={relationsGroup.total}
+                                    clickHref={(url: string) =>
+                                        getRelationGroup(url.split("?").pop())
+                                    }
+                                />
+                            </>
+                        )}
+                    </div>
+                </div>
+                {/* end search dan table */}
             </div>
         </AuthenticatedLayout>
     );

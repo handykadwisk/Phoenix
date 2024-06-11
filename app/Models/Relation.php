@@ -13,7 +13,7 @@ class Relation extends Model
 
     protected $table = 't_relation';
 
-    public $with = ['mTagging','mRelationType','mRelationAka', 'children'];
+    public $with = ['mTagging','mRelationType','mRelationAka', 'children','groupRelation'];
 
     protected $guarded = [
         'RELATION_ORGANIZATION_ID',
@@ -36,5 +36,9 @@ class Relation extends Model
 
     public function children() {
         return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_PARENT_ID');
+    }
+
+    public function groupRelation(){
+        return $this->hasMany(RelationGroup::class, 'RELATION_GROUP_ID', 'RELATION_ORGANIZATION_GROUP');
     }
 }

@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MRelationType;
 use App\Models\Relation;
 use App\Models\RelationGroup;
+use App\Models\RelationLob;
+use App\Models\RelationProfession;
+use App\Models\RelationStatus;
+use App\Models\RelationType;
+use App\Models\Salutation;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,24 +19,57 @@ use Inertia\Inertia;
 class RelationGroupController extends Controller
 {
 
-    public function getRelationGroupData($dataPerPage = 2)
+    public function getRelationGroupData($dataPerPage = 2, $searchQuery = null)
     {
+        $data = RelationGroup::orderBy('RELATION_GROUP_ID', 'desc');
+        if ($searchQuery) {
+            if ($searchQuery->input('RELATION_GROUP_NAME')) {
+                $data->where('RELATION_GROUP_NAME', 'like', '%'.$searchQuery->RELATION_GROUP_NAME.'%');
+            }
+        } 
 
-        return RelationGroup::orderBy('RELATION_GROUP_ID', 'asc')
-            // ->where('RELATION_ORGANIZATION_PARENT_ID', "0")
-            ->paginate($dataPerPage);
+        return $data->paginate($dataPerPage);
     }
 
-    public function getRelationGroupJson(){
-        $data = $this->getRelationGroupData(5);
+    public function getRelationGroupJson(Request $request){
+        $data = $this->getRelationGroupData(5, $request);
         return response()->json($data);
+    }
+
+    // Get All Relation Type 
+    public function getAllRelatioType()
+    {
+        $relationType = RelationType::get();
+
+        return $relationType;
     }
 
     public function index()
     {
-        $xxx= "aa";
+        // call data relation group
+        $relationGroup = RelationGroup::get();
+        // call data relation lob
+        $relationLob = RelationLob::get();
+        // call data relation type
+        $relationTypeAll = $this->getAllRelatioType();
+        // call data salutation
+        $salutation = Salutation::get();
+        // call data relation status
+        $relationStatus = RelationStatus::get();
+        // call mapping relation Type
+        $mRelationType = MRelationType::get();
+
+        // cal profession
+        $profession = RelationProfession::get();
+
         return Inertia::render('Group/Group', [
-            'xxx' => $xxx,
+            'relationType' => $relationTypeAll,
+            'relationLOB' => $relationLob,
+            'salutation' => $salutation,
+            'relationStatus' => $relationStatus,
+            'relationGroup' => $relationGroup,
+            'mRelationType' => $mRelationType,
+            'profession'   => $profession
         ]);
     }
 
@@ -57,7 +96,7 @@ class RelationGroupController extends Controller
 
 
         return new JsonResponse([
-            'New relation group added.'
+            $group
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -86,4 +125,19 @@ class RelationGroupController extends Controller
             'relationGroup' => $relationGroup
         ]);
     }
+
+    public function get_detail(Request $request){
+        $detailRelation = RelationGroup::with('rGroup')->find($request->id);
+        // print_r($detailRelation);die;
+        return response()->json($detailRelation);
+    }
+
+    public function get_group(Request $request){
+        
+        $getGroup = RelationGroup::where("RELATION_GROUP_ID",$request->idGroup)->get();
+        // dd($getGroup);
+        // print_r($detailRelation);die;
+        return response()->json($getGroup);
+    }
+    
 }

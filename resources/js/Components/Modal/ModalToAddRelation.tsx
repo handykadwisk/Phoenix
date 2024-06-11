@@ -55,19 +55,6 @@ export default function ModalToAdd({
                 setIsError("");
                 onSuccess(res.data[0]);
                 close();
-                Swal.fire({
-                    title: "Success",
-                    text: "New Relation Added",
-                    icon: "success",
-                }).then((result: any) => {
-                    // console.log(result);
-                    if (result.value) {
-                        window.open(
-                            "/relation/detailRelation/" + res.data[0],
-                            "_self"
-                        );
-                    }
-                });
                 // idRelation(res);
             })
             .catch((err) => {

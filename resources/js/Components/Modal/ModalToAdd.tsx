@@ -37,6 +37,7 @@ export default function ModalToAdd({
 
     const action = async (e: any) => {
         e.preventDefault();
+        console.log(data);
 
         setIsProcessing(true);
         await axios
@@ -46,7 +47,6 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
-                console.log(res);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data[0]);

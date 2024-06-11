@@ -33,29 +33,21 @@ import TableTD from "@/Components/Table/TableTD";
 import Dropdown from "@/Components/Dropdown";
 import { Console } from "console";
 import Swal from "sweetalert2";
+import DetailRelationPopup from "./DetailRelation";
+import AddRelationPopup from "./AddRelation";
 
 export default function Relation({ auth }: PageProps) {
     useEffect(() => {
         getMappingParent("", "");
     }, []);
 
-    interface FormInterface {
-        group_id: string;
-        name_relation: string;
-        parent_id: BigInteger;
-        abbreviation: string;
-        relation_aka: string;
-        relation_email: string;
-        relation_description: string;
-        relation_type_id: any;
-    }
-
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });
 
+    const [getDetailRelation, setGetDetailRelation] = useState<any>("");
+
     const [relations, setRelations] = useState<any>([]);
-    const [showTable, setShowTable] = useState<boolean>(false);
     const [salutations, setSalutations] = useState<any>([]);
     const [searchRelation, setSearchRelation] = useState<any>({
         RELATION_ORGANIZATION_NAME: "",
@@ -78,8 +70,11 @@ export default function Relation({ auth }: PageProps) {
                         document: false,
                         search: false,
                     });
+                    setSearchRelation({
+                        ...searchRelation,
+                        RELATION_ORGANIZATION_NAME: "",
+                    });
                 }
-                setShowTable(true);
             })
             .catch((err) => {
                 console.log(err);
@@ -211,7 +206,26 @@ export default function Relation({ auth }: PageProps) {
             profession_id: "",
             relation_type_id: [],
         });
-        getRelation();
+        // if (modal.add) {
+        Swal.fire({
+            title: "Success",
+            text: "New Relation Added",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                setGetDetailRelation(message);
+                setModal({
+                    add: false,
+                    delete: false,
+                    edit: false,
+                    view: true,
+                    document: false,
+                    search: false,
+                });
+            }
+        });
+        // }
         setIsSuccess(message);
     };
 
@@ -448,12 +462,11 @@ export default function Relation({ auth }: PageProps) {
         await axios
             .post(`/getRelation?${pageNumber}`)
             .then((res) => {
-                setRelations(res.data);
+                setRelations([]);
                 setSearchRelation({
                     ...searchRelation,
                     RELATION_ORGANIZATION_NAME: "",
                 });
-                setShowTable(false);
             })
             .catch((err) => {
                 console.log(err);
@@ -472,9 +485,9 @@ export default function Relation({ auth }: PageProps) {
             )} */}
 
             {/* modal add relation */}
-            <ModalToAdd
+            <AddRelationPopup
                 show={modal.add}
-                onClose={() =>
+                modal={() =>
                     setModal({
                         add: false,
                         delete: false,
@@ -484,616 +497,12 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     })
                 }
-                title={"Add Relation"}
-                url={`/relation`}
-                data={data}
-                onSuccess={handleSuccess}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
-                }
-                body={
-                    <>
-                        <div className="grid gap-4 grid-cols-2">
-                            <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="relation_status_id"
-                                    value="Relation Status"
-                                />
-                                <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.relation_status_id}
-                                    onChange={(e) => {
-                                        setData(
-                                            "relation_status_id",
-                                            e.target.value
-                                        );
-                                        getSalutationById(
-                                            e.target.value,
-                                            "relation_status_id"
-                                        );
-                                        disableLob(e.target.value);
-                                    }}
-                                >
-                                    <option>
-                                        -- Choose Relation Status --
-                                    </option>
-                                    {relationStatus.map(
-                                        (relationStatus: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={
-                                                        relationStatus.relation_status_id
-                                                    }
-                                                >
-                                                    {
-                                                        relationStatus.relation_status_name
-                                                    }
-                                                </option>
-                                            );
-                                        }
-                                    )}
-                                </select>
-                            </div>
-                            <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="salutation_id"
-                                    value="Salutation"
-                                />
-                                <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.salutation_id}
-                                    onChange={(e) => {
-                                        setData(
-                                            "salutation_id",
-                                            e.target.value
-                                        );
-                                    }}
-                                >
-                                    <option>-- Choose Salutation --</option>
-                                    {salutations.map(
-                                        (getSalutations: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={
-                                                        getSalutations.salutation_id
-                                                    }
-                                                >
-                                                    {
-                                                        getSalutations.salutation_name
-                                                    }
-                                                </option>
-                                            );
-                                        }
-                                    )}
-                                </select>
-                            </div>
-                        </div>
-                        <div className={"grid gap-4 grid-cols-2"}>
-                            <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="name_relation"
-                                    value="Name Relation"
-                                />
-                                <TextInput
-                                    id="name_relation"
-                                    type="text"
-                                    name="name_relation"
-                                    value={data.name_relation}
-                                    className="mt-2"
-                                    autoComplete="name_relation"
-                                    onChange={(e) =>
-                                        setData("name_relation", e.target.value)
-                                    }
-                                    required
-                                    placeholder="Name Relation"
-                                />
-                            </div>
-                            <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="abbreviation"
-                                    value="Abbreviation"
-                                />
-                                <TextInput
-                                    id="abbreviation"
-                                    type="text"
-                                    name="abbreviation"
-                                    value={data.abbreviation}
-                                    className="mt-2"
-                                    autoComplete="abbreviation"
-                                    onChange={(e) =>
-                                        setData("abbreviation", e.target.value)
-                                    }
-                                    required
-                                    placeholder="Abbreviation"
-                                />
-                            </div>
-                        </div>
-                        <div className="grid gap-4 grid-cols-2 mt-4">
-                            <div className="mt-4">
-                                {data.relation_aka?.length ? (
-                                    <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
-                                        {data.relation_aka?.map(
-                                            (tag: any, i: number) => {
-                                                return (
-                                                    // <>
-                                                    <div
-                                                        key={i}
-                                                        className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
-                                                    >
-                                                        {tag.name_aka}
-                                                        <div>
-                                                            {/* <a href=""> */}
-                                                            <div
-                                                                className="text-red-600"
-                                                                onMouseDown={(
-                                                                    e
-                                                                ) =>
-                                                                    e.preventDefault()
-                                                                }
-                                                                onClick={() => {
-                                                                    const updatedData =
-                                                                        data.relation_aka.filter(
-                                                                            (
-                                                                                d: any
-                                                                            ) =>
-                                                                                d.name_aka !==
-                                                                                tag.name_aka
-                                                                        );
-                                                                    setData(
-                                                                        "relation_aka",
-                                                                        updatedData
-                                                                    );
-                                                                }}
-                                                            >
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="none"
-                                                                    viewBox="0 0 24 24"
-                                                                    strokeWidth={
-                                                                        1.5
-                                                                    }
-                                                                    stroke="currentColor"
-                                                                    className="w-6 h-6"
-                                                                >
-                                                                    <path
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                        d="M6 18 18 6M6 6l12 12"
-                                                                    />
-                                                                </svg>
-                                                            </div>
-                                                            {/* </a> */}
-                                                        </div>
-                                                    </div>
-                                                    // </>
-                                                );
-                                            }
-                                        )}
-                                        <div className="w-full text-right">
-                                            <span
-                                                className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
-                                                onClick={() => {
-                                                    setData("relation_aka", []);
-                                                    inputRef.current?.focus();
-                                                }}
-                                            >
-                                                Clear all
-                                            </span>
-                                        </div>
-                                    </div>
-                                ) : null}
-                                <TextInput
-                                    ref={inputRef}
-                                    type="text"
-                                    value={query}
-                                    onChange={(e) =>
-                                        setQuery(e.target.value.trimStart())
-                                    }
-                                    placeholder="Create AKA"
-                                    className=""
-                                    autoComplete="relation_aka"
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter" && !isDisable) {
-                                            setData("relation_aka", [
-                                                ...data.relation_aka,
-                                                {
-                                                    name_aka: query,
-                                                },
-                                            ]);
-                                            setQuery("");
-                                            setMenuOpen(true);
-                                        }
-                                    }}
-                                />
-                                <button
-                                    className="text-sm disabled:text-gray-300 text-rose-500 disabled:cursor-not-allowed"
-                                    disabled={isDisable}
-                                    onClick={() => {
-                                        if (isDisable) {
-                                            return;
-                                        }
-                                        setData("relation_aka", [
-                                            ...data.relation_aka,
-                                            {
-                                                name_aka: query,
-                                            },
-                                        ]);
-                                        setQuery("");
-                                        inputRef.current?.focus();
-                                        setMenuOpen(true);
-                                    }}
-                                >
-                                    + Add
-                                </button>
-                            </div>
-                            <div className="mt-4">
-                                {/* <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED BY APP"
-                                /> */}
-                                <ul role="list" className="">
-                                    <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            <span className="mt-1 ml-2">
-                                                <Switch
-                                                    enabled={switchPage}
-                                                    onChangeButton={(e: any) =>
-                                                        handleCheckboxHR(e)
-                                                    }
-                                                />
-                                            </span>
-                                            <span className="ml-2 text-sm">
-                                                HR MANAGED BY APP
-                                            </span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <InputLabel
-                                htmlFor="group_id"
-                                value="Group"
-                                className="block"
-                            />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.group_id}
-                                onChange={(e) => {
-                                    setData("group_id", e.target.value);
-                                    getMappingParent(
-                                        e.target.value,
-                                        "group_id"
-                                    );
-                                }}
-                            >
-                                <option>-- Choose Group --</option>
-                                {relationGroup.map((groups: any, i: number) => {
-                                    return (
-                                        <option
-                                            key={i}
-                                            value={groups.RELATION_GROUP_ID}
-                                        >
-                                            {groups.RELATION_GROUP_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                        <div className="mt-4">
-                            <InputLabel htmlFor="parent_id" value="Parent" />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.parent_id}
-                                onChange={(e) =>
-                                    setData("parent_id", e.target.value)
-                                }
-                            >
-                                <option value={""} className="text-white">
-                                    -- Choose Parent --
-                                </option>
-                                {mappingParent.mapping_parent.map(
-                                    (parents: any, i: number) => {
-                                        return (
-                                            <option
-                                                key={i}
-                                                value={
-                                                    parents.RELATION_ORGANIZATION_ID
-                                                }
-                                            >
-                                                {parents.text_combo}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div>
-                        <div className="grid gap-4 grid-cols-2">
-                            <div className="mt-4">
-                                <InputLabel
-                                    htmlFor="relation_email"
-                                    value="Email"
-                                />
-                                <TextInput
-                                    id="relation_email"
-                                    type="email"
-                                    name="relation_email"
-                                    value={data.relation_email}
-                                    className="mt-2"
-                                    autoComplete="relation_email"
-                                    onChange={(e) =>
-                                        setData(
-                                            "relation_email",
-                                            e.target.value
-                                        )
-                                    }
-                                    placeholder="example@gmail.com"
-                                />
-                            </div>
-                            <div className="mt-4">
-                                {/* <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED BY APP"
-                                /> */}
-                                <ul role="list" className="mt-8">
-                                    <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            <span className="mt-1 ml-2">
-                                                <Switch
-                                                    enabled={switchPageTBK}
-                                                    onChangeButton={(e: any) =>
-                                                        handleCheckboxTBK(e)
-                                                    }
-                                                />
-                                            </span>
-                                            <span className="ml-2 text-sm">
-                                                MARK TBK RELATION
-                                            </span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <InputLabel
-                                htmlFor="relation_type_id"
-                                value="Relation Type"
-                            />
-                            <div>
-                                <ul
-                                    role="list"
-                                    className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
-                                >
-                                    {relationType.map(
-                                        (typeRelation: any, i: number) => {
-                                            return (
-                                                <li
-                                                    key={
-                                                        typeRelation.RELATION_TYPE_ID
-                                                    }
-                                                    className="col-span-1 flex rounded-md shadow-sm"
-                                                >
-                                                    <div className="flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white">
-                                                        <Checkbox
-                                                            name="relation_type_id[]"
-                                                            id={
-                                                                typeRelation.RELATION_TYPE_ID
-                                                            }
-                                                            value={
-                                                                typeRelation.RELATION_TYPE_ID
-                                                            }
-                                                            onChange={(e) =>
-                                                                handleCheckbox(
-                                                                    e
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
-                                                        <div className="flex-1 truncate px-1 py-2 text-xs">
-                                                            <span className="text-gray-900">
-                                                                {
-                                                                    typeRelation.RELATION_TYPE_NAME
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            );
-                                        }
-                                    )}
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="mt-4" id="relationJobs">
-                            <InputLabel
-                                htmlFor="profession_id"
-                                value="Relation Profession"
-                            />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.profession_id}
-                                onChange={(e) =>
-                                    setData("profession_id", e.target.value)
-                                }
-                            >
-                                <option>
-                                    -- Choose Relation Profession --
-                                </option>
-                                {profession?.map((rProf: any, i: number) => {
-                                    return (
-                                        <option
-                                            key={i}
-                                            value={rProf.RELATION_PROFESSION_ID}
-                                        >
-                                            {rProf.RELATION_PROFESSION_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                        <div className="mt-4" id="relationLob">
-                            <InputLabel
-                                htmlFor="relation_lob_id"
-                                value="Relation Lob"
-                            />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.relation_lob_id}
-                                onChange={(e) =>
-                                    setData("relation_lob_id", e.target.value)
-                                }
-                            >
-                                <option>-- Choose Relation Lob --</option>
-                                {relationLOB.map((rLob: any, i: number) => {
-                                    return (
-                                        <option
-                                            key={i}
-                                            value={rLob.RELATION_LOB_ID}
-                                        >
-                                            {rLob.RELATION_LOB_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                        <div className="mt-4">
-                            <InputLabel
-                                htmlFor="relation_description"
-                                value="Relation Description"
-                            />
-                            <TextArea
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                id="relation_description"
-                                name="relation_description"
-                                defaultValue={data.relation_description}
-                                onChange={(e: any) =>
-                                    setData(
-                                        "relation_description",
-                                        e.target.value
-                                    )
-                                }
-                            />
-                        </div>
-                        <div className="mt-4">
-                            {data.tagging_name?.length ? (
-                                <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
-                                    {data.tagging_name?.map(
-                                        (tag: any, i: number) => {
-                                            return (
-                                                // <>
-                                                <div
-                                                    key={i}
-                                                    className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
-                                                >
-                                                    {tag.name_tag}
-                                                    <div>
-                                                        {/* <a href=""> */}
-                                                        <div
-                                                            className="text-red-600"
-                                                            onMouseDown={(e) =>
-                                                                e.preventDefault()
-                                                            }
-                                                            onClick={() => {
-                                                                const updatedData =
-                                                                    data.tagging_name.filter(
-                                                                        (
-                                                                            d: any
-                                                                        ) =>
-                                                                            d.name_tag !==
-                                                                            tag.name_tag
-                                                                    );
-                                                                setData(
-                                                                    "tagging_name",
-                                                                    updatedData
-                                                                );
-                                                            }}
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                strokeWidth={
-                                                                    1.5
-                                                                }
-                                                                stroke="currentColor"
-                                                                className="w-6 h-6"
-                                                            >
-                                                                <path
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    d="M6 18 18 6M6 6l12 12"
-                                                                />
-                                                            </svg>
-                                                        </div>
-                                                        {/* </a> */}
-                                                    </div>
-                                                </div>
-                                                // </>
-                                            );
-                                        }
-                                    )}
-                                    <div className="w-full text-right">
-                                        <span
-                                            className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
-                                            onClick={() => {
-                                                setData("tagging_name", []);
-                                                inputRefTag.current?.focus();
-                                            }}
-                                        >
-                                            Clear all
-                                        </span>
-                                    </div>
-                                </div>
-                            ) : null}
-                            <TextInput
-                                ref={inputRefTag}
-                                type="text"
-                                value={query}
-                                onChange={(e) =>
-                                    setQuery(e.target.value.trimStart())
-                                }
-                                placeholder="Create Tags"
-                                className=""
-                                autoComplete="tagging_name"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !isDisableTag) {
-                                        setData("tagging_name", [
-                                            ...data.tagging_name,
-                                            {
-                                                name_tag: query,
-                                            },
-                                        ]);
-                                        setQuery("");
-                                        setMenuOpen(true);
-                                    }
-                                }}
-                            />
-                            <button
-                                className="text-sm disabled:text-gray-300 text-rose-500 disabled:cursor-not-allowed"
-                                disabled={isDisableTag}
-                                onClick={() => {
-                                    if (isDisableTag) {
-                                        return;
-                                    }
-                                    setData("tagging_name", [
-                                        ...data.tagging_name,
-                                        {
-                                            name_tag: query,
-                                        },
-                                    ]);
-                                    setQuery("");
-                                    inputRefTag.current?.focus();
-                                    setMenuOpen(true);
-                                }}
-                            >
-                                + Add
-                            </button>
-                        </div>
-                    </>
-                }
+                handleSuccess={handleSuccess}
+                relationStatus={relationStatus}
+                relationGroup={relationGroup}
+                relationType={relationType}
+                profession={profession}
+                relationLOB={relationLOB}
             />
             {/* end modal add relation */}
 
@@ -1803,6 +1212,45 @@ export default function Relation({ auth }: PageProps) {
             />
             {/* end modal edit relation */}
 
+            {/* modal detail  */}
+            <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Detail Relation"}
+                url={""}
+                data={""}
+                addOns={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DetailRelationPopup
+                            detailRelation={getDetailRelation}
+                            relationStatus={relationStatus}
+                            relationGroup={relationGroup}
+                            relationType={relationType}
+                            profession={profession}
+                            relationLOB={relationLOB}
+                        />
+                    </>
+                }
+            />
+            {/* end modal detail */}
+
             {/* Modal Search */}
             {/* modal search */}
             <ModalSearch
@@ -1820,7 +1268,9 @@ export default function Relation({ auth }: PageProps) {
                 title={"Search Relation"}
                 submitButtonName={"Search"}
                 onAction={() => {
-                    getRelation();
+                    if (searchRelation.RELATION_ORGANIZATION_NAME !== "") {
+                        getRelation();
+                    }
                 }}
                 isLoading={isLoading}
                 body={
@@ -1847,7 +1297,12 @@ export default function Relation({ auth }: PageProps) {
                                 }
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
-                                        getRelation();
+                                        if (
+                                            searchRelation.RELATION_ORGANIZATION_NAME !==
+                                            ""
+                                        ) {
+                                            getRelation();
+                                        }
                                     }
                                 }}
                             />
@@ -1865,7 +1320,7 @@ export default function Relation({ auth }: PageProps) {
                             {/* header table */}
                             <div className="md:grid md:grid-cols-8 md:gap-4">
                                 <Button
-                                    className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2"
+                                    className="text-sm w-full lg:w-1/2 font-semibold px-6 py-1.5 mb-4 md:col-span-2"
                                     onClick={() => {
                                         setSwitchPage(false);
                                         setModal({
@@ -1880,182 +1335,191 @@ export default function Relation({ auth }: PageProps) {
                                 >
                                     {"Add Relation"}
                                 </Button>
-                                <hr className="mb-3 md:mb-0 md:hidden" />
-                                <button
-                                    className="md:mb-4 mb-2 relative md:ml-auto lg:w-1/2 md:w-3/4 w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4"
-                                    onClick={() => {
-                                        setModal({
-                                            add: false,
-                                            delete: false,
-                                            edit: false,
-                                            view: false,
-                                            document: false,
-                                            search: !modal.search,
-                                        });
-                                    }}
-                                >
-                                    <MagnifyingGlassIcon
-                                        className="mx-2 h-5 w-5 text-gray-400"
-                                        aria-hidden="true"
-                                    />
-                                    Search...
-                                </button>
-                                <Button
-                                    className="mb-4 md:col-span-2 lg:col-span-1 w-full py-1.5 px-2"
-                                    onClick={() => clearSearchRelation()}
-                                >
-                                    Clear Search
-                                </Button>
                             </div>
+                        </div>
 
-                            {/* table */}
-                            {showTable ? (
-                                <>
-                                    <div className="max-w-full overflow-x-auto mb-10 mt-5 md:h-full h-75 ring-1 ring-gray-200 shadow-xl rounded-lg custom-table overflow-visible">
-                                        <table className="w-full table-auto divide-y divide-gray-300">
-                                            <thead className="bg-gray-100">
-                                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                                    <TableTH
-                                                        className={
-                                                            "max-w-[0px] text-center"
-                                                        }
-                                                        label={"No"}
-                                                    />
-                                                    <TableTH
-                                                        className={
-                                                            "min-w-[50px]"
-                                                        }
-                                                        label={"Name Relation"}
-                                                    />
-                                                    <TableTH
-                                                        className={
-                                                            "min-w-[50px] text-center"
-                                                        }
-                                                        label={"Action"}
-                                                    />
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {relations.data?.map(
-                                                    (
-                                                        dataRelation: any,
-                                                        i: number
-                                                    ) => {
-                                                        return (
-                                                            <tr
-                                                                key={i}
-                                                                className={
-                                                                    i % 2 === 0
-                                                                        ? ""
-                                                                        : "bg-gray-100"
-                                                                }
-                                                            >
-                                                                <TableTD
-                                                                    value={
-                                                                        relations.from +
-                                                                        i
-                                                                    }
-                                                                    className={
-                                                                        "text-center"
-                                                                    }
-                                                                />
-                                                                <TableTD
-                                                                    value={
-                                                                        <>
-                                                                            {
-                                                                                dataRelation.RELATION_ORGANIZATION_NAME
-                                                                            }
-                                                                        </>
-                                                                    }
-                                                                    className={
-                                                                        ""
-                                                                    }
-                                                                />
-                                                                <TableTD
-                                                                    value={
-                                                                        <>
-                                                                            <a
-                                                                                href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
-                                                                            >
-                                                                                <div
-                                                                                    className="flex justify-center items-center"
-                                                                                    title="Detail"
-                                                                                >
-                                                                                    <svg
-                                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                                        fill="none"
-                                                                                        viewBox="0 0 24 24"
-                                                                                        strokeWidth={
-                                                                                            1.5
-                                                                                        }
-                                                                                        stroke="currentColor"
-                                                                                        className="size-6 text-red-700 cursor-pointer"
-                                                                                    >
-                                                                                        <path
-                                                                                            strokeLinecap="round"
-                                                                                            strokeLinejoin="round"
-                                                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                                                                        />
-                                                                                        <path
-                                                                                            strokeLinecap="round"
-                                                                                            strokeLinejoin="round"
-                                                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                                                        />
-                                                                                    </svg>
-                                                                                </div>
-                                                                            </a>
-                                                                        </>
-
-                                                                        // <Dropdown
-                                                                        //     title="Actions"
-                                                                        //     children={
-                                                                        //         <>
-                                                                        //             <a
-                                                                        //                 href=""
-                                                                        //                 className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                        //                 onClick={(
-                                                                        //                     e
-                                                                        //                 ) =>
-                                                                        //                     handleEditModel(
-                                                                        //                         e,
-                                                                        //                         dataRelation.RELATION_ORGANIZATION_ID
-                                                                        //                     )
-                                                                        //                 }
-                                                                        //             >
-                                                                        //                 Edit
-                                                                        //             </a>
-                                                                        //             <a
-                                                                        //                 href={`/relation/detailRelation/${dataRelation.RELATION_ORGANIZATION_ID}`}
-                                                                        //                 className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                        //             >
-                                                                        //                 Detail
-                                                                        //             </a>
-                                                                        //         </>
-                                                                        //     }
-                                                                        // />
-                                                                    }
-                                                                    className={
-                                                                        ""
-                                                                    }
-                                                                />
-                                                            </tr>
-                                                        );
-                                                    }
-                                                )}
-                                            </tbody>
-                                        </table>
+                        <div className="grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 xs:gap-0 lg:grid-cols-3 lg:gap-4">
+                            <div className="bg-white rounded-md p-10 mb-5 lg:mb-0">
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
+                                        <button
+                                            className=" w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4 hover:ring-red-500"
+                                            onClick={() => {
+                                                setModal({
+                                                    add: false,
+                                                    delete: false,
+                                                    edit: false,
+                                                    view: false,
+                                                    document: false,
+                                                    search: !modal.search,
+                                                });
+                                            }}
+                                        >
+                                            <MagnifyingGlassIcon
+                                                className="mx-2 h-5 w-5 text-gray-400"
+                                                aria-hidden="true"
+                                            />
+                                            Search Relation
+                                        </button>
                                     </div>
-                                    <Pagination
-                                        links={relations.links}
-                                        fromData={relations.from}
-                                        toData={relations.to}
-                                        totalData={relations.total}
-                                        clickHref={(url: string) =>
-                                            getRelation(url.split("?").pop())
-                                        }
-                                    />
-                                </>
-                            ) : null}
+                                    <div className="flex justify-center items-center xs:col-span-3 lg:col-auto">
+                                        <Button
+                                            className="mb-4 w-full py-1.5 px-2"
+                                            onClick={() =>
+                                                clearSearchRelation()
+                                            }
+                                        >
+                                            Clear Search
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-md col-span-2 p-10">
+                                {relations.length === 0 ? (
+                                    <div className="text-center text-lg">
+                                        <span>No Data Available</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                                            <table className="w-full table-auto divide-y divide-gray-300">
+                                                <thead className="bg-gray-100">
+                                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                                        <TableTH
+                                                            className={
+                                                                "max-w-[0px] text-center"
+                                                            }
+                                                            label={"No"}
+                                                        />
+                                                        <TableTH
+                                                            className={
+                                                                "min-w-[50px]"
+                                                            }
+                                                            label={
+                                                                "Name Relation"
+                                                            }
+                                                        />
+                                                        <TableTH
+                                                            className={
+                                                                "min-w-[50px] text-center"
+                                                            }
+                                                            label={"Action"}
+                                                        />
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {relations.data?.map(
+                                                        (
+                                                            dataRelation: any,
+                                                            i: number
+                                                        ) => {
+                                                            return (
+                                                                <tr
+                                                                    key={i}
+                                                                    className={
+                                                                        i %
+                                                                            2 ===
+                                                                        0
+                                                                            ? ""
+                                                                            : "bg-gray-100"
+                                                                    }
+                                                                >
+                                                                    <TableTD
+                                                                        value={
+                                                                            relations.from +
+                                                                            i
+                                                                        }
+                                                                        className={
+                                                                            "text-center"
+                                                                        }
+                                                                    />
+                                                                    <TableTD
+                                                                        value={
+                                                                            <>
+                                                                                {
+                                                                                    dataRelation.RELATION_ORGANIZATION_NAME
+                                                                                }
+                                                                            </>
+                                                                        }
+                                                                        className={
+                                                                            ""
+                                                                        }
+                                                                    />
+                                                                    <TableTD
+                                                                        value={
+                                                                            <>
+                                                                                <a
+                                                                                    onClick={() => {
+                                                                                        setModal(
+                                                                                            {
+                                                                                                add: false,
+                                                                                                delete: false,
+                                                                                                edit: false,
+                                                                                                view: true,
+                                                                                                document:
+                                                                                                    false,
+                                                                                                search: false,
+                                                                                            }
+                                                                                        );
+                                                                                        setGetDetailRelation(
+                                                                                            dataRelation.RELATION_ORGANIZATION_ID
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    <div
+                                                                                        className="flex justify-center items-center"
+                                                                                        title="Detail"
+                                                                                    >
+                                                                                        <svg
+                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                            fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            strokeWidth={
+                                                                                                1.5
+                                                                                            }
+                                                                                            stroke="currentColor"
+                                                                                            className="size-6 text-red-700 cursor-pointer"
+                                                                                        >
+                                                                                            <path
+                                                                                                strokeLinecap="round"
+                                                                                                strokeLinejoin="round"
+                                                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                                                            />
+                                                                                            <path
+                                                                                                strokeLinecap="round"
+                                                                                                strokeLinejoin="round"
+                                                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                                                            />
+                                                                                        </svg>
+                                                                                    </div>
+                                                                                </a>
+                                                                            </>
+                                                                        }
+                                                                        className={
+                                                                            ""
+                                                                        }
+                                                                    />
+                                                                </tr>
+                                                            );
+                                                        }
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <Pagination
+                                            links={relations.links}
+                                            fromData={relations.from}
+                                            toData={relations.to}
+                                            totalData={relations.total}
+                                            clickHref={(url: string) =>
+                                                getRelation(
+                                                    url.split("?").pop()
+                                                )
+                                            }
+                                        />
+                                    </>
+                                )}
+                            </div>
                         </div>
                         {/* table page*/}
                     </div>

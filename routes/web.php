@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelation/{id}', [RelationController::class, 'getRelationById'])->name('relation.getRelationById');
     Route::patch('/editRelation/{id}', [RelationController::class, 'edit'])->name('relation.edit');
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');
+    Route::post('/getRelationDetail', [RelationController::class, 'get_detail'])->name('getRelationDetail.get_detail');
 
 
     //Policy
@@ -40,11 +41,13 @@ Route::middleware('auth')->group(function () {
 
     // Group
     Route::get('group', [RelationGroupController::class, 'index'])->name('group');
-    Route::get('/getRelationGroup', [RelationGroupController::class, 'getRelationGroupJson'])->name('getRelationGroup.getRelationGroupJson');
+    Route::post('/getRelationGroup', [RelationGroupController::class, 'getRelationGroupJson'])->name('getRelationGroup.getRelationGroupJson');
     Route::post('/group', [RelationGroupController::class, 'store'])->name('group.store');
     Route::post('/getRelationById', [RelationGroupController::class, 'getRelationByIdGroup'])->name('getRelationById.getRelationByIdGroup');
     Route::get('/getGroup/{id}', [RelationGroupController::class, 'getGroupById'])->name('group.getGroupById');
     Route::get('/group/detailGroup/{id}', [RelationGroupController::class, 'detailGroup'])->name('group.detailGroup.Group');
+    Route::post('/getRelationGroupDetail', [RelationGroupController::class, 'get_detail'])->name('getRelationGroupDetail.get_detail');
+    Route::post('/getGroup', [RelationGroupController::class, 'get_group'])->name('getGroup.get_group');
 
 });
 

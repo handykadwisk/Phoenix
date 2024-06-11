@@ -13,7 +13,7 @@ class RelationGroup extends Model
 
     protected $table = 't_relation_group';
 
-    public $with = ['rGroup'];
+    // public $with = ['rGroup'];
 
     protected $fillable = [
         'RELATION_GROUP_NAME',

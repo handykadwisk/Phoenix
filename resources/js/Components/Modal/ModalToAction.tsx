@@ -49,6 +49,7 @@ export default function ModalToAction({
     });
 
     const action = async (e: any) => {
+        // console.log(data);
         e.preventDefault();
 
         setIsProcessing(true);
@@ -58,8 +59,8 @@ export default function ModalToAction({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data[0]);
                 close();
+                onSuccess(res.data[0]);
             })
             .catch((err) => {
                 setIsProcessing(false);
@@ -71,7 +72,7 @@ export default function ModalToAction({
     return (
         <>
             <Transition.Root show={show} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={() => {}}>
+                <Dialog as="div" className="relative z-50" onClose={close}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
