@@ -339,10 +339,6 @@ export default function Group({ auth }: PageProps) {
                                             ""
                                         ) {
                                             getRelationGroup();
-                                            setSearchGroup({
-                                                ...searchGroup,
-                                                RELATION_GROUP_NAME: "",
-                                            });
                                         }
                                     }
                                 }}
