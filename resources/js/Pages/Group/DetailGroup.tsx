@@ -84,23 +84,6 @@ export default function DetailGroup({
         // setIsSuccess("");
         // reset();
         // if (modal.add) {
-        const { data, setData, errors, reset } = useForm<any>({
-            group_id: "",
-            name_relation: "",
-            parent_id: "",
-            abbreviation: "",
-            relation_aka: [],
-            relation_email: "",
-            relation_description: "",
-            relation_lob_id: "",
-            salutation_id: "",
-            relation_status_id: "",
-            tagging_name: [],
-            is_managed: "",
-            mark_tbk_relation: "",
-            profession_id: "",
-            relation_type_id: [],
-        });
         Swal.fire({
             title: "Success",
             text: "New Relation Added",
@@ -108,7 +91,8 @@ export default function DetailGroup({
         }).then((result: any) => {
             // console.log(result);
             if (result.value) {
-                getDetailGroup(message);
+                getDetailGroup(idGroup);
+                getGroupName(idGroup);
                 setModal({
                     add: false,
                     delete: false,
@@ -178,7 +162,7 @@ export default function DetailGroup({
             {/* modal detail  */}
             <ModalToAction
                 show={modal.view}
-                onClose={() =>
+                onClose={() => {
                     setModal({
                         add: false,
                         delete: false,
@@ -186,8 +170,10 @@ export default function DetailGroup({
                         view: false,
                         document: false,
                         search: false,
-                    })
-                }
+                    });
+                    getDetailGroup(idGroup);
+                    getGroupName(idGroup);
+                }}
                 title={"Detail Relation"}
                 url={""}
                 data={""}
