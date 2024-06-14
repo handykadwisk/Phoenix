@@ -148,6 +148,17 @@ const Sidebar = ({
                                                     role="list"
                                                     className="-mx-2 space-y-1"
                                                 >
+                                                    <NavLink
+                                                        href={route(
+                                                            `dashboard`
+                                                        )}
+                                                        active={route().current(
+                                                            `dashboard`
+                                                        )}
+                                                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
+                                                    >
+                                                        {"Dashboard"}
+                                                    </NavLink>
                                                     {auth.menu
                                                         ?.filter(
                                                             (m: any) =>

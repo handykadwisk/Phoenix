@@ -20,6 +20,7 @@ import Switch from "@/Components/Switch";
 import Checkbox from "@/Components/Checkbox";
 import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
+import PersonPopup from "../Person/Person";
 
 export default function DetailRelation({
     detailRelation,
@@ -45,6 +46,7 @@ export default function DetailRelation({
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });
+
     const [isSuccess, setIsSuccess] = useState<string>("");
 
     const [modal, setModal] = useState({
@@ -297,6 +299,24 @@ export default function DetailRelation({
         // }
         setIsSuccess(message);
     };
+
+    // Onclick Person
+    const handleClickPerson = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !modal.view,
+            document: false,
+            search: false,
+        });
+    };
+    // end Onclick Person
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -1002,6 +1022,39 @@ export default function DetailRelation({
                     </>
                 }
             />
+
+            {/* modal for person */}
+            <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Person"}
+                url={""}
+                data={""}
+                addOns={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <PersonPopup auth={""} idRelation={detailRelation} />
+                    </>
+                }
+            />
+            {/* end modal for person */}
+
             <div>
                 <dl className="mt-0">
                     {/* Top */}
@@ -1183,7 +1236,15 @@ export default function DetailRelation({
                                 <span>Job Desc</span>
                             </div>
                         </div>
-                        <div className="bg-white p-5 shadow-md rounded-lg">
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickPerson(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <span>Person</span>
                             </div>

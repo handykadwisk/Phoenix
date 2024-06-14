@@ -7,6 +7,7 @@ use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RelationGroupController;
+use App\Http\Controllers\TPersonController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -48,6 +49,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/group/detailGroup/{id}', [RelationGroupController::class, 'detailGroup'])->name('group.detailGroup.Group');
     Route::post('/getRelationGroupDetail', [RelationGroupController::class, 'get_detail'])->name('getRelationGroupDetail.get_detail');
     Route::post('/getGroup', [RelationGroupController::class, 'get_group'])->name('getGroup.get_group');
+
+    // Person
+    Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
+    Route::get('getPersonRelationship', [TPersonController::class, 'getDataPersonRelationship'])->name('getPersonRelationship.getDataPersonRelationship');
+    Route::post('/person', [TPersonController::class, 'store'])->name('person.store');
+    Route::post('/getPersonDetail', [TPersonController::class, 'get_detail'])->name('getPersonDetail.get_detail');
 
 });
 

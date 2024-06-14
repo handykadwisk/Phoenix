@@ -497,6 +497,7 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     })
                 }
+                idGroupRelation={""}
                 handleSuccess={handleSuccess}
                 relationStatus={relationStatus}
                 relationGroup={relationGroup}
