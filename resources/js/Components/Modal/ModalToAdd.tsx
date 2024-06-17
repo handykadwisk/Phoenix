@@ -98,7 +98,7 @@ export default function ModalToAdd({
                                             >
                                                 {title}
                                             </Dialog.Title>
-                                            {/* <hr className="my-3" /> */}
+                                            <hr className="my-3" />
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}

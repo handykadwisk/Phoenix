@@ -22,4 +22,8 @@ class TPerson extends Model
     public function ContactEmergency(){
         return $this->hasMany(TPersonEmergencyContact::class, 'PERSON_ID');
     }
+
+    public function taxStatus(){
+        return $this->hasOne(RTaxStatus::class, 'TAX_STATUS_ID', 'TAX_STATUS_ID');
+    }
 }

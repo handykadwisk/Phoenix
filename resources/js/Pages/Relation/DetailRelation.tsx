@@ -1102,7 +1102,7 @@ export default function DetailRelation({
                                     </div>
                                 </a>
                             </div>
-                            <div className="grid gap-x-2 gap-y-2 grid-cols-3 mt-4 ml-3">
+                            <div className="grid gap-x-2 gap-y-2 grid-cols-3 mt-4 ml-3 xs:grid xs:grid-cols-1 lg:grid lg:grid-cols-3">
                                 <div className="">
                                     <span>Group</span>
                                     <br></br>

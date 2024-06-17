@@ -64,6 +64,7 @@ export default function Person({
     };
 
     const { data, setData, errors, reset } = useForm<any>({
+        PERSONE_ID: "",
         PERSON_FIRST_NAME: "",
         PERSON_MIDDLE_NAME: "",
         PERSON_LAST_NAME: "",
@@ -95,7 +96,7 @@ export default function Person({
         PERSON_BLOOD_TYPE: "",
         PERSON_BLOOD_RHESUS: "",
         PERSON_MARITAL_STATUS: "",
-        TEXT_STATUS_ID: "",
+        TAX_STATUS_ID: "",
         PERSON_RECRUITMENT_LOCATION: "",
         PERSON_LOCK_UPDATE: "",
         PERSON_LOCK_UPDATED_DATE: "",
@@ -128,6 +129,7 @@ export default function Person({
     const handleAddModel = async (e: FormEvent) => {
         e.preventDefault();
         getPersonRelationship();
+        setData("RELATION_ORGANIZATION_ID", idRelation);
         setModal({
             add: !modal.add,
             delete: false,
@@ -187,7 +189,7 @@ export default function Person({
                 PERSON_BLOOD_TYPE: "",
                 PERSON_BLOOD_RHESUS: "",
                 PERSON_MARITAL_STATUS: "",
-                TEXT_STATUS_ID: "",
+                TAX_STATUS_ID: "",
                 PERSON_RECRUITMENT_LOCATION: "",
                 PERSON_LOCK_UPDATE: "",
                 PERSON_LOCK_UPDATED_DATE: "",

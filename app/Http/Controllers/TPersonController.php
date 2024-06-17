@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RPersonRelationship;
+use App\Models\RTaxStatus;
 use App\Models\TPerson;
 use App\Models\TPersonEmergencyContact;
 use App\Models\UserLog;
@@ -42,6 +43,14 @@ class TPersonController extends Controller
 
         return response()->json($pRelationship);
     }
+
+    public function getTStatus(){
+        $taxStatus = RTaxStatus::get();
+
+        return response()->json($taxStatus);
+    }
+
+
 
     public function store(Request $request){
         // Remove Object "CONTACT EMERGENCY" agar bisa insert dengan request all
@@ -93,9 +102,47 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
+    }
+
+    public function addPersonEmployment(Request $request){
+        // dd($request);
+        // print_r($request);die;
+
+        // Update Person
+        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+            ->update([
+                'PERSONE_ID' => $request->PERSONE_ID,
+                'PERSON_CATEGORY' => $request->PERSON_CATEGORY,
+                'PERSON_IS_DELETED' => $request->PERSON_IS_DELETED,
+                'TAX_STATUS_ID' => $request->TAX_STATUS_ID,
+                'PERSON_HIRE_DATE' => $request->PERSON_HIRE_DATE,
+                'PERSON_END_DATE' => $request->PERSON_END_DATE,
+                'PERSON_RECRUITMENT_LOCATION' => $request->PERSON_RECRUITMENT_LOCATION,
+                'PERSON_SALARY_ADJUSTMENT1' => $request->PERSON_SALARY_ADJUSTMENT1,
+                'PERSON_SALARY_ADJUSTMENT2' => $request->PERSON_SALARY_ADJUSTMENT2,
+                'PERSON_UPDATED_BY' => Auth::user()->id,
+                'PERSON_UPDATED_DATE' => now()
+            ]);
+
+        // Created Log
+        UserLog::create([
+                "created_by" => Auth::user()->id,
+                "action"     => json_encode([
+                "description" => "Created (Person).",
+                "module"      => "Person",
+                "id"          => $request->PERSON_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->PERSON_ID
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

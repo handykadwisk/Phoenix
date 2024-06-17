@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('t_person', function (Blueprint $table) {
             $table->bigIncrements('PERSON_ID')->unique()->primary();
+            $table->string('PERSONE_ID')->nullable();
             $table->string('PERSON_FIRST_NAME')->nullable();
             $table->string('PERSON_MIDDLE_NAME')->nullable();
             $table->string('PERSON_LAST_NAME')->nullable();
@@ -29,9 +30,9 @@ return new class extends Migration
             $table->integer('DIVISION_ID')->nullable();
             $table->integer('OFFICE_ID')->nullable();
             $table->integer('PERSON_IS_DELETED')->nullable()->comment('0 = ACTIVE, 1=INACTIVE');
-            $table->bigIncrements('PERSON_CREATED_BY')->nullable();
+            $table->bigInteger('PERSON_CREATED_BY')->nullable();
             $table->timestamp('PERSON_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable()->nullable();
-            $table->bigIncrements('PERSON_UPDATED_BY')->nullable();
+            $table->bigInteger('PERSON_UPDATED_BY')->nullable();
             $table->timestamp('PERSON_UPDATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable()->nullable();
             $table->integer('PERSON_CATEGORY')->nullable();
             $table->date('PERSON_HIRE_DATE')->nullable();

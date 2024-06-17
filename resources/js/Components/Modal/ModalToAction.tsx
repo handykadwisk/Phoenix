@@ -14,7 +14,6 @@ export default function ModalToAction({
     body,
     url,
     data,
-    addOns,
     method,
     onSuccess,
     headers,
@@ -28,7 +27,6 @@ export default function ModalToAction({
     body: any;
     url: string;
     data: any | null;
-    addOns: any | null;
     method: string;
     onSuccess: any;
     headers: any | null | undefined;
