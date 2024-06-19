@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class TDocument extends Model
+{
+    use HasFactory;
+
+    protected $primaryKey = 'DOCUMENT_ID';
+
+    protected $table = 't_document';
+
+    protected $guarded = [
+        'DOCUMENT_ID',
+    ];
+
+    public $timestamps = false;
+}

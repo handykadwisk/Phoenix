@@ -333,12 +333,7 @@ class RelationController extends Controller
                     Tag::where('TAG_ID', $request->m_tagging[$i]['tagging']['TAG_ID'])->delete();
                 }
             }
-
-
             
-
-
-
             $tagName = $request->m_tagging[$i]['tagging']['TAG_NAME'];  // catetan mau di hapus apa engga di tag data sebelumnyaa
             $tagging = Tag::insertGetId([
                 'TAG_NAME' => $tagName,

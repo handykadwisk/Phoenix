@@ -1236,19 +1236,21 @@ export default function DetailRelation({
                                 <span>Job Desc</span>
                             </div>
                         </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickPerson(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Person</span>
+                        {dataRelationNew.HR_MANAGED_BY_APP === 1 ? (
+                            <div
+                                className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                                onClick={(e) =>
+                                    handleClickPerson(
+                                        e,
+                                        dataRelationNew.RELATION_ORGANIZATION_NAME
+                                    )
+                                }
+                            >
+                                <div className="flex justify-center items-center text-sm font-medium">
+                                    <span>Person/User</span>
+                                </div>
                             </div>
-                        </div>
+                        ) : null}
                     </div>
 
                     {/* end Structure */}

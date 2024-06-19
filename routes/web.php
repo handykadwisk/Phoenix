@@ -54,9 +54,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
     Route::get('getPersonRelationship', [TPersonController::class, 'getDataPersonRelationship'])->name('getPersonRelationship.getDataPersonRelationship');
     Route::post('/person', [TPersonController::class, 'store'])->name('person.store');
+    Route::post('/editPersons', [TPersonController::class, 'edit'])->name('editPersons.edit');
     Route::post('/getPersonDetail', [TPersonController::class, 'get_detail'])->name('getPersonDetail.get_detail');
     Route::post('/personEmployment', [TPersonController::class, 'addPersonEmployment'])->name('personEmployment.addPersonEmployment');
     Route::get('/getTaxStatus', [TPersonController::class, 'getTStatus'])->name('getTaxStatus.getTStatus');
+    Route::post('/getStructure', [TPersonController::class, 'getStructure'])->name('getStructure.getStructure');
+    Route::post('/getDivision', [TPersonController::class, 'getDivision'])->name('getDivision.getDivision');
+    Route::post('/getOffice', [TPersonController::class, 'getOffice'])->name('getOffice.getOffice');
+    Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
+    Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
 
 
 });

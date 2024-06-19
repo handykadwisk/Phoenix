@@ -6,10 +6,12 @@ use App\Models\RPersonRelationship;
 use App\Models\RTaxStatus;
 use App\Models\TPerson;
 use App\Models\TPersonEmergencyContact;
+use App\Models\TRelationStructure;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TPersonController extends Controller
 {
@@ -48,6 +50,64 @@ class TPersonController extends Controller
         $taxStatus = RTaxStatus::get();
 
         return response()->json($taxStatus);
+    }
+
+    public function edit(Request $request){
+        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+            ->update([
+                'PERSON_FIRST_NAME' => $request->PERSON_FIRST_NAME,
+                'PERSON_GENDER' => $request->PERSON_GENDER,
+                'PERSON_BIRTH_PLACE' => $request->PERSON_BIRTH_PLACE,
+                'PERSON_BIRTH_DATE' => $request->PERSON_BIRTH_DATE,
+                'PERSON_EMAIL' => $request->PERSON_EMAIL,
+                'PERSON_CONTACT' => $request->PERSON_CONTACT,
+                'PERSON_UPDATED_BY' => Auth::user()->id,
+                'PERSON_UPDATED_DATE' => now(),
+                'PERSON_KTP' => $request->PERSON_KTP,
+                'PERSON_NPWP' => $request->PERSON_NPWP,
+                'PERSON_KK' => $request->PERSON_KK,
+                'PERSON_BLOOD_TYPE' => $request->PERSON_BLOOD_TYPE,
+                'PERSON_BLOOD_RHESUS' => $request->PERSON_BLOOD_RHESUS,
+                'PERSON_MARITAL_STATUS' => $request->PERSON_MARITAL_STATUS,
+            ]);
+
+        // cek existing contact emergency
+        $contactEmergency = TPersonEmergencyContact::where('PERSON_ID', $request->PERSON_ID)->get();
+        if ($contactEmergency->count()>0) { //jika ada delete data sebelumnya
+            TPersonEmergencyContact::where('PERSON_ID', $request->PERSON_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->contact_emergency)) {
+            // Created Mapping Relation AKA
+            for ($i=0; $i < sizeof($request->contact_emergency); $i++) { 
+                TPersonEmergencyContact::create([
+                    "PERSON_ID" => $request->PERSON_ID,
+                    "PERSON_EMERGENCY_CONTACT_NAME" => $request->contact_emergency[$i]["PERSON_EMERGENCY_CONTACT_NAME"],
+                    "PERSON_EMERGENCY_CONTACT_NUMBER" => $request->contact_emergency[$i]["PERSON_EMERGENCY_CONTACT_NUMBER"],
+                    "PERSON_RELATIONSHIP_ID" => $request->contact_emergency[$i]["PERSON_RELATIONSHIP_ID"]
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+                "created_by" => Auth::user()->id,
+                "action"     => json_encode([
+                "description" => "Updated (Person).",
+                "module"      => "Person",
+                "id"          => $request->PERSON_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->PERSON_ID
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+
+        
     }
 
 
@@ -102,7 +162,7 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -132,7 +192,7 @@ class TPersonController extends Controller
         UserLog::create([
                 "created_by" => Auth::user()->id,
                 "action"     => json_encode([
-                "description" => "Created (Person).",
+                "description" => "Updated (Person).",
                 "module"      => "Person",
                 "id"          => $request->PERSON_ID
             ]),
@@ -144,5 +204,66 @@ class TPersonController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+
+    // get Structure by relation id
+    public function getStructure(Request $request){
+        $data = DB::select('call sp_combo_relation_structure(?)', [$request->id]);
+        return response()->json($data);
+        // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
+        // // dd($structure);
+        // // $structure = TRelationStructure::find('RELATION_ORGANIZATION_ID', $request->id);
+
+        // return response()->json($structure);
+    }
+
+    public function getDivision(Request $request){
+        $data = DB::select('call sp_combo_relation_division(?)', [$request->id]);
+        return response()->json($data);
+    }
+
+    public function getOffice(Request $request){
+        $data = DB::select('call sp_combo_relation_office(?)', [$request->id]);
+        return response()->json($data);
+    }
+
+    public function addPersonStructureDivision(Request $request){
+        // dd($request);
+        // print_r($request);die;
+
+        // Update Person
+        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+            ->update([
+                'STRUCTURE_ID' => $request->STRUCTURE_ID,
+                'DIVISION_ID' => $request->DIVISION_ID,
+                'OFFICE_ID' => $request->OFFICE_ID,
+                'PERSON_UPDATED_BY' => Auth::user()->id,
+                'PERSON_UPDATED_DATE' => now()
+            ]);
+
+        // Created Log
+        UserLog::create([
+                "created_by" => Auth::user()->id,
+                "action"     => json_encode([
+                "description" => "Updated (Person).",
+                "module"      => "Person",
+                "id"          => $request->PERSON_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->PERSON_ID
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function uploadFile(Request $request){
+        dd($request);
+        $imgProfile = $request->file('files');
+        // dd($imgProfile[0]);
+        dd($imgProfile[0]->getClientOriginalName());
     }
 }

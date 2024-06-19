@@ -23,7 +23,24 @@ class TPerson extends Model
         return $this->hasMany(TPersonEmergencyContact::class, 'PERSON_ID');
     }
 
+    public function Relation(){
+        return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
     public function taxStatus(){
         return $this->hasOne(RTaxStatus::class, 'TAX_STATUS_ID', 'TAX_STATUS_ID');
     }
+
+    public function Office(){
+        return $this->hasOne(TRelationOffice::class, 'RELATION_OFFICE_ID', 'OFFICE_ID');
+    }
+
+    public function Structure(){
+        return $this->hasOne(TRelationStructure::class, 'RELATION_STRUCTURE_ID', 'STRUCTURE_ID');
+    }
+
+    public function Division(){
+        return $this->hasOne(TRelationDivision::class, 'RELATION_DIVISION_ID', 'DIVISION_ID');
+    }
+
 }

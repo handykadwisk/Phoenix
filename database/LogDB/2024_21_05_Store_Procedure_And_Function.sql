@@ -36,10 +36,10 @@ DELIMITER ;
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_division` */;
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_path_relation_division`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
-BEGIN
-  CALL `sp_path_relation_division`(input_relation_organization_id,input, @path);
-  RETURN @path;
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_division`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_relation_division`(input_relation_organization_id,input, @path);
+  RETURN @path;
 END */$$
 DELIMITER ;
 
@@ -60,10 +60,10 @@ DELIMITER ;
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_office` */;
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_path_relation_office`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
-BEGIN
-  CALL `sp_path_relation_office`(input_relation_organization_id,input, @path);
-  RETURN @path;
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_office`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_relation_office`(input_relation_organization_id,input, @path);
+  RETURN @path;
 END */$$
 DELIMITER ;
 
@@ -84,10 +84,10 @@ DELIMITER ;
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_structure` */;
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_path_relation_structure`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
-BEGIN
-  CALL `sp_path_relation_structure`(input_relation_organization_id,input, @path);
-  RETURN @path;
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_structure`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_relation_structure`(input_relation_organization_id,input, @path);
+  RETURN @path;
 END */$$
 DELIMITER ;
 
@@ -97,64 +97,64 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_combo_relation_division`(IN `input_relation_organization_id` INT)
-BEGIN
-  SET `max_sp_recursion_depth` = 5000 ;
-  IF input_relation_organization_id IS NULL 
-  THEN 
-  SELECT 
-    RELATION_DIVISION_ID,
-    RELATION_DIVISION_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_DIVISION_ALIAS,
-    @path_combo := `f_get_path_relation_division` (NULL, RELATION_DIVISION_ID) mapping,
-    IF(
-      (
-        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-      ) <= 1,
-      RELATION_DIVISION_ALIAS,
-      CONCAT(
-        REPEAT(
-          '++',
-          (
-            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-          ) - 1
-        ),
-        RELATION_DIVISION_ALIAS
-      )
-    ) text_combo 
-  FROM
-    photrelationdivision 
-  ORDER BY RELATION_ORGANIZATION_ID,
-    mapping ;
-  ELSE 
-  SELECT 
-    RELATION_DIVISION_ID,
-    RELATION_DIVISION_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_DIVISION_ALIAS,
-    @path_combo := `f_get_path_relation_division` (input_relation_organization_id, RELATION_DIVISION_ID) mapping,
-    IF(
-      (
-        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-      ) <= 1,
-      RELATION_DIVISION_ALIAS,
-      CONCAT(
-        REPEAT(
-          '++',
-          (
-            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-          ) - 1
-        ),
-        RELATION_DIVISION_ALIAS
-      )
-    ) text_combo 
-  FROM
-    photrelationdivision 
-  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
-  ORDER BY RELATION_ORGANIZATION_ID,
-    mapping ;
-  END IF ;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_relation_division`(IN `input_relation_organization_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_organization_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_DIVISION_ID,
+    RELATION_DIVISION_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_DIVISION_ALIAS,
+    @path_combo := `f_get_path_relation_division` (NULL, RELATION_DIVISION_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      RELATION_DIVISION_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        RELATION_DIVISION_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_relation_division 
+  ORDER BY RELATION_ORGANIZATION_ID,
+    mapping ;
+  ELSE 
+  SELECT 
+    RELATION_DIVISION_ID,
+    RELATION_DIVISION_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_DIVISION_ALIAS,
+    @path_combo := `f_get_path_relation_division` (input_relation_organization_id, RELATION_DIVISION_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      RELATION_DIVISION_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        RELATION_DIVISION_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_relation_division 
+  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
+  ORDER BY RELATION_ORGANIZATION_ID,
+    mapping ;
+  END IF ;
 END */$$
 DELIMITER ;
 
@@ -253,86 +253,86 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_combo_relation_office`(IN `input_relation_organization_id` INT)
-BEGIN
-  SET `max_sp_recursion_depth` = 5000 ;
-IF  input_relation_organization_id IS NULL THEN
-SELECT 
-    RELATION_OFFICE_ID,
-    RELATION_OFFICE_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_OFFICE_ALIAS,
-    @path_combo:=`f_get_path_relation_office`(NULL, RELATION_OFFICE_ID) mapping,
-  IF(
-    (
-    LENGTH(@path_combo)-	
-    LENGTH(
-      REPLACE(
-        @path_combo,
-        ".",
-        ""
-      )
-    )) <= 1,
-    officealias,
-    CONCAT(
-      REPEAT(
-        '++',
-        (
-        LENGTH(@path_combo)-
-        LENGTH(
-          REPLACE(
-            @path_combo,
-            ".",
-            ""
-          )
-        )) - 1
-      ),
-      RELATION_OFFICE_ALIAS
-    )
-  ) text_combo     
-  FROM
-    photrelationoffice 
-  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
-ELSE
-  
-  SELECT 
-RELATION_OFFICE_ID,
-    RELATION_OFFICE_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_OFFICE_ALIAS,
-    @path_combo:=`f_get_path_relation_office`(input_relation_organization_id, RELATION_OFFICE_ID) mapping,
-  IF(
-  (
-  LENGTH(@path_combo)-
-    LENGTH(
-      REPLACE(
-        @path_combo,
-        ".",
-        ""
-      )
-    )) <= 1,
-    RELATION_OFFICE_ALIAS,
-    CONCAT(
-      REPEAT(
-        '++',
-        (
-        LENGTH(@path_combo)-
-        LENGTH(
-          REPLACE(
-            @path_combo,
-            ".",
-            ""
-          )
-        )) - 1
-      ),
-      RELATION_OFFICE_ALIAS
-    )
-  ) text_combo     
-  FROM
-    photrelationoffice 
-  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
-  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
-  END IF;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_relation_office`(IN `input_relation_organization_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+IF  input_relation_organization_id IS NULL THEN
+SELECT 
+    RELATION_OFFICE_ID,
+    RELATION_OFFICE_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_OFFICE_ALIAS,
+    @path_combo:=`f_get_path_relation_office`(NULL, RELATION_OFFICE_ID) mapping,
+  IF(
+    (
+    LENGTH(@path_combo)-	
+    LENGTH(
+      REPLACE(
+        @path_combo,
+        ".",
+        ""
+      )
+    )) <= 1,
+    officealias,
+    CONCAT(
+      REPEAT(
+        '++',
+        (
+        LENGTH(@path_combo)-
+        LENGTH(
+          REPLACE(
+            @path_combo,
+            ".",
+            ""
+          )
+        )) - 1
+      ),
+      RELATION_OFFICE_ALIAS
+    )
+  ) text_combo     
+  FROM
+    t_relation_office 
+  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
+ELSE
+  
+  SELECT 
+RELATION_OFFICE_ID,
+    RELATION_OFFICE_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_OFFICE_ALIAS,
+    @path_combo:=`f_get_path_relation_office`(input_relation_organization_id, RELATION_OFFICE_ID) mapping,
+  IF(
+  (
+  LENGTH(@path_combo)-
+    LENGTH(
+      REPLACE(
+        @path_combo,
+        ".",
+        ""
+      )
+    )) <= 1,
+    RELATION_OFFICE_ALIAS,
+    CONCAT(
+      REPEAT(
+        '++',
+        (
+        LENGTH(@path_combo)-
+        LENGTH(
+          REPLACE(
+            @path_combo,
+            ".",
+            ""
+          )
+        )) - 1
+      ),
+      RELATION_OFFICE_ALIAS
+    )
+  ) text_combo     
+  FROM
+    t_relation_office 
+  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
+  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
+  END IF;
 END */$$
 DELIMITER ;
 
@@ -409,64 +409,64 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_combo_relation_structure`(IN `input_relation_organization_id` INT)
-BEGIN
-  SET `max_sp_recursion_depth` = 5000 ;
-  IF input_relation_organization_id IS NULL 
-  THEN 
-  SELECT 
-    RELATION_STRUCTURE_ID,
-    RELATION_STRUCTURE_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_STRUCTURE_ALIAS,
-    @path_combo := `f_get_path_relation_structure` (NULL, RELATION_STRUCTURE_ID) mapping,
-    IF(
-      (
-        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-      ) <= 1,
-      RELATION_STRUCTURE_ALIAS,
-      CONCAT(
-        REPEAT(
-          '++',
-          (
-            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-          ) - 1
-        ),
-        RELATION_STRUCTURE_ALIAS
-      )
-    ) text_combo 
-  FROM
-    photrelationstructure 
-  ORDER BY RELATION_ORGANIZATION_ID,
-    mapping ;
-  ELSE 
-  SELECT 
-    RELATION_STRUCTURE_ID,
-    RELATION_STRUCTURE_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_STRUCTURE_ALIAS,
-    @path_combo := `f_get_path_relation_structure` (input_relation_organization_id, RELATION_STRUCTURE_ID) mapping,
-    IF(
-      (
-        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-      ) <= 1,
-      RELATION_STRUCTURE_ALIAS,
-      CONCAT(
-        REPEAT(
-          '++',
-          (
-            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
-          ) - 1
-        ),
-        RELATION_STRUCTURE_ALIAS
-      )
-    ) text_combo 
-  FROM
-    photrelationstructure 
-  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
-  ORDER BY RELATION_ORGANIZATION_ID,
-    mapping ;
-  END IF ;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_relation_structure`(IN `input_relation_organization_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_organization_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_STRUCTURE_ID,
+    RELATION_STRUCTURE_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_STRUCTURE_ALIAS,
+    @path_combo := `f_get_path_relation_structure` (NULL, RELATION_STRUCTURE_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      RELATION_STRUCTURE_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        RELATION_STRUCTURE_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_relation_structure 
+  ORDER BY RELATION_ORGANIZATION_ID,
+    mapping ;
+  ELSE 
+  SELECT 
+    RELATION_STRUCTURE_ID,
+    RELATION_STRUCTURE_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_STRUCTURE_ALIAS,
+    @path_combo := `f_get_path_relation_structure` (input_relation_organization_id, RELATION_STRUCTURE_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      RELATION_STRUCTURE_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        RELATION_STRUCTURE_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_relation_structure 
+  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
+  ORDER BY RELATION_ORGANIZATION_ID,
+    mapping ;
+  END IF ;
 END */$$
 DELIMITER ;
 
@@ -488,44 +488,44 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_path_relation_division`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
-BEGIN
-  DECLARE _id INT ;
-  DECLARE _parent INT ;
-  DECLARE _path TEXT ;
-  SET `max_sp_recursion_depth` = 5000 ;
-  IF input_relation_organization_id IS NULL 
-  THEN 
-  SELECT 
-    RELATION_DIVISION_ID,
-    RELATION_DIVISION_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationdivision 
-  WHERE sdivisionid = input ;
-  ELSE 
-  SELECT 
-    RELATION_DIVISION_ID,
-    RELATION_DIVISION_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationdivision 
-  WHERE RELATION_DIVISION_ID = input 
-    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
-  END IF ;
-  IF _parent IS NULL 
-  OR _parent = 0 
-  THEN SET _path = CONCAT(_id, '.') ;
-  ELSE CALL `sp_path_relation_division` (
-    input_relation_organization_id,
-    _parent,
-    _path
-  ) ;
-  SELECT 
-    CONCAT(_path, _id, '.') INTO _path ;
-  END IF ;
-  SELECT 
-    _path INTO output ;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_relation_division`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_organization_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_DIVISION_ID,
+    RELATION_DIVISION_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_relation_division 
+  WHERE sdivisionid = input ;
+  ELSE 
+  SELECT 
+    RELATION_DIVISION_ID,
+    RELATION_DIVISION_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_relation_division 
+  WHERE RELATION_DIVISION_ID = input 
+    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_relation_division` (
+    input_relation_organization_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
 END */$$
 DELIMITER ;
 
@@ -582,44 +582,44 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_path_relation_office`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
-BEGIN
-  DECLARE _id INT ;
-  DECLARE _parent INT ;
-  DECLARE _path TEXT ;
-  SET `max_sp_recursion_depth` = 5000 ;
-  IF input_relation_organization_id IS NULL 
-  THEN 
-  SELECT 
-    RELATION_OFFICE_ID,
-    RELATION_OFFICE_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationoffice 
-  WHERE RELATION_OFFICE_ID = input ;
-  ELSE 
-  SELECT 
-    RELATION_OFFICE_ID,
-    RELATION_OFFICE_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationoffice 
-  WHERE RELATION_OFFICE_ID = input 
-    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
-  END IF ;
-  IF _parent IS NULL 
-  OR _parent = 0 
-  THEN SET _path = CONCAT(_id, '.') ;
-  ELSE CALL `sp_path_relation_office` (
-    input_relation_organization_id,
-    _parent,
-    _path
-  ) ;
-  SELECT 
-    CONCAT(_path, _id, '.') INTO _path ;
-  END IF ;
-  SELECT 
-    _path INTO output ;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_relation_office`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_organization_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_OFFICE_ID,
+    RELATION_OFFICE_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_relation_office 
+  WHERE RELATION_OFFICE_ID = input ;
+  ELSE 
+  SELECT 
+    RELATION_OFFICE_ID,
+    RELATION_OFFICE_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_relation_office 
+  WHERE RELATION_OFFICE_ID = input 
+    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_relation_office` (
+    input_relation_organization_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
 END */$$
 DELIMITER ;
 
@@ -676,44 +676,44 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_path_relation_structure`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
-BEGIN
-  DECLARE _id INT ;
-  DECLARE _parent INT ;
-  DECLARE _path TEXT ;
-  SET `max_sp_recursion_depth` = 5000 ;
-  IF input_relation_organization_id IS NULL 
-  THEN 
-  SELECT 
-    RELATION_STRUCTURE_ID,
-    RELATION_STRUCTURE_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationstructure 
-  WHERE RELATION_STRUCTURE_ID = input ;
-  ELSE 
-  SELECT 
-    RELATION_STRUCTURE_ID,
-    RELATION_STRUCTURE_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationstructure 
-  WHERE RELATION_STRUCTURE_ID = input 
-    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
-  END IF ;
-  IF _parent IS NULL 
-  OR _parent = 0 
-  THEN SET _path = CONCAT(_id, '.') ;
-  ELSE CALL `sp_path_relation_structure` (
-    input_relation_organization_id,
-    _parent,
-    _path
-  ) ;
-  SELECT 
-    CONCAT(_path, _id, '.') INTO _path ;
-  END IF ;
-  SELECT 
-    _path INTO output ;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_relation_structure`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_organization_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_STRUCTURE_ID,
+    RELATION_STRUCTURE_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_relation_structure 
+  WHERE RELATION_STRUCTURE_ID = input ;
+  ELSE 
+  SELECT 
+    RELATION_STRUCTURE_ID,
+    RELATION_STRUCTURE_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_relation_structure 
+  WHERE RELATION_STRUCTURE_ID = input 
+    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_relation_structure` (
+    input_relation_organization_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
 END */$$
 DELIMITER ;
 
@@ -787,13 +787,13 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_set_mapping_relation_structure`(IN `input_relation_organization_id` INT)
-BEGIN
-IF input_relation_organization_id IS NULL THEN
-UPDATE photrelationstructure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID); 
-ELSE
-UPDATE photrelationstructure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
-END IF;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_structure`(IN `input_relation_organization_id` INT)
+BEGIN
+IF input_relation_organization_id IS NULL THEN
+UPDATE photrelationstructure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID); 
+ELSE
+UPDATE photrelationstructure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
+END IF;
 END */$$
 DELIMITER ;
 

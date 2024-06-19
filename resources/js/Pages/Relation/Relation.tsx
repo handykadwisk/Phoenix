@@ -1400,12 +1400,12 @@ export default function Relation({ auth }: PageProps) {
                                                                 "Name Relation"
                                                             }
                                                         />
-                                                        <TableTH
+                                                        {/* <TableTH
                                                             className={
                                                                 "min-w-[50px] text-center"
                                                             }
                                                             label={"Action"}
-                                                        />
+                                                        /> */}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1416,13 +1416,29 @@ export default function Relation({ auth }: PageProps) {
                                                         ) => {
                                                             return (
                                                                 <tr
+                                                                    onDoubleClick={() => {
+                                                                        setModal(
+                                                                            {
+                                                                                add: false,
+                                                                                delete: false,
+                                                                                edit: false,
+                                                                                view: true,
+                                                                                document:
+                                                                                    false,
+                                                                                search: false,
+                                                                            }
+                                                                        );
+                                                                        setGetDetailRelation(
+                                                                            dataRelation.RELATION_ORGANIZATION_ID
+                                                                        );
+                                                                    }}
                                                                     key={i}
                                                                     className={
                                                                         i %
                                                                             2 ===
                                                                         0
-                                                                            ? ""
-                                                                            : "bg-gray-100"
+                                                                            ? "hover:bg-red-500 cursor-pointer hover:text-white"
+                                                                            : "bg-gray-100 hover:bg-red-500 cursor-pointer hover:text-white"
                                                                     }
                                                                 >
                                                                     <TableTD
@@ -1446,7 +1462,7 @@ export default function Relation({ auth }: PageProps) {
                                                                             ""
                                                                         }
                                                                     />
-                                                                    <TableTD
+                                                                    {/* <TableTD
                                                                         value={
                                                                             <>
                                                                                 <a
@@ -1499,7 +1515,7 @@ export default function Relation({ auth }: PageProps) {
                                                                         className={
                                                                             ""
                                                                         }
-                                                                    />
+                                                                    /> */}
                                                                 </tr>
                                                             );
                                                         }

@@ -45,7 +45,7 @@ return new class extends Migration
             $table->integer('PERSON_BLOOD_TYPE')->nullable()->comment('1=A, 2=B, 3=AB, 4=0');
             $table->integer('PERSON_BLOOD_RHESUS')->nullable()->comment('1=positive, 2=negative');
             $table->integer('PERSON_MARITAL_STATUS')->nullable()->comment('1=Single, 2= Married,3=Divorced,4=Widowed');
-            $table->integer('TEXT_STATUS_ID')->nullable();
+            $table->integer('TAX_STATUS_ID')->nullable();
             $table->string('PERSON_RECRUITMENT_LOCATION')->nullable();
             $table->integer('PERSON_LOCK_UPDATE')->nullable()->comment('null/0 = lock 1=unlock');
             $table->date('PERSON_LOCK_UPDATED_DATE')->nullable();

@@ -143,6 +143,7 @@ export default function Person({
     const handleDetailModel = async (e: FormEvent, idPerson: string) => {
         e.preventDefault();
         // show modal detail
+        getPersonRelationship();
         setModal({
             add: false,
             delete: false,
@@ -200,7 +201,7 @@ export default function Person({
 
             Swal.fire({
                 title: "Success",
-                text: "New Relation Added",
+                text: "New Person Added",
                 icon: "success",
             }).then((result: any) => {
                 // console.log(result);
@@ -271,6 +272,7 @@ export default function Person({
                         <DetailPersonPopup
                             idPerson={idPerson}
                             idRelation={idRelation}
+                            dataPersonRelationship={dataPersonRelationship}
                         />
                     </>
                 }
@@ -279,7 +281,7 @@ export default function Person({
 
             <div>
                 <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
-                    <div className="p-6 text-gray-900 mb-60">
+                    <div className="p-6 text-gray-900">
                         <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-lg dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                             {/* header table */}
                             <div className="md:grid md:grid-cols-8 md:gap-4">
