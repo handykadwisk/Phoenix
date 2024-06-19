@@ -43,4 +43,8 @@ class TPerson extends Model
         return $this->hasOne(TRelationDivision::class, 'RELATION_DIVISION_ID', 'DIVISION_ID');
     }
 
+    public function Document(){
+        return $this->hasOne(TDocument::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
+    }
+
 }

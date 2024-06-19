@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\RPersonRelationship;
 use App\Models\RTaxStatus;
+use App\Models\TDocument;
 use App\Models\TPerson;
 use App\Models\TPersonEmergencyContact;
 use App\Models\TRelationStructure;
@@ -12,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TPersonController extends Controller
 {
@@ -162,7 +164,7 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -260,10 +262,78 @@ class TPersonController extends Controller
         ]);
     }
 
+    public function handleDirectoryUploadedFile($file, $id, $rootDirectory, $documentId = null) {
+
+        $parentDir = ((floor(($id) / 1000)) * 1000) . '/';
+        $personId = $id . '/';
+        $typeDir = '';
+        $uploadPath = 'images/' . $rootDirectory . $parentDir . $personId . $typeDir;
+        Storage::makeDirectory($uploadPath, 0777, true, true);
+        Storage::disk('public')->putFileAs($uploadPath, $file[0], $file[0]->getClientOriginalName());
+
+        if ($documentId) {
+            TDocument::where('DOCUMENT_ID', $documentId)
+                    ->update([
+                        'DOCUMENT_FILENAME'         => pathinfo($file[0]->getClientOriginalName(), PATHINFO_FILENAME),
+                        'DOCUMENT_PATHNAME'         => $uploadPath,
+                        'DOCUMENT_EXTENTION'        => pathinfo($file[0]->getClientOriginalName(), PATHINFO_EXTENSION),
+                        'DOCUMENT_TYPE'             => pathinfo($file[0]->getClientOriginalName(), PATHINFO_EXTENSION),
+                        'DOCUMENT_SIZE'             => $file[0]->getSize(),
+                        'DOCUMENT_CREATED_BY'       => Auth::user()->id,
+                        'DOCUMENT_CREATED_DATE'     => now()
+                    ]);
+            $document = $documentId;
+            
+        } else {
+            $document = TDocument::create([
+                'DOCUMENT_FILENAME'         => pathinfo($file[0]->getClientOriginalName(), PATHINFO_FILENAME),
+                'DOCUMENT_PATHNAME'         => $uploadPath,
+                'DOCUMENT_EXTENTION'        => pathinfo($file[0]->getClientOriginalName(), PATHINFO_EXTENSION),
+                'DOCUMENT_TYPE'             => pathinfo($file[0]->getClientOriginalName(), PATHINFO_EXTENSION),
+                'DOCUMENT_SIZE'             => $file[0]->getSize(),
+                'DOCUMENT_CREATED_BY'       => Auth::user()->id,
+                'DOCUMENT_CREATED_DATE'     => now()
+            ])->DOCUMENT_ID;
+        }
+
+
+        return $document;
+
+    }
+
     public function uploadFile(Request $request){
-        dd($request);
+        // dd($request->id);
+        // document
         $imgProfile = $request->file('files');
-        // dd($imgProfile[0]);
-        dd($imgProfile[0]->getClientOriginalName());
+        if ($imgProfile) {
+                $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
+    
+                if ($document) {
+                    TPerson::where('PERSON_ID', $request->id)
+                      ->update([
+                        'PERSON_IMAGE_ID'    => $document
+                      ]);
+                }
+    
+            }
+
+            // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Updated (Person).",
+            "module"      => "Person",
+            "id"          => $request->id
+        ]),
+        'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->id
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+        // dd($imgProfile[0]->getClientOriginalName());
+
     }
 }

@@ -103,7 +103,7 @@ export default function DetailPerson({
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
-                // console.log(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -241,16 +241,39 @@ export default function DetailPerson({
         });
     };
 
-    const saveUpload = async (files: any) => {
+    const saveUpload = async (files: any, id: string) => {
         // console.log(data);
         await axios
-            .post(`/uploadFile?${idPerson}`, files, {
-                headers: {
-                    "Content-type": "multipart/form-data",
-                },
-            })
+            .post(
+                `/uploadFile`,
+                { files, id },
+                {
+                    headers: {
+                        "Content-type": "multipart/form-data",
+                    },
+                }
+            )
             .then((res) => {
-                alert("success");
+                Swal.fire({
+                    title: "Success",
+                    text: "Images Change",
+                    icon: "success",
+                }).then((result: any) => {
+                    // console.log(result);
+                    if (result.value) {
+                        getPersonDetail(res.data[0]);
+                        // getPersons();
+                        // setGetDetailRelation(message);
+                        // setModal({
+                        //     add: false,
+                        //     delete: false,
+                        //     edit: false,
+                        //     view: true,
+                        //     document: false,
+                        //     search: false,
+                        // });
+                    }
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -1622,15 +1645,29 @@ export default function DetailPerson({
                 <div className="xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-3 lg:gap-4">
                     <div className="bg-white p-4 shadow-md rounded-md">
                         <div className="flex justify-end">
-                            <a
-                                className="hover:text-red-500"
-                                onClick={(e) => handleEditPerson(e)}
-                            >
-                                <PencilSquareIcon
-                                    className="w-7"
-                                    title="Edit Profile"
-                                />
-                            </a>
+                            {/* button save gambar */}
+                            {fileNew ? (
+                                <div
+                                    className="mt-3 flex justify-center items-center font-semibold text-red-600 cursor-pointer"
+                                    onClick={(e) =>
+                                        saveUpload(fileNew, idPerson)
+                                    }
+                                >
+                                    <div className="bg-red-600 text-white w-24 text-center px-2 py-2 rounded-md hover:bg-red-500 text-sm">
+                                        Save
+                                    </div>
+                                </div>
+                            ) : (
+                                <a
+                                    className="hover:text-red-500"
+                                    onClick={(e) => handleEditPerson(e)}
+                                >
+                                    <PencilSquareIcon
+                                        className="w-7"
+                                        title="Edit Profile"
+                                    />
+                                </a>
+                            )}
                         </div>
                         <div className="flex justify-center items-center">
                             <label
@@ -1646,10 +1683,27 @@ export default function DetailPerson({
                                         src={file}
                                         alt="Image Person"
                                     />
-                                ) : (
+                                ) : detailPerson.PERSON_IMAGE_ID === null ||
+                                  detailPerson.PERSON_IMAGE_ID === "" ? (
                                     <img
                                         className="h-44 w-44 rounded-full border-2 bg-gray-50"
                                         src={defaultImage}
+                                        alt="Image Person"
+                                    />
+                                ) : (
+                                    <img
+                                        className="h-44 w-44 rounded-full border-2 bg-gray-50"
+                                        src={
+                                            window.location.origin +
+                                            "/storage/" +
+                                            detailPerson.document
+                                                ?.DOCUMENT_PATHNAME +
+                                            detailPerson.document
+                                                ?.DOCUMENT_FILENAME +
+                                            "." +
+                                            detailPerson.document
+                                                ?.DOCUMENT_EXTENTION
+                                        }
                                         alt="Image Person"
                                     />
                                 )}
@@ -1663,17 +1717,6 @@ export default function DetailPerson({
                                 />
                             </label>
                         </div>
-                        {/* button save gambar */}
-                        {fileNew ? (
-                            <div
-                                className="mt-3 flex justify-center items-center font-semibold text-red-600 cursor-pointer"
-                                onClick={(e) => saveUpload(fileNew)}
-                            >
-                                <div className="bg-red-600 text-white w-24 text-center px-2 py-2 rounded-md hover:bg-red-500 text-sm">
-                                    Save
-                                </div>
-                            </div>
-                        ) : null}
 
                         <div className="mt-9 flex justify-center items-center font-semibold text-red-600">
                             <div className="absolute pb-9">
