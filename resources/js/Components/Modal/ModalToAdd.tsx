@@ -43,7 +43,7 @@ export default function ModalToAdd({
         e.preventDefault();
 
         setIsProcessing(true);
-        // console.log(data);
+        console.log(data);
         await axios
             .post(url, data, {
                 headers: {
@@ -51,15 +51,16 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
+                console.log(res);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data[0]);
                 close();
             })
             .catch((err) => {
+                console.log(err);
                 setIsProcessing(false);
                 setIsError(err.response.data[0]);
-                console.log(err);
             });
     };
 
@@ -106,6 +107,7 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
+
                                             {body}
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">

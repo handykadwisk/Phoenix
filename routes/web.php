@@ -36,10 +36,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
 
     // Finance > Operasional
+    Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('getCA');
+    Route::post('/getCA', [CashAdvanceController::class, 'getCADataForJSON'])->name('cashAdvance.getCADataForJSON');
+    Route::get('/getCAById/{id}', [CashAdvanceController::class, 'getCAById'])->name('getCAById');
     Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
-
-    // Finance > Operasional
-    Route::get('/finance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
+    Route::post('/cashAdvance', [CashAdvanceController::class, 'store'])->name('cashAdvance.store');
+    Route::patch('/cashAdvanceApprove/{id}', [CashAdvanceController::class, 'approve'])->name('cashAdvance.approve');
+    Route::patch('/cashAdvanceRevised/{id}', [CashAdvanceController::class, 'revised'])->name('cashAdvance.revised');
 });
 
 require __DIR__ . '/auth.php';

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CashAdvanceStatus;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\RelationLob;
@@ -71,7 +72,7 @@ class DatabaseSeeder extends Seeder
         // create user
         User::create(
             [
-                'name' => 'admin',
+                'name' => 'Admin',
                 'email' => 'admin@email.com',
                 'password' => bcrypt('12345678'),
                 'role_id' => $admin->id
@@ -79,8 +80,32 @@ class DatabaseSeeder extends Seeder
         );
         User::create(
             [
-                'name' => 'user',
+                'name' => 'User',
                 'email' => 'user@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Fadhlan',
+                'email' => 'fadhlan@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Haris',
+                'email' => 'haris@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Pian',
+                'email' => 'pian@email.com',
                 'password' => bcrypt('12345678'),
                 'role_id' => $user->id
             ]
@@ -155,6 +180,32 @@ class DatabaseSeeder extends Seeder
 
         RelationStatus::create([
             'relation_status_name' => 'Individu',
+        ]);
+
+        // Created Cash Advance Status
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 0,
+            'CA_STATUS_NAME' => 'Request'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 1,
+            'CA_STATUS_NAME' => 'Accept'
+        ]);
+        
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 2,
+            'CA_STATUS_NAME' => 'Reject'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 3,
+            'CA_STATUS_NAME' => 'Need Revision'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 4,
+            'CA_STATUS_NAME' => 'Need Approval'
         ]);
     }
 }

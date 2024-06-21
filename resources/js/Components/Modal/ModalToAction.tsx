@@ -96,7 +96,7 @@ export default function ModalToAction({
                             >
                                 <Dialog.Panel
                                     className={classPanel}
-                                    style={{ maxWidth: panelWidth }}
+                                    // style={{ maxWidth: panelWidth }}
                                 >
                                     <form onSubmit={action}>
                                         <div className="bg-white px-4 pb-4 pt-3 sm:pb-4">

@@ -154,7 +154,6 @@ class RelationController extends Controller
             ]);
         }
 
-
         // Created Log
         UserLog::create([
             'created_by' => Auth::user()->id,
@@ -165,7 +164,6 @@ class RelationController extends Controller
             ]),
             'action_by'  => Auth::user()->email
         ]);
-
 
         return new JsonResponse([
             'New relation added.'
