@@ -1314,11 +1314,145 @@ export default function Relation({ auth }: PageProps) {
             {/* end modal search */}
             {/* Modal End search */}
 
-            <div>
+            <div className="grid grid-rows-3 grid-flow-col gap-4 mt-4">
+                <div className="bg-white shadow-md rounded-md p-4 max-h-20">
+                    <div className="text-center w-auto">
+                        <Button
+                            className="p-3"
+                            // onClick={() => {
+                            //     // setSwitchPage(false);
+                            //     setModal({
+                            //         add: false,
+                            //         delete: false,
+                            //         edit: false,
+                            //         view: !modal.view,
+                            //         document: false,
+                            //         search: false,
+                            //     });
+                            // }}
+                            // onClick={(e) => handleAddModel(e)}
+                        >
+                            {"Add Relation"}
+                        </Button>
+                    </div>
+                </div>
+                <div className="row-span-2 bg-white shadow-md rounded-md pl-4 pr-4 pt-4">
+                    <div className="">
+                        <TextInput
+                            id="RELATION_ORGANIZATION_NAME"
+                            type="text"
+                            name="RELATION_ORGANIZATION_NAME"
+                            value={searchRelation.RELATION_ORGANIZATION_NAME}
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) =>
+                                setSearchRelation({
+                                    ...searchRelation,
+                                    RELATION_ORGANIZATION_NAME: e.target.value,
+                                })
+                            }
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    if (
+                                        searchRelation.RELATION_ORGANIZATION_NAME !==
+                                        ""
+                                    ) {
+                                        getRelation();
+                                    }
+                                }
+                            }}
+                            placeholder="Search Relation Name"
+                        />
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                        <div
+                            className="bg-red-600 text-white p-2 w-52 rounded-md text-center hover:bg-red-500 cursor-pointer"
+                            onClick={() => clearSearchRelation()}
+                        >
+                            Clear Search
+                        </div>
+                    </div>
+                </div>
+                <div className="relative row-span-3 col-span-9 bg-white shadow-md rounded-md p-4">
+                    {/* Table Relation */}
+                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                        <table className="w-full table-auto divide-y divide-gray-300">
+                            <thead className="">
+                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                    <TableTH
+                                        className={
+                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg"
+                                        }
+                                        label={"No"}
+                                    />
+                                    <TableTH
+                                        className={"min-w-[50px] bg-gray-200"}
+                                        label={"Name Relation"}
+                                    />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {relations.data?.map(
+                                    (dataRelation: any, i: number) => {
+                                        return (
+                                            <tr
+                                                onDoubleClick={() => {
+                                                    setModal({
+                                                        add: false,
+                                                        delete: false,
+                                                        edit: false,
+                                                        view: true,
+                                                        document: false,
+                                                        search: false,
+                                                    });
+                                                    setGetDetailRelation(
+                                                        dataRelation.RELATION_ORGANIZATION_ID
+                                                    );
+                                                }}
+                                                key={i}
+                                                className={
+                                                    i % 2 === 0
+                                                        ? "cursor-pointer"
+                                                        : "bg-gray-100 cursor-pointer"
+                                                }
+                                            >
+                                                <TableTD
+                                                    value={relations.from + i}
+                                                    className={"text-center"}
+                                                />
+                                                <TableTD
+                                                    value={
+                                                        <>
+                                                            {
+                                                                dataRelation.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </>
+                                                    }
+                                                    className={""}
+                                                />
+                                            </tr>
+                                        );
+                                    }
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    <Pagination
+                        links={relations.links}
+                        fromData={relations.from}
+                        toData={relations.to}
+                        totalData={relations.total}
+                        clickHref={(url: string) =>
+                            getRelation(url.split("?").pop())
+                        }
+                    />
+                </div>
+            </div>
+
+            {/* <div>
                 <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
                     <div className="p-6 text-gray-900 mb-60">
                         <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-                            {/* header table */}
+                            header table
                             <div className="md:grid md:grid-cols-8 md:gap-4">
                                 <Button
                                     className="text-sm w-full lg:w-1/2 font-semibold px-6 py-1.5 mb-4 md:col-span-2"
@@ -1400,12 +1534,6 @@ export default function Relation({ auth }: PageProps) {
                                                                 "Name Relation"
                                                             }
                                                         />
-                                                        {/* <TableTH
-                                                            className={
-                                                                "min-w-[50px] text-center"
-                                                            }
-                                                            label={"Action"}
-                                                        /> */}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1437,8 +1565,8 @@ export default function Relation({ auth }: PageProps) {
                                                                         i %
                                                                             2 ===
                                                                         0
-                                                                            ? "hover:bg-red-500 cursor-pointer hover:text-white"
-                                                                            : "bg-gray-100 hover:bg-red-500 cursor-pointer hover:text-white"
+                                                                            ? "cursor-pointer"
+                                                                            : "bg-gray-100 cursor-pointer"
                                                                     }
                                                                 >
                                                                     <TableTD
@@ -1462,60 +1590,6 @@ export default function Relation({ auth }: PageProps) {
                                                                             ""
                                                                         }
                                                                     />
-                                                                    {/* <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                <a
-                                                                                    onClick={() => {
-                                                                                        setModal(
-                                                                                            {
-                                                                                                add: false,
-                                                                                                delete: false,
-                                                                                                edit: false,
-                                                                                                view: true,
-                                                                                                document:
-                                                                                                    false,
-                                                                                                search: false,
-                                                                                            }
-                                                                                        );
-                                                                                        setGetDetailRelation(
-                                                                                            dataRelation.RELATION_ORGANIZATION_ID
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    <div
-                                                                                        className="flex justify-center items-center"
-                                                                                        title="Detail"
-                                                                                    >
-                                                                                        <svg
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            fill="none"
-                                                                                            viewBox="0 0 24 24"
-                                                                                            strokeWidth={
-                                                                                                1.5
-                                                                                            }
-                                                                                            stroke="currentColor"
-                                                                                            className="size-6 text-red-700 cursor-pointer"
-                                                                                        >
-                                                                                            <path
-                                                                                                strokeLinecap="round"
-                                                                                                strokeLinejoin="round"
-                                                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                                                                            />
-                                                                                            <path
-                                                                                                strokeLinecap="round"
-                                                                                                strokeLinejoin="round"
-                                                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </div>
-                                                                                </a>
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    /> */}
                                                                 </tr>
                                                             );
                                                         }
@@ -1538,10 +1612,10 @@ export default function Relation({ auth }: PageProps) {
                                 )}
                             </div>
                         </div>
-                        {/* table page*/}
+                        table page
                     </div>
                 </div>
-            </div>
+            </div> */}
         </AuthenticatedLayout>
     );
 }

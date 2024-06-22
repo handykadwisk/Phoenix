@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RBank;
 use App\Models\RPersonRelationship;
 use App\Models\RTaxStatus;
 use App\Models\TDocument;
 use App\Models\TPerson;
+use App\Models\TPersonBankAccount;
 use App\Models\TPersonEmergencyContact;
 use App\Models\TRelationStructure;
 use App\Models\UserLog;
@@ -225,6 +227,11 @@ class TPersonController extends Controller
         return response()->json($data);
     }
 
+    public function getRBank(){
+        $data = RBank::get();
+        return response()->json($data);
+    }
+
     public function getOffice(Request $request){
         $data = DB::select('call sp_combo_relation_office(?)', [$request->id]);
         return response()->json($data);
@@ -336,4 +343,34 @@ class TPersonController extends Controller
         // dd($imgProfile[0]->getClientOriginalName());
 
     }
-}
+
+    public function addBankAccount(Request $request){
+        // $personFor = $request->BANK_ACCOUNT[0]['BANK_ID']['value'];
+        // print_r($personFor);die;
+        $bankForNew = [];
+        foreach ($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_FOR'] as $bankFor) {
+            // get Bank For
+            array_push($bankForNew, (int)$bankFor['value']);
+        }
+        $valueBankFor = json_encode($bankForNew);
+
+        // created bank account
+        // if (is_countable($request->BANK_ACCOUNT)) {
+            for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
+                TPersonBankAccount::create([
+                    "PERSON_ID" => $request->BANK_ACCOUNT[$i]["idPerson"],
+                    "PERSON_BANK_ACCOUNT_NAME" => $request->BANK_ACCOUNT[$i]["PERSON_BANK_ACCOUNT_NUMBER"],
+                    "PERSON_BANK_ACCOUNT_NUMBER" => $request->BANK_ACCOUNT[$i]["PERSON_BANK_ACCOUNT_NUMBER"],
+                    "PERSON_BANK_ACCOUNT_FOR" => $valueBankFor,
+                    "BANK_ID" => $request->BANK_ACCOUNT[$i]['BANK_ID']['value'],
+                ]);
+            }
+        // }
+
+        return new JsonResponse([
+            $request->BANK_ACCOUNT[0]["idPerson"]
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+}   

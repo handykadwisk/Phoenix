@@ -61,8 +61,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/getStructure', [TPersonController::class, 'getStructure'])->name('getStructure.getStructure');
     Route::post('/getDivision', [TPersonController::class, 'getDivision'])->name('getDivision.getDivision');
     Route::post('/getOffice', [TPersonController::class, 'getOffice'])->name('getOffice.getOffice');
+    Route::post('/getRBank', [TPersonController::class, 'getRBank'])->name('getRBank.getRBank');
     Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
+    Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
 
 
 });

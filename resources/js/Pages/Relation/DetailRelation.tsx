@@ -21,6 +21,7 @@ import Checkbox from "@/Components/Checkbox";
 import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
 import PersonPopup from "../Person/Person";
+import StructurePopup from "../Structure/Structure";
 
 export default function DetailRelation({
     detailRelation,
@@ -50,6 +51,16 @@ export default function DetailRelation({
     const [isSuccess, setIsSuccess] = useState<string>("");
 
     const [modal, setModal] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    // Structure Modal
+    const [structureModal, setStructureModal] = useState({
         add: false,
         delete: false,
         edit: false,
@@ -299,6 +310,24 @@ export default function DetailRelation({
         // }
         setIsSuccess(message);
     };
+
+    // Onclick Structure
+    const handleClickStructure = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setStructureModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !structureModal.view,
+            document: false,
+            search: false,
+        });
+    };
+    // end Structure
 
     // Onclick Person
     const handleClickPerson = async (
@@ -1023,6 +1052,37 @@ export default function DetailRelation({
                 }
             />
 
+            {/* modal for structure */}
+            <ModalToAction
+                show={structureModal.view}
+                onClose={() =>
+                    setStructureModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Structure"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <StructurePopup auth={""} idRelation={detailRelation} />
+                    </>
+                }
+            />
+            {/* end Modal for structure */}
+
             {/* modal for person */}
             <ModalToAction
                 show={modal.view}
@@ -1039,7 +1099,6 @@ export default function DetailRelation({
                 title={"Person"}
                 url={""}
                 data={""}
-                addOns={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
@@ -1216,7 +1275,15 @@ export default function DetailRelation({
 
                     {/* Structure */}
                     <div className="grid gap-9 grid-cols-3 mt-6 xs:grid-cols-2 xs:gap-x-3 lg:grid-cols-3 lg:gap-4">
-                        <div className="bg-white p-5 shadow-md rounded-lg">
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickStructure(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <span>Structure</span>
                             </div>

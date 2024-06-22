@@ -12,6 +12,7 @@ import {
 } from "react";
 import { spawn } from "child_process";
 import axios from "axios";
+import Select from "react-tailwindcss-select";
 import {
     ArrowUpIcon,
     ArrowUpTrayIcon,
@@ -24,6 +25,7 @@ import {
     PencilIcon,
     PencilSquareIcon,
     PhoneIcon,
+    PlusIcon,
     UserGroupIcon,
     UserIcon,
     UsersIcon,
@@ -39,6 +41,8 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import DetailEmployment from "./EmploymentDetail";
 import DetailStructure from "./StructureDivision";
 import { Datepicker } from "flowbite-react";
+import test from "node:test";
+import BankAccount from "./BankAccount";
 
 export default function DetailPerson({
     idPerson,
@@ -55,6 +59,7 @@ export default function DetailPerson({
     const [structure, setStructure] = useState<any>([]);
     const [division, setDivision] = useState<any>([]);
     const [office, setOffice] = useState<any>([]);
+    const [bank, setBank] = useState<any>([]);
     const [file, setFile] = useState<any>();
     const [fileNew, setFileNew] = useState<any>();
     useEffect(() => {
@@ -98,12 +103,18 @@ export default function DetailPerson({
         }
     };
 
+    const bankSelect = bank?.map((query: any) => {
+        return {
+            value: query.BANK_ID,
+            label: query.BANK_ABBREVIATION,
+        };
+    });
+
     const getPersonDetail = async (id: string) => {
         await axios
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -148,6 +159,17 @@ export default function DetailPerson({
             .post(`/getOffice`, { id })
             .then((res) => {
                 setOffice(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getRBank = async () => {
+        await axios
+            .post(`/getRBank`)
+            .then((res) => {
+                setBank(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -206,6 +228,10 @@ export default function DetailPerson({
         OFFICE_ID: "",
     });
 
+    const [dataBank, setDataBank] = useState<any>({
+        account_bank: [],
+    });
+
     // for modal
     const [modal, setModal] = useState({
         add: false,
@@ -218,6 +244,15 @@ export default function DetailPerson({
 
     // modal structure
     const [modalStructure, setModalStructure] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    const [modalBank, setModalBank] = useState({
         add: false,
         delete: false,
         edit: false,
@@ -261,6 +296,7 @@ export default function DetailPerson({
                 }).then((result: any) => {
                     // console.log(result);
                     if (result.value) {
+                        setFile();
                         getPersonDetail(res.data[0]);
                         // getPersons();
                         // setGetDetailRelation(message);
@@ -355,16 +391,20 @@ export default function DetailPerson({
                   search: false,
               });
     };
-    // const handleEditEmployment = async (e: FormEvent) => {
-    //     setModal({
-    //         add: false,
-    //         delete: false,
-    //         edit: !modal.edit,
-    //         view: true,
-    //         document: false,
-    //         search: false,
-    //     });
-    // };
+
+    const handleBankAccount = async (e: FormEvent) => {
+        e.preventDefault();
+
+        getRBank();
+        setModalBank({
+            add: !modalBank.add,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+        });
+    };
 
     const handleSuccessEditPerson = (message: string) => {
         // setIsSuccess("");
@@ -430,9 +470,25 @@ export default function DetailPerson({
         }
     };
 
+    const handleSuccess = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            Swal.fire({
+                title: "Success",
+                text: "Bank Account Added",
+                icon: "success",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    getPersonDetail(message);
+                }
+            });
+        }
+    };
+
     const handleSuccessStructure = (message: string) => {
         // setIsSuccess("");
-        if (message !== "" && modalStructure.add) {
+        if (message !== "") {
             setDataStructure({
                 PERSON_ID: idPerson,
                 STRUCTURE_ID: "",
@@ -482,9 +538,27 @@ export default function DetailPerson({
             });
         }
     };
-
     return (
         <>
+            {/* Bank Account */}
+            <BankAccount
+                show={modalBank.add}
+                modal={() =>
+                    setModalBank({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                bank={bank}
+                idPerson={idPerson}
+                handleSuccess={handleSuccess}
+            />
+            {/* End Bank Account */}
+
             {/* Edit Person */}
             <ModalToAdd
                 show={modal.edit}
@@ -1341,7 +1415,7 @@ export default function DetailPerson({
                                             detailPerson.relation
                                                 ?.RELATION_ORGANIZATION_NAME
                                         }
-                                        className="mt-2"
+                                        className="mt-2 bg-slate-400"
                                         autoComplete="RELATION_ORGANIZATION_ID"
                                         // onChange={(e) =>
                                         //     setDataById({
@@ -1646,7 +1720,7 @@ export default function DetailPerson({
                     <div className="bg-white p-4 shadow-md rounded-md">
                         <div className="flex justify-end">
                             {/* button save gambar */}
-                            {fileNew ? (
+                            {file ? (
                                 <div
                                     className="mt-3 flex justify-center items-center font-semibold text-red-600 cursor-pointer"
                                     onClick={(e) =>
@@ -1659,7 +1733,7 @@ export default function DetailPerson({
                                 </div>
                             ) : (
                                 <a
-                                    className="hover:text-red-500"
+                                    className="hover:text-red-500 cursor-pointer"
                                     onClick={(e) => handleEditPerson(e)}
                                 >
                                     <PencilSquareIcon
@@ -1674,7 +1748,7 @@ export default function DetailPerson({
                                 htmlFor="imgProfile"
                                 className="bg-red-800 w-50 rounded-full"
                             >
-                                <div className="absolute w-44 h-44 rounded-full flex justify-center items-center group hover:bg-gray-200 opacity-70 transition duration-500 cursor-pointer">
+                                <div className="absolute w-44 h-44 rounded-full flex justify-center items-center group hover:bg-gray-700 opacity-70 transition duration-500 cursor-pointer">
                                     <ArrowUpTrayIcon className="w-10 text-white hidden group-hover:block" />
                                 </div>
                                 {file ? (
@@ -2042,7 +2116,7 @@ export default function DetailPerson({
                             <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
                                 <a
                                     className="m-auto"
-                                    onClick={(e) => handleStructure(e)}
+                                    onClick={(e) => handleBankAccount(e)}
                                 >
                                     Bank Account
                                 </a>

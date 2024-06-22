@@ -127,7 +127,6 @@ export default function AddPerson({
     //         });
     //     }
     // };
-    // console.log(data.CONTACT_EMERGENCY);
 
     return (
         <>
@@ -314,6 +313,77 @@ export default function AddPerson({
                                         <option value={"3"}>Divorced</option>
                                         <option value={"4"}>Widowed</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div className="grid gap-4 grid-cols-3 mt-4">
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_KTP"
+                                        value={"Person KTP"}
+                                    />
+                                    <TextInput
+                                        id="PERSON_KTP"
+                                        type="text"
+                                        name="PERSON_KTP"
+                                        value={data.PERSON_KTP}
+                                        className="mt-2"
+                                        autoComplete="PERSON_KTP"
+                                        onChange={(e) => {
+                                            setData(
+                                                "PERSON_KTP",
+                                                e.target.value
+                                            );
+                                        }}
+                                        required
+                                        placeholder="Person KTP"
+                                    />
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_NPWP"
+                                        value={"Person NPWP "}
+                                    />
+                                    <TextInput
+                                        id="PERSON_NPWP"
+                                        type="text"
+                                        name="PERSON_NPWP"
+                                        value={data.PERSON_NPWP}
+                                        className="mt-2"
+                                        autoComplete="PERSON_NPWP"
+                                        onChange={(e) => {
+                                            setData(
+                                                "PERSON_NPWP",
+                                                e.target.value
+                                            );
+                                        }}
+                                        required
+                                        placeholder="Person NPWP"
+                                    />
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_KK"
+                                        value={"Person KK "}
+                                    />
+                                    <TextInput
+                                        id="PERSON_KK"
+                                        type="text"
+                                        name="PERSON_KK"
+                                        value={data.PERSON_KK}
+                                        className="mt-2"
+                                        autoComplete="PERSON_KK"
+                                        onChange={(e) => {
+                                            setData(
+                                                "PERSON_KK",
+                                                e.target.value
+                                            );
+                                        }}
+                                        required
+                                        placeholder="Person KK"
+                                    />
                                 </div>
                             </div>
                             <div className="mt-6">
