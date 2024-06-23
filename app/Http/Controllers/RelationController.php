@@ -131,7 +131,7 @@ class RelationController extends Controller
         }
 
         // Created Relation
-        $relation = Relation::insertGetId([
+        $relation = Relation::create([
             'RELATION_ORGANIZATION_NAME' => $addTBK,
             'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
             'RELATION_ORGANIZATION_ABBREVIATION' => $request->abbreviation,
@@ -167,7 +167,7 @@ class RelationController extends Controller
             for ($i=0; $i < sizeof($request->relation_aka); $i++) { 
                 $nameRelationAka = $request->relation_aka[$i]["name_aka"];
                 MRelationAka::create([
-                    "RELATION_ORGANIZATION_ID" => $relation,
+                    "RELATION_ORGANIZATION_ID" => $relation->RELATION_ORGANIZATION_ID,
                     "RELATION_AKA_NAME" => $nameRelationAka
                 ]);
             }
@@ -178,7 +178,7 @@ class RelationController extends Controller
             for ($i = 0; $i < sizeof($request->relation_type_id); $i++) {
                 $idRelationType = $request->relation_type_id[$i]["id"];
                 MRelationType::create([
-                    'RELATION_ORGANIZATION_ID' => $relation,
+                    'RELATION_ORGANIZATION_ID' => $relation->RELATION_ORGANIZATION_ID,
                     'RELATION_TYPE_ID' => $idRelationType
                 ]);
             }    
@@ -200,7 +200,7 @@ class RelationController extends Controller
                 // created mapping tagging
                 if ($tagging) {
                     MTag::create([
-                        'RELATION_ORGANIZATION_ID' => $relation,
+                        'RELATION_ORGANIZATION_ID' => $relation->RELATION_ORGANIZATION_ID,
                         'TAG_ID' => $tagging
                     ]);
                 }
@@ -214,14 +214,15 @@ class RelationController extends Controller
             'action'     => json_encode([
                 "description" => "Created (Relation).",
                 "module"      => "Relation",
-                "id"          => $relation
+                "id"          => $relation->RELATION_ORGANIZATION_ID
             ]),
             'action_by'  => Auth::user()->email
         ]);
 
 
         return new JsonResponse([
-            $relation
+            $relation->RELATION_ORGANIZATION_ID,
+            $relation->RELATION_ORGANIZATION_NAME
         ], 201, [
             'X-Inertia' => true
         ]);

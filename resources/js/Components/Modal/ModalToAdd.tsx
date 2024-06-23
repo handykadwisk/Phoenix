@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
@@ -28,6 +28,7 @@ export default function ModalToAdd({
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
+    const modalRef = useRef(null);
 
     const close = () => {
         if (closeable) {
@@ -49,7 +50,7 @@ export default function ModalToAdd({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data[0]);
+                onSuccess(res.data);
                 close();
             })
             .catch((err) => {
@@ -62,7 +63,12 @@ export default function ModalToAdd({
     return (
         <>
             <Transition.Root show={show} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={() => {}}>
+                <Dialog
+                    as="div"
+                    className="relative z-999"
+                    onClose={() => {}}
+                    initialFocus={modalRef}
+                >
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -102,7 +108,12 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {body}
+                                            <div
+                                                className="max-h-[45rem] overflow-y-auto custom-scrollbar px-2.5"
+                                                ref={modalRef}
+                                            >
+                                                {body}
+                                            </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             <PrimaryButton

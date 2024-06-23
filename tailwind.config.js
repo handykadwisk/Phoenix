@@ -17,6 +17,15 @@ export default {
             fontFamily: {
                 sans: ["Poppins", ...defaultTheme.fontFamily.sans],
             },
+            zIndex: {
+                999999: "999999",
+                99999: "99999",
+                9999: "9999",
+                999: "999",
+                99: "99",
+                9: "9",
+                1: "1",
+            },
         },
         screens: {
             xs: "360px",
@@ -37,9 +46,6 @@ export default {
             "2xl": "1536px",
             // => @media (min-width: 1536px) { ... }
         },
-        // zIndex: {
-        //     100: "100",
-        // },
     },
 
     plugins: [forms, require("flowbite/plugin")],

@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
@@ -35,6 +35,7 @@ export default function ModalToAction({
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
+    const modalRef = useRef(null);
 
     const close = () => {
         if (closeable) {
@@ -70,7 +71,12 @@ export default function ModalToAction({
     return (
         <>
             <Transition.Root show={show} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={close}>
+                <Dialog
+                    as="div"
+                    className="relative z-50"
+                    onClose={close}
+                    initialFocus={modalRef}
+                >
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -107,7 +113,12 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {body}
+                                            <div
+                                                className="max-h-[45rem] overflow-y-auto custom-scrollbar px-2.5"
+                                                ref={modalRef}
+                                            >
+                                                {body}
+                                            </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             {submitButtonName && (

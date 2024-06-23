@@ -33,7 +33,10 @@ export default function DetailGroup({
 }>) {
     const [dataRelationGroupNew, setDataRelationGroupNew] = useState<any>([]);
     const [relationGroupNew, setRelationGroupNew] = useState<any>([]);
-    const [relationId, setRelationId] = useState<string>("");
+    const [relationId, setRelationId] = useState<any>({
+        idGroup: "",
+        nameRelation: "",
+    });
 
     // variable for modal
     const [modal, setModal] = useState({
@@ -121,10 +124,17 @@ export default function DetailGroup({
         });
     };
 
-    const handleDetailPopup = async (e: FormEvent, idGroup: string) => {
+    const handleDetailPopup = async (
+        e: FormEvent,
+        idGroup: string,
+        nameRelation: string
+    ) => {
         e.preventDefault();
 
-        setRelationId(idGroup);
+        setRelationId({
+            idGroup: idGroup,
+            nameRelation: nameRelation,
+        });
         setModal({
             add: false,
             delete: false,
@@ -174,21 +184,20 @@ export default function DetailGroup({
                     getDetailGroup(idGroup);
                     getGroupName(idGroup);
                 }}
-                title={"Detail Relation"}
+                title={relationId.nameRelation}
                 url={""}
                 data={""}
-                addOns={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[55%]"
                 }
                 submitButtonName={""}
                 body={
                     <>
                         <DetailRelationPopup
-                            detailRelation={relationId}
+                            detailRelation={relationId.idGroup}
                             relationStatus={relationStatus}
                             relationGroup={relationGroup}
                             relationType={relationType}
@@ -199,34 +208,13 @@ export default function DetailGroup({
                 }
             />
 
-            <div className="grid grid-cols-3 gap-4">
-                <div className=" bg-white rounded-lg shadow-md pb-10">
-                    <div className="flex justify-center items-center">
-                        {/* Foto Group*/}
-                        <img
-                            className="h-36 w-36 rounded-full border-2 bg-gray-50 mt-10"
-                            src={defaultImage}
-                            alt=""
-                        />
-                    </div>
-                    <div className="flex justify-center items-center mt-5">
-                        {/* Name Group*/}
-                        <div className="text-sm text-gray-500">
-                            <span>Group</span>
-                        </div>
-                    </div>
-                    <div className="flex justify-center items-center">
-                        <div className="text-lg">
-                            <span>
-                                {dataRelationGroupNew.RELATION_GROUP_NAME}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            <div className="grid grid-cols-1">
                 <div className="col-span-2 bg-white rounded-lg shadow-md pb-10">
-                    <div className="flex justify-between">
-                        <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white">
-                            Relation
+                    <div className="flex justify-between items-center">
+                        <div className="w-fit px-4 text-md font-semibold">
+                            <span className="border-b-2 border-red-600">
+                                Relation
+                            </span>
                         </div>
                         <a
                             onClick={(e) =>
@@ -238,7 +226,7 @@ export default function DetailGroup({
                             className="cursor-pointer"
                             title="Edit Relation"
                         >
-                            <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white">
+                            <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white hover:bg-red-500">
                                 Add Relation To Group
                             </div>
                         </a>
@@ -285,7 +273,8 @@ export default function DetailGroup({
                                                                         ) =>
                                                                             handleDetailPopup(
                                                                                 e,
-                                                                                item.RELATION_ORGANIZATION_ID
+                                                                                item.RELATION_ORGANIZATION_ID,
+                                                                                item.RELATION_ORGANIZATION_NAME
                                                                             )
                                                                         }
                                                                         className="font-medium text-gray-900 hover:text-red-500 cursor-pointer"
@@ -333,7 +322,8 @@ export default function DetailGroup({
                                                                                                 ) =>
                                                                                                     handleDetailPopup(
                                                                                                         e,
-                                                                                                        dataChildren.RELATION_ORGANIZATION_ID
+                                                                                                        dataChildren.RELATION_ORGANIZATION_ID,
+                                                                                                        dataChildren.RELATION_ORGANIZATION_NAME
                                                                                                     )
                                                                                                 }
                                                                                                 className="text-sm text-gray-500 hover:text-red-500 cursor-pointer"

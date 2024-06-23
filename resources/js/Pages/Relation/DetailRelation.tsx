@@ -12,7 +12,11 @@ import {
 } from "react";
 import { spawn } from "child_process";
 import axios from "axios";
-import { PencilIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
+import {
+    PencilIcon,
+    PencilSquareIcon,
+    XMarkIcon,
+} from "@heroicons/react/20/solid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -367,7 +371,6 @@ export default function DetailRelation({
                 title={"Edit Relation"}
                 url={`/editRelation/${detailRelation}`}
                 data={dataById}
-                addOns={mRelation}
                 onSuccess={handleSuccessEdit}
                 method={"patch"}
                 headers={null}
@@ -1072,7 +1075,7 @@ export default function DetailRelation({
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[65%]"
                 }
                 submitButtonName={""}
                 body={
@@ -1114,215 +1117,162 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
 
-            <div>
-                <dl className="mt-0">
-                    {/* Top */}
-                    <div className="grid grid-cols-3 gap-4 xs:grid-cols-1 md:grid-cols-3">
-                        <div className="rounded-lg bg-white px-4 py-5 shadow-md sm:p-6">
-                            {/* profile */}
-                            <div className="">
-                                <div className="p-5">
-                                    <div className="flex justify-center items-center">
-                                        <img
-                                            className="h-36 w-36 rounded-full border-2 bg-gray-50"
-                                            src={defaultImage}
-                                            alt=""
-                                        />
-                                    </div>
-                                    <div className="flex justify-center items-center mt-5">
-                                        <span className="font-medium">
-                                            {
-                                                dataRelationNew.RELATION_ORGANIZATION_NAME
-                                            }
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* end profile */}
+            {/* Detail Relation*/}
+            {/* Top */}
+            <div className="bg-white p-4 rounded-md shadow-md">
+                {/* Official Information */}
+                <div className="flex justify-between">
+                    <div className="text-md font-semibold w-fit ">
+                        <span className="border-b-2 border-red-600">
+                            Official Information
+                        </span>
+                    </div>
+                    <a
+                        onClick={(e) =>
+                            handleEditModel(
+                                e,
+                                dataRelationNew.RELATION_ORGANIZATION_ID
+                            )
+                        }
+                        className="cursor-pointer"
+                        title="Edit Relation"
+                    >
+                        <div className="bg-red-600 p-2 rounded-md text-white">
+                            <PencilSquareIcon className="w-5" />
                         </div>
-                        {/* All Information */}
-                        <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
-                            <div className="flex justify-between">
-                                <div className="bg-red-600 w-44 p-2 text-center rounded-md text-white">
-                                    <span>Official Information</span>
-                                </div>
-                                <a
-                                    onClick={(e) =>
-                                        handleEditModel(
-                                            e,
-                                            dataRelationNew.RELATION_ORGANIZATION_ID
-                                        )
+                    </a>
+                </div>
+                <div className="grid grid-cols-4 gap-4 mt-4">
+                    <div>
+                        <div className="font-semibold">
+                            <span>Group</span>
+                        </div>
+                        {dataRelationNew.group_relation?.length === 0 ? (
+                            <>
+                                <div className="text-sm text-gray-400">-</div>
+                            </>
+                        ) : (
+                            <>
+                                {dataRelationNew.group_relation?.map(
+                                    (gRelation: any, i: number) => {
+                                        return (
+                                            <div
+                                                className="text-sm text-gray-400"
+                                                key={i}
+                                            >
+                                                {gRelation.RELATION_GROUP_NAME}
+                                            </div>
+                                        );
                                     }
-                                    className="cursor-pointer"
-                                    title="Edit Relation"
-                                >
-                                    <div className="bg-red-600 w-10 p-2 rounded-md text-white">
-                                        <PencilSquareIcon className="w-auto" />
-                                    </div>
-                                </a>
+                                )}
+                            </>
+                        )}
+                    </div>
+                    <div>
+                        <div className="font-semibold">
+                            <span>Email</span>
+                        </div>
+                        {dataRelationNew.RELATION_ORGANIZATION_EMAIL === "" ||
+                        dataRelationNew.RELATION_ORGANIZATION_EMAIL === null ? (
+                            <div className="text-sm text-gray-400">-</div>
+                        ) : (
+                            <div className="text-sm text-gray-400">
+                                {dataRelationNew.RELATION_ORGANIZATION_EMAIL}
                             </div>
-                            <div className="grid gap-x-2 gap-y-2 grid-cols-3 mt-4 ml-3 xs:grid xs:grid-cols-1 lg:grid lg:grid-cols-3">
-                                <div className="">
-                                    <span>Group</span>
-                                    <br></br>
-                                    {dataRelationNew.group_relation?.length ===
-                                    0 ? (
-                                        <>
-                                            <span>-</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {dataRelationNew.group_relation?.map(
-                                                (gRelation: any, i: number) => {
-                                                    return (
-                                                        <span
-                                                            className="text-gray-500"
-                                                            key={i}
-                                                        >
-                                                            {
-                                                                gRelation.RELATION_GROUP_NAME
-                                                            }
-                                                        </span>
-                                                    );
+                        )}
+                    </div>
+                    <div className="col-span-2">
+                        <div className="font-semibold">
+                            <span>Address & Location</span>
+                        </div>
+                        <div className="text-sm text-gray-400">
+                            <span className="font-normal">
+                                Jl.Gatot Subroto, Kuningan, Mampang Perampatan,
+                                Jakarta Selatan
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {/* End Official Information */}
+
+                {/* Relation Type And */}
+                <div className="text-md font-semibold border-b-2 w-fit border-red-600 mt-4">
+                    <span>Relation Type</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div className="grid grid-cols-1 gap-4 mt-2">
+                        <div className="mb-2 relative flex flex-wrap gap-3">
+                            {dataRelationNew.m_relation_type?.map(
+                                (dRelation: any, i: number) => {
+                                    return (
+                                        // <>
+                                        <div
+                                            key={i}
+                                            className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm"
+                                        >
+                                            <span className="text-white">
+                                                {
+                                                    dRelation.relation_type
+                                                        .RELATION_TYPE_NAME
                                                 }
-                                            )}
-                                        </>
-                                    )}
-                                </div>
-                                <div className="">
-                                    <span>Email</span>
-                                    <br></br>
-                                    {dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
-                                        "" ||
-                                    dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
-                                        null ? (
-                                        <span>-</span>
-                                    ) : (
-                                        <span className="font-normal text-gray-500">
-                                            {
-                                                dataRelationNew.RELATION_ORGANIZATION_EMAIL
-                                            }
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="">
-                                    <span>Address</span>
-                                    <br></br>
-                                    <span className="font-normal text-gray-500">
-                                        Jl.Gatot Subroto, Kuningan, Mampang
-                                        Perampatan, Jakarta Selatan
-                                    </span>
-                                </div>
-                            </div>
-                            <hr className="mt-5" />
-                            <div className="bg-red-600 w-44 p-2 text-center rounded-md mt-10 text-white">
-                                <span>Tags</span>
-                            </div>
-                            <div className="grid grid-cols-1 gap-4 mt-3">
-                                <div className="p-2 mb-2 relative flex flex-wrap gap-3">
-                                    {dataRelationNew.m_tagging?.map(
-                                        (dRelation: any, i: number) => {
-                                            return (
-                                                // <>
+                                            </span>
+                                            <div>
+                                                {/* <a href=""> */}
                                                 <div
-                                                    key={i}
-                                                    className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2"
+                                                    className="text-white cursor-pointer"
+                                                    onMouseDown={(e) =>
+                                                        e.preventDefault()
+                                                    }
                                                 >
-                                                    <span className="text-white">
-                                                        {
-                                                            dRelation.tagging
-                                                                .TAG_NAME
-                                                        }
-                                                    </span>
-                                                    <div>
-                                                        {/* <a href=""> */}
-                                                        <div
-                                                            className="text-white cursor-pointer"
-                                                            onMouseDown={(e) =>
-                                                                e.preventDefault()
-                                                            }
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                strokeWidth={
-                                                                    1.5
-                                                                }
-                                                                stroke="currentColor"
-                                                                className="w-6 h-6"
-                                                            >
-                                                                <path
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    d="M6 18 18 6M6 6l12 12"
-                                                                />
-                                                            </svg>
-                                                        </div>
-                                                        {/* </a> */}
-                                                    </div>
+                                                    <XMarkIcon className="w-5" />
                                                 </div>
-                                                // </>
-                                            );
-                                        }
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                        {/* end all information */}
-                    </div>
-                    {/* End Top */}
-
-                    {/* Structure */}
-                    <div className="grid gap-9 grid-cols-3 mt-6 xs:grid-cols-2 xs:gap-x-3 lg:grid-cols-3 lg:gap-4">
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickStructure(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Structure</span>
-                            </div>
-                        </div>
-                        <div className="bg-white p-5 shadow-md rounded-lg">
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Division</span>
-                            </div>
-                        </div>
-                        <div className="bg-white p-5 shadow-md rounded-lg">
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Addres & Location</span>
-                            </div>
-                        </div>
-                        <div className="bg-white p-5 shadow-md rounded-lg">
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Job Desc</span>
-                            </div>
-                        </div>
-                        {dataRelationNew.HR_MANAGED_BY_APP === 1 ? (
-                            <div
-                                className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                                onClick={(e) =>
-                                    handleClickPerson(
-                                        e,
-                                        dataRelationNew.RELATION_ORGANIZATION_NAME
-                                    )
+                                                {/* </a> */}
+                                            </div>
+                                        </div>
+                                        // </>
+                                    );
                                 }
-                            >
-                                <div className="flex justify-center items-center text-sm font-medium">
-                                    <span>Person/User</span>
-                                </div>
-                            </div>
-                        ) : null}
+                            )}
+                        </div>
                     </div>
-
-                    {/* end Structure */}
-                </dl>
+                    <div></div>
+                </div>
+                {/* END Relation Type And */}
             </div>
+            {/* End Top */}
+
+            {/* Button */}
+            <div className="grid grid-cols-4 gap-4 mt-4">
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                    onClick={(e) =>
+                        handleClickStructure(
+                            e,
+                            dataRelationNew.RELATION_ORGANIZATION_NAME
+                        )
+                    }
+                >
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Structure</span>
+                    </div>
+                </div>
+                <div className="bg-white p-5 shadow-md rounded-lg">
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Division</span>
+                    </div>
+                </div>
+                <div className="bg-white p-5 shadow-md rounded-lg">
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Addres & Location</span>
+                    </div>
+                </div>
+                <div className="bg-white p-5 shadow-md rounded-lg">
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Job Desc</span>
+                    </div>
+                </div>
+            </div>
+            {/* End Button */}
         </>
 
         // </AuthenticatedLayout>

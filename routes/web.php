@@ -8,6 +8,8 @@ use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RelationGroupController;
 use App\Http\Controllers\TPersonController;
+use App\Http\Controllers\TRelationStructureController;
+use App\Models\TRelationStructure;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -66,6 +68,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
     Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
 
+    // Structure
+    Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');
+    
 
 });
 

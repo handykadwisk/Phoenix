@@ -45,7 +45,10 @@ export default function Relation({ auth }: PageProps) {
         mapping_parent: [],
     });
 
-    const [getDetailRelation, setGetDetailRelation] = useState<any>("");
+    const [getDetailRelation, setGetDetailRelation] = useState<any>({
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
+    });
 
     const [relations, setRelations] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
@@ -214,7 +217,10 @@ export default function Relation({ auth }: PageProps) {
         }).then((result: any) => {
             // console.log(result);
             if (result.value) {
-                setGetDetailRelation(message);
+                setGetDetailRelation({
+                    RELATION_ORGANIZATION_NAME: message[1],
+                    RELATION_ORGANIZATION_ID: message[0],
+                });
                 setModal({
                     add: false,
                     delete: false,
@@ -227,46 +233,6 @@ export default function Relation({ auth }: PageProps) {
         });
         // }
         setIsSuccess(message);
-    };
-
-    // edit
-    const handleEditModel = async (e: FormEvent, id: number) => {
-        e.preventDefault();
-
-        await axios
-            .get(`/getRelation/${id}`)
-            .then((res) => {
-                setDataById(res.data);
-                setMRelation(res.data.m_relation_type);
-                getSalutationById(
-                    res.data.relation_status_id,
-                    "relation_status_id"
-                );
-                getMappingParent(
-                    res.data.RELATION_ORGANIZATION_GROUP,
-                    "RELATION_ORGANIZATION_GROUP"
-                );
-                if (res.data.HR_MANAGED_BY_APP == "1") {
-                    setSwitchPage(true);
-                } else {
-                    setSwitchPage(false);
-                }
-                if (res.data.MARK_TBK_RELATION == "1") {
-                    setSwitchPageTBK(true);
-                } else {
-                    setSwitchPageTBK(false);
-                }
-            })
-            .catch((err) => console.log(err));
-
-        setModal({
-            add: false,
-            delete: false,
-            edit: !modal.edit,
-            view: false,
-            document: false,
-            search: false,
-        });
     };
 
     const handleCheckboxEdit = (e: any) => {
@@ -290,15 +256,6 @@ export default function Relation({ auth }: PageProps) {
                 (data: any) => data.RELATION_TYPE_ID !== parseInt(value)
             );
             setDataById({ ...dataById, m_relation_type: updatedData });
-        }
-    };
-
-    const checkChecked = (id: number) => {
-        // return true;
-        if (id === 1) {
-            return true;
-        } else {
-            return false;
         }
     };
 
@@ -340,26 +297,6 @@ export default function Relation({ auth }: PageProps) {
                 (d: any) => d.id !== value
             );
             setData("relation_type_id", updatedData);
-        }
-    };
-
-    const handleCheckboxHR = (e: any) => {
-        if (e == true) {
-            setSwitchPage(true);
-            setData("is_managed", "1");
-        } else {
-            setSwitchPage(false);
-            setData("is_managed", "0");
-        }
-    };
-
-    const handleCheckboxTBK = (e: any) => {
-        if (e == true) {
-            setSwitchPageTBK(true);
-            setData("mark_tbk_relation", "1");
-        } else {
-            setSwitchPageTBK(false);
-            setData("mark_tbk_relation", "0");
         }
     };
 
@@ -523,7 +460,6 @@ export default function Relation({ auth }: PageProps) {
                 title={"Edit Relation"}
                 url={`/editRelation/${dataById.RELATION_ORGANIZATION_ID}`}
                 data={dataById}
-                addOns={mRelation}
                 onSuccess={handleSuccess}
                 method={"patch"}
                 headers={null}
@@ -1226,21 +1162,22 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     })
                 }
-                title={"Detail Relation"}
+                title={getDetailRelation.RELATION_ORGANIZATION_NAME}
                 url={""}
                 data={""}
-                addOns={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[55%]"
                 }
                 submitButtonName={""}
                 body={
                     <>
                         <DetailRelationPopup
-                            detailRelation={getDetailRelation}
+                            detailRelation={
+                                getDetailRelation.RELATION_ORGANIZATION_ID
+                            }
                             relationStatus={relationStatus}
                             relationGroup={relationGroup}
                             relationType={relationType}
@@ -1314,30 +1251,28 @@ export default function Relation({ auth }: PageProps) {
             {/* end modal search */}
             {/* Modal End search */}
 
-            <div className="grid grid-rows-3 grid-flow-col gap-4 mt-4">
-                <div className="bg-white shadow-md rounded-md p-4 max-h-20">
-                    <div className="text-center w-auto">
+            {/* Page */}
+            <div className="grid grid-cols-6 gap-4 p-4">
+                <div className="flex flex-col">
+                    <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
-                            className="p-3"
-                            // onClick={() => {
-                            //     // setSwitchPage(false);
-                            //     setModal({
-                            //         add: false,
-                            //         delete: false,
-                            //         edit: false,
-                            //         view: !modal.view,
-                            //         document: false,
-                            //         search: false,
-                            //     });
-                            // }}
-                            // onClick={(e) => handleAddModel(e)}
+                            className="p-2"
+                            onClick={() => {
+                                setSwitchPage(false);
+                                setModal({
+                                    add: true,
+                                    delete: false,
+                                    edit: false,
+                                    view: false,
+                                    document: false,
+                                    search: false,
+                                });
+                            }}
                         >
                             {"Add Relation"}
                         </Button>
                     </div>
-                </div>
-                <div className="row-span-2 bg-white shadow-md rounded-md pl-4 pr-4 pt-4">
-                    <div className="">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
                         <TextInput
                             id="RELATION_ORGANIZATION_NAME"
                             type="text"
@@ -1357,35 +1292,46 @@ export default function Relation({ auth }: PageProps) {
                                         ""
                                     ) {
                                         getRelation();
+                                        setSearchRelation({
+                                            ...searchRelation,
+                                            RELATION_ORGANIZATION_NAME: "",
+                                        });
                                     }
                                 }
                             }}
                             placeholder="Search Relation Name"
                         />
-                    </div>
-                    <div className="mt-4 flex justify-end">
-                        <div
-                            className="bg-red-600 text-white p-2 w-52 rounded-md text-center hover:bg-red-500 cursor-pointer"
-                            onClick={() => clearSearchRelation()}
-                        >
-                            Clear Search
+                        <div className="mt-4 flex justify-end gap-2">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
+                                onClick={() => clearSearchRelation()}
+                            >
+                                Search
+                            </div>
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => clearSearchRelation()}
+                            >
+                                Clear Search
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="relative row-span-3 col-span-9 bg-white shadow-md rounded-md p-4">
-                    {/* Table Relation */}
+                <div className="col-span-5 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
                                         className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg"
+                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg rounded-bl-lg"
                                         }
                                         label={"No"}
                                     />
                                     <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
+                                        className={
+                                            "min-w-[50px] bg-gray-200 rounded-tr-lg rounded-br-lg"
+                                        }
                                         label={"Name Relation"}
                                     />
                                 </tr>
@@ -1396,6 +1342,12 @@ export default function Relation({ auth }: PageProps) {
                                         return (
                                             <tr
                                                 onDoubleClick={() => {
+                                                    setGetDetailRelation({
+                                                        RELATION_ORGANIZATION_NAME:
+                                                            dataRelation.RELATION_ORGANIZATION_NAME,
+                                                        RELATION_ORGANIZATION_ID:
+                                                            dataRelation.RELATION_ORGANIZATION_ID,
+                                                    });
                                                     setModal({
                                                         add: false,
                                                         delete: false,
@@ -1404,9 +1356,6 @@ export default function Relation({ auth }: PageProps) {
                                                         document: false,
                                                         search: false,
                                                     });
-                                                    setGetDetailRelation(
-                                                        dataRelation.RELATION_ORGANIZATION_ID
-                                                    );
                                                 }}
                                                 key={i}
                                                 className={
@@ -1447,175 +1396,6 @@ export default function Relation({ auth }: PageProps) {
                     />
                 </div>
             </div>
-
-            {/* <div>
-                <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
-                    <div className="p-6 text-gray-900 mb-60">
-                        <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-                            header table
-                            <div className="md:grid md:grid-cols-8 md:gap-4">
-                                <Button
-                                    className="text-sm w-full lg:w-1/2 font-semibold px-6 py-1.5 mb-4 md:col-span-2"
-                                    onClick={() => {
-                                        setSwitchPage(false);
-                                        setModal({
-                                            add: true,
-                                            delete: false,
-                                            edit: false,
-                                            view: false,
-                                            document: false,
-                                            search: false,
-                                        });
-                                    }}
-                                >
-                                    {"Add Relation"}
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 xs:gap-0 lg:grid-cols-3 lg:gap-4">
-                            <div className="bg-white rounded-md p-10 mb-5 lg:mb-0">
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
-                                        <button
-                                            className=" w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4 hover:ring-red-500"
-                                            onClick={() => {
-                                                setModal({
-                                                    add: false,
-                                                    delete: false,
-                                                    edit: false,
-                                                    view: false,
-                                                    document: false,
-                                                    search: !modal.search,
-                                                });
-                                            }}
-                                        >
-                                            <MagnifyingGlassIcon
-                                                className="mx-2 h-5 w-5 text-gray-400"
-                                                aria-hidden="true"
-                                            />
-                                            Search Relation
-                                        </button>
-                                    </div>
-                                    <div className="flex justify-center items-center xs:col-span-3 lg:col-auto">
-                                        <Button
-                                            className="mb-4 w-full py-1.5 px-2"
-                                            onClick={() =>
-                                                clearSearchRelation()
-                                            }
-                                        >
-                                            Clear Search
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-md col-span-2 p-10">
-                                {relations.length === 0 ? (
-                                    <div className="text-center text-lg">
-                                        <span>No Data Available</span>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                                            <table className="w-full table-auto divide-y divide-gray-300">
-                                                <thead className="bg-gray-100">
-                                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                                        <TableTH
-                                                            className={
-                                                                "max-w-[0px] text-center"
-                                                            }
-                                                            label={"No"}
-                                                        />
-                                                        <TableTH
-                                                            className={
-                                                                "min-w-[50px]"
-                                                            }
-                                                            label={
-                                                                "Name Relation"
-                                                            }
-                                                        />
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {relations.data?.map(
-                                                        (
-                                                            dataRelation: any,
-                                                            i: number
-                                                        ) => {
-                                                            return (
-                                                                <tr
-                                                                    onDoubleClick={() => {
-                                                                        setModal(
-                                                                            {
-                                                                                add: false,
-                                                                                delete: false,
-                                                                                edit: false,
-                                                                                view: true,
-                                                                                document:
-                                                                                    false,
-                                                                                search: false,
-                                                                            }
-                                                                        );
-                                                                        setGetDetailRelation(
-                                                                            dataRelation.RELATION_ORGANIZATION_ID
-                                                                        );
-                                                                    }}
-                                                                    key={i}
-                                                                    className={
-                                                                        i %
-                                                                            2 ===
-                                                                        0
-                                                                            ? "cursor-pointer"
-                                                                            : "bg-gray-100 cursor-pointer"
-                                                                    }
-                                                                >
-                                                                    <TableTD
-                                                                        value={
-                                                                            relations.from +
-                                                                            i
-                                                                        }
-                                                                        className={
-                                                                            "text-center"
-                                                                        }
-                                                                    />
-                                                                    <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                {
-                                                                                    dataRelation.RELATION_ORGANIZATION_NAME
-                                                                                }
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    />
-                                                                </tr>
-                                                            );
-                                                        }
-                                                    )}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <Pagination
-                                            links={relations.links}
-                                            fromData={relations.from}
-                                            toData={relations.to}
-                                            totalData={relations.total}
-                                            clickHref={(url: string) =>
-                                                getRelation(
-                                                    url.split("?").pop()
-                                                )
-                                            }
-                                        />
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        table page
-                    </div>
-                </div>
-            </div> */}
         </AuthenticatedLayout>
     );
 }

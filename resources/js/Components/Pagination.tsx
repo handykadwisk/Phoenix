@@ -15,7 +15,7 @@ export default function Pagination({
     clickHref: CallableFunction;
 }>) {
     return (
-        <div className="sm:flex sm:flex-1 sm:items-center sm:justify-between mt-2 mb-96">
+        <div className="sm:flex sm:flex-1 sm:items-center sm:justify-between mt-2">
             <div>
                 <p className="text-sm text-gray-700 mb-2 md:mb-0">
                     Showing <span className="font-medium">{fromData}</span> to{" "}

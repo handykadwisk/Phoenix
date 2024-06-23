@@ -14,6 +14,8 @@ class MRelationType extends Model
 
     public $timestamps = false;
 
+    protected $with = ['relationType'];
+
     public $fillable = [
         'RELATION_ORGANIZATION_ID',
         'RELATION_TYPE_ID'
@@ -22,5 +24,9 @@ class MRelationType extends Model
     public function relation()
     {
         return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function relationType(){
+        return $this->hasOne(RelationType::class, 'RELATION_TYPE_ID', 'RELATION_TYPE_ID');
     }
 }
