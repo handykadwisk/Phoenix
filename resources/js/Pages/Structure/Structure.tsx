@@ -101,7 +101,7 @@ export default function Structure({
                             {"Add Structure"}
                         </Button>
                     </div>
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[458px]">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[313px]">
                         <TextInput
                             id="RELATION_STRUCTURE_ALIAS"
                             type="text"
@@ -146,7 +146,7 @@ export default function Structure({
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[80rem]">
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem]">
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
@@ -161,7 +161,7 @@ export default function Structure({
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }
-                                        label={"Name Relation"}
+                                        label={"Name Structure"}
                                     />
                                 </tr>
                             </thead>
@@ -215,7 +215,7 @@ export default function Structure({
                                 )}
                             </tbody>
                         </table>
-                        <div className="absolute bottom-0 w-[53.3rem] mb-2">
+                        <div className="absolute bottom-0 w-[46.3rem] mb-2">
                             <Pagination
                                 links={dataStructure.links}
                                 fromData={dataStructure.from}

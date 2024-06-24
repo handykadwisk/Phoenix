@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class TRelationStructureController extends Controller
 {
-    public function getStructureData($dataPerPage = 10, $searchQuery = null)
+    public function getStructureData($dataPerPage = 5, $searchQuery = null)
     {
 
         // dd($searchQuery->RELATION_ORGANIZATION_NAME);
@@ -25,7 +25,7 @@ class TRelationStructureController extends Controller
 
     public function getStructureJson(Request $request)
     {
-        $data = $this->getStructureData(10, $request);
+        $data = $this->getStructureData(5, $request);
         // print_r($data);
         // die;
         return response()->json($data);

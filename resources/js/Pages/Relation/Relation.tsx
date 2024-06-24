@@ -1169,7 +1169,7 @@ export default function Relation({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[55%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
                 }
                 submitButtonName={""}
                 body={
@@ -1252,7 +1252,7 @@ export default function Relation({ auth }: PageProps) {
             {/* Modal End search */}
 
             {/* Page */}
-            <div className="grid grid-cols-6 gap-4 p-4">
+            <div className="grid grid-cols-4 gap-4 p-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
@@ -1317,7 +1317,7 @@ export default function Relation({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-5 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
@@ -1384,16 +1384,18 @@ export default function Relation({ auth }: PageProps) {
                                 )}
                             </tbody>
                         </table>
+                        <div className="absolute bottom-[4rem] w-[57.3rem] mb-2">
+                            <Pagination
+                                links={relations.links}
+                                fromData={relations.from}
+                                toData={relations.to}
+                                totalData={relations.total}
+                                clickHref={(url: string) =>
+                                    getRelation(url.split("?").pop())
+                                }
+                            />
+                        </div>
                     </div>
-                    <Pagination
-                        links={relations.links}
-                        fromData={relations.from}
-                        toData={relations.to}
-                        totalData={relations.total}
-                        clickHref={(url: string) =>
-                            getRelation(url.split("?").pop())
-                        }
-                    />
                 </div>
             </div>
         </AuthenticatedLayout>

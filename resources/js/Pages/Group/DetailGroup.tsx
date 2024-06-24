@@ -191,7 +191,7 @@ export default function DetailGroup({
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[55%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
                 }
                 submitButtonName={""}
                 body={
@@ -252,7 +252,7 @@ export default function DetailGroup({
                                                     {item.children.length !==
                                                     0 ? (
                                                         <span
-                                                            className="absolute left-4 top-4 -ml-px h-24 w-0.5 bg-gray-300"
+                                                            className="absolute left-4 top-4 -ml-px h-44 w-0.5 bg-gray-300"
                                                             aria-hidden="true"
                                                         />
                                                     ) : null}
@@ -302,7 +302,7 @@ export default function DetailGroup({
                                                                                     .length -
                                                                                     1 ? (
                                                                                     <span
-                                                                                        className="absolute left-4 top-4 -ml-px h-10 w-0.5 bg-gray-300"
+                                                                                        className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-gray-300"
                                                                                         aria-hidden="true"
                                                                                     />
                                                                                 ) : null}

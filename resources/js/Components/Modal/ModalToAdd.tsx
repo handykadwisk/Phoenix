@@ -109,7 +109,7 @@ export default function ModalToAdd({
                                                 <Alert body={isError} />
                                             )}
                                             <div
-                                                className="max-h-[45rem] overflow-y-auto custom-scrollbar px-2.5"
+                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2.5"
                                                 ref={modalRef}
                                             >
                                                 {body}

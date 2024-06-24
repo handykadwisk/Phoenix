@@ -236,7 +236,7 @@ export default function Group({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[55%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
                 }
                 submitButtonName={""}
                 body={
@@ -256,7 +256,7 @@ export default function Group({ auth }: PageProps) {
 
             {/* End Modal Detail Group */}
 
-            <div className="grid grid-cols-6 gap-4 p-4">
+            <div className="grid grid-cols-4 gap-4 p-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
@@ -315,7 +315,7 @@ export default function Group({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-5 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
@@ -384,16 +384,18 @@ export default function Group({ auth }: PageProps) {
                                 )}
                             </tbody>
                         </table>
+                        <div className="absolute bottom-[4rem] w-[57.3rem] mb-2">
+                            <Pagination
+                                links={relationsGroup.links}
+                                fromData={relationsGroup.from}
+                                toData={relationsGroup.to}
+                                totalData={relationsGroup.total}
+                                clickHref={(url: string) =>
+                                    getRelationGroup(url.split("?").pop())
+                                }
+                            />
+                        </div>
                     </div>
-                    <Pagination
-                        links={relationsGroup.links}
-                        fromData={relationsGroup.from}
-                        toData={relationsGroup.to}
-                        totalData={relationsGroup.total}
-                        clickHref={(url: string) =>
-                            getRelationGroup(url.split("?").pop())
-                        }
-                    />
                 </div>
             </div>
         </AuthenticatedLayout>
