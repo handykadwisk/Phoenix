@@ -134,7 +134,7 @@ export default function DetailPerson({
 
     const getStructure = async (id: string) => {
         await axios
-            .post(`/getStructure`, { id })
+            .post(`/getStructurePerson`, { id })
             .then((res) => {
                 setStructure(res.data);
             })
@@ -145,7 +145,7 @@ export default function DetailPerson({
 
     const getDivision = async (id: string) => {
         await axios
-            .post(`/getDivision`, { id })
+            .post(`/getDivisionPerson`, { id })
             .then((res) => {
                 setDivision(res.data);
             })
@@ -156,7 +156,7 @@ export default function DetailPerson({
 
     const getOffice = async (id: string) => {
         await axios
-            .post(`/getOffice`, { id })
+            .post(`/getOfficePerson`, { id })
             .then((res) => {
                 setOffice(res.data);
             })
@@ -416,7 +416,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({

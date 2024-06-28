@@ -18,4 +18,13 @@ class TRelationDivision extends Model
     ];
 
     public $timestamps = false;
+
+    public function toRelation(){
+        return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID' , 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(TRelationDivision::class, 'RELATION_DIVISION_PARENT_ID');
+    }
 }

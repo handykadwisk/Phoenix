@@ -309,9 +309,10 @@ class TPersonController extends Controller
     }
 
     public function uploadFile(Request $request){
-        // dd($request->id);
+        // dd($request);
         // document
         $imgProfile = $request->file('files');
+        // print_r($imgProfile);die;
         if ($imgProfile) {
                 $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
     

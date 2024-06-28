@@ -26,6 +26,8 @@ import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
 import PersonPopup from "../Person/Person";
 import StructurePopup from "../Structure/Structure";
+import Division from "../Division/Division";
+import AddressPopup from "../Address/Address";
 
 export default function DetailRelation({
     detailRelation,
@@ -71,6 +73,20 @@ export default function DetailRelation({
         view: false,
         document: false,
         search: false,
+    });
+
+    // Structure Modal
+    const [divisionModal, setDivisionModal] = useState({
+        add: false,
+        edit: false,
+        view: false,
+    });
+
+    // location modal
+    const [locationModal, setLocationModal] = useState({
+        add: false,
+        edit: false,
+        view: false,
     });
 
     useEffect(() => {
@@ -333,6 +349,36 @@ export default function DetailRelation({
     };
     // end Structure
 
+    // OnClick Division
+    const handleClickDivision = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setDivisionModal({
+            add: false,
+            edit: false,
+            view: !divisionModal.view,
+        });
+    };
+    // End Division Click
+
+    // OnClick Address Location
+    const handleClickAddressLocation = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setLocationModal({
+            add: false,
+            edit: false,
+            view: !locationModal.view,
+        });
+    };
+    // End Address Location Click
+
     // Onclick Person
     const handleClickPerson = async (
         e: FormEvent,
@@ -350,6 +396,7 @@ export default function DetailRelation({
         });
     };
     // end Onclick Person
+    console.log(dataById.m_relation_type);
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -380,7 +427,7 @@ export default function DetailRelation({
                 submitButtonName={"Submit"}
                 body={
                     <>
-                        <div className="grid gap-4 grid-cols-2">
+                        <div className="lg:grid lg:gap-4 lg:grid-cols-2 xs:grid xs:gap-4 xs:grid-cols-1">
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="relation_status_id"
@@ -422,7 +469,7 @@ export default function DetailRelation({
                                     )}
                                 </select>
                             </div>
-                            <div className="mt-4">
+                            <div className="lg:mt-4 xs:mt-0">
                                 <InputLabel
                                     htmlFor="salutation_id"
                                     value="Salutation"
@@ -457,7 +504,7 @@ export default function DetailRelation({
                                 </select>
                             </div>
                         </div>
-                        <div className={"grid gap-4 grid-cols-2"}>
+                        <div className="lg:grid lg:gap-4 lg:grid-cols-2 xs:grid xs:gap-0 xs:grid-cols-1">
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="RELATION_ORGANIZATION_NAME"
@@ -506,7 +553,7 @@ export default function DetailRelation({
                                 />
                             </div>
                         </div>
-                        <div className="grid gap-4 grid-cols-2 mt-4">
+                        <div className="xs:grid xs:gap-0 xs:grid-cols-1 mt-4 lg:grid lg:gap-4 lg:grid-cols-2">
                             <div className="mt-4">
                                 {dataById.m_relation_aka?.length ? (
                                     <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
@@ -735,7 +782,7 @@ export default function DetailRelation({
                                 )}
                             </select>
                         </div>
-                        <div className="grid gap-4 grid-cols-2">
+                        <div className="xs:grid xs:gap-4 xs:grid-cols-1 lg:grid lg:gap-4 lg:grid-cols-2">
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="RELATION_ORGANIZATION_EMAIL"
@@ -758,7 +805,7 @@ export default function DetailRelation({
                                     placeholder="example@gmail.com"
                                 />
                             </div>
-                            <div className="mt-4">
+                            <div className="xs:-mt-5 lg:mt-4">
                                 {/* <InputLabel
                                     htmlFor="is_managed"
                                     value="HR MANAGED BY APP"
@@ -1080,11 +1127,85 @@ export default function DetailRelation({
                 submitButtonName={""}
                 body={
                     <>
-                        <StructurePopup auth={""} idRelation={detailRelation} />
+                        <StructurePopup
+                            auth={""}
+                            idRelation={detailRelation}
+                            nameRelation={
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            }
+                        />
                     </>
                 }
             />
             {/* end Modal for structure */}
+
+            {/* Modal Division */}
+            <ModalToAction
+                show={divisionModal.view}
+                onClose={() =>
+                    setDivisionModal({
+                        add: false,
+                        edit: false,
+                        view: false,
+                    })
+                }
+                title={"Division"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <Division
+                            auth={""}
+                            idRelation={detailRelation}
+                            nameRelation={
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            }
+                        />
+                    </>
+                }
+            />
+            {/* end Modal Division */}
+
+            {/* Modal Address Location */}
+            <ModalToAction
+                show={locationModal.view}
+                onClose={() =>
+                    setLocationModal({
+                        add: false,
+                        edit: false,
+                        view: false,
+                    })
+                }
+                title={"Address & Location"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <AddressPopup
+                            auth={""}
+                            idRelation={detailRelation}
+                            nameRelation={
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            }
+                        />
+                    </>
+                }
+            />
+            {/* end Modal Address Location */}
 
             {/* modal for person */}
             <ModalToAction
@@ -1122,7 +1243,7 @@ export default function DetailRelation({
             <div className="bg-white p-4 rounded-md shadow-md">
                 {/* Official Information */}
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-fit ">
+                    <div className="text-md font-semibold w-fit">
                         <span className="border-b-2 border-red-600">
                             Official Information
                         </span>
@@ -1142,7 +1263,7 @@ export default function DetailRelation({
                         </div>
                     </a>
                 </div>
-                <div className="grid grid-cols-4 gap-4 mt-4">
+                <div className="xs:grid xs:grid-cols-1 xs:gap-2 mt-4 lg:grid lg:grid-cols-4 xs:gap-4">
                     <div>
                         <div className="font-semibold">
                             <span>Group</span>
@@ -1168,7 +1289,7 @@ export default function DetailRelation({
                             </>
                         )}
                     </div>
-                    <div>
+                    <div className="xs:col-span-2 lg:col-span-1">
                         <div className="font-semibold">
                             <span>Email</span>
                         </div>
@@ -1242,7 +1363,7 @@ export default function DetailRelation({
             {/* End Top */}
 
             {/* Button */}
-            <div className="grid grid-cols-4 gap-4 mt-4">
+            <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
                 <div
                     className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
                     onClick={(e) =>
@@ -1256,19 +1377,48 @@ export default function DetailRelation({
                         <span>Structure</span>
                     </div>
                 </div>
-                <div className="bg-white p-5 shadow-md rounded-lg">
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                    onClick={(e) =>
+                        handleClickDivision(
+                            e,
+                            dataRelationNew.RELATION_ORGANIZATION_NAME
+                        )
+                    }
+                >
                     <div className="flex justify-center items-center text-sm font-medium">
                         <span>Division</span>
                     </div>
                 </div>
-                <div className="bg-white p-5 shadow-md rounded-lg">
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                    onClick={(e) =>
+                        handleClickAddressLocation(
+                            e,
+                            dataRelationNew.RELATION_ORGANIZATION_NAME
+                        )
+                    }
+                >
                     <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Addres & Location</span>
+                        <span>Address & Location</span>
                     </div>
                 </div>
                 <div className="bg-white p-5 shadow-md rounded-lg">
                     <div className="flex justify-center items-center text-sm font-medium">
                         <span>Job Desc</span>
+                    </div>
+                </div>
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                    onClick={(e) =>
+                        handleClickPerson(
+                            e,
+                            dataRelationNew.RELATION_ORGANIZATION_NAME
+                        )
+                    }
+                >
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Person/User</span>
                     </div>
                 </div>
             </div>

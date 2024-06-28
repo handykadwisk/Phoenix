@@ -24,6 +24,7 @@ return new class extends Migration
             $table->timestamp('RELATION_OFFICE_UPDATE_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable()->nullable();
             $table->string('RELATION_OFFICE_MAPPING')->nullable();
             $table->string('RELATION_OFFICE_ADDRESS', 225)->nullable();
+            $table->string('RELATION_OFFICE_PHONENUMBER')->nullable();
             $table->string('RELATION_OFFICE_PROVINCE', 225)->nullable();
             $table->string('RELATION_OFFICE_REGENCY', 225)->nullable();
         });

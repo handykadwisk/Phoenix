@@ -330,7 +330,7 @@ export default function Group({ auth }: PageProps) {
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg rounded-br-lg"
                                         }
-                                        label={"Name Relation"}
+                                        label={"Name Group"}
                                     />
                                 </tr>
                             </thead>

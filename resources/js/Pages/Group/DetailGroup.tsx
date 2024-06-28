@@ -226,12 +226,12 @@ export default function DetailGroup({
                             className="cursor-pointer"
                             title="Edit Relation"
                         >
-                            <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white hover:bg-red-500">
+                            <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white hover:bg-red-500 text-sm">
                                 Add Relation To Group
                             </div>
                         </a>
                     </div>
-                    <div className="pl-8 pr-8 pb-6">
+                    <div className="px-4 pb-6">
                         {/* <Card data={relationGroup} /> */}
                         {dataRelationGroupNew.r_group?.length === 0 ? (
                             <>
@@ -239,7 +239,7 @@ export default function DetailGroup({
                             </>
                         ) : (
                             <>
-                                <ul role="list" className="mb-4">
+                                <ul className="flex flex-col space-y-2 text-lg">
                                     {dataRelationGroupNew.r_group
                                         ?.filter(
                                             (m: any) =>
@@ -247,102 +247,77 @@ export default function DetailGroup({
                                                 0
                                         )
                                         .map((item: any, i: number) => (
-                                            <li key={i}>
-                                                <div className="relative">
-                                                    {item.children.length !==
-                                                    0 ? (
+                                            <li className="" key={i}>
+                                                <div className="relative flex justify-between font-semibold hover:text-red-600">
+                                                    <div className="flex items-center justify-center pr-2">
                                                         <span
-                                                            className="absolute left-4 top-4 -ml-px h-44 w-0.5 bg-gray-300"
-                                                            aria-hidden="true"
-                                                        />
-                                                    ) : null}
-                                                    <div className="relative flex space-x-3">
-                                                        <div>
-                                                            <span
-                                                                className={
-                                                                    "bg-red-500 h-8 w-8 rounded-full flex items-center justify-center"
-                                                                }
-                                                            ></span>
-                                                        </div>
-                                                        <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                                            <div>
-                                                                <p className="text-sm text-gray-500">
-                                                                    <a
-                                                                        onClick={(
-                                                                            e
-                                                                        ) =>
-                                                                            handleDetailPopup(
-                                                                                e,
-                                                                                item.RELATION_ORGANIZATION_ID,
-                                                                                item.RELATION_ORGANIZATION_NAME
-                                                                            )
-                                                                        }
-                                                                        className="font-medium text-gray-900 hover:text-red-500 cursor-pointer"
-                                                                    >
-                                                                        {
-                                                                            item.RELATION_ORGANIZATION_NAME
-                                                                        }
-                                                                    </a>
-                                                                </p>
-                                                                <br />
-                                                                {item.children?.map(
-                                                                    (
-                                                                        dataChildren: any,
-                                                                        a: number
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                a
-                                                                            }
-                                                                        >
-                                                                            <div className="relative pb-8">
-                                                                                {a !==
-                                                                                item
-                                                                                    .children
-                                                                                    .length -
-                                                                                    1 ? (
-                                                                                    <span
-                                                                                        className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-gray-300"
-                                                                                        aria-hidden="true"
-                                                                                    />
-                                                                                ) : null}
-                                                                                <div className="relative flex space-x-3">
-                                                                                    <div>
-                                                                                        <span
-                                                                                            className={
-                                                                                                "bg-red-500 h-8 w-8 rounded-full flex items-center justify-center "
-                                                                                            }
-                                                                                        ></span>
-                                                                                    </div>
-                                                                                    <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1">
-                                                                                        <div>
-                                                                                            <a
-                                                                                                onClick={(
-                                                                                                    e
-                                                                                                ) =>
-                                                                                                    handleDetailPopup(
-                                                                                                        e,
-                                                                                                        dataChildren.RELATION_ORGANIZATION_ID,
-                                                                                                        dataChildren.RELATION_ORGANIZATION_NAME
-                                                                                                    )
-                                                                                                }
-                                                                                                className="text-sm text-gray-500 hover:text-red-500 cursor-pointer"
-                                                                                            >
-                                                                                                {
-                                                                                                    dataChildren.RELATION_ORGANIZATION_NAME
-                                                                                                }
-                                                                                            </a>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </li>
-                                                                    )
-                                                                )}
-                                                            </div>
-                                                        </div>
+                                                            className={
+                                                                "bg-red-500 h-3 w-3 rounded-full"
+                                                            }
+                                                        ></span>
+                                                    </div>
+                                                    <div className="flex items-center w-full">
+                                                        <a
+                                                            href="#"
+                                                            className="inline-block w-full py-1 pr-4 text-sm"
+                                                            onClick={(e) =>
+                                                                handleDetailPopup(
+                                                                    e,
+                                                                    item.RELATION_ORGANIZATION_ID,
+                                                                    item.RELATION_ORGANIZATION_NAME
+                                                                )
+                                                            }
+                                                        >
+                                                            {
+                                                                item.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </a>
                                                     </div>
                                                 </div>
+                                                {item.children?.map(
+                                                    (
+                                                        dataChildren: any,
+                                                        a: number
+                                                    ) => (
+                                                        <div
+                                                            className="pt-0 pl-[0.32rem]"
+                                                            key={a}
+                                                        >
+                                                            <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                                                                <li>
+                                                                    <div className="relative flex justify-between hover:text-red-600">
+                                                                        <div className="flex items-center justify-center pr-2">
+                                                                            <span
+                                                                                className={
+                                                                                    "bg-red-500 h-3 w-3 rounded-full"
+                                                                                }
+                                                                            ></span>
+                                                                        </div>
+                                                                        <div className="flex items-center w-full">
+                                                                            <a
+                                                                                href="#"
+                                                                                className="inline-block w-full py-1 pr-4 text-sm"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    handleDetailPopup(
+                                                                                        e,
+                                                                                        dataChildren.RELATION_ORGANIZATION_ID,
+                                                                                        dataChildren.RELATION_ORGANIZATION_NAME
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    dataChildren.RELATION_ORGANIZATION_NAME
+                                                                                }
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    )
+                                                )}
                                             </li>
                                         ))}
                                 </ul>

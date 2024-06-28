@@ -1252,7 +1252,7 @@ export default function Relation({ auth }: PageProps) {
             {/* Modal End search */}
 
             {/* Page */}
-            <div className="grid grid-cols-4 gap-4 p-4">
+            <div className="grid grid-cols-4 gap-4 p-4 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
@@ -1317,8 +1317,8 @@ export default function Relation({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
+                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
@@ -1384,17 +1384,17 @@ export default function Relation({ auth }: PageProps) {
                                 )}
                             </tbody>
                         </table>
-                        <div className="absolute bottom-[4rem] w-[57.3rem] mb-2">
-                            <Pagination
-                                links={relations.links}
-                                fromData={relations.from}
-                                toData={relations.to}
-                                totalData={relations.total}
-                                clickHref={(url: string) =>
-                                    getRelation(url.split("?").pop())
-                                }
-                            />
-                        </div>
+                    </div>
+                    <div className="absolute bottom-0 w-[57rem] mb-4">
+                        <Pagination
+                            links={relations.links}
+                            fromData={relations.from}
+                            toData={relations.to}
+                            totalData={relations.total}
+                            clickHref={(url: string) =>
+                                getRelation(url.split("?").pop())
+                            }
+                        />
                     </div>
                 </div>
             </div>

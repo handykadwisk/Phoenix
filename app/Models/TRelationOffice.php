@@ -18,4 +18,16 @@ class TRelationOffice extends Model
     ];
 
     public $timestamps = false;
+
+    public function toRelation(){
+        return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID' , 'RELATION_ORGANIZATION_ID');
+    }
+    public function parent()
+    {
+        return $this->belongsTo(TRelationOffice::class, 'RELATION_OFFICE_PARENT_ID');
+    }
+
+    public function mLocationType(){
+        return $this->hasMany(MRelationOfficeLocationType::class, 'RELATION_OFFICE_ID');
+    } 
 }

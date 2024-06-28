@@ -8,7 +8,10 @@ use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RelationGroupController;
 use App\Http\Controllers\TPersonController;
+use App\Http\Controllers\TRelationDivisionController;
+use App\Http\Controllers\TRelationOfficeController;
 use App\Http\Controllers\TRelationStructureController;
+use App\Models\TRelationDivision;
 use App\Models\TRelationStructure;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -60,9 +63,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/getPersonDetail', [TPersonController::class, 'get_detail'])->name('getPersonDetail.get_detail');
     Route::post('/personEmployment', [TPersonController::class, 'addPersonEmployment'])->name('personEmployment.addPersonEmployment');
     Route::get('/getTaxStatus', [TPersonController::class, 'getTStatus'])->name('getTaxStatus.getTStatus');
-    Route::post('/getStructure', [TPersonController::class, 'getStructure'])->name('getStructure.getStructure');
-    Route::post('/getDivision', [TPersonController::class, 'getDivision'])->name('getDivision.getDivision');
-    Route::post('/getOffice', [TPersonController::class, 'getOffice'])->name('getOffice.getOffice');
+    Route::post('/getStructurePerson', [TPersonController::class, 'getStructure'])->name('getStructurePerson.getStructure');
+    Route::post('/getDivisionPerson', [TPersonController::class, 'getDivision'])->name('getDivisionPerson.getDivision');
+    Route::post('/getOfficePerson', [TPersonController::class, 'getOffice'])->name('getOfficePerson.getOffice');
     Route::post('/getRBank', [TPersonController::class, 'getRBank'])->name('getRBank.getRBank');
     Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
@@ -70,8 +73,29 @@ Route::middleware('auth')->group(function () {
 
     // Structure
     Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');
+    Route::post('/getGrade', [TRelationStructureController::class, 'getGrade'])->name('getGrade.getGrade');
+    Route::post('/getStructureCombo', [TRelationStructureController::class, 'getStructureCombo'])->name('getStructureCombo.getStructureCombo');
+    Route::post('/addStructure', [TRelationStructureController::class, 'store'])->name('addStructure.store');
+    Route::post('/getStructureDetail', [TRelationStructureController::class, 'get_detail'])->name('getStructureDetail.get_detail');
+    Route::post('/editStructure', [TRelationStructureController::class, 'edit'])->name('editStructure.edit');
     
 
+    // Division
+    Route::post('/getDivision', [TRelationDivisionController::class, 'getDivisionJson'])->name('getDivision.getDivisionJson');
+    Route::post('/addDivision', [TRelationDivisionController::class, 'store'])->name('addDivision.store');
+    Route::post('/getDivisionCombo', [TRelationDivisionController::class, 'getDivisionCombo'])->name('getDivisionCombo.getDivisionCombo');
+    Route::post('/getDivisionDetail', [TRelationDivisionController::class, 'get_detail'])->name('getDivisionDetail.get_detail');
+    Route::post('/editDivision', [TRelationDivisionController::class, 'edit'])->name('editDivision.edit');
+
+    // Office
+    Route::post('/getOffice', [TRelationOfficeController::class, 'getOfficeJson'])->name('getOffice.getOfficeJson');
+    Route::post('/getLocationType', [TRelationOfficeController::class, 'getLocationType'])->name('getLocationType.getLocationType');
+    Route::post('/getOfficeCombo', [TRelationOfficeController::class, 'getOfficeCombo'])->name('getOfficeCombo.getOfficeCombo');
+    Route::post('/getWilayah', [TRelationOfficeController::class, 'get_wilayah'])->name('getWilayah.get_wilayah');
+    Route::post('/getRegency', [TRelationOfficeController::class, 'get_regency'])->name('getRegency.get_regency');
+    Route::post('/addAddress', [TRelationOfficeController::class, 'store'])->name('addAddress.store');
+    Route::post('/getOfficeDetail', [TRelationOfficeController::class, 'get_detail'])->name('getOfficeDetail.get_detail');
+    
 });
 
 require __DIR__ . '/auth.php';

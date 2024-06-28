@@ -185,7 +185,7 @@ export default function AddRelation({
                 }
                 body={
                     <>
-                        <div className="grid gap-4 grid-cols-2">
+                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="relation_status_id"
@@ -262,7 +262,7 @@ export default function AddRelation({
                                 </select>
                             </div>
                         </div>
-                        <div className={"grid gap-4 grid-cols-2"}>
+                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="name_relation"
@@ -302,7 +302,7 @@ export default function AddRelation({
                                 />
                             </div>
                         </div>
-                        <div className="grid gap-4 grid-cols-2 mt-4">
+                        <div className="mt-4 xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
                             <div className="mt-4">
                                 {data.relation_aka?.length ? (
                                     <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
@@ -504,7 +504,7 @@ export default function AddRelation({
                                 )}
                             </select>
                         </div>
-                        <div className="grid gap-4 grid-cols-2">
+                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="relation_email"
@@ -526,7 +526,7 @@ export default function AddRelation({
                                     placeholder="example@gmail.com"
                                 />
                             </div>
-                            <div className="mt-4">
+                            <div className="xs:mt-0 lg:mt-4">
                                 {/* <InputLabel
                                     htmlFor="is_managed"
                                     value="HR MANAGED BY APP"
