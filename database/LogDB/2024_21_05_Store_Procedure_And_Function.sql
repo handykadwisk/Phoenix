@@ -723,13 +723,13 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_set_mapping_relation_division`(IN `input_relation_organization_id` INT)
-BEGIN
-IF input_relation_organization_id IS NULL THEN
-UPDATE photrelationdivision SET RELATION_DIVISION_MAPPING=f_get_path_relation_division(input_relation_organization_id, RELATION_DIVISION_ID); 
-ELSE
-UPDATE photrelationdivision SET RELATION_DIVISION_MAPPING=f_get_path_relation_division(input_relation_organization_id, RELATION_DIVISION_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
-END IF;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_division`(IN `input_relation_organization_id` INT)
+BEGIN
+IF input_relation_organization_id IS NULL THEN
+UPDATE t_relation_division SET RELATION_DIVISION_MAPPING=f_get_path_relation_division(input_relation_organization_id, RELATION_DIVISION_ID); 
+ELSE
+UPDATE t_relation_division SET RELATION_DIVISION_MAPPING=f_get_path_relation_division(input_relation_organization_id, RELATION_DIVISION_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
+END IF;
 END */$$
 DELIMITER ;
 
@@ -755,13 +755,13 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_set_mapping_relation_office`(IN `input_relation_organization_id` INT)
-BEGIN
-IF input_relation_organization_id IS NULL THEN
-UPDATE photrelationoffice SET RELATION_OFFICE_MAPPING=f_get_path_relation_office(input_relation_organization_id, RELATION_OFFICE_ID); 
-ELSE
-UPDATE photrelationoffice SET RELATION_OFFICE_MAPPING=f_get_path_relation_office(input_relation_organization_id, RELATION_OFFICE_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
-END IF;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_office`(IN `input_relation_organization_id` INT)
+BEGIN
+IF input_relation_organization_id IS NULL THEN
+UPDATE t_relation_office SET RELATION_OFFICE_MAPPING=f_get_path_relation_office(input_relation_organization_id, RELATION_OFFICE_ID); 
+ELSE
+UPDATE t_relation_office SET RELATION_OFFICE_MAPPING=f_get_path_relation_office(input_relation_organization_id, RELATION_OFFICE_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
+END IF;
 END */$$
 DELIMITER ;
 
@@ -790,9 +790,9 @@ DELIMITER $$
 /*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_structure`(IN `input_relation_organization_id` INT)
 BEGIN
 IF input_relation_organization_id IS NULL THEN
-UPDATE photrelationstructure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID); 
+UPDATE t_relation_structure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID); 
 ELSE
-UPDATE photrelationstructure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
+UPDATE t_relation_structure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_structure(input_relation_organization_id, RELATION_STRUCTURE_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
 END IF;
 END */$$
 DELIMITER ;
