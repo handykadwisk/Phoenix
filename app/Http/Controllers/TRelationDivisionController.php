@@ -41,7 +41,7 @@ class TRelationDivisionController extends Controller
     }
 
     public function store(Request $request){
-        
+        // dd($request->RELATION_ORGANIZATION_NAME);
         // Parent jika kosong = 0
         // dd($request->RELATION_DIVISION_PARENT_ID);
         $idParent = 0;
@@ -50,8 +50,8 @@ class TRelationDivisionController extends Controller
         }
 
         $division = TRelationDivision::create([
-            'RELATION_DIVISION_NAME' => $request->RELATION_DIVISION_NAME,
-            'RELATION_DIVISION_ALIAS' => $request->RELATION_DIVISION_NAME,
+            'RELATION_DIVISION_NAME' => $request->RELATION_ORGANIZATION_NAME." ".$request->RELATION_DIVISION_ALIAS,
+            'RELATION_DIVISION_ALIAS' => $request->RELATION_DIVISION_ALIAS,
             'RELATION_DIVISION_INITIAL' => $request->RELATION_DIVISION_INITIAL,
             'RELATION_DIVISION_DESCRIPTION' => $request->RELATION_DIVISION_DESCRIPTION,
             'RELATION_DIVISION_PARENT_ID' => $idParent,
@@ -100,8 +100,8 @@ class TRelationDivisionController extends Controller
         }
 
         $division = TRelationDivision::where('RELATION_DIVISION_ID', $request->RELATION_DIVISION_ID)->update([
-            'RELATION_DIVISION_NAME' => $request->RELATION_DIVISION_NAME,
-            'RELATION_DIVISION_ALIAS' => $request->RELATION_DIVISION_NAME,
+            'RELATION_DIVISION_NAME' => $request->to_relation['RELATION_ORGANIZATION_ALIAS']." ".$request->RELATION_DIVISION_ALIAS,
+            'RELATION_DIVISION_ALIAS' => $request->RELATION_DIVISION_ALIAS,
             'RELATION_DIVISION_INITIAL' => $request->RELATION_DIVISION_INITIAL,
             'RELATION_DIVISION_DESCRIPTION' => $request->RELATION_DIVISION_DESCRIPTION,
             'RELATION_DIVISION_PARENT_ID' => $parentId,

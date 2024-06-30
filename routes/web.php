@@ -7,6 +7,7 @@ use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RelationGroupController;
+use App\Http\Controllers\TJobDescController;
 use App\Http\Controllers\TPersonController;
 use App\Http\Controllers\TRelationDivisionController;
 use App\Http\Controllers\TRelationOfficeController;
@@ -95,6 +96,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRegency', [TRelationOfficeController::class, 'get_regency'])->name('getRegency.get_regency');
     Route::post('/addAddress', [TRelationOfficeController::class, 'store'])->name('addAddress.store');
     Route::post('/getOfficeDetail', [TRelationOfficeController::class, 'get_detail'])->name('getOfficeDetail.get_detail');
+    Route::post('/editOffice', [TRelationOfficeController::class, 'edit'])->name('editOffice.edit');
+
+    // Job Desc
+    Route::post('/getJobDesc', [TJobDescController::class, 'getJobDescJson'])->name('getJobDesc.getJobDescJson');
+    Route::post('/getJobDescCombo', [TJobDescController::class, 'getJobDescCombo'])->name('getJobDescCombo.getJobDescCombo');
+    Route::post('/addJobDesc', [TJobDescController::class, 'store'])->name('addJobDesc.store');
+    Route::post('/getJobDescDetail', [TJobDescController::class, 'get_detail'])->name('getJobDescDetail.get_detail');
+    Route::post('/editJobDesc', [TJobDescController::class, 'edit'])->name('editJobDesc.edit');
+    
     
 });
 

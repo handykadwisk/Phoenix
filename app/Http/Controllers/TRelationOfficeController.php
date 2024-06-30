@@ -79,6 +79,8 @@ class TRelationOfficeController extends Controller
             "RELATION_OFFICE_PHONENUMBER"   => $request->RELATION_OFFICE_PHONENUMBER,
             "RELATION_OFFICE_PROVINCE"      => $request->RELATION_OFFICE_PROVINCE['value'],
             "RELATION_OFFICE_REGENCY"       => $request->RELATION_OFFICE_REGENCY['value'],
+            "RELATION_OFFICE_CREATED_BY"    => Auth::user()->id,
+            "RELATION_OFFICE_CREATED_DATE"  => now(),
         ]);
 
         if ($office) {
@@ -108,7 +110,7 @@ class TRelationOfficeController extends Controller
 
         return new JsonResponse([
             $office->RELATION_OFFICE_ID,
-            $office->RELATION_DIVISION_NAME
+            $office->RELATION_OFFICE_ALIAS
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -119,5 +121,70 @@ class TRelationOfficeController extends Controller
 
         $data = TRelationOffice::with('mLocationType')->with('toRelation')->with('parent')->find($request->id);
         return response()->json($data);
+    }
+
+    // edit office
+    public function edit(Request $request){
+        // dd($request);
+        // jika parent kosong = 0
+        $parentId = 0;
+        if ($request->RELATION_OFFICE_PARENT_ID != null || $request->RELATION_OFFICE_PARENT_ID != "") {
+            $parentId = $request->RELATION_OFFICE_PARENT_ID;
+        }
+
+        // add store t_relation_office
+        $office = TRelationOffice::where('RELATION_OFFICE_ID', $request->RELATION_OFFICE_ID)->update([
+            "RELATION_OFFICE_NAME"          => $request->to_relation['RELATION_ORGANIZATION_ALIAS']." ".$request->RELATION_OFFICE_ALIAS,
+            "RELATION_OFFICE_ALIAS"         => $request->RELATION_OFFICE_ALIAS,
+            "RELATION_OFFICE_DESCRIPTION"   => $request->RELATION_OFFICE_DESCRIPTION,
+            "RELATION_OFFICE_PARENT_ID"     => $parentId,
+            "RELATION_ORGANIZATION_ID"      => $request->RELATION_ORGANIZATION_ID,
+            "RELATION_OFFICE_ADDRESS"       => $request->RELATION_OFFICE_ADDRESS,
+            "RELATION_OFFICE_PHONENUMBER"   => $request->RELATION_OFFICE_PHONENUMBER,
+            "RELATION_OFFICE_PROVINCE"      => $request->RELATION_OFFICE_PROVINCE,
+            "RELATION_OFFICE_REGENCY"       => $request->RELATION_OFFICE_REGENCY,
+            "RELATION_OFFICE_UPDATED_BY"    => Auth::user()->id,
+            "RELATION_OFFICE_UPDATE_DATE"  => now(),
+        ]);
+
+        if ($office) {
+            DB::select('call sp_set_mapping_relation_office(?)', [$request->RELATION_ORGANIZATION_ID]);
+        }
+
+
+        // check m location type
+        $existingLocationType = MRelationOfficeLocationType::where('RELATION_OFFICE_ID', $request->RELATION_OFFICE_ID)->get();
+        if ($existingLocationType->count()>0) {
+            MRelationOfficeLocationType::where('RELATION_OFFICE_ID', $request->RELATION_OFFICE_ID)->delete();
+        }
+
+        // store to m relation location type
+        for ($i=0; $i < sizeof($request->m_location_type); $i++) { 
+            
+            $idLocationType = $request->m_location_type[$i]['LOCATION_TYPE_ID'];
+            MRelationOfficeLocationType::create([
+                "RELATION_OFFICE_ID" => $request->RELATION_OFFICE_ID,
+                "LOCATION_TYPE_ID" => $idLocationType
+            ]);
+        }
+
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Updated (Office).",
+                "module"      => "Office",
+                "id"          => $request->RELATION_OFFICE_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+
+        return new JsonResponse([
+            $request->RELATION_OFFICE_ID,
+            $request->RELATION_OFFICE_ALIAS
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

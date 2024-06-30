@@ -28,6 +28,7 @@ import PersonPopup from "../Person/Person";
 import StructurePopup from "../Structure/Structure";
 import Division from "../Division/Division";
 import AddressPopup from "../Address/Address";
+import JobDesk from "../Job/JobDesk";
 
 export default function DetailRelation({
     detailRelation,
@@ -84,6 +85,13 @@ export default function DetailRelation({
 
     // location modal
     const [locationModal, setLocationModal] = useState({
+        add: false,
+        edit: false,
+        view: false,
+    });
+
+    // job des modal
+    const [jobdeskModal, setJobDeskModal] = useState({
         add: false,
         edit: false,
         view: false,
@@ -379,6 +387,21 @@ export default function DetailRelation({
     };
     // End Address Location Click
 
+    // OnClick Address Location
+    const handleClickJobDesk = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setJobDeskModal({
+            add: false,
+            edit: false,
+            view: !jobdeskModal.view,
+        });
+    };
+    // End Address Location Click
+
     // Onclick Person
     const handleClickPerson = async (
         e: FormEvent,
@@ -395,8 +418,6 @@ export default function DetailRelation({
             search: false,
         });
     };
-    // end Onclick Person
-    console.log(dataById.m_relation_type);
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -1207,6 +1228,40 @@ export default function DetailRelation({
             />
             {/* end Modal Address Location */}
 
+            {/* modal for job desc */}
+            <ModalToAction
+                show={jobdeskModal.view}
+                onClose={() =>
+                    setJobDeskModal({
+                        add: false,
+                        edit: false,
+                        view: false,
+                    })
+                }
+                title={"Job Desc"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <JobDesk
+                            auth={""}
+                            idRelation={detailRelation}
+                            nameRelation={
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            }
+                        />
+                    </>
+                }
+            />
+            {/* end modal for job desc */}
+
             {/* modal for person */}
             <ModalToAction
                 show={modal.view}
@@ -1403,7 +1458,15 @@ export default function DetailRelation({
                         <span>Address & Location</span>
                     </div>
                 </div>
-                <div className="bg-white p-5 shadow-md rounded-lg">
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                    onClick={(e) =>
+                        handleClickJobDesk(
+                            e,
+                            dataRelationNew.RELATION_ORGANIZATION_NAME
+                        )
+                    }
+                >
                     <div className="flex justify-center items-center text-sm font-medium">
                         <span>Job Desc</span>
                     </div>

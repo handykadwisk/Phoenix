@@ -5,7 +5,6 @@ import Button from "@/Components/Button/Button";
 import TableTD from "@/Components/Table/TableTD";
 import TableTH from "@/Components/Table/TableTH";
 import axios from "axios";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import Pagination from "@/Components/Pagination";
 import Swal from "sweetalert2";
 import ModalToAction from "@/Components/Modal/ModalToAction";
@@ -13,9 +12,11 @@ import TextInput from "@/Components/TextInput";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
-import DetailStructure from "./DetailStructure";
+import Checkbox from "@/Components/Checkbox";
+import SelectTailwind from "react-tailwindcss-select";
+import DetailJobDescPopup from "./DetailJobDesc";
 
-export default function Structure({
+export default function JobDesk({
     auth,
     idRelation,
     nameRelation,
@@ -25,21 +26,45 @@ export default function Structure({
     nameRelation: any;
 }>) {
     useEffect(() => {
-        getStructure();
+        getJobDesc();
     }, []);
 
-    const [dataStructure, setDataStructure] = useState<any>([]);
-    const [grade, setGrade] = useState<any>([]);
-    const [structureCombo, setSetStructureCombo] = useState<any>([]);
-    const [searchStructure, setSearchStructure] = useState<any>({
-        RELATION_STRUCTURE_ALIAS: "",
-    });
-    const [detailStructure, setDetailStructure] = useState<any>({
-        RELATION_STRUCTURE_NAME: "",
-        RELATION_STRUCTURE_ID: "",
+    const [dataJobDesc, setDataJobDesc] = useState<any>([]);
+    const [searchOffice, setSearchOffice] = useState<any>({
+        RELATION_OFFICE_ALIAS: "",
     });
 
-    // for modal
+    const [detailJobDesc, setDetailJobDesc] = useState<any>({
+        RELATION_JOBDESC_ID: "",
+        RELATION_JOBDESC_ALIAS: "",
+    });
+    const [comboJobDesc, setComboJobDesc] = useState<any>([]);
+
+    const getJobDesc = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getJobDesc?${pageNumber}`, {
+                idRelation,
+                RELATION_OFFICE_ALIAS: searchOffice.RELATION_OFFICE_ALIAS,
+            })
+            .then((res) => {
+                setDataJobDesc(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getJobDescCombo = async (id: string) => {
+        await axios
+            .post(`/getJobDescCombo`, { id })
+            .then((res) => {
+                setComboJobDesc(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     const [modal, setModal] = useState({
         add: false,
         delete: false,
@@ -49,32 +74,12 @@ export default function Structure({
         search: false,
     });
 
-    const getStructureCombo = async (id: string) => {
-        await axios
-            .post(`/getStructureCombo`, { id })
-            .then((res) => {
-                setSetStructureCombo(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-    const getGrade = async () => {
-        await axios
-            .post(`/getGrade`)
-            .then((res) => {
-                setGrade(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const addStructurePopup = async (e: FormEvent) => {
+    const addJobDescPopup = async (e: FormEvent) => {
         e.preventDefault();
 
-        getGrade();
-        getStructureCombo(idRelation);
+        // getLocationType(idRelation);
+        getJobDescCombo(idRelation);
+        // getWilayah();
         setModal({
             add: !modal.add,
             delete: false,
@@ -85,48 +90,30 @@ export default function Structure({
         });
     };
 
-    const getStructure = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getStructure?${pageNumber}`, {
-                idRelation,
-                RELATION_STRUCTURE_ALIAS:
-                    searchStructure.RELATION_STRUCTURE_ALIAS,
-            })
-            .then((res) => {
-                setDataStructure(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const { data, setData, errors, reset } = useForm<any>({
-        RELATION_STRUCTURE_NAME: "",
-        RELATION_STRUCTURE_ALIAS: "",
-        RELATION_STRUCTURE_DESCRIPTION: "",
-        RELATION_STRUCTURE_PARENT_ID: "",
+    const { data, setData } = useForm<any>({
+        RELATION_JOBDESC_ALIAS: "",
+        RELATION_JOBDESC_DESCRIPTION: "",
+        RELATION_JOBDESC_PARENT_ID: "",
         RELATION_ORGANIZATION_ID: idRelation,
-        RELATION_STRUCTURE_MAPPING: "",
-        RELATION_GRADE_ID: "",
+        RELATION_ORGANIZATION_ALIAS: nameRelation,
     });
 
     const handleSuccess = (message: string) => {
         setData({
-            RELATION_STRUCTURE_NAME: "",
-            RELATION_STRUCTURE_ALIAS: "",
-            RELATION_STRUCTURE_DESCRIPTION: "",
-            RELATION_STRUCTURE_PARENT_ID: "",
+            RELATION_JOBDESC_ALIAS: "",
+            RELATION_JOBDESC_DESCRIPTION: "",
+            RELATION_JOBDESC_PARENT_ID: "",
             RELATION_ORGANIZATION_ID: idRelation,
-            RELATION_STRUCTURE_MAPPING: "",
-            RELATION_GRADE_ID: "",
+            RELATION_ORGANIZATION_ALIAS: nameRelation,
         });
+
         Swal.fire({
             title: "Success",
-            text: "New Relation Structure",
+            text: "New Relation Job Desc",
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
-                getStructure();
+                getJobDesc();
                 // setGetDetailRelation({
                 //     RELATION_ORGANIZATION_NAME: message[1],
                 //     RELATION_ORGANIZATION_ID: message[0],
@@ -158,12 +145,12 @@ export default function Structure({
                         search: false,
                     })
                 }
-                title={"Add Structure"}
-                url={`/addStructure`}
+                title={"Add Job Desc"}
+                url={`/addJobDesc`}
                 data={data}
                 onSuccess={handleSuccess}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
                 }
                 body={
                     <>
@@ -173,118 +160,87 @@ export default function Structure({
                                 htmlFor="RELATION_ORGANIZATION_NAME"
                                 value={"Relation"}
                             />
-                            <div className="bg-gray-400 rounded-md py-1 px-2 shadow-md mt-2">
+                            <div className="bg-gray-400 rounded-md py-1 px-2 shadow-md mt-0">
                                 {nameRelation}
                             </div>
                         </div>
-                        <div className="xs:grid xs:grid-cols-1 xs:gap-4 mt-2 lg:grid lg:grid-cols-2 lg:gap-4">
-                            <div className="relative">
+                        <div className="relative mt-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-2 lg:gap-4">
+                            <div>
                                 <InputLabel
                                     className="absolute"
-                                    htmlFor="RELATION_STRUCTURE_NAME"
-                                    value={"Structure Name"}
+                                    htmlFor="RELATION_JOBDESC_ALIAS"
+                                    value={"Job Desc"}
                                 />
-                                <div className="ml-[7.2rem] text-red-600">
+                                <div className="ml-[4.2rem] text-red-600">
                                     *
                                 </div>
                                 <TextInput
-                                    id="RELATION_STRUCTURE_NAME"
+                                    id="RELATION_JOBDESC_ALIAS"
                                     type="text"
-                                    name="RELATION_STRUCTURE_NAME"
-                                    value={data.RELATION_STRUCTURE_ALIAS}
-                                    className="mt-2"
-                                    autoComplete="RELATION_STRUCTURE_NAME"
+                                    name="RELATION_JOBDESC_ALIAS"
+                                    value={data.RELATION_JOBDESC_ALIAS}
+                                    className="mt-0"
+                                    autoComplete="RELATION_JOBDESC_ALIAS"
                                     onChange={(e) => {
                                         setData(
-                                            "RELATION_STRUCTURE_ALIAS",
+                                            "RELATION_JOBDESC_ALIAS",
                                             e.target.value
                                         );
                                     }}
                                     required
-                                    placeholder="Structure Name"
+                                    placeholder="Job Desc"
                                 />
                             </div>
-                            <div className="relative">
+                            <div className="xs:mt-2 lg:mt-0">
                                 <InputLabel
-                                    className="absolute"
-                                    htmlFor="RELATION_GRADE_ID"
-                                    value={"Grade"}
+                                    className=""
+                                    htmlFor="RELATION_JOBDESC_PARENT_ID"
+                                    value={"Job Desc Parent"}
                                 />
-                                <div className="ml-[3rem] text-red-600">*</div>
                                 <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.RELATION_GRADE_ID}
+                                    className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={data.RELATION_JOBDESC_PARENT_ID}
                                     onChange={(e) => {
                                         setData(
-                                            "RELATION_GRADE_ID",
+                                            "RELATION_JOBDESC_PARENT_ID",
                                             e.target.value
                                         );
                                     }}
                                 >
                                     <option value={""}>
-                                        -- Choose Grade --
+                                        -- Choose Parent --
                                     </option>
-                                    {grade?.map((dGrade: any, i: number) => {
-                                        return (
-                                            <option
-                                                value={dGrade.GRADE_ID}
-                                                key={i}
-                                            >
-                                                {dGrade.GRADE_AKA}
-                                            </option>
-                                        );
-                                    })}
+                                    {comboJobDesc?.map(
+                                        (cOffice: any, i: number) => {
+                                            return (
+                                                <option
+                                                    value={
+                                                        cOffice.RELATION_JOBDESC_ID
+                                                    }
+                                                    key={i}
+                                                >
+                                                    {cOffice.text_combo}
+                                                </option>
+                                            );
+                                        }
+                                    )}
                                 </select>
                             </div>
                         </div>
-                        <div className="mt-2">
+                        <div className="relative mt-2 mb-4">
                             <InputLabel
                                 className=""
-                                htmlFor="RELATION_STRUCTURE_PARENT_ID"
-                                value={"Parent Structure"}
-                            />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.RELATION_STRUCTURE_PARENT_ID}
-                                onChange={(e) => {
-                                    setData(
-                                        "RELATION_STRUCTURE_PARENT_ID",
-                                        e.target.value
-                                    );
-                                }}
-                            >
-                                <option value={""}>-- Choose Parent --</option>
-                                {structureCombo?.map(
-                                    (comboStructure: any, i: number) => {
-                                        return (
-                                            <option
-                                                value={
-                                                    comboStructure.RELATION_STRUCTURE_ID
-                                                }
-                                                key={i}
-                                            >
-                                                {comboStructure.text_combo}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div>
-                        <div className="mt-4 mb-2">
-                            <InputLabel
-                                htmlFor="RELATION_STRUCTURE_DESCRIPTION"
-                                value="Description"
+                                htmlFor="RELATION_JOBDESC_DESCRIPTION"
+                                value={"Description"}
                             />
                             <TextArea
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                id="RELATION_STRUCTURE_DESCRIPTION"
-                                name="RELATION_STRUCTURE_DESCRIPTION"
-                                defaultValue={
-                                    data.RELATION_STRUCTURE_DESCRIPTION
-                                }
+                                id="RELATION_JOBDESC_DESCRIPTION"
+                                name="RELATION_JOBDESC_DESCRIPTION"
+                                defaultValue={data.RELATION_JOBDESC_DESCRIPTION}
                                 onChange={(e: any) =>
                                     setData(
-                                        "RELATION_STRUCTURE_DESCRIPTION",
+                                        "RELATION_JOBDESC_DESCRIPTION",
                                         e.target.value
                                     )
                                 }
@@ -295,10 +251,11 @@ export default function Structure({
             />
             {/* end modal add */}
 
-            {/* modal detail  */}
+            {/* modal detail */}
             <ModalToAction
                 show={modal.view}
-                onClose={() =>
+                onClose={() => {
+                    getJobDesc();
                     setModal({
                         add: false,
                         delete: false,
@@ -306,9 +263,9 @@ export default function Structure({
                         view: false,
                         document: false,
                         search: false,
-                    })
-                }
-                title={detailStructure.RELATION_STRUCTURE_NAME}
+                    });
+                }}
+                title={detailJobDesc.RELATION_JOBDESC_ALIAS}
                 url={""}
                 data={""}
                 onSuccess={""}
@@ -320,53 +277,55 @@ export default function Structure({
                 submitButtonName={""}
                 body={
                     <>
-                        <DetailStructure
-                            idStructure={detailStructure.RELATION_STRUCTURE_ID}
-                            grade={grade}
-                            structureCombo={structureCombo}
+                        <DetailJobDescPopup
+                            idAddress={detailJobDesc.RELATION_JOBDESC_ID}
+                            comboJobDesc={comboJobDesc}
+                            setDetailJobDesc={setDetailJobDesc}
+                            // divisionCombo={comboDivision}
                         />
                     </>
                 }
             />
             {/* end modal detail */}
+
             <div className="grid grid-cols-4 gap-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <div
                             className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
-                            onClick={(e) => addStructurePopup(e)}
+                            onClick={(e) => addJobDescPopup(e)}
                         >
-                            <span>Add Structure</span>
+                            <span>Add Job Desc</span>
                         </div>
                     </div>
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[293px]">
                         <TextInput
-                            id="RELATION_STRUCTURE_ALIAS"
+                            id="RELATION_OFFICE_ALIAS"
                             type="text"
-                            name="RELATION_STRUCTURE_ALIAS"
-                            value={searchStructure.RELATION_STRUCTURE_ALIAS}
+                            name="RELATION_OFFICE_ALIAS"
+                            value={searchOffice.RELATION_OFFICE_ALIAS}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) =>
-                                setSearchStructure({
-                                    ...searchStructure,
-                                    RELATION_STRUCTURE_ALIAS: e.target.value,
+                                setSearchOffice({
+                                    ...searchOffice,
+                                    RELATION_OFFICE_ALIAS: e.target.value,
                                 })
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (
-                                        searchStructure.RELATION_STRUCTURE_ALIAS !==
+                                        searchOffice.RELATION_OFFICE_ALIAS !==
                                         ""
                                     ) {
-                                        getStructure();
-                                        setSearchStructure({
-                                            ...searchStructure,
-                                            RELATION_STRUCTURE_ALIAS: "",
+                                        getJobDesc();
+                                        setSearchOffice({
+                                            ...searchOffice,
+                                            RELATION_OFFICE_ALIAS: "",
                                         });
                                     }
                                 }
                             }}
-                            placeholder="Search Structure Name"
+                            placeholder="Search Job Desc Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
@@ -393,35 +352,28 @@ export default function Structure({
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
-                                        label={"No"}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Name Structure"}
+                                        label={"No."}
                                     />
                                     <TableTH
                                         className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg text-center"
+                                            "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }
-                                        label={"Grade"}
+                                        label={"Name Job Desc"}
                                     />
                                 </tr>
                             </thead>
                             <tbody>
-                                {dataStructure.data?.map(
-                                    (dStructure: any, i: number) => {
+                                {dataJobDesc.data?.map(
+                                    (dOffice: any, i: number) => {
                                         return (
                                             <tr
                                                 onDoubleClick={() => {
-                                                    getGrade();
-                                                    getStructureCombo(
-                                                        idRelation
-                                                    );
-                                                    setDetailStructure({
-                                                        RELATION_STRUCTURE_NAME:
-                                                            dStructure.RELATION_STRUCTURE_ALIAS,
-                                                        RELATION_STRUCTURE_ID:
-                                                            dStructure.RELATION_STRUCTURE_ID,
+                                                    getJobDescCombo(idRelation);
+                                                    setDetailJobDesc({
+                                                        RELATION_JOBDESC_ID:
+                                                            dOffice.RELATION_JOBDESC_ID,
+                                                        RELATION_JOBDESC_ALIAS:
+                                                            dOffice.RELATION_JOBDESC_ALIAS,
                                                     });
                                                     setModal({
                                                         add: false,
@@ -440,31 +392,18 @@ export default function Structure({
                                                 }
                                             >
                                                 <TableTD
-                                                    value={
-                                                        dataStructure.from + i
-                                                    }
+                                                    value={dataJobDesc.from + i}
                                                     className={"text-center"}
                                                 />
                                                 <TableTD
                                                     value={
                                                         <>
                                                             {
-                                                                dStructure.RELATION_STRUCTURE_ALIAS
+                                                                dOffice.RELATION_JOBDESC_ALIAS
                                                             }
                                                         </>
                                                     }
                                                     className={""}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dStructure.grade
-                                                                    ?.GRADE_AKA
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={"text-center"}
                                                 />
                                             </tr>
                                         );
@@ -472,17 +411,17 @@ export default function Structure({
                                 )}
                             </tbody>
                         </table>
-                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                            <Pagination
-                                links={dataStructure.links}
-                                fromData={dataStructure.from}
-                                toData={dataStructure.to}
-                                totalData={dataStructure.total}
-                                clickHref={(url: string) =>
-                                    getStructure(url.split("?").pop())
-                                }
-                            />
-                        </div>
+                    </div>
+                    <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
+                        <Pagination
+                            links={dataJobDesc.links}
+                            fromData={dataJobDesc.from}
+                            toData={dataJobDesc.to}
+                            totalData={dataJobDesc.total}
+                            clickHref={(url: string) =>
+                                getJobDesc(url.split("?").pop())
+                            }
+                        />
                     </div>
                 </div>
             </div>

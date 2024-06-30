@@ -88,11 +88,11 @@ export default function Division({
     };
 
     const { data, setData } = useForm<any>({
-        RELATION_DIVISION_NAME: "",
         RELATION_DIVISION_ALIAS: "",
         RELATION_DIVISION_INITIAL: "",
         RELATION_DIVISION_DESCRIPTION: "",
         RELATION_DIVISION_PARENT_ID: "",
+        RELATION_ORGANIZATION_NAME: nameRelation,
         RELATION_ORGANIZATION_ID: idRelation,
         RELATION_DIVISION_MAPPING: "",
         RELATION_DIVISION_CREATED_BY: "",
@@ -106,6 +106,7 @@ export default function Division({
             RELATION_DIVISION_INITIAL: "",
             RELATION_DIVISION_DESCRIPTION: "",
             RELATION_DIVISION_PARENT_ID: "",
+            RELATION_ORGANIZATION_NAME: nameRelation,
             RELATION_ORGANIZATION_ID: idRelation,
             RELATION_DIVISION_MAPPING: "",
             RELATION_DIVISION_CREATED_BY: "",
@@ -134,7 +135,6 @@ export default function Division({
             }
         });
     };
-
     return (
         <>
             {/* modal add */}
@@ -173,22 +173,22 @@ export default function Division({
                             <div>
                                 <InputLabel
                                     className="absolute"
-                                    htmlFor="RELATION_DIVISION_NAME"
+                                    htmlFor="RELATION_DIVISION_ALIAS"
                                     value={"Division Name"}
                                 />
                                 <div className="ml-[6.5rem] text-red-600">
                                     *
                                 </div>
                                 <TextInput
-                                    id="RELATION_DIVISION_NAME"
+                                    id="RELATION_DIVISION_ALIAS"
                                     type="text"
-                                    name="RELATION_DIVISION_NAME"
-                                    value={data.RELATION_DIVISION_NAME}
+                                    name="RELATION_DIVISION_ALIAS"
+                                    value={data.RELATION_DIVISION_ALIAS}
                                     className="mt-2"
-                                    autoComplete="RELATION_DIVISION_NAME"
+                                    autoComplete="RELATION_DIVISION_ALIAS"
                                     onChange={(e) => {
                                         setData(
-                                            "RELATION_DIVISION_NAME",
+                                            "RELATION_DIVISION_ALIAS",
                                             e.target.value
                                         );
                                     }}
@@ -310,6 +310,7 @@ export default function Division({
                         <DetailDivision
                             idDivision={detailDivision.RELATION_DIVISION_ID}
                             divisionCombo={comboDivision}
+                            setDetailDivision={setDetailDivision}
                         />
                     </>
                 }
@@ -443,7 +444,7 @@ export default function Division({
                                 )}
                             </tbody>
                         </table>
-                        <div className="absolute bottom-0 w-[46.3rem] mb-2">
+                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
                             <Pagination
                                 links={dataDivision.links}
                                 fromData={dataDivision.from}

@@ -38,6 +38,7 @@ export default function ModalToAdd({
 
     const action = async (e: any) => {
         // console.log(data);
+        // return false;
         e.preventDefault();
 
         setIsProcessing(true);

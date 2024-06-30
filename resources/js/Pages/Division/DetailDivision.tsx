@@ -23,9 +23,11 @@ import TextInput from "@/Components/TextInput";
 export default function DetailDivision({
     idDivision,
     divisionCombo,
+    setDetailDivision,
 }: PropsWithChildren<{
     idDivision: any;
     divisionCombo: any;
+    setDetailDivision: any;
 }>) {
     const [dataDivisionNew, setDataDivisionNew] = useState<any>([]);
 
@@ -46,7 +48,6 @@ export default function DetailDivision({
     };
 
     const [dataById, setDataById] = useState<any>({
-        RELATION_DIVISION_NAME: "",
         RELATION_DIVISION_ALIAS: "",
         RELATION_DIVISION_INITIAL: "",
         RELATION_DIVISION_DESCRIPTION: "",
@@ -86,6 +87,10 @@ export default function DetailDivision({
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
+                setDetailDivision({
+                    RELATION_DIVISION_ID: message[0],
+                    RELATION_DIVISION_NAME: message[1],
+                });
                 getDivisionDetail(message[0]);
                 // setGetDetailRelation({
                 //     RELATION_ORGANIZATION_NAME: message[1],
@@ -144,23 +149,23 @@ export default function DetailDivision({
                             <div>
                                 <InputLabel
                                     className="absolute"
-                                    htmlFor="RELATION_DIVISION_NAME"
+                                    htmlFor="RELATION_DIVISION_ALIAS"
                                     value={"Division Name"}
                                 />
                                 <div className="ml-[7.2rem] text-red-600">
                                     *
                                 </div>
                                 <TextInput
-                                    id="RELATION_DIVISION_NAME"
+                                    id="RELATION_DIVISION_ALIAS"
                                     type="text"
-                                    name="RELATION_DIVISION_NAME"
-                                    value={dataById.RELATION_DIVISION_NAME}
+                                    name="RELATION_DIVISION_ALIAS"
+                                    value={dataById.RELATION_DIVISION_ALIAS}
                                     className="mt-2"
-                                    autoComplete="RELATION_DIVISION_NAME"
+                                    autoComplete="RELATION_DIVISION_ALIAS"
                                     onChange={(e) => {
                                         setDataById({
                                             ...dataById,
-                                            RELATION_DIVISION_NAME:
+                                            RELATION_DIVISION_ALIAS:
                                                 e.target.value,
                                         });
                                     }}
@@ -216,7 +221,7 @@ export default function DetailDivision({
                                     ?.filter(
                                         (m: any) =>
                                             m.RELATION_DIVISION_ALIAS !==
-                                            dataById.RELATION_DIVISION_ALIAS
+                                            dataDivisionNew.RELATION_DIVISION_ALIAS
                                     )
                                     .map((item: any, i: number) => {
                                         return (

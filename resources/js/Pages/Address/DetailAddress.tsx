@@ -22,32 +22,46 @@ import TextArea from "@/Components/TextArea";
 import TextInput from "@/Components/TextInput";
 import SelectTailwind from "react-tailwindcss-select";
 import Checkbox from "@/Components/Checkbox";
+import BeatLoader from "react-spinners/BeatLoader";
 
 export default function DetailAddress({
     idAddress,
     comboOffice,
     wilayah,
     locationType,
+    setDetailAddress,
 }: PropsWithChildren<{
     idAddress: any;
     comboOffice: any;
     wilayah: any;
     locationType: any;
+    setDetailAddress: any;
     // divisionCombo: any;
 }>) {
     const [dataOfficeNew, setDataDetailOffice] = useState<any>([]);
     const [regency, setRegency] = useState<any>([]);
+
+    const [isLoading, setIsLoading] = useState<any>({
+        get_detail: false,
+    });
 
     useEffect(() => {
         getOfficeDetail(idAddress);
     }, [idAddress]);
 
     const getOfficeDetail = async (id: string) => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
         await axios
             .post(`/getOfficeDetail`, { id })
             .then((res) => {
                 setDataDetailOffice(res.data);
-                console.log(res.data);
+                setIsLoading({
+                    ...isLoading,
+                    get_detail: false,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -68,11 +82,12 @@ export default function DetailAddress({
                 LOCATION_TYPE_ID: "",
             },
         ],
+        RELATION_OFFICE_REGENCYNEW: "",
     });
 
     useEffect(() => {
-        getRegency("");
-    }, [dataById.RELATION_OFFICE_REGENCY]);
+        getRegency(dataById.RELATION_OFFICE_PROVINCE);
+    }, [dataById.RELATION_OFFICE_PROVINCE]);
 
     const [modal, setModal] = useState({
         add: false,
@@ -105,12 +120,19 @@ export default function DetailAddress({
     });
 
     const getRegency = async (id: any) => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
         const valueKode = id;
         await axios
             .post(`/getRegency`, { valueKode })
             .then((res) => {
                 setRegency(res.data);
-                console.log(res.data);
+                setIsLoading({
+                    ...isLoading,
+                    get_detail: false,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -166,23 +188,33 @@ export default function DetailAddress({
         }
     };
     const getRegencyLabel = (value: any) => {
-        console.log(value);
-        return false;
         if (value) {
             const selectedRegency = regencySelect.filter(
                 (optionRegency: any) => optionRegency.value === value
             );
-            return selectedRegency[0].label;
+            if (selectedRegency?.length === 0) {
+                dataById.RELATION_OFFICE_REGENCY;
+            } else {
+                return {
+                    label: selectedRegency[0].label,
+                    value: dataById.RELATION_OFFICE_REGENCY,
+                };
+            }
+            // return selectedRegency[0].label;
         }
     };
 
     const handleSuccess = (message: string) => {
         Swal.fire({
             title: "Success",
-            text: "Edit Relation Division",
+            text: "Edit Relation Address",
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
+                setDetailAddress({
+                    RELATION_OFFICE_ID: message[0],
+                    RELATION_OFFICE_ALIAS: message[1],
+                });
                 getOfficeDetail(message[0]);
                 // setGetDetailRelation({
                 //     RELATION_ORGANIZATION_NAME: message[1],
@@ -199,6 +231,7 @@ export default function DetailAddress({
             }
         });
     };
+    console.log(isLoading.get_detail);
     return (
         <>
             {/* <span>Detail Division</span> */}
@@ -215,8 +248,8 @@ export default function DetailAddress({
                         search: false,
                     })
                 }
-                title={"Edit Division"}
-                url={`/editDivision`}
+                title={"Edit Address"}
+                url={`/editOffice`}
                 data={dataById}
                 onSuccess={handleSuccess}
                 classPanel={
@@ -277,7 +310,7 @@ export default function DetailAddress({
                                     onChange={(e: any) => {
                                         setDataById({
                                             ...dataById,
-                                            RELATION_OFFICE_ALIAS:
+                                            RELATION_OFFICE_PARENT_ID:
                                                 e.target.value,
                                         });
                                     }}
@@ -285,8 +318,13 @@ export default function DetailAddress({
                                     <option value={""}>
                                         -- Choose Parent --
                                     </option>
-                                    {comboOffice?.map(
-                                        (cOffice: any, i: number) => {
+                                    {comboOffice
+                                        ?.filter(
+                                            (m: any) =>
+                                                m.RELATION_OFFICE_ALIAS !==
+                                                dataOfficeNew.RELATION_OFFICE_ALIAS
+                                        )
+                                        .map((cOffice: any, i: number) => {
                                             return (
                                                 <option
                                                     value={
@@ -297,8 +335,7 @@ export default function DetailAddress({
                                                     {cOffice.text_combo}
                                                 </option>
                                             );
-                                        }
-                                    )}
+                                        })}
                                 </select>
                             </div>
                             <div className="xs:mt-2 lg:mt-0">
@@ -317,7 +354,7 @@ export default function DetailAddress({
                                     onChange={(e: any) => {
                                         setDataById({
                                             ...dataById,
-                                            RELATION_OFFICE_ALIAS:
+                                            RELATION_OFFICE_PHONENUMBER:
                                                 e.target.value,
                                         });
                                     }}
@@ -341,7 +378,7 @@ export default function DetailAddress({
                                 onChange={(e: any) => {
                                     setDataById({
                                         ...dataById,
-                                        RELATION_OFFICE_ALIAS: e.target.value,
+                                        RELATION_OFFICE_ADDRESS: e.target.value,
                                     });
                                 }}
                             />
@@ -387,6 +424,7 @@ export default function DetailAddress({
                                     // }
                                     onChange={(val: any) => {
                                         // console.log(val.value);
+                                        // return false;
                                         getRegency(val.value);
                                         setDataById({
                                             ...dataById,
@@ -420,12 +458,9 @@ export default function DetailAddress({
                                     options={regencySelect}
                                     isSearchable={true}
                                     placeholder={"--Select Regency--"}
-                                    value={{
-                                        label: getRegencyLabel(
-                                            dataById.RELATION_OFFICE_REGENCY
-                                        ),
-                                        value: dataById.RELATION_OFFICE_REGENCY,
-                                    }}
+                                    value={getRegencyLabel(
+                                        dataById.RELATION_OFFICE_REGENCY
+                                    )}
                                     // value={dataById.RELATION_OFFICE_REGENCY}
                                     // onChange={(e) =>
                                     //     inputDataBank(
@@ -518,7 +553,8 @@ export default function DetailAddress({
                                 onChange={(e: any) => {
                                     setDataById({
                                         ...dataById,
-                                        RELATION_OFFICE_ALIAS: e.target.value,
+                                        RELATION_OFFICE_DESCRIPTION:
+                                            e.target.value,
                                     });
                                 }}
                             />
@@ -527,107 +563,127 @@ export default function DetailAddress({
                 }
             />
             {/* end modal edit*/}
-            <div className="bg-white py-4 shadow-md rounded-md mb-2">
-                <div className="grid grid-cols-2 px-4">
-                    <div className="">
-                        <div className="text-sm font-semibold">
-                            <span>Relation Name</span>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                            <span>
-                                {
-                                    dataOfficeNew.to_relation
-                                        ?.RELATION_ORGANIZATION_ALIAS
-                                }
-                            </span>
-                        </div>
+            <div className="bg-white py-4 shadow-md rounded-md mb-2 h-[210px]">
+                {isLoading.get_detail ? (
+                    <div className="flex justify-center items-center sweet-loading h-[199px]">
+                        <BeatLoader
+                            // cssOverride={override}
+                            size={10}
+                            color={"#ff4242"}
+                            loading={true}
+                            speedMultiplier={1.5}
+                            aria-label="Loading Spinner"
+                            data-testid="loader"
+                        />
                     </div>
-                    <div>
-                        <div className="flex justify-between items-center">
-                            <div className="text-sm font-semibold">
-                                <span>Parent Name</span>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-2 px-4">
+                            <div className="">
+                                <div className="text-sm font-semibold">
+                                    <span>Relation Name</span>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    <span>
+                                        {
+                                            dataOfficeNew.to_relation
+                                                ?.RELATION_ORGANIZATION_ALIAS
+                                        }
+                                    </span>
+                                </div>
                             </div>
                             <div>
-                                <a
-                                    onClick={(e) =>
-                                        handleEditModel(
-                                            e,
-                                            dataOfficeNew.RELATION_OFFICE_ID
-                                        )
-                                    }
-                                    className="cursor-pointer"
-                                    title="Edit Office"
-                                >
-                                    <div className="p-1 rounded-md text-red-600">
-                                        <PencilSquareIcon className="w-5" />
+                                <div className="flex justify-between items-center">
+                                    <div className="text-sm font-semibold">
+                                        <span>Parent Name</span>
                                     </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                            <span>
-                                {dataOfficeNew?.parent === null
-                                    ? "-"
-                                    : dataOfficeNew.parent
-                                          ?.RELATION_OFFICE_ALIAS}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div className="mt-3 px-4">
-                    <div>
-                        <div className="text-sm font-semibold">
-                            <span>Location Type</span>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4 mt-2">
-                            <div className="mb-2 relative flex flex-wrap gap-3">
-                                {dataOfficeNew.m_location_type?.map(
-                                    (dOffice: any, i: number) => {
-                                        return (
-                                            <div
-                                                key={i}
-                                                className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm"
-                                            >
-                                                <span className="text-white">
-                                                    {
-                                                        dOffice.location_type
-                                                            .RELATION_LOCATION_TYPE_NAME
-                                                    }
-                                                </span>
-                                                <div>
-                                                    <div
-                                                        className="text-white cursor-pointer"
-                                                        onMouseDown={(e) =>
-                                                            e.preventDefault()
-                                                        }
-                                                    >
-                                                        <XMarkIcon className="w-5" />
-                                                    </div>
-                                                </div>
+                                    <div>
+                                        <a
+                                            onClick={(e) =>
+                                                handleEditModel(
+                                                    e,
+                                                    dataOfficeNew.RELATION_OFFICE_ID
+                                                )
+                                            }
+                                            className="cursor-pointer"
+                                            title="Edit Office"
+                                        >
+                                            <div className="p-1 rounded-md text-red-600">
+                                                <PencilSquareIcon className="w-5" />
                                             </div>
-                                        );
-                                    }
-                                )}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    <span>
+                                        {dataOfficeNew?.parent === null
+                                            ? "-"
+                                            : dataOfficeNew.parent
+                                                  ?.RELATION_OFFICE_ALIAS}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div className="mt-3 px-4">
-                    <div>
-                        <div className="text-sm font-semibold">
-                            <span>Description</span>
+                        <div className="mt-3 px-4">
+                            <div>
+                                <div className="text-sm font-semibold">
+                                    <span>Location Type</span>
+                                </div>
+                                <div className="grid grid-cols-1 gap-4 mt-2">
+                                    <div className="mb-2 relative flex flex-wrap gap-3">
+                                        {dataOfficeNew.m_location_type?.map(
+                                            (dOffice: any, i: number) => {
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm"
+                                                    >
+                                                        <span className="text-white">
+                                                            {
+                                                                dOffice
+                                                                    .location_type
+                                                                    .RELATION_LOCATION_TYPE_NAME
+                                                            }
+                                                        </span>
+                                                        <div>
+                                                            <div
+                                                                className="text-white cursor-pointer"
+                                                                onMouseDown={(
+                                                                    e
+                                                                ) =>
+                                                                    e.preventDefault()
+                                                                }
+                                                            >
+                                                                <XMarkIcon className="w-5" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                            <p>
-                                {dataOfficeNew.RELATION_OFFICE_DESCRIPTION ===
-                                    null ||
-                                dataOfficeNew.RELATION_OFFICE_DESCRIPTION === ""
-                                    ? "-"
-                                    : dataOfficeNew.RELATION_OFFICE_DESCRIPTION}
-                            </p>
+                        <div className="mt-3 px-4">
+                            <div>
+                                <div className="text-sm font-semibold">
+                                    <span>Description</span>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    <p>
+                                        {dataOfficeNew.RELATION_OFFICE_DESCRIPTION ===
+                                            null ||
+                                        dataOfficeNew.RELATION_OFFICE_DESCRIPTION ===
+                                            ""
+                                            ? "-"
+                                            : dataOfficeNew.RELATION_OFFICE_DESCRIPTION}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </>
+                )}
             </div>
         </>
     );

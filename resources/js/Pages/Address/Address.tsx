@@ -544,6 +544,7 @@ export default function Address({
                             comboOffice={comboOffice}
                             wilayah={wilayah}
                             locationType={locationType}
+                            setDetailAddress={setDetailAddress}
                             // divisionCombo={comboDivision}
                         />
                     </>
@@ -676,7 +677,7 @@ export default function Address({
                                 )}
                             </tbody>
                         </table>
-                        <div className="absolute bottom-0 w-[46.3rem] mb-2">
+                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
                             <Pagination
                                 links={dataOffice.links}
                                 fromData={dataOffice.from}

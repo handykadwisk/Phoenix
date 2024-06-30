@@ -1,8 +1,8 @@
 /*
-SQLyog Ultimate v11.33 (64 bit)
-MySQL - 8.2.0 : Database - phoenix
+SQLyog Ultimate v13.1.1 (32 bit)
+MySQL - 8.3.0 : Database - phoenix
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -48,10 +48,10 @@ DELIMITER ;
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_job_desc` */;
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_path_relation_job_desc`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
-BEGIN
-  CALL `sp_path_relation_job_desc`(input_relation_organization_id,input, @path);
-  RETURN @path;
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_job_desc`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_relation_job_desc`(input_relation_organization_id,input, @path);
+  RETURN @path;
 END */$$
 DELIMITER ;
 
@@ -164,86 +164,86 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_combo_relation_job_desc`(IN `input_relation_organization_id` INT)
-BEGIN
-  SET `max_sp_recursion_depth` = 5000 ;
-IF  input_relation_organization_id IS NULL THEN
-SELECT 
-    RELATION_JOBDESC_ID,
-    RELATION_JOBDESC_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_JOBDESC_ALIAS,
-    @path_combo:=`f_get_path_relation_job_desc`(NULL, RELATION_JOBDESC_ID) mapping,
-  IF(
-    (
-    LENGTH(@path_combo)-   
-    LENGTH(
-      REPLACE(
-        @path_combo,
-        ".",
-        ""
-      )
-    )) <= 1,
-    RELATION_JOBDESC_ALIAS,
-    CONCAT(
-      REPEAT(
-        '++',
-        (
-        LENGTH(@path_combo)-
-        LENGTH(
-          REPLACE(
-            @path_combo,
-            ".",
-            ""
-          )
-        )) - 1
-      ),
-      RELATION_JOBDESC_ALIAS
-    )
-  ) text_combo     
-  FROM
-    photrelationjobdesc 
-  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
-ELSE
-  
-  SELECT 
-    RELATION_JOBDESC_ID,
-    RELATION_JOBDESC_PARENT_ID,
-    RELATION_ORGANIZATION_ID,
-    RELATION_JOBDESC_ALIAS,
-    @path_combo:=`f_get_path_relation_job_desc`(input_relation_organization_id, RELATION_JOBDESC_ID) mapping,
-  IF(
-    (
-    LENGTH(@path_combo)-
-    LENGTH(
-      REPLACE(
-        @path_combo,
-        ".",
-        ""
-      )
-    )) <= 1,
-    RELATION_JOBDESC_ALIAS,
-    CONCAT(
-      REPEAT(
-        '++',
-        (
-        LENGTH(@path_combo)-
-        LENGTH(
-          REPLACE(
-            @path_combo,
-            ".",
-            ""
-          )
-        )) - 1
-      ),
-      RELATION_JOBDESC_ALIAS
-    )
-  ) text_combo     
-  FROM
-    photrelationjobdesc 
-  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
-  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
-  END IF;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_relation_job_desc`(IN `input_relation_organization_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+IF  input_relation_organization_id IS NULL THEN
+SELECT 
+    RELATION_JOBDESC_ID,
+    RELATION_JOBDESC_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_JOBDESC_ALIAS,
+    @path_combo:=`f_get_path_relation_job_desc`(NULL, RELATION_JOBDESC_ID) mapping,
+  IF(
+    (
+    LENGTH(@path_combo)-   
+    LENGTH(
+      REPLACE(
+        @path_combo,
+        ".",
+        ""
+      )
+    )) <= 1,
+    RELATION_JOBDESC_ALIAS,
+    CONCAT(
+      REPEAT(
+        '++',
+        (
+        LENGTH(@path_combo)-
+        LENGTH(
+          REPLACE(
+            @path_combo,
+            ".",
+            ""
+          )
+        )) - 1
+      ),
+      RELATION_JOBDESC_ALIAS
+    )
+  ) text_combo     
+  FROM
+    t_job_desc 
+  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
+ELSE
+  
+  SELECT 
+    RELATION_JOBDESC_ID,
+    RELATION_JOBDESC_PARENT_ID,
+    RELATION_ORGANIZATION_ID,
+    RELATION_JOBDESC_ALIAS,
+    @path_combo:=`f_get_path_relation_job_desc`(input_relation_organization_id, RELATION_JOBDESC_ID) mapping,
+  IF(
+    (
+    LENGTH(@path_combo)-
+    LENGTH(
+      REPLACE(
+        @path_combo,
+        ".",
+        ""
+      )
+    )) <= 1,
+    RELATION_JOBDESC_ALIAS,
+    CONCAT(
+      REPEAT(
+        '++',
+        (
+        LENGTH(@path_combo)-
+        LENGTH(
+          REPLACE(
+            @path_combo,
+            ".",
+            ""
+          )
+        )) - 1
+      ),
+      RELATION_JOBDESC_ALIAS
+    )
+  ) text_combo     
+  FROM
+    t_job_desc 
+  WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
+  ORDER BY RELATION_ORGANIZATION_ID,mapping ;
+  END IF;
 END */$$
 DELIMITER ;
 
@@ -535,44 +535,44 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_path_relation_job_desc`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
-BEGIN
-  DECLARE _id INT ;
-  DECLARE _parent INT ;
-  DECLARE _path TEXT ;
-  SET `max_sp_recursion_depth` = 5000 ;
-  IF input_relation_organization_id IS NULL 
-  THEN 
-  SELECT 
-    RELATION_JOBDESC_ID,
-    RELATION_JOBDESC_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationjobdesc 
-  WHERE RELATION_JOBDESC_ID = input ;
-  ELSE 
-  SELECT 
-    RELATION_JOBDESC_ID,
-    RELATION_JOBDESC_PARENT_ID INTO _id,
-    _parent 
-  FROM
-    photrelationjobdesc 
-  WHERE RELATION_JOBDESC_ID = input 
-    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
-  END IF ;
-  IF _parent IS NULL 
-  OR _parent = 0 
-  THEN SET _path = CONCAT(_id, '.') ;
-  ELSE CALL `sp_path_relation_job_desc` (
-    input_relation_organization_id,
-    _parent,
-    _path
-  ) ;
-  SELECT 
-    CONCAT(_path, _id, '.') INTO _path ;
-  END IF ;
-  SELECT 
-    _path INTO output ;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_relation_job_desc`(IN `input_relation_organization_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_organization_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_JOBDESC_ID,
+    RELATION_JOBDESC_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_job_desc 
+  WHERE RELATION_JOBDESC_ID = input ;
+  ELSE 
+  SELECT 
+    RELATION_JOBDESC_ID,
+    RELATION_JOBDESC_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_job_desc 
+  WHERE RELATION_JOBDESC_ID = input 
+    AND RELATION_ORGANIZATION_ID = input_relation_organization_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_relation_job_desc` (
+    input_relation_organization_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
 END */$$
 DELIMITER ;
 
@@ -739,13 +739,13 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_set_mapping_relation_job_desc`(IN `input_relation_organization_id` INT)
-BEGIN
-IF input_relation_organization_id IS NULL THEN
-UPDATE photrelationjobdesc SET RELATION_JOBDESC_MAPPING=f_get_path_relation_job_desc(input_relation_organization_id, RELATION_JOBDESC_ID); 
-ELSE
-UPDATE photrelationjobdesc SET RELATION_JOBDESC_MAPPING=f_get_path_relation_job_desc(input_relation_organization_id, RELATION_JOBDESC_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
-END IF;
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_job_desc`(IN `input_relation_organization_id` INT)
+BEGIN
+IF input_relation_organization_id IS NULL THEN
+UPDATE t_job_desc SET RELATION_JOBDESC_MAPPING=f_get_path_relation_job_desc(input_relation_organization_id, RELATION_JOBDESC_ID); 
+ELSE
+UPDATE t_job_desc SET RELATION_JOBDESC_MAPPING=f_get_path_relation_job_desc(input_relation_organization_id, RELATION_JOBDESC_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
+END IF;
 END */$$
 DELIMITER ;
 

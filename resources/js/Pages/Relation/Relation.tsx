@@ -1385,7 +1385,7 @@ export default function Relation({ auth }: PageProps) {
                             </tbody>
                         </table>
                     </div>
-                    <div className="absolute bottom-0 w-[57rem] mb-4">
+                    <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
                         <Pagination
                             links={relations.links}
                             fromData={relations.from}
