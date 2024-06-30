@@ -12,25 +12,6 @@ MySQL - 8.3.0 : Database - phoenix
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/* Function  structure for function  `f_get_last_note_claim` */
-
-/*!50003 DROP FUNCTION IF EXISTS `f_get_last_note_claim` */;
-DELIMITER $$
-
-/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_last_note_claim`(`var_claim_id` BIGINT) RETURNS text CHARSET latin1
-BEGIN
-  DECLARE LAST_NOTE TEXT;
-  SELECT 
-    CLAIM_HISTORY_NOTE into LAST_NOTE 
-  FROM
-    photclaimhistory 
-  where CLAIM_ID = var_claim_id 
-  ORDER BY CLAIM_HISTORY_ID DESC 
-  LIMIT 1 ;
-  RETURN LAST_NOTE ;
-END */$$
-DELIMITER ;
-
 /* Function  structure for function  `f_get_path_relation_division` */
 
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_division` */;
@@ -467,18 +448,6 @@ BEGIN
   ORDER BY RELATION_ORGANIZATION_ID,
     mapping ;
   END IF ;
-END */$$
-DELIMITER ;
-
-/* Procedure structure for procedure `sp_get_last_note_claim` */
-
-/*!50003 DROP PROCEDURE IF EXISTS  `sp_get_last_note_claim` */;
-
-DELIMITER $$
-
-/*!50003 CREATE DEFINER=`admin`@`%` PROCEDURE `sp_get_last_note_claim`(IN `var_claim_id` bigINT)
-BEGIN
-  SELECT f_get_last_note_claim(var_claim_id) AS LAST_NOTE;
 END */$$
 DELIMITER ;
 

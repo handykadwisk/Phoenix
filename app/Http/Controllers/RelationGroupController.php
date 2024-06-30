@@ -75,7 +75,7 @@ class RelationGroupController extends Controller
 
     public function store(Request $request){
         // Created Relation
-        $group = RelationGroup::insertGetId([
+        $group = RelationGroup::create([
             'RELATION_GROUP_NAME' => $request->RELATION_GROUP_NAME,
             'RELATION_GROUP_DESCRIPTION' => $request->RELATION_GROUP_DESCRIPTION,
             'RELATION_GROUP_CREATED_BY' => Auth::user()->id,
@@ -89,14 +89,15 @@ class RelationGroupController extends Controller
             'action'     => json_encode([
                 "description" => "Created (Group).",
                 "module"      => "Group",
-                "id"          => $group
+                "id"          => $group->RELATION_GROUP_NAME
             ]),
             'action_by'  => Auth::user()->email
         ]);
 
 
         return new JsonResponse([
-            $group
+            $group->RELATION_GROUP_ID,
+            $group->RELATION_GROUP_NAME
         ], 201, [
             'X-Inertia' => true
         ]);

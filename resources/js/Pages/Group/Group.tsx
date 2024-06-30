@@ -101,7 +101,10 @@ export default function Group({ auth }: PageProps) {
         }).then((result: any) => {
             // console.log(result);
             if (result.value) {
-                setIdGroup(message);
+                setIdGroup({
+                    RELATION_GROUP_ID: message[0],
+                    RELATION_GROUP_NAME: message[1],
+                });
                 setModal({
                     add: false,
                     delete: false,
@@ -315,7 +318,7 @@ export default function Group({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
@@ -384,7 +387,7 @@ export default function Group({ auth }: PageProps) {
                                 )}
                             </tbody>
                         </table>
-                        <div className="absolute bottom-[4rem] w-[57.3rem] mb-2">
+                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
                             <Pagination
                                 links={relationsGroup.links}
                                 fromData={relationsGroup.from}

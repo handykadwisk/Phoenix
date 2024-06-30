@@ -563,7 +563,7 @@ export default function DetailAddress({
                 }
             />
             {/* end modal edit*/}
-            <div className="bg-white py-4 shadow-md rounded-md mb-2 h-[210px]">
+            <div className="bg-white py-4 shadow-md rounded-md mb-2 h-[310px]">
                 {isLoading.get_detail ? (
                     <div className="flex justify-center items-center sweet-loading h-[199px]">
                         <BeatLoader

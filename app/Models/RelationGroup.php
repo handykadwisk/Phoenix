@@ -14,17 +14,11 @@ class RelationGroup extends Model
     protected $table = 't_relation_group';
 
     // public $with = ['rGroup'];
-
-    protected $fillable = [
-        'RELATION_GROUP_NAME',
-        'RELATION_GROUP_DESCRIPTION',
-        'RELATION_GROUP_CREATED_BY',
-        'RELATION_GROUP_CREATED_DATE',
-        'RELATION_GROUP_UPDATED_BY',
-        'RELATION_GROUP_UPDATED_DATE',
-        'RELATION_GROUP_PARENT',
-        'RELATION_GROUP_ALIAS',
+    protected $guarded = [
+        'RELATION_GROUP_ID',
     ];
+
+    public $timestamps = false;
 
     public function rGroup()
     {

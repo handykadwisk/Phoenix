@@ -298,7 +298,7 @@ export default function Structure({
             {/* modal detail  */}
             <ModalToAction
                 show={modal.view}
-                onClose={() =>
+                onClose={() => {
                     setModal({
                         add: false,
                         delete: false,
@@ -306,8 +306,9 @@ export default function Structure({
                         view: false,
                         document: false,
                         search: false,
-                    })
-                }
+                    });
+                    getStructure();
+                }}
                 title={detailStructure.RELATION_STRUCTURE_NAME}
                 url={""}
                 data={""}
