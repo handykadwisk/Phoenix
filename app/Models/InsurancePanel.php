@@ -14,36 +14,37 @@ class InsurancePanel extends Model
     protected $table = 't_insurance_panel';
 
     public $timestamps = false;
-    public $with = ['installment', 'insurance', 'currency', 'policy'];
+    public $with = ['installment', 'insurance', 'currency', 'policy', 'endorsement'];
 
-    protected $fillable = [
-        'IP_ID',
-        'POLICY_ID',
-        'POLICY_INITIAL_PREMIUM_ID',
-        'IP_PREMIUM_TYPE',
-        'INSURANCE_ID',
-        'IP_POLICY_LEADER',
-        'IP_CURRENCY_ID',
-        'IP_TERM',
-        'IP_POLICY_INITIAL_PREMIUM',
-        'IP_POLICY_SHARE',
-        'IP_DISC_INSURANCE',
-        'IP_PIP_AFTER_DISC',
-        'IP_POLICY_BF',
-        'IP_BF_AMOUNT',
-        'IP_VAT',
-        'IP_PPH_23',
-        'IP_NET_BF',
-        'IP_PAYMENT_METHOD',
-        'IP_VAT_AMOUNT',
-        'IP_CREATED_BY',
-        'IP_CREATED_DATE',
-        'IP_UPDATED_BY',
-        'IP_UPDATED_DATE'
-    ];
+    // protected $fillable = [
+    //     'IP_ID',
+    //     'POLICY_ID',
+    //     'POLICY_INITIAL_PREMIUM_ID',
+    //     'IP_PREMIUM_TYPE',
+    //     'INSURANCE_ID',
+    //     'IP_POLICY_LEADER',
+    //     'IP_CURRENCY_ID',
+    //     'IP_TERM',
+    //     'IP_POLICY_INITIAL_PREMIUM',
+    //     'IP_POLICY_SHARE',
+    //     'IP_DISC_INSURANCE',
+    //     'IP_PIP_AFTER_DISC',
+    //     'IP_POLICY_BF',
+    //     'IP_BF_AMOUNT',
+    //     'IP_VAT',
+    //     'IP_PPH_23',
+    //     'IP_NET_BF',
+    //     'IP_PAYMENT_METHOD',
+    //     'IP_VAT_AMOUNT',
+    //     'IP_CREATED_BY',
+    //     'IP_CREATED_DATE',
+    //     'IP_UPDATED_BY',
+    //     'IP_UPDATED_DATE'
+    // ];
+    protected $guarded = ['IP_ID'];
 
     public function installment() {
-        return $this->hasMany(Installment::class, 'INSURANCE_PANEL_ID', 'IP_ID');
+        return $this->hasMany(Installment::class, 'IP_ID', 'IP_ID');
     }
 
     public function insurance() {
@@ -56,6 +57,10 @@ class InsurancePanel extends Model
 
     public function policy() {
         return $this->hasOne(Policy::class, 'POLICY_ID', 'POLICY_ID');
+    }
+
+    public function endorsement() {
+        return $this->hasOne(Endorsement::class, 'ENDORSEMENT_ID', 'ENDORSEMENT_ID');
     }
 
     // public function insuranceType() {

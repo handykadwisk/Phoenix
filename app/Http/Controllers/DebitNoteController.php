@@ -14,7 +14,7 @@ class DebitNoteController extends Controller
 {
     public function index()
     {        
-        // $listInitialPremium = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
+        // $listInitialPremium = MPolicyPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
         //         ->leftJoin('r_currency', 'm_policy_initial_premium.CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
         //         ->orderBy('m_policy_initial_premium.POLICY_ID', 'desc')
         //         ->get();

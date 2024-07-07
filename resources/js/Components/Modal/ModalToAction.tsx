@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
@@ -42,6 +42,7 @@ export default function ModalToAction({
     const close = () => {
         if (closeable) {
             onClose();
+            setIsError("");
         }
     };
 
@@ -53,7 +54,7 @@ export default function ModalToAction({
         e.preventDefault();
 
         setIsProcessing(true);
-        onSuccess("");
+        // onSuccess("");
 
         await callAxios({ url, data, method })
             .then((res) => {
@@ -64,15 +65,20 @@ export default function ModalToAction({
             })
             .catch((err) => {
                 setIsProcessing(false);
-                setIsError(err);
+                setIsError(err.response.data[0]);
                 console.log(err);
             });
     };
 
+
     return (
         <>
             <Transition.Root show={show} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={() => {}}>
+                <Dialog
+                    as="div"
+                    className="relative z-50"
+                    onClose={() => {}}
+                >
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -109,7 +115,11 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {body}
+                                            <div
+                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2.5"
+                                            >
+                                                {body}
+                                            </div>
                                         </div>
                                         <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             {/* {deleteButtonName && (

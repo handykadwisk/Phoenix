@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Installment;
 use App\Models\InsurancePanel;
-use App\Models\MPolicyInitialPremium;
+use App\Models\MEndorsementPremium;
+use App\Models\MPolicyPremium;
 use App\Models\Policy;
 use App\Models\PolicyInstallment;
 use App\Models\RInsuranceType;
@@ -16,49 +17,94 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Psy\VersionUpdater\Installer;
+
 // use Nette\Utils\Validators;
 
 class InsurancePanelController extends Controller
 {
     public function getInsurancPanelData ($dataPerPage = 10, $searchQuery = null) {
-        
-        // $data = InsurancePanel::leftJoin('t_policy', 't_insurance_panel.POLICY_ID', '=', 't_policy.POLICY_ID')
-        // ->leftJoin('t_relation', 't_insurance_panel.INSURANCE_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
-        // ->leftJoin('r_currency', 't_insurance_panel.IP_CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
-        // ->orderBy('IP_ID', 'desc');
-        $data = InsurancePanel::orderBy('IP_ID', 'desc');
+
+        $data = InsurancePanel::orderBy('IP_ID', 'desc')->whereNull('IP_IS_DELETED');
         
         if ($searchQuery) {
-            // print('b');
             if ($searchQuery->input('policy_id')) {
-                $data->where('t_policy.POLICY_ID', 'like', '%'.$searchQuery->policy_id.'%');
+                $data->where('POLICY_ID', $searchQuery->policy_id);
             }
-            // if ($searchQuery->input('policy_insurance_type_name')) {
-            //     $data->where('policy_insurance_type_name', 'like', '%'.$searchQuery->policy_insurance_type_name.'%');
-            // }
-            // if ($searchQuery->input('policy_broker_name')) {
-            //     $data->where('policy_broker_name', 'like', '%'.$searchQuery->policy_broker_name.'%');
-            // }
-            // if ($searchQuery->input('policy_inception_date')) {
-            //     $data->where('policy_inception_date', $searchQuery->policy_inception_date);
-            // }
-            // if ($searchQuery->input('policy_due_date')) {
-            //     $data->where('policy_due_date', $searchQuery->policy_due_date);
-            // }
-            // if ($searchQuery->input('policy_status_id')) {
-            //     $data->where('policy_status_id', $searchQuery->policy_status_id);
-            // }
+            if ($searchQuery->input('client_id')) {
+                $data->where('INSURANCE_ID', $searchQuery->client_id);
+            }
         }
-        // dd($data->paginate($dataPerPage));
         return $data->paginate($dataPerPage);
 
     }
 
-    public function initialPremium($id) {
+    public function getCurrency(Request $request) {
+        if ($request->endorsement_id) {
+            // cari addtional premium ke endorsement
+            $data = MEndorsementPremium::select('CURRENCY_ID')->where('ENDORSEMENT_ID', $request->endorsement_id)->groupBy('CURRENCY_ID')->get();
+        } else {
+            $data = MPolicyPremium::select('CURRENCY_ID')->where('POLICY_ID', $request->policy_id)->groupBy('CURRENCY_ID')->get();
+        }
+        return response()->json($data);
+    }
+
+    public function getPremium(Request $request) {
+        if ($request->endorsement_id) {
+            // cari addtional premium ke endorsement
+            $data = MEndorsementPremium::where('ENDORSEMENT_ID', $request->endorsement_id)->get();
+        } else {
+            $data = MPolicyPremium::where('POLICY_ID', $request->policy_id)->get();
+        }
+        return response()->json($data);
+    }
+
+    public function getPremiumById(Request $request) {
+        // dd($request->premium_type);
+
+        if ($request->premium_type == "additional") {
+            $data = MEndorsementPremium::find($request->policy_iniital_premium_id);
+        } else {
+            $data = MPolicyPremium::find($request->policy_iniital_premium_id);
+        }
         
-        $data = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
-        ->where('POLICY_INITIAL_PREMIUM_ID', $id)->first();
-        // dd($data);
+        // $data = MPolicyPremium::find($request->policy_iniital_premium_id);
+        return response()->json($data);
+
+    }
+
+    public function getPremiumByCurrency(Request $request) {
+        if ($request->premium_type == "additional") {
+            $data = MEndorsementPremium::where('ENDORSEMENT_ID', $request->id)
+            ->where('CURRENCY_ID', $request->currency_id)
+            ->get();
+        } else {
+            $data = MPolicyPremium::where('POLICY_ID', $request->id)
+            ->where('CURRENCY_ID', $request->currency_id)
+            ->get();
+        }
+        //  config()->set('database.connections.mysql.strict', false);
+        // DB::reconnect(); //important 
+
+        // if ($request->premium_type == "additional") {
+        //     $data = MEndorsementPremium::select('m_endorsement_premium.*')->where('ENDORSEMENT_ID', $request->id)->where('CURRENCY_ID', $request->currency_id)->groupBy('CURRENCY_ID')->get();
+        // } else {
+        //     $data = MPolicyPremium::select('sum(GROSS_PREMI) as GROSS_PREMI, sum(ADMIN_COST) as ADMIN_COST, sum(DISC_BROKER) as DISC_BROKER, sum(DISC_CONSULTATION) as DISC_CONSULTATION, sum(DISC_ADMIN) as DISC_ADMIN, sum(NETT_PREMI) as NETT_PREMI, sum(FEE_BASED_INCOME) as FEE_BASED_INCOME, sum(AGENT_COMMISION) as AGENT_COMMISION, sum(ACQUISITION_COST) as ACQUISITION_COST,')
+        //     ->where('POLICY_ID', $request->id)
+        //     ->where('CURRENCY_ID', $request->currency_id)
+        //     ->groupBy('CURRENCY_ID')
+        //     ->get();
+        // }
+        // //now changing back the strict ON
+        // config()->set('database.connections.mysql.strict', true);
+        // DB::reconnect();
+        return response()->json($data);
+    }
+
+    public function getInsurancePanelByPremiumId($id) {
+        
+        $data = InsurancePanel::where('POLICY_INITIAL_PREMIUM_ID', $id)->get();
+        // dd(response()->json($data));
         return response()->json($data);
 
     }
@@ -71,27 +117,36 @@ class InsurancePanelController extends Controller
 
     }
 
+    public function getPolicyBeforeInsurancePanel()
+    {
+        $policyIds = InsurancePanel::select('POLICY_ID')->whereNotNull('POLICY_ID');
+ 
+        $policies = Policy::whereNotIn('POLICY_ID', $policyIds)->get();
+        return $policies;
+    }
+
     public function index()
     {        
-        $listInitialPremium = MPolicyInitialPremium::leftJoin('t_policy', 'm_policy_initial_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
-                ->leftJoin('r_currency', 'm_policy_initial_premium.CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
-                ->orderBy('m_policy_initial_premium.POLICY_ID', 'desc')
+        $listInitialPremium = MPolicyPremium::leftJoin('t_policy', 'm_policy_premium.POLICY_ID', '=', 't_policy.POLICY_ID')
+                ->leftJoin('r_currency', 'm_policy_premium.CURRENCY_ID', '=', 'r_currency.CURRENCY_ID')
+                ->orderBy('m_policy_premium.POLICY_ID', 'desc')
                 ->get();
-        // dd($policyIinitialPremium->toArray());
+        // dd($this->getPolicyBeforeInsurancePanel());
         return Inertia::render('InsurancePanel/Index', [
-            
+            'policies' => Policy::get(), //$this->getPolicyBeforeInsurancePanel(),
             'listInitialPremium' => $listInitialPremium,
             // 'currency' => RCurrency::get(),
             // 'insuranceType' => RInsuranceType::where('INSURANCE_TYPE_STATUS', '=', 1)->get(),
             'insurance' => DB::table('t_relation')
                 ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
                 ->where('RELATION_TYPE_ID', '=', 1)
-                ->get()
+                ->get(),
+            'insurancePanels' => InsurancePanel::get()
         ]);
     }
 
     public function getInsurancePanelJson(Request $request) {
-// dd($request);
+        // dd($request->policy_number);
         $data = $this->getInsurancPanelData(10, $request);
         return response()->json($data);
 
@@ -99,22 +154,22 @@ class InsurancePanelController extends Controller
 
     public function store(Request $request) {
 
-        // dd($request);
-        
+        // dd($request);        
         // Create Policy
         $insurancePanel = InsurancePanel::insertGetId([
 
             // 'IP_ID',
             'POLICY_ID'                     => $request->policy_id,
+            'ENDORSEMENT_ID'                => $request->endorsement_id,
             'POLICY_INITIAL_PREMIUM_ID'     => $request->policy_initial_premium_id, // Belum ada isi
             'IP_PREMIUM_TYPE'               => $request->ip_premium_type,
             'INSURANCE_ID'                  => $request->insurance_id,
             'IP_POLICY_LEADER'              => $request->ip_policy_leader, // Belum ada isi
             'IP_CURRENCY_ID'                => $request->ip_currency_id, // Belum ada isi
-            // 'IP_TERM'                       => $request->ip_term,
-            'IP_POLICY_INITIAL_PREMIUM'     => $request->ip_policy_initial_premium,
+            'ENGINEERING_FEE'               => $request->engineering_fee,
+            'IP_POLICY_INITIAL_PREMIUM'     => $request->ip_policy_initial_premium ? $request->ip_policy_initial_premium : 0,
             'IP_POLICY_SHARE'               => $request->ip_policy_share,
-            'IP_DISC_INSURANCE'             => $request->ip_disc_insurance,
+            'IP_DISC_INSURANCE'             => 0,//$request->ip_disc_insurance,
             'IP_PIP_AFTER_DISC'             => $request->ip_pip_after_disc,
             'IP_POLICY_BF'                  => $request->ip_policy_bf,
             'IP_BF_AMOUNT'                  => $request->ip_bf_amount,
@@ -133,7 +188,7 @@ class InsurancePanelController extends Controller
             $installmentData[] = [
 
                 // 'INSTALLMENT_ID',
-                'INSURANCE_PANEL_ID'        => $insurancePanel,
+                'IP_ID'        => $insurancePanel,
                 'INSTALLMENT_TERM'          => $req['installment_term'], // Belum ada isi
                 'INSTALLMENT_PERCENTAGE'    => $req['installment_percentage'],
                 'INSTALLMENT_DUE_DATE'      => $req['installment_due_date'],
@@ -163,7 +218,8 @@ class InsurancePanelController extends Controller
 
 
         return new JsonResponse([
-            'Insurance Panel Success Added.'
+            // 'Insurance Panel Success Added.'
+            $insurancePanel
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -181,8 +237,9 @@ class InsurancePanelController extends Controller
         return response()->json($data);        
     }
 
-    public function edit(Request $request, InsurancePanel $insurancePanel) {
+    public function edit(Request $request) {
 
+        // print_r($request);
         // dd($request);
         // $validateData = Validator::make($request->all(), [
         //     'POLICY_ID'                     =>  'required',
@@ -214,15 +271,16 @@ class InsurancePanelController extends Controller
         $insurancePanel = InsurancePanel::where('IP_ID', $request->id)
                         ->update([
                             'POLICY_ID'                     => $request->POLICY_ID,
+                            'ENDORSEMENT_ID'                => $request->ENDORSEMENT_ID,
                             'POLICY_INITIAL_PREMIUM_ID'     => $request->POLICY_INITIAL_PREMIUM_ID, // Belum ada isi
                             'IP_PREMIUM_TYPE'               => $request->IP_PREMIUM_TYPE,
                             'INSURANCE_ID'                  => $request->INSURANCE_ID,
                             'IP_POLICY_LEADER'              => $request->IP_POLICY_LEADER, // Belum ada isi
                             'IP_CURRENCY_ID'                => $request->IP_CURRENCY_ID, // Belum ada isi
-                            // 'IP_TERM'                       => $request->IP_TERM,
+                            'ENGINEERING_FEE'               => $request->ENGINEERING_FEE,
                             'IP_POLICY_INITIAL_PREMIUM'     => $request->IP_POLICY_INITIAL_PREMIUM,
                             'IP_POLICY_SHARE'               => $request->IP_POLICY_SHARE,
-                            'IP_DISC_INSURANCE'             => $request->IP_DISC_INSURANCE,
+                            'IP_DISC_INSURANCE'             => 0, //$request->IP_DISC_INSURANCE,
                             'IP_PIP_AFTER_DISC'             => $request->IP_PIP_AFTER_DISC,
                             'IP_POLICY_BF'                  => $request->IP_POLICY_BF,
                             'IP_BF_AMOUNT'                  => $request->IP_BF_AMOUNT,
@@ -234,14 +292,15 @@ class InsurancePanelController extends Controller
                             'IP_UPDATED_BY'                 => Auth::user()->id,
                             'IP_UPDATED_DATE'               => now()
                         ]);
+
+        // $checkInstallment = Installment::find($request['INSTALLMENT_ID']);
                         
         foreach ($request->installment as $req) {
-            Installment::updateOrCreate(
-                [
-                    'INSTALLMENT_ID'    => $req['INSTALLMENT_ID']
-                ],
-                [
-                    // 'INSURANCE_PANEL_ID'        => $insurancePanel,
+            
+            // jika bukan baris baru, maka update
+            if ($req['INSTALLMENT_ID']) {
+                Installment::where('INSTALLMENT_ID', $req['INSTALLMENT_ID'])
+                ->update([
                     'INSTALLMENT_TERM'          => $req['INSTALLMENT_TERM'], // Belum ada isi
                     'INSTALLMENT_PERCENTAGE'    => $req['INSTALLMENT_PERCENTAGE'],
                     'INSTALLMENT_DUE_DATE'      => $req['INSTALLMENT_DUE_DATE'],
@@ -253,8 +312,25 @@ class InsurancePanelController extends Controller
                     'INSTALLMENT_NET_BF'        => $req['INSTALLMENT_NET_BF'],
                     'INSTALLMENT_ADMIN_COST'    => $req['INSTALLMENT_ADMIN_COST'],
                     'INSTALLMENT_POLICY_COST'   => $req['INSTALLMENT_POLICY_COST']
-                ]
-            );
+                ]);                
+            } else {
+                // jika baris baru, maka insert
+                Installment::create([
+                    'IP_ID'                     => $request->id,
+                    'INSTALLMENT_TERM'          => $req['INSTALLMENT_TERM'], // Belum ada isi
+                    'INSTALLMENT_PERCENTAGE'    => $req['INSTALLMENT_PERCENTAGE'],
+                    'INSTALLMENT_DUE_DATE'      => $req['INSTALLMENT_DUE_DATE'],
+                    'INSTALLMENT_AR'            => $req['INSTALLMENT_AR'],
+                    'INSTALLMENT_AP'            => $req['INSTALLMENT_AP'],
+                    'INSTALLMENT_GROSS_BF'      => $req['INSTALLMENT_GROSS_BF'],
+                    'INSTALLMENT_VAT'           => $req['INSTALLMENT_VAT'],
+                    'INSTALLMENT_PPH_23'        => $req['INSTALLMENT_PPH_23'],
+                    'INSTALLMENT_NET_BF'        => $req['INSTALLMENT_NET_BF'],
+                    'INSTALLMENT_ADMIN_COST'    => $req['INSTALLMENT_ADMIN_COST'],
+                    'INSTALLMENT_POLICY_COST'   => $req['INSTALLMENT_POLICY_COST']
+                ]);
+            }
+            
         }
         
         if ($request->deleteInstallment) {
@@ -276,6 +352,63 @@ class InsurancePanelController extends Controller
         return new JsonResponse([
             'Insurance Panel updated.'
         ], 200, [
+            'X-Inertia' => true
+        ]);
+
+    }
+
+    public function deactivate (Request $request) {
+
+        // dd($request);
+        $updatingData = InsurancePanel::where('IP_ID', $request->id)
+                              ->update([
+                                'IP_IS_DELETED'      => 1,
+                                'IP_IS_DELETED_BY'   => Auth::user()->id,
+                                'IP_IS_DELETED_DATE' => now()
+                              ]);
+        
+        if ($updatingData) {
+
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Deactivate Insurer.",
+                    "module"      => "Insurer",
+                    "id"          => $request->id
+                ]),
+                'action_by'  => Auth::user()->email
+            ]);
+            
+            return new JsonResponse([
+                // 'Endorsement deactivated.'
+                'status' => true
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
+
+    }
+
+    public function destroy($ip_id) {
+
+        // cek CN atau DN
+        $cekCnDn = true;
+        if ($cekCnDn) {
+            //  jika sudah ada DN atau CN, maka gabisa hapus
+            $msg = "Failed deleted Insurer because existing DN or CN";
+            $status = false;
+        } else {
+            // jika belum ada DN atau CN, maka insurer bisa dihapus
+            InsurancePanel::where('IP_ID', $ip_id)->delete();
+            Installment::where('IP_ID', $ip_id)->delete();            
+            $msg= "Successfull deleted Insurer";
+            $status = true;
+        }        
+        
+        return new JsonResponse([
+            'status' => $status,
+            'msg'   => $msg
+        ], 201, [
             'X-Inertia' => true
         ]);
 

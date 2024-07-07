@@ -5,28 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MPolicyInitialPremium extends Model
+class MPolicyPremium extends Model
 {
     use HasFactory;
     protected $primaryKey = 'POLICY_INITIAL_PREMIUM_ID';
-    protected $table = 'm_policy_initial_premium';
+    protected $table = 'm_policy_premium';
 
     public $timestamps = false;
     public $with = ['currency'];
 
-    protected $fillable = [
-        'POLICY_INITIAL_PREMIUM_ID',
-        'POLICY_ID',
-        'CURRENCY_ID',
-        'SUM_INSURED',
-        'RATE',
-        'INITIAL_PREMIUM',
-        'INSTALLMENT',
-        'CREATED_BY',
-        'CREATED_DATE',
-        'UPDATED_BY',
-        'UPDATED_DATE'
-    ];
+    // protected $fillable = [
+    //     'POLICY_INITIAL_PREMIUM_ID',
+    //     'POLICY_ID',
+    //     'CURRENCY_ID',
+    //     'SUM_INSURED',
+    //     'RATE',
+    //     'INITIAL_PREMIUM',
+    //     'INSTALLMENT',
+    //     'CREATED_BY',
+    //     'CREATED_DATE',
+    //     'UPDATED_BY',
+    //     'UPDATED_DATE'
+    // ];
+    protected $guarded = ['POLICY_INITIAL_PREMIUM_ID'];
 
     public function currency() {
         return $this->hasOne(RCurrency::class, 'CURRENCY_ID', 'CURRENCY_ID');

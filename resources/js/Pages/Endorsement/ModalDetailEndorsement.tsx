@@ -18,27 +18,26 @@ import TextInput from "@/Components/TextInput";
 import Swal from "sweetalert2";
 import SwitchPage from "@/Components/Switch";
 
-export default function ModalDetailPolicy({
-    policy,
-    insurance,
-    insuranceType,
-    policyStatus,
+export default function ModalDetailEndorsement({
+    endorsement,
+    listPolicy,
+    endorsementTypes,
+    endorsementStatus,
     currency,
     onDeleteSuccess,
 }: PropsWithChildren<{
-    policy: any;
-    insurance: any | null;
-    insuranceType: any | null;
-    policyStatus: any | null;
+    endorsement: any;
+    listPolicy: any | null;
+    endorsementTypes: any | null;
+    endorsementStatus: any | null;
     currency: any | null;
     onDeleteSuccess: any;
 }>) {
     const [insurancePanels, setInsurancePanels] = useState<any>([]);
-    const [dataById, setDataById] = useState<any>(policy);
-    const [flagSwitch, setFlagSwitch] = useState<boolean>(false);
+    const [dataById, setDataById] = useState<any>(endorsement);
     const [sumByCurrency, setSumByCurrency] = useState<any>([]);
     const [flagDelete, setFlagDelete] = useState<number>(0);
-    // const { insurance, insuranceType, policyStatus, currency }: any =
+    // const { insurance, endorsementTypes, endorsementStatus, currency }: any =
     //     usePage().props;
 
     const premiumType = [
@@ -47,54 +46,18 @@ export default function ModalDetailPolicy({
     ];
 
     useEffect(() => {
-        getInsurancePanel(policy.POLICY_ID);
+        getInsurancePanel(endorsement.ENDORSEMENT_ID);
         getSummaryPremi()
-        // setFlagSwitch(policy.SELF_INSURED? true:false)
-    }, [policy.POLICY_ID]);
+    }, [endorsement.ENDORSEMENT_ID]);
 
-    
     const getInsurancePanel = async (id: number) => {
+        // harusnya insurancePanelByEndorsementId
         await axios
             .get(`/insurancePanelByPolicyId/${id}`)
             .then((res) => setInsurancePanels(res.data))
             .catch((err) => console.log(err));
     };
-    console.log("policy: ", policy);
-
-    const getSummaryPremi = () => {
-        // const dataToGroup = dataById.policy_premium;
-        const dataToGroup: any = [...dataById.policy_premium];
-        console.log("dataToGroup: ", dataToGroup);
-        const groupBy = (data: any, keys: any) => {
-            // console.log('data: ',data)
-            return Object.values(
-                data.reduce((acc: any, val: any) => {
-                    const currency_id = keys.reduce(
-                        (finalName: any, key: any) => finalName + val[key],
-                        ""
-                    );
-                    if (acc[currency_id]) {
-                        acc[currency_id].values.push(
-                            val.NETT_PREMI ? val.NETT_PREMI : 0
-                        );
-                        acc[currency_id].sum += val.NETT_PREMI
-                            ? val.NETT_PREMI
-                            : 0;
-                    } else {
-                        acc[currency_id] = {
-                            currency_id,
-                            sum: val.NETT_PREMI ? val.NETT_PREMI : 0,
-                            values: [val.NETT_PREMI ? val.NETT_PREMI : 0],
-                        };
-                    }
-                    return acc;
-                }, {})
-            );
-        };
-        setSumByCurrency(groupBy(dataToGroup, ["CURRENCY_ID"]));
-    };
-
-    console.log("sumByCurrency: ", sumByCurrency);
+    console.log("dataById: ", dataById);
 
     const editClick = () => {
         alert("a");
@@ -109,21 +72,12 @@ export default function ModalDetailPolicy({
         search: false,
     });
 
-    const getCurrencyById = (currId: any) => {
-        console.log("currId: ", currId);
-        const dataCurr = currency;
-        const result = dataCurr.find((id: any) => id.CURRENCY_ID == currId);
-        return result ? result.CURRENCY_SYMBOL : null;
-    };
-
     // edit
     const handleEditModal = async () => {
         // e.preventDefault();
-        const id = policy.POLICY_ID;
-        setFlagSwitch(policy.SELF_INSURED ? true : false);
-
+        const id = endorsement.ENDORSEMENT_ID;
         await axios
-            .get(`/getPolicy/${id}`)
+            .get(`/getEndorsement/${id}`)
             .then((res) => setDataById(res.data))
             .catch((err) => console.log(err));
 
@@ -136,26 +90,27 @@ export default function ModalDetailPolicy({
             search: false,
         });
     };
-    const editPolicyPremium = (
+    const editEndorsementPremium = (
         name: string,
         value: string | undefined,
         i: number
     ) => {
-        const changeVal: any = [...dataById.policy_premium];
+        const changeVal: any = [...dataById.endorsement_premium];
         changeVal[i][name] = value;
-        setDataById({ ...dataById, policy_premium: changeVal });
+        console.log(name)
+        setDataById({ ...dataById, endorsement_premium: changeVal });
     };
     // console.log("dataById: ", dataById);
-    const addRowEditPolicyPremium = (e: FormEvent) => {
+    const addRowEditEndorsementPremium = (e: FormEvent) => {
         e.preventDefault();
         // console.log(dataById);
         setDataById({
             ...dataById,
-            policy_premium: [
-                ...dataById.policy_premium,
+            endorsement_premium: [
+                ...dataById.endorsement_premium,
                 {
-                    POLICY_INITIAL_PREMIUM_ID: null,
-                    POLICY_ID: dataById.POLICY_ID,
+                    ENDORSEMENT_PREMIUM_ID: null,
+                    ENDORSEMENT_ID: dataById.ENDORSEMENT_ID,
                     CURRENCY_ID: "",
                     COVERAGE_NAME: "",
                     GROSS_PREMI: 0,
@@ -167,30 +122,29 @@ export default function ModalDetailPolicy({
                     FEE_BASED_INCOME: 0,
                     AGENT_COMMISION: 0,
                     ACQUISITION_COST: 0,
+                    // SUM_INSURED: "",
+                    // RATE: "",
+                    // ADDITIONAL_PREMIUM: "",
                 },
             ],
         });
-        getSummaryPremi();
     };
 
-    const deleteRowEditPolicyPremium = (i: number) => {
-        const val = [...dataById.policy_premium];
+    const deleteRowEditEndorsementPremium = (i: number) => {
+        const val = [...dataById.endorsement_premium];
         val.splice(i, 1);
-        if (
-            dataById.policy_premium[i].policy_initial_premium_id !==
-            null
-        ) {
-            if (dataById.deletedPolicyPremium) {
+        if (dataById.endorsement_premium[i].endorsement_premium_id !== null) {
+            if (dataById.deletedEndorsementPremium) {
                 // alert("a");
                 setDataById({
                     ...dataById,
-                    policy_premium: val,
-                    deletedPolicyPremium: [
-                        ...dataById.deletedPolicyPremium,
+                    endorsement_premium: val,
+                    deletedEndorsementPremium: [
+                        ...dataById.deletedEndorsementPremium,
                         {
-                            policy_initial_premium_id:
-                                dataById.policy_premium[i]
-                                    .POLICY_INITIAL_PREMIUM_ID,
+                            endorsement_premium_id:
+                                dataById.endorsement_premium[i]
+                                    .ENDORSEMENT_PREMIUM_ID,
                         },
                     ],
                 });
@@ -198,12 +152,12 @@ export default function ModalDetailPolicy({
                 // alert("b");
                 setDataById({
                     ...dataById,
-                    policy_premium: val,
-                    deletedPolicyPremium: [
+                    endorsement_premium: val,
+                    deletedEndorsementPremium: [
                         {
-                            policy_initial_premium_id:
-                                dataById.policy_premium[i]
-                                    .POLICY_INITIAL_PREMIUM_ID,
+                            endorsement_premium_id:
+                                dataById.endorsement_premium[i]
+                                    .ENDORSEMENT_PREMIUM_ID,
                         },
                     ],
                 });
@@ -211,24 +165,25 @@ export default function ModalDetailPolicy({
         } else {
             setDataById({
                 ...dataById,
-                policy_premium: val,
+                endorsement_premium: val,
             });
         }
+        
     };
 
+        // getSummaryPremi();
     useEffect(() => {
         getSummaryPremi();
     }, [flagDelete]);
 
-
-    const editPolicyInstallment = (
+    const editEndorsementInstallment = (
         name: string,
         value: string | undefined,
         i: number
     ) => {
-        const changeVal: any = [...dataById.policy_installment];
+        const changeVal: any = [...dataById.endorsement_installment];
         changeVal[i][name] = value;
-        setDataById({ ...dataById, policy_installment: changeVal });
+        setDataById({ ...dataById, endorsement_installment: changeVal });
     };
 
     const addRowEditInstallment = (e: FormEvent) => {
@@ -236,48 +191,46 @@ export default function ModalDetailPolicy({
         // console.log(dataById);
         setDataById({
             ...dataById,
-            policy_installment: [
-                ...dataById.policy_installment,
+            endorsement_installment: [
+                ...dataById.endorsement_installment,
                 {
-                    POLICY_INSTALLMENT_ID: null,
-                    POLICY_ID: dataById.POLICY_ID,
-                    POLICY_INSTALLMENT_TERM: "",
-                    POLICY_INSTALLMENT_PERCENTAGE: "",
-                    INSTALLMENT_DUE_DATE: "",
-                    POLICY_INSTALLMENT_AMOUNT: "",
+                    ENDORSEMENT_INSTALLMENT_ID: null,
+                    ENDORSEMENT_ID: dataById.ENDORSEMENT_ID,
+                    ENDORSEMENT_INSTALLMENT_TERM: "",
+                    ENDORSEMENT_INSTALLMENT_RATE: "",
+                    ENDORSEMENT_INSTALLMENT_DUE_DATE: "",
+                    ENDORSEMENT_INSTALLMENT_AMOUNT: "",
                 },
             ],
         });
     };
 
     const deleteRowEditInstallment = (i: number) => {
-        const val = [...dataById.policy_installment];
+        const val = [...dataById.endorsement_installment];
         val.splice(i, 1);
-        if (dataById.policy_installment[i].policy_installment_id !== null) {
+        if (dataById.endorsement_installment[i].endorsement_installment_id !== null) {
             if (dataById.deletedInstallment) {
-                // alert("a");
                 setDataById({
                     ...dataById,
-                    policy_installment: val,
-                    deletedPolicyPremium: [
+                    endorsement_installment: val,
+                    deletedEndorsementPremium: [
                         ...dataById.deletedInstallment,
                         {
-                            policy_installment_id:
-                                dataById.policy_installment[i]
-                                    .POLICY_INISTALLMENT_ID,
+                            endorsement_installment_id:
+                                dataById.endorsement_installment[i]
+                                    .ENDORSEMENT_INSTALLMENT_ID,
                         },
                     ],
                 });
             } else {
-                // alert("b");
                 setDataById({
                     ...dataById,
-                    policy_installment: val,
-                    deletedPolicyPremium: [
+                    endorsement_installment: val,
+                    deletedEndorsementPremium: [
                         {
-                            policy_installment_id:
-                                dataById.policy_installment[i]
-                                    .POLICY_INSTALLMENT_ID,
+                            endorsement_installment_id:
+                                dataById.endorsement_installment[i]
+                                    .ENDORSEMENT_INSTALLMENT_ID,
                         },
                     ],
                 });
@@ -285,18 +238,17 @@ export default function ModalDetailPolicy({
         } else {
             setDataById({
                 ...dataById,
-                policy_installment: val,
+                endorsement_installment: val,
             });
         }
     };
     const editCalculate = (i: number) => {
-        const changeVal: any = [...dataById.policy_premium];
+        const changeVal: any = [...dataById.endorsement_premium];
         // const si = changeVal[i]["SUM_INSURED"];
         // const rate = changeVal[i]["RATE"];
         // if (si && rate) {
         //     changeVal[i]["INITIAL_PREMIUM"] = (si * rate) / 100;
         // } else [(changeVal[i]["INITIAL_PREMIUM"] = 0)];
-
         const gross_premi = changeVal[i]["GROSS_PREMI"];
         const admin_cost = changeVal[i]["ADMIN_COST"];
         const disc_broker = changeVal[i]["DISC_BROKER"];
@@ -308,10 +260,9 @@ export default function ModalDetailPolicy({
             parseFloat(disc_broker) -
             parseFloat(disc_admin) -
             parseFloat(disc_consultation);
-        setDataById({ ...dataById, policy_premium: changeVal });
+        setDataById({ ...dataById, endorsement_premium: changeVal });
 
         getSummaryPremi();
-        console.log('edit calculate')
     };
     // end edit
 
@@ -340,21 +291,13 @@ export default function ModalDetailPolicy({
         // getPolicy();
     };
 
-    // Parent Component
-    // const callbackModal = () => {
-    //     setState({ showModal: false });
-    // };
-    // //ChildButton
-    // closeButtonClickHandler = () => {
-    //     this.props.callbackModal();
-    // };
     const handleDeleteModal = async () => {
-        const id = policy.POLICY_ID;
+        const id = endorsement.ENDORSEMENT_ID;
         // alert("aaa");
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
-            width:400,
+            width: 400,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -363,13 +306,13 @@ export default function ModalDetailPolicy({
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .patch(`/deactivatePolicy/${id}`, {id:id})
+                    .patch(`/deactivateEndorsement/${id}`, { id: id })
                     .then((res) => {
                         console.log(res.data.status);
                         if (res.data.status) {
                             Swal.fire({
                                 title: "Deleted!",
-                                text: "Your Policy has been deleted.",
+                                text: "Your Endorsement has been deleted.",
                                 icon: "success",
                             });
                             onDeleteSuccess(true);
@@ -383,36 +326,48 @@ export default function ModalDetailPolicy({
                         // setDataById(res.data)
                     })
                     .catch((err) => console.log(err));
-           }
+            }
         });
         // onDeleteSuccess(true)
     };
 
-    const handleSwitch = () => {
-        setFlagSwitch(!flagSwitch);
+    const getCurrencyById = (currId: any) => {
+        console.log("currId: ", currId);
+        const dataCurr = currency;
+        const result = dataCurr.find((id: any) => id.CURRENCY_ID == currId);
+        return result ? result.CURRENCY_SYMBOL : null;
     };
+
+    const getSummaryPremi = () => {
+        // const dataToGroup = dataById.endorsement_premium;
+        const dataToGroup: any = [...dataById.endorsement_premium];
+        // alert('aa')
+        const groupBy = (data: any, keys: any) => {
+            return Object.values(
+                data.reduce((acc: any, val: any) => {
+                    const currency_id = keys.reduce(
+                        (finalName: any, key: any) => finalName + val[key],
+                        ""
+                    );
+                    if (acc[currency_id]) {
+                        acc[currency_id].values.push(val.NETT_PREMI);
+                        acc[currency_id].sum += val.NETT_PREMI;
+                    } else {
+                        acc[currency_id] = {
+                            currency_id,
+                            sum: val.NETT_PREMI,
+                            values: [val.NETT_PREMI],
+                        };
+                    }
+                    return acc;
+                }, {})
+            );
+        };
+       
+        setSumByCurrency(groupBy(dataToGroup, ["CURRENCY_ID"]));
+    };
+
     
-    useEffect(() => {
-        if (flagSwitch == false) {
-            // console.log("SELF_INSURED: 0");
-            setDataById({
-                ...dataById,
-                SELF_INSURED: 0,
-            });
-        }
-        // !flagSwitch ? console.log("SELF_INSURED: 0") : console.log("True");
-        // setDataById({
-        //     ...dataById,
-        //     SELF_INSURED: values,
-        // });
-        // console.log('x: ', flagSwitch);
-    }, [flagSwitch]);
-    // const setSelfInsured = () => {
-    //     console.log('x: ', flagSwitch);
-    // }
-
-    // console.log("ModalDetailPolicy: ", policy);
-
     return (
         <>
             {/* modal edit */}
@@ -426,11 +381,11 @@ export default function ModalDetailPolicy({
                         view: false,
                         document: false,
                         search: false,
-                    }),
-                        setSumByCurrency([]);
+                    });
+                    setSumByCurrency([]);
                 }}
-                title={"Edit Policy"}
-                url={`/editPolicy/${dataById.POLICY_ID}`}
+                title={"Edit Endorsement"}
+                url={`/editEndorsement/${dataById.ENDORSEMENT_ID}`}
                 data={dataById}
                 onSuccess={handleSuccess}
                 // onSuccess={""}
@@ -438,58 +393,101 @@ export default function ModalDetailPolicy({
                 headers={null}
                 submitButtonName={"Submit"}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-6xl"
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
                 }
                 body={
                     <>
-                        <div className="mb-4 ml-4 mr-4">
-                            <InputLabel
-                                htmlFor="edit_relation"
-                                value="Client Name"
-                            />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                value={dataById.RELATION_ID}
-                                onChange={(e) =>
-                                    setDataById({
-                                        ...dataById,
-                                        RELATION_ID: e.target.value,
-                                    })
-                                }
-                            >
-                                <option>
-                                    -- <i>Choose Status</i> --
-                                </option>
-                                {insurance?.map((status: any) => {
-                                    return (
-                                        <option
-                                            value={
-                                                status.RELATION_ORGANIZATION_ID
-                                            }
-                                        >
-                                            {status.RELATION_ORGANIZATION_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
                         <div className="grid grid-rows grid-flow-col gap-4 ml-4 mr-4">
                             <div className="mb-4">
                                 <InputLabel
                                     htmlFor="edit_policy_number"
                                     value="Policy Number"
                                 />
-                                <TextInput
-                                    id="edit_policy_number"
-                                    type="text"
-                                    name="edit_policy_number"
-                                    value={dataById.POLICY_NUMBER}
-                                    className=""
-                                    autoComplete="edit_policy_number"
+                                <select
+                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    value={dataById.POLICY_ID}
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            POLICY_NUMBER: e.target.value,
+                                            POLICY_ID: e.target.value,
+                                        })
+                                    }
+                                    disabled
+                                >
+                                    <option>
+                                        -- <i>Choose Policy Number</i> --
+                                    </option>
+                                    {listPolicy.map(
+                                        (policy: any, i: number) => {
+                                            return (
+                                                <option
+                                                    key={i}
+                                                    value={policy.POLICY_ID}
+                                                >
+                                                    {policy.POLICY_NUMBER}
+                                                </option>
+                                            );
+                                        }
+                                    )}
+                                </select>
+                            </div>
+                            <div className="mb-4">
+                                <InputLabel
+                                    htmlFor="edit_policy_the_insured"
+                                    value="Policy The Insured"
+                                />
+                                <TextInput
+                                    id="edit_policy_the_insured"
+                                    type="text"
+                                    name="edit_policy_the_insured"
+                                    value={dataById.policy.POLICY_THE_INSURED}
+                                    className=""
+                                    autoComplete="edit_policy_the_insured"
+                                    readOnly
+                                />
+                            </div>
+                            {dataById.SELF_INSURED ? (
+                                <div className="mb-4 w-24 ">
+                                    <InputLabel
+                                        htmlFor="self_insured"
+                                        value="Self Insured %"
+                                    />
+                                    <TextInput
+                                        id="self_insured"
+                                        type="text"
+                                        name="self_insured"
+                                        value={dataById.SELF_INSURED}
+                                        className=""
+                                        autoComplete="SELF_INSURED"
+                                        onChange={(e) =>
+                                            setDataById({
+                                                ...dataById,
+                                                SELF_INSURED: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                            ) : (
+                                ""
+                            )}
+                        </div>
+                        <div className="grid grid-rows grid-flow-col gap-4 ml-4 mr-4">
+                            <div className="mb-4">
+                                <InputLabel
+                                    htmlFor="edit_endorsement_number"
+                                    value="Endorsement Number"
+                                />
+                                <TextInput
+                                    id="edit_endorsement_number"
+                                    type="text"
+                                    name="edit_endorsement_number"
+                                    value={dataById.ENDORSEMENT_NUMBER}
+                                    className=""
+                                    autoComplete="edit_endorsement_number"
+                                    onChange={(e) =>
+                                        setDataById({
+                                            ...dataById,
+                                            ENDORSEMENT_NUMBER: e.target.value,
                                         })
                                     }
                                     required
@@ -497,95 +495,113 @@ export default function ModalDetailPolicy({
                             </div>
                             <div className="mb-4">
                                 <InputLabel
-                                    htmlFor="edit_insurance_type"
-                                    value="Insurance Type"
+                                    htmlFor="edit_endorsement_type"
+                                    value="Endorsement Type"
                                 />
                                 <select
                                     className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    value={dataById.INSURANCE_TYPE_ID}
+                                    value={dataById.ENDORSEMENT_TYPE_ID}
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            INSURANCE_TYPE_ID: e.target.value,
+                                            ENDORSEMENT_TYPE_ID: e.target.value,
                                         })
                                     }
+                                    required
                                 >
-                                    <option value={""}>
-                                        -- <i>Choose Insurance Type</i> --
+                                    <option>
+                                        -- <i>Choose</i> --
                                     </option>
-                                    {insuranceType?.map((status: any) => {
-                                        return (
-                                            <option
-                                                value={status.INSURANCE_TYPE_ID}
-                                            >
-                                                {status.INSURANCE_TYPE_NAME}
-                                            </option>
-                                        );
-                                    })}
+                                    {endorsementTypes.map(
+                                        (eT: any, i: number) => {
+                                            return (
+                                                <option
+                                                    key={i}
+                                                    value={
+                                                        eT.ENDORSEMENT_TYPE_ID
+                                                    }
+                                                >
+                                                    {eT.ENDORSEMENT_TYPE_NAME}
+                                                </option>
+                                            );
+                                        }
+                                    )}
                                 </select>
                             </div>
-                        </div>
-                        <div className="mb-4 ml-4 mr-4">
-                            <InputLabel
-                                htmlFor="edit_the_insured"
-                                value="Policy The Insured"
-                            />
-                            <TextInput
-                                id="edit_the_insured"
-                                type="text"
-                                name="edit_the_insured"
-                                value={dataById.POLICY_THE_INSURED}
-                                className=""
-                                autoComplete="edit_the_insured"
-                                onChange={(e) =>
-                                    setDataById({
-                                        ...dataById,
-                                        POLICY_THE_INSURED: e.target.value,
-                                    })
-                                }
-                                required
-                            />
                         </div>
 
                         <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                             <div>
                                 <InputLabel
-                                    htmlFor="edit_policy_inception_date"
+                                    htmlFor="edit_endorsement_effective_date"
                                     value="Inception Date"
                                 />
                                 <TextInput
-                                    id="edit_policy_inception_date"
+                                    id="edit_endorsement_effective_date"
                                     type="date"
-                                    name="edit_policy_inception_date"
-                                    value={dataById.POLICY_INCEPTION_DATE}
+                                    name="edit_endorsement_effective_date"
+                                    value={dataById.ENDORSEMENT_EFFECTIVE_DATE}
                                     className=""
-                                    autoComplete="edit_policy_inception_date"
+                                    autoComplete="edit_endorsement_effective_date"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            POLICY_INCEPTION_DATE:
+                                            ENDORSEMENT_EFFECTIVE_DATE:
                                                 e.target.value,
                                         })
                                     }
                                     required
                                 />
                             </div>
-                            <div>
+                            <div className="mb-4">
                                 <InputLabel
-                                    htmlFor="edit_policy_due_date"
-                                    value="Expiry Date"
+                                    htmlFor="edit_endorsement_status"
+                                    value="Endorsement Status"
                                 />
-                                <TextInput
-                                    id="edit_policy_due_date"
-                                    type="date"
-                                    name="edit_policy_due_date"
-                                    value={dataById.POLICY_DUE_DATE}
-                                    className=""
-                                    autoComplete="edit_policy_due_date"
+                                <select
+                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    value={dataById.ENDORSEMENT_STATUS}
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            POLICY_DUE_DATE: e.target.value,
+                                            ENDORSEMENT_STATUS: e.target.value,
+                                        })
+                                    }
+                                    required
+                                >
+                                    <option value={""}>
+                                        -- <i>Choose</i> --
+                                    </option>
+                                    {endorsementStatus.map(
+                                        (eS: any, i: number) => {
+                                            return (
+                                                <option key={i} value={eS.id}>
+                                                    {eS.stat}
+                                                </option>
+                                            );
+                                        }
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                            <div>
+                                <InputLabel
+                                    htmlFor="edit_endorsement_note"
+                                    value="Endorsement Note"
+                                />
+                                <TextInput
+                                    id="edit_endorsement_note"
+                                    type="text"
+                                    name="edit_endorsement_note"
+                                    value={dataById.ENDORSEMENT_NOTE}
+                                    className=""
+                                    autoComplete="edit_endorsement_note"
+                                    onChange={(e) =>
+                                        setDataById({
+                                            ...dataById,
+                                            ENDORSEMENT_NOTE: e.target.value,
                                         })
                                     }
                                     required
@@ -593,75 +609,9 @@ export default function ModalDetailPolicy({
                             </div>
                         </div>
 
-                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
-                            <div>
-                                <InputLabel
-                                    htmlFor="edit_policy_status_id"
-                                    value="Policy Status"
-                                />
-                                <select
-                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={dataById.POLICY_STATUS_ID}
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            POLICY_STATUS_ID: e.target.value,
-                                        })
-                                    }
-                                >
-                                    <option>
-                                        -- <i>Choose</i> --
-                                    </option>
-                                    {policyStatus.map((ps: any, i: number) => {
-                                        return (
-                                            <option key={i} value={ps.id}>
-                                                {ps.stat}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                            </div>
-                            <div className="w-60">
-                                <InputLabel
-                                    // htmlFor="self_insured"
-                                    value="Self Insured"
-                                />
-
-                                <div className="grid grid-cols-5">
-                                    <div className="">
-                                        <SwitchPage
-                                            enabled={flagSwitch}
-                                            onChangeButton={handleSwitch}
-                                        />
-                                    </div>
-                                    {flagSwitch ? (
-                                        <div className="col-span-4 ">
-                                            <CurrencyInput
-                                                id="self_insured"
-                                                name="self_insured"
-                                                value={dataById.SELF_INSURED}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                onValueChange={(values) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        SELF_INSURED: values,
-                                                    })
-                                                }
-                                                className="block w-15  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </div>
-                                    ) : (
-                                        ""
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
                         <div className="mt-8 ml-4 mr-4">
                             <h3 className="text-xl font-semibold leading-6 text-gray-900">
-                                Policy Premium
+                                Endorsement Premium
                             </h3>
                             <hr className="my-3" />
                         </div>
@@ -675,7 +625,7 @@ export default function ModalDetailPolicy({
                                         <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
                                             Coverage Name
                                         </th>
-                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
                                             Currency
                                         </th>
                                         <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
@@ -700,7 +650,7 @@ export default function ModalDetailPolicy({
                                             Fee Based Income
                                         </th>
                                         <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
-                                            Agen Commission
+                                            Agen Commision
                                         </th>
                                         <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
                                             Acquisition Costs
@@ -711,23 +661,23 @@ export default function ModalDetailPolicy({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dataById.policy_premium?.map(
-                                        (iP: any, i: number) => {
+                                    {dataById.endorsement_premium?.map(
+                                        (eP: any, i: number) => {
                                             return (
                                                 <tr key={i}>
-                                                    <td className="border-b w-10 text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b w-10 text-sm border-[#eee]  dark:border-strokedark">
                                                         {i + 1}
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <TextInput
                                                             type="text"
                                                             id="coverage_name"
                                                             name="COVERAGE_NAME"
                                                             value={
-                                                                iP.COVERAGE_NAME
+                                                                eP.COVERAGE_NAME
                                                             }
                                                             onChange={(e) =>
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "COVERAGE_NAME",
                                                                     e.target
                                                                         .value,
@@ -738,20 +688,20 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <select
-                                                            className="mt-0 block w-20 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
                                                             value={
-                                                                iP.CURRENCY_ID
+                                                                eP.CURRENCY_ID
                                                             }
                                                             onChange={(e) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "CURRENCY_ID",
                                                                     e.target
                                                                         .value,
                                                                     i
-                                                                ),
-                                                                    getSummaryPremi();
+                                                                );
+                                                                getSummaryPremi();
                                                             }}
                                                         >
                                                             <option>
@@ -785,19 +735,19 @@ export default function ModalDetailPolicy({
                                                             )}
                                                         </select>
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="gross_premi"
                                                             name="GROSS_PREMI"
                                                             value={
-                                                                iP.GROSS_PREMI
+                                                                eP.GROSS_PREMI
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "GROSS_PREMI",
                                                                     values,
                                                                     i
@@ -810,19 +760,19 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="admin_cost"
                                                             name="ADMIN_COST"
                                                             value={
-                                                                iP.ADMIN_COST
+                                                                eP.ADMIN_COST
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "ADMIN_COST",
                                                                     values,
                                                                     i
@@ -835,19 +785,19 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="disc_broker"
                                                             name="DISC_BROKER"
                                                             value={
-                                                                iP.DISC_BROKER
+                                                                eP.DISC_BROKER
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "DISC_BROKER",
                                                                     values,
                                                                     i
@@ -860,19 +810,19 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="disc_consultation"
                                                             name="DISC_CONSULTATION"
                                                             value={
-                                                                iP.DISC_CONSULTATION
+                                                                eP.DISC_CONSULTATION
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "DISC_CONSULTATION",
                                                                     values,
                                                                     i
@@ -885,19 +835,19 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="disc_admin"
                                                             name="DISC_ADMIN"
                                                             value={
-                                                                iP.DISC_ADMIN
+                                                                eP.DISC_ADMIN
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "DISC_ADMIN",
                                                                     values,
                                                                     i
@@ -910,19 +860,19 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="nett_premi"
                                                             name="NETT_PREMI"
                                                             value={
-                                                                iP.NETT_PREMI
+                                                                eP.NETT_PREMI
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "NETT_PREMI",
                                                                     values,
                                                                     i
@@ -935,74 +885,85 @@ export default function ModalDetailPolicy({
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="fee_based_income"
                                                             name="FEE_BASED_INCOME"
                                                             value={
-                                                                iP.FEE_BASED_INCOME
+                                                                eP.FEE_BASED_INCOME
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "FEE_BASED_INCOME",
                                                                     values,
                                                                     i
-                                                                );
+                                                                ),
+                                                                    editCalculate(
+                                                                        i
+                                                                    );
                                                             }}
                                                             className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
                                                             id="agent_commision"
                                                             name="AGENT_COMMISION"
                                                             value={
-                                                                iP.AGENT_COMMISION
+                                                                eP.AGENT_COMMISION
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "AGENT_COMMISION",
                                                                     values,
                                                                     i
-                                                                );
+                                                                ),
+                                                                    editCalculate(
+                                                                        i
+                                                                    );
                                                             }}
                                                             className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
                                                         <CurrencyInput
-                                                            id="aqcuisition_cost"
+                                                            id="acquisition_cost"
                                                             name="ACQUISITION_COST"
                                                             value={
-                                                                iP.ACQUISITION_COST
+                                                                eP.ACQUISITION_COST
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyPremium(
+                                                                editEndorsementPremium(
                                                                     "ACQUISITION_COST",
                                                                     values,
                                                                     i
-                                                                );
+                                                                ),
+                                                                    editCalculate(
+                                                                        i
+                                                                    );
                                                             }}
                                                             className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                             required
                                                         />
                                                     </td>
-                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                        {dataById.policy_premium
+
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        {dataById
+                                                            .endorsement_premium
                                                             .length !== 1 && (
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -1013,13 +974,13 @@ export default function ModalDetailPolicy({
                                                                 stroke="currentColor"
                                                                 className="mx-auto h-6 text-red-500 cursor-pointer"
                                                                 onClick={() => {
-                                                                    deleteRowEditPolicyPremium(
+                                                                    deleteRowEditEndorsementPremium(
                                                                         i
-                                                                    );
-                                                                    setFlagDelete(
-                                                                        flagDelete +
-                                                                            1
-                                                                    );
+                                                                    ),
+                                                                        setFlagDelete(
+                                                                            flagDelete +
+                                                                                1
+                                                                        );
                                                                 }}
                                                             >
                                                                 <path
@@ -1040,7 +1001,7 @@ export default function ModalDetailPolicy({
                                             href=""
                                             className="text-xs mt-1 text-primary-pelindo ms-1"
                                             onClick={(e) =>
-                                                addRowEditPolicyPremium(e)
+                                                addRowEditEndorsementPremium(e)
                                             }
                                         >
                                             + Add Row
@@ -1092,7 +1053,7 @@ export default function ModalDetailPolicy({
                         {/* Policy Installment Edit */}
                         <div className="mt-10 ml-4 mr-4">
                             <h3 className="text-xl font-semibold leading-6 text-gray-900">
-                                Debit Note Installment
+                                Endorsement Installment
                             </h3>
                             <hr className="my-3" />
                         </div>
@@ -1116,20 +1077,20 @@ export default function ModalDetailPolicy({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dataById.policy_installment?.map(
-                                        (pI: any, i: number) => {
+                                    {dataById.endorsement_installment?.map(
+                                        (eI: any, i: number) => {
                                             return (
                                                 <tr key={i}>
                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                         <TextInput
-                                                            id="policy_installment_term"
-                                                            name="POLICY_INSTALLMENT_TERM"
+                                                            id="endorsement_installment_term"
+                                                            name="ENDORSEMENT_INSTALLMENT_TERM"
                                                             value={
-                                                                pI.POLICY_INSTALLMENT_TERM
+                                                                eI.ENDORSEMENT_INSTALLMENT_TERM
                                                             }
                                                             onChange={(e) =>
-                                                                editPolicyInstallment(
-                                                                    "POLICY_INSTALLMENT_TERM",
+                                                                editEndorsementInstallment(
+                                                                    "ENDORSEMENT_INSTALLMENT_TERM",
                                                                     e.target
                                                                         .value,
                                                                     i
@@ -1141,18 +1102,18 @@ export default function ModalDetailPolicy({
                                                     </td>
                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                         <CurrencyInput
-                                                            id="policy_installment_percentage"
-                                                            name="POLICY_INSTALLMENT_PERCENTAGE"
+                                                            id="endorsement_installment_rate"
+                                                            name="ENDORSEMENT_INSTALLMENT_RATE"
                                                             value={
-                                                                pI.POLICY_INSTALLMENT_PERCENTAGE
+                                                                eI.ENDORSEMENT_INSTALLMENT_RATE
                                                             }
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
                                                                 values
                                                             ) => {
-                                                                editPolicyInstallment(
-                                                                    "POLICY_INSTALLMENT_PERCENTAGE",
+                                                                editEndorsementInstallment(
+                                                                    "ENDORSEMENT_INSTALLMENT_RATE",
                                                                     values,
                                                                     i
                                                                 );
@@ -1164,14 +1125,14 @@ export default function ModalDetailPolicy({
                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                         <TextInput
                                                             type="date"
-                                                            id="installment_due_date"
-                                                            name="INSTALLMENT_DUE_DATE"
+                                                            id="endorsement_installment_due_date"
+                                                            name="ENDORSEMENT_INSTALLMENT_DUE_DATE"
                                                             value={
-                                                                pI.INSTALLMENT_DUE_DATE
+                                                                eI.ENDORSEMENT_INSTALLMENT_DUE_DATE
                                                             }
                                                             onChange={(e) =>
-                                                                editPolicyInstallment(
-                                                                    "INSTALLMENT_DUE_DATE",
+                                                                editEndorsementInstallment(
+                                                                    "ENDORSEMENT_INSTALLMENT_DUE_DATE",
                                                                     e.target
                                                                         .value,
                                                                     i
@@ -1183,7 +1144,7 @@ export default function ModalDetailPolicy({
                                                     </td>
                                                     <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                         {dataById
-                                                            .policy_installment
+                                                            .endorsement_installment
                                                             .length !== 1 && (
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -1237,228 +1198,183 @@ export default function ModalDetailPolicy({
                     <div className="grid grid-cols-1 xs:grid-cols-1 md:grid-cols-1">
                         {/* All Information */}
                         <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
-                            <div className="mb-2">
+                            <div className=" mb-4">
                                 <div className="flex">
                                     <div className="text-xl font-semibold leading-6 items-center text-gray-900 ml-4 mr-4 border-b-2 w-fit">
                                         <span className="">
-                                            Policy Number:{" "}
-                                            {policy.POLICY_NUMBER}{" "}
+                                            Endorsement Number:{" "}
+                                            {endorsement.ENDORSEMENT_NUMBER}
                                         </span>
-                                    </div>
-                                    <div className="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                                        {policy.POLICY_STATUS_ID == 1 ? (
-                                            <span>Current</span>
-                                        ) : (
-                                            <span>Lapse</span>
-                                        )}
                                     </div>
                                 </div>
                                 {/* <div className="grid grid-cols-3 gap-4 mr-6">
-                                    <div className="col-span-2 w-fit">
-                                        <h3 className="text-xl font-semibold leading-6 items-center text-gray-900 ml-4 mr-4 border-b-2 ">
-                                            Policy Number:{" "}
-                                            {policy.POLICY_NUMBER}{" "}
-                                            {policy.POLICY_STATUS_ID == 1 ? (
-                                                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                                                    Current
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-                                                    Lapse
-                                                </span>
-                                            )}
+                                    <div className="col-span-2">
+                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4">
+                                            Endorsement:{" "}
+                                            {endorsement.ENDORSEMENT_NUMBER}
                                         </h3>
                                     </div>
                                 </div> */}
 
                                 {/* <hr className="my-3 w-auto ml-4 mr-6" /> */}
                             </div>
-                            <div className="grid grid-cols-4">
-                                <div className="col-span-3">
-                                    <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
+                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
+                                <div className="">
+                                    <div className="grid grid-cols-4 gap-4">
                                         <div className="">
-                                            <div className="grid grid-cols-4 gap-4">
-                                                <div className="">
-                                                    <span>Client Name</span>
-                                                </div>
-                                                <div className=" col-span-3">
-                                                    <span className="font-normal text-gray-500">
-                                                        {
-                                                            policy.relation
-                                                                .RELATION_ORGANIZATION_NAME
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            <span>Policy Number</span>
                                         </div>
-                                        <div className=""></div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
-                                        <div className="">
-                                            <div className="grid grid-cols-4 gap-4">
-                                                <div className="">
-                                                    <span>The Insured</span>
-                                                </div>
-                                                <div className=" col-span-3">
-                                                    <span className="font-normal text-gray-500">
-                                                        {
-                                                            policy.POLICY_THE_INSURED
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="">
-                                            <div className="grid grid-cols-4 gap-4">
-                                                <div className="">
-                                                    <span>Inception Date</span>
-                                                </div>
-                                                <div className=" col-span-3">
-                                                    <span className="font-normal text-gray-500">
-                                                        {
-                                                            policy.POLICY_INCEPTION_DATE
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
-                                        <div className="">
-                                            <div className="grid grid-cols-4 gap-4">
-                                                <div className="">
-                                                    <span>Insurance Type</span>
-                                                </div>
-                                                <div className=" col-span-3">
-                                                    <span className="font-normal text-gray-500">
-                                                        {
-                                                            policy
-                                                                .insurance_type
-                                                                .INSURANCE_TYPE_NAME
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="">
-                                            <div className="grid grid-cols-4 gap-4">
-                                                <div className="">
-                                                    <span>Expiry Date</span>
-                                                </div>
-                                                <div className=" col-span-3">
-                                                    <span className="font-normal text-gray-500">
-                                                        {policy.POLICY_DUE_DATE}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                        <div className=" col-span-3">
+                                            <span className="font-normal text-gray-500">
+                                                {
+                                                    endorsement.policy
+                                                        .POLICY_NUMBER
+                                                }
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="">
-                                    {/* <div className="grid grid-cols-3"> */}
-                                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4 mt-4">
-                                        <div className="ml-4 mb-4">
-                                            <h2 className=" text-lg font-semibold text-gray-900 dark:text-white">
-                                                Summary Premium:
-                                            </h2>
-                                            <ol className="max-w-md space-y-1 text-gray-500 list-decimal list-inside dark:text-gray-400">
-                                                {sumByCurrency?.map(
-                                                    (sum: any, i: number) => {
-                                                        if (
-                                                            sum.currency_id &&
-                                                            sum.currency_id !=
-                                                                "null"
-                                                        ) {
-                                                            const curr =
-                                                                getCurrencyById(
-                                                                    sum.currency_id
-                                                                );
-                                                            return (
-                                                                <li key={i}>
-                                                                    {curr +
-                                                                        " = " +
-                                                                        new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            sum.sum
-                                                                        )}
-                                                                </li>
-                                                            );
-                                                        }
-                                                    }
-                                                )}
-                                            </ol>
+                                    <div className="grid grid-cols-4 gap-4">
+                                        <div className="">
+                                            <span>The Insured</span>
+                                        </div>
+                                        <div className=" col-span-3">
+                                            <span className="font-normal text-gray-500">
+                                                {
+                                                    endorsement.policy
+                                                        .POLICY_THE_INSURED
+                                                }
+                                            </span>
                                         </div>
                                     </div>
-                                    {/* </div> */}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
+                                <div className="">
+                                    <div className="grid grid-cols-4 gap-4">
+                                        <div className="">
+                                            <span>Effective Date</span>
+                                        </div>
+                                        <div className=" col-span-3">
+                                            <span className="font-normal text-gray-500">
+                                                {
+                                                    endorsement.ENDORSEMENT_EFFECTIVE_DATE
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <div className="grid grid-cols-4 gap-4">
+                                        <div className="">
+                                            <span>Endorsement Type</span>
+                                        </div>
+                                        <div className=" col-span-3">
+                                            <span className="font-normal text-gray-500">
+                                                {
+                                                    endorsement.endorsement_type
+                                                        .ENDORSEMENT_TYPE_NAME
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
+                                <div className="">
+                                    <div className="grid grid-cols-4 gap-4">
+                                        <div className="">
+                                            <span>Note</span>
+                                        </div>
+                                        <div className=" col-span-3">
+                                            <span className="font-normal text-gray-500">
+                                                {endorsement.ENDORSEMENT_NOTE}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <div className="grid grid-cols-4 gap-4">
+                                        <div className="">
+                                            <span>Status</span>
+                                        </div>
+                                        <div className=" col-span-3">
+                                            <span className="font-normal text-gray-500">
+                                                {" "}
+                                                {endorsement.ENDORSEMENT_STATUS ==
+                                                0
+                                                    ? "Ongoing"
+                                                    : endorsement.ENDORSEMENT_STATUS ==
+                                                      1
+                                                    ? "Finalized"
+                                                    : "Canceled"}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* <hr className="mt-5" /> */}
 
-                            <div className="grid gap-4">
+                            <div className="grid  gap-4">
                                 <div>
                                     <div className="mt-10">
-                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4 mb-3 w-fit border-b-2">
-                                            Policy Premium
+                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-2 mr-2 mb-3 border-b-2 w-fit">
+                                            Endorsement Premium
                                         </h3>
-                                        {/* <hr className="my-3 w-auto ml-4 mr-6" /> */}
+                                        {/* <hr className="my-3 w-auto ml-2 mr-2" /> */}
                                     </div>
                                     <div className="grid gap-x-2 gap-y-2 -mt-4 ml-0">
-                                        {/* <div className="mt-8 flow-root"> */}
-                                        {/* <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"> */}
-                                        <div className=" overflow-x-auto inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                        <div className="overflow-x-auto inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                                             <table className="min-w-full ">
                                                 <thead>
                                                     <tr className="bg-gray-2 dark:bg-meta-4">
-                                                        <th className="min-w-[10px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[10px] py-2 px-2 text-sm text-black dark:text-white">
                                                             No.
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Coverage Name
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Currency
                                                         </th>
-                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[50px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Gross Premi
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Admin Cost
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Disc Broker
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Disc Consultation
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Disc Admin
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Nett Premi
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Fee Based Income
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
-                                                            Agen Commission
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
+                                                            Agen Commision
                                                         </th>
-                                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[150px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Acquisition Costs
                                                         </th>
-                                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                        <th className="min-w-[50px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Delete
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {policy.policy_premium.map(
+                                                    {endorsement.endorsement_premium.map(
                                                         (
-                                                            pip: any,
+                                                            eP: any,
                                                             i: number
                                                         ) => (
                                                             <tr key={i}>
@@ -1467,150 +1383,105 @@ export default function ModalDetailPolicy({
                                                                 </td>
                                                                 <td className="whitespace-nowrap capitalize px-3 py-4 text-sm text-gray-500">
                                                                     {
-                                                                        pip.COVERAGE_NAME
+                                                                        eP.COVERAGE_NAME
                                                                     }
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    {pip.currency
-                                                                        ? pip
+                                                                    {eP.currency
+                                                                        ? eP
                                                                               .currency
                                                                               .CURRENCY_SYMBOL
-                                                                        : "-"}
+                                                                        : ""}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.GROSS_PREMI
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.GROSS_PREMI
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.ADMIN_COST
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.ADMIN_COST
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.DISC_BROKER
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.DISC_BROKER
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.DISC_CONSULTATION
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.DISC_CONSULTATION
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.DISC_ADMIN
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.DISC_ADMIN
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.NETT_PREMI
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.NETT_PREMI
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.FEE_BASED_INCOME
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.FEE_BASED_INCOME
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.AGENT_COMMISION
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.AGENT_COMMISION
+                                                                    )}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    <CurrencyInput
-                                                                        value={
-                                                                            pip.ACQUISITION_COST
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
                                                                         }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        readOnly
-                                                                        className="border-none"
-                                                                    />
+                                                                    ).format(
+                                                                        eP.ACQUISITION_COST
+                                                                    )}
                                                                 </td>
                                                             </tr>
                                                         )
@@ -1622,9 +1493,48 @@ export default function ModalDetailPolicy({
                                 </div>
                             </div>
                             <div>
+                                <div className="relative w-1/4 overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4 mt-4">
+                                    <div className="ml-6 mb-4">
+                                        <h2 className=" text-lg font-semibold text-gray-900 dark:text-white">
+                                            Summary Premium:
+                                        </h2>
+                                        <ol className="max-w-md space-y-1 text-gray-500 list-decimal list-inside dark:text-gray-400">
+                                            {sumByCurrency?.map(
+                                                (sum: any, i: number) => {
+                                                    if (
+                                                        sum.currency_id &&
+                                                        sum.currency_id !=
+                                                            "null"
+                                                    ) {
+                                                        const curr =
+                                                            getCurrencyById(
+                                                                sum.currency_id
+                                                            );
+                                                        return (
+                                                            <li key={i}>
+                                                                {curr +
+                                                                    " = " +
+                                                                    new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
+                                                                        }
+                                                                    ).format(
+                                                                        sum.sum
+                                                                    )}
+                                                            </li>
+                                                        );
+                                                    }
+                                                }
+                                            )}
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
                                 <div>
                                     <div className="mt-10">
-                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4 mb-3 w-fit border-b-2">
+                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4 mb-3 border-b-2 w-fit">
                                             Installment
                                         </h3>
                                         {/* <hr className="my-3 w-auto ml-4 mr-6" /> */}
@@ -1661,25 +1571,25 @@ export default function ModalDetailPolicy({
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {policy.policy_installment.map(
+                                                    {endorsement.endorsement_installment.map(
                                                         (
-                                                            pI: any,
+                                                            eI: any,
                                                             i: number
                                                         ) => (
                                                             <tr key={i}>
                                                                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                                                                     {
-                                                                        pI.POLICY_INSTALLMENT_TERM
+                                                                        eI.ENDORSEMENT_INSTALLMENT_TERM
                                                                     }
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                                     {
-                                                                        pI.POLICY_INSTALLMENT_PERCENTAGE
+                                                                        eI.ENDORSEMENT_INSTALLMENT_RATE
                                                                     }
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                                     {
-                                                                        pI.INSTALLMENT_DUE_DATE
+                                                                        eI.ENDORSEMENT_INSTALLMENT_DUE_DATE
                                                                     }
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -1702,7 +1612,7 @@ export default function ModalDetailPolicy({
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <div className="mt-10">
-                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4  mb-3 w-fit border-b-2">
+                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4 mb-3 border-b-2 w-fit">
                                             Insurer Information
                                         </h3>
                                         {/* <hr className="my-3 w-auto ml-4 mr-6" /> */}
@@ -1743,7 +1653,7 @@ export default function ModalDetailPolicy({
                                                                     {i + 1}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                                    {insurancePanel.IP_POLICY_LEADER ==
+                                                                    {/* {insurancePanel.IP_POLICY_LEADER ==
                                                                     1
                                                                         ? insurancePanel
                                                                               .insurance
@@ -1752,7 +1662,7 @@ export default function ModalDetailPolicy({
                                                                         : insurancePanel
                                                                               .insurance
                                                                               .RELATION_ORGANIZATION_NAME +
-                                                                          " - Co Member"}
+                                                                          " - Co Member"} */}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                                     {insurancePanel.IP_POLICY_SHARE +

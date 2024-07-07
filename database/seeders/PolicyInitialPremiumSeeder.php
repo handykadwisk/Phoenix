@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\MPolicyInitialPremium;
+use App\Models\MPolicyPremium;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +13,7 @@ class PolicyInitialPremiumSeeder extends Seeder
      */
     public function run(): void
     {
-        MPolicyInitialPremium::create([
+        MPolicyPremium::create([
             'POLICY_ID' => 1,
             'CURRENCY_ID' => 1,
             'SUM_INSURED' => 100,
@@ -23,7 +23,7 @@ class PolicyInitialPremiumSeeder extends Seeder
             'CREATED_BY' => 1,
             'CREATED_DATE' => now()
         ]);
-        MPolicyInitialPremium::create([
+        MPolicyPremium::create([
             'POLICY_ID' => 1,
             'CURRENCY_ID' => 2,
             'SUM_INSURED' => 10,
@@ -33,7 +33,7 @@ class PolicyInitialPremiumSeeder extends Seeder
             'CREATED_BY' => 1,
             'CREATED_DATE' => now()
         ]);
-        MPolicyInitialPremium::create([
+        MPolicyPremium::create([
             'POLICY_ID' => 2,
             'CURRENCY_ID' => 1,
             'SUM_INSURED' => 100,
@@ -43,7 +43,7 @@ class PolicyInitialPremiumSeeder extends Seeder
             'CREATED_BY' => 1,
             'CREATED_DATE' => now()
         ]);
-        MPolicyInitialPremium::create([
+        MPolicyPremium::create([
             'POLICY_ID' => 2,
             'CURRENCY_ID' => 2,
             'SUM_INSURED' => 10,

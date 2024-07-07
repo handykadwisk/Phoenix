@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
@@ -60,6 +60,7 @@ export default function ModalToAdd({
             });
     };
 
+
     return (
         <>
             <Transition.Root show={show} as={Fragment}>
@@ -100,7 +101,9 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {body}
+                                            <div className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2.5">
+                                                {body}
+                                            </div>
                                         </div>
                                         <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             <PrimaryButton

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\MPolicyInitialPremium;
+use App\Models\MPolicyPremium;
 
 class Policy extends Model
 {
@@ -15,28 +15,29 @@ class Policy extends Model
     protected $table = 't_policy';
 
     public $timestamps = false;
-    public $with = ['policyInitialPremium', 'policyInstallment', 'insuranceType', 'relation'];
+    public $with = ['policyPremium', 'policyInstallment', 'insuranceType', 'relation'];
 
-    protected $fillable = [
-        'POLICY_ID',
-        'RELATION_ID',
-        'POLICY_NUMBER',
-        'INSURANCE_TYPE_ID',
-        'POLICY_THE_INSURED',
-        'POLICY_INCEPTION_DATE',
-        'POLICY_DUE_DATE',
-        'POLICY_STATUS_ID',
-        'POLICY_INSURANCE_PANEL',
-        'POLICY_SHARE',
-        'POLICY_CREATED_BY',
-        'POLICY_CREATED_DATE',
-        'POLICY_UPDATED_BY',
-        'POLICY_UPDATED_DATE',
-        'POLICY_INSTALLMENT'
-    ];
+    // protected $fillable = [
+    //     'POLICY_ID',
+    //     'RELATION_ID',
+    //     'POLICY_NUMBER',
+    //     'INSURANCE_TYPE_ID',
+    //     'POLICY_THE_INSURED',
+    //     'POLICY_INCEPTION_DATE',
+    //     'POLICY_DUE_DATE',
+    //     'POLICY_STATUS_ID',
+    //     'POLICY_INSURANCE_PANEL',
+    //     'POLICY_SHARE',
+    //     'POLICY_CREATED_BY',
+    //     'POLICY_CREATED_DATE',
+    //     'POLICY_UPDATED_BY',
+    //     'POLICY_UPDATED_DATE',
+    //     'POLICY_INSTALLMENT'
+    // ];
+    protected $guarded = ['POLICY_ID'];
 
-    public function policyInitialPremium() {
-        return $this->hasMany(MPolicyInitialPremium::class, 'POLICY_ID', 'POLICY_ID');
+    public function policyPremium() {
+        return $this->hasMany(MPolicyPremium::class, 'POLICY_ID', 'POLICY_ID');
     }
 
     public function policyInstallment() {
