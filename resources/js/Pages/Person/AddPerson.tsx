@@ -150,7 +150,7 @@ export default function AddPerson({
                                 </span> */}
                             {/* <div className=""></div> */}
                             {/* </div> */}
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="PERSON_FIRST_NAME"
@@ -163,7 +163,6 @@ export default function AddPerson({
                                     name="PERSON_FIRST_NAME"
                                     value={data.PERSON_FIRST_NAME}
                                     className="mt-2"
-                                    autoComplete="PERSON_FIRST_NAME"
                                     onChange={(e) =>
                                         setData(
                                             "PERSON_FIRST_NAME",
@@ -210,7 +209,6 @@ export default function AddPerson({
                                         name="PERSON_BIRTH_PLACE"
                                         value={data.PERSON_BIRTH_PLACE}
                                         className="mt-2"
-                                        autoComplete="PERSON_BIRTH_PLACE"
                                         onChange={(e) =>
                                             setData(
                                                 "PERSON_BIRTH_PLACE",
@@ -221,7 +219,7 @@ export default function AddPerson({
                                         placeholder="Place Of Birth"
                                     />
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
                                         className="absolute"
                                         htmlFor="PERSON_BIRTH_DATE"
@@ -234,7 +232,6 @@ export default function AddPerson({
                                         name="PERSON_BIRTH_DATE"
                                         value={data.PERSON_BIRTH_DATE}
                                         className="mt-2"
-                                        autoComplete="PERSON_BIRTH_DATE"
                                         onChange={(e) =>
                                             setData(
                                                 "PERSON_BIRTH_DATE",
@@ -328,7 +325,6 @@ export default function AddPerson({
                                         name="PERSON_KTP"
                                         value={data.PERSON_KTP}
                                         className="mt-2"
-                                        autoComplete="PERSON_KTP"
                                         onChange={(e) => {
                                             setData(
                                                 "PERSON_KTP",
@@ -351,7 +347,6 @@ export default function AddPerson({
                                         name="PERSON_NPWP"
                                         value={data.PERSON_NPWP}
                                         className="mt-2"
-                                        autoComplete="PERSON_NPWP"
                                         onChange={(e) => {
                                             setData(
                                                 "PERSON_NPWP",
@@ -374,7 +369,6 @@ export default function AddPerson({
                                         name="PERSON_KK"
                                         value={data.PERSON_KK}
                                         className="mt-2"
-                                        autoComplete="PERSON_KK"
                                         onChange={(e) => {
                                             setData(
                                                 "PERSON_KK",
@@ -409,7 +403,6 @@ export default function AddPerson({
                                                     name="PERSON_CONTACT"
                                                     value={data.PERSON_CONTACT}
                                                     className="mt-2"
-                                                    autoComplete="PERSON_CONTACT"
                                                     onChange={(e) =>
                                                         setData(
                                                             "PERSON_CONTACT",
@@ -430,7 +423,6 @@ export default function AddPerson({
                                                     name="PERSON_EMAIL"
                                                     value={data.PERSON_EMAIL}
                                                     className="mt-2 mb-2"
-                                                    autoComplete="PERSON_EMAIL"
                                                     onChange={(e) =>
                                                         setData(
                                                             "PERSON_EMAIL",
@@ -479,7 +471,6 @@ export default function AddPerson({
                                                                             cm.NAME_CONTACT_EMERGENCY
                                                                         }
                                                                         className="mt-1"
-                                                                        autoComplete="NAME_CONTACT_EMERGENCY"
                                                                         onChange={(
                                                                             e
                                                                         ) =>
@@ -503,7 +494,6 @@ export default function AddPerson({
                                                                             cm.PHONE_CONTACT_EMERGENCY
                                                                         }
                                                                         className="mt-7"
-                                                                        autoComplete="PHONE_CONTACT_EMERGENCY"
                                                                         onChange={(
                                                                             e
                                                                         ) =>

@@ -161,7 +161,6 @@ export default function DetailDivision({
                                     name="RELATION_DIVISION_ALIAS"
                                     value={dataById.RELATION_DIVISION_ALIAS}
                                     className="mt-2"
-                                    autoComplete="RELATION_DIVISION_ALIAS"
                                     onChange={(e) => {
                                         setDataById({
                                             ...dataById,
@@ -187,7 +186,6 @@ export default function DetailDivision({
                                     name="RELATION_DIVISION_INITIAL"
                                     value={dataById.RELATION_DIVISION_INITIAL}
                                     className="mt-2"
-                                    autoComplete="RELATION_DIVISION_INITIAL"
                                     onChange={(e) => {
                                         setDataById({
                                             ...dataById,

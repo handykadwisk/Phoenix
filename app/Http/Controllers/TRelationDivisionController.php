@@ -56,8 +56,8 @@ class TRelationDivisionController extends Controller
             'RELATION_DIVISION_DESCRIPTION' => $request->RELATION_DIVISION_DESCRIPTION,
             'RELATION_DIVISION_PARENT_ID' => $idParent,
             'RELATION_ORGANIZATION_ID' => $request->RELATION_ORGANIZATION_ID,
-            'RELATION_STRUCTURE_CREATED_BY' => Auth::user()->id,
-            'RELATION_STRUCTURE_CREATED_DATE' => now(),
+            'RELATION_DIVISION_CREATED_BY' => Auth::user()->id,
+            'RELATION_DIVISION_CREATED_DATE' => now(),
         ]);
 
         if ($division) {

@@ -144,6 +144,26 @@ export default function DetailGroup({
             search: false,
         });
     };
+    const [switchPage, setSwitchPage] = useState(false);
+    const [switchPageTBK, setSwitchPageTBK] = useState(false);
+    const { data, setData, errors, reset } = useForm<any>({
+        group_id: "",
+        name_relation: "",
+        parent_id: "",
+        abbreviation: "",
+        relation_aka: [],
+        relation_email: "",
+        relation_description: "",
+        relation_lob_id: "",
+        salutation_id: "",
+        relation_status_id: "",
+        tagging_name: [],
+        is_managed: "",
+        mark_tbk_relation: "",
+        profession_id: "",
+        relation_type_id: [],
+    });
+
     return (
         <>
             {/* modal add relation */}
@@ -166,6 +186,12 @@ export default function DetailGroup({
                 relationType={relationType}
                 profession={profession}
                 relationLOB={relationLOB}
+                data={data}
+                setData={setData}
+                switchPage={switchPage}
+                setSwitchPage={setSwitchPage}
+                switchPageTBK={switchPageTBK}
+                setSwitchPageTBK={setSwitchPageTBK}
             />
             {/* end modal add relation */}
 

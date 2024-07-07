@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('t_role', function (Blueprint $table) {
             $table->id();
             $table->string('role_name');
-            $table->timestamps();
+            $table->bigInteger('ROLE_CREATED_BY')->nullable();
+            $table->timestamp('ROLE_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable()->nullable();
+            $table->bigInteger('ROLE_UPDATED_BY')->nullable();
+            $table->timestamp('ROLE_UPDATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable()->nullable();
         });
     }
 

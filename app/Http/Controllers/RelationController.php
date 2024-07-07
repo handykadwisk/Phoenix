@@ -32,12 +32,19 @@ class RelationController extends Controller
 
     public function getRelationData($dataPerPage = 5, $searchQuery = null)
     {
-
-        // dd($searchQuery->RELATION_ORGANIZATION_NAME);
-        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc');
+        
+        $RType = $searchQuery->RELATION_TYPE_ID;
+        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('salutation');
+        // print_r($data);
         if ($searchQuery) {
             if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
-                    $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
+                $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
+            }
+            if ($searchQuery->input('RELATION_TYPE_ID')) {
+                $data->whereHas('mRelationType', function($q) use($RType) {
+                    // Query the name field in status table
+                    $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
+             });
             }
         } 
             // dd($data->toSql());
@@ -124,10 +131,23 @@ class RelationController extends Controller
             $parentID = "0";
         }
 
+        // ubah ke to lower dan huruf besar di awal
+        $nameRelation = strtolower($request->name_relation);
+        $nameRelationNew = ucwords($nameRelation);
 
-        $addTBK = $request->name_relation;
-        if ($request->mark_tbk_relation === "1") {
-            $addTBK = $request->name_relation." Tbk.";
+        $addTBK = $nameRelationNew;
+        if ($request->mark_tbk_relation == "1") {
+            $addTBK = $nameRelationNew." Tbk.";
+        }
+
+        $professionId = $request->profession_id;
+        if ($request->profession_id != NULL || $request->profession_id != "") {
+            $professionId = $request->profession_id['value'];
+        }
+
+        $lobId = $request->relation_lob_id;
+        if ($request->relation_lob_id != NULL || $request->relation_lob_id != "") {
+            $lobId = $request->relation_lob_id['value'];
         }
 
         // Created Relation
@@ -152,8 +172,8 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_SIGNATURE_TITLE' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NUMBER' => NULL,
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME' => NULL,
-            'RELATION_PROFESSION_ID' => $request->profession_id,
-            'RELATION_LOB_ID' => $request->relation_lob_id,
+            'RELATION_PROFESSION_ID' => $professionId,
+            'RELATION_LOB_ID' => $lobId,
             'salutation_id' => $request->salutation_id,
             'relation_status_id' => $request->relation_status_id
 
@@ -207,6 +227,10 @@ class RelationController extends Controller
             }    
         }
 
+        // get salutation name for detail relation
+        $salutation = Salutation::find($relation->salutation_id);
+        $salutationName = $salutation->salutation_name;
+
 
         // Created Log
         UserLog::create([
@@ -222,7 +246,8 @@ class RelationController extends Controller
 
         return new JsonResponse([
             $relation->RELATION_ORGANIZATION_ID,
-            $relation->RELATION_ORGANIZATION_NAME
+            $addTBK,
+            $salutationName
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -255,16 +280,38 @@ class RelationController extends Controller
         }
 
 
+        // cek jika ganti parent
+
+
         // Cek Relation Perent Id 
         $parentID = $request->RELATION_ORGANIZATION_PARENT_ID;
         if ($request->RELATION_ORGANIZATION_PARENT_ID == '' || $request->RELATION_ORGANIZATION_PARENT_ID == NULL) {
             $parentID = "0";
         }
 
+        // ubah ke to lower dan huruf besar di awal
+        $nameRelation = strtolower($request->RELATION_ORGANIZATION_NAME);
+        $nameRelationNew = ucwords($nameRelation);
+
+        $addTBK = $nameRelationNew;
+        if ($request->MARK_TBK_RELATION == "1") {
+            $addTBK = $nameRelationNew." Tbk.";
+        }
+
+        $professionId = $request->RELATION_PROFESSION_ID;
+        if ($request->RELATION_PROFESSION_ID != NULL || $request->RELATION_PROFESSION_ID != "") {
+            $professionId = $request->RELATION_PROFESSION_ID;
+        }
+
+        $lobId = $request->RELATION_LOB_ID;
+        if ($request->RELATION_LOB_ID != NULL || $request->RELATION_LOB_ID != "") {
+            $lobId = $request->RELATION_LOB_ID;
+        }
+
         // Update Relation
         $relation = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
             ->update([
-                'RELATION_ORGANIZATION_NAME' => $request->RELATION_ORGANIZATION_NAME,
+                'RELATION_ORGANIZATION_NAME' => $addTBK,
                 'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
                 'RELATION_ORGANIZATION_ABBREVIATION' => $request->RELATION_ORGANIZATION_ABBREVIATION,
                 'RELATION_ORGANIZATION_AKA' => $request->RELATION_ORGANIZATION_AKA,
@@ -276,7 +323,8 @@ class RelationController extends Controller
                 'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
                 'RELATION_ORGANIZATION_ALIAS' => $request->RELATION_ORGANIZATION_NAME,
                 'RELATION_ORGANIZATION_EMAIL' => $request->RELATION_ORGANIZATION_EMAIL,
-                'RELATION_LOB_ID' => $request->RELATION_LOB_ID,
+                'RELATION_PROFESSION_ID' => $professionId,
+                'RELATION_LOB_ID' => $lobId,
                 'salutation_id' => $request->salutation_id,
                 'relation_status_id' => $request->relation_status_id
             ]);
@@ -353,6 +401,10 @@ class RelationController extends Controller
             }
         }
 
+        // get salutation name for detail relation
+        $salutation = Salutation::find($request->salutation_id);
+        $salutationName = $salutation->salutation_name;
+
         // Created Log
         UserLog::create([
             'created_by' => Auth::user()->id,
@@ -365,7 +417,9 @@ class RelationController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->RELATION_ORGANIZATION_ID
+            $request->RELATION_ORGANIZATION_ID,
+            $addTBK,
+            $salutationName
         ], 201, [
             'X-Inertia' => true
         ]);

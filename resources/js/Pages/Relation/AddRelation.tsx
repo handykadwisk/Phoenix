@@ -21,6 +21,7 @@ import Checkbox from "@/Components/Checkbox";
 import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import SelectTailwind from "react-tailwindcss-select";
 
 export default function AddRelation({
     idGroupRelation,
@@ -32,6 +33,12 @@ export default function AddRelation({
     show,
     modal,
     handleSuccess,
+    data,
+    setData,
+    switchPage,
+    setSwitchPage,
+    switchPageTBK,
+    setSwitchPageTBK,
 }: PropsWithChildren<{
     idGroupRelation: string;
     relationStatus: any;
@@ -42,31 +49,37 @@ export default function AddRelation({
     show: any;
     modal: any;
     handleSuccess: any;
+    data: any;
+    setData: any;
+    switchPage: any;
+    setSwitchPage: any;
+    switchPageTBK: any;
+    setSwitchPageTBK: any;
 }>) {
     // console.log("xx", relationGroup);
     const [salutations, setSalutations] = useState<any>([]);
-    const [switchPage, setSwitchPage] = useState(false);
-    const [switchPageTBK, setSwitchPageTBK] = useState(false);
+    // const [switchPage, setSwitchPage] = useState(false);
+    // const [switchPageTBK, setSwitchPageTBK] = useState(false);
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });
-    const { data, setData, errors, reset } = useForm<any>({
-        group_id: "",
-        name_relation: "",
-        parent_id: "",
-        abbreviation: "",
-        relation_aka: [],
-        relation_email: "",
-        relation_description: "",
-        relation_lob_id: "",
-        salutation_id: "",
-        relation_status_id: "",
-        tagging_name: [],
-        is_managed: "",
-        mark_tbk_relation: "",
-        profession_id: "",
-        relation_type_id: [],
-    });
+    // const { data, setData, errors, reset } = useForm<any>({
+    //     group_id: "",
+    //     name_relation: "",
+    //     parent_id: "",
+    //     abbreviation: "",
+    //     relation_aka: [],
+    //     relation_email: "",
+    //     relation_description: "",
+    //     relation_lob_id: "",
+    //     salutation_id: "",
+    //     relation_status_id: "",
+    //     tagging_name: [],
+    //     is_managed: "",
+    //     mark_tbk_relation: "",
+    //     profession_id: "",
+    //     relation_type_id: [],
+    // });
 
     const getSalutationById = async (id: string, column: string) => {
         if (id) {
@@ -167,6 +180,21 @@ export default function AddRelation({
                 item.name_tag?.toLocaleLowerCase()?.trim() ===
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
+
+    const lobSelect = relationLOB?.map((query: any) => {
+        return {
+            value: query.RELATION_LOB_ID,
+            label: query.RELATION_LOB_NAME,
+        };
+    });
+
+    const professionSelect = profession?.map((query: any) => {
+        return {
+            value: query.RELATION_PROFESSION_ID,
+            label: query.RELATION_PROFESSION_NAME,
+        };
+    });
+
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -186,14 +214,19 @@ export default function AddRelation({
                 body={
                     <>
                         <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
-                            <div className="mt-4">
+                            <div className="relative">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="relation_status_id"
                                     value="Relation Status"
                                 />
+                                <div className="ml-[6.8rem] text-red-600">
+                                    *
+                                </div>
                                 <select
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={data.relation_status_id}
+                                    required
                                     onChange={(e) => {
                                         setData(
                                             "relation_status_id",
@@ -227,11 +260,15 @@ export default function AddRelation({
                                     )}
                                 </select>
                             </div>
-                            <div className="mt-4">
+                            <div className="relative">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="salutation_id"
                                     value="Salutation"
                                 />
+                                <div className="ml-[4.8rem] text-red-600">
+                                    *
+                                </div>
                                 <select
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={data.salutation_id}
@@ -241,6 +278,7 @@ export default function AddRelation({
                                             e.target.value
                                         );
                                     }}
+                                    required
                                 >
                                     <option>-- Choose Salutation --</option>
                                     {salutations.map(
@@ -263,18 +301,19 @@ export default function AddRelation({
                             </div>
                         </div>
                         <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="name_relation"
                                     value="Name Relation"
                                 />
+                                <div className="ml-[6.7rem] text-red-600">
+                                    *
+                                </div>
                                 <TextInput
-                                    id="name_relation"
                                     type="text"
-                                    name="name_relation"
                                     value={data.name_relation}
                                     className="mt-2"
-                                    autoComplete="name_relation"
                                     onChange={(e) =>
                                         setData("name_relation", e.target.value)
                                     }
@@ -282,18 +321,19 @@ export default function AddRelation({
                                     placeholder="Name Relation"
                                 />
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="abbreviation"
                                     value="Abbreviation"
                                 />
+                                <div className="ml-[5.8rem] text-red-600">
+                                    *
+                                </div>
                                 <TextInput
-                                    id="abbreviation"
                                     type="text"
-                                    name="abbreviation"
                                     value={data.abbreviation}
                                     className="mt-2"
-                                    autoComplete="abbreviation"
                                     onChange={(e) =>
                                         setData("abbreviation", e.target.value)
                                     }
@@ -383,9 +423,8 @@ export default function AddRelation({
                                     onChange={(e) =>
                                         setQuery(e.target.value.trimStart())
                                     }
-                                    placeholder="Create AKA"
+                                    placeholder="Create AKA *"
                                     className=""
-                                    autoComplete="relation_aka"
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter" && !isDisable) {
                                             setData("relation_aka", [
@@ -511,12 +550,9 @@ export default function AddRelation({
                                     value="Email"
                                 />
                                 <TextInput
-                                    id="relation_email"
                                     type="email"
-                                    name="relation_email"
                                     value={data.relation_email}
                                     className="mt-2"
-                                    autoComplete="relation_email"
                                     onChange={(e) =>
                                         setData(
                                             "relation_email",
@@ -606,7 +642,35 @@ export default function AddRelation({
                                 htmlFor="profession_id"
                                 value="Relation Profession"
                             />
-                            <select
+                            <SelectTailwind
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                        }`,
+                                }}
+                                options={professionSelect}
+                                isSearchable={true}
+                                placeholder={"--Select LOB--"}
+                                value={data.profession_id}
+                                // onChange={(e) =>
+                                //     inputDataBank(
+                                //         "BANK_ID",
+                                //         e.target.value,
+                                //         i
+                                //     )
+                                // }
+                                onChange={(val: any) => {
+                                    setData("profession_id", val);
+                                }}
+                                primaryColor={"bg-red-500"}
+                            />
+                            {/* <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                 value={data.profession_id}
                                 onChange={(e) =>
@@ -626,14 +690,42 @@ export default function AddRelation({
                                         </option>
                                     );
                                 })}
-                            </select>
+                            </select> */}
                         </div>
                         <div className="mt-4" id="relationLob">
                             <InputLabel
                                 htmlFor="relation_lob_id"
                                 value="Relation Lob"
                             />
-                            <select
+                            <SelectTailwind
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                        }`,
+                                }}
+                                options={lobSelect}
+                                isSearchable={true}
+                                placeholder={"--Select LOB--"}
+                                value={data.relation_lob_id}
+                                // onChange={(e) =>
+                                //     inputDataBank(
+                                //         "BANK_ID",
+                                //         e.target.value,
+                                //         i
+                                //     )
+                                // }
+                                onChange={(val: any) => {
+                                    setData("relation_lob_id", val);
+                                }}
+                                primaryColor={"bg-red-500"}
+                            />
+                            {/* <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                 value={data.relation_lob_id}
                                 onChange={(e) =>
@@ -651,7 +743,7 @@ export default function AddRelation({
                                         </option>
                                     );
                                 })}
-                            </select>
+                            </select> */}
                         </div>
                         <div className="mt-4">
                             <InputLabel
@@ -751,7 +843,6 @@ export default function AddRelation({
                                 }
                                 placeholder="Create Tags"
                                 className=""
-                                autoComplete="tagging_name"
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" && !isDisableTag) {
                                         setData("tagging_name", [

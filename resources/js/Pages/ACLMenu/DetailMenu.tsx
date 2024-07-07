@@ -1,0 +1,198 @@
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, useForm, usePage } from "@inertiajs/react";
+import { PageProps } from "@/types";
+import Button from "@/Components/Button/Button";
+import defaultImage from "../../Images/user/default.jpg";
+import {
+    EllipsisHorizontalIcon,
+    EnvelopeIcon,
+    EyeIcon,
+    MagnifyingGlassIcon,
+    PencilIcon,
+    PencilSquareIcon,
+    PhoneIcon,
+} from "@heroicons/react/20/solid";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react/jsx-runtime";
+import { FormEvent, PropsWithChildren, useEffect, useState } from "react";
+import axios from "axios";
+import Pagination from "@/Components/Pagination";
+import ToastMessage from "@/Components/ToastMessage";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import TextArea from "@/Components/TextArea";
+import ModalToAction from "@/Components/Modal/ModalToAction";
+import TableTH from "@/Components/Table/TableTH";
+import TableTD from "@/Components/Table/TableTD";
+import ModalSearch from "@/Components/Modal/ModalSearch";
+import Swal from "sweetalert2";
+
+export default function DetailGroup({
+    idMenu,
+    comboMenu,
+    handleSuccess,
+    modal,
+    setModal,
+}: PropsWithChildren<{
+    idMenu: any;
+    comboMenu: any;
+    handleSuccess: any;
+    modal: any;
+    setModal: any;
+}>) {
+    useEffect(() => {
+        getMenuById();
+    }, [idMenu]);
+
+    // const [detailMenu, setDetailMenu] = useState<any>([]);
+
+    const getMenuById = async () => {
+        await axios
+            .post(`/getMenuById`, {
+                idMenu,
+                // menu_name: searchMenu.menu_name,
+            })
+            .then((res) => {
+                setDataById(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [dataById, setDataById] = useState<any>({
+        menu_parent_id: "",
+        menu_name: "",
+        menu_url: "",
+        menu_sequence: "",
+        menu_is_deleted: "",
+    });
+
+    return (
+        <>
+            <ModalToAdd
+                show={modal}
+                onClose={setModal}
+                title={"Edit Menu"}
+                url={`/setting/editMenu`}
+                data={dataById}
+                onSuccess={handleSuccess}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
+                }
+                buttonAddOns={"Delete"}
+                body={
+                    <>
+                        {/* Parent */}
+                        <div className="mb-3">
+                            <div>
+                                <InputLabel
+                                    className=""
+                                    htmlFor="menu_parent_id"
+                                    value={"Parent"}
+                                />
+                                <select
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={dataById.menu_parent_id}
+                                    onChange={(e) => {
+                                        setDataById({
+                                            ...dataById,
+                                            menu_parent_id: e.target.value,
+                                        });
+                                    }}
+                                >
+                                    <option value={""}>
+                                        -- Choose Parent --
+                                    </option>
+                                    {comboMenu.map((mData: any, i: number) => {
+                                        return (
+                                            <option value={mData.id} key={i}>
+                                                {mData.menu_name}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
+                            <div className="mt-2">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="menu_name"
+                                    value={"Menu Name"}
+                                />
+                                <div className="ml-[5.5rem] text-red-600">
+                                    *
+                                </div>
+                                <TextInput
+                                    id="menu_name"
+                                    type="text"
+                                    name="menu_name"
+                                    value={dataById.menu_name}
+                                    className="mt-2"
+                                    onChange={(e) => {
+                                        setDataById({
+                                            ...dataById,
+                                            menu_name: e.target.value,
+                                        });
+                                    }}
+                                    required
+                                    placeholder="Name Menu"
+                                />
+                            </div>
+                            <div className="mt-2">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="menu_url"
+                                    value={"Menu URL"}
+                                />
+                                <div className="ml-[4.3rem] text-red-600">
+                                    *
+                                </div>
+                                <TextInput
+                                    id="menu_url"
+                                    type="text"
+                                    name="menu_url"
+                                    value={dataById.menu_url}
+                                    className="mt-2"
+                                    onChange={(e) => {
+                                        setDataById({
+                                            ...dataById,
+                                            menu_url: e.target.value,
+                                        });
+                                    }}
+                                    required
+                                    placeholder="Menu URL"
+                                />
+                            </div>
+                            <div className="mt-2">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="menu_sequence"
+                                    value={"Menu Sequence"}
+                                />
+                                <div className="ml-[7.3rem] text-red-600">
+                                    *
+                                </div>
+                                <TextInput
+                                    id="menu_sequence"
+                                    type="text"
+                                    name="menu_sequence"
+                                    value={dataById.menu_sequence}
+                                    className="mt-2"
+                                    onChange={(e) => {
+                                        setDataById({
+                                            ...dataById,
+                                            menu_sequence: e.target.value,
+                                        });
+                                    }}
+                                    required
+                                    placeholder="Menu Sequence"
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+        </>
+    );
+}

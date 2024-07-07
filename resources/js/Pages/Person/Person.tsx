@@ -11,6 +11,8 @@ import AddPersonPopup from "./AddPerson";
 import DetailPersonPopup from "./DetailPerson";
 import Swal from "sweetalert2";
 import ModalToAction from "@/Components/Modal/ModalToAction";
+import TextInput from "@/Components/TextInput";
+import UserPage from "./User/User";
 
 export default function Person({
     auth,
@@ -29,8 +31,14 @@ export default function Person({
     const [dataPersonRelationship, setDataPersonRelationship] = useState<any>(
         []
     );
-    // const [detailPerson, setDetailPerson] = useState<any>([]);
+    const [detailPerson, setDetailPerson] = useState<any>({
+        PERSON_ID: "",
+        PERSON_FIRST_NAME: "",
+    });
     const [idPerson, setIdPerson] = useState<string>("");
+    const [searchPerson, setSearchPerson] = useState<any>({
+        PERSON_FIRST_NAME: "",
+    });
 
     useEffect(() => {
         getPersons();
@@ -40,6 +48,7 @@ export default function Person({
         await axios
             .post(`/getPersons?${pageNumber}`, {
                 idRelation,
+                PERSON_FIRST_NAME: searchPerson.PERSON_FIRST_NAME,
             })
             .then((res) => {
                 setDataPerson(res.data);
@@ -221,6 +230,19 @@ export default function Person({
         }
     };
 
+    const [tab, setTab] = useState<any>({
+        nameTab: "Person",
+        currentTab: true,
+    });
+    const tabs = [
+        { name: "Person", href: "#", current: true },
+        { name: "User", href: "#", current: false },
+    ];
+
+    function classNames(...classes: any) {
+        return classes.filter(Boolean).join(" ");
+    }
+
     return (
         <>
             {/* modal add person */}
@@ -259,7 +281,6 @@ export default function Person({
                 title={"Detail Person"}
                 url={""}
                 data={""}
-                addOns={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
@@ -279,209 +300,201 @@ export default function Person({
             />
             {/* end detail person */}
 
-            <div>
-                <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
-                    <div className="p-6 text-gray-900">
-                        <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-lg dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-                            {/* header table */}
-                            <div className="md:grid md:grid-cols-8 md:gap-4">
-                                <Button
-                                    className="text-sm w-full lg:w-1/2 font-semibold px-6 py-1.5 mb-4 md:col-span-2"
-                                    // onClick={() => {
-                                    //     // setSwitchPage(false);
-                                    //     setModal({
-                                    //         add: false,
-                                    //         delete: false,
-                                    //         edit: false,
-                                    //         view: !modal.view,
-                                    //         document: false,
-                                    //         search: false,
-                                    //     });
-                                    // }}
-                                    onClick={(e) => handleAddModel(e)}
+            <div className="mb-4">
+                <div className="sm:hidden">
+                    <label htmlFor="tabs" className="sr-only">
+                        Select a tab
+                    </label>
+                    {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
+                    <select
+                        id="tabs"
+                        name="tabs"
+                        className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                        defaultValue={tabs.find((tab) => tab.current).name}
+                    >
+                        {tabs.map((tab) => (
+                            <option key={tab.name}>{tab.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="hidden sm:block">
+                    <div className="border-b border-gray-200">
+                        <nav
+                            className="-mb-px flex space-x-2"
+                            aria-label="Tabs"
+                        >
+                            {tabs.map((tabNew) => (
+                                <a
+                                    key={tabNew.name}
+                                    onClick={() => {
+                                        setTab({
+                                            nameTab: tabNew.name,
+                                            currentTab: true,
+                                        });
+                                    }}
+                                    className={classNames(
+                                        tabNew.name === tab.nameTab &&
+                                            tab.currentTab === true
+                                            ? "border-red-500 text-red-600 cursor-pointer"
+                                            : "border-transparent text-gray-500 hover:border-red-300 hover:text-red-700 cursor-pointer",
+                                        "whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium"
+                                    )}
+                                    aria-current={
+                                        tabNew.name === tab.nameTab &&
+                                        tab.currentTab === true
+                                            ? "page"
+                                            : undefined
+                                    }
                                 >
-                                    {"Add Person"}
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 xs:gap-0 lg:grid-cols-3 lg:gap-4">
-                            <div className="bg-white rounded-md p-10 mb-5 lg:mb-0 shadow-lg">
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
-                                        <button
-                                            className=" w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4 hover:ring-red-500"
-                                            onClick={() => {
-                                                // setModal({
-                                                //     add: false,
-                                                //     delete: false,
-                                                //     edit: false,
-                                                //     view: false,
-                                                //     document: false,
-                                                //     search: !modal.search,
-                                                // });
-                                            }}
-                                        >
-                                            <MagnifyingGlassIcon
-                                                className="mx-2 h-5 w-5 text-gray-400"
-                                                aria-hidden="true"
-                                            />
-                                            Search Relation
-                                        </button>
-                                    </div>
-                                    <div className="flex justify-center items-center xs:col-span-3 lg:col-auto text-sm">
-                                        <Button
-                                            className="mb-4 w-full py-2 px-3"
-                                            // onClick={() =>
-                                            //     clearSearchRelation()
-                                            // }
-                                        >
-                                            Clear Search
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-md col-span-2 p-10 shadow-lg">
-                                {dataPerson.data?.length === 0 ? (
-                                    <div className="text-center text-lg">
-                                        <span>No Data Available</span>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                                            <table className="w-full table-auto divide-y divide-gray-300">
-                                                <thead className="bg-gray-100">
-                                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                                        <TableTH
-                                                            className={
-                                                                "max-w-[0px] text-center"
-                                                            }
-                                                            label={"No"}
-                                                        />
-                                                        <TableTH
-                                                            className={
-                                                                "min-w-[50px]"
-                                                            }
-                                                            label={
-                                                                "Name Person"
-                                                            }
-                                                        />
-                                                        <TableTH
-                                                            className={
-                                                                "min-w-[50px] text-center"
-                                                            }
-                                                            label={"Action"}
-                                                        />
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {dataPerson.data?.map(
-                                                        (
-                                                            dPerson: any,
-                                                            i: number
-                                                        ) => {
-                                                            return (
-                                                                <tr
-                                                                    key={i}
-                                                                    className={
-                                                                        i %
-                                                                            2 ===
-                                                                        0
-                                                                            ? ""
-                                                                            : "bg-gray-100"
-                                                                    }
-                                                                >
-                                                                    <TableTD
-                                                                        value={
-                                                                            dataPerson.from +
-                                                                            i
-                                                                        }
-                                                                        className={
-                                                                            "text-center"
-                                                                        }
-                                                                    />
-                                                                    <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                {
-                                                                                    dPerson.PERSON_FIRST_NAME
-                                                                                }
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    />
-                                                                    <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                <a
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleDetailModel(
-                                                                                            e,
-                                                                                            dPerson.PERSON_ID
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    <div
-                                                                                        className="flex justify-center items-center"
-                                                                                        title="Detail"
-                                                                                    >
-                                                                                        <svg
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            fill="none"
-                                                                                            viewBox="0 0 24 24"
-                                                                                            strokeWidth={
-                                                                                                1.5
-                                                                                            }
-                                                                                            stroke="currentColor"
-                                                                                            className="size-6 text-red-700 cursor-pointer"
-                                                                                        >
-                                                                                            <path
-                                                                                                strokeLinecap="round"
-                                                                                                strokeLinejoin="round"
-                                                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                                                                            />
-                                                                                            <path
-                                                                                                strokeLinecap="round"
-                                                                                                strokeLinejoin="round"
-                                                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </div>
-                                                                                </a>
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    />
-                                                                </tr>
-                                                            );
-                                                        }
-                                                    )}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <Pagination
-                                            links={dataPerson.links}
-                                            fromData={dataPerson.from}
-                                            toData={dataPerson.to}
-                                            totalData={dataPerson.total}
-                                            clickHref={(url: string) =>
-                                                getPersons(url.split("?").pop())
-                                            }
-                                        />
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        {/* table page*/}
+                                    {tabNew.name}
+                                </a>
+                            ))}
+                        </nav>
                     </div>
                 </div>
             </div>
+            {tab.nameTab === "Person" ? (
+                // person
+                <div className="grid grid-cols-4 gap-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
+                    <div className="flex flex-col">
+                        <div className="bg-white mb-4 rounded-md shadow-md p-4">
+                            <div
+                                className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
+                                onClick={(e) => handleAddModel(e)}
+                            >
+                                <span>Add Person</span>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[293px]">
+                            <TextInput
+                                id="PERSON_FIRST_NAME"
+                                type="text"
+                                name="PERSON_FIRST_NAME"
+                                value={searchPerson.PERSON_FIRST_NAME}
+                                className="mt-2 ring-1 ring-red-600"
+                                onChange={(e) =>
+                                    setSearchPerson({
+                                        ...searchPerson,
+                                        PERSON_FIRST_NAME: e.target.value,
+                                    })
+                                }
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        if (
+                                            searchPerson.PERSON_FIRST_NAME !==
+                                            ""
+                                        ) {
+                                            getPersons();
+                                            setSearchPerson({
+                                                ...searchPerson,
+                                                PERSON_FIRST_NAME: "",
+                                            });
+                                        }
+                                    }
+                                }}
+                                placeholder="Search Person Name"
+                            />
+                            <div className="mt-4 flex justify-end gap-2">
+                                <div
+                                    className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
+                                    onClick={() => clearSearchPerson()}
+                                >
+                                    Search
+                                </div>
+                                <div
+                                    className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                    onClick={() => clearSearchPerson()}
+                                >
+                                    Clear Search
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0">
+                        <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
+                            <table className="w-full table-auto divide-y divide-gray-300">
+                                <thead className="">
+                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                        <TableTH
+                                            className={
+                                                "w-[10px] text-center bg-gray-200 rounded-tl-lg"
+                                            }
+                                            label={"No."}
+                                        />
+                                        <TableTH
+                                            className={
+                                                "min-w-[50px] bg-gray-200 rounded-tr-lg"
+                                            }
+                                            label={"Name Person"}
+                                        />
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {dataPerson.data?.map(
+                                        (dPerson: any, i: number) => {
+                                            return (
+                                                <tr
+                                                    onDoubleClick={(e) => {
+                                                        setDetailPerson({
+                                                            PERSON_ID:
+                                                                dPerson.PERSON_ID,
+                                                            PERSON_FIRST_NAME:
+                                                                dPerson.PERSON_FIRST_NAME,
+                                                        });
+                                                        handleDetailModel(
+                                                            e,
+                                                            dPerson.PERSON_ID
+                                                        );
+                                                    }}
+                                                    key={i}
+                                                    className={
+                                                        i % 2 === 0
+                                                            ? "cursor-pointer"
+                                                            : "bg-gray-100 cursor-pointer"
+                                                    }
+                                                >
+                                                    <TableTD
+                                                        value={
+                                                            dataPerson.from + i
+                                                        }
+                                                        className={
+                                                            "text-center"
+                                                        }
+                                                    />
+                                                    <TableTD
+                                                        value={
+                                                            <>
+                                                                {
+                                                                    dPerson.PERSON_FIRST_NAME
+                                                                }
+                                                            </>
+                                                        }
+                                                        className={""}
+                                                    />
+                                                </tr>
+                                            );
+                                        }
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
+                            <Pagination
+                                links={dataPerson.links}
+                                fromData={dataPerson.from}
+                                toData={dataPerson.to}
+                                totalData={dataPerson.total}
+                                clickHref={(url: string) =>
+                                    getPersons(url.split("?").pop())
+                                }
+                            />
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                // user
+                <UserPage idRelation={idRelation} dataUsers={dataPerson} />
+            )}
         </>
     );
 }

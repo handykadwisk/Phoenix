@@ -135,6 +135,20 @@ export default function Division({
             }
         });
     };
+
+    const clearSearchDivision = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getDivision?${pageNumber}`, {
+                idRelation,
+            })
+            .then((res) => {
+                setDataDivision(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <>
             {/* modal add */}
@@ -185,7 +199,6 @@ export default function Division({
                                     name="RELATION_DIVISION_ALIAS"
                                     value={data.RELATION_DIVISION_ALIAS}
                                     className="mt-2"
-                                    autoComplete="RELATION_DIVISION_ALIAS"
                                     onChange={(e) => {
                                         setData(
                                             "RELATION_DIVISION_ALIAS",
@@ -211,7 +224,6 @@ export default function Division({
                                     name="RELATION_DIVISION_INITIAL"
                                     value={data.RELATION_DIVISION_INITIAL}
                                     className="mt-2"
-                                    autoComplete="RELATION_DIVISION_INITIAL"
                                     onChange={(e) => {
                                         setData(
                                             "RELATION_DIVISION_INITIAL",
@@ -359,13 +371,13 @@ export default function Division({
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchDivision()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchDivision()}
                             >
                                 Clear Search
                             </div>

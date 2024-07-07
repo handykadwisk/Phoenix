@@ -171,7 +171,6 @@ export default function DetailJobDesc({
                                     name="RELATION_JOBDESC_ALIAS"
                                     value={dataById.RELATION_JOBDESC_ALIAS}
                                     className="mt-0"
-                                    autoComplete="RELATION_JOBDESC_ALIAS"
                                     onChange={(e: any) => {
                                         setDataById({
                                             ...dataById,

@@ -30,8 +30,8 @@ export default function JobDesk({
     }, []);
 
     const [dataJobDesc, setDataJobDesc] = useState<any>([]);
-    const [searchOffice, setSearchOffice] = useState<any>({
-        RELATION_OFFICE_ALIAS: "",
+    const [searchJobDesc, setSearchJobDesc] = useState<any>({
+        RELATION_JOBDESC_ALIAS: "",
     });
 
     const [detailJobDesc, setDetailJobDesc] = useState<any>({
@@ -44,7 +44,7 @@ export default function JobDesk({
         await axios
             .post(`/getJobDesc?${pageNumber}`, {
                 idRelation,
-                RELATION_OFFICE_ALIAS: searchOffice.RELATION_OFFICE_ALIAS,
+                RELATION_JOBDESC_ALIAS: searchJobDesc.RELATION_JOBDESC_ALIAS,
             })
             .then((res) => {
                 setDataJobDesc(res.data);
@@ -130,6 +130,19 @@ export default function JobDesk({
         });
     };
 
+    const clearSearchJobDesc = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getJobDesc?${pageNumber}`, {
+                idRelation,
+            })
+            .then((res) => {
+                setDataJobDesc(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <>
             {/* modal add */}
@@ -180,7 +193,6 @@ export default function JobDesk({
                                     name="RELATION_JOBDESC_ALIAS"
                                     value={data.RELATION_JOBDESC_ALIAS}
                                     className="mt-0"
-                                    autoComplete="RELATION_JOBDESC_ALIAS"
                                     onChange={(e) => {
                                         setData(
                                             "RELATION_JOBDESC_ALIAS",
@@ -300,27 +312,27 @@ export default function JobDesk({
                     </div>
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[293px]">
                         <TextInput
-                            id="RELATION_OFFICE_ALIAS"
+                            id="RELATION_JOBDESC_ALIAS"
                             type="text"
-                            name="RELATION_OFFICE_ALIAS"
-                            value={searchOffice.RELATION_OFFICE_ALIAS}
+                            name="RELATION_JOBDESC_ALIAS"
+                            value={searchJobDesc.RELATION_JOBDESC_ALIAS}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) =>
-                                setSearchOffice({
-                                    ...searchOffice,
-                                    RELATION_OFFICE_ALIAS: e.target.value,
+                                setSearchJobDesc({
+                                    ...searchJobDesc,
+                                    RELATION_JOBDESC_ALIAS: e.target.value,
                                 })
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (
-                                        searchOffice.RELATION_OFFICE_ALIAS !==
+                                        searchJobDesc.RELATION_JOBDESC_ALIAS !==
                                         ""
                                     ) {
                                         getJobDesc();
-                                        setSearchOffice({
-                                            ...searchOffice,
-                                            RELATION_OFFICE_ALIAS: "",
+                                        setSearchJobDesc({
+                                            ...searchJobDesc,
+                                            RELATION_JOBDESC_ALIAS: "",
                                         });
                                     }
                                 }
@@ -330,13 +342,13 @@ export default function JobDesk({
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchJobDesc()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchJobDesc()}
                             >
                                 Clear Search
                             </div>

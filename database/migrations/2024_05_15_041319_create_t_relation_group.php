@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('t_relation_group', function (Blueprint $table) {
-            $table->increments('RELATION_GROUP_ID')->primary();
+            $table->increments('RELATION_GROUP_ID')->primary()->unique();
             $table->string('RELATION_GROUP_NAME')->nullable();
             $table->string('RELATION_GROUP_DESCRIPTION')->nullable();
             $table->bigInteger('RELATION_GROUP_CREATED_BY')->nullable();

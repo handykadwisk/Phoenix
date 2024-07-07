@@ -286,7 +286,6 @@ export default function DetailAddress({
                                     name="RELATION_OFFICE_ALIAS"
                                     value={dataById.RELATION_OFFICE_ALIAS}
                                     className="mt-0"
-                                    autoComplete="RELATION_OFFICE_ALIAS"
                                     onChange={(e: any) => {
                                         setDataById({
                                             ...dataById,
@@ -350,7 +349,6 @@ export default function DetailAddress({
                                     name="RELATION_OFFICE_PHONENUMBER"
                                     value={dataById.RELATION_OFFICE_PHONENUMBER}
                                     className="mt-0"
-                                    autoComplete="RELATION_OFFICE_PHONENUMBER"
                                     onChange={(e: any) => {
                                         setDataById({
                                             ...dataById,

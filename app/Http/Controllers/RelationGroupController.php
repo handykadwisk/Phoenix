@@ -74,9 +74,13 @@ class RelationGroupController extends Controller
     }
 
     public function store(Request $request){
+
+        // tolower
+        $nameGroup = strtolower($request->RELATION_GROUP_NAME);
+
         // Created Relation
         $group = RelationGroup::create([
-            'RELATION_GROUP_NAME' => $request->RELATION_GROUP_NAME,
+            'RELATION_GROUP_NAME' => ucwords($nameGroup),
             'RELATION_GROUP_DESCRIPTION' => $request->RELATION_GROUP_DESCRIPTION,
             'RELATION_GROUP_CREATED_BY' => Auth::user()->id,
             'RELATION_GROUP_CREATED_DATE' => now(),

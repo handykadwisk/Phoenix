@@ -196,7 +196,6 @@ export default function BankAccount({
                                                     dB.PERSON_BANK_ACCOUNT_NUMBER
                                                 }
                                                 className="mt-9"
-                                                autoComplete="PERSON_BANK_ACCOUNT_NUMBER"
                                                 onChange={(e) =>
                                                     inputDataBank(
                                                         "PERSON_BANK_ACCOUNT_NUMBER",

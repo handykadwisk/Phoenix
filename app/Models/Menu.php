@@ -10,16 +10,14 @@ use Illuminate\Support\Facades\Auth;
 
 class Menu extends Model
 {
+    protected $primaryKey = 'id';
+
     protected $table = 'r_menu';
 
     protected $with = ['children', 'access'];
 
-    protected $fillable = [
-        'menu_name',
-        'menu_url',
-        'menu_parent_id',
-        'menu_created_by',
-        'menu_is_deleted'
+    protected $guarded = [
+        'id',
     ];
 
     public $timestamps = false;

@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export default function ModalToAdd({
     show = false,
@@ -15,6 +16,7 @@ export default function ModalToAdd({
     data,
     onSuccess,
     classPanel = "",
+    buttonAddOns,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -25,6 +27,7 @@ export default function ModalToAdd({
     data: any;
     classPanel: any;
     onSuccess: any;
+    buttonAddOns: any;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -49,6 +52,7 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
+                console.log(res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -99,18 +103,30 @@ export default function ModalToAdd({
                                 >
                                     <form onSubmit={action}>
                                         <div className="bg-gray-100 p-6 sm:pb-4">
-                                            <Dialog.Title
-                                                as="h3"
-                                                className="text-xl font-semibold leading-6 text-gray-900"
-                                            >
-                                                {title}
-                                            </Dialog.Title>
+                                            <div className="flex justify-between">
+                                                <div className="px-1">
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-xl font-semibold leading-6 text-gray-900"
+                                                    >
+                                                        {title}
+                                                    </Dialog.Title>
+                                                </div>
+                                                <div
+                                                    className="cursor-pointer"
+                                                    onClick={close}
+                                                >
+                                                    <span>
+                                                        <XMarkIcon className="w-7" />
+                                                    </span>
+                                                </div>
+                                            </div>
                                             <hr className="my-3" />
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
                                             <div
-                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2.5"
+                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-1"
                                                 ref={modalRef}
                                             >
                                                 {body}
@@ -123,6 +139,14 @@ export default function ModalToAdd({
                                             >
                                                 Submit
                                             </PrimaryButton>
+                                            {buttonAddOns && (
+                                                <PrimaryButton
+                                                    className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                    disabled={isProcessing}
+                                                >
+                                                    {buttonAddOns}
+                                                </PrimaryButton>
+                                            )}
                                             <button
                                                 type="button"
                                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"

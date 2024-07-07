@@ -29,6 +29,7 @@ import StructurePopup from "../Structure/Structure";
 import Division from "../Division/Division";
 import AddressPopup from "../Address/Address";
 import JobDesk from "../Job/JobDesk";
+import SelectTailwind from "react-tailwindcss-select";
 
 export default function DetailRelation({
     detailRelation,
@@ -37,6 +38,8 @@ export default function DetailRelation({
     relationType,
     profession,
     relationLOB,
+    getDetailMap,
+    setGetDetailRelation,
 }: PropsWithChildren<{
     detailRelation: any;
     relationStatus: any;
@@ -44,6 +47,8 @@ export default function DetailRelation({
     relationType: any;
     profession: any;
     relationLOB: any;
+    getDetailMap: any;
+    setGetDetailRelation: any;
 }>) {
     // const { success, detailRelation }: any = usePage().props;
     const [dataRelationNew, setDataRelationNew] = useState<any>([]);
@@ -322,9 +327,14 @@ export default function DetailRelation({
             text: "Relation Edit",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
+            // console.log(message);
             if (result.value) {
-                getDetailRelation(message);
+                setGetDetailRelation({
+                    RELATION_ORGANIZATION_NAME: message[1],
+                    RELATION_ORGANIZATION_ID: message[0],
+                    RELATION_SALUTATION: message[2],
+                });
+                getDetailRelation(message[0]);
                 setModal({
                     add: false,
                     delete: false,
@@ -417,6 +427,38 @@ export default function DetailRelation({
             document: false,
             search: false,
         });
+    };
+
+    const professionSelect = profession?.map((query: any) => {
+        return {
+            value: query.RELATION_PROFESSION_ID,
+            label: query.RELATION_PROFESSION_NAME,
+        };
+    });
+
+    const lobSelect = relationLOB?.map((query: any) => {
+        return {
+            value: query.RELATION_LOB_ID,
+            label: query.RELATION_LOB_NAME,
+        };
+    });
+
+    const getProfessionSelect = (value: any) => {
+        if (value) {
+            const selected = professionSelect.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+
+    const getLobSelect = (value: any) => {
+        if (value) {
+            const selected = lobSelect.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
     };
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
@@ -532,12 +574,9 @@ export default function DetailRelation({
                                     value="Name Relation"
                                 />
                                 <TextInput
-                                    id="RELATION_ORGANIZATION_NAME"
                                     type="text"
-                                    name="RELATION_ORGANIZATION_NAME"
                                     value={dataById.RELATION_ORGANIZATION_NAME}
                                     className="mt-2"
-                                    autoComplete="RELATION_ORGANIZATION_NAME"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
@@ -555,14 +594,11 @@ export default function DetailRelation({
                                     value="Abbreviation"
                                 />
                                 <TextInput
-                                    id="RELATION_ORGANIZATION_ABBREVIATION"
                                     type="text"
-                                    name="RELATION_ORGANIZATION_ABBREVIATION"
                                     value={
                                         dataById.RELATION_ORGANIZATION_ABBREVIATION
                                     }
                                     className="mt-2"
-                                    autoComplete="RELATION_ORGANIZATION_ABBREVIATION"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
@@ -663,7 +699,6 @@ export default function DetailRelation({
                                     }
                                     placeholder="Create AKA"
                                     className=""
-                                    autoComplete="relation_aka"
                                     onKeyDown={(e) => {
                                         if (
                                             e.key === "Enter" &&
@@ -787,8 +822,15 @@ export default function DetailRelation({
                                 <option value={""} className="text-white">
                                     -- Choose Parent --
                                 </option>
-                                {mappingParent.mapping_parent.map(
-                                    (parents: any, i: number) => {
+                                {/* {mappingParent.mapping_parent.map(
+                                    (parents: any, i: number) => { */}
+                                {mappingParent.mapping_parent
+                                    ?.filter(
+                                        (m: any) =>
+                                            m.RELATION_ORGANIZATION_ALIAS !==
+                                            dataById.RELATION_ORGANIZATION_ALIAS
+                                    )
+                                    .map((parents: any, i: number) => {
                                         return (
                                             <option
                                                 key={i}
@@ -799,8 +841,7 @@ export default function DetailRelation({
                                                 {parents.text_combo}
                                             </option>
                                         );
-                                    }
-                                )}
+                                    })}
                             </select>
                         </div>
                         <div className="xs:grid xs:gap-4 xs:grid-cols-1 lg:grid lg:gap-4 lg:grid-cols-2">
@@ -810,12 +851,9 @@ export default function DetailRelation({
                                     value="Email"
                                 />
                                 <TextInput
-                                    id="RELATION_ORGANIZATION_EMAIL"
                                     type="email"
-                                    name="RELATION_ORGANIZATION_EMAIL"
                                     value={dataById.RELATION_ORGANIZATION_EMAIL}
                                     className="mt-2"
-                                    autoComplete="RELATION_ORGANIZATION_EMAIL"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
@@ -906,7 +944,44 @@ export default function DetailRelation({
                                 htmlFor="profession_id"
                                 value="Relation Profession"
                             />
-                            <select
+                            <SelectTailwind
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                        }`,
+                                }}
+                                options={professionSelect}
+                                isSearchable={true}
+                                placeholder={"--Select LOB--"}
+                                value={{
+                                    label: getProfessionSelect(
+                                        dataById.RELATION_PROFESSION_ID
+                                    ),
+                                    value: dataById.RELATION_PROFESSION_ID,
+                                }}
+                                // value={dataById.RELATION_PROFESSION_ID}
+                                // onChange={(e) =>
+                                //     inputDataBank(
+                                //         "BANK_ID",
+                                //         e.target.value,
+                                //         i
+                                //     )
+                                // }
+                                onChange={(val: any) =>
+                                    setDataById({
+                                        ...dataById,
+                                        RELATION_PROFESSION_ID: val.value,
+                                    })
+                                }
+                                primaryColor={"bg-red-500"}
+                            />
+                            {/* <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                 value={dataById.RELATION_PROFESSION_ID}
                                 onChange={(e) =>
@@ -930,14 +1005,51 @@ export default function DetailRelation({
                                         </option>
                                     );
                                 })}
-                            </select>
+                            </select> */}
                         </div>
                         <div className="mt-4" id="relationLob">
                             <InputLabel
                                 htmlFor="RELATION_LOB_ID"
                                 value="Relation Lob"
                             />
-                            <select
+                            <SelectTailwind
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                        }`,
+                                }}
+                                options={lobSelect}
+                                isSearchable={true}
+                                placeholder={"--Select LOB--"}
+                                // value={dataById.RELATION_LOB_ID}
+                                value={{
+                                    label: getLobSelect(
+                                        dataById.RELATION_LOB_ID
+                                    ),
+                                    value: dataById.RELATION_LOB_ID,
+                                }}
+                                // onChange={(e) =>
+                                //     inputDataBank(
+                                //         "BANK_ID",
+                                //         e.target.value,
+                                //         i
+                                //     )
+                                // }
+                                onChange={(val: any) =>
+                                    setDataById({
+                                        ...dataById,
+                                        RELATION_LOB_ID: val.value,
+                                    })
+                                }
+                                primaryColor={"bg-red-500"}
+                            />
+                            {/* <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                 value={dataById.RELATION_LOB_ID}
                                 onChange={(e) =>
@@ -958,7 +1070,7 @@ export default function DetailRelation({
                                         </option>
                                     );
                                 })}
-                            </select>
+                            </select> */}
                         </div>
                         <div className="mt-4">
                             <InputLabel
@@ -1069,7 +1181,6 @@ export default function DetailRelation({
                                 }
                                 placeholder="Create Tags"
                                 className=""
-                                autoComplete="tagging"
                                 onKeyDown={(e) => {
                                     if (
                                         e.key === "Enter" &&
@@ -1275,14 +1386,14 @@ export default function DetailRelation({
                         search: false,
                     })
                 }
-                title={"Person"}
+                title={"Person & User"}
                 url={""}
                 data={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
                 }
                 submitButtonName={""}
                 body={
@@ -1300,7 +1411,7 @@ export default function DetailRelation({
                 <div className="flex justify-between">
                     <div className="text-md font-semibold w-fit">
                         <span className="border-b-2 border-red-600">
-                            Official Information
+                            Relation Information
                         </span>
                     </div>
                     <a
@@ -1318,7 +1429,7 @@ export default function DetailRelation({
                         </div>
                     </a>
                 </div>
-                <div className="xs:grid xs:grid-cols-1 xs:gap-2 mt-4 lg:grid lg:grid-cols-4 xs:gap-4">
+                <div className="xs:grid xs:grid-cols-1 xs:gap-2 lg:grid lg:grid-cols-4 lg:gap-4">
                     <div>
                         <div className="font-semibold">
                             <span>Group</span>
@@ -1481,7 +1592,7 @@ export default function DetailRelation({
                     }
                 >
                     <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Person/User</span>
+                        <span>Person & User</span>
                     </div>
                 </div>
             </div>

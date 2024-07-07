@@ -18,8 +18,8 @@ class TJobDescController extends Controller
         $data = TJobDesc::where('RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
         ->orderBy('RELATION_JOBDESC_ID', 'desc');
         if ($searchQuery) {
-            if ($searchQuery->input('RELATION_OFFICE_ALIAS')) {
-                    $data->where('RELATION_OFFICE_ALIAS', 'like', '%'.$searchQuery->RELATION_OFFICE_ALIAS.'%');
+            if ($searchQuery->input('RELATION_JOBDESC_ALIAS')) {
+                    $data->where('RELATION_JOBDESC_ALIAS', 'like', '%'.$searchQuery->RELATION_JOBDESC_ALIAS.'%');
             }
         } 
         // dd($data->toSql());

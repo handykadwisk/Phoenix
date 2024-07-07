@@ -602,7 +602,6 @@ export default function DetailPerson({
                                     name="PERSON_FIRST_NAME"
                                     value={editPerson.PERSON_FIRST_NAME}
                                     className="mt-2"
-                                    autoComplete="PERSON_FIRST_NAME"
                                     onChange={(e) => {
                                         setEditPerson({
                                             ...editPerson,
@@ -649,7 +648,6 @@ export default function DetailPerson({
                                         name="PERSON_BIRTH_PLACE"
                                         value={editPerson.PERSON_BIRTH_PLACE}
                                         className="mt-2"
-                                        autoComplete="PERSON_BIRTH_PLACE"
                                         onChange={(e) => {
                                             setEditPerson({
                                                 ...editPerson,
@@ -674,7 +672,6 @@ export default function DetailPerson({
                                         name="PERSON_BIRTH_DATE"
                                         value={editPerson.PERSON_BIRTH_DATE}
                                         className="mt-2"
-                                        autoComplete="PERSON_BIRTH_DATE"
                                         onChange={(e) => {
                                             setEditPerson({
                                                 ...editPerson,
@@ -772,7 +769,6 @@ export default function DetailPerson({
                                         name="PERSON_KTP"
                                         value={editPerson.PERSON_KTP}
                                         className="mt-2"
-                                        autoComplete="PERSON_KTP"
                                         onChange={(e) => {
                                             setEditPerson({
                                                 ...editPerson,
@@ -794,7 +790,6 @@ export default function DetailPerson({
                                         name="PERSON_NPWP"
                                         value={editPerson.PERSON_NPWP}
                                         className="mt-2"
-                                        autoComplete="PERSON_NPWP"
                                         onChange={(e) => {
                                             setEditPerson({
                                                 ...editPerson,
@@ -817,7 +812,6 @@ export default function DetailPerson({
                                         name="PERSON_KK"
                                         value={editPerson.PERSON_KK}
                                         className="mt-2"
-                                        autoComplete="PERSON_KK"
                                         onChange={(e) => {
                                             setEditPerson({
                                                 ...editPerson,
@@ -854,7 +848,6 @@ export default function DetailPerson({
                                                         editPerson.PERSON_CONTACT
                                                     }
                                                     className="mt-2"
-                                                    autoComplete="PERSON_CONTACT"
                                                     onChange={(e) => {
                                                         setEditPerson({
                                                             ...editPerson,
@@ -878,7 +871,6 @@ export default function DetailPerson({
                                                         editPerson.PERSON_EMAIL
                                                     }
                                                     className="mt-2 mb-2"
-                                                    autoComplete="PERSON_EMAIL"
                                                     onChange={(e) => {
                                                         setEditPerson({
                                                             ...editPerson,
@@ -928,7 +920,6 @@ export default function DetailPerson({
                                                                             cm.PERSON_EMERGENCY_CONTACT_NAME
                                                                         }
                                                                         className="mt-1"
-                                                                        autoComplete="PERSON_EMERGENCY_CONTACT_NAME"
                                                                         onChange={(
                                                                             e
                                                                         ) =>
@@ -952,7 +943,6 @@ export default function DetailPerson({
                                                                             cm.PERSON_EMERGENCY_CONTACT_NUMBER
                                                                         }
                                                                         className="mt-7"
-                                                                        autoComplete="PERSON_EMERGENCY_CONTACT_NUMBER"
                                                                         onChange={(
                                                                             e
                                                                         ) =>
@@ -1120,7 +1110,6 @@ export default function DetailPerson({
                                         name="PERSONE_ID"
                                         value={data.PERSONE_ID}
                                         className="mt-1"
-                                        autoComplete="PERSONE_ID"
                                         onChange={(e) =>
                                             setData(
                                                 "PERSONE_ID",
@@ -1226,7 +1215,6 @@ export default function DetailPerson({
                                         name="PERSON_HIRE_DATE"
                                         value={data.PERSON_HIRE_DATE}
                                         className="mt-2"
-                                        autoComplete="PERSON_HIRE_DATE"
                                         onChange={(e) =>
                                             setData(
                                                 "PERSON_HIRE_DATE",
@@ -1258,7 +1246,6 @@ export default function DetailPerson({
                                                 name="PERSON_END_DATE"
                                                 value={data.PERSON_END_DATE}
                                                 className="mt-2"
-                                                autoComplete="PERSON_END_DATE"
                                                 onChange={(e) =>
                                                     setData(
                                                         "PERSON_END_DATE",
@@ -1284,7 +1271,6 @@ export default function DetailPerson({
                                         name="PERSON_SALARY_ADJUSTMENT1"
                                         value={data.PERSON_SALARY_ADJUSTMENT1}
                                         className="mt-2"
-                                        autoComplete="PERSON_SALARY_ADJUSTMENT1"
                                         onChange={(e) =>
                                             setData(
                                                 "PERSON_SALARY_ADJUSTMENT1",
@@ -1306,7 +1292,6 @@ export default function DetailPerson({
                                         name="PERSON_SALARY_ADJUSTMENT2"
                                         value={data.PERSON_SALARY_ADJUSTMENT2}
                                         className="mt-2"
-                                        autoComplete="PERSON_SALARY_ADJUSTMENT2"
                                         onChange={(e) =>
                                             setData(
                                                 "PERSON_SALARY_ADJUSTMENT2",
@@ -1416,7 +1401,6 @@ export default function DetailPerson({
                                                 ?.RELATION_ORGANIZATION_NAME
                                         }
                                         className="mt-2 bg-slate-400"
-                                        autoComplete="RELATION_ORGANIZATION_ID"
                                         // onChange={(e) =>
                                         //     setDataById({
                                         //         ...dataById,
@@ -1581,7 +1565,6 @@ export default function DetailPerson({
                                                 ?.RELATION_ORGANIZATION_NAME
                                         }
                                         className="mt-2 bg-slate-400"
-                                        autoComplete="RELATION_ORGANIZATION_ID"
                                         // onChange={(e) =>
                                         //     setDataById({
                                         //         ...dataById,
@@ -1792,7 +1775,7 @@ export default function DetailPerson({
                             </label>
                         </div>
 
-                        <div className="mt-9 flex justify-center items-center font-semibold text-red-600">
+                        <div className="relative mt-9 flex justify-center items-center font-semibold text-red-600">
                             <div className="absolute pb-9">
                                 {detailPerson.PERSON_FIRST_NAME}
                             </div>
@@ -1917,7 +1900,7 @@ export default function DetailPerson({
                                     <span>Contact</span>
                                 </div>
                                 <div className="flex justify-between mt-2">
-                                    <div className="text-sm text-gray-500">
+                                    <div className="relative text-sm text-gray-500">
                                         <span>
                                             <PhoneIcon className="w-4 absolute" />
                                         </span>
@@ -1927,7 +1910,7 @@ export default function DetailPerson({
                                     </div>
                                 </div>
                                 <div className="flex justify-between mt-3">
-                                    <div className="text-sm text-gray-500">
+                                    <div className="relative text-sm text-gray-500">
                                         <span>
                                             <EnvelopeIcon className="w-4 absolute" />
                                         </span>
@@ -1963,7 +1946,7 @@ export default function DetailPerson({
                                                 return (
                                                     <div key={i}>
                                                         <div className="flex justify-between mt-2">
-                                                            <div className="text-sm text-gray-500">
+                                                            <div className="relative text-sm text-gray-500">
                                                                 <span>
                                                                     <UserIcon className="w-4 absolute" />
                                                                 </span>
@@ -1975,7 +1958,7 @@ export default function DetailPerson({
                                                             </div>
                                                         </div>
                                                         <div className="flex justify-between mt-3">
-                                                            <div className="text-sm text-gray-500">
+                                                            <div className="relative text-sm text-gray-500">
                                                                 <span>
                                                                     <PhoneIcon className="w-4 absolute" />
                                                                 </span>
@@ -1987,7 +1970,7 @@ export default function DetailPerson({
                                                             </div>
                                                         </div>
                                                         <div className="flex justify-between mt-3">
-                                                            <div className="text-sm text-gray-500">
+                                                            <div className="relative text-sm text-gray-500">
                                                                 <span>
                                                                     <UsersIcon className="w-4 absolute" />
                                                                 </span>

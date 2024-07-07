@@ -23,13 +23,13 @@ class TPersonController extends Controller
     {
 
         // dd($searchQuery);
-        $data = TPerson::where('RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
+        $data = TPerson::with('users')->where('RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
         ->orderBy('PERSON_FIRST_NAME', 'asc');
-        // if ($searchQuery) {
-        //     if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
-        //             $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
-        //     }
-        // } 
+        if ($searchQuery) {
+            if ($searchQuery->input('PERSON_FIRST_NAME')) {
+                    $data->where('PERSON_FIRST_NAME', 'like', '%'.$searchQuery->PERSON_FIRST_NAME.'%');
+            }
+        } 
             // dd($data->toSql());
 
             return $data->paginate($dataPerPage);

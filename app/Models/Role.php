@@ -10,10 +10,12 @@ class Role extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id';
+
     protected $table = 't_role';
 
-    protected $fillable = [
-        'role_name'
+    protected $guarded = [
+        'id',
     ];
 
     public function menu()

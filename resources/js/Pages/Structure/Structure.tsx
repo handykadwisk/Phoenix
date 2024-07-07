@@ -143,6 +143,34 @@ export default function Structure({
         });
     };
 
+    // search
+    const clearSearchStructure = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getStructure?${pageNumber}`, {
+                idRelation,
+            })
+            .then((res) => {
+                setDataStructure(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    // const clearSearchStructure = async (pageNumber = "page=1") => {
+    //     await axios
+    //         .post(`/getStructure?${pageNumber}`)
+    //         .then((res) => {
+    //             setRelations([]);
+    //             setSearchRelation({
+    //                 ...searchRelation,
+    //                 RELATION_ORGANIZATION_NAME: "",
+    //             });
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         });
+    // };
+
     return (
         <>
             {/* modal add */}
@@ -193,7 +221,6 @@ export default function Structure({
                                     name="RELATION_STRUCTURE_NAME"
                                     value={data.RELATION_STRUCTURE_ALIAS}
                                     className="mt-2"
-                                    autoComplete="RELATION_STRUCTURE_NAME"
                                     onChange={(e) => {
                                         setData(
                                             "RELATION_STRUCTURE_ALIAS",
@@ -372,13 +399,13 @@ export default function Structure({
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchStructurer()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchStructure()}
                             >
                                 Clear Search
                             </div>

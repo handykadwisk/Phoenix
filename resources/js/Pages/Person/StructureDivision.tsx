@@ -128,7 +128,6 @@ export default function DetailPerson({
         //                                 name="PERSONE_ID"
         //                                 value={dataById.PERSONE_ID}
         //                                 className="mt-1"
-        //                                 autoComplete="PERSONE_ID"
         //                                 onChange={(e) =>
         //                                     setDataById({
         //                                         ...dataById,
@@ -235,7 +234,6 @@ export default function DetailPerson({
         //                                 name="PERSON_HIRE_DATE"
         //                                 value={dataById.PERSON_HIRE_DATE}
         //                                 className="mt-2"
-        //                                 autoComplete="PERSON_HIRE_DATE"
         //                                 onChange={(e) =>
         //                                     setDataById({
         //                                         ...dataById,
@@ -268,7 +266,6 @@ export default function DetailPerson({
         //                                         name="PERSON_END_DATE"
         //                                         value={dataById.PERSON_END_DATE}
         //                                         className="mt-2"
-        //                                         autoComplete="PERSON_END_DATE"
         //                                         onChange={(e) =>
         //                                             setDataById({
         //                                                 ...dataById,
@@ -297,7 +294,6 @@ export default function DetailPerson({
         //                                     dataById.PERSON_SALARY_ADJUSTMENT1
         //                                 }
         //                                 className="mt-2"
-        //                                 autoComplete="PERSON_SALARY_ADJUSTMENT1"
         //                                 onChange={(e) =>
         //                                     setDataById({
         //                                         ...dataById,
@@ -322,7 +318,6 @@ export default function DetailPerson({
         //                                     dataById.PERSON_SALARY_ADJUSTMENT2
         //                                 }
         //                                 className="mt-2"
-        //                                 autoComplete="PERSON_SALARY_ADJUSTMENT2"
         //                                 onChange={(e) =>
         //                                     setDataById({
         //                                         ...dataById,

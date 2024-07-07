@@ -8,10 +8,15 @@ use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RelationGroupController;
 use App\Http\Controllers\TJobDescController;
+use App\Http\Controllers\TPermissionController;
 use App\Http\Controllers\TPersonController;
+use App\Http\Controllers\TRelationAgentController;
 use App\Http\Controllers\TRelationDivisionController;
 use App\Http\Controllers\TRelationOfficeController;
 use App\Http\Controllers\TRelationStructureController;
+use App\Models\Role;
+use App\Models\TPermission;
+use App\Models\TRelationAgent;
 use App\Models\TRelationDivision;
 use App\Models\TRelationStructure;
 use Illuminate\Foundation\Application;
@@ -47,14 +52,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
 
     // Group
-    Route::get('group', [RelationGroupController::class, 'index'])->name('group');
+    Route::get('/relation/group', [RelationGroupController::class, 'index'])->name('relation/group');
     Route::post('/getRelationGroup', [RelationGroupController::class, 'getRelationGroupJson'])->name('getRelationGroup.getRelationGroupJson');
-    Route::post('/group', [RelationGroupController::class, 'store'])->name('group.store');
+    Route::post('/relation/group', [RelationGroupController::class, 'store'])->name('group.store');
     Route::post('/getRelationById', [RelationGroupController::class, 'getRelationByIdGroup'])->name('getRelationById.getRelationByIdGroup');
     Route::get('/getGroup/{id}', [RelationGroupController::class, 'getGroupById'])->name('group.getGroupById');
     Route::get('/group/detailGroup/{id}', [RelationGroupController::class, 'detailGroup'])->name('group.detailGroup.Group');
     Route::post('/getRelationGroupDetail', [RelationGroupController::class, 'get_detail'])->name('getRelationGroupDetail.get_detail');
     Route::post('/getGroup', [RelationGroupController::class, 'get_group'])->name('getGroup.get_group');
+
+
+    // Agent
+    Route::get('/relation/agent', [TRelationAgentController::class, 'index'])->name('relation/agent');
+    Route::post('/getRelationAgent', [TRelationAgentController::class, 'getRelationAgentJson'])->name('getRelationAgent.getRelationAgentJson');
+    Route::post('/relation/agent', [TRelationAgentController::class, 'store'])->name('agent.store');
+    Route::post('/getAgentDetail', [TRelationAgentController::class, 'get_detail'])->name('getAgentDetail.get_detail');
 
     // Person
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
@@ -105,6 +117,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/getJobDescDetail', [TJobDescController::class, 'get_detail'])->name('getJobDescDetail.get_detail');
     Route::post('/editJobDesc', [TJobDescController::class, 'edit'])->name('editJobDesc.edit');
     
+    //Menu
+    Route::get('/setting/menu', [MenuController::class, 'index'])->name('setting/menu');
+    Route::post('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
+    Route::post('/setting/addMenu', [MenuController::class, 'store'])->name('addMenu.store');
+    Route::post('/getMenuCombo', [MenuController::class, 'getMenuCombo'])->name('getMenuCombo.getMenuCombo');
+    Route::post('/getMenuById', [MenuController::class, 'getMenuById'])->name('getMenuById.getMenuById');
+    Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
+
+    // Permission
+    Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
+    Route::post('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
+    Route::post('/setting/addPermission', [TPermissionController::class, 'store'])->name('addPermission.store');
+    Route::post('/getPermissionById',  [TPermissionController::class, 'get_detail'])->name('getPermissionById.get_detail');
+    Route::post('/setting/editPermission', [TPermissionController::class, 'edit'])->name('editPermission.store');
+
+    // Role
+    Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
+    Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
+    Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
     
 });
 

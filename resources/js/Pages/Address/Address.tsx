@@ -212,6 +212,19 @@ export default function Address({
         });
     };
 
+    const clearSearchAddress = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getOffice?${pageNumber}`, {
+                idRelation,
+            })
+            .then((res) => {
+                setDataOffice(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <>
             {/* modal add */}
@@ -262,7 +275,6 @@ export default function Address({
                                     name="RELATION_OFFICE_ALIAS"
                                     value={data.RELATION_OFFICE_ALIAS}
                                     className="mt-0"
-                                    autoComplete="RELATION_OFFICE_ALIAS"
                                     onChange={(e) => {
                                         setData(
                                             "RELATION_OFFICE_ALIAS",
@@ -320,7 +332,6 @@ export default function Address({
                                     name="RELATION_OFFICE_PHONENUMBER"
                                     value={data.RELATION_OFFICE_PHONENUMBER}
                                     className="mt-0"
-                                    autoComplete="RELATION_OFFICE_PHONENUMBER"
                                     onChange={(e) => {
                                         setData(
                                             "RELATION_OFFICE_PHONENUMBER",
@@ -594,13 +605,13 @@ export default function Address({
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchAddress()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRelation()}
+                                onClick={() => clearSearchAddress()}
                             >
                                 Clear Search
                             </div>

@@ -19,6 +19,10 @@ class TPerson extends Model
 
     public $timestamps = false;
 
+    public function users(){
+        return $this->hasMany(User::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
     public function ContactEmergency(){
         return $this->hasMany(TPersonEmergencyContact::class, 'PERSON_ID');
     }

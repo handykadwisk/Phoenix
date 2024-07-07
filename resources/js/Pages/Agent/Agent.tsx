@@ -26,128 +26,109 @@ import ModalToAction from "@/Components/Modal/ModalToAction";
 import TableTH from "@/Components/Table/TableTH";
 import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
-import ModalDetailGroup from "./DetailGroup";
+import DetailAgentPopup from "./DetailAgent";
 import Swal from "sweetalert2";
 
-export default function Group({ auth }: PageProps) {
-    // variabel relation Group
-    const [relationsGroup, setRelationsGroup] = useState<any>([]);
-    const [searchGroup, setSearchGroup] = useState<any>({
-        RELATION_GROUP_NAME: "",
-    });
-    const [idGroup, setIdGroup] = useState<any>({
-        RELATION_GROUP_ID: "",
-        RELATION_GROUP_NAME: "",
+export default function Agent({ auth }: PageProps) {
+    const [dataAgent, setDataAgent] = useState<any>([]);
+
+    // for search agent
+    const [searchAgent, setSearchAgent] = useState<any>({
+        RELATION_AGENT_NAME: "",
     });
 
-    // Get Relation Group
-    const getRelationGroup = async (pageNumber = "page=1") => {
+    // get data agent
+    const getAgent = async (pageNumber = "page=1") => {
         await axios
-            .post(`/getRelationGroup?${pageNumber}`, {
-                RELATION_GROUP_NAME: searchGroup.RELATION_GROUP_NAME,
+            .post(`/getRelationAgent?${pageNumber}`, {
+                RELATION_AGENT_NAME: searchAgent.RELATION_AGENT_NAME,
             })
             .then((res) => {
-                setRelationsGroup(res.data);
-                setSearchGroup({
-                    ...searchGroup,
-                    RELATION_GROUP_NAME: "",
-                });
-                if (modal.search) {
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                    });
-                }
+                setDataAgent(res.data);
             })
             .catch((err) => {
                 console.log(err);
             });
-        // setPolicies(policy)
     };
 
-    const {
-        flash,
-        relation,
-        relationGroup,
-        salutation,
-        relationType,
-        relationStatus,
-        relationLOB,
-        mRelationType,
-        profession,
-        custom_menu,
-    }: any = usePage().props;
-
-    const { data, setData, errors, reset } = useForm({
-        RELATION_GROUP_NAME: "",
-        RELATION_GROUP_DESCRIPTION: "",
-    });
-
-    const handleSuccess = (message: string) => {
-        reset();
-        setData({
-            RELATION_GROUP_NAME: "",
-            RELATION_GROUP_DESCRIPTION: "",
-        });
-        // getRelationGroup();
-        Swal.fire({
-            title: "Success",
-            text: "New Group Added",
-            icon: "success",
-        }).then((result: any) => {
-            // console.log(result);
-            if (result.value) {
-                setIdGroup({
-                    RELATION_GROUP_ID: message[0],
-                    RELATION_GROUP_NAME: message[1],
+    // for clear search
+    const clearSearchAgent = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getRelationAgent?${pageNumber}`, {
+                // idRelation,
+            })
+            .then((res) => {
+                setDataAgent([]);
+                setSearchAgent({
+                    ...searchAgent,
+                    RELATION_AGENT_NAME: "",
                 });
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: true,
-                    document: false,
-                    search: false,
-                });
-            }
-        });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
-    // Modal Button Handle
+    // for modal
     const [modal, setModal] = useState({
         add: false,
         delete: false,
         edit: false,
         view: false,
-        document: false,
-        search: false,
     });
 
-    // search
-    const clearSearchGroup = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRelationGroup?${pageNumber}`)
-            .then((res) => {
-                setRelationsGroup([]);
-                setSearchGroup({
-                    ...searchGroup,
-                    RELATION_GROUP_NAME: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    // popup menu add
+    const addAgentPopup = async (e: FormEvent) => {
+        e.preventDefault();
+
+        // getComboMenu();
+        setModal({
+            add: !modal.add,
+            delete: false,
+            edit: false,
+            view: false,
+        });
     };
 
-    return (
-        <AuthenticatedLayout user={auth.user} header={"Group"}>
-            <Head title="Group" />
+    const { data, setData } = useForm<any>({
+        RELATION_AGENT_NAME: "",
+        RELATION_AGENT_ALIAS: "",
+        RELATION_AGENT_DESCRIPTION: "",
+    });
 
-            {/* Modal Add Group */}
+    const handleSuccess = (message: string) => {
+        setData({
+            RELATION_AGENT_NAME: "",
+            RELATION_AGENT_ALIAS: "",
+            RELATION_AGENT_DESCRIPTION: "",
+        });
+
+        Swal.fire({
+            title: "Success",
+            text: "New Relation Agent",
+            icon: "success",
+        }).then((result: any) => {
+            if (result.value) {
+                setModal({
+                    add: false,
+                    delete: false,
+                    edit: false,
+                    view: !modal.view,
+                });
+            }
+        });
+    };
+
+    const [detailAgent, setDetailAgent] = useState<any>({
+        RELATION_AGENT_ID: "",
+        RELATION_AGENT_NAME: "",
+    });
+
+    return (
+        <AuthenticatedLayout user={auth.user} header={"Agent"}>
+            <Head title="Agent" />
+
+            {/* modal add*/}
             <ModalToAdd
                 show={modal.add}
                 onClose={() =>
@@ -156,12 +137,11 @@ export default function Group({ auth }: PageProps) {
                         delete: false,
                         edit: false,
                         view: false,
-                        document: false,
-                        search: false,
                     })
                 }
-                title={"Add Group"}
-                url={`/relation/group`}
+                title={"Add Agent"}
+                buttonAddOns={""}
+                url={`/relation/agent`}
                 data={data}
                 onSuccess={handleSuccess}
                 classPanel={
@@ -170,41 +150,45 @@ export default function Group({ auth }: PageProps) {
                 body={
                     <>
                         <div>
-                            <div className="mt-4">
+                            <div className="mt-0 relative">
                                 <InputLabel
-                                    htmlFor="RELATION_GROUP_NAME"
-                                    value="Name Relation Group"
+                                    className="absolute"
+                                    htmlFor="RELATION_AGENT_NAME"
+                                    value="Name Relation Agent"
                                 />
+                                <div className="ml-[9.5rem] text-red-600">
+                                    *
+                                </div>
                                 <TextInput
                                     type="text"
-                                    value={data.RELATION_GROUP_NAME}
+                                    value={data.RELATION_AGENT_NAME}
                                     className="mt-2"
                                     onChange={(e) =>
                                         setData(
-                                            "RELATION_GROUP_NAME",
+                                            "RELATION_AGENT_NAME",
                                             e.target.value
                                         )
                                     }
                                     required
-                                    placeholder="Name Relation Group"
+                                    placeholder="Name Relation Agent"
                                 />
                             </div>
                             <div className="mt-4">
                                 <InputLabel
-                                    htmlFor="RELATION_GROUP_DESCRIPTION"
-                                    value="Relation Group Description"
+                                    htmlFor="RELATION_AGENT_DESCRIPTION"
+                                    value="Description"
                                 />
                                 <TextArea
                                     className="mt-2"
-                                    id="RELATION_GROUP_DESCRIPTION"
-                                    name="RELATION_GROUP_DESCRIPTION"
+                                    id="RELATION_AGENT_DESCRIPTION"
+                                    name="RELATION_AGENT_DESCRIPTION"
                                     defaultValue={
-                                        data.RELATION_GROUP_DESCRIPTION
+                                        data.RELATION_AGENT_DESCRIPTION
                                     }
                                     onChange={(e: any) =>
                                         setData({
                                             ...data,
-                                            RELATION_GROUP_DESCRIPTION:
+                                            RELATION_AGENT_DESCRIPTION:
                                                 e.target.value,
                                         })
                                     }
@@ -214,9 +198,9 @@ export default function Group({ auth }: PageProps) {
                     </>
                 }
             />
-            {/* End Modal Add Group */}
+            {/* end modal add */}
 
-            {/* modal detail */}
+            {/* detail modal */}
             <ModalToAction
                 show={modal.view}
                 onClose={() =>
@@ -225,88 +209,71 @@ export default function Group({ auth }: PageProps) {
                         delete: false,
                         edit: false,
                         view: false,
-                        document: false,
-                        search: false,
                     })
                 }
-                title={idGroup.RELATION_GROUP_NAME}
+                title={detailAgent.RELATION_AGENT_NAME}
                 url={""}
                 data={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
                 }
                 submitButtonName={""}
                 body={
                     <>
-                        <ModalDetailGroup
-                            idGroup={idGroup.RELATION_GROUP_ID}
-                            relationStatus={relationStatus}
-                            relationGroup={relationGroup}
-                            relationType={relationType}
-                            profession={profession}
-                            relationLOB={relationLOB}
+                        <DetailAgentPopup
+                            auth={auth}
+                            idAgent={detailAgent.RELATION_AGENT_ID}
                         />
                     </>
                 }
             />
-            {/* modal end detail  */}
-
-            {/* End Modal Detail Group */}
+            {/* end detail modal */}
 
             <div className="grid grid-cols-4 gap-4 p-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
-                        <Button
-                            className="p-2"
-                            onClick={() => {
-                                setModal({
-                                    add: true,
-                                    delete: false,
-                                    edit: false,
-                                    view: false,
-                                    document: false,
-                                    search: false,
-                                });
-                            }}
+                        <div
+                            className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
+                            onClick={(e) => addAgentPopup(e)}
                         >
-                            {"Add Group"}
-                        </Button>
+                            <span>Add Agent</span>
+                        </div>
                     </div>
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
                         <TextInput
                             type="text"
-                            value={searchGroup.RELATION_GROUP_NAME}
+                            value={searchAgent.RELATION_AGENT_NAME}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) =>
-                                setSearchGroup({
-                                    ...searchGroup,
-                                    RELATION_GROUP_NAME: e.target.value,
+                                setSearchAgent({
+                                    ...searchAgent,
+                                    RELATION_AGENT_NAME: e.target.value,
                                 })
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (
-                                        searchGroup.RELATION_GROUP_NAME !== ""
+                                        searchAgent.RELATION_AGENT_NAME !== ""
                                     ) {
-                                        getRelationGroup();
+                                        getAgent();
                                     }
                                 }
                             }}
-                            placeholder="Search Group Name"
+                            placeholder="Search Agent Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchGroup()}
+                                onClick={() => clearSearchAgent()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchGroup()}
+                                onClick={() => clearSearchAgent()}
                             >
                                 Clear Search
                             </div>
@@ -328,29 +295,30 @@ export default function Group({ auth }: PageProps) {
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg rounded-br-lg"
                                         }
-                                        label={"Name Group"}
+                                        label={"Name Agent"}
                                     />
                                 </tr>
                             </thead>
                             <tbody>
-                                {relationsGroup.data?.map(
-                                    (dataGroup: any, i: number) => {
+                                {dataAgent.data?.map(
+                                    (dAgent: any, i: number) => {
                                         return (
                                             <tr
                                                 onDoubleClick={() => {
+                                                    // getDivisionCombo(
+                                                    //     idRelation
+                                                    // );
+                                                    setDetailAgent({
+                                                        RELATION_AGENT_ID:
+                                                            dAgent.RELATION_AGENT_ID,
+                                                        RELATION_AGENT_NAME:
+                                                            dAgent.RELATION_AGENT_NAME,
+                                                    });
                                                     setModal({
                                                         add: false,
                                                         delete: false,
                                                         edit: false,
                                                         view: true,
-                                                        document: false,
-                                                        search: false,
-                                                    });
-                                                    setIdGroup({
-                                                        RELATION_GROUP_ID:
-                                                            dataGroup.RELATION_GROUP_ID,
-                                                        RELATION_GROUP_NAME:
-                                                            dataGroup.RELATION_GROUP_NAME,
                                                     });
                                                 }}
                                                 key={i}
@@ -362,7 +330,7 @@ export default function Group({ auth }: PageProps) {
                                             >
                                                 <TableTD
                                                     value={
-                                                        relationsGroup.from + i
+                                                        dataAgent.from + i + "."
                                                     }
                                                     className={"text-center"}
                                                 />
@@ -370,7 +338,7 @@ export default function Group({ auth }: PageProps) {
                                                     value={
                                                         <>
                                                             {
-                                                                dataGroup.RELATION_GROUP_NAME
+                                                                dAgent.RELATION_AGENT_NAME
                                                             }
                                                         </>
                                                     }
@@ -382,17 +350,6 @@ export default function Group({ auth }: PageProps) {
                                 )}
                             </tbody>
                         </table>
-                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                            <Pagination
-                                links={relationsGroup.links}
-                                fromData={relationsGroup.from}
-                                toData={relationsGroup.to}
-                                totalData={relationsGroup.total}
-                                clickHref={(url: string) =>
-                                    getRelationGroup(url.split("?").pop())
-                                }
-                            />
-                        </div>
                     </div>
                 </div>
             </div>

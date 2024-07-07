@@ -5,6 +5,7 @@ import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
 import Swal from "sweetalert2";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export default function ModalToAction({
     show = false,
@@ -58,8 +59,8 @@ export default function ModalToAction({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
+                onSuccess(res.data);
                 close();
-                onSuccess(res.data[0]);
             })
             .catch((err) => {
                 setIsProcessing(false);
@@ -103,18 +104,30 @@ export default function ModalToAction({
                                 <Dialog.Panel className={classPanel}>
                                     <form onSubmit={action}>
                                         <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
-                                            <Dialog.Title
-                                                as="h3"
-                                                className="text-xl font-semibold leading-6 text-gray-900"
-                                            >
-                                                {title}
-                                            </Dialog.Title>
+                                            <div className="flex justify-between">
+                                                <div className="px-1">
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-xl font-semibold leading-6 text-gray-900"
+                                                    >
+                                                        {title}
+                                                    </Dialog.Title>
+                                                </div>
+                                                <div
+                                                    className="cursor-pointer"
+                                                    onClick={close}
+                                                >
+                                                    <span>
+                                                        <XMarkIcon className="w-7" />
+                                                    </span>
+                                                </div>
+                                            </div>
                                             <hr className="my-3" />
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
                                             <div
-                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2.5"
+                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
                                                 ref={modalRef}
                                             >
                                                 {body}

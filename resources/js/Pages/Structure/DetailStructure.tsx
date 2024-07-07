@@ -155,7 +155,6 @@ export default function DetailStructure({
                                     name="RELATION_STRUCTURE_NAME"
                                     value={dataById.RELATION_STRUCTURE_ALIAS}
                                     className="mt-2"
-                                    autoComplete="RELATION_STRUCTURE_NAME"
                                     onChange={(e) => {
                                         setDataById({
                                             ...dataById,
