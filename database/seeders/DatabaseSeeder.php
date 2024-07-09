@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Menu;
+use App\Models\Relation;
+use App\Models\RelationGroup;
 use App\Models\RelationLob;
 use App\Models\RelationStatus;
 use App\Models\RelationType;
@@ -51,7 +53,7 @@ class DatabaseSeeder extends Seeder
             [
                 'menu_name'       => 'Group',
                 'menu_parent_id'  => $relation->id,
-                'menu_url'        => 'group',
+                'menu_url'        => 'relation/group',
                 'menu_is_deleted' => 0,
                 'menu_sequence'   => 5,
                 'menu_created_by' => 'admin'
@@ -130,6 +132,36 @@ class DatabaseSeeder extends Seeder
                 'role_id' => $user->id
             ]
         );
+
+        // add Group
+        $addGroup = RelationGroup::create([
+            'RELATION_GROUP_NAME' => 'FRESNEL',
+            'RELATION_GROUP_CREATED_BY' => 1,
+            'RELATION_GROUP_CREATED_DATE' => now(),
+        ]);
+
+        // Add Relation
+        $addRelation = Relation::create([
+            'RELATION_ORGANIZATION_NAME' => "Fresnel Perdana Mandiri",
+            'RELATION_ORGANIZATION_ALIAS' => "Fresnel Perdana Mandiri",
+            'RELATION_ORGANIZATION_PARENT_ID' => "0",
+            "RELATION_ORGANIZATION_ABBREVIATION" => "FPM",
+            // "RELATION_ORGANIZATION_AKA" => "1",
+            "RELATION_ORGANIZATION_GROUP" => $addGroup->RELATION_GROUP_ID,
+            "RELATION_ORGANIZATION_CREATED_BY" => 1,
+            "RELATION_ORGANIZATION_CREATED_DATE" => now(),
+            "HR_MANAGED_BY_APP" => 1,
+            "salutation_id" => 3,
+            "relation_status_id" => 1,
+        ]);
+
+        // update Relation
+        $updateRelation = Relation::where('RELATION_ORGANIZATION_ID', $addRelation->RELATION_ORGANIZATION_ID)
+        ->update([
+            "RELATION_ORGANIZATION_MAPPING" => $addRelation->RELATION_ORGANIZATION_ID . "."
+        ]);
+
+
 
         // // create 2024_21_05_Store_Procedure_And_Function
         // $file_path1 = resource_path('../database/LogDB/2024_21_05_Store_Procedure_And_Function.sql');

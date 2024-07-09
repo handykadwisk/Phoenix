@@ -109,6 +109,10 @@ export default function Agent({ auth }: PageProps) {
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
+                setDetailAgent({
+                    RELATION_AGENT_ID: message[0],
+                    RELATION_AGENT_NAME: message[1],
+                });
                 setModal({
                     add: false,
                     delete: false,

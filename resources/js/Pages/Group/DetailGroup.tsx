@@ -61,7 +61,7 @@ export default function DetailGroup({
             .post(`/getRelationGroupDetail`, { id })
             .then((res) => {
                 setDataRelationGroupNew(res.data);
-                // console.log(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -163,6 +163,50 @@ export default function DetailGroup({
         profession_id: "",
         relation_type_id: [],
     });
+
+    function BasicInfo(dataChildrenNew: any): React.ReactElement {
+        return (
+            <>
+                {dataChildrenNew?.length !== 0
+                    ? dataChildrenNew?.map((dChild: any, a: number) => (
+                          <div className="pt-0 pl-[0.32rem]" key={a}>
+                              <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                                  <li>
+                                      <div className="relative flex justify-between hover:text-red-600">
+                                          <div className="flex items-center justify-center pr-2">
+                                              <span
+                                                  className={
+                                                      "bg-red-500 h-3 w-3 rounded-full"
+                                                  }
+                                              ></span>
+                                          </div>
+                                          <div className="flex items-center w-full">
+                                              <a
+                                                  href="#"
+                                                  className="inline-block w-full py-1 pr-4 text-sm"
+                                                  onClick={(e) =>
+                                                      handleDetailPopup(
+                                                          e,
+                                                          dChild.RELATION_ORGANIZATION_ID,
+                                                          dChild.RELATION_ORGANIZATION_NAME
+                                                      )
+                                                  }
+                                              >
+                                                  {
+                                                      dChild.RELATION_ORGANIZATION_NAME
+                                                  }
+                                              </a>
+                                          </div>
+                                      </div>
+                                      {BasicInfo(dChild.children)}
+                                  </li>
+                              </ul>
+                          </div>
+                      ))
+                    : null}
+            </>
+        );
+    }
 
     return (
         <>
@@ -339,6 +383,9 @@ export default function DetailGroup({
                                                                             </a>
                                                                         </div>
                                                                     </div>
+                                                                    {BasicInfo(
+                                                                        dataChildren.children
+                                                                    )}
                                                                 </li>
                                                             </ul>
                                                         </div>
