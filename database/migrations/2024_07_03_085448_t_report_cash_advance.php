@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('t_cash_advance', function (Blueprint $table) {
-            $table->increments('EXPENSES_ID')->primary();
-            $table->string('EXPENSES_NUMBER')->nullable();
-            $table->integer('EXPENSES_TYPE')->nullable();
-            $table->string('DIVISION')->nullable();
+        Schema::create('t_report_cash_advance', function (Blueprint $table) {
+            $table->increments('REPORT_CASH_ADVANCE_ID')->primary();
+            $table->foreignId('EXPENSES_ID')->nullable();
             $table->smallInteger('USED_BY')->nullable();
-            $table->smallInteger('EXPENSES_REQUESTED_BY')->nullable();
-            $table->dateTime('EXPENSES_REQUESTED_DATE')->nullable();
-            $table->smallInteger('EXPENSES_UPDATED_BY')->nullable();
-            $table->dateTime('EXPENSES_UPDATED_DATE')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_REQUESTED_BY')->nullable();
+            $table->dateTime('REPORT_CASH_ADVANCE_REQUESTED_DATE')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_UPDATED_BY')->nullable();
+            $table->dateTime('REPORT_CASH_ADVANCE_UPDATED_DATE')->nullable();
             $table->smallInteger('FIRST_APPROVAL_BY')->nullable();
             $table->string('FIRST_APPROVAL_USER')->nullable();
             $table->dateTime('FIRST_APPROVAL_CHANGE_STATUS_DATE')->nullable();
@@ -31,14 +29,14 @@ return new class extends Migration
             $table->dateTime('SECOND_APPROVAL_CHANGE_STATUS_DATE')->nullable();
             $table->smallInteger('SECOND_APPROVAL_STATUS')->nullable();
             $table->text('SECOND_APPROVAL_NOTE')->nullable();
-            $table->text('EXPENSES_REQUEST_NOTE')->nullable();
-            $table->smallInteger('DELIVERY_METHOD')->nullable();
+            $table->text('REPORT_CASH_ADVANCE_REQUEST_NOTE')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_REFUND_TYPE')->nullable();
+            $table->string('REPORT_CASH_ADVANCE_REFUND_PROOF')->nullable();
             $table->smallInteger('FA_APPROVAL_BY')->nullable();
             $table->string('FA_APPROVAL_USER')->nullable();
             $table->dateTime('FA_APPROVAL_CHANGE_STATUS_DATE')->nullable();
             $table->smallInteger('FA_APPROVAL_STATUS')->nullable();
             $table->text('FA_APPROVAL_NOTE')->nullable();
-            $table->decimal('EXPENSES_TOTAL_AMOUNT', 16, 2)->nullable();
             $table->timestamps();
         });
     }
@@ -48,6 +46,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('t_cash_advance');
+        Schema::dropIfExists('t_report_cash_advance');
     }
 };

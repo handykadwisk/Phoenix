@@ -53,7 +53,11 @@ export default function ModalToAction({
         setIsProcessing(true);
         onSuccess("");
 
-        await callAxios({ url, data, method })
+        await callAxios({
+            url,
+            data,
+            method,
+        })
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");

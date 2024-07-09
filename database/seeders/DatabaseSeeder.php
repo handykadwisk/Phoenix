@@ -47,6 +47,64 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $finance = Menu::create(
+            [
+                'menu_name'       => 'Finance',
+                'menu_url'        => NULL,
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $cashAdvance = Menu::create(
+            [
+                'menu_parent_id' => $finance,
+                'menu_name'       => 'Cash Advance',
+                'menu_url'        => 'cashAdvance',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $reimburse = Menu::create(
+            [
+                'menu_parent_id' => $finance,
+                'menu_name'       => 'Reimburse',
+                'menu_url'        => 'reimburse',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $otherExpenses = Menu::create(
+            [
+                'menu_parent_id' => $finance,
+                'menu_name'       => 'Other Expenses',
+                'menu_url'        => 'otherExpenses',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $setting = Menu::create(
+            [
+                'menu_name'       => 'Settings',
+                'menu_url'        => NULL,
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $approvalLimit = Menu::create(
+            [
+                'menu_parent_id' => $setting,
+                'menu_name'       => 'Approval Limit',
+                'menu_url'        => 'approvalLimit',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
         // create role
         $admin = Role::create([
             'role_name' => 'Admin'
@@ -55,7 +113,7 @@ class DatabaseSeeder extends Seeder
             'role_name' => 'User'
         ]);
 
-        // mapping
+        // Mapping data menu
         RoleAccessMenu::create([
             'role_id' => $admin->id,
             'menu_id' => $dashboard->id
@@ -67,6 +125,30 @@ class DatabaseSeeder extends Seeder
         RoleAccessMenu::create([
             'role_id' => $admin->id,
             'menu_id' => $policy->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $finance
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $cashAdvance
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $reimburse
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $otherExpenses
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $setting
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $approvalLimit
         ]);
 
         // create user
@@ -190,7 +272,7 @@ class DatabaseSeeder extends Seeder
 
         CashAdvanceStatus::create([
             'CA_STATUS_ID' => 1,
-            'CA_STATUS_NAME' => 'Accept'
+            'CA_STATUS_NAME' => 'Approved'
         ]);
         
         CashAdvanceStatus::create([

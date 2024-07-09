@@ -1,8 +1,8 @@
 export default function TH(props: any) {
-    const { label, className, rowSpan, colSpan } = props;
+    const { label, children, className, rowSpan, colSpan } = props;
     return (
         <th className={className} rowSpan={rowSpan} colSpan={colSpan}>
-            {label}
+            {label ? label : children}
         </th>
     );
 }

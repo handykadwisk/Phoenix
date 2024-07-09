@@ -36,13 +36,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
 
     // Finance > Operasional
-    Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('getCA');
-    Route::post('/getCA', [CashAdvanceController::class, 'getCADataForJSON'])->name('cashAdvance.getCADataForJSON');
+    
+    // Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('getCA');
+    Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
+    Route::post('/getReportCA', [CashAdvanceController::class, 'getReportCA'])->name('cashAdvance.getReportCA');
+    Route::get('/getCANumber', [CashAdvanceController::class, 'getCANumber'])->name('getCANumber');
     Route::get('/getCAById/{id}', [CashAdvanceController::class, 'getCAById'])->name('getCAById');
     Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
     Route::post('/cashAdvance', [CashAdvanceController::class, 'store'])->name('cashAdvance.store');
+    Route::post('/cashAdvanceReport', [CashAdvanceController::class, 'report_cash_advance'])->name('cashAdvance.report_cash_advance');
     Route::patch('/cashAdvanceApprove/{id}', [CashAdvanceController::class, 'approve'])->name('cashAdvance.approve');
     Route::patch('/cashAdvanceRevised/{id}', [CashAdvanceController::class, 'revised'])->name('cashAdvance.revised');
+    Route::patch('/cashAdvanceExecute/{id}', [CashAdvanceController::class, 'execute'])->name('cashAdvance.execute');
+    Route::get('/cashAdvanceDownload/{id}', [CashAdvanceController::class, 'download'])->name('cashAdvance.download');
+
+    Route::get('/reimburse', [CashAdvanceController::class, 'index'])->name('reimburse');
+
+    Route::get('/otherExpenses', [CashAdvanceController::class, 'index'])->name('otherExpenses');
+
+    Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
 });
 
 require __DIR__ . '/auth.php';

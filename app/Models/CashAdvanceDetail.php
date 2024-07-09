@@ -16,8 +16,15 @@ class CashAdvanceDetail extends Model
 
     protected $guarded = ['EXPENSES_DETAIL_ID'];
 
+    protected $with = ['document'];
+
     public function cash_advance(): BelongsTo
     {
         return $this->belongsTo(CashAdvance::class);
+    }
+
+    public function document(): BelongsTo
+    {
+        return $this->belongsTo(Document::class, 'EXPENSES_DETAIL_DOCUMENT_ID');
     }
 }

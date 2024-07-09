@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('t_cash_advance_detail', function (Blueprint $table) {
             $table->increments('EXPENSES_DETAIL_ID');
             $table->smallInteger('EXPENSES_ID')->nullable();
-            $table->date('EXPENSES_DETAIL_DATE')->nullable();
+            $table->date('EXPENSES_DETAIL_START_DATE')->nullable();
+            $table->date('EXPENSES_DETAIL_END_DATE')->nullable();
             $table->text('EXPENSES_DETAIL_PURPOSE')->nullable();
             $table->text('EXPENSES_DETAIL_LOCATION')->nullable();
             $table->smallInteger('RELATION_ORGANIZATION_ID')->nullable();
