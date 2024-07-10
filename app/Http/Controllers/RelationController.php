@@ -237,13 +237,19 @@ class RelationController extends Controller
         // get salutation name for detail relation
         $preSalutation = "";
         $postSalutation = "";
-        if ($relation->PRE_SALUTATION == "" || $relation->PRE_SALUTATION == null) {
-            $salutationPost = Salutation::find($relation->POST_SALUTATION);
-            $postSalutation = $salutationPost->salutation_name;
+        if ($relation->PRE_SALUTATION == null && $relation->POST_SALUTATION == null) {
+            $preSalutation = "";
+            $postSalutation = "";
         }else{
-            $salutationPre = Salutation::find($relation->PRE_SALUTATION);
-            $preSalutation = $salutationPre->salutation_name;
+            if ($relation->PRE_SALUTATION == "" || $relation->PRE_SALUTATION == null) {
+                $salutationPost = Salutation::find($relation->POST_SALUTATION);
+                $postSalutation = $salutationPost->salutation_name;
+            }else{
+                $salutationPre = Salutation::find($relation->PRE_SALUTATION);
+                $preSalutation = $salutationPre->salutation_name;
+            }
         }
+        
         
 
 
@@ -421,13 +427,19 @@ class RelationController extends Controller
         // get salutation name for detail relation
         $preSalutation = "";
         $postSalutation = "";
-        if ($request->PRE_SALUTATION == "" || $request->PRE_SALUTATION == null) {
-            $salutationPost = Salutation::find($request->POST_SALUTATION);
-            $postSalutation = $salutationPost->salutation_name;
+        if ($request->PRE_SALUTATION == null && $request->POST_SALUTATION == null) {
+            $preSalutation = "";
+            $postSalutation = "";
         }else{
-            $salutationPre = Salutation::find($request->PRE_SALUTATION);
-            $preSalutation = $salutationPre->salutation_name;
+            if ($request->PRE_SALUTATION == "" || $request->PRE_SALUTATION == null) {
+                $salutationPost = Salutation::find($request->POST_SALUTATION);
+                $postSalutation = $salutationPost->salutation_name;
+            }else{
+                $salutationPre = Salutation::find($request->PRE_SALUTATION);
+                $preSalutation = $salutationPre->salutation_name;
+            }
         }
+        
 
         // Created Log
         UserLog::create([

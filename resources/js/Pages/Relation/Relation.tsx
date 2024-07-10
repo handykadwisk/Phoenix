@@ -51,7 +51,6 @@ export default function Relation({ auth }: PageProps) {
             })
             .then((res) => {
                 setRelations(res.data);
-                console.log(res.data);
                 if (modal.search) {
                     setModal({
                         add: false,
@@ -638,7 +637,9 @@ export default function Relation({ auth }: PageProps) {
                                                 onDoubleClick={() => {
                                                     if (
                                                         dataRelation?.pre_salutation ===
-                                                        null
+                                                            null &&
+                                                        dataRelation?.post_salutation !==
+                                                            null
                                                     ) {
                                                         setGetDetailRelation({
                                                             RELATION_ORGANIZATION_NAME:
@@ -652,7 +653,12 @@ export default function Relation({ auth }: PageProps) {
                                                                     .post_salutation
                                                                     ?.salutation_name,
                                                         });
-                                                    } else {
+                                                    } else if (
+                                                        dataRelation?.post_salutation ===
+                                                            null &&
+                                                        dataRelation?.pre_salutation !==
+                                                            null
+                                                    ) {
                                                         setGetDetailRelation({
                                                             RELATION_ORGANIZATION_NAME:
                                                                 dataRelation.RELATION_ORGANIZATION_NAME,
@@ -662,6 +668,17 @@ export default function Relation({ auth }: PageProps) {
                                                                 dataRelation
                                                                     .pre_salutation
                                                                     ?.salutation_name,
+                                                            RELATION_SALUTATION_POST:
+                                                                "",
+                                                        });
+                                                    } else {
+                                                        setGetDetailRelation({
+                                                            RELATION_ORGANIZATION_NAME:
+                                                                dataRelation.RELATION_ORGANIZATION_NAME,
+                                                            RELATION_ORGANIZATION_ID:
+                                                                dataRelation.RELATION_ORGANIZATION_ID,
+                                                            RELATION_SALUTATION_PRE:
+                                                                "",
                                                             RELATION_SALUTATION_POST:
                                                                 "",
                                                         });
