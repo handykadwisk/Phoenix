@@ -20,9 +20,9 @@ import AddRelationPopup from "./AddRelation";
 import Select from "react-tailwindcss-select";
 
 export default function Relation({ auth }: PageProps) {
-    useEffect(() => {
-        getMappingParent("", "");
-    }, []);
+    // useEffect(() => {
+    //     getMappingParent("", "");
+    // }, []);
 
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
@@ -31,7 +31,8 @@ export default function Relation({ auth }: PageProps) {
     const [getDetailRelation, setGetDetailRelation] = useState<any>({
         RELATION_ORGANIZATION_ID: "",
         RELATION_ORGANIZATION_NAME: "",
-        RELATION_SALUTATION: "",
+        RELATION_SALUTATION_PRE: "",
+        RELATION_SALUTATION_POST: "",
     });
 
     const [relations, setRelations] = useState<any>([]);
@@ -50,6 +51,7 @@ export default function Relation({ auth }: PageProps) {
             })
             .then((res) => {
                 setRelations(res.data);
+                console.log(res.data);
                 if (modal.search) {
                     setModal({
                         add: false,
@@ -137,7 +139,8 @@ export default function Relation({ auth }: PageProps) {
         relation_email: "",
         relation_description: "",
         relation_lob_id: "",
-        salutation_id: "",
+        pre_salutation_id: "",
+        post_salutation_id: "",
         relation_status_id: "",
         tagging_name: [],
         is_managed: "",
@@ -156,7 +159,8 @@ export default function Relation({ auth }: PageProps) {
         relation_description: "",
         RELATION_PROFESSION_ID: "",
         RELATION_LOB_ID: "",
-        salutation_id: "",
+        PRE_SALUTATION: "",
+        POST_SALUTATION: "",
         relation_status_id: "",
         TAG_NAME: "",
         HR_MANAGED_BY_APP: "",
@@ -188,7 +192,8 @@ export default function Relation({ auth }: PageProps) {
             relation_email: "",
             relation_description: "",
             relation_lob_id: "",
-            salutation_id: "",
+            pre_salutation_id: "",
+            post_salutation_id: "",
             relation_status_id: "",
             tagging_name: [],
             is_managed: "",
@@ -207,7 +212,8 @@ export default function Relation({ auth }: PageProps) {
                 setGetDetailRelation({
                     RELATION_ORGANIZATION_NAME: message[1],
                     RELATION_ORGANIZATION_ID: message[0],
-                    RELATION_SALUTATION: message[2],
+                    RELATION_SALUTATION_PRE: message[2],
+                    RELATION_SALUTATION_POST: message[3],
                 });
                 setModal({
                     add: false,
@@ -389,7 +395,6 @@ export default function Relation({ auth }: PageProps) {
             label: query.RELATION_TYPE_NAME,
         };
     });
-
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -445,9 +450,13 @@ export default function Relation({ auth }: PageProps) {
                     })
                 }
                 title={
-                    getDetailRelation.RELATION_SALUTATION +
-                    " " +
-                    getDetailRelation.RELATION_ORGANIZATION_NAME
+                    getDetailRelation.RELATION_SALUTATION_PRE !== ""
+                        ? getDetailRelation.RELATION_SALUTATION_PRE +
+                          " " +
+                          getDetailRelation.RELATION_ORGANIZATION_NAME
+                        : getDetailRelation.RELATION_ORGANIZATION_NAME +
+                          " " +
+                          getDetailRelation.RELATION_SALUTATION_POST
                 }
                 url={""}
                 data={""}
@@ -627,16 +636,36 @@ export default function Relation({ auth }: PageProps) {
                                         return (
                                             <tr
                                                 onDoubleClick={() => {
-                                                    setGetDetailRelation({
-                                                        RELATION_ORGANIZATION_NAME:
-                                                            dataRelation.RELATION_ORGANIZATION_NAME,
-                                                        RELATION_ORGANIZATION_ID:
-                                                            dataRelation.RELATION_ORGANIZATION_ID,
-                                                        RELATION_SALUTATION:
-                                                            dataRelation
-                                                                .salutation
-                                                                ?.salutation_name,
-                                                    });
+                                                    if (
+                                                        dataRelation?.pre_salutation ===
+                                                        null
+                                                    ) {
+                                                        setGetDetailRelation({
+                                                            RELATION_ORGANIZATION_NAME:
+                                                                dataRelation.RELATION_ORGANIZATION_NAME,
+                                                            RELATION_ORGANIZATION_ID:
+                                                                dataRelation.RELATION_ORGANIZATION_ID,
+                                                            RELATION_SALUTATION_PRE:
+                                                                "",
+                                                            RELATION_SALUTATION_POST:
+                                                                dataRelation
+                                                                    .post_salutation
+                                                                    ?.salutation_name,
+                                                        });
+                                                    } else {
+                                                        setGetDetailRelation({
+                                                            RELATION_ORGANIZATION_NAME:
+                                                                dataRelation.RELATION_ORGANIZATION_NAME,
+                                                            RELATION_ORGANIZATION_ID:
+                                                                dataRelation.RELATION_ORGANIZATION_ID,
+                                                            RELATION_SALUTATION_PRE:
+                                                                dataRelation
+                                                                    .pre_salutation
+                                                                    ?.salutation_name,
+                                                            RELATION_SALUTATION_POST:
+                                                                "",
+                                                        });
+                                                    }
                                                     setModal({
                                                         add: false,
                                                         delete: false,

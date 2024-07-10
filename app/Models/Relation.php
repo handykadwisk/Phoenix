@@ -42,7 +42,11 @@ class Relation extends Model
         return $this->hasMany(RelationGroup::class, 'RELATION_GROUP_ID', 'RELATION_ORGANIZATION_GROUP');
     }
 
-    public function salutation(){
-        return $this->hasOne(Salutation::class, 'salutation_id', 'salutation_id');
+    public function PreSalutation(){
+        return $this->hasOne(Salutation::class, 'salutation_id', 'PRE_SALUTATION');
+    }
+
+    public function PostSalutation(){
+        return $this->hasOne(Salutation::class, 'salutation_id', 'POST_SALUTATION');
     }
 }

@@ -58,6 +58,7 @@ export default function AddRelation({
 }>) {
     // console.log("xx", relationGroup);
     const [salutations, setSalutations] = useState<any>([]);
+    const [postSalutations, setPostSalutation] = useState<any>([]);
     // const [switchPage, setSwitchPage] = useState(false);
     // const [switchPageTBK, setSwitchPageTBK] = useState(false);
     const [mappingParent, setMappingParent] = useState<any>({
@@ -81,12 +82,12 @@ export default function AddRelation({
     //     relation_type_id: [],
     // });
 
-    const getSalutationById = async (id: string, column: string) => {
+    const getPostSalutationById = async (id: string, column: string) => {
         if (id) {
             await axios
-                .post(`/getSalutationById`, { id, column })
+                .post(`/getPostSalutationById`, { id, column })
                 .then((res) => {
-                    setSalutations(res.data);
+                    setPostSalutation(res.data);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -100,6 +101,19 @@ export default function AddRelation({
         } else if (id == "2") {
             document.getElementById("relationLob").style.display = "none";
             document.getElementById("relationJobs").style.display = "";
+        }
+    };
+
+    const getPreSalutationById = async (id: string, column: string) => {
+        if (id) {
+            await axios
+                .post(`/getPreSalutationById`, { id, column })
+                .then((res) => {
+                    setSalutations(res.data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         }
     };
 
@@ -232,14 +246,18 @@ export default function AddRelation({
                                             "relation_status_id",
                                             e.target.value
                                         );
-                                        getSalutationById(
+                                        getPreSalutationById(
+                                            e.target.value,
+                                            "relation_status_id"
+                                        );
+                                        getPostSalutationById(
                                             e.target.value,
                                             "relation_status_id"
                                         );
                                         disableLob(e.target.value);
                                     }}
                                 >
-                                    <option>
+                                    <option value={""}>
                                         -- Choose Relation Status --
                                     </option>
                                     {relationStatus.map(
@@ -260,44 +278,89 @@ export default function AddRelation({
                                     )}
                                 </select>
                             </div>
-                            <div className="relative">
-                                <InputLabel
-                                    className="absolute"
-                                    htmlFor="salutation_id"
-                                    value="Salutation"
-                                />
-                                <div className="ml-[4.8rem] text-red-600">
-                                    *
-                                </div>
-                                <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.salutation_id}
-                                    onChange={(e) => {
-                                        setData(
-                                            "salutation_id",
-                                            e.target.value
-                                        );
-                                    }}
-                                    required
-                                >
-                                    <option>-- Choose Salutation --</option>
-                                    {salutations.map(
-                                        (getSalutations: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={
-                                                        getSalutations.salutation_id
-                                                    }
-                                                >
-                                                    {
-                                                        getSalutations.salutation_name
-                                                    }
-                                                </option>
+                            <div className="relative grid grid-cols-2 gap-2">
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="pre_salutation_id"
+                                        value="Pre Salutation"
+                                    />
+                                    <div className="ml-[4.8rem] text-red-600"></div>
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={data.pre_salutation_id}
+                                        onChange={(e) => {
+                                            setData(
+                                                "pre_salutation_id",
+                                                e.target.value
                                             );
-                                        }
-                                    )}
-                                </select>
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Pre Salutation --
+                                        </option>
+                                        {salutations.map(
+                                            (
+                                                getSalutations: any,
+                                                i: number
+                                            ) => {
+                                                return (
+                                                    <option
+                                                        key={i}
+                                                        value={
+                                                            getSalutations.salutation_id
+                                                        }
+                                                    >
+                                                        {
+                                                            getSalutations.salutation_name
+                                                        }
+                                                    </option>
+                                                );
+                                            }
+                                        )}
+                                    </select>
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="post_salutation_id"
+                                        value="Post Salutation"
+                                    />
+                                    <div className="ml-[4.8rem] text-red-600"></div>
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={data.post_salutation_id}
+                                        onChange={(e) => {
+                                            setData(
+                                                "post_salutation_id",
+                                                e.target.value
+                                            );
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Post Salutation --
+                                        </option>
+                                        {postSalutations.map(
+                                            (
+                                                getSalutations: any,
+                                                i: number
+                                            ) => {
+                                                return (
+                                                    <option
+                                                        key={i}
+                                                        value={
+                                                            getSalutations.salutation_id
+                                                        }
+                                                    >
+                                                        {
+                                                            getSalutations.salutation_name
+                                                        }
+                                                    </option>
+                                                );
+                                            }
+                                        )}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
@@ -459,7 +522,7 @@ export default function AddRelation({
                                     + Add
                                 </button>
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-4 hidden">
                                 {/* <InputLabel
                                     htmlFor="is_managed"
                                     value="HR MANAGED BY APP"
@@ -656,7 +719,7 @@ export default function AddRelation({
                                 }}
                                 options={professionSelect}
                                 isSearchable={true}
-                                placeholder={"--Select LOB--"}
+                                placeholder={"--Select Profession--"}
                                 value={data.profession_id}
                                 // onChange={(e) =>
                                 //     inputDataBank(

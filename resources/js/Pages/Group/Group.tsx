@@ -172,9 +172,13 @@ export default function Group({ auth }: PageProps) {
                         <div>
                             <div className="mt-4">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="RELATION_GROUP_NAME"
                                     value="Name Relation Group"
                                 />
+                                <div className="ml-[9.6rem] text-red-600">
+                                    *
+                                </div>
                                 <TextInput
                                     type="text"
                                     value={data.RELATION_GROUP_NAME}

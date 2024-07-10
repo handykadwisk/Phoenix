@@ -41,7 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
     Route::post('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
-    Route::post('/getSalutationById', [RelationController::class, 'getSalutation'])->name('getSalutationById.getSalutation');
+    Route::post('/getPostSalutationById', [RelationController::class, 'getPostSalutation'])->name('getPostSalutationById.getPostSalutation');
+    Route::post('/getPreSalutationById', [RelationController::class, 'getPreSalutation'])->name('getPreSalutationById.getPreSalutation');
     Route::get('/getRelation/{id}', [RelationController::class, 'getRelationById'])->name('relation.getRelationById');
     Route::patch('/editRelation/{id}', [RelationController::class, 'edit'])->name('relation.edit');
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');

@@ -54,6 +54,7 @@ export default function DetailRelation({
     const [dataRelationNew, setDataRelationNew] = useState<any>([]);
     const [mRelation, setMRelation] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
+    const [postSalutations, setPostSalutations] = useState<any>([]);
     const [switchPage, setSwitchPage] = useState(false);
     const [switchPageTBK, setSwitchPageTBK] = useState(false);
     const [mappingParent, setMappingParent] = useState<any>({
@@ -106,9 +107,9 @@ export default function DetailRelation({
         getDetailRelation(detailRelation);
     }, [detailRelation]);
 
-    useEffect(() => {
-        getMappingParent("", "");
-    }, []);
+    // useEffect(() => {
+    //     getMappingParent("", "");
+    // }, []);
 
     const getMappingParent = async (name: string, column: string) => {
         // setIsLoading(true)
@@ -131,6 +132,7 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
+                // console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -140,7 +142,7 @@ export default function DetailRelation({
     const getSalutationById = async (id: string, column: string) => {
         if (id) {
             await axios
-                .post(`/getSalutationById`, { id, column })
+                .post(`/getPreSalutationById`, { id, column })
                 .then((res) => {
                     setSalutations(res.data);
                 })
@@ -159,6 +161,19 @@ export default function DetailRelation({
         }
     };
 
+    const getPostSalutationById = async (id: string, column: string) => {
+        if (id) {
+            await axios
+                .post(`/getPostSalutationById`, { id, column })
+                .then((res) => {
+                    setPostSalutations(res.data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
+
     const [dataById, setDataById] = useState<any>({
         RELATION_ORGANIZATION_GROUP: "",
         RELATION_ORGANIZATION_NAME: "",
@@ -169,7 +184,8 @@ export default function DetailRelation({
         relation_description: "",
         RELATION_PROFESSION_ID: "",
         RELATION_LOB_ID: "",
-        salutation_id: "",
+        PRE_SALUTATION: "",
+        POST_SALUTATION: "",
         relation_status_id: "",
         TAG_NAME: "",
         HR_MANAGED_BY_APP: "",
@@ -213,10 +229,17 @@ export default function DetailRelation({
             dataRelationNew.relation_status_id,
             "relation_status_id"
         );
-        getMappingParent(
-            dataRelationNew.RELATION_ORGANIZATION_GROUP,
-            "RELATION_ORGANIZATION_GROUP"
+        getPostSalutationById(
+            dataRelationNew.relation_status_id,
+            "relation_status_id"
         );
+        if (dataRelationNew.RELATION_ORGANIZATION_GROUP !== null) {
+            getMappingParent(
+                dataRelationNew.RELATION_ORGANIZATION_GROUP,
+                "RELATION_ORGANIZATION_GROUP"
+            );
+        }
+
         if (dataRelationNew.HR_MANAGED_BY_APP == "1") {
             setSwitchPage(true);
         } else {
@@ -332,7 +355,8 @@ export default function DetailRelation({
                 setGetDetailRelation({
                     RELATION_ORGANIZATION_NAME: message[1],
                     RELATION_ORGANIZATION_ID: message[0],
-                    RELATION_SALUTATION: message[2],
+                    RELATION_SALUTATION_PRE: message[2],
+                    RELATION_SALUTATION_POST: message[3],
                 });
                 getDetailRelation(message[0]);
                 setModal({
@@ -491,11 +515,15 @@ export default function DetailRelation({
                 body={
                     <>
                         <div className="lg:grid lg:gap-4 lg:grid-cols-2 xs:grid xs:gap-4 xs:grid-cols-1">
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="relation_status_id"
                                     value="Relation Status"
                                 />
+                                <div className="ml-[6.8rem] text-red-600">
+                                    *
+                                </div>
                                 <select
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={dataById.relation_status_id}
@@ -505,6 +533,10 @@ export default function DetailRelation({
                                             relation_status_id: e.target.value,
                                         });
                                         getSalutationById(
+                                            e.target.value,
+                                            "relation_status_id"
+                                        );
+                                        getPostSalutationById(
                                             e.target.value,
                                             "relation_status_id"
                                         );
@@ -532,47 +564,97 @@ export default function DetailRelation({
                                     )}
                                 </select>
                             </div>
-                            <div className="lg:mt-4 xs:mt-0">
-                                <InputLabel
-                                    htmlFor="salutation_id"
-                                    value="Salutation"
-                                />
-                                <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={dataById.salutation_id}
-                                    onChange={(e) => {
-                                        setDataById({
-                                            ...dataById,
-                                            salutation_id: e.target.value,
-                                        });
-                                    }}
-                                >
-                                    <option>-- Choose Salutation --</option>
-                                    {salutations.map(
-                                        (getSalutations: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={
-                                                        getSalutations.salutation_id
-                                                    }
-                                                >
-                                                    {
-                                                        getSalutations.salutation_name
-                                                    }
-                                                </option>
-                                            );
-                                        }
-                                    )}
-                                </select>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="lg:mt-4 xs:mt-0">
+                                    <InputLabel
+                                        htmlFor="PRE_SALUTATION"
+                                        value="Pre Salutation"
+                                    />
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataById.PRE_SALUTATION}
+                                        onChange={(e) => {
+                                            setDataById({
+                                                ...dataById,
+                                                PRE_SALUTATION: e.target.value,
+                                            });
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Pre Salutation --
+                                        </option>
+                                        {salutations.map(
+                                            (
+                                                getSalutations: any,
+                                                i: number
+                                            ) => {
+                                                return (
+                                                    <option
+                                                        key={i}
+                                                        value={
+                                                            getSalutations.salutation_id
+                                                        }
+                                                    >
+                                                        {
+                                                            getSalutations.salutation_name
+                                                        }
+                                                    </option>
+                                                );
+                                            }
+                                        )}
+                                    </select>
+                                </div>
+                                <div className="lg:mt-4 xs:mt-0">
+                                    <InputLabel
+                                        htmlFor="POST_SALUTATION"
+                                        value="Post Salutation"
+                                    />
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataById.POST_SALUTATION}
+                                        onChange={(e) => {
+                                            setDataById({
+                                                ...dataById,
+                                                POST_SALUTATION: e.target.value,
+                                            });
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Post Salutation --
+                                        </option>
+                                        {postSalutations.map(
+                                            (
+                                                getSalutations: any,
+                                                i: number
+                                            ) => {
+                                                return (
+                                                    <option
+                                                        key={i}
+                                                        value={
+                                                            getSalutations.salutation_id
+                                                        }
+                                                    >
+                                                        {
+                                                            getSalutations.salutation_name
+                                                        }
+                                                    </option>
+                                                );
+                                            }
+                                        )}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div className="lg:grid lg:gap-4 lg:grid-cols-2 xs:grid xs:gap-0 xs:grid-cols-1">
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="RELATION_ORGANIZATION_NAME"
                                     value="Name Relation"
                                 />
+                                <div className="ml-[6.7rem] text-red-600">
+                                    *
+                                </div>
                                 <TextInput
                                     type="text"
                                     value={dataById.RELATION_ORGANIZATION_NAME}
@@ -588,11 +670,15 @@ export default function DetailRelation({
                                     placeholder="Name Relation"
                                 />
                             </div>
-                            <div className="mt-4" id="abbr">
+                            <div className="mt-4 relative" id="abbr">
                                 <InputLabel
+                                    className="absolute"
                                     htmlFor="RELATION_ORGANIZATION_ABBREVIATION"
                                     value="Abbreviation"
                                 />
+                                <div className="ml-[5.8rem] text-red-600">
+                                    *
+                                </div>
                                 <TextInput
                                     type="text"
                                     value={
@@ -743,7 +829,7 @@ export default function DetailRelation({
                                     + Add
                                 </button>
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-4 hidden">
                                 {/* <InputLabel
                                     htmlFor="is_managed"
                                     value="HR MANAGED BY APP"
@@ -788,7 +874,7 @@ export default function DetailRelation({
                                     );
                                 }}
                             >
-                                <option>-- Choose Group --</option>
+                                <option value={""}>-- Choose Group --</option>
                                 {relationGroup?.map(
                                     (groups: any, i: number) => {
                                         return (
@@ -1473,10 +1559,7 @@ export default function DetailRelation({
                             <span>Address & Location</span>
                         </div>
                         <div className="text-sm text-gray-400">
-                            <span className="font-normal">
-                                Jl.Gatot Subroto, Kuningan, Mampang Perampatan,
-                                Jakarta Selatan
-                            </span>
+                            <span className="font-normal">-</span>
                         </div>
                     </div>
                 </div>

@@ -34,7 +34,7 @@ class RelationController extends Controller
     {
         
         $RType = $searchQuery->RELATION_TYPE_ID;
-        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('salutation');
+        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
         // print_r($data);
         if ($searchQuery) {
             if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
@@ -69,9 +69,15 @@ class RelationController extends Controller
         return response()->json($data);
     }
 
-    public function getSalutation(Request $request)
+    public function getPreSalutation(Request $request)
     {
-        $data = Salutation::where('relation_status_id', 'like', '%' . $request->id . '%')->get();
+        $data = Salutation::where('relation_status_id', 'like', '%' . $request->id . '%')->where('salutation_position', 1)->get();
+        return response()->json($data);
+    }
+
+    public function getPostSalutation(Request $request)
+    {
+        $data = Salutation::where('relation_status_id', 'like', '%' . $request->id . '%')->where('salutation_position', 2)->get();
         return response()->json($data);
     }
 
@@ -154,7 +160,7 @@ class RelationController extends Controller
         $relation = Relation::create([
             'RELATION_ORGANIZATION_NAME' => $addTBK,
             'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
-            'RELATION_ORGANIZATION_ABBREVIATION' => $request->abbreviation,
+            'RELATION_ORGANIZATION_ABBREVIATION' => strtoupper($request->abbreviation),
             // 'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
             'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
@@ -165,7 +171,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_CREATED_DATE' => now(),
             'RELATION_ORGANIZATION_UPDATED_DATE' => NULL,
             'RELATION_ORGANIZATION_DESCRIPTION' => $request->relation_description,
-            'RELATION_ORGANIZATION_ALIAS' => $request->name_relation,
+            'RELATION_ORGANIZATION_ALIAS' => $addTBK,
             'RELATION_ORGANIZATION_EMAIL' => $request->relation_email,
             'RELATION_ORGANIZATION_LOGO_ID' => NULL,
             'RELATION_ORGANIZATION_SIGNATURE_NAME' => NULL,
@@ -174,7 +180,8 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_BANK_ACCOUNT_NAME' => NULL,
             'RELATION_PROFESSION_ID' => $professionId,
             'RELATION_LOB_ID' => $lobId,
-            'salutation_id' => $request->salutation_id,
+            'PRE_SALUTATION' => $request->pre_salutation_id,
+            'POST_SALUTATION' => $request->post_salutation_id,
             'relation_status_id' => $request->relation_status_id
 
         ]);
@@ -228,8 +235,16 @@ class RelationController extends Controller
         }
 
         // get salutation name for detail relation
-        $salutation = Salutation::find($relation->salutation_id);
-        $salutationName = $salutation->salutation_name;
+        $preSalutation = "";
+        $postSalutation = "";
+        if ($relation->PRE_SALUTATION == "" || $relation->PRE_SALUTATION == null) {
+            $salutationPost = Salutation::find($relation->POST_SALUTATION);
+            $postSalutation = $salutationPost->salutation_name;
+        }else{
+            $salutationPre = Salutation::find($relation->PRE_SALUTATION);
+            $preSalutation = $salutationPre->salutation_name;
+        }
+        
 
 
         // Created Log
@@ -247,7 +262,8 @@ class RelationController extends Controller
         return new JsonResponse([
             $relation->RELATION_ORGANIZATION_ID,
             $addTBK,
-            $salutationName
+            $preSalutation,
+            $postSalutation
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -321,11 +337,12 @@ class RelationController extends Controller
                 'RELATION_ORGANIZATION_UPDATED_BY' => Auth::user()->id,
                 'RELATION_ORGANIZATION_UPDATED_DATE' => now(),
                 'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
-                'RELATION_ORGANIZATION_ALIAS' => $request->RELATION_ORGANIZATION_NAME,
+                'RELATION_ORGANIZATION_ALIAS' => $addTBK,
                 'RELATION_ORGANIZATION_EMAIL' => $request->RELATION_ORGANIZATION_EMAIL,
                 'RELATION_PROFESSION_ID' => $professionId,
                 'RELATION_LOB_ID' => $lobId,
-                'salutation_id' => $request->salutation_id,
+                'PRE_SALUTATION' => $request->PRE_SALUTATION,
+                'POST_SALUTATION' => $request->POST_SALUTATION,
                 'relation_status_id' => $request->relation_status_id
             ]);
 
@@ -402,8 +419,15 @@ class RelationController extends Controller
         }
 
         // get salutation name for detail relation
-        $salutation = Salutation::find($request->salutation_id);
-        $salutationName = $salutation->salutation_name;
+        $preSalutation = "";
+        $postSalutation = "";
+        if ($request->PRE_SALUTATION == "" || $request->PRE_SALUTATION == null) {
+            $salutationPost = Salutation::find($request->POST_SALUTATION);
+            $postSalutation = $salutationPost->salutation_name;
+        }else{
+            $salutationPre = Salutation::find($request->PRE_SALUTATION);
+            $preSalutation = $salutationPre->salutation_name;
+        }
 
         // Created Log
         UserLog::create([
@@ -419,7 +443,8 @@ class RelationController extends Controller
         return new JsonResponse([
             $request->RELATION_ORGANIZATION_ID,
             $addTBK,
-            $salutationName
+            $preSalutation,
+            $postSalutation
         ], 201, [
             'X-Inertia' => true
         ]);
