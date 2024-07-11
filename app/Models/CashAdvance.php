@@ -11,11 +11,13 @@ class CashAdvance extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'EXPENSES_ID';
+    protected $primaryKey = 'CASH_ADVANCE_ID';
 
     protected $table = 't_cash_advance';
 
-    protected $guarded = ['EXPENSES_ID'];
+    protected $guarded = ['CASH_ADVANCE_ID'];
+
+    public $timestamps = false;
 
     protected $with = [
         'cash_advance_detail',
@@ -27,27 +29,26 @@ class CashAdvance extends Model
 
     public function cash_advance_detail(): HasMany
     {
-        return $this->hasMany(CashAdvanceDetail::class, 'EXPENSES_ID');
+        return $this->hasMany(CashAdvanceDetail::class, 'CASH_ADVANCE_ID');
     }
     
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'EXPENSES_REQUESTED_BY');
+        return $this->belongsTo(User::class, 'CASH_ADVANCE_REQUESTED_BY');
     }
 
     public function user_used_by(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'USED_BY');
+        return $this->belongsTo(User::class, 'CASH_ADVANCE_USED_BY');
     }
 
     public function user_approval(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'FIRST_APPROVAL_BY');
+        return $this->belongsTo(User::class, 'CASH_ADVANCE_FIRST_APPROVAL_BY');
     }
 
     public function approval_status(): BelongsTo
     {
-        return $this->belongsTo(CashAdvanceStatus::class, 'FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
+        return $this->belongsTo(CashAdvanceStatus::class, 'CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
     }
-
 }

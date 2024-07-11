@@ -21,27 +21,27 @@ class CashAdvanceController extends Controller
 {
     public function getCAData($dataPerPage = 2, $searchQuery = null)
     {
-        $data = CashAdvance::orderBy('EXPENSES_ID', 'desc');
+        $data = CashAdvance::orderBy('CASH_ADVANCE_ID', 'desc');
         if ($searchQuery) {
-            if ($searchQuery->input('EXPENSES_NUMBER')) {
-                $data->where('EXPENSES_NUMBER', 'like', '%'.$searchQuery->EXPENSES_NUMBER.'%');
+            if ($searchQuery->input('CASH_ADVANCE_NUMBER')) {
+                $data->where('CASH_ADVANCE_NUMBER', 'like', '%'.$searchQuery->CASH_ADVANCE_NUMBER.'%');
             }
         }
 
         return $data->paginate($dataPerPage);
     }
 
-    public function getReportCAData($dataPerPage = 2, $searchQuery = null)
-    {
-        $data = CashAdvance::orderBy('EXPENSES_ID', 'desc');
-        if ($searchQuery) {
-            if ($searchQuery->input('EXPENSES_NUMBER')) {
-                $data->where('EXPENSES_NUMBER', 'like', '%'.$searchQuery->EXPENSES_NUMBER.'%');
-            }
-        }
+    // public function getReportCAData($dataPerPage = 2, $searchQuery = null)
+    // {
+    //     $data = ReportCashAdvance::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
+    //     if ($searchQuery) {
+    //         if ($searchQuery->input('REPORT_CASH_ADVANCE_NUMBER')) {
+    //             $data->where('CASH_ADVANCE_ID', 'like', '%'.$searchQuery->REPORT_CASH_ADVANCE_NUMBER.'%');
+    //         }
+    //     }
 
-        return $data->paginate($dataPerPage);
-    }
+    //     return $data->paginate($dataPerPage);
+    // }
 
     // public function getCA()
     // {
@@ -50,6 +50,12 @@ class CashAdvanceController extends Controller
     // }
 
     public function getCA(Request $request)
+    {
+        $data = $this->getCAData(10, $request);
+        return response()->json($data);
+    }
+    
+    public function getReportCA(Request $request)
     {
         $data = $this->getCAData(10, $request);
         return response()->json($data);
@@ -73,10 +79,9 @@ class CashAdvanceController extends Controller
     public function getCANumber()
     {
         $data = 
-            CashAdvance::where('EXPENSES_TYPE', 1)
-                            ->where('FIRST_APPROVAL_STATUS', 1)
-                            ->orderBy('EXPENSES_ID', 'desc')
-                            ->get();
+            CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                        ->orderBy('CASH_ADVANCE_ID', 'desc')
+                        ->get();
 
         return response()->json($data);
     }
@@ -116,21 +121,25 @@ class CashAdvanceController extends Controller
         return $replace;
     }
 
-    public function getExpensesNumber($expenses_type)
+    public function getExpensesNumber()
     {
-        if ($expenses_type == 1) {
-            $code = 'CA/';
-            $start_char = 10;
-            $start_char_2 = 3;
-        } else {
-            $code = 'RMBS/';
-            $start_char = 12;
-            $start_char_2 = 5;
-        }
+        // if ($cash_advance_type == 1) {
+        //     $code = 'CA/';
+        //     $start_char = 10;
+        //     $start_char_2 = 3;
+        // } else {
+        //     $code = 'RMBS/';
+        //     $start_char = 12;
+        //     $start_char_2 = 5;
+        // }
+
+        $code = 'CA/';
+        $start_char = 10;
+        $start_char_2 = 3;
         
         $year_month = date('Y/n').'/';
 
-        $queries = DB::select('SELECT MAX(EXPENSES_NUMBER) AS max_number FROM t_cash_advance WHERE EXPENSES_TYPE = ?', [$expenses_type]);
+        $queries = DB::select('SELECT MAX(CASH_ADVANCE_NUMBER) AS max_number FROM t_cash_advance');
 
         foreach ($queries as $query) {
             $getMaxNumber = $query->max_number;
@@ -146,17 +155,17 @@ class CashAdvanceController extends Controller
         
         $counting = sprintf('%05s', $count);
 
-        $expenses_number = $code . $year_month . $counting;
+        $cash_advance_number = $code . $year_month . $counting;
 
-        return $expenses_number;
+        return $cash_advance_number;
     }
 
-    public function download($expenses_detail_id)
+    public function download($cash_advance_detail_id)
     {
-        $CashAdvanceDetail = CashAdvanceDetail::find($expenses_detail_id);
+        $CashAdvanceDetail = CashAdvanceDetail::find($cash_advance_detail_id);
         
         // $filePath = public_path('/storage/documents/CA/0/11/11-List-Asuransi--2-Unit-Dumptruck.pdf');
-        $filePath = public_path('/storage/documents/CA/0/' . $expenses_detail_id . '/'. $CashAdvanceDetail->document->DOCUMENT_FILENAME);
+        $filePath = public_path('/storage/documents/CA/0/' . $cash_advance_detail_id . '/'. $CashAdvanceDetail->document->DOCUMENT_FILENAME);
         
         $headers = [
             'filename' => $CashAdvanceDetail->document->DOCUMENT_FILENAME
@@ -172,39 +181,49 @@ class CashAdvanceController extends Controller
     public function store(Request $request)
     {
         // dd($request);
+
+        $user_id = auth()->user()->id;
         
-        $total_pengajuan = 0;
+        $total_amount = 0;
 
         foreach ($request->CashAdvanceDetail as $value) {
-            $total_pengajuan += $value['jumlah'];
+            $total_amount += $value['cash_advance_detail_amount'];
         }
         
-        $expenses_number = $this->getExpensesNumber(1);
-        $expenses_type = 1;
-        $used_by = $request->nama_pemohon;
-        $expenses_requested_by = auth()->user()->id;
-        $division = 'IT';
-        $expenses_requested_date = now();
-        $first_approval_by = $request->nama_pemberi_approval;
-        $first_approval_status = 0;
-        $expenses_request_note = $request->catatan;
-        $delivery_method = $request->metode_pengiriman;
-        $expenses_total_amount = $total_pengajuan;
+        $cash_advance_number = $this->getExpensesNumber();
+        $cash_advance_used_by = $request->cash_advance_used_by;
+        $cash_advance_requested_by = $user_id;
+        $cash_advance_division = 'IT';
+        $cash_advance_requested_date = now();
+        $cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
+        $cash_advance_first_approval_status = 0;
+        $cash_advance_request_note = $request->cash_advance_request_note;
+        $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
+        $cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
+        $cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
+        $cash_advance_cash_amount = $request->cash_advance_cash_amount;
+        $cash_advance_total_amount = $total_amount;
+        $cash_advance_created_at = now();
+        $cash_advance_created_by = $user_id;
 
         // Insert CA
         $cash_advance = CashAdvance::create([
-            'EXPENSES_NUMBER' => $expenses_number,
-            'EXPENSES_TYPE' => $expenses_type,
-            'USED_BY' => $used_by,
-            'EXPENSES_REQUESTED_BY' => $expenses_requested_by,
-            'DIVISION' => $division,
-            'EXPENSES_REQUESTED_DATE' => $expenses_requested_date,
-            'FIRST_APPROVAL_BY' => $first_approval_by,
-            'FIRST_APPROVAL_STATUS' => $first_approval_status,
-            'EXPENSES_REQUEST_NOTE' => $expenses_request_note,
-            'DELIVERY_METHOD' => $delivery_method,
-            'EXPENSES_TOTAL_AMOUNT' => $expenses_total_amount
-        ])->EXPENSES_ID;
+            'CASH_ADVANCE_NUMBER' => $cash_advance_number,
+            'CASH_ADVANCE_USED_BY' => $cash_advance_used_by,
+            'CASH_ADVANCE_REQUESTED_BY' => $cash_advance_requested_by,
+            'CASH_ADVANCE_DIVISION' => $cash_advance_division,
+            'CASH_ADVANCE_REQUESTED_DATE' => $cash_advance_requested_date,
+            'CASH_ADVANCE_FIRST_APPROVAL_BY' => $cash_advance_first_approval_by,
+            'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
+            'CASH_ADVANCE_REQUEST_NOTE' => $cash_advance_request_note,
+            'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
+            'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
+            'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
+            'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
+            'CASH_ADVANCE_TOTAL_AMOUNT' => $cash_advance_total_amount,
+            'CASH_ADVANCE_CREATED_AT' => $cash_advance_created_at,
+            'CASH_ADVANCE_CREATED_BY' => $cash_advance_created_by
+        ])->CASH_ADVANCE_ID;
 
         // Created Log CA
         UserLog::create([
@@ -217,57 +236,50 @@ class CashAdvanceController extends Controller
             'action_by'  => Auth::user()->email
         ]);
 
-        // Get new id data CA
-        // $cash_advance = CashAdvance::orderBy('EXPENSES_ID', 'desc')->limit(1)->get('expenses_id');
-        
-        // foreach ($cash_advance as $ca) {
-        //     $expenses_id = $ca['expenses_id'];
-        // }
-
         foreach ($request->CashAdvanceDetail as $key => $cad) {
-            $expenses_detail_start_date = $cad['tanggal_awal'];
-            $expenses_detail_end_date = $cad['tanggal_akhir'];
-            $expenses_detail_purpose = $cad['peruntukan'];
-            $expenses_detail_location = $cad['tempat'];
-            $relation_organization_id = $cad['perusahaan'];
-            $expenses_detail_relation_name = $cad['nama'];
-            $expenses_detail_relation_position = $cad['posisi'];
-            $expenses_detail_amount = $cad['jumlah'];
+            $cash_advance_detail_start_date = $cad['cash_advance_detail_start_date'];
+            $cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
+            $cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
+            $cash_advance_detail_location = $cad['cash_advance_detail_location'];
+            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+            $cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
+            $cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
+            $cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
             
             // Insert CA Detail
             $CashAdvanceDetail = CashAdvanceDetail::create([
-                'EXPENSES_ID' => $cash_advance,
-                'EXPENSES_DETAIL_START_DATE' => $expenses_detail_start_date,
-                'EXPENSES_DETAIL_END_DATE' => $expenses_detail_end_date,
-                'EXPENSES_DETAIL_PURPOSE' => $expenses_detail_purpose,
-                'EXPENSES_DETAIL_LOCATION' => $expenses_detail_location,
-                'RELATION_ORGANIZATION_ID' => $relation_organization_id,
-                'EXPENSES_DETAIL_RELATION_NAME' => $expenses_detail_relation_name,
-                'EXPENSES_DETAIL_RELATION_POSITION' => $expenses_detail_relation_position,
-                'EXPENSES_DETAIL_AMOUNT' => $expenses_detail_amount
+                'CASH_ADVANCE_ID' => $cash_advance,
+                'CASH_ADVANCE_DETAIL_START_DATE' => $cash_advance_detail_start_date,
+                'CASH_ADVANCE_DETAIL_END_DATE' => $cash_advance_detail_end_date,
+                'CASH_ADVANCE_DETAIL_PURPOSE' => $cash_advance_detail_purpose,
+                'CASH_ADVANCE_DETAIL_LOCATION' => $cash_advance_detail_location,
+                'CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID' => $cash_advance_detail_relation_organization_id,
+                'CASH_ADVANCE_DETAIL_RELATION_NAME' => $cash_advance_detail_relation_name,
+                'CASH_ADVANCE_DETAIL_RELATION_POSITION' => $cash_advance_detail_relation_position,
+                'CASH_ADVANCE_DETAIL_AMOUNT' => $cash_advance_detail_amount
             ]);
 
             // Get data expenses detail id
-            $expenses_detail_id = $CashAdvanceDetail->EXPENSES_DETAIL_ID;
+            $cash_advance_detail_id = $CashAdvanceDetail->CASH_ADVANCE_DETAIL_ID;
 
             // Start process file upload
             $file = $request->file('CashAdvanceDetail');
 
             if ($file) {
-                $parentDir = ((floor(($expenses_detail_id) / 1000)) * 1000) . '/';
-                $CAId = $expenses_detail_id . '/';
+                $parentDir = ((floor(($cash_advance_detail_id) / 1000)) * 1000) . '/';
+                $CAId = $cash_advance_detail_id . '/';
                 $typeDir = '';
                 $uploadPath = 'documents/' . 'CA/'. $parentDir . $CAId . $typeDir;
 
                 $userId = Auth::user()->id;
-                $documentOriginalName =  $this->RemoveSpecialChar($file[$key]['dokumen']->getClientOriginalName());
-                $documentFileName =  $expenses_detail_id . '-' . $this->RemoveSpecialChar($file[$key]['dokumen']->getClientOriginalName());
+                $documentOriginalName =  $this->RemoveSpecialChar($file[$key]['cash_advance_detail_document_id']->getClientOriginalName());
+                $documentFileName =  $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file[$key]['cash_advance_detail_document_id']->getClientOriginalName());
                 $documentDirName =  $uploadPath;
-                $documentFileType = $file[$key]['dokumen']->getMimeType();
-                $documentFileSize = $file[$key]['dokumen']->getSize();
+                $documentFileType = $file[$key]['cash_advance_detail_document_id']->getMimeType();
+                $documentFileSize = $file[$key]['cash_advance_detail_document_id']->getSize();
 
                 Storage::makeDirectory($uploadPath, 0777, true, true);
-                Storage::disk('public')->putFileAs($uploadPath, $file[$key]['dokumen'], $expenses_detail_id . '-' . $this->RemoveSpecialChar($file[$key]['dokumen']->getClientOriginalName()));
+                Storage::disk('public')->putFileAs($uploadPath, $file[$key]['cash_advance_detail_document_id'], $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file[$key]['cash_advance_detail_document_id']->getClientOriginalName()));
 
                 $document = Document::create([
                     'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
@@ -279,9 +291,9 @@ class CashAdvanceController extends Controller
                 ])->DOCUMENT_ID;
                     
                 if ($document) {
-                    CashAdvanceDetail::where('EXPENSES_DETAIL_ID', $CashAdvanceDetail->EXPENSES_DETAIL_ID)
+                    CashAdvanceDetail::where('CASH_ADVANCE_DETAIL_ID', $CashAdvanceDetail->CASH_ADVANCE_DETAIL_ID)
                     ->update([
-                        'EXPENSES_DETAIL_DOCUMENT_ID' => $document
+                        'CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document
                     ]);
                 }
             }
@@ -293,7 +305,7 @@ class CashAdvanceController extends Controller
                 'action'     => json_encode([
                     "description" => "Created (Cash Advance Detail).",
                     "module"      => "Cash Advance",
-                    "id"          => $expenses_detail_id
+                    "id"          => $cash_advance_detail_id
                 ]),
                 'action_by'  => Auth::user()->email
             ]);
@@ -307,16 +319,14 @@ class CashAdvanceController extends Controller
     }
 
     public function approve(Request $request)
-    {   
-        $expenses_id = $request->EXPENSES_ID;
-        $expenses_updated_date = date('Y-m-d H:i:s');
-        $first_approval_change_status_date = date('Y-m-d H:i:s');
-        $first_approval_status = $request->FIRST_APPROVAL_STATUS;
+    {
+        $cash_advance_id = $request->CASH_ADVANCE_ID;
+        $cash_advance_first_approval_change_status_date = date('Y-m-d H:i:s');
+        $cash_advance_first_approval_status = $request->CASH_ADVANCE_FIRST_APPROVAL_STATUS;
 
-        CashAdvance::where('EXPENSES_ID', $expenses_id)->update([
-            'EXPENSES_UPDATED_DATE' => $expenses_updated_date,
-            'FIRST_APPROVAL_CHANGE_STATUS_DATE' => $first_approval_change_status_date,
-            'FIRST_APPROVAL_STATUS' => $first_approval_status
+        CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
+            'CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $cash_advance_first_approval_change_status_date,
+            'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status
         ]);
 
         // Created Log CA
@@ -325,19 +335,19 @@ class CashAdvanceController extends Controller
             'action'     => json_encode([
                 "description" => "Approve (Cash Advance).",
                 "module"      => "Cash Advance",
-                "id"          => $expenses_id
+                "id"          => $cash_advance_id
             ]),
             'action_by'  => Auth::user()->email
         ]);
 
         foreach ($request->cash_advance_detail as $cad) {
-            $expenses_detail_id = $cad['EXPENSES_DETAIL_ID'];
-            $expenses_detail_status = $cad['EXPENSES_DETAIL_STATUS'];
-            $expenses_detail_note = $cad['EXPENSES_DETAIL_NOTE'];
+            $cash_advance_detail_id = $cad['CASH_ADVANCE_DETAIL_ID'];
+            $cash_advance_detail_status = $cad['CASH_ADVANCE_DETAIL_STATUS'];
+            $cash_advance_detail_note = $cad['CASH_ADVANCE_DETAIL_NOTE'];
 
-            CashAdvanceDetail::where('EXPENSES_DETAIL_ID', $expenses_detail_id)->update([
-                'EXPENSES_DETAIL_STATUS' => $expenses_detail_status,
-                'EXPENSES_DETAIL_NOTE' => $expenses_detail_note
+            CashAdvanceDetail::where('CASH_ADVANCE_DETAIL_ID', $cash_advance_detail_id)->update([
+                'CASH_ADVANCE_DETAIL_STATUS' => $cash_advance_detail_status,
+                'CASH_ADVANCE_DETAIL_NOTE' => $cash_advance_detail_note
             ]);
 
             // Created Log CA Detail
@@ -346,7 +356,7 @@ class CashAdvanceController extends Controller
                 'action'     => json_encode([
                     "description" => "Approve (Cash Advance Detail).",
                     "module"      => "Cash Advance",
-                    "id"          => $expenses_detail_id
+                    "id"          => $cash_advance_detail_id
                 ]),
                 'action_by'  => Auth::user()->email
             ]);
@@ -362,26 +372,40 @@ class CashAdvanceController extends Controller
     public function revised(Request $request)
     {
         // dd($request);
+
+        $user_id = auth()->user()->id;
         
-        $expenses_id = $request->EXPENSES_ID;
+        $cash_advance_id = $request->CASH_ADVANCE_ID;
 
         $CountRequestDataById = sizeof($request->cash_advance_detail);
-        $CountCashAdvanceDetail = CashAdvanceDetail::where('EXPENSES_ID', $expenses_id)->count();
+        $CountCashAdvanceDetail = CashAdvanceDetail::where('CASH_ADVANCE_ID', $cash_advance_id)->count();
 
-        $total_pengajuan = 0;
+        $total_amount = 0;
 
         foreach ($request->cash_advance_detail as $value) {
-            $total_pengajuan += $value['EXPENSES_DETAIL_AMOUNT'];
+            $total_amount += $value['CASH_ADVANCE_DETAIL_AMOUNT'];
         }
 
-        $expenses_total_amount = $total_pengajuan;
-        $first_approval_status = 0;
-        $expenses_request_note = $request->EXPENSES_REQUEST_NOTE;
+        $cash_advance_total_amount = $total_amount;
+        $cash_advance_first_approval_status = 0;
+        $cash_advance_request_note = $request->CASH_ADVANCE_REQUEST_NOTE;
+        $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
+        $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
+        $cash_advance_delivery_method_cash = $request->CASH_ADVANCE_DELIVERY_METHOD_CASH;
+        $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
+        $cash_advance_updated_at = now();
+        $cash_advance_updated_by = $user_id;
 
-        CashAdvance::where('EXPENSES_ID', $expenses_id)->update([
-            'FIRST_APPROVAL_STATUS' => $first_approval_status,
-            'EXPENSES_REQUEST_NOTE' => $expenses_request_note,
-            'EXPENSES_TOTAL_AMOUNT' => $expenses_total_amount
+        CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
+            'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
+            'CASH_ADVANCE_REQUEST_NOTE' => $cash_advance_request_note,
+            'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
+            'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
+            'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
+            'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
+            'CASH_ADVANCE_TOTAL_AMOUNT' => $cash_advance_total_amount,
+            'CASH_ADVANCE_UPDATED_AT' => $cash_advance_updated_at,
+            'CASH_ADVANCE_UPDATED_BY' => $cash_advance_updated_by
         ]);
 
         // Created Log CA
@@ -390,32 +414,34 @@ class CashAdvanceController extends Controller
             'action'     => json_encode([
                 "description" => "Revised (Cash Advance).",
                 "module"      => "Cash Advance",
-                "id"          => $expenses_id
+                "id"          => $cash_advance_id
             ]),
             'action_by'  => Auth::user()->email
         ]);
 
         if ($CountRequestDataById === $CountCashAdvanceDetail) {
             foreach ($request->cash_advance_detail as $cad) {
-                $expenses_detail_id = $cad['EXPENSES_DETAIL_ID'];
-                $expenses_detail_date = $cad['EXPENSES_DETAIL_DATE'];
-                $expenses_detail_purpose = $cad['EXPENSES_DETAIL_PURPOSE'];
-                $expenses_detail_location = $cad['EXPENSES_DETAIL_LOCATION'];
-                $relation_organization_id = $cad['RELATION_ORGANIZATION_ID'];
-                $expenses_detail_relation_name = $cad['EXPENSES_DETAIL_RELATION_NAME'];
-                $expenses_detail_relation_position = $cad['EXPENSES_DETAIL_RELATION_POSITION'];
-                $expenses_detail_amount = $cad['EXPENSES_DETAIL_AMOUNT'];
-                $expenses_detail_status = null;
+                $cash_advance_detail_id = $cad['CASH_ADVANCE_DETAIL_ID'];
+                $cash_advance_detail_start_date = $cad['CASH_ADVANCE_DETAIL_START_DATE'];
+                $cash_advance_detail_end_date = $cad['CASH_ADVANCE_DETAIL_END_DATE'];
+                $cash_advance_detail_purpose = $cad['CASH_ADVANCE_DETAIL_PURPOSE'];
+                $cash_advance_detail_location = $cad['CASH_ADVANCE_DETAIL_LOCATION'];
+                $cash_advance_detail_relation_organization_id = $cad['CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'];
+                $cash_advance_detail_relation_name = $cad['CASH_ADVANCE_DETAIL_RELATION_NAME'];
+                $cash_advance_detail_relation_position = $cad['CASH_ADVANCE_DETAIL_RELATION_POSITION'];
+                $cash_advance_detail_amount = $cad['CASH_ADVANCE_DETAIL_AMOUNT'];
+                $cash_advance_detail_status = null;
                 
-                CashAdvanceDetail::where('EXPENSES_DETAIL_ID', $expenses_detail_id)->update([
-                    'EXPENSES_DETAIL_DATE' => $expenses_detail_date,
-                    'EXPENSES_DETAIL_PURPOSE' => $expenses_detail_purpose,
-                    'EXPENSES_DETAIL_LOCATION' => $expenses_detail_location,
-                    'RELATION_ORGANIZATION_ID' => $relation_organization_id,
-                    'EXPENSES_DETAIL_RELATION_NAME' => $expenses_detail_relation_name,
-                    'EXPENSES_DETAIL_RELATION_POSITION' => $expenses_detail_relation_position,
-                    'EXPENSES_DETAIL_AMOUNT' => $expenses_detail_amount,
-                    'EXPENSES_DETAIL_STATUS' => $expenses_detail_status
+                CashAdvanceDetail::where('CASH_ADVANCE_DETAIL_ID', $cash_advance_detail_id)->update([
+                    'CASH_ADVANCE_DETAIL_START_DATE' => $cash_advance_detail_start_date,
+                    'CASH_ADVANCE_DETAIL_END_DATE' => $cash_advance_detail_end_date,
+                    'CASH_ADVANCE_DETAIL_PURPOSE' => $cash_advance_detail_purpose,
+                    'CASH_ADVANCE_DETAIL_LOCATION' => $cash_advance_detail_location,
+                    'CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID' => $cash_advance_detail_relation_organization_id,
+                    'CASH_ADVANCE_DETAIL_RELATION_NAME' => $cash_advance_detail_relation_name,
+                    'CASH_ADVANCE_DETAIL_RELATION_POSITION' => $cash_advance_detail_relation_position,
+                    'CASH_ADVANCE_DETAIL_AMOUNT' => $cash_advance_detail_amount,
+                    'CASH_ADVANCE_DETAIL_STATUS' => $cash_advance_detail_status
                 ]);
     
                 // Created Log CA Detail
@@ -424,33 +450,35 @@ class CashAdvanceController extends Controller
                     'action'     => json_encode([
                         "description" => "Revised (Cash Advance Detail).",
                         "module"      => "Cash Advance",
-                        "id"          => $expenses_detail_id
+                        "id"          => $cash_advance_detail_id
                     ]),
                     'action_by'  => Auth::user()->email
                 ]);
             }
         } else {
-            CashAdvanceDetail::where('EXPENSES_ID', $expenses_id)->delete();
+            CashAdvanceDetail::where('CASH_ADVANCE_ID', $cash_advance_id)->delete();
 
             foreach ($request->cash_advance_detail as $cad) {
-                $expenses_detail_id = $cad['EXPENSES_DETAIL_ID'];
-                $expenses_detail_date = $cad['EXPENSES_DETAIL_DATE'];
-                $expenses_detail_purpose = $cad['EXPENSES_DETAIL_PURPOSE'];
-                $expenses_detail_location = $cad['EXPENSES_DETAIL_LOCATION'];
-                $relation_organization_id = $cad['RELATION_ORGANIZATION_ID'];
-                $expenses_detail_relation_name = $cad['EXPENSES_DETAIL_RELATION_NAME'];
-                $expenses_detail_relation_position = $cad['EXPENSES_DETAIL_RELATION_POSITION'];
-                $expenses_detail_amount = $cad['EXPENSES_DETAIL_AMOUNT'];
+                $cash_advance_detail_id = $cad['CASH_ADVANCE_DETAIL_ID'];
+                $cash_advance_detail_start_date = $cad['CASH_ADVANCE_DETAIL_START_DATE'];
+                $cash_advance_detail_end_date = $cad['CASH_ADVANCE_DETAIL_END_DATE'];
+                $cash_advance_detail_purpose = $cad['CASH_ADVANCE_DETAIL_PURPOSE'];
+                $cash_advance_detail_location = $cad['CASH_ADVANCE_DETAIL_LOCATION'];
+                $cash_advance_detail_relation_organization_id = $cad['RELATION_ORGANIZATION_ID'];
+                $cash_advance_detail_relation_name = $cad['CASH_ADVANCE_DETAIL_RELATION_NAME'];
+                $cash_advance_detail_relation_position = $cad['CASH_ADVANCE_DETAIL_RELATION_POSITION'];
+                $cash_advance_detail_amount = $cad['CASH_ADVANCE_DETAIL_AMOUNT'];
                 
                 CashAdvanceDetail::create([
-                    'EXPENSES_ID' => $expenses_id,
-                    'EXPENSES_DETAIL_DATE' => $expenses_detail_date,
-                    'EXPENSES_DETAIL_PURPOSE' => $expenses_detail_purpose,
-                    'EXPENSES_DETAIL_LOCATION' => $expenses_detail_location,
-                    'RELATION_ORGANIZATION_ID' => $relation_organization_id,
-                    'EXPENSES_DETAIL_RELATION_NAME' => $expenses_detail_relation_name,
-                    'EXPENSES_DETAIL_RELATION_POSITION' => $expenses_detail_relation_position,
-                    'EXPENSES_DETAIL_AMOUNT' => $expenses_detail_amount
+                    'CASH_ADVANCE_ID' => $cash_advance_id,
+                    'CASH_ADVANCE_DETAIL_START_DATE' => $cash_advance_detail_start_date,
+                    'CASH_ADVANCE_DETAIL_END_DATE' => $cash_advance_detail_end_date,
+                    'CASH_ADVANCE_DETAIL_PURPOSE' => $cash_advance_detail_purpose,
+                    'CASH_ADVANCE_DETAIL_LOCATION' => $cash_advance_detail_location,
+                    'CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID' => $cash_advance_detail_relation_organization_id,
+                    'CASH_ADVANCE_DETAIL_RELATION_NAME' => $cash_advance_detail_relation_name,
+                    'CASH_ADVANCE_DETAIL_RELATION_POSITION' => $cash_advance_detail_relation_position,
+                    'CASH_ADVANCE_DETAIL_AMOUNT' => $cash_advance_detail_amount
                 ]);
     
                 // Created Log CA Detail
@@ -459,7 +487,7 @@ class CashAdvanceController extends Controller
                     'action'     => json_encode([
                         "description" => "Revised (Cash Advance Detail).",
                         "module"      => "Cash Advance",
-                        "id"          => $expenses_detail_id
+                        "id"          => $cash_advance_detail_id
                     ]),
                     'action_by'  => Auth::user()->email
                 ]);
@@ -473,45 +501,93 @@ class CashAdvanceController extends Controller
         ]);
     }
 
+    public function execute(Request $request)
+    {
+        // dd($request);
+        $cash_advance_id = $request->CASH_ADVANCE_ID;
+        $cash_advance_second_approval_by = auth()->user()->id;
+        $cash_advance_second_approval_user = auth()->user()->name;
+        $cash_advance_second_approval_change_status_date = date('Y-m-d H:i:s');
+        $cash_advance_second_approval_status = 4;
+        $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
+        $cash_advance_transfer_date = $request->CASH_ADVANCE_TRANSFER_DATE;
+        $cash_advance_from_bank_account = $request->CASH_ADVANCE_FROM_BANK_ACCOUNT;
+        $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
+        $cash_advance_receive_date = $request->CASH_ADVANCE_RECEIVE_DATE;
+        $cash_advance_receive_name = $request->CASH_ADVANCE_RECEIVE_NAME;
+
+        CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
+            'CASH_ADVANCE_SECOND_APPROVAL_BY' => $cash_advance_second_approval_by,
+            'CASH_ADVANCE_SECOND_APPROVAL_USER' => $cash_advance_second_approval_user,
+            'CASH_ADVANCE_SECOND_APPROVAL_CHANGE_STATUS_DATE' => $cash_advance_second_approval_change_status_date,
+            'CASH_ADVANCE_SECOND_APPROVAL_STATUS' => $cash_advance_second_approval_status,
+            'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
+            'CASH_ADVANCE_TRANSFER_DATE' => $cash_advance_transfer_date,
+            'CASH_ADVANCE_FROM_BANK_ACCOUNT' => $cash_advance_from_bank_account,
+            'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
+            'CASH_ADVANCE_RECEIVE_DATE' => $cash_advance_receive_date,
+            'CASH_ADVANCE_RECEIVE_NAME' => $cash_advance_receive_name,
+        ]);
+
+        // Created Log CA Detail
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Execute (Cash Advance).",
+                "module"      => "Cash Advance",
+                "id"          => $cash_advance_id
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            'Cash Advance has been execute.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
     public function report_cash_advance(Request $request)
     {
         // dd($request->file('refund_proof'));
+
+        $user_id = auth()->user()->id;
         
-        $expenses_id = $request->expenses_number;
-        $report_cash_advance_requested_by = $request->nama_pengguna;
+        $report_cash_advance_id = $request->cash_advance_number;
+        $report_cash_advance_requested_by = $user_id;
         $report_cash_advance_requested_date = now();
-        $first_approval_by = $request->nama_pemberi_approval;
-        $first_approval_status = 0;
-        $report_cash_advance_request_note = $request->catatan;
+        $report_cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
+        $report_cash_advance_first_approval_status = 0;
+        $report_cash_advance_request_note = $request->cash_advance_request_note;
         $report_cash_advance_refund_type = $request->refund_type;
-        $refund_proof = $request->file('refund_proof')[0];
+        $report_refund_proof = $request->file('refund_proof')[0];
 
         // Insert Report CA
         $report_cash_advance = ReportCashAdvance::create([
-            'EXPENSES_ID' => $expenses_id,
+            'CASH_ADVANCE_ID' => $report_cash_advance_id,
             'REPORT_CASH_ADVANCE_REQUESTED_BY' => $report_cash_advance_requested_by,
             'REPORT_CASH_ADVANCE_REQUESTED_DATE' => $report_cash_advance_requested_date,
-            'FIRST_APPROVAL_BY' => $first_approval_by,
-            'FIRST_APPROVAL_STATUS' => $first_approval_status,
+            'REPORT_CASH_ADVANCE_FIRST_APPROVAL_BY' => $report_cash_advance_first_approval_by,
+            'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
             'REPORT_CASH_ADVANCE_REQUEST_NOTE' => $report_cash_advance_request_note,
             'REPORT_CASH_ADVANCE_REFUND_TYPE' => $report_cash_advance_refund_type
         ])->REPORT_CASH_ADVANCE_ID;
 
-        if($refund_proof) {
+        if($report_refund_proof) {
             $parentDir = ((floor(($report_cash_advance) / 1000)) * 1000) . '/';
             $CAId = $report_cash_advance . '/';
             $typeDir = '';
             $uploadPath = 'documents/' . 'Report CA/'. $parentDir . $CAId . $typeDir;
 
             $userId = Auth::user()->id;
-            $documentOriginalName =  $this->RemoveSpecialChar($refund_proof->getClientOriginalName());
-            $documentFileName =  $report_cash_advance . '-' . $this->RemoveSpecialChar($refund_proof->getClientOriginalName());
+            $documentOriginalName =  $this->RemoveSpecialChar($report_refund_proof->getClientOriginalName());
+            $documentFileName =  $report_cash_advance . '-' . $this->RemoveSpecialChar($report_refund_proof->getClientOriginalName());
             $documentDirName =  $uploadPath;
-            $documentFileType = $refund_proof->getMimeType();
-            $documentFileSize = $refund_proof->getSize();
+            $documentFileType = $report_refund_proof->getMimeType();
+            $documentFileSize = $report_refund_proof->getSize();
 
             Storage::makeDirectory($uploadPath, 0777, true, true);
-            Storage::disk('public')->putFileAs($uploadPath, $refund_proof, $report_cash_advance . '-' . $this->RemoveSpecialChar($refund_proof->getClientOriginalName()));
+            Storage::disk('public')->putFileAs($uploadPath, $report_refund_proof, $report_cash_advance . '-' . $this->RemoveSpecialChar($report_refund_proof->getClientOriginalName()));
 
             $document = Document::create([
                 'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
@@ -523,7 +599,7 @@ class CashAdvanceController extends Controller
             ])->DOCUMENT_ID;
                 
             if ($document) {
-                ReportCashAdvance::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance)
+                ReportCashAdvance::where('CASH_ADVANCE_ID', $report_cash_advance)
                 ->update([
                     'REPORT_CASH_ADVANCE_REFUND_PROOF' => $document
                 ]);
@@ -542,20 +618,22 @@ class CashAdvanceController extends Controller
         ]);
 
         foreach ($request->CashAdvanceDetail as $key => $cad) {
-            $report_cash_advance_detail_date = $cad['tanggalKegiatan'];
-            $report_cash_advance_detail_purpose = $cad['peruntukan'];
-            $report_cash_advance_detail_location = $cad['tempat'];
-            $relation_organization_id = $cad['perusahaan'];
-            $report_cash_advance_detail_relation_name = $cad['nama'];
-            $report_cash_advance_detail_relation_position = $cad['posisi'];
-            $report_cash_advance_detail_amount = $cad['jumlah'];
+            $report_cash_advance_detail_start_date = $cad['cash_advance_detail_start_date'];
+            $report_cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
+            $report_cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
+            $report_cash_advance_detail_location = $cad['cash_advance_detail_location'];
+            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+            $report_cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
+            $report_cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
+            $report_cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
 
             $report_cash_advance_detail = ReportCashAdvanceDetail::create([
-                'REPORT_CASH_ADVANCE_ID' => $report_cash_advance,
-                'REPORT_CASH_ADVANCE_DETAIL_DATE' => $report_cash_advance_detail_date,
+                'CASH_ADVANCE_ID' => $report_cash_advance,
+                'REPORT_CASH_ADVANCE_DETAIL_START_DATE' => $report_cash_advance_detail_start_date,
+                'REPORT_CASH_ADVANCE_DETAIL_END_DATE' => $report_cash_advance_detail_end_date,
                 'REPORT_CASH_ADVANCE_DETAIL_PURPOSE' => $report_cash_advance_detail_purpose,
                 'REPORT_CASH_ADVANCE_DETAIL_LOCATION' => $report_cash_advance_detail_location,
-                'RELATION_ORGANIZATION_ID' => $relation_organization_id,
+                'REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID' => $cash_advance_detail_relation_organization_id,
                 'REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME' => $report_cash_advance_detail_relation_name,
                 'REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION' => $report_cash_advance_detail_relation_position,
                 'REPORT_CASH_ADVANCE_DETAIL_AMOUNT' => $report_cash_advance_detail_amount

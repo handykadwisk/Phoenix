@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('REPORT_CASH_ADVANCE_DETAIL_DATE')->nullable();
             $table->text('REPORT_CASH_ADVANCE_DETAIL_PURPOSE')->nullable();
             $table->text('REPORT_CASH_ADVANCE_DETAIL_LOCATION')->nullable();
-            $table->smallInteger('RELATION_ORGANIZATION_ID')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID')->nullable();
             $table->string('REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME')->nullable();
             $table->string('REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION')->nullable();
             $table->decimal('REPORT_CASH_ADVANCE_DETAIL_AMOUNT', 15, 2)->nullable();

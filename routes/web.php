@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\OtherExpensesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
+use App\Http\Controllers\ReimburseController;
 use App\Http\Controllers\RelationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
 
     // Finance > Operasional
+    // Cash Advance
     
     // Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('getCA');
     Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
@@ -50,10 +53,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/cashAdvanceExecute/{id}', [CashAdvanceController::class, 'execute'])->name('cashAdvance.execute');
     Route::get('/cashAdvanceDownload/{id}', [CashAdvanceController::class, 'download'])->name('cashAdvance.download');
 
-    Route::get('/reimburse', [CashAdvanceController::class, 'index'])->name('reimburse');
+    // Reimburse
+    Route::post('/getReimburse', [ReimburseController::class, 'getReimburse'])->name('cashAdvance.getReimburse');
+    Route::get('/getReimburseNumber', [ReimburseController::class, 'getReimburseNumber'])->name('getReimburseNumber');
+    Route::get('/getReimburseById/{id}', [ReimburseController::class, 'getReimburseById'])->name('getReimburseById');
+    Route::get('/reimburse', [ReimburseController::class, 'index'])->name('reimburse');
+    Route::post('/reimburse', [ReimburseController::class, 'store'])->name('reimburse.store');
+    Route::patch('/reimburseApprove/{id}', [ReimburseController::class, 'approve'])->name('reimburse.approve');
+    Route::patch('/reimburseRevised/{id}', [ReimburseController::class, 'revised'])->name('reimburse.revised');
+    Route::get('/reimburseDownload/{id}', [ReimburseController::class, 'download'])->name('reimburse.download');
 
-    Route::get('/otherExpenses', [CashAdvanceController::class, 'index'])->name('otherExpenses');
+    // Other Expenses
+    Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');
+    Route::get('/getOtherExpensesNumber', [OtherExpensesController::class, 'getOtherExpensesNumber'])->name('getOtherExpensesNumber');
+    Route::get('/getOtherExpensesById/{id}', [OtherExpensesController::class, 'getOtherExpensesById'])->name('getOtherExpensesById');
+    Route::get('/otherExpenses', [OtherExpensesController::class, 'index'])->name('otherExpenses');
+    Route::post('/otherExpenses', [OtherExpensesController::class, 'store'])->name('otherExpenses.store');
+    Route::patch('/otherExpensesApprove/{id}', [OtherExpensesController::class, 'approve'])->name('otherExpenses.approve');
+    Route::patch('/otherExpensesRevised/{id}', [OtherExpensesController::class, 'revised'])->name('otherExpenses.revised');
+    Route::get('/otherExpensesDownload/{id}', [OtherExpensesController::class, 'download'])->name('otherExpenses.download');
 
+    // Approval Limit
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
 });
 

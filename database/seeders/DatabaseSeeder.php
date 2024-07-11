@@ -86,18 +86,18 @@ class DatabaseSeeder extends Seeder
             ]
         )->id;
 
-        $setting = Menu::create(
-            [
-                'menu_name'       => 'Settings',
-                'menu_url'        => NULL,
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        )->id;
+        // $setting = Menu::create(
+        //     [
+        //         'menu_name'       => 'Settings',
+        //         'menu_url'        => NULL,
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
         $approvalLimit = Menu::create(
             [
-                'menu_parent_id' => $setting,
+                'menu_parent_id'  => $finance,
                 'menu_name'       => 'Approval Limit',
                 'menu_url'        => 'approvalLimit',
                 'menu_is_deleted' => 0,
@@ -142,10 +142,10 @@ class DatabaseSeeder extends Seeder
             'role_id' => $admin->id,
             'menu_id' => $otherExpenses
         ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $setting
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $setting
+        // ]);
         RoleAccessMenu::create([
             'role_id' => $admin->id,
             'menu_id' => $approvalLimit
@@ -287,7 +287,12 @@ class DatabaseSeeder extends Seeder
 
         CashAdvanceStatus::create([
             'CA_STATUS_ID' => 4,
-            'CA_STATUS_NAME' => 'Need Approval'
+            'CA_STATUS_NAME' => 'Execute'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 5,
+            'CA_STATUS_NAME' => 'Pending Report'
         ]);
     }
 }

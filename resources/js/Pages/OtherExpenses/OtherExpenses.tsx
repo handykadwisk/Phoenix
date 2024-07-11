@@ -25,7 +25,7 @@ import ModalSearch from "@/Components/Modal/ModalSearch";
 
 export default function CashAdvance({ auth }: PageProps) {
     useEffect(() => {
-        getReimburseNumber();
+        getOtherExpensesNumber();
     }, []);
 
     // Modal Add Start
@@ -44,35 +44,35 @@ export default function CashAdvance({ auth }: PageProps) {
     // Modal Add End
 
     const { data, setData, errors, reset } = useForm({
-        reimburse_number: "",
-        reimburse_used_by: "",
-        reimburse_requested_by: "",
-        reimburse_division: "",
-        reimburse_first_approval_by: "",
-        reimburse_request_note: "",
-        reimburse_delivery_method_transfer: "",
-        reimburse_transfer_amount: "",
-        reimburse_delivery_method_cash: "",
-        reimburse_cash_amount: "",
-        reimburse_total_amount: "",
-        reimburse_transfer_date: "",
-        reimburse_from_bank_account: "",
-        reimburse_receive_date: "",
-        reimburse_receive_name: "",
+        other_expenses_number: "",
+        other_expenses_used_by: "",
+        other_expenses_requested_by: "",
+        other_expenses_division: "",
+        other_expenses_first_approval_by: "",
+        other_expenses_request_note: "",
+        other_expenses_delivery_method_transfer: "",
+        other_expenses_transfer_amount: "",
+        other_expenses_delivery_method_cash: "",
+        other_expenses_cash_amount: "",
+        other_expenses_total_amount: "",
+        other_expenses_transfer_date: "",
+        other_expenses_from_bank_account: "",
+        other_expenses_receive_date: "",
+        other_expenses_receive_name: "",
         refund_type: "",
         refund_proof: "",
-        ReimburseDetail: [
+        OtherExpensesDetail: [
             {
-                reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
-                reimburse_detail_note: "",
+                other_expenses_detail_date: "",
+                other_expenses_detail_end_date: "",
+                other_expenses_detail_purpose: "",
+                other_expenses_detail_relation_name: "",
+                other_expenses_detail_relation_position: "",
+                other_expenses_detail_relation_organization_id: "",
+                other_expenses_detail_location: "",
+                other_expenses_detail_amount: "",
+                other_expenses_detail_document_id: "",
+                other_expenses_detail_note: "",
             },
         ],
     });
@@ -84,65 +84,65 @@ export default function CashAdvance({ auth }: PageProps) {
         setIsSuccess("");
         reset();
         setData({
-            reimburse_number: "",
-            reimburse_used_by: "",
-            reimburse_requested_by: "",
-            reimburse_division: "",
-            reimburse_first_approval_by: "",
-            reimburse_request_note: "",
-            reimburse_delivery_method_transfer: "",
-            reimburse_transfer_amount: "",
-            reimburse_delivery_method_cash: "",
-            reimburse_cash_amount: "",
-            reimburse_total_amount: "",
-            reimburse_transfer_date: "",
-            reimburse_from_bank_account: "",
-            reimburse_receive_date: "",
-            reimburse_receive_name: "",
+            other_expenses_number: "",
+            other_expenses_used_by: "",
+            other_expenses_requested_by: "",
+            other_expenses_division: "",
+            other_expenses_first_approval_by: "",
+            other_expenses_request_note: "",
+            other_expenses_delivery_method_transfer: "",
+            other_expenses_transfer_amount: "",
+            other_expenses_delivery_method_cash: "",
+            other_expenses_cash_amount: "",
+            other_expenses_total_amount: "",
+            other_expenses_transfer_date: "",
+            other_expenses_from_bank_account: "",
+            other_expenses_receive_date: "",
+            other_expenses_receive_name: "",
             refund_type: "",
             refund_proof: "",
-            ReimburseDetail: [
+            OtherExpensesDetail: [
                 {
-                    reimburse_detail_date: "",
-                    reimburse_detail_end_date: "",
-                    reimburse_detail_purpose: "",
-                    reimburse_detail_relation_name: "",
-                    reimburse_detail_relation_position: "",
-                    reimburse_detail_relation_organization_id: "",
-                    reimburse_detail_location: "",
-                    reimburse_detail_amount: "",
-                    reimburse_detail_document_id: "",
-                    reimburse_detail_note: "",
+                    other_expenses_detail_date: "",
+                    other_expenses_detail_end_date: "",
+                    other_expenses_detail_purpose: "",
+                    other_expenses_detail_relation_name: "",
+                    other_expenses_detail_relation_position: "",
+                    other_expenses_detail_relation_organization_id: "",
+                    other_expenses_detail_location: "",
+                    other_expenses_detail_amount: "",
+                    other_expenses_detail_document_id: "",
+                    other_expenses_detail_note: "",
                 },
             ],
         });
 
         setIsSuccess(message);
-        getReimburse();
-        getReimburseNumber();
+        getOtherExpenses();
+        getOtherExpensesNumber();
     };
     // Handle Success End
 
     const [dataById, setDataById] = useState<any>({
-        // REIMBURSE_NUMBER: "",
-        // REIMBURSE_TYPE: "",
+        // OTHER_EXPENSES_NUMBER: "",
+        // OTHER_EXPENSES_TYPE: "",
         // DIVISION: "",
         // USED_BY: "",
-        // REIMBURSE_REQUESTED_BY: "",
-        // REIMBURSE_REQUESTED_DATE: "",
+        // OTHER_EXPENSES_REQUESTED_BY: "",
+        // OTHER_EXPENSES_REQUESTED_DATE: "",
         // FIRST_APPROVAL_USER: "",
-        // REIMBURSE_REQUEST_NOTE: "",
-        // REIMBURSE_TOTAL_AMOUNT: "",
-        // REIMBURSE_TRANSFER_AMOUNT: "",
-        reimburse_detail: [
+        // OTHER_EXPENSES_REQUEST_NOTE: "",
+        // OTHER_EXPENSES_TOTAL_AMOUNT: "",
+        // OTHER_EXPENSES_TRANSFER_AMOUNT: "",
+        other_expenses_detail: [
             {
-                REIMBURSE_DETAIL_ID: "",
-                REIMBURSE_DETAIL_PURPOSE: "",
-                REIMBURSE_DETAIL_LOCATION: "",
-                REIMBURSE_DETAIL_AMOUNT: "",
-                REIMBURSE_DETAIL_NOTE: "",
-                REIMBURSE_DETAIL_DOCUMENT_ID: "",
-                reimburse_detail_document_id: "",
+                OTHER_EXPENSES_DETAIL_ID: "",
+                OTHER_EXPENSES_DETAIL_PURPOSE: "",
+                OTHER_EXPENSES_DETAIL_LOCATION: "",
+                OTHER_EXPENSES_DETAIL_AMOUNT: "",
+                OTHER_EXPENSES_DETAIL_NOTE: "",
+                OTHER_EXPENSES_DETAIL_DOCUMENT_ID: "",
+                other_expenses_detail_document_id: "",
             },
         ],
         user: [
@@ -174,16 +174,16 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Add Row Start
     const [DataRow, setDataRow] = useState([
         {
-            reimburse_detail_date: "",
-            reimburse_detail_end_date: "",
-            reimburse_detail_purpose: "",
-            reimburse_detail_relation_name: "",
-            reimburse_detail_relation_position: "",
-            reimburse_detail_relation_organization_id: "",
-            reimburse_detail_location: "",
-            reimburse_detail_amount: "",
-            reimburse_detail_document_id: "",
-            reimburse_detail_note: "",
+            other_expenses_detail_date: "",
+            other_expenses_detail_end_date: "",
+            other_expenses_detail_purpose: "",
+            other_expenses_detail_relation_name: "",
+            other_expenses_detail_relation_position: "",
+            other_expenses_detail_relation_organization_id: "",
+            other_expenses_detail_location: "",
+            other_expenses_detail_amount: "",
+            other_expenses_detail_document_id: "",
+            other_expenses_detail_note: "",
         },
     ]);
 
@@ -193,32 +193,32 @@ export default function CashAdvance({ auth }: PageProps) {
         setDataRow([
             ...DataRow,
             {
-                reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
-                reimburse_detail_note: "",
+                other_expenses_detail_date: "",
+                other_expenses_detail_end_date: "",
+                other_expenses_detail_purpose: "",
+                other_expenses_detail_relation_name: "",
+                other_expenses_detail_relation_position: "",
+                other_expenses_detail_relation_organization_id: "",
+                other_expenses_detail_location: "",
+                other_expenses_detail_amount: "",
+                other_expenses_detail_document_id: "",
+                other_expenses_detail_note: "",
             },
         ]);
 
-        setData("ReimburseDetail", [
-            ...data.ReimburseDetail,
+        setData("OtherExpensesDetail", [
+            ...data.OtherExpensesDetail,
             {
-                reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
-                reimburse_detail_note: "",
+                other_expenses_detail_date: "",
+                other_expenses_detail_end_date: "",
+                other_expenses_detail_purpose: "",
+                other_expenses_detail_relation_name: "",
+                other_expenses_detail_relation_position: "",
+                other_expenses_detail_relation_organization_id: "",
+                other_expenses_detail_location: "",
+                other_expenses_detail_amount: "",
+                other_expenses_detail_document_id: "",
+                other_expenses_detail_note: "",
             },
         ]);
     };
@@ -226,13 +226,13 @@ export default function CashAdvance({ auth }: PageProps) {
 
     // Handle Remove Row Start
     const handleRemoveRow = (i: number) => {
-        const deleteRow = [...data.ReimburseDetail];
+        const deleteRow = [...data.OtherExpensesDetail];
 
         deleteRow.splice(i, 1);
 
         setDataRow(deleteRow);
 
-        setData("ReimburseDetail", deleteRow);
+        setData("OtherExpensesDetail", deleteRow);
     };
     // Handle Remove Row End
 
@@ -240,35 +240,35 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleChangeAdd = (e: any, i: number) => {
         const { name, value } = e.target;
 
-        const onchangeVal: any = [...data.ReimburseDetail];
+        const onchangeVal: any = [...data.OtherExpensesDetail];
 
         onchangeVal[i][name] = value;
 
         setDataRow(onchangeVal);
 
-        setData("ReimburseDetail", onchangeVal);
+        setData("OtherExpensesDetail", onchangeVal);
     };
     // Handle Change Add End
 
     const handleUploadFile = (e: any, i: number) => {
         const { name, files } = e.target;
 
-        const onchangeFile: any = [...data.ReimburseDetail];
+        const onchangeFile: any = [...data.OtherExpensesDetail];
 
         onchangeFile[i][name] = files[0];
 
-        setData("ReimburseDetail", onchangeFile);
+        setData("OtherExpensesDetail", onchangeFile);
     };
 
     // Handle Change Approve Start
     const handleChangeApprove = (e: any, i: number) => {
         const { name, value } = e.target;
 
-        const onchangeVal: any = [...dataById.reimburse_detail];
+        const onchangeVal: any = [...dataById.other_expenses_detail];
 
         onchangeVal[i][name] = value;
 
-        setDataById({ ...dataById, reimburse_detail: onchangeVal });
+        setDataById({ ...dataById, other_expenses_detail: onchangeVal });
     };
     // Handle Change Approve End
 
@@ -276,49 +276,49 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleChangeRevised = (e: any, i: number) => {
         const { name, value } = e.target;
 
-        const onchangeVal: any = [...dataById.reimburse_detail];
+        const onchangeVal: any = [...dataById.other_expenses_detail];
 
         onchangeVal[i][name] = value;
 
-        setDataById({ ...dataById, reimburse_detail: onchangeVal });
+        setDataById({ ...dataById, other_expenses_detail: onchangeVal });
     };
     // Handle Change Revised End
 
     const handleUploadFileRevised = (e: any, i: number) => {
         const { name, files } = e.target;
 
-        const onchangeFile: any = [...dataById.reimburse_detail];
+        const onchangeFile: any = [...dataById.other_expenses_detail];
 
         onchangeFile[i][name] = files[0];
 
-        // setData("ReimburseDetail", onchangeFile);
+        // setData("OtherExpensesDetail", onchangeFile);
 
-        setDataById({ ...dataById, reimburse_detail: onchangeFile });
+        setDataById({ ...dataById, other_expenses_detail: onchangeFile });
     };
 
     // Handle Remove Row Revised Start
     const handleRemoveRowRevised = (i: number) => {
-        const deleteRow = [...dataById.reimburse_detail];
+        const deleteRow = [...dataById.other_expenses_detail];
 
         deleteRow.splice(i, 1);
 
-        setDataById({ ...dataById, reimburse_detail: deleteRow });
+        setDataById({ ...dataById, other_expenses_detail: deleteRow });
     };
     // Handle Remove Row Revised End
 
-    // Handle Add Row Report Reimburse Start
+    // Handle Add Row Report  Other Expenses Start
     const [DataReportRow, setDataReportRow] = useState([
         {
-            reimburse_detail_date: "",
-            reimburse_detail_end_date: "",
-            reimburse_detail_purpose: "",
-            reimburse_detail_relation_name: "",
-            reimburse_detail_relation_position: "",
-            reimburse_detail_relation_organization_id: "",
-            reimburse_detail_location: "",
-            reimburse_detail_amount: "",
-            reimburse_detail_document_id: "",
-            reimburse_detail_note: "",
+            other_expenses_detail_date: "",
+            other_expenses_detail_end_date: "",
+            other_expenses_detail_purpose: "",
+            other_expenses_detail_relation_name: "",
+            other_expenses_detail_relation_position: "",
+            other_expenses_detail_relation_organization_id: "",
+            other_expenses_detail_location: "",
+            other_expenses_detail_amount: "",
+            other_expenses_detail_document_id: "",
+            other_expenses_detail_note: "",
         },
     ]);
 
@@ -328,71 +328,71 @@ export default function CashAdvance({ auth }: PageProps) {
         setDataReportRow([
             ...DataReportRow,
             {
-                reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
-                reimburse_detail_note: "",
+                other_expenses_detail_date: "",
+                other_expenses_detail_end_date: "",
+                other_expenses_detail_purpose: "",
+                other_expenses_detail_relation_name: "",
+                other_expenses_detail_relation_position: "",
+                other_expenses_detail_relation_organization_id: "",
+                other_expenses_detail_location: "",
+                other_expenses_detail_amount: "",
+                other_expenses_detail_document_id: "",
+                other_expenses_detail_note: "",
             },
         ]);
 
-        setData("ReimburseDetail", [
-            ...data.ReimburseDetail,
+        setData("OtherExpensesDetail", [
+            ...data.OtherExpensesDetail,
             {
-                reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
-                reimburse_detail_note: "",
+                other_expenses_detail_date: "",
+                other_expenses_detail_end_date: "",
+                other_expenses_detail_purpose: "",
+                other_expenses_detail_relation_name: "",
+                other_expenses_detail_relation_position: "",
+                other_expenses_detail_relation_organization_id: "",
+                other_expenses_detail_location: "",
+                other_expenses_detail_amount: "",
+                other_expenses_detail_document_id: "",
+                other_expenses_detail_note: "",
             },
         ]);
     };
-    // Handle Add Row Report Reimburse End
+    // Handle Add Row Report  Other Expenses End
 
-    // Handle Change Add Report Reimburse Start
+    // Handle Change Add Report  Other Expenses Start
     const handleChangeAddReport = (e: any, i: number) => {
         const { name, value } = e.target;
 
-        const onchangeVal: any = [...data.ReimburseDetail];
+        const onchangeVal: any = [...data.OtherExpensesDetail];
 
         onchangeVal[i][name] = value;
 
         setDataReportRow(onchangeVal);
 
-        setData("ReimburseDetail", onchangeVal);
+        setData("OtherExpensesDetail", onchangeVal);
     };
-    // Handle Change Add Report Reimburse End
+    // Handle Change Add Report  Other Expenses End
 
-    // Handle Remove Row Report Reimburse Start
+    // Handle Remove Row Report  Other Expenses Start
     const handleRemoveReportRow = (i: number) => {
-        const deleteRow = [...data.ReimburseDetail];
+        const deleteRow = [...data.OtherExpensesDetail];
 
         deleteRow.splice(i, 1);
 
         setDataReportRow(deleteRow);
 
-        setData("ReimburseDetail", deleteRow);
+        setData("OtherExpensesDetail", deleteRow);
     };
-    // Handle Remove Row Report Reimburse End
+    // Handle Remove Row Report  Other Expenses End
 
-    const [reimburse, setReimburse] = useState<any>([]);
-    const [CANumber, setReimburseNumber] = useState<any>([]);
+    const [other_expenses, setOtherExpenses] = useState<any>([]);
+    const [OtherExpensesNumber, setOtherExpensesNumber] = useState<any>([]);
 
-    const getReimburseNumber = async () => {
+    const getOtherExpensesNumber = async () => {
         await axios
-            .get(`/getReimburseNumber`)
+            .get(`/getOtherExpensesNumber`)
             .then(function (response) {
-                setReimburseNumber(response.data);
+                setOtherExpensesNumber(response.data);
                 console.log("xxx", response.data);
             })
             .catch(function (error) {
@@ -401,19 +401,19 @@ export default function CashAdvance({ auth }: PageProps) {
     };
 
     // Search Start
-    const [searchReimburse, setSearchReimburse] = useState<any>({
-        REIMBURSE_NUMBER: "",
+    const [searchOtherExpenses, setSearchOtherExpenses] = useState<any>({
+        OTHER_EXPENSES_NUMBER: "",
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const getReimburse = async (pageNumber = "page=1") => {
+    const getOtherExpenses = async (pageNumber = "page=1") => {
         setIsLoading(true);
         await axios
-            .post(`/getReimburse?${pageNumber}`, {
-                REIMBURSE_NUMBER: searchReimburse.REIMBURSE_NUMBER,
+            .post(`/getOtherExpenses?${pageNumber}`, {
+                OTHER_EXPENSES_NUMBER: searchOtherExpenses.OTHER_EXPENSES_NUMBER,
             })
             .then((res) => {
-                setReimburse(res.data);
+                setOtherExpenses(res.data);
                 setIsLoading(false);
                 if (modal.search) {
                     setModal({
@@ -439,10 +439,10 @@ export default function CashAdvance({ auth }: PageProps) {
         setIsLoading(true);
         await axios
             .post(`/getReportCA?${pageNumber}`, {
-                REIMBURSE_NUMBER: searchReimburse.REIMBURSE_NUMBER,
+                OTHER_EXPENSES_NUMBER: searchOtherExpenses.OTHER_EXPENSES_NUMBER,
             })
             .then((res) => {
-                setReimburse(res.data);
+                setOtherExpenses(res.data);
                 setIsLoading(false);
                 if (modal.search) {
                     setModal({
@@ -466,14 +466,14 @@ export default function CashAdvance({ auth }: PageProps) {
     // Search End
 
     // Clear Search Start
-    const clearSearchReimburse = async (pageNumber = "page=1") => {
+    const clearSearchOtherExpenses = async (pageNumber = "page=1") => {
         await axios
-            .post(`/getReimburse?${pageNumber}`)
+            .post(`/getOtherExpenses?${pageNumber}`)
             .then((res) => {
-                setReimburse([]);
-                setSearchReimburse({
-                    ...searchReimburse,
-                    REIMBURSE_NUMBER: "",
+                setOtherExpenses([]);
+                setSearchOtherExpenses({
+                    ...searchOtherExpenses,
+                    OTHER_EXPENSES_NUMBER: "",
                 });
 
                 // console.log(res);
@@ -484,11 +484,11 @@ export default function CashAdvance({ auth }: PageProps) {
     };
     // Clear Search End
 
-    // const getReimburse = async (pageNumber = "page=1") => {
+    // const getOtherExpenses = async (pageNumber = "page=1") => {
     //     await axios
-    //         .get(`/getReimburse?${pageNumber}`)
+    //         .get(`/getOtherExpenses?${pageNumber}`)
     //         .then((res) => {
-    //             setReimburse(res.data);
+    //             setOtherExpenses(res.data);
     //         })
     //         .catch((err) => {
     //             console.log(err);
@@ -530,11 +530,11 @@ export default function CashAdvance({ auth }: PageProps) {
     const types = [
         {
             id: 1,
-            type: "Reimburse",
+            type: " Other Expenses",
         },
         {
             id: 2,
-            type: "Reimburse",
+            type: " Other Expenses",
         },
     ];
 
@@ -563,11 +563,11 @@ export default function CashAdvance({ auth }: PageProps) {
     const tabs = [
         {
             index: 1,
-            name: "Reimburse",
+            name: " Other Expenses",
         },
         {
             index: 2,
-            name: "Report Reimburse",
+            name: "Report  Other Expenses",
         },
     ];
     // Data End
@@ -577,7 +577,7 @@ export default function CashAdvance({ auth }: PageProps) {
         e.preventDefault();
 
         await axios
-            .get(`/getReimburseById/${id}`)
+            .get(`/getOtherExpensesById/${id}`)
             .then((res) => {
                 setDataById(res.data);
                 console.log(res.data);
@@ -604,7 +604,7 @@ export default function CashAdvance({ auth }: PageProps) {
         e.preventDefault();
 
         await axios
-            .get(`/getReimburseById/${id}`)
+            .get(`/getOtherExpensesById/${id}`)
             .then((res) => {
                 setDataById(res.data);
                 console.log(res.data);
@@ -631,7 +631,7 @@ export default function CashAdvance({ auth }: PageProps) {
         e.preventDefault();
 
         await axios
-            .get(`/getReimburseById/${id}`)
+            .get(`/getOtherExpensesById/${id}`)
             .then((res) => {
                 setDataById(res.data);
                 console.log(res.data);
@@ -658,7 +658,7 @@ export default function CashAdvance({ auth }: PageProps) {
         e.preventDefault();
 
         await axios
-            .get(`/getReimburseById/${id}`)
+            .get(`/getOtherExpensesById/${id}`)
             .then((res) => {
                 setDataById(res.data);
                 console.log(res.data);
@@ -683,13 +683,13 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleBtnStatus = async (status: number) => {
         setDataById({
             ...dataById,
-            REIMBURSE_FIRST_APPROVAL_STATUS: status,
+            OTHER_EXPENSES_FIRST_APPROVAL_STATUS: status,
         });
 
         // console.log(dataById);
 
         await axios
-            .patch(`/reimburseApprove/${dataById.REIMBURSE_ID}`, dataById, {
+            .patch(`/otherExpensesApprove/${dataById.OTHER_EXPENSES_ID}`, dataById, {
                 headers: {
                     "Content-type": "multipart/form-data",
                 },
@@ -705,7 +705,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
     const handleBtnRevised = async () => {
         await axios
-            .patch(`/reimburseRevised/${dataById.REIMBURSE_ID}`, dataById, {
+            .patch(`/otherExpensesRevised/${dataById.OTHER_EXPENSES_ID}`, dataById, {
                 headers: {
                     "Content-type": "multipart/form-data",
                 },
@@ -721,7 +721,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
     const handleFileDownload = async (id: number) => {
         await axios({
-            url: `/reimburseDownload/${id}`,
+            url: `/otherExpensesDownload/${id}`,
             method: "GET",
             responseType: "blob",
         })
@@ -754,19 +754,19 @@ export default function CashAdvance({ auth }: PageProps) {
     let total = 0;
 
     DataRow.forEach((item) => {
-        total += Number(item.reimburse_detail_amount);
+        total += Number(item.other_expenses_detail_amount);
     });
 
     let revised_total_amount = 0;
 
-    dataById.reimburse_detail.forEach((item: any) => {
-        revised_total_amount += Number(item.REIMBURSE_DETAIL_AMOUNT);
+    dataById.other_expenses_detail.forEach((item: any) => {
+        revised_total_amount += Number(item.OTHER_EXPENSES_DETAIL_AMOUNT);
     });
 
     let count_approve = 0;
 
-    dataById.reimburse_detail.forEach((item: any) => {
-        count_approve += Number(item.REIMBURSE_DETAIL_STATUS);
+    dataById.other_expenses_detail.forEach((item: any) => {
+        count_approve += Number(item.OTHER_EXPENSES_DETAIL_STATUS);
     });
 
     const [toggleState, setToggleState] = useState(1);
@@ -777,24 +777,24 @@ export default function CashAdvance({ auth }: PageProps) {
 
     const [checkedTransfer, setCheckedTransfer] = useState(false);
     const handleCheckedTransfer = (e:any) => {
-        setData("reimburse_delivery_method_transfer", e.target.value)
+        setData("other_expenses_delivery_method_transfer", e.target.value)
         setCheckedTransfer(!checkedTransfer); 
     };
 
     const [checkedCash, setCheckedCash] = useState(false);
     const handleCheckedCash = (e:any) => {
-        setData("reimburse_delivery_method_cash", e.target.value)
+        setData("other_expenses_delivery_method_cash", e.target.value)
         setCheckedCash(!checkedCash); 
     };
 
     console.log(data);
     // console.log(DataRow);
-    console.log("Reimburse", reimburse.data);
+    console.log(" Other Expenses", other_expenses.data);
     console.log("Data By Id", dataById);
 
     return (
-        <AuthenticatedLayout user={auth.user} header={"Reimburse"}>
-            <Head title="Reimburse" />
+        <AuthenticatedLayout user={auth.user} header={" Other Expenses"}>
+            <Head title=" Other Expenses" />
 
             {isSuccess && (
                 <ToastMessage
@@ -822,8 +822,8 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title={"Add Reimburse"}
-                url={`/reimburse`}
+                title={"Add  Other Expenses"}
+                url={`/otherExpenses`}
                 data={data}
                 onSuccess={handleSuccess}
                 panelWidth={"65%"}
@@ -867,14 +867,14 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburse_division"
+                                    htmlFor="other_expenses_division"
                                     value="Division"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburse_division"
+                                    id="other_expenses_division"
                                     type="text"
-                                    name="reimburse_division"
+                                    name="other_expenses_division"
                                     value="IT"
                                     readOnly
                                 />
@@ -892,7 +892,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="namaPemohon"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
-                                        setData("reimburse_used_by", e.target.value)
+                                        setData("other_expenses_used_by", e.target.value)
                                     }
                                     required
                                 >
@@ -920,7 +920,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
                                         setData(
-                                            "reimburse_first_approval_by",
+                                            "other_expenses_first_approval_by",
                                             e.target.value
                                         )
                                     }
@@ -1011,12 +1011,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <TD className="border">{i + 1}.</TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_date"
+                                                    id="other_expenses_detail_date"
                                                     type="date"
-                                                    name="reimburse_detail_date"
-                                                    value={val.reimburse_detail_date}
+                                                    name="other_expenses_detail_date"
+                                                    value={val.other_expenses_detail_date}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_date"
+                                                    autoComplete="other_expenses_detail_date"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
@@ -1025,8 +1025,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <select
-                                                    id="reimburse_detail_purpose"
-                                                    name="reimburse_detail_purpose"
+                                                    id="other_expenses_detail_purpose"
+                                                    name="other_expenses_detail_purpose"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     required
                                                     onChange={(e) =>
@@ -1048,8 +1048,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <select
-                                                    id="reimburse_detail_relation_organization_id"
-                                                    name="reimburse_detail_relation_organization_id"
+                                                    id="other_expenses_detail_relation_organization_id"
+                                                    name="other_expenses_detail_relation_organization_id"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
@@ -1077,12 +1077,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_relation_name"
+                                                    id="other_expenses_detail_relation_name"
                                                     type="text"
-                                                    name="reimburse_detail_relation_name"
-                                                    value={val.reimburse_detail_relation_name}
+                                                    name="other_expenses_detail_relation_name"
+                                                    value={val.other_expenses_detail_relation_name}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_name"
+                                                    autoComplete="other_expenses_detail_relation_name"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
@@ -1090,12 +1090,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_relation_position"
+                                                    id="other_expenses_detail_relation_position"
                                                     type="text"
-                                                    name="reimburse_detail_relation_position"
-                                                    value={val.reimburse_detail_relation_position}
+                                                    name="other_expenses_detail_relation_position"
+                                                    value={val.other_expenses_detail_relation_position}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_position"
+                                                    autoComplete="other_expenses_detail_relation_position"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
@@ -1103,12 +1103,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_location"
+                                                    id="other_expenses_detail_location"
                                                     type="text"
-                                                    name="reimburse_detail_location"
-                                                    value={val.reimburse_detail_location}
+                                                    name="other_expenses_detail_location"
+                                                    value={val.other_expenses_detail_location}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_location"
+                                                    autoComplete="other_expenses_detail_location"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
@@ -1117,12 +1117,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_amount"
+                                                    id="other_expenses_detail_amount"
                                                     type="number"
-                                                    name="reimburse_detail_amount"
-                                                    value={val.reimburse_detail_amount}
+                                                    name="other_expenses_detail_amount"
+                                                    value={val.other_expenses_detail_amount}
                                                     className="w-1/2 text-right"
-                                                    autoComplete="reimburse_detail_amount"
+                                                    autoComplete="other_expenses_detail_amount"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
@@ -1133,8 +1133,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <TD className="border">
                                                 <input
                                                     type="file"
-                                                    id="reimburse_detail_document_id"
-                                                    name="reimburse_detail_document_id"
+                                                    id="other_expenses_detail_document_id"
+                                                    name="other_expenses_detail_document_id"
                                                     className="bg-white leading-4"
                                                     multiple
                                                     onChange={(e) =>
@@ -1210,22 +1210,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </div>
                                             {checkedTransfer === true ? (
                                                 <TextInput
-                                                    id="reimburse_transfer_amount"
+                                                    id="other_expenses_transfer_amount"
                                                     type="number"
-                                                    name="reimburse_transfer_amount"
-                                                    value={data.reimburse_transfer_amount}
+                                                    name="other_expenses_transfer_amount"
+                                                    value={data.other_expenses_transfer_amount}
                                                     className="w-full lg:w-1/4 text-right"
                                                     placeholder="0"
                                                     onChange={(e) =>
-                                                        setData("reimburse_transfer_amount", e.target.value)
+                                                        setData("other_expenses_transfer_amount", e.target.value)
                                                     }
                                                     required
                                                 />
                                             ) : (
                                                 <TextInput
-                                                    id="reimburse_transfer_amount"
+                                                    id="other_expenses_transfer_amount"
                                                     type="number"
-                                                    name="reimburse_transfer_amount"
+                                                    name="other_expenses_transfer_amount"
                                                     value={""}
                                                     className="w-full lg:w-1/4 text-right"
                                                     placeholder="0"
@@ -1268,22 +1268,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </div>
                                             {checkedCash === true ? (
                                                 <TextInput
-                                                    id="reimburse_cash_amount"
+                                                    id="other_expenses_cash_amount"
                                                     type="number"
-                                                    name="reimburse_cash_amount"
-                                                    value={data.reimburse_cash_amount}
+                                                    name="other_expenses_cash_amount"
+                                                    value={data.other_expenses_cash_amount}
                                                     className="w-5/12 lg:w-1/4 text-right ml-9"
                                                     placeholder="0"
                                                     onChange={(e) =>
-                                                        setData("reimburse_cash_amount", e.target.value)
+                                                        setData("other_expenses_cash_amount", e.target.value)
                                                     }
                                                     required
                                                 />
                                             ) : (
                                                 <TextInput
-                                                    id="reimburse_cash_amount"
+                                                    id="other_expenses_cash_amount"
                                                     type="number"
-                                                    name="reimburse_cash_amount"
+                                                    name="other_expenses_cash_amount"
                                                     value={""}
                                                     className="w-5/12 lg:w-1/4 text-right ml-9"
                                                     placeholder="0"
@@ -1302,18 +1302,18 @@ export default function CashAdvance({ auth }: PageProps) {
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
-                                htmlFor="reimburse_request_note"
+                                htmlFor="other_expenses_request_note"
                                 value="Note"
                                 className="mb-2"
                             />
                             <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
+                                id="other_expenses_request_note"
+                                name="other_expenses_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={data.reimburse_request_note}
+                                value={data.other_expenses_request_note}
                                 onChange={(e) =>
-                                    setData("reimburse_request_note", e.target.value)
+                                    setData("other_expenses_request_note", e.target.value)
                                 }
                             />
                         </div>
@@ -1341,7 +1341,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Detail Reimburse"
+                title="Detail  Other Expenses"
                 url=""
                 data=""
                 method=""
@@ -1354,21 +1354,21 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
-                                    value="Reimburse Number"
+                                    htmlFor="other_expensesNumber"
+                                    value="Other Expenses Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="other_expensesNumber"
                                     type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
+                                    name="other_expensesNumber"
+                                    value={dataById.OTHER_EXPENSES_NUMBER}
                                     className=""
-                                    autoComplete="reimburseNumber"
+                                    autoComplete="other_expensesNumber"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            REIMBURSE_NUMBER: e.target.value,
+                                            OTHER_EXPENSES_NUMBER: e.target.value,
                                         })
                                     }
                                     readOnly
@@ -1380,12 +1380,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value="Type"
                                     className="mb-2"
                                 />
-                                {dataById.REIMBURSE_TYPE === 1 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 1 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         onChange={(e) =>
@@ -1397,12 +1397,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                         readOnly
                                     />
                                 )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 2 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         onChange={(e) =>
@@ -1469,13 +1469,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="divisi"
                                     type="text"
                                     name="divisi"
-                                    value={dataById.REIMBURSE_DIVISION}
+                                    value={dataById.OTHER_EXPENSES_DIVISION}
                                     className=""
                                     autoComplete="divisi"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            REIMBURSE_DIVISION: e.target.value,
+                                            OTHER_EXPENSES_DIVISION: e.target.value,
                                         })
                                     }
                                     readOnly
@@ -1492,7 +1492,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
+                                        dataById.OTHER_EXPENSES_REQUESTED_DATE,
                                         "dd-mm-yyyy"
                                     )}
                                     className=""
@@ -1581,7 +1581,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody id="form_table">
-                                    {dataById.reimburse_detail.map(
+                                    {dataById.other_expenses_detail.map(
                                         (cad: any, i: number) => (
                                             <tr
                                                 className="text-center text-gray-700 text-sm leading-7"
@@ -1592,56 +1592,56 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {dateFormat(
-                                                        cad.REIMBURSE_DETAIL_DATE,
+                                                        cad.OTHER_EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE === "1" &&
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE === "1" &&
                                                         "Peruntukan A"
                                                     }
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE === "2" &&
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE === "2" &&
                                                         "Peruntukan B"
                                                     }
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE === "3" &&
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE === "3" &&
                                                         "Peruntukan C"
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         1 && "Perusahaan A"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         2 && "Perusahaan B"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         3 && "Perusahaan C"}
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_RELATION_NAME
+                                                        cad.OTHER_EXPENSES_DETAIL_RELATION_NAME
                                                     }
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        cad.OTHER_EXPENSES_DETAIL_RELATION_POSITION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_LOCATION
+                                                        cad.OTHER_EXPENSES_DETAIL_LOCATION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {formatCurrency.format(
-                                                        cad.REIMBURSE_DETAIL_AMOUNT
+                                                        cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !== null ? (
+                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !== null ? (
                                                 <TD className="border px-3 py-2">
                                                     <button
                                                         type="button"
                                                         onClick={() =>
                                                             handleFileDownload(
-                                                                cad.REIMBURSE_DETAIL_ID
+                                                                cad.OTHER_EXPENSES_DETAIL_ID
                                                             )
                                                         }
                                                     >
@@ -1665,7 +1665,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TD>
                                         <TD className="border py-2">
                                             {formatCurrency.format(
-                                                dataById.REIMBURSE_TOTAL_AMOUNT
+                                                dataById.OTHER_EXPENSES_TOTAL_AMOUNT
                                             )}
                                         </TD>
                                     </tr>
@@ -1678,18 +1678,18 @@ export default function CashAdvance({ auth }: PageProps) {
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
-                                htmlFor="reimburse_request_note"
+                                htmlFor="other_expenses_request_note"
                                 value="Note"
                                 className="mb-2"
                             />
                             <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
+                                id="other_expenses_request_note"
+                                name="other_expenses_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.OTHER_EXPENSES_REQUEST_NOTE}
                                 onChange={(e) =>
-                                    setData("reimburse_request_note", e.target.value)
+                                    setData("other_expenses_request_note", e.target.value)
                                 }
                                 readOnly
                             />
@@ -1718,8 +1718,8 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Approve Reimburse"
-                url={`/reimburseApprove/${dataById.reimburse_detail.REIMBURSE_DETAIL_ID}`}
+                title="Approve  Other Expenses"
+                url={`/otherExpensesApprove/${dataById.other_expenses_detail.OTHER_EXPENSES_DETAIL_ID}`}
                 data={dataById}
                 method="patch"
                 onSuccess={handleSuccess}
@@ -1731,17 +1731,17 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
-                                    value="Reimburse Number"
+                                    htmlFor="other_expensesNumber"
+                                    value="Other Expenses Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="other_expensesNumber"
                                     type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
+                                    name="other_expensesNumber"
+                                    value={dataById.OTHER_EXPENSES_NUMBER}
                                     className=""
-                                    autoComplete="reimburseNumber"
+                                    autoComplete="other_expensesNumber"
                                     readOnly
                                 />
                             </div>
@@ -1751,23 +1751,23 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value="Type"
                                     className="mb-2"
                                 />
-                                {dataById.REIMBURSE_TYPE === 1 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 1 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         readOnly
                                     />
                                 )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 2 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         readOnly
@@ -1816,7 +1816,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="divisi"
                                     type="text"
                                     name="divisi"
-                                    value={dataById.REIMBURSE_DIVISION}
+                                    value={dataById.OTHER_EXPENSES_DIVISION}
                                     className=""
                                     autoComplete="divisi"
                                     readOnly
@@ -1833,7 +1833,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
+                                        dataById.OTHER_EXPENSES_REQUESTED_DATE,
                                         "dd-mm-yyyy"
                                     )}
                                     className=""
@@ -1926,7 +1926,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>{" "}
                                 <tbody id="form_table">
-                                    {dataById.reimburse_detail.map(
+                                    {dataById.other_expenses_detail.map(
                                         (cad: any, i: number) => (
                                             <tr
                                                 className="text-center text-sm"
@@ -1937,53 +1937,53 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {dateFormat(
-                                                        cad.REIMBURSE_DETAIL_DATE,
+                                                        cad.OTHER_EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
                                                         "1" && "Peruntukan A"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
                                                         "2" && "Peruntukan B"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
                                                         "3" && "Peruntukan C"}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         1 && "Perusahaan A"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         2 && "Perusahaan B"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         3 && "Perusahaan C"}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_RELATION_NAME
+                                                        cad.OTHER_EXPENSES_DETAIL_RELATION_NAME
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        cad.OTHER_EXPENSES_DETAIL_RELATION_POSITION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_LOCATION
+                                                        cad.OTHER_EXPENSES_DETAIL_LOCATION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {formatCurrency.format(
-                                                        cad.REIMBURSE_DETAIL_AMOUNT
+                                                        cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !== null ? (
+                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !== null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
                                                             onClick={() =>
                                                                 handleFileDownload(
-                                                                    cad.REIMBURSE_DETAIL_ID
+                                                                    cad.OTHER_EXPENSES_DETAIL_ID
                                                                 )
                                                             }
                                                         >
@@ -1995,10 +1995,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 )}
                                                 <TD className="border">
                                                     <select
-                                                        name="REIMBURSE_DETAIL_STATUS"
-                                                        id="REIMBURSE_DETAIL_STATUS"
+                                                        name="OTHER_EXPENSES_DETAIL_STATUS"
+                                                        id="OTHER_EXPENSES_DETAIL_STATUS"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_STATUS
+                                                            cad.OTHER_EXPENSES_DETAIL_STATUS
                                                         }
                                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         onChange={(e) =>
@@ -2032,14 +2032,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_NOTE"
+                                                        id="OTHER_EXPENSES_DETAIL_NOTE"
                                                         type="text"
-                                                        name="REIMBURSE_DETAIL_NOTE"
+                                                        name="OTHER_EXPENSES_DETAIL_NOTE"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_NOTE
+                                                            cad.OTHER_EXPENSES_DETAIL_NOTE
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_NOTE"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_NOTE"
                                                         onChange={(e) =>
                                                             handleChangeApprove(
                                                                 e,
@@ -2062,7 +2062,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TD>
                                         <TD className="border text-center py-2">
                                             {formatCurrency.format(
-                                                dataById.REIMBURSE_TOTAL_AMOUNT
+                                                dataById.OTHER_EXPENSES_TOTAL_AMOUNT
                                             )}
                                         </TD>
                                     </tr>
@@ -2073,16 +2073,16 @@ export default function CashAdvance({ auth }: PageProps) {
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
-                                htmlFor="reimburse_request_note"
+                                htmlFor="other_expenses_request_note"
                                 value="Note"
                                 className="mb-2"
                             />
                             <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
+                                id="other_expenses_request_note"
+                                name="other_expenses_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.OTHER_EXPENSES_REQUEST_NOTE}
                                 readOnly
                             />
                         </div>
@@ -2201,8 +2201,8 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Revised Reimburse"
-                url={`/reimburseRevised/${dataById.REIMBURSE_ID}`}
+                title="Revised  Other Expenses"
+                url={`/otherExpensesRevised/${dataById.OTHER_EXPENSES_ID}`}
                 data={dataById}
                 method="patch"
                 onSuccess={handleSuccess}
@@ -2214,21 +2214,21 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
-                                    value="Reimburse Number"
+                                    htmlFor="other_expensesNumber"
+                                    value="Other Expenses Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="other_expensesNumber"
                                     type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
+                                    name="other_expensesNumber"
+                                    value={dataById.OTHER_EXPENSES_NUMBER}
                                     className=""
-                                    autoComplete="reimburseNumber"
+                                    autoComplete="other_expensesNumber"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            REIMBURSE_NUMBER: e.target.value,
+                                            OTHER_EXPENSES_NUMBER: e.target.value,
                                         })
                                     }
                                     readOnly
@@ -2240,12 +2240,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value="Type"
                                     className="mb-2"
                                 />
-                                {dataById.REIMBURSE_TYPE === 1 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 1 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         onChange={(e) =>
@@ -2257,12 +2257,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                         readOnly
                                     />
                                 )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 2 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         onChange={(e) =>
@@ -2289,7 +2289,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="namaPemohon"
                                     onChange={(e) =>
-                                        setData("reimburse_used_by", e.target.value)
+                                        setData("other_expenses_used_by", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -2308,7 +2308,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
-                                        setData("reimburse_requested_by", e.target.value)
+                                        setData("other_expenses_requested_by", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -2320,14 +2320,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburse_division"
+                                    id="other_expenses_division"
                                     type="text"
-                                    name="reimburse_division"
-                                    value={dataById.REIMBURSE_DIVISION}
+                                    name="other_expenses_division"
+                                    value={dataById.OTHER_EXPENSES_DIVISION}
                                     className=""
-                                    autoComplete="reimburse_division"
+                                    autoComplete="other_expenses_division"
                                     onChange={(e) =>
-                                        setData("reimburse_division", e.target.value)
+                                        setData("other_expenses_division", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -2343,7 +2343,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
+                                        dataById.OTHER_EXPENSES_REQUESTED_DATE,
                                         "dd-mm-yyyy"
                                     )}
                                     className=""
@@ -2372,7 +2372,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     autoComplete="namaPemberiApproval"
                                     onChange={(e) =>
                                         setData(
-                                            "reimburse_first_approval_by",
+                                            "other_expenses_first_approval_by",
                                             e.target.value
                                         )
                                     }
@@ -2432,7 +2432,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="border px-3 py-2"
                                             rowSpan={2}
                                         />
-                                        {dataById.reimburse_detail.length >
+                                        {dataById.other_expenses_detail.length >
                                             1 && (
                                             <TH
                                                 label="Action"
@@ -2457,7 +2457,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dataById.reimburse_detail.map(
+                                    {dataById.other_expenses_detail.map(
                                         (cad: any, i: number) => (
                                             <tr
                                                 className="text-center text-sm"
@@ -2468,14 +2468,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_DATE"
+                                                        id="OTHER_EXPENSES_DETAIL_DATE"
                                                         type="date"
-                                                        name="REIMBURSE_DETAIL_DATE"
+                                                        name="OTHER_EXPENSES_DETAIL_DATE"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_DATE
+                                                            cad.OTHER_EXPENSES_DETAIL_DATE
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_DATE"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_DATE"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2487,14 +2487,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 {/* <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_END_DATE"
+                                                        id="OTHER_EXPENSES_DETAIL_END_DATE"
                                                         type="date"
-                                                        name="REIMBURSE_DETAIL_END_DATE"
+                                                        name="OTHER_EXPENSES_DETAIL_END_DATE"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_END_DATE
+                                                            cad.OTHER_EXPENSES_DETAIL_END_DATE
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_END_DATE"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_END_DATE"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2506,11 +2506,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD> */}
                                                 <TD className="border">
                                                     <select
-                                                        id="REIMBURSE_DETAIL_PURPOSE"
-                                                        name="REIMBURSE_DETAIL_PURPOSE"
+                                                        id="OTHER_EXPENSES_DETAIL_PURPOSE"
+                                                        name="OTHER_EXPENSES_DETAIL_PURPOSE"
                                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_PURPOSE
+                                                            cad.OTHER_EXPENSES_DETAIL_PURPOSE
                                                         }
                                                         required
                                                         onChange={(e) =>
@@ -2535,11 +2535,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <select
-                                                        id="REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        name="REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID"
+                                                        id="OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID"
+                                                        name="OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID"
                                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID
+                                                            cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID
                                                         }
                                                         onChange={(e) =>
                                                             handleChangeRevised(
@@ -2573,14 +2573,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_RELATION_NAME"
+                                                        id="OTHER_EXPENSES_DETAIL_RELATION_NAME"
                                                         type="text"
-                                                        name="REIMBURSE_DETAIL_RELATION_NAME"
+                                                        name="OTHER_EXPENSES_DETAIL_RELATION_NAME"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_RELATION_NAME
+                                                            cad.OTHER_EXPENSES_DETAIL_RELATION_NAME
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_RELATION_NAME"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_RELATION_NAME"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2592,14 +2592,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_RELATION_POSITION"
+                                                        id="OTHER_EXPENSES_DETAIL_RELATION_POSITION"
                                                         type="text"
-                                                        name="REIMBURSE_DETAIL_RELATION_POSITION"
+                                                        name="OTHER_EXPENSES_DETAIL_RELATION_POSITION"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_RELATION_POSITION
+                                                            cad.OTHER_EXPENSES_DETAIL_RELATION_POSITION
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_RELATION_POSITION"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_RELATION_POSITION"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2611,14 +2611,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_LOCATION"
+                                                        id="OTHER_EXPENSES_DETAIL_LOCATION"
                                                         type="text"
-                                                        name="REIMBURSE_DETAIL_LOCATION"
+                                                        name="OTHER_EXPENSES_DETAIL_LOCATION"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_LOCATION
+                                                            cad.OTHER_EXPENSES_DETAIL_LOCATION
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_LOCATION"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_LOCATION"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2630,14 +2630,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
-                                                        id="REIMBURSE_DETAIL_AMOUNT"
+                                                        id="OTHER_EXPENSES_DETAIL_AMOUNT"
                                                         type="number"
-                                                        name="REIMBURSE_DETAIL_AMOUNT"
+                                                        name="OTHER_EXPENSES_DETAIL_AMOUNT"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_AMOUNT
+                                                            cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                         }
                                                         className="w-1/2 text-right"
-                                                        autoComplete="REIMBURSE_DETAIL_AMOUNT"
+                                                        autoComplete="OTHER_EXPENSES_DETAIL_AMOUNT"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2651,8 +2651,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <TD className="border">
                                                     <input
                                                         type="file"
-                                                        id="reimburse_detail_document_id"
-                                                        name="reimburse_detail_document_id"
+                                                        id="other_expenses_detail_document_id"
+                                                        name="other_expenses_detail_document_id"
                                                         className="bg-white leading-4"
                                                         onChange={(e) =>
                                                             handleUploadFileRevised(
@@ -2663,13 +2663,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_STATUS ===
                                                         0 && (
                                                         <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
                                                             Approve
                                                         </span>
                                                     )}
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_STATUS ===
                                                         1 && (
                                                         <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
                                                             Reject
@@ -2677,9 +2677,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border text-left px-3">
-                                                    {cad.REIMBURSE_DETAIL_NOTE}
+                                                    {cad.OTHER_EXPENSES_DETAIL_NOTE}
                                                 </TD>
-                                                {dataById.reimburse_detail
+                                                {dataById.other_expenses_detail
                                                     .length > 1 && (
                                                     <TD className="border">
                                                         <Button
@@ -2743,26 +2743,26 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </div>
                                             {checkedTransfer === true ? (
                                                 <TextInput
-                                                    id="REIMBURSE_TRANSFER_AMOUNT"
+                                                    id="OTHER_EXPENSES_TRANSFER_AMOUNT"
                                                     type="number"
-                                                    name="REIMBURSE_TRANSFER_AMOUNT"
-                                                    value={dataById.REIMBURSE_TRANSFER_AMOUNT}
+                                                    name="OTHER_EXPENSES_TRANSFER_AMOUNT"
+                                                    value={dataById.OTHER_EXPENSES_TRANSFER_AMOUNT}
                                                     className="w-full lg:w-1/4 text-right"
                                                     placeholder="0"
                                                     onChange={(e) =>
                                                         setDataById({
                                                             ...dataById,
-                                                            REIMBURSE_TRANSFER_AMOUNT: e.target.value,
+                                                            OTHER_EXPENSES_TRANSFER_AMOUNT: e.target.value,
                                                         })
                                                     }
                                                     required
                                                 />
                                             ) : (
                                                 <TextInput
-                                                    id="REIMBURSE_TRANSFER_AMOUNT"
+                                                    id="OTHER_EXPENSES_TRANSFER_AMOUNT"
                                                     type="number"
-                                                    name="REIMBURSE_TRANSFER_AMOUNT"
-                                                    value={dataById.REIMBURSE_TRANSFER_AMOUNT}
+                                                    name="OTHER_EXPENSES_TRANSFER_AMOUNT"
+                                                    value={dataById.OTHER_EXPENSES_TRANSFER_AMOUNT}
                                                     className="w-full lg:w-1/4 text-right"
                                                     placeholder="0"
                                                     // required
@@ -2804,26 +2804,26 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </div>
                                             {checkedCash === true ? (
                                                 <TextInput
-                                                    id="REIMBURSE_CASH_AMOUNT"
+                                                    id="OTHER_EXPENSES_CASH_AMOUNT"
                                                     type="number"
-                                                    name="REIMBURSE_CASH_AMOUNT"
-                                                    value={dataById.REIMBURSE_CASH_AMOUNT}
+                                                    name="OTHER_EXPENSES_CASH_AMOUNT"
+                                                    value={dataById.OTHER_EXPENSES_CASH_AMOUNT}
                                                     className="w-5/12 lg:w-1/4 text-right ml-9"
                                                     placeholder="0"
                                                     onChange={(e) =>
                                                         setDataById({
                                                             ...dataById,
-                                                            REIMBURSE_CASH_AMOUNT: e.target.value,
+                                                            OTHER_EXPENSES_CASH_AMOUNT: e.target.value,
                                                         })
                                                     }
                                                     required
                                                 />
                                             ) : (
                                                 <TextInput
-                                                    id="REIMBURSE_CASH_AMOUNT"
+                                                    id="OTHER_EXPENSES_CASH_AMOUNT"
                                                     type="number"
-                                                    name="REIMBURSE_CASH_AMOUNT"
-                                                    value={dataById.REIMBURSE_CASH_AMOUNT}
+                                                    name="OTHER_EXPENSES_CASH_AMOUNT"
+                                                    value={dataById.OTHER_EXPENSES_CASH_AMOUNT}
                                                     className="w-5/12 lg:w-1/4 text-right ml-9"
                                                     placeholder="0"
                                                     // onChange={(e) =>
@@ -2841,16 +2841,16 @@ export default function CashAdvance({ auth }: PageProps) {
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
-                                htmlFor="reimburse_request_note"
+                                htmlFor="other_expenses_request_note"
                                 value="Note"
                                 className="mb-2"
                             />
                             <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
+                                id="other_expenses_request_note"
+                                name="other_expenses_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.OTHER_EXPENSES_REQUEST_NOTE}
                                 readOnly
                             />
                         </div>
@@ -2929,8 +2929,8 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Execute Reimburse"
-                url={`/reimburseApprove/${dataById.REIMBURSE_ID}`}
+                title="Execute  Other Expenses"
+                url={`/otherExpensesApprove/${dataById.OTHER_EXPENSES_ID}`}
                 data={dataById}
                 method="patch"
                 onSuccess={handleSuccess}
@@ -2942,17 +2942,17 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
-                                    value="Reimburse Number"
+                                    htmlFor="other_expensesNumber"
+                                    value="Other Expenses Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="other_expensesNumber"
                                     type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
+                                    name="other_expensesNumber"
+                                    value={dataById.OTHER_EXPENSES_NUMBER}
                                     className=""
-                                    autoComplete="reimburseNumber"
+                                    autoComplete="other_expensesNumber"
                                     readOnly
                                 />
                             </div>
@@ -2962,23 +2962,23 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value="Type"
                                     className="mb-2"
                                 />
-                                {dataById.REIMBURSE_TYPE === 1 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 1 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         readOnly
                                     />
                                 )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
+                                {dataById.OTHER_EXPENSES_TYPE === 2 && (
                                     <TextInput
                                         id="tipe"
                                         type="text"
                                         name="tipe"
-                                        value={"Reimburse"}
+                                        value={" Other Expenses"}
                                         className=""
                                         autoComplete="tipe"
                                         readOnly
@@ -3027,7 +3027,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="divisi"
                                     type="text"
                                     name="divisi"
-                                    value={dataById.REIMBURSE_DIVISION}
+                                    value={dataById.OTHER_EXPENSES_DIVISION}
                                     className=""
                                     autoComplete="divisi"
                                     readOnly
@@ -3044,7 +3044,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="TEXT"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
+                                        dataById.OTHER_EXPENSES_REQUESTED_DATE,
                                         "dd-mm-yyyy"
                                     )}
                                     className=""
@@ -3137,7 +3137,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>{" "}
                                 <tbody id="form_table">
-                                    {dataById.reimburse_detail.map(
+                                    {dataById.other_expenses_detail.map(
                                         (cad: any, i: number) => (
                                             <tr
                                                 className="text-center text-sm"
@@ -3148,53 +3148,53 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {dateFormat(
-                                                        cad.REIMBURSE_DETAIL_DATE,
+                                                        cad.OTHER_EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
                                                         "1" && "Peruntukan A"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
                                                         "2" && "Peruntukan B"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
                                                         "3" && "Peruntukan C"}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         1 && "Perusahaan A"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         2 && "Perusahaan B"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         3 && "Perusahaan C"}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_RELATION_NAME
+                                                        cad.OTHER_EXPENSES_DETAIL_RELATION_NAME
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        cad.OTHER_EXPENSES_DETAIL_RELATION_POSITION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.REIMBURSE_DETAIL_LOCATION
+                                                        cad.OTHER_EXPENSES_DETAIL_LOCATION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {formatCurrency.format(
-                                                        cad.REIMBURSE_DETAIL_AMOUNT
+                                                        cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !== null ? (
+                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !== null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
                                                             onClick={() =>
                                                                 handleFileDownload(
-                                                                    cad.REIMBURSE_DETAIL_ID
+                                                                    cad.OTHER_EXPENSES_DETAIL_ID
                                                                 )
                                                             }
                                                         >
@@ -3205,13 +3205,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <TD className="border px-3 py-2">-</TD>
                                                 )}
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_STATUS ===
                                                         0 && (
                                                         <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
                                                             Approve
                                                         </span>
                                                     )}
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
+                                                    {cad.OTHER_EXPENSES_DETAIL_STATUS ===
                                                         1 && (
                                                         <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
                                                             Reject
@@ -3219,7 +3219,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border">
-                                                    {cad.REIMBURSE_DETAIL_NOTE}
+                                                    {cad.OTHER_EXPENSES_DETAIL_NOTE}
                                                 </TD>
                                             </tr>
                                         )
@@ -3235,7 +3235,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TD>
                                         <TD className="border text-center py-2">
                                             {formatCurrency.format(
-                                                dataById.REIMBURSE_TOTAL_AMOUNT
+                                                dataById.OTHER_EXPENSES_TOTAL_AMOUNT
                                             )}
                                         </TD>
                                     </tr>
@@ -3244,7 +3244,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         </div>
                         {/* Table form end */}
 
-                        <div className="mt-10">
+                        {/* <div className="mt-10">
                             <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
                                 <legend className="ml-12 bg-gray-300 px-3 font-medium">Delivery Method</legend>
                                 <div className="mt-4 mx-5 space-y-5">
@@ -3265,16 +3265,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </label>
                                             </div>
                                             <TextInput
-                                                id="REIMBURSE_TRANSFER_AMOUNT"
+                                                id="OTHER_EXPENSES_TRANSFER_AMOUNT"
                                                 type="number"
-                                                name="REIMBURSE_TRANSFER_AMOUNT"
-                                                value={dataById.REIMBURSE_TRANSFER_AMOUNT}
+                                                name="OTHER_EXPENSES_TRANSFER_AMOUNT"
+                                                value={dataById.OTHER_EXPENSES_TRANSFER_AMOUNT}
                                                 className="w-full lg:w-1/4 text-right"
                                                 placeholder="0"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        REIMBURSE_TRANSFER_AMOUNT: e.target.value,
+                                                        OTHER_EXPENSES_TRANSFER_AMOUNT: e.target.value,
                                                     })
                                                 }
                                                 required
@@ -3297,21 +3297,21 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <div className="ml-7">
                                         <div className="mb-5">
                                             <InputLabel
-                                                htmlFor="reimburse_transfer_date"
+                                                htmlFor="other_expenses_transfer_date"
                                                 className="mb-2"
                                             >
                                                 Transfer Date
                                                 <span className="text-red-600">*</span>
                                             </InputLabel>
                                             <TextInput
-                                                id="reimburse_transfer_date"
+                                                id="other_expenses_transfer_date"
                                                 type="date"
-                                                name="reimburse_transfer_date"
-                                                value={data.reimburse_transfer_date}
+                                                name="other_expenses_transfer_date"
+                                                value={data.other_expenses_transfer_date}
                                                 className="w-full lg:w-7/12"    
                                                 onChange={(e) =>
                                                     setData(
-                                                        "reimburse_transfer_date",
+                                                        "other_expenses_transfer_date",
                                                         e.target.value
                                                     )
                                                 }
@@ -3320,16 +3320,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </div>
                                         <div className="mb-5">
                                             <InputLabel
-                                                htmlFor="reimburse_from_bank_account"
+                                                htmlFor="other_expenses_from_bank_account"
                                                 className="mb-2"
                                             >
                                                 From Bank Account
                                                 <span className="text-red-600">*</span>
                                             </InputLabel>
-                                            <select name="reimburse_from_bank_account" id="reimburse_from_bank_account" className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            <select name="other_expenses_from_bank_account" id="other_expenses_from_bank_account" className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             onChange={(e) =>
                                                 setData(
-                                                    "reimburse_from_bank_account",
+                                                    "other_expenses_from_bank_account",
                                                     e.target.value
                                                 )
                                             }
@@ -3357,16 +3357,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </label>
                                             </div>
                                             <TextInput
-                                                id="REIMBURSE_CASH_AMOUNT"
+                                                id="OTHER_EXPENSES_CASH_AMOUNT"
                                                 type="number"
-                                                name="REIMBURSE_CASH_AMOUNT"
-                                                value={dataById.REIMBURSE_CASH_AMOUNT}
+                                                name="OTHER_EXPENSES_CASH_AMOUNT"
+                                                value={dataById.OTHER_EXPENSES_CASH_AMOUNT}
                                                 className="w-full lg:w-6/12 text-right ml-9"
                                                 placeholder="0"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        REIMBURSE_CASH_AMOUNT: e.target.value,
+                                                        OTHER_EXPENSES_CASH_AMOUNT: e.target.value,
                                                     })
                                                 }
                                                 required
@@ -3376,22 +3376,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <div className="ml-7">
                                         <div className="mb-5">
                                             <InputLabel
-                                                htmlFor="reimburse_receive_date"
+                                                htmlFor="other_expenses_receive_date"
                                                 className="mb-2"
                                             >
                                                 Receive Date
                                                 <span className="text-red-600">*</span>
                                             </InputLabel>
                                             <TextInput
-                                                id="reimburse_receive_date"
+                                                id="other_expenses_receive_date"
                                                 type="date"
-                                                name="reimburse_receive_date"
-                                                value={data.reimburse_receive_date}
+                                                name="other_expenses_receive_date"
+                                                value={data.other_expenses_receive_date}
                                                 className="w-full lg:w-7/12"
                                                 placeholder="Bank Account"
                                                 onChange={(e) =>
                                                     setData(
-                                                        "reimburse_receive_date",
+                                                        "other_expenses_receive_date",
                                                         e.target.value
                                                     )
                                                 }
@@ -3407,14 +3407,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <span className="text-red-600">*</span>
                                             </InputLabel>
                                             <TextInput
-                                                id="reimburse_receive_name"
+                                                id="other_expenses_receive_name"
                                                 type="text"
-                                                name="reimburse_receive_name"
-                                                value={data.reimburse_receive_name}
+                                                name="other_expenses_receive_name"
+                                                value={data.other_expenses_receive_name}
                                                 className="w-full lg:w-7/12"
                                                 onChange={(e) =>
                                                     setData(
-                                                        "reimburse_receive_name",
+                                                        "other_expenses_receive_name",
                                                         e.target.value
                                                     )
                                                 }
@@ -3424,20 +3424,20 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </div>
                                 </div>
                             </fieldset>
-                        </div>
+                        </div> */}
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
-                                htmlFor="reimburse_request_note"
+                                htmlFor="other_expenses_request_note"
                                 value="Note"
                                 className="mb-2"
                             />
                             <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
+                                id="other_expenses_request_note"
+                                name="other_expenses_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.OTHER_EXPENSES_REQUEST_NOTE}
                                 readOnly
                             />
                         </div>
@@ -3504,8 +3504,8 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title={"Report Reimburse"}
-                url={`/reimburseReport`}
+                title={"Report  Other Expenses"}
+                url={`/otherExpensesReport`}
                 data={data}
                 onSuccess={handleSuccess}
                 panelWidth={"65%"}
@@ -3514,31 +3514,31 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
+                                    htmlFor="other_expensesNumber"
                                     className="mb-2"
                                 >
-                                    Reimburse Number{" "}
+                                    Other Expenses Number{" "}
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <select
-                                    id="reimburseNumber"
-                                    name="reimburseNumber"
+                                    id="other_expensesNumber"
+                                    name="other_expensesNumber"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
                                         setData(
-                                            "reimburse_number",
+                                            "other_expenses_number",
                                             e.target.value
                                         )
                                     }
                                     required
                                 >
-                                    <option value="">-- Choose Reimburse --</option>
-                                    {CANumber.map((ca: any) => (
+                                    <option value="">-- Choose  Other Expenses --</option>
+                                    {OtherExpensesNumber.map((ca: any) => (
                                         <option
-                                            key={ca.REIMBURSE_ID}
-                                            value={ca.REIMBURSE_ID}
+                                            key={ca.OTHER_EXPENSES_ID}
+                                            value={ca.OTHER_EXPENSES_ID}
                                         >
-                                            {ca.REIMBURSE_NUMBER}
+                                            {ca.OTHER_EXPENSES_NUMBER}
                                         </option>
                                     ))}
                                 </select>
@@ -3587,7 +3587,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
                                         setData(
-                                            "reimburse_first_approval_by",
+                                            "other_expenses_first_approval_by",
                                             e.target.value
                                         )
                                     }
@@ -3681,12 +3681,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <TD className="border">{i + 1}.</TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_date"
+                                                    id="other_expenses_detail_date"
                                                     type="date"
-                                                    name="reimburse_detail_date"
-                                                    value={val.reimburse_detail_date}
+                                                    name="other_expenses_detail_date"
+                                                    value={val.other_expenses_detail_date}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_date"
+                                                    autoComplete="other_expenses_detail_date"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -3697,12 +3697,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_end_date"
+                                                    id="other_expenses_detail_end_date"
                                                     type="date"
-                                                    name="reimburse_detail_end_date"
-                                                    value={val.reimburse_detail_end_date}
+                                                    name="other_expenses_detail_end_date"
+                                                    value={val.other_expenses_detail_end_date}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_end_date"
+                                                    autoComplete="other_expenses_detail_end_date"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -3713,8 +3713,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                             <select
-                                                    id="reimburse_detail_purpose"
-                                                    name="reimburse_detail_purpose"
+                                                    id="other_expenses_detail_purpose"
+                                                    name="other_expenses_detail_purpose"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     required
                                                     onChange={(e) =>
@@ -3739,8 +3739,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <select
-                                                    id="reimburse_detail_relation_organization_id"
-                                                    name="reimburse_detail_relation_organization_id"
+                                                    id="other_expenses_detail_relation_organization_id"
+                                                    name="other_expenses_detail_relation_organization_id"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
@@ -3771,12 +3771,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_relation_name"
+                                                    id="other_expenses_detail_relation_name"
                                                     type="text"
-                                                    name="reimburse_detail_relation_name"
-                                                    value={val.reimburse_detail_relation_name}
+                                                    name="other_expenses_detail_relation_name"
+                                                    value={val.other_expenses_detail_relation_name}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_name"
+                                                    autoComplete="other_expenses_detail_relation_name"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -3787,12 +3787,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_relation_position"
+                                                    id="other_expenses_detail_relation_position"
                                                     type="text"
-                                                    name="reimburse_detail_relation_position"
-                                                    value={val.reimburse_detail_relation_position}
+                                                    name="other_expenses_detail_relation_position"
+                                                    value={val.other_expenses_detail_relation_position}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_position"
+                                                    autoComplete="other_expenses_detail_relation_position"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -3803,12 +3803,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_location"
+                                                    id="other_expenses_detail_location"
                                                     type="text"
-                                                    name="reimburse_detail_location"
-                                                    value={val.reimburse_detail_location}
+                                                    name="other_expenses_detail_location"
+                                                    value={val.other_expenses_detail_location}
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_location"
+                                                    autoComplete="other_expenses_detail_location"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -3819,12 +3819,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
-                                                    id="reimburse_detail_amount"
+                                                    id="other_expenses_detail_amount"
                                                     type="number"
-                                                    name="reimburse_detail_amount"
-                                                    value={val.reimburse_detail_amount}
+                                                    name="other_expenses_detail_amount"
+                                                    value={val.other_expenses_detail_amount}
                                                     className="w-1/2 text-right"
-                                                    autoComplete="reimburse_detail_amount"
+                                                    autoComplete="other_expenses_detail_amount"
                                                     placeholder="0"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
@@ -3837,8 +3837,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <TD className="border">
                                                 <input
                                                     type="file"
-                                                    id="reimburse_detail_document_id"
-                                                    name="reimburse_detail_document_id"
+                                                    id="other_expenses_detail_document_id"
+                                                    name="other_expenses_detail_document_id"
                                                     className="bg-white leading-4"
                                                     multiple
                                                     onChange={(e) =>
@@ -3897,18 +3897,18 @@ export default function CashAdvance({ auth }: PageProps) {
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
-                                htmlFor="reimburse_request_note"
+                                htmlFor="other_expenses_request_note"
                                 value="Note"
                                 className="mb-2"
                             />
                             <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
+                                id="other_expenses_request_note"
+                                name="other_expenses_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={data.reimburse_request_note}
+                                value={data.other_expenses_request_note}
                                 onChange={(e) =>
-                                    setData("reimburse_request_note", e.target.value)
+                                    setData("other_expenses_request_note", e.target.value)
                                 }
                                 readOnly
                                 //
@@ -3968,7 +3968,7 @@ export default function CashAdvance({ auth }: PageProps) {
             />
             {/* Modal Report End */}
 
-            {/* Modal Search Reimburse */}
+            {/* Modal Search  Other Expenses */}
             <ModalSearch
                 show={modal.search}
                 onClose={() =>
@@ -3985,29 +3985,29 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title={"Search Reimburse"}
+                title={"Search  Other Expenses"}
                 submitButtonName={"Search"}
                 onAction={() => {
-                    getReimburse();
+                    getOtherExpenses();
                 }}
                 isLoading={isLoading}
                 body={
                     <>
                         <div className="mb-4">
                             <InputLabel
-                                htmlFor="REIMBURSE_NUMBER"
-                                value="Reimburse Number"
+                                htmlFor="OTHER_EXPENSES_NUMBER"
+                                value="Other Expenses Number"
                             />
                             <TextInput
-                                id="REIMBURSE_NUMBER"
+                                id="OTHER_EXPENSES_NUMBER"
                                 type="text"
-                                name="REIMBURSE_NUMBER"
-                                value={searchReimburse.REIMBURSE_NUMBER}
+                                name="OTHER_EXPENSES_NUMBER"
+                                value={searchOtherExpenses.OTHER_EXPENSES_NUMBER}
                                 className=""
                                 onChange={(e) =>
-                                    setSearchReimburse({
-                                        ...searchReimburse,
-                                        REIMBURSE_NUMBER: e.target.value,
+                                    setSearchOtherExpenses({
+                                        ...searchOtherExpenses,
+                                        OTHER_EXPENSES_NUMBER: e.target.value,
                                     })
                                 }
                             />
@@ -4015,9 +4015,9 @@ export default function CashAdvance({ auth }: PageProps) {
                     </>
                 }
             />
-            {/* End Modal Search Reimburse */}
+            {/* End Modal Search  Other Expenses */}
 
-            {/* Modal Search Reimburse Report */}
+            {/* Modal Search  Other Expenses Report */}
             {/* <ModalSearch
                 show={modal.search_ca_report}
                 onClose={() =>
@@ -4034,7 +4034,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title={"Search Reimburse Report"}
+                title={"Search  Other Expenses Report"}
                 submitButtonName={"Search"}
                 onAction={() => getReportCA()}
                 isLoading={isLoading}
@@ -4042,19 +4042,19 @@ export default function CashAdvance({ auth }: PageProps) {
                     <>
                         <div className="mb-4">
                             <InputLabel
-                                htmlFor="REIMBURSE_NUMBER"
-                                value="Reimburse Number"
+                                htmlFor="OTHER_EXPENSES_NUMBER"
+                                value="Other Expenses Number"
                             />
                             <TextInput
-                                id="REIMBURSE_NUMBER"
+                                id="OTHER_EXPENSES_NUMBER"
                                 type="text"
-                                name="REIMBURSE_NUMBER"
-                                value={searchReimburse.REIMBURSE_NUMBER}
+                                name="OTHER_EXPENSES_NUMBER"
+                                value={searchOtherExpenses.OTHER_EXPENSES_NUMBER}
                                 className=""
                                 onChange={(e) =>
-                                    setSearchReimburse({
-                                        ...searchReimburse,
-                                        REIMBURSE_NUMBER: e.target.value,
+                                    setSearchOtherExpenses({
+                                        ...searchOtherExpenses,
+                                        OTHER_EXPENSES_NUMBER: e.target.value,
                                     })
                                 }
                             />
@@ -4062,7 +4062,7 @@ export default function CashAdvance({ auth }: PageProps) {
                     </>
                 }
             /> */}
-            {/* End Modal Search Reimburse Report */}
+            {/* End Modal Search  Other Expenses Report */}
 
             {/* Content Start */}
             {/* <div className="max-w-0xl mx-auto sm:px-6 lg:px-0"> */}
@@ -4101,7 +4101,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 });
                             }}
                         >
-                            {"Add Reimburse"}
+                            {"Add  Other Expenses"}
                         </Button>
                     </div>
                 </div>
@@ -4130,13 +4130,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                         className="mx-2 h-5 w-5 text-gray-400"
                                         aria-hidden="true"
                                     />
-                                    Search Reimburse
+                                    Search  Other Expenses
                                 </button>
                             </div>
                             <div className="flex justify-center items-center">
                                 <Button
                                     className="mb-4 w-40 py-1.5 px-2"
-                                    onClick={() => clearSearchReimburse()}
+                                    onClick={() => clearSearchOtherExpenses()}
                                 >
                                     Clear Search
                                 </Button>
@@ -4204,7 +4204,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
-                                            label={"Reimburse Number"}
+                                            label={"Other Expenses Number"}
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
@@ -4229,17 +4229,17 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {reimburse.data === undefined && (
+                                    {other_expenses.data === undefined && (
                                         <tr>
                                             <TD
                                                 className="leading-10 text-gray-500"
                                                 colSpan="6"
                                             >
-                                                Please Search Reimburse
+                                                Please Search  Other Expenses
                                             </TD>
                                         </tr>
                                     )}
-                                    {reimburse.data?.length === 0 ? (
+                                    {other_expenses.data?.length === 0 ? (
                                         <tr>
                                             <TD
                                                 className="leading-10 text-gray-500"
@@ -4249,7 +4249,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </TD>
                                         </tr>
                                     ) : (
-                                        reimburse.data?.map(
+                                        other_expenses.data?.map(
                                             (ca: any, i: number) => (
                                                 <tr
                                                     key={i}
@@ -4265,7 +4265,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                     <TableTD
                                                         value={
-                                                            ca.REIMBURSE_NUMBER
+                                                            ca.OTHER_EXPENSES_NUMBER
                                                         }
                                                         className=""
                                                     />
@@ -4275,14 +4275,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 /> */}
                                                     <TableTD
                                                         value={dateFormat(
-                                                            ca.REIMBURSE_REQUESTED_DATE,
+                                                            ca.OTHER_EXPENSES_REQUESTED_DATE,
                                                             "dd mmmm yyyy"
                                                         )}
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={formatCurrency.format(
-                                                            ca.REIMBURSE_TOTAL_AMOUNT
+                                                            ca.OTHER_EXPENSES_TOTAL_AMOUNT
                                                         )}
                                                         className=""
                                                     />
@@ -4384,7 +4384,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleApproveModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.OTHER_EXPENSES_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4398,7 +4398,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleShowModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.OTHER_EXPENSES_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4412,7 +4412,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleRevisedModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.OTHER_EXPENSES_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4426,7 +4426,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleExecuteModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.OTHER_EXPENSES_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4446,12 +4446,12 @@ export default function CashAdvance({ auth }: PageProps) {
                             </table>
                         </div>
                         <Pagination
-                            links={reimburse.links}
-                            fromData={reimburse.from}
-                            toData={reimburse.to}
-                            totalData={reimburse.total}
+                            links={other_expenses.links}
+                            fromData={other_expenses.from}
+                            toData={other_expenses.to}
+                            totalData={other_expenses.total}
                             clickHref={(url: string) =>
-                                getReimburse(url.split("?").pop())
+                                getOtherExpenses(url.split("?").pop())
                             }
                         />
                     </div>

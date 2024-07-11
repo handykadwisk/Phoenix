@@ -10,11 +10,11 @@ class CashAdvanceDetail extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'EXPENSES_DETAIL_ID';
+    protected $primaryKey = 'CASH_ADVANCE_DETAIL_ID';
 
     protected $table = 't_cash_advance_detail';
 
-    protected $guarded = ['EXPENSES_DETAIL_ID'];
+    protected $guarded = ['CASH_ADVANCE_DETAIL_ID'];
 
     protected $with = ['document'];
 
@@ -25,6 +25,6 @@ class CashAdvanceDetail extends Model
 
     public function document(): BelongsTo
     {
-        return $this->belongsTo(Document::class, 'EXPENSES_DETAIL_DOCUMENT_ID');
+        return $this->belongsTo(Document::class, 'CASH_ADVANCE_DETAIL_DOCUMENT_ID');
     }
 }

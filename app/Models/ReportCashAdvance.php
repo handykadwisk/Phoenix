@@ -14,4 +14,6 @@ class ReportCashAdvance extends Model
     protected $table = 't_report_cash_advance';
 
     protected $guarded = ['REPORT_CASH_ADVANCE_ID'];
+
+    public $timestamps = false;
 }
