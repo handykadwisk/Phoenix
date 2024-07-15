@@ -259,7 +259,7 @@ class OtherExpensesController extends Controller
                 $parentDir = ((floor(($other_expenses_detail_id) / 1000)) * 1000) . '/';
                 $CAId = $other_expenses_detail_id . '/';
                 $typeDir = '';
-                $uploadPath = 'documents/' . 'CA/'. $parentDir . $CAId . $typeDir;
+                $uploadPath = 'documents/' . 'OtherExpenses/'. $parentDir . $CAId . $typeDir;
 
                 $userId = Auth::user()->id;
                 $documentOriginalName =  $this->RemoveSpecialChar($file[$key]['other_expenses_detail_document_id']->getClientOriginalName());

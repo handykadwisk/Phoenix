@@ -16,7 +16,7 @@ return new class extends Migration
             $table->smallInteger('CASH_ADVANCE_ID')->nullable();
             $table->date('CASH_ADVANCE_DETAIL_START_DATE')->nullable();
             $table->date('CASH_ADVANCE_DETAIL_END_DATE')->nullable();
-            $table->text('CASH_ADVANCE_DETAIL_PURPOSE')->nullable();
+            $table->smallInteger('CASH_ADVANCE_DETAIL_PURPOSE')->nullable();
             $table->text('CASH_ADVANCE_DETAIL_LOCATION')->nullable();
             $table->smallInteger('CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID')->nullable();
             $table->string('CASH_ADVANCE_DETAIL_RELATION_NAME')->nullable();

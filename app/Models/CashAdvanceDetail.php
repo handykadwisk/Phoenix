@@ -16,7 +16,7 @@ class CashAdvanceDetail extends Model
 
     protected $guarded = ['CASH_ADVANCE_DETAIL_ID'];
 
-    protected $with = ['document'];
+    protected $with = ['document', 'purpose'];
 
     public function cash_advance(): BelongsTo
     {
@@ -26,5 +26,10 @@ class CashAdvanceDetail extends Model
     public function document(): BelongsTo
     {
         return $this->belongsTo(Document::class, 'CASH_ADVANCE_DETAIL_DOCUMENT_ID');
+    }
+
+    public function purpose(): BelongsTo
+    {
+        return $this->belongsTo(CashAdvancePurpose::class, 'CASH_ADVANCE_DETAIL_PURPOSE');
     }
 }

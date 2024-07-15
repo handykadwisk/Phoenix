@@ -259,7 +259,7 @@ class ReimburseController extends Controller
                 $parentDir = ((floor(($reimburse_detail_id) / 1000)) * 1000) . '/';
                 $CAId = $reimburse_detail_id . '/';
                 $typeDir = '';
-                $uploadPath = 'documents/' . 'CA/'. $parentDir . $CAId . $typeDir;
+                $uploadPath = 'documents/' . 'Reimburse/'. $parentDir . $CAId . $typeDir;
 
                 $userId = Auth::user()->id;
                 $documentOriginalName =  $this->RemoveSpecialChar($file[$key]['reimburse_detail_document_id']->getClientOriginalName());

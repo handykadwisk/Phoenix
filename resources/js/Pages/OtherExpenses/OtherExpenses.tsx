@@ -4152,13 +4152,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                 </div>
                                 <div className="flex relative">
                                     <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
-                                        Approved
+                                        Approve 1
                                         <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
                                             0
                                         </span>
                                     </Button>
                                 </div>
-                                {/* <div className="flex relative">
+                                <div className="flex relative">
                                     <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
                                         Approve 2
                                         <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
@@ -4173,7 +4173,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             0
                                         </span>
                                     </Button>
-                                </div> */}
+                                </div>
                                 <div className="flex relative">
                                     <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
                                         Need Revision
@@ -4218,10 +4218,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="min-w-[50px]"
                                             label={"Status"}
                                         />
-                                        {/* <TableTH
+                                        <TableTH
                                             className="min-w-[50px]"
-                                            label={"Report"}
-                                        /> */}
+                                            label={"Approve 1"}
+                                        />
+                                        <TableTH
+                                            className="min-w-[50px]"
+                                            label={"Approve 2"}
+                                        />
+                                        <TableTH
+                                            className="min-w-[50px]"
+                                            label={"Approve 3"}
+                                        />
                                         <TableTH
                                             className={"min-w-[50px]"}
                                             label={"Action"}
@@ -4233,7 +4241,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <tr>
                                             <TD
                                                 className="leading-10 text-gray-500"
-                                                colSpan="6"
+                                                colSpan="9"
                                             >
                                                 Please Search  Other Expenses
                                             </TD>
@@ -4243,7 +4251,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <tr>
                                             <TD
                                                 className="leading-10 text-gray-500"
-                                                colSpan="6"
+                                                colSpan="9"
                                             >
                                                 Data not available
                                             </TD>
@@ -4269,10 +4277,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         }
                                                         className=""
                                                     />
-                                                    {/* <TableTD
-                                                    value={ca.DIVISION}
-                                                    className=""
-                                                /> */}
                                                     <TableTD
                                                         value={dateFormat(
                                                             ca.OTHER_EXPENSES_REQUESTED_DATE,
@@ -4366,10 +4370,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             className=""
                                                         />
                                                     )}
-                                                    {/* <TableTD
+                                                    <TableTD
                                                         value=""
                                                         className=""
-                                                    /> */}
+                                                    />
+                                                    <TableTD
+                                                        value=""
+                                                        className=""
+                                                    />
+                                                    <TableTD
+                                                        value=""
+                                                        className=""
+                                                    />
                                                     <TableTD
                                                         value={
                                                             <Dropdown

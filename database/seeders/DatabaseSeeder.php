@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceStatus;
 use App\Models\User;
 use App\Models\Menu;
@@ -162,14 +163,6 @@ class DatabaseSeeder extends Seeder
         );
         User::create(
             [
-                'name' => 'User',
-                'email' => 'user@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
-        User::create(
-            [
                 'name' => 'Fadhlan',
                 'email' => 'fadhlan@email.com',
                 'password' => bcrypt('12345678'),
@@ -188,6 +181,30 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Pian',
                 'email' => 'pian@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Fitano',
+                'email' => 'fitano@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Mei',
+                'email' => 'mei@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Apep',
+                'email' => 'apep@email.com',
                 'password' => bcrypt('12345678'),
                 'role_id' => $user->id
             ]
@@ -294,5 +311,52 @@ class DatabaseSeeder extends Seeder
             'CA_STATUS_ID' => 5,
             'CA_STATUS_NAME' => 'Pending Report'
         ]);
+
+        // Created Cash Advance Purpose
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Biaya Perjalanan Dinas (Sesuai SK)'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Makan'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Hotel'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Pesawat'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Kereta Api'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Kapal Laut'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Travel'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Transportasi Lainnya'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Perjamuan'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Kegiatan Olahraga'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Lain - lain'
+        ]);
+
+        
     }
 }
