@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Installment;
 use App\Models\InsurancePanel;
 use App\Models\MEndorsementPremium;
+use App\Models\MInsurerCoverage;
 use App\Models\MPolicyPremium;
 use App\Models\Policy;
 use App\Models\PolicyInstallment;
@@ -149,6 +150,113 @@ class InsurancePanelController extends Controller
         // dd($request->policy_number);
         $data = $this->getInsurancPanelData(10, $request);
         return response()->json($data);
+
+    }
+
+    public function insertManyInsurer(Request $request) {
+        
+        foreach ($request->input() as $req => $value) {
+            $insurancePanel = InsurancePanel::insertGetId([
+                'POLICY_ID'         => $value['POLICY_ID'], // Belum ada isi
+                'INSURANCE_ID'       => $value['INSURANCE_ID'],
+                'IP_POLICY_SHARE'   => $value['IP_POLICY_SHARE'],
+                'IP_POLICY_LEADER'  => $value['IP_POLICY_LEADER'],
+                'POLICY_COST'       => $value['POLICY_COST'],
+                'IP_CREATED_BY'     => Auth::user()->id
+            ]);
+
+            foreach ($value['premium'] as $key => $cover) {
+                $insurerCoverage = MInsurerCoverage::insertGetId([
+                    'IP_ID'             =>  $insurancePanel,
+                    'ACQUISITION_COST'  => $cover['ACQUISITION_COST'], // Belum ada isi
+                    'ADMIN_COST'  => $cover['ADMIN_COST'],
+                    'AGENT_COMMISION'  => $cover['AGENT_COMMISION'],
+                    'BROKERAGE_FEE'  => $cover['BROKERAGE_FEE'],
+                    'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
+                    'COVERAGE_NAME'  => $cover['COVERAGE_NAME'],
+                    'CURRENCY_ID'  => $cover['CURRENCY_ID'],
+                    'DISC_ADMIN'  => $cover['DISC_ADMIN'],
+                    'DISC_BROKER'  => $cover['DISC_BROKER'],
+                    'DISC_CONSULTATION'  => $cover['DISC_CONSULTATION'],
+                    'ENGINEERING_FEE'  => $cover['ENGINEERING_FEE'],
+                    'FEE_BASED_INCOME'  => $cover['FEE_BASED_INCOME'],
+                    'GROSS_PREMI'  => $cover['GROSS_PREMI'],
+                    'NETT_PREMI'  => $cover['NETT_PREMI'],
+                    'POLICY_COVERAGE_ID'  => $cover['POLICY_COVERAGE_ID']
+                ]);
+            }
+        }
+
+        
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Add Insurer.",
+                "module"      => "Add Insurer",
+                "id"          => $request->id
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            'Create Insurer Succeed.'
+        ], 200, [
+            'X-Inertia' => true
+        ]);
+
+    }
+
+    public function editManyInsurer(Request $request) {
+        // dd($request->input());
+        foreach ($request->input() as $req => $value) {
+            $insurer = InsurancePanel::where('IP_ID', $value['IP_ID'])
+                        ->update([
+                            'POLICY_ID'         => $value['POLICY_ID'], 
+                            'INSURANCE_ID'      => $value['INSURANCE_ID'],
+                            'IP_POLICY_SHARE'   => $value['IP_POLICY_SHARE'],
+                            'IP_POLICY_LEADER'  => $value['IP_POLICY_LEADER'],
+                            'POLICY_COST'       => $value['POLICY_COST'],
+                            'IP_UPDATED_BY'     => Auth::user()->id,
+                            'IP_UPDATED_DATE'   => now()
+                        ]);
+            foreach ($value['premium'] as $key => $cover) {
+                $insurerCoverage = MInsurerCoverage::where('INSURER_COVERAGE_ID', $cover['INSURER_COVERAGE_ID'])
+                        ->update([
+                            'ACQUISITION_COST'  => $cover['ACQUISITION_COST'], 
+                            'ADMIN_COST'  => $cover['ADMIN_COST'],
+                            'AGENT_COMMISION'  => $cover['AGENT_COMMISION'],
+                            'BROKERAGE_FEE'  => $cover['BROKERAGE_FEE'],
+                            'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
+                            'COVERAGE_NAME'  => $cover['COVERAGE_NAME'],
+                            'CURRENCY_ID'  => $cover['CURRENCY_ID'],
+                            'DISC_ADMIN'  => $cover['DISC_ADMIN'],
+                            'DISC_BROKER'  => $cover['DISC_BROKER'],
+                            'DISC_CONSULTATION'  => $cover['DISC_CONSULTATION'],
+                            'ENGINEERING_FEE'  => $cover['ENGINEERING_FEE'],
+                            'FEE_BASED_INCOME'  => $cover['FEE_BASED_INCOME'],
+                            'GROSS_PREMI'  => $cover['GROSS_PREMI'],
+                            'NETT_PREMI'  => $cover['NETT_PREMI'],
+                            'POLICY_COVERAGE_ID'  => $cover['POLICY_COVERAGE_ID']
+                        ]);
+            }
+        }
+
+        
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Edit Insurer.",
+                "module"      => "Edit Insurer",
+                "id"          => $request->id
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            'Edit Insurer Succeed.'
+        ], 200, [
+            'X-Inertia' => true
+        ]);
 
     }
 

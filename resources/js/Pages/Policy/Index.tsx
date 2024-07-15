@@ -969,7 +969,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                             </div>
                         </div>
 
-                        <div className="mt-10 ml-4 mr-4">
+                        {/* <div className="mt-10 ml-4 mr-4">
                             <h3 className="text-xl font-semibold leading-6 text-gray-900">
                                 Policy Premium
                             </h3>
@@ -1532,7 +1532,6 @@ console.log("sumByCurrency: ", sumByCurrency);
                             </div>
                         </div>
 
-                        {/* Policy Installment add */}
                         <div className="mt-10">
                             <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4">
                                 Debit Note Installment
@@ -1570,13 +1569,6 @@ console.log("sumByCurrency: ", sumByCurrency);
                                                             value={
                                                                 pI.policy_installment_term
                                                             }
-                                                            // decimalScale={
-                                                            //     2
-                                                            // }
-                                                            // decimalsLimit={
-                                                            //     2
-                                                            // }
-                                                            // decimalSeparator={','}
                                                             onChange={(e) =>
                                                                 inputPolicyInstallment(
                                                                     "policy_installment_term",
@@ -1607,17 +1599,6 @@ console.log("sumByCurrency: ", sumByCurrency);
                                                                     i
                                                                 );
                                                             }}
-                                                            // onChange={(
-                                                            //     e
-                                                            // ) =>
-                                                            //     inputPolicyInstallment(
-                                                            //         "policy_installment_percentage",
-                                                            //         e
-                                                            //             .target
-                                                            //             .value,
-                                                            //         i
-                                                            //     )
-                                                            // }
                                                             className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
                                                             required
                                                         />
@@ -1630,13 +1611,6 @@ console.log("sumByCurrency: ", sumByCurrency);
                                                             value={
                                                                 pI.installment_due_date
                                                             }
-                                                            // decimalScale={
-                                                            //     2
-                                                            // }
-                                                            // decimalsLimit={
-                                                            //     2
-                                                            // }
-                                                            // decimalSeparator={','}
                                                             onChange={(e) =>
                                                                 inputPolicyInstallment(
                                                                     "installment_due_date",
@@ -1693,7 +1667,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                                     </div>
                                 </tbody>
                             </table>
-                        </div>
+                        </div> */}
                     </>
                 }
             />

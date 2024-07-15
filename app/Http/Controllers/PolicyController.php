@@ -117,14 +117,14 @@ class PolicyController extends Controller
             'policy_status_id.required'          => 'Policy Status is required.',
         ]);
 
-        $totalRateInstallment = collect($request->policyInstallment)->sum('policy_installment_percentage');
-        if ($totalRateInstallment != 100) {
-            return new JsonResponse([
-                ['Rate Installment must equal to 100 %.']
-            ], 422, [
-                'X-Inertia' => true
-            ]);
-        }
+        // $totalRateInstallment = collect($request->policyInstallment)->sum('policy_installment_percentage');
+        // if ($totalRateInstallment != 100) {
+        //     return new JsonResponse([
+        //         ['Rate Installment must equal to 100 %.']
+        //     ], 422, [
+        //         'X-Inertia' => true
+        //     ]);
+        // }
         if (trim($request->policy_number)) {
             $cekPolicy = $this->checkPolicyNumber(trim($request->policy_number));
             if (sizeof($cekPolicy) > 0) {
@@ -157,39 +157,39 @@ class PolicyController extends Controller
             'POLICY_CREATED_BY'      => Auth::user()->id
         ]);
 
-        // Create Initial Premium
-        $policyPremiumData = [];
-        foreach ($request->policyPremium as $req) {
-            $policyPremiumData[] = [
-                'POLICY_ID' => $policy,
-                'CURRENCY_ID' => $req['currency_id'],
-                'COVERAGE_NAME' => $req['coverage_name'],
-                'GROSS_PREMI' => $req['gross_premi'],
-                'ADMIN_COST' => $req['admin_cost'],
-                'DISC_BROKER' => $req['disc_broker'],
-                'DISC_CONSULTATION' => $req['disc_consultation'],
-                'DISC_ADMIN' => $req['disc_admin'],
-                'NETT_PREMI' => $req['nett_premi'],
-                'FEE_BASED_INCOME' => $req['fee_based_income'],
-                'AGENT_COMMISION' => $req['agent_commision'],
-                'ACQUISITION_COST' => $req['acquisition_cost'],
-                'CREATED_BY' => Auth::user()->id
-            ];
-        };
-        MPolicyPremium::insert($policyPremiumData);
-        // $policy->policyInitialPremium()->saveMany($initialPremiumData);
+        // // Create Initial Premium
+        // $policyPremiumData = [];
+        // foreach ($request->policyPremium as $req) {
+        //     $policyPremiumData[] = [
+        //         'POLICY_ID' => $policy,
+        //         'CURRENCY_ID' => $req['currency_id'],
+        //         'COVERAGE_NAME' => $req['coverage_name'],
+        //         'GROSS_PREMI' => $req['gross_premi'],
+        //         'ADMIN_COST' => $req['admin_cost'],
+        //         'DISC_BROKER' => $req['disc_broker'],
+        //         'DISC_CONSULTATION' => $req['disc_consultation'],
+        //         'DISC_ADMIN' => $req['disc_admin'],
+        //         'NETT_PREMI' => $req['nett_premi'],
+        //         'FEE_BASED_INCOME' => $req['fee_based_income'],
+        //         'AGENT_COMMISION' => $req['agent_commision'],
+        //         'ACQUISITION_COST' => $req['acquisition_cost'],
+        //         'CREATED_BY' => Auth::user()->id
+        //     ];
+        // };
+        // MPolicyPremium::insert($policyPremiumData);
+        // // $policy->policyInitialPremium()->saveMany($initialPremiumData);
 
-        // Create Policy Installment
-        $policyInstallmentData = [];
-        foreach ($request->policyInstallment as $req) {
-            $policyInstallmentData[] = [
-                'POLICY_ID' => $policy,
-                'POLICY_INSTALLMENT_TERM' => $req['policy_installment_term'],
-                'POLICY_INSTALLMENT_PERCENTAGE' => $req['policy_installment_percentage'],
-                'INSTALLMENT_DUE_DATE' => $req['installment_due_date']
-            ];
-        };
-        PolicyInstallment::insert($policyInstallmentData);
+        // // Create Policy Installment
+        // $policyInstallmentData = [];
+        // foreach ($request->policyInstallment as $req) {
+        //     $policyInstallmentData[] = [
+        //         'POLICY_ID' => $policy,
+        //         'POLICY_INSTALLMENT_TERM' => $req['policy_installment_term'],
+        //         'POLICY_INSTALLMENT_PERCENTAGE' => $req['policy_installment_percentage'],
+        //         'INSTALLMENT_DUE_DATE' => $req['installment_due_date']
+        //     ];
+        // };
+        // PolicyInstallment::insert($policyInstallmentData);
 
          // Created Log
         UserLog::create([

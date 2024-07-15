@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
+use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\RelationController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
@@ -46,6 +47,8 @@ Route::middleware('auth')->group(function () {
     // Insurance Panel
     Route::get('/insurancePanel', [InsurancePanelController::class, 'index'])->name('insurancePanel');
     Route::post('/insurancePanel', [InsurancePanelController::class, 'store'])->name('insurancePanel.store');
+    Route::post('/insertManyInsurer', [InsurancePanelController::class, 'insertManyInsurer'])->name('insurancePanel.insertManyInsurer');
+    Route::post('/editManyInsurer', [InsurancePanelController::class, 'editManyInsurer'])->name('insurancePanel.editManyInsurer');
     Route::get('/getInsurancePanel/{id}', [InsurancePanelController::class, 'get_id'])->name('insurancePanel.get_id');
     Route::post('/getInsurancePanel', [InsurancePanelController::class, 'getInsurancePanelJson'])->name('insurancePanel.getInsurancePanelJson');
     Route::patch('/editInsurancePanel/{id}', [InsurancePanelController::class, 'edit'])->name('insurancePanel.edit');
@@ -73,6 +76,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/editEndorsement/{id}', [EndorsementController::class, 'edit'])->name('endorsement.edit');
     Route::patch('/deactivateEndorsement/{id}', [EndorsementController::class, 'deactivate'])->name('endorsement.deactivate');
     Route::get('/getEndorsementInstallment/{id}', [EndorsementController::class, 'endorsementInstallment'])->name('endorsement.endorsementInstallment');
+
+    // Policy Coverage Name
+    Route::get('/getCoverageNameByPolicyId/{id}', [PolicyCoverageController::class, 'get_by_policy_id'])->name('policyCoverage.get_by_policy_id');
+    Route::post('/policyCoverage', [PolicyCoverageController::class, 'store'])->name('policyCoverage.store');
+    Route::post('/editManyCoverage', [PolicyCoverageController::class, 'editManyCoverage'])->name('policyCoverage.editManyCoverage');
     
     
 });
