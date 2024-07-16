@@ -1,5 +1,6 @@
 {
     "name": "phoenix/phoenix",
+    "version": "1.0.0",
     "type": "project",
     "description": "Phoenix ERP",
     "keywords": ["phoenix", "erp"],
