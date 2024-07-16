@@ -13,26 +13,6 @@ export default function Dashboard({ auth }: PageProps) {
         <AuthenticatedLayout user={auth.user} header={"Dashboard"}>
             <Head title="Dashboard" />
 
-            {/*Quick Access  */}
-            <div className="bg-white p-4 rounded-lg shadow-md hidden">
-                <div className="w-fit font-semibold">
-                    <span className="border-b-2 border-red-600">
-                        Quick Access
-                    </span>
-                </div>
-
-                <div className="mt-4 flex gap-3">
-                    {/* Button Add Relation */}
-                    <div className="bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-400 hover:shadow-lg">
-                        <span>Add Relation</span>
-                    </div>
-                    <div className="bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-400 hover:shadow-lg">
-                        <span>Add Group</span>
-                    </div>
-                    {/* End Button Add Relation */}
-                </div>
-            </div>
-
             <div>
                 <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                     {stats.map((item) => (

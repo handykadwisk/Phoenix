@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\OtherExpensesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
+use App\Http\Controllers\ReimburseController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RelationGroupController;
 use App\Http\Controllers\TJobDescController;
@@ -92,7 +95,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/addStructure', [TRelationStructureController::class, 'store'])->name('addStructure.store');
     Route::post('/getStructureDetail', [TRelationStructureController::class, 'get_detail'])->name('getStructureDetail.get_detail');
     Route::post('/editStructure', [TRelationStructureController::class, 'edit'])->name('editStructure.edit');
-    
+
 
     // Division
     Route::post('/getDivision', [TRelationDivisionController::class, 'getDivisionJson'])->name('getDivision.getDivisionJson');
@@ -117,7 +120,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/addJobDesc', [TJobDescController::class, 'store'])->name('addJobDesc.store');
     Route::post('/getJobDescDetail', [TJobDescController::class, 'get_detail'])->name('getJobDescDetail.get_detail');
     Route::post('/editJobDesc', [TJobDescController::class, 'edit'])->name('editJobDesc.edit');
-    
+
     //Menu
     Route::get('/setting/menu', [MenuController::class, 'index'])->name('setting/menu');
     Route::post('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
@@ -137,7 +140,45 @@ Route::middleware('auth')->group(function () {
     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
-    
+
+    // Finance > Operasional
+    // Cash Advance
+
+    // Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('getCA');
+    Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
+    Route::post('/getCAReport', [CashAdvanceController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
+    Route::get('/getCANumber', [CashAdvanceController::class, 'getCANumber'])->name('getCANumber');
+    Route::get('/getCAById/{id}', [CashAdvanceController::class, 'getCAById'])->name('getCAById');
+    Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
+    Route::post('/cashAdvance', [CashAdvanceController::class, 'store'])->name('cashAdvance.store');
+    Route::post('/cashAdvanceReport', [CashAdvanceController::class, 'report_cash_advance'])->name('cashAdvance.report_cash_advance');
+    Route::patch('/cashAdvanceApprove/{id}', [CashAdvanceController::class, 'approve'])->name('cashAdvance.approve');
+    Route::patch('/cashAdvanceRevised/{id}', [CashAdvanceController::class, 'revised'])->name('cashAdvance.revised');
+    Route::patch('/cashAdvanceExecute/{id}', [CashAdvanceController::class, 'execute'])->name('cashAdvance.execute');
+    Route::get('/cashAdvanceDownload/{id}', [CashAdvanceController::class, 'download'])->name('cashAdvance.download');
+
+    // Reimburse
+    Route::post('/getReimburse', [ReimburseController::class, 'getReimburse'])->name('cashAdvance.getReimburse');
+    Route::get('/getReimburseNumber', [ReimburseController::class, 'getReimburseNumber'])->name('getReimburseNumber');
+    Route::get('/getReimburseById/{id}', [ReimburseController::class, 'getReimburseById'])->name('getReimburseById');
+    Route::get('/reimburse', [ReimburseController::class, 'index'])->name('reimburse');
+    Route::post('/reimburse', [ReimburseController::class, 'store'])->name('reimburse.store');
+    Route::patch('/reimburseApprove/{id}', [ReimburseController::class, 'approve'])->name('reimburse.approve');
+    Route::patch('/reimburseRevised/{id}', [ReimburseController::class, 'revised'])->name('reimburse.revised');
+    Route::get('/reimburseDownload/{id}', [ReimburseController::class, 'download'])->name('reimburse.download');
+
+    // Other Expenses
+    Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');
+    Route::get('/getOtherExpensesNumber', [OtherExpensesController::class, 'getOtherExpensesNumber'])->name('getOtherExpensesNumber');
+    Route::get('/getOtherExpensesById/{id}', [OtherExpensesController::class, 'getOtherExpensesById'])->name('getOtherExpensesById');
+    Route::get('/otherExpenses', [OtherExpensesController::class, 'index'])->name('otherExpenses');
+    Route::post('/otherExpenses', [OtherExpensesController::class, 'store'])->name('otherExpenses.store');
+    Route::patch('/otherExpensesApprove/{id}', [OtherExpensesController::class, 'approve'])->name('otherExpenses.approve');
+    Route::patch('/otherExpensesRevised/{id}', [OtherExpensesController::class, 'revised'])->name('otherExpenses.revised');
+    Route::get('/otherExpensesDownload/{id}', [OtherExpensesController::class, 'download'])->name('otherExpenses.download');
+
+    // Approval Limit
+    Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
 });
 
 require __DIR__ . '/auth.php';

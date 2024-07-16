@@ -18,6 +18,17 @@ import Swal from "sweetalert2";
 import DetailRelationPopup from "./DetailRelation";
 import AddRelationPopup from "./AddRelation";
 import Select from "react-tailwindcss-select";
+import { ArrowLongLeftIcon, ArrowLongRightIcon, EllipsisHorizontalIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/react/20/solid'
+import ModalToAdd from '@/Components/Modal/ModalToAdd';
+import ToastMessage from '@/Components/ToastMessage';
+import { FormEvent, Fragment } from 'react';
+import { InertiaFormProps } from '@inertiajs/react/types/useForm';
+import TablePage from '@/Components/Table/Index';
+import { link } from 'fs';
+import dateFormat from 'dateformat';
+import { Menu, Tab, Transition } from '@headlessui/react';
+import Dropdown from '@/Components/Dropdown';
+import { Console } from 'console';
 
 export default function Relation({ auth }: PageProps) {
     // useEffect(() => {
@@ -121,11 +132,11 @@ export default function Relation({ auth }: PageProps) {
 
         if (id == "1") {
             // jika corporate
-            document.getElementById("relationLob").style.display = "";
-            document.getElementById("relationJobs").style.display = "none";
+            document.getElementById("relationLob")!.style.display = "";
+            document.getElementById("relationJobs")!.style.display = "none";
         } else if (id == "2") {
-            document.getElementById("relationLob").style.display = "none";
-            document.getElementById("relationJobs").style.display = "";
+            document.getElementById("relationLob")!.style.display = "none";
+            document.getElementById("relationJobs")!.style.display = "";
         }
     };
 
@@ -269,11 +280,11 @@ export default function Relation({ auth }: PageProps) {
     const disableLob = async (id: string) => {
         if (id == "1") {
             // jika corporate
-            document.getElementById("relationLob").style.display = "";
-            document.getElementById("relationJobs").style.display = "none";
+            document.getElementById("relationLob")!.style.display = "";
+            document.getElementById("relationJobs")!.style.display = "none";
         } else if (id == "2") {
-            document.getElementById("relationLob").style.display = "none";
-            document.getElementById("relationJobs").style.display = "";
+            document.getElementById("relationLob")!.style.display = "none";
+            document.getElementById("relationJobs")!.style.display = "";
         }
     };
 

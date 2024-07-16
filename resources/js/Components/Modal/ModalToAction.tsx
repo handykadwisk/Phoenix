@@ -18,8 +18,8 @@ export default function ModalToAction({
     method,
     onSuccess,
     headers,
-    classPanel = "",
     submitButtonName,
+    classPanel,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;

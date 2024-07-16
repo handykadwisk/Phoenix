@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\CashAdvancePurpose;
+use App\Models\CashAdvanceStatus;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\Relation;
@@ -81,6 +83,64 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $finance = Menu::create(
+            [
+                'menu_name'       => 'Finance',
+                'menu_url'        => NULL,
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $cashAdvance = Menu::create(
+            [
+                'menu_parent_id' => $finance,
+                'menu_name'       => 'Cash Advance',
+                'menu_url'        => 'cashAdvance',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $reimburse = Menu::create(
+            [
+                'menu_parent_id' => $finance,
+                'menu_name'       => 'Reimburse',
+                'menu_url'        => 'reimburse',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        $otherExpenses = Menu::create(
+            [
+                'menu_parent_id' => $finance,
+                'menu_name'       => 'Other Expenses',
+                'menu_url'        => 'otherExpenses',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
+        // $setting = Menu::create(
+        //     [
+        //         'menu_name'       => 'Settings',
+        //         'menu_url'        => NULL,
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
+
+        $approvalLimit = Menu::create(
+            [
+                'menu_parent_id'  => $finance,
+                'menu_name'       => 'Approval Limit',
+                'menu_url'        => 'approvalLimit',
+                'menu_is_deleted' => 0,
+                'menu_created_by' => 'admin'
+            ]
+        )->id;
+
         // create role
         $admin = Role::create([
             'role_name' => 'Admin'
@@ -89,7 +149,7 @@ class DatabaseSeeder extends Seeder
             'role_name' => 'User'
         ]);
 
-        // mapping
+        // Mapping data menu
         RoleAccessMenu::create([
             'role_id' => $admin->id,
             'menu_id' => $dashboard->id
@@ -104,21 +164,33 @@ class DatabaseSeeder extends Seeder
         ]);
         RoleAccessMenu::create([
             'role_id' => $admin->id,
-            'menu_id' => $group->id
+            'menu_id' => $finance
         ]);
         RoleAccessMenu::create([
             'role_id' => $admin->id,
-            'menu_id' => $childRelation->id
+            'menu_id' => $cashAdvance
         ]);
         RoleAccessMenu::create([
             'role_id' => $admin->id,
-            'menu_id' => $childAgent->id
+            'menu_id' => $reimburse
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $otherExpenses
+        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $setting
+        // ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $approvalLimit
         ]);
 
         // create user
         User::create(
             [
-                'name' => 'admin',
+                'name' => 'Admin',
                 'email' => 'admin@email.com',
                 'password' => bcrypt('12345678'),
                 'role_id' => $admin->id
@@ -126,8 +198,48 @@ class DatabaseSeeder extends Seeder
         );
         User::create(
             [
-                'name' => 'user',
-                'email' => 'user@email.com',
+                'name' => 'Fadhlan',
+                'email' => 'fadhlan@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Haris',
+                'email' => 'haris@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Pian',
+                'email' => 'pian@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Fitano',
+                'email' => 'fitano@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Mei',
+                'email' => 'mei@email.com',
+                'password' => bcrypt('12345678'),
+                'role_id' => $user->id
+            ]
+        );
+        User::create(
+            [
+                'name' => 'Apep',
+                'email' => 'apep@email.com',
                 'password' => bcrypt('12345678'),
                 'role_id' => $user->id
             ]
@@ -240,12 +352,8 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path11)
         );
 
-        // create 2024_16_05_r_salutation
-        $file_path12 = resource_path('../database/LogDB/2024_16_05_r_salutation.sql');
-
-        \DB::unprepared(
-            file_get_contents($file_path12)
-        );
-    
+        RelationStatus::create([
+            'relation_status_name' => 'Individu',
+        ]);
     }
 }

@@ -32,7 +32,7 @@ class RelationController extends Controller
 
     public function getRelationData($dataPerPage = 5, $searchQuery = null)
     {
-        
+
         $RType = $searchQuery->RELATION_TYPE_ID;
         $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
         // print_r($data);
@@ -46,13 +46,13 @@ class RelationController extends Controller
                     $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
              });
             }
-        } 
+        }
             // dd($data->toSql());
 
             return $data->paginate($dataPerPage);
     }
 
-    // Get All Relation Type 
+    // Get All Relation Type
     public function getAllRelatioType()
     {
         $relationType = RelationType::get();
@@ -86,7 +86,7 @@ class RelationController extends Controller
     {
         // call data relation
         $relation = Relation::where('RELATION_ORGANIZATION_PARENT_ID', "0")->paginate(3);
-        
+
         // call data relation group
         $relationGroup = RelationGroup::get();
         // call data relation lob
@@ -131,7 +131,7 @@ class RelationController extends Controller
         //     echo "ada";
         // }
         // die;
-        // Cek Relation Perent Id 
+        // Cek Relation Perent Id
         $parentID = $request->parent_id;
         if ($request->parent_id == '' || $request->parent_id == NULL) {
             $parentID = "0";
@@ -191,7 +191,7 @@ class RelationController extends Controller
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
-            for ($i=0; $i < sizeof($request->relation_aka); $i++) { 
+            for ($i=0; $i < sizeof($request->relation_aka); $i++) {
                 $nameRelationAka = $request->relation_aka[$i]["name_aka"];
                 MRelationAka::create([
                     "RELATION_ORGANIZATION_ID" => $relation->RELATION_ORGANIZATION_ID,
@@ -199,7 +199,7 @@ class RelationController extends Controller
                 ]);
             }
         }
-        
+
         if (is_countable($request->relation_type_id)) {
             // Created Mapping Relation Type
             for ($i = 0; $i < sizeof($request->relation_type_id); $i++) {
@@ -208,13 +208,13 @@ class RelationController extends Controller
                     'RELATION_ORGANIZATION_ID' => $relation->RELATION_ORGANIZATION_ID,
                     'RELATION_TYPE_ID' => $idRelationType
                 ]);
-            }    
+            }
         }
 
 
         if (is_countable($request->tagging_name)) {
             // created tagging
-            for ($i=0; $i < sizeof($request->tagging_name); $i++) { 
+            for ($i=0; $i < sizeof($request->tagging_name); $i++) {
                 $tagName = $request->tagging_name[$i]["name_tag"];
                 $tagging = Tag::insertGetId([
                     'TAG_NAME' => $tagName,
@@ -231,7 +231,7 @@ class RelationController extends Controller
                         'TAG_ID' => $tagging
                     ]);
                 }
-            }    
+            }
         }
 
         // get salutation name for detail relation
@@ -249,8 +249,8 @@ class RelationController extends Controller
                 $preSalutation = $salutationPre->salutation_name;
             }
         }
-        
-        
+
+
 
 
         // Created Log
@@ -263,7 +263,6 @@ class RelationController extends Controller
             ]),
             'action_by'  => Auth::user()->email
         ]);
-
 
         return new JsonResponse([
             $relation->RELATION_ORGANIZATION_ID,
@@ -286,7 +285,7 @@ class RelationController extends Controller
     public function edit(Request $request)
     {
         // dd($request);
-        // for ($i=0; $i < sizeof($request->m_tagging); $i++) { 
+        // for ($i=0; $i < sizeof($request->m_tagging); $i++) {
         //     $xx = $request->m_tagging[$i]['tagging']['TAG_ID'];
         //     print_r($xx);
         // }
@@ -305,7 +304,7 @@ class RelationController extends Controller
         // cek jika ganti parent
 
 
-        // Cek Relation Perent Id 
+        // Cek Relation Perent Id
         $parentID = $request->RELATION_ORGANIZATION_PARENT_ID;
         if ($request->RELATION_ORGANIZATION_PARENT_ID == '' || $request->RELATION_ORGANIZATION_PARENT_ID == NULL) {
             $parentID = "0";
@@ -362,7 +361,7 @@ class RelationController extends Controller
         }
 
         // Created Mapping Relation AKA
-        for ($i=0; $i < sizeof($request->m_relation_aka); $i++) { 
+        for ($i=0; $i < sizeof($request->m_relation_aka); $i++) {
             $nameRelationAka = $request->m_relation_aka[$i]["RELATION_AKA_NAME"];
             MRelationAka::create([
                 "RELATION_ORGANIZATION_ID" => $request->RELATION_ORGANIZATION_ID,
@@ -397,7 +396,7 @@ class RelationController extends Controller
         }
 
         // created mtag
-        for ($i=0; $i < sizeof($request->m_tagging); $i++) { 
+        for ($i=0; $i < sizeof($request->m_tagging); $i++) {
             // cek existing tagging
             if ($request->m_tagging[$i]['tagging']['TAG_ID'] !== "") {
                 $existingDataTag = Tag::where('TAG_ID', $request->m_tagging[$i]['tagging']['TAG_ID'])->get();
@@ -405,7 +404,7 @@ class RelationController extends Controller
                     Tag::where('TAG_ID', $request->m_tagging[$i]['tagging']['TAG_ID'])->delete();
                 }
             }
-            
+
             $tagName = $request->m_tagging[$i]['tagging']['TAG_NAME'];  // catetan mau di hapus apa engga di tag data sebelumnyaa
             $tagging = Tag::insertGetId([
                 'TAG_NAME' => $tagName,
@@ -439,7 +438,7 @@ class RelationController extends Controller
                 $preSalutation = $salutationPre->salutation_name;
             }
         }
-        
+
 
         // Created Log
         UserLog::create([
