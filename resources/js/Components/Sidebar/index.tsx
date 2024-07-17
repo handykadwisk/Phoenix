@@ -445,7 +445,7 @@ const Sidebar = ({
                                                                                             active={route().current(
                                                                                                 filteredChildren.menu_url
                                                                                             )}
-                                                                                            className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:text-red-700`}
+                                                                                            className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
                                                                                         >
                                                                                             {
                                                                                                 filteredChildren.menu_name

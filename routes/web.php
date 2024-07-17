@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getCAReport', [CashAdvanceController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
     Route::get('/getCANumber', [CashAdvanceController::class, 'getCANumber'])->name('getCANumber');
     Route::get('/getCAById/{id}', [CashAdvanceController::class, 'getCAById'])->name('getCAById');
+    Route::get('/getCAReportById/{id}', [CashAdvanceController::class, 'getCAReportById'])->name('getCAReportById');
     Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
     Route::post('/cashAdvance', [CashAdvanceController::class, 'store'])->name('cashAdvance.store');
     Route::post('/cashAdvanceReport', [CashAdvanceController::class, 'report_cash_advance'])->name('cashAdvance.report_cash_advance');

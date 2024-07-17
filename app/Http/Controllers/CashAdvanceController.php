@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\CashAdvance;
 use App\Models\CashAdvanceDetail;
 use App\Models\CashAdvancePurpose;
+use App\Models\CashAdvanceReport;
 use App\Models\Document;
-use App\Models\ReportCashAdvance;
-use App\Models\ReportCashAdvanceDetail;
+use App\Models\CashAdvanceDetailReport;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +34,7 @@ class CashAdvanceController extends Controller
 
     public function getReportCAData($dataPerPage = 2, $searchQuery = null)
     {
-        $data = ReportCashAdvance::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
+        $data = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
         if ($searchQuery) {
             if ($searchQuery->input('REPORT_CASH_ADVANCE_NUMBER')) {
                 $data->where('CASH_ADVANCE_ID', 'like', '%'.$searchQuery->REPORT_CASH_ADVANCE_NUMBER.'%');
@@ -65,6 +65,12 @@ class CashAdvanceController extends Controller
     public function getCAById(string $id) 
     {
         $data = CashAdvance::findOrFail($id);
+        return response()->json($data);
+    }
+
+    public function getCAReportById(string $id) 
+    {
+        $data = CashAdvanceReport::findOrFail($id);
         return response()->json($data);
     }
 
@@ -557,26 +563,84 @@ class CashAdvanceController extends Controller
         // dd($request->file('refund_proof'));
 
         $user_id = auth()->user()->id;
+        $user = User::find($request->cash_advance_first_approval_by);
+
+        $total_amount_report = 0;
+
+        foreach ($request->CashAdvanceDetail as $value) {
+            $total_amount_report += $value['cash_advance_detail_amount'];
+        }
         
         $report_cash_advance_id = $request->cash_advance_number;
+        $report_cash_advance_division = "IT";
         $report_cash_advance_requested_by = $user_id;
         $report_cash_advance_requested_date = now();
         $report_cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
+        $report_cash_advance_first_approval_user = $user->name;
         $report_cash_advance_first_approval_status = 0;
         $report_cash_advance_request_note = $request->cash_advance_request_note;
         $report_cash_advance_refund_type = $request->refund_type;
         $report_refund_proof = $request->file('refund_proof')[0];
+        $report_cash_advance_total_amount = $total_amount_report;
 
         // Insert Report CA
-        $report_cash_advance = ReportCashAdvance::create([
+        $report_cash_advance = CashAdvanceReport::create([
             'CASH_ADVANCE_ID' => $report_cash_advance_id,
+            'REPORT_CASH_ADVANCE_DIVISION' => $report_cash_advance_division,
             'REPORT_CASH_ADVANCE_REQUESTED_BY' => $report_cash_advance_requested_by,
             'REPORT_CASH_ADVANCE_REQUESTED_DATE' => $report_cash_advance_requested_date,
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_BY' => $report_cash_advance_first_approval_by,
+            'REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER' => $report_cash_advance_first_approval_user,
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
             'REPORT_CASH_ADVANCE_REQUEST_NOTE' => $report_cash_advance_request_note,
-            'REPORT_CASH_ADVANCE_REFUND_TYPE' => $report_cash_advance_refund_type
+            'REPORT_CASH_ADVANCE_REFUND_TYPE' => $report_cash_advance_refund_type,
+            'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount
         ])->REPORT_CASH_ADVANCE_ID;
+
+        // Created Log Report CA
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Created (Report Cash Advance).",
+                "module"      => "Report Cash Advance",
+                "id"          => $report_cash_advance
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        foreach ($request->CashAdvanceDetail as $key => $cad) {
+            $report_cash_advance_detail_start_date = $cad['cash_advance_detail_start_date'];
+            $report_cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
+            $report_cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
+            $report_cash_advance_detail_location = $cad['cash_advance_detail_location'];
+            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+            $report_cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
+            $report_cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
+            $report_cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
+
+            $report_cash_advance_detail = CashAdvanceDetailReport::create([
+                'REPORT_CASH_ADVANCE_ID' => $report_cash_advance,
+                'REPORT_CASH_ADVANCE_DETAIL_START_DATE' => $report_cash_advance_detail_start_date,
+                'REPORT_CASH_ADVANCE_DETAIL_END_DATE' => $report_cash_advance_detail_end_date,
+                'REPORT_CASH_ADVANCE_DETAIL_PURPOSE' => $report_cash_advance_detail_purpose,
+                'REPORT_CASH_ADVANCE_DETAIL_LOCATION' => $report_cash_advance_detail_location,
+                'REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID' => $cash_advance_detail_relation_organization_id,
+                'REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME' => $report_cash_advance_detail_relation_name,
+                'REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION' => $report_cash_advance_detail_relation_position,
+                'REPORT_CASH_ADVANCE_DETAIL_AMOUNT' => $report_cash_advance_detail_amount
+            ])->REPORT_CASH_ADVANCE_DETAIL_ID;
+
+            // Created Log Report CA Detail
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Created (Report Cash Advance Detail).",
+                    "module"      => "Report Cash Advance Detail",
+                    "id"          => $report_cash_advance_detail
+                ]),
+                'action_by'  => Auth::user()->email
+            ]);
+        }
 
         if($report_refund_proof) {
             $parentDir = ((floor(($report_cash_advance) / 1000)) * 1000) . '/';
@@ -604,56 +668,11 @@ class CashAdvanceController extends Controller
             ])->DOCUMENT_ID;
                 
             if ($document) {
-                ReportCashAdvance::where('CASH_ADVANCE_ID', $report_cash_advance)
+                CashAdvanceReport::where('CASH_ADVANCE_ID', $report_cash_advance)
                 ->update([
                     'REPORT_CASH_ADVANCE_REFUND_PROOF' => $document
                 ]);
             }
-        }
-
-        // Created Log Report CA
-        UserLog::create([
-            'created_by' => Auth::user()->id,
-            'action'     => json_encode([
-                "description" => "Created (Report Cash Advance).",
-                "module"      => "Report Cash Advance",
-                "id"          => $report_cash_advance
-            ]),
-            'action_by'  => Auth::user()->email
-        ]);
-
-        foreach ($request->CashAdvanceDetail as $key => $cad) {
-            $report_cash_advance_detail_start_date = $cad['cash_advance_detail_start_date'];
-            $report_cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
-            $report_cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
-            $report_cash_advance_detail_location = $cad['cash_advance_detail_location'];
-            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
-            $report_cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
-            $report_cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
-            $report_cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
-
-            $report_cash_advance_detail = ReportCashAdvanceDetail::create([
-                'CASH_ADVANCE_ID' => $report_cash_advance,
-                'REPORT_CASH_ADVANCE_DETAIL_START_DATE' => $report_cash_advance_detail_start_date,
-                'REPORT_CASH_ADVANCE_DETAIL_END_DATE' => $report_cash_advance_detail_end_date,
-                'REPORT_CASH_ADVANCE_DETAIL_PURPOSE' => $report_cash_advance_detail_purpose,
-                'REPORT_CASH_ADVANCE_DETAIL_LOCATION' => $report_cash_advance_detail_location,
-                'REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID' => $cash_advance_detail_relation_organization_id,
-                'REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME' => $report_cash_advance_detail_relation_name,
-                'REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION' => $report_cash_advance_detail_relation_position,
-                'REPORT_CASH_ADVANCE_DETAIL_AMOUNT' => $report_cash_advance_detail_amount
-            ])->REPORT_CASH_ADVANCE_DETAIL_ID;
-
-            // Created Log Report CA Detail
-            UserLog::create([
-                'created_by' => Auth::user()->id,
-                'action'     => json_encode([
-                    "description" => "Created (Report Cash Advance Detail).",
-                    "module"      => "Report Cash Advance Detail",
-                    "id"          => $report_cash_advance_detail
-                ]),
-                'action_by'  => Auth::user()->email
-            ]);
         }
 
         return new JsonResponse([

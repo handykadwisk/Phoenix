@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('t_report_cash_advance_detail', function (Blueprint $table) {
             $table->increments('REPORT_CASH_ADVANCE_DETAIL_ID')->primary();
             $table->foreignId('REPORT_CASH_ADVANCE_ID')->nullable();
-            $table->date('REPORT_CASH_ADVANCE_DETAIL_DATE')->nullable();
+            $table->date('REPORT_CASH_ADVANCE_DETAIL_START_DATE')->nullable();
+            $table->date('REPORT_CASH_ADVANCE_DETAIL_END_DATE')->nullable();
             $table->text('REPORT_CASH_ADVANCE_DETAIL_PURPOSE')->nullable();
             $table->text('REPORT_CASH_ADVANCE_DETAIL_LOCATION')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID')->nullable();
