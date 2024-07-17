@@ -1,9 +1,10 @@
-import { PropsWithChildren } from "react";
+import { MouseEventHandler, PropsWithChildren } from "react";
 
 export default function TableTD({
     value,
     className = "",
 }: PropsWithChildren<{
+    onButton: MouseEventHandler;
     value: any;
     className: string;
 }>) {

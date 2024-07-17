@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('RELATION_ORGANIZATION_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable();
             $table->string('RELATION_ORGANIZATION_UPDATED_BY')->nullable();
             $table->timestamp('RELATION_ORGANIZATION_UPDATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable();
-            $table->string('RELATION_ORGANIZATION_DESCRIPTION')->nullable();
+            $table->text('RELATION_ORGANIZATION_DESCRIPTION')->nullable();
             $table->string('RELATION_ORGANIZATION_ALIAS')->nullable();
             $table->string('RELATION_ORGANIZATION_EMAIL')->nullable();
             $table->string('RELATION_ORGANIZATION_MAPPING')->nullable();

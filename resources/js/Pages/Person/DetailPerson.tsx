@@ -43,6 +43,8 @@ import DetailStructure from "./StructureDivision";
 import { Datepicker } from "flowbite-react";
 import test from "node:test";
 import BankAccount from "./BankAccount";
+// import AddressPerson from "./AddressPerson";
+import SelectTailwind from "react-tailwindcss-select";
 
 export default function DetailPerson({
     idPerson,
@@ -62,6 +64,8 @@ export default function DetailPerson({
     const [bank, setBank] = useState<any>([]);
     const [file, setFile] = useState<any>();
     const [fileNew, setFileNew] = useState<any>();
+    const [wilayah, setWilayah] = useState<any>([]);
+    const [regency, setRegency] = useState<any>([]);
     useEffect(() => {
         getPersonDetail(idPerson);
     }, [idPerson]);
@@ -69,6 +73,22 @@ export default function DetailPerson({
     useEffect(() => {
         getTax();
     }, [idPerson]);
+
+    useEffect(() => {
+        getWilayah();
+    }, [idPerson]);
+
+    const getWilayah = async () => {
+        await axios
+            .post(`/getWilayah`)
+            .then((res) => {
+                setWilayah(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     // Upload File
     const handleChange = (e: any) => {
@@ -214,6 +234,21 @@ export default function DetailPerson({
         ],
     });
 
+    const [dataAddress, setDataAddress] = useState<any>({
+        idPerson: idPerson,
+        ADDRESS_ID: "",
+        ADDRESS_CATEGORY: "",
+        ADDRESS_LOCATION_TYPE: "",
+        ADDRESS_DETAIL: "",
+        ADDRESS_RT_NUMBER: "",
+        ADDRESS_RW_NUMBER: "",
+        ADDRESS_VILLAGE: "",
+        ADDRESS_DISTRICT: "",
+        ADDRESS_PROVINCE: "",
+        ADDRESS_REGENCY: "",
+        ADDRESS_STATUS: "",
+    });
+
     const [dataStructure, setDataStructure] = useState<any>({
         PERSON_ID: idPerson,
         STRUCTURE_ID: "",
@@ -253,6 +288,15 @@ export default function DetailPerson({
     });
 
     const [modalBank, setModalBank] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    const [modalAddressPerson, setModalAddressPerson] = useState({
         add: false,
         delete: false,
         edit: false,
@@ -362,6 +406,18 @@ export default function DetailPerson({
                   document: false,
                   search: false,
               });
+    };
+
+    const handleAddressPerson = async (e: FormEvent) => {
+        e.preventDefault();
+        setModalAddressPerson({
+            add: !modalAddressPerson.add,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+        });
     };
 
     const handleStructure = async (e: FormEvent) => {
@@ -538,8 +594,396 @@ export default function DetailPerson({
             });
         }
     };
+
+    const [checkDomAddress, setCheckDomAddress] = useState({
+        domAddress: "",
+    });
+
+    const handleCheckbox = (e: any) => {
+        const { value, checked } = e.target;
+
+        if (checked) {
+            setCheckDomAddress({
+                ...checkDomAddress,
+                domAddress: "3",
+            });
+        } else {
+            setCheckDomAddress({
+                ...checkDomAddress,
+                domAddress: "",
+            });
+        }
+    };
+
     return (
         <>
+            {/* address Person */}
+            <ModalToAdd
+                show={modalAddressPerson.add}
+                onClose={() => {
+                    setModalAddressPerson({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }}
+                buttonAddOns={""}
+                title={"Add Address Person"}
+                url={`/personEmployment`}
+                data={dataAddress}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                }
+                onSuccess={""}
+                body={
+                    <>
+                        <div className="text-gray-600 text-xs hover:underline hover:cursor-pointer w-fit border-b-2 mb-2">
+                            <span>
+                                <i>+ Add Other Address</i>
+                            </span>
+                        </div>
+                        <div className="text-red-600 font-semibold">
+                            <span>KTP Address</span>
+                        </div>
+                        <div className="mb-2">
+                            <div className="">
+                                <InputLabel
+                                    htmlFor="ADDRESS_DETAIL"
+                                    value="Address"
+                                />
+                                <TextArea
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    id="ADDRESS_DETAIL"
+                                    name="ADDRESS_DETAIL"
+                                    defaultValue={dataAddress.ADDRESS_DETAIL}
+                                    onChange={(e) => {
+                                        setDataAddress({
+                                            ...dataAddress,
+                                            ADDRESS_DETAIL: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <InputLabel
+                                        htmlFor="ADDRESS_RT_NUMBER"
+                                        value="RT"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={dataAddress.ADDRESS_RT_NUMBER}
+                                        className=""
+                                        onChange={(e) => {
+                                            setDataAddress({
+                                                ...dataAddress,
+                                                ADDRESS_RT_NUMBER:
+                                                    e.target.value,
+                                            });
+                                        }}
+                                        // required
+                                        placeholder="RT"
+                                    />
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        htmlFor="ADDRESS_RW_NUMBER"
+                                        value="RW"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={dataAddress.ADDRESS_RW_NUMBER}
+                                        className=""
+                                        onChange={(e) => {
+                                            setDataAddress({
+                                                ...dataAddress,
+                                                ADDRESS_RW_NUMBER:
+                                                    e.target.value,
+                                            });
+                                        }}
+                                        // required
+                                        placeholder="RW"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="mt-2">
+                                    <InputLabel
+                                        htmlFor="ADDRESS_PROVINCE"
+                                        value="Province"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={dataAddress.ADDRESS_PROVINCE}
+                                        className=""
+                                        onChange={(e) => {
+                                            setDataAddress({
+                                                ...dataAddress,
+                                                ADDRESS_PROVINCE:
+                                                    e.target.value,
+                                            });
+                                        }}
+                                        // required
+                                        placeholder="Province"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <InputLabel
+                                        htmlFor="ADDRESS_REGENCY"
+                                        value="Regency"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={dataAddress.ADDRESS_REGENCY}
+                                        className=""
+                                        onChange={(e) => {
+                                            setDataAddress({
+                                                ...dataAddress,
+                                                ADDRESS_REGENCY: e.target.value,
+                                            });
+                                        }}
+                                        // required
+                                        placeholder="Province"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="mt-2">
+                                    <InputLabel
+                                        htmlFor="ADDRESS_DISTRICT"
+                                        value="District"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={dataAddress.ADDRESS_DISTRICT}
+                                        className=""
+                                        onChange={(e) => {
+                                            setDataAddress({
+                                                ...dataAddress,
+                                                ADDRESS_DISTRICT:
+                                                    e.target.value,
+                                            });
+                                        }}
+                                        // required
+                                        placeholder="District"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <InputLabel
+                                        htmlFor="ADDRESS_VILLAGE"
+                                        value="Village"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={dataAddress.ADDRESS_VILLAGE}
+                                        className=""
+                                        onChange={(e) => {
+                                            setDataAddress({
+                                                ...dataAddress,
+                                                ADDRESS_VILLAGE: e.target.value,
+                                            });
+                                        }}
+                                        // required
+                                        placeholder="Village"
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-2 text-sm flex">
+                                <div className="flex w-4 flex-shrink-0 items-center justify-end rounded-l-md text-sm font-medium">
+                                    <Checkbox
+                                        // id={typeRelation.RELATION_TYPE_ID}
+                                        value={checkDomAddress.domAddress}
+                                        onChange={(e) => handleCheckbox(e)}
+                                    />
+                                </div>
+                                <div className="flex flex-1 items-center justify-between truncate rounded-r-md">
+                                    <div className="flex-1 truncate px-1 py-2 text-xs">
+                                        <span className="text-gray-900">
+                                            {/* {typeRelation.RELATION_TYPE_NAME} */}
+                                            Set KTP Address as Domicile Address
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {checkDomAddress.domAddress === "3" ? (
+                            <>
+                                <div className="border-b-2"></div>
+                                <div className="text-red-600 font-semibold">
+                                    <span>Domicile Address</span>
+                                </div>
+                                <div className="mb-2">
+                                    <div className="">
+                                        <InputLabel
+                                            htmlFor="ADDRESS_DETAIL"
+                                            value="Address"
+                                        />
+                                        <TextArea
+                                            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            id="ADDRESS_DETAIL"
+                                            name="ADDRESS_DETAIL"
+                                            defaultValue={
+                                                dataAddress.ADDRESS_DETAIL
+                                            }
+                                            onChange={(e) => {
+                                                setDataAddress({
+                                                    ...dataAddress,
+                                                    ADDRESS_DETAIL:
+                                                        e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 mt-2">
+                                        <div>
+                                            <InputLabel
+                                                htmlFor="ADDRESS_RT_NUMBER"
+                                                value="RT"
+                                            />
+                                            <TextInput
+                                                type="text"
+                                                value={
+                                                    dataAddress.ADDRESS_RT_NUMBER
+                                                }
+                                                className=""
+                                                onChange={(e) => {
+                                                    setDataAddress({
+                                                        ...dataAddress,
+                                                        ADDRESS_RT_NUMBER:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                // required
+                                                placeholder="RT"
+                                            />
+                                        </div>
+                                        <div>
+                                            <InputLabel
+                                                htmlFor="ADDRESS_RW_NUMBER"
+                                                value="RW"
+                                            />
+                                            <TextInput
+                                                type="text"
+                                                value={
+                                                    dataAddress.ADDRESS_RW_NUMBER
+                                                }
+                                                className=""
+                                                onChange={(e) => {
+                                                    setDataAddress({
+                                                        ...dataAddress,
+                                                        ADDRESS_RW_NUMBER:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                // required
+                                                placeholder="RW"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="mt-2">
+                                            <InputLabel
+                                                htmlFor="ADDRESS_PROVINCE"
+                                                value="Province"
+                                            />
+                                            <TextInput
+                                                type="text"
+                                                value={
+                                                    dataAddress.ADDRESS_PROVINCE
+                                                }
+                                                className=""
+                                                onChange={(e) => {
+                                                    setDataAddress({
+                                                        ...dataAddress,
+                                                        ADDRESS_PROVINCE:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                // required
+                                                placeholder="Province"
+                                            />
+                                        </div>
+                                        <div className="mt-2">
+                                            <InputLabel
+                                                htmlFor="ADDRESS_REGENCY"
+                                                value="Regency"
+                                            />
+                                            <TextInput
+                                                type="text"
+                                                value={
+                                                    dataAddress.ADDRESS_REGENCY
+                                                }
+                                                className=""
+                                                onChange={(e) => {
+                                                    setDataAddress({
+                                                        ...dataAddress,
+                                                        ADDRESS_REGENCY:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                // required
+                                                placeholder="Province"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="mt-2">
+                                            <InputLabel
+                                                htmlFor="ADDRESS_DISTRICT"
+                                                value="District"
+                                            />
+                                            <TextInput
+                                                type="text"
+                                                value={
+                                                    dataAddress.ADDRESS_DISTRICT
+                                                }
+                                                className=""
+                                                onChange={(e) => {
+                                                    setDataAddress({
+                                                        ...dataAddress,
+                                                        ADDRESS_DISTRICT:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                // required
+                                                placeholder="District"
+                                            />
+                                        </div>
+                                        <div className="mt-2">
+                                            <InputLabel
+                                                htmlFor="ADDRESS_VILLAGE"
+                                                value="Village"
+                                            />
+                                            <TextInput
+                                                type="text"
+                                                value={
+                                                    dataAddress.ADDRESS_VILLAGE
+                                                }
+                                                className=""
+                                                onChange={(e) => {
+                                                    setDataAddress({
+                                                        ...dataAddress,
+                                                        ADDRESS_VILLAGE:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                // required
+                                                placeholder="Village"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : null}
+                    </>
+                }
+            />
+
+            {/* end address person */}
+
             {/* Bank Account */}
             <BankAccount
                 show={modalBank.add}
@@ -1726,7 +2170,7 @@ export default function DetailPerson({
                                 </a>
                             )}
                         </div>
-                        <div className="flex justify-center items-center">
+                        <div className="flex justify-center items-center relative">
                             <label
                                 htmlFor="imgProfile"
                                 className="bg-red-800 w-50 rounded-full"
@@ -2025,7 +2469,7 @@ export default function DetailPerson({
                             </div>
                         ) : (
                             <div className="grid grid-cols-3 gap-4 mt-1">
-                                <div className="p-2 grid grid-cols-3 gap-2">
+                                <div className="p-2 grid grid-cols-3 gap-2 relative">
                                     <div className="flex justify-center">
                                         <UserGroupIcon className="w-12 text-red-600" />
                                     </div>
@@ -2043,7 +2487,7 @@ export default function DetailPerson({
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-2 grid grid-cols-3 gap-2">
+                                <div className="p-2 grid grid-cols-3 gap-2 relative">
                                     <div className="flex justify-center">
                                         <IdentificationIcon className="w-12 text-red-600" />
                                     </div>
@@ -2061,7 +2505,7 @@ export default function DetailPerson({
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-2 grid grid-cols-3 gap-2">
+                                <div className="p-2 grid grid-cols-3 gap-2 relative">
                                     <div className="flex justify-center">
                                         <MapIcon className="w-12 text-red-600" />
                                     </div>
@@ -2094,7 +2538,12 @@ export default function DetailPerson({
                                 </a>
                             </div>
                             <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
-                                <a className="m-auto">Address Person</a>
+                                <a
+                                    className="m-auto"
+                                    onClick={(e) => handleAddressPerson(e)}
+                                >
+                                    Address Person
+                                </a>
                             </div>
                             <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
                                 <a

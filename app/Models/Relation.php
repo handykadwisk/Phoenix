@@ -49,4 +49,8 @@ class Relation extends Model
     public function PostSalutation(){
         return $this->hasOne(Salutation::class, 'salutation_id', 'POST_SALUTATION');
     }
+
+    public function MRelationAgent(){
+        return $this->hasOne(MRelationAgent::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
 }

@@ -70,7 +70,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/relation/agent', [TRelationAgentController::class, 'index'])->name('relation/agent');
     Route::post('/getRelationAgent', [TRelationAgentController::class, 'getRelationAgentJson'])->name('getRelationAgent.getRelationAgentJson');
     Route::post('/relation/agent', [TRelationAgentController::class, 'store'])->name('agent.store');
-    Route::post('/getAgentDetail', [TRelationAgentController::class, 'get_detail'])->name('getAgentDetail.get_detail');
+    Route::post('/getMRelationAgent', [TRelationAgentController::class, 'getMRelationAgent'])->name('getMRelationAgent.getMRelationAgent');
+    Route::post('/getRelationAgentSelect', [TRelationAgentController::class, 'relationAgent'])->name('getRelationAgentSelect.relationAgent');
+    Route::post('/addMRelationAgent', [TRelationAgentController::class, 'addMRelationAgent'])->name('addMRelationAgent.addMRelationAgent');
+    Route::post('/deleteAgent', [TRelationAgentController::class, 'deleteAgent'])->name('deleteAgent.deleteAgent');
+    
 
     // Person
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
