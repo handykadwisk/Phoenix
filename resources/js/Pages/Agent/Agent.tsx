@@ -30,18 +30,22 @@ import DetailAgentPopup from "./DetailAgent";
 import Swal from "sweetalert2";
 
 export default function Agent({ auth }: PageProps) {
+    useEffect(() => {
+        getAgent();
+    }, []);
     const [dataAgent, setDataAgent] = useState<any>([]);
 
     // for search agent
     const [searchAgent, setSearchAgent] = useState<any>({
-        RELATION_AGENT_NAME: "",
+        RELATION_ORGANIZATION_NAME: "",
     });
 
     // get data agent
     const getAgent = async (pageNumber = "page=1") => {
         await axios
             .post(`/getRelationAgent?${pageNumber}`, {
-                RELATION_AGENT_NAME: searchAgent.RELATION_AGENT_NAME,
+                RELATION_ORGANIZATION_NAME:
+                    searchAgent.RELATION_ORGANIZATION_NAME,
             })
             .then((res) => {
                 setDataAgent(res.data);
@@ -61,7 +65,7 @@ export default function Agent({ auth }: PageProps) {
                 setDataAgent([]);
                 setSearchAgent({
                     ...searchAgent,
-                    RELATION_AGENT_NAME: "",
+                    RELATION_ORGANIZATION_NAME: "",
                 });
             })
             .catch((err) => {
@@ -91,14 +95,14 @@ export default function Agent({ auth }: PageProps) {
     };
 
     const { data, setData } = useForm<any>({
-        RELATION_AGENT_NAME: "",
+        RELATION_ORGANIZATION_NAME: "",
         RELATION_AGENT_ALIAS: "",
         RELATION_AGENT_DESCRIPTION: "",
     });
 
     const handleSuccess = (message: string) => {
         setData({
-            RELATION_AGENT_NAME: "",
+            RELATION_ORGANIZATION_NAME: "",
             RELATION_AGENT_ALIAS: "",
             RELATION_AGENT_DESCRIPTION: "",
         });
@@ -111,7 +115,7 @@ export default function Agent({ auth }: PageProps) {
             if (result.value) {
                 setDetailAgent({
                     RELATION_AGENT_ID: message[0],
-                    RELATION_AGENT_NAME: message[1],
+                    RELATION_ORGANIZATION_NAME: message[1],
                 });
                 setModal({
                     add: false,
@@ -124,8 +128,8 @@ export default function Agent({ auth }: PageProps) {
     };
 
     const [detailAgent, setDetailAgent] = useState<any>({
-        RELATION_AGENT_ID: "",
-        RELATION_AGENT_NAME: "",
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
     });
 
     return (
@@ -157,7 +161,7 @@ export default function Agent({ auth }: PageProps) {
                             <div className="mt-0 relative">
                                 <InputLabel
                                     className="absolute"
-                                    htmlFor="RELATION_AGENT_NAME"
+                                    htmlFor="RELATION_ORGANIZATION_NAME"
                                     value="Name Relation Agent"
                                 />
                                 <div className="ml-[9.5rem] text-red-600">
@@ -165,11 +169,11 @@ export default function Agent({ auth }: PageProps) {
                                 </div>
                                 <TextInput
                                     type="text"
-                                    value={data.RELATION_AGENT_NAME}
+                                    value={data.RELATION_ORGANIZATION_NAME}
                                     className="mt-2"
                                     onChange={(e) =>
                                         setData(
-                                            "RELATION_AGENT_NAME",
+                                            "RELATION_ORGANIZATION_NAME",
                                             e.target.value
                                         )
                                     }
@@ -215,7 +219,7 @@ export default function Agent({ auth }: PageProps) {
                         view: false,
                     })
                 }
-                title={detailAgent.RELATION_AGENT_NAME}
+                title={"Agent " + detailAgent.RELATION_ORGANIZATION_NAME}
                 url={""}
                 data={""}
                 onSuccess={""}
@@ -229,7 +233,7 @@ export default function Agent({ auth }: PageProps) {
                     <>
                         <DetailAgentPopup
                             auth={auth}
-                            idAgent={detailAgent.RELATION_AGENT_ID}
+                            idAgent={detailAgent.RELATION_ORGANIZATION_ID}
                         />
                     </>
                 }
@@ -238,7 +242,7 @@ export default function Agent({ auth }: PageProps) {
 
             <div className="grid grid-cols-4 gap-4 p-4">
                 <div className="flex flex-col">
-                    <div className="bg-white mb-4 rounded-md shadow-md p-4">
+                    <div className="bg-white mb-4 hidden rounded-md shadow-md p-4">
                         <div
                             className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
                             onClick={(e) => addAgentPopup(e)}
@@ -249,18 +253,19 @@ export default function Agent({ auth }: PageProps) {
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
                         <TextInput
                             type="text"
-                            value={searchAgent.RELATION_AGENT_NAME}
+                            value={searchAgent.RELATION_ORGANIZATION_NAME}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) =>
                                 setSearchAgent({
                                     ...searchAgent,
-                                    RELATION_AGENT_NAME: e.target.value,
+                                    RELATION_ORGANIZATION_NAME: e.target.value,
                                 })
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (
-                                        searchAgent.RELATION_AGENT_NAME !== ""
+                                        searchAgent.RELATION_ORGANIZATION_NAME !==
+                                        ""
                                     ) {
                                         getAgent();
                                     }
@@ -291,15 +296,15 @@ export default function Agent({ auth }: PageProps) {
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
                                         className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg rounded-bl-lg"
+                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg "
                                         }
                                         label={"No"}
                                     />
                                     <TableTH
                                         className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg rounded-br-lg"
+                                            "min-w-[50px] bg-gray-200 rounded-tr-lg "
                                         }
-                                        label={"Name Agent"}
+                                        label={"Name Relation Agent"}
                                     />
                                 </tr>
                             </thead>
@@ -313,10 +318,10 @@ export default function Agent({ auth }: PageProps) {
                                                     //     idRelation
                                                     // );
                                                     setDetailAgent({
-                                                        RELATION_AGENT_ID:
-                                                            dAgent.RELATION_AGENT_ID,
-                                                        RELATION_AGENT_NAME:
-                                                            dAgent.RELATION_AGENT_NAME,
+                                                        RELATION_ORGANIZATION_ID:
+                                                            dAgent.RELATION_ORGANIZATION_ID,
+                                                        RELATION_ORGANIZATION_NAME:
+                                                            dAgent.RELATION_ORGANIZATION_NAME,
                                                     });
                                                     setModal({
                                                         add: false,
@@ -342,7 +347,7 @@ export default function Agent({ auth }: PageProps) {
                                                     value={
                                                         <>
                                                             {
-                                                                dAgent.RELATION_AGENT_NAME
+                                                                dAgent.RELATION_ORGANIZATION_NAME
                                                             }
                                                         </>
                                                     }
@@ -354,6 +359,17 @@ export default function Agent({ auth }: PageProps) {
                                 )}
                             </tbody>
                         </table>
+                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
+                            <Pagination
+                                links={dataAgent.links}
+                                fromData={dataAgent.from}
+                                toData={dataAgent.to}
+                                totalData={dataAgent.total}
+                                clickHref={(url: string) =>
+                                    getAgent(url.split("?").pop())
+                                }
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

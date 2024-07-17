@@ -180,54 +180,74 @@ export default function Relation({ auth }: PageProps) {
     });
 
     const handleSuccess = (message: string) => {
-        setIsSuccess("");
-        reset();
-        setData({
-            group_id: "",
-            name_relation: "",
-            parent_id: "",
-            abbreviation: "",
-            relation_aka: [],
-            relation_email: "",
-            relation_description: "",
-            relation_lob_id: "",
-            pre_salutation_id: "",
-            post_salutation_id: "",
-            relation_status_id: "",
-            tagging_name: [],
-            is_managed: "",
-            mark_tbk_relation: "",
-            profession_id: "",
-            relation_type_id: [],
-        });
-        // if (modal.add) {
-        Swal.fire({
-            title: "Success",
-            text: "New Relation Added",
-            icon: "success",
-        }).then((result: any) => {
-            // console.log(result);
-            if (result.value) {
-                setGetDetailRelation({
-                    RELATION_ORGANIZATION_NAME: message[1],
-                    RELATION_ORGANIZATION_ID: message[0],
-                    RELATION_SALUTATION_PRE: message[2],
-                    RELATION_SALUTATION_POST: message[3],
-                });
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: true,
-                    document: false,
-                    search: false,
-                });
-            }
-        });
-        setSwitchPage(false);
-        setSwitchPageTBK(false);
-        // }
-        setIsSuccess(message);
+        if (message[0] === "0") {
+            Swal.fire({
+                title: "Warning",
+                text: message[1],
+                icon: "warning",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    setModal({
+                        add: true,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }
+            });
+        } else {
+            setIsSuccess("");
+            reset();
+            setData({
+                group_id: "",
+                name_relation: "",
+                parent_id: "",
+                abbreviation: "",
+                relation_aka: [],
+                relation_email: "",
+                relation_description: "",
+                relation_lob_id: "",
+                pre_salutation_id: "",
+                post_salutation_id: "",
+                relation_status_id: "",
+                tagging_name: [],
+                is_managed: "",
+                mark_tbk_relation: "",
+                profession_id: "",
+                relation_type_id: [],
+            });
+            // if (modal.add) {
+            Swal.fire({
+                title: "Success",
+                text: "New Relation Added",
+                icon: "success",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    setGetDetailRelation({
+                        RELATION_ORGANIZATION_NAME: message[1],
+                        RELATION_ORGANIZATION_ID: message[0],
+                        RELATION_SALUTATION_PRE: message[2],
+                        RELATION_SALUTATION_POST: message[3],
+                    });
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: true,
+                        document: false,
+                        search: false,
+                    });
+                }
+            });
+            setSwitchPage(false);
+            setSwitchPageTBK(false);
+            // }
+            setIsSuccess(message);
+        }
     };
 
     const handleCheckboxEdit = (e: any) => {
