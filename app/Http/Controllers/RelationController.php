@@ -143,7 +143,7 @@ class RelationController extends Controller
                 ]);
             }
         }
-        
+
 
 
 
@@ -306,21 +306,13 @@ class RelationController extends Controller
 
     public function edit(Request $request)
     {
-<<<<<<< HEAD
-        // dd($request);
-        // for ($i=0; $i < sizeof($request->m_tagging); $i++) {
-        //     $xx = $request->m_tagging[$i]['tagging']['TAG_ID'];
-        //     print_r($xx);
-        // }
-        // die;
-=======
-        
+
 
 
         // cek abbrev apakah sama seperti sebelumnya
         $abbre = Relation::find($request->RELATION_ORGANIZATION_ID);
         $abbreOld = $abbre->RELATION_ORGANIZATION_ABBREVIATION;
-        
+
         // cek jika sama tidak melakukan cek abbreviation existing
         if ($abbreOld != $request->RELATION_ORGANIZATION_ABBREVIATION) {
             // cek abbreviation
@@ -341,11 +333,10 @@ class RelationController extends Controller
         }
 
 
-        
 
 
 
->>>>>>> origin/development-haris
+
         // cek apakah ganti group apa engga
         $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
         $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
@@ -369,7 +360,7 @@ class RelationController extends Controller
                                 ->update([
                                     'RELATION_ORGANIZATION_PARENT_ID'         => 0,
                                 ]);
-                                
+
                 // update child to parent
                 if ($updateParent) {
                     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)

@@ -463,15 +463,10 @@ const Sidebar = ({
                                                                                             href={route(
                                                                                                 filteredChildren.menu_url
                                                                                             )}
-                                                                                            active={
-                                                                                                route().current(
-                                                                                                    `${filteredChildren.menu_url}.*`
-                                                                                                ) ||
-                                                                                                route().current(
-                                                                                                    filteredChildren.menu_url
-                                                                                                )
-                                                                                            }
-                                                                                            className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:text-red-600`}
+                                                                                            active={route().current(
+                                                                                                filteredChildren.menu_url
+                                                                                            )}
+                                                                                            className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:text-red-700`}
                                                                                         >
                                                                                             {
                                                                                                 filteredChildren.menu_name

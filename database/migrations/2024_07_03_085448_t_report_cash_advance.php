@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('t_report_cash_advance', function (Blueprint $table) {
             $table->increments('REPORT_CASH_ADVANCE_ID')->primary();
             $table->foreignId('CASH_ADVANCE_ID')->nullable();
+            $table->string('REPORT_CASH_ADVANCE_DIVISION')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_USED_BY')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_REQUESTED_BY')->nullable();
             $table->dateTime('REPORT_CASH_ADVANCE_REQUESTED_DATE')->nullable();
@@ -35,6 +36,7 @@ return new class extends Migration
             $table->text('REPORT_CASH_ADVANCE_REQUEST_NOTE')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_REFUND_TYPE')->nullable();
             $table->string('REPORT_CASH_ADVANCE_REFUND_PROOF')->nullable();
+            $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT', 16, 2)->nullable();
             $table->datetime('REPORT_CASH_ADVANCE_CREATED_AT')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_CREATED_BY')->nullable();
             $table->dateTime('REPORT_CASH_ADVANCE_UPDATED_AT')->nullable();
