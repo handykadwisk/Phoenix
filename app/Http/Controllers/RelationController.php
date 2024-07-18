@@ -377,6 +377,11 @@ class RelationController extends Controller
                                     'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
                                 ]);
                 }
+            }else{
+                Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+                ->update([
+                    'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
+                ]);
             }
         }
 
