@@ -195,6 +195,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_DESCRIPTION' => $request->relation_description,
             'RELATION_ORGANIZATION_ALIAS' => $addTBK,
             'RELATION_ORGANIZATION_EMAIL' => $request->relation_email,
+            'RELATION_ORGANIZATION_WEBSITE' => $request->relation_website,
             'RELATION_ORGANIZATION_LOGO_ID' => NULL,
             'RELATION_ORGANIZATION_SIGNATURE_NAME' => NULL,
             'RELATION_ORGANIZATION_SIGNATURE_TITLE' => NULL,
@@ -426,6 +427,7 @@ class RelationController extends Controller
                 'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
                 'RELATION_ORGANIZATION_ALIAS' => $addTBK,
                 'RELATION_ORGANIZATION_EMAIL' => $request->RELATION_ORGANIZATION_EMAIL,
+                'RELATION_ORGANIZATION_WEBSITE' => $request->RELATION_ORGANIZATION_WEBSITE,
                 'RELATION_PROFESSION_ID' => $professionId,
                 'RELATION_LOB_ID' => $lobId,
                 'PRE_SALUTATION' => $request->PRE_SALUTATION,
@@ -559,5 +561,20 @@ class RelationController extends Controller
         return Inertia::render('Relation/DetailRelation', [
             'detailRelation' => $detailRelation,
         ]);
+    }
+
+    public function getCekAbbreviation(Request $request){
+        // cek abbreviation
+        // dd($request->name);
+        $flag = "0";
+        $message = "Existing";
+        $data = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
+        return response()->json($data);
+        // if ($abbreviation->count() > 0) {
+        //     $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
+        //     if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
+        //         return $message;
+        //     }
+        // }
     }
 }

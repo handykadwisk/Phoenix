@@ -47,6 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/editRelation/{id}', [RelationController::class, 'edit'])->name('relation.edit');
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');
     Route::post('/getRelationDetail', [RelationController::class, 'get_detail'])->name('getRelationDetail.get_detail');
+    Route::post('/getCekAbbreviation', [RelationController::class, 'getCekAbbreviation'])->name('getCekAbbreviation.getCekAbbreviation');
+    
 
 
     //Policy

@@ -181,6 +181,7 @@ export default function DetailRelation({
         RELATION_ORGANIZATION_ABBREVIATION: "",
         RELATION_ORGANIZATION_AKA: "",
         RELATION_ORGANIZATION_EMAIL: "",
+        RELATION_ORGANIZATION_WEBSITE: "",
         relation_description: "",
         RELATION_PROFESSION_ID: "",
         RELATION_LOB_ID: "",
@@ -951,27 +952,25 @@ export default function DetailRelation({
                                 />
                             </div>
                             <div className="xs:-mt-5 lg:mt-4">
-                                {/* <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED BY APP"
-                                /> */}
-                                <ul role="list" className="mt-8">
-                                    <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            <span className="mt-1 ml-2">
-                                                <Switch
-                                                    enabled={switchPageTBK}
-                                                    onChangeButton={(e: any) =>
-                                                        handleCheckboxTBKEdit(e)
-                                                    }
-                                                />
-                                            </span>
-                                            <span className="ml-2 text-sm">
-                                                MARK TBK RELATION
-                                            </span>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <InputLabel
+                                    htmlFor="RELATION_ORGANIZATION_WEBSITE"
+                                    value="Email"
+                                />
+                                <TextInput
+                                    type="text"
+                                    value={
+                                        dataById.RELATION_ORGANIZATION_WEBSITE
+                                    }
+                                    className="mt-2"
+                                    onChange={(e) =>
+                                        setDataById({
+                                            ...dataById,
+                                            RELATION_ORGANIZATION_WEBSITE:
+                                                e.target.value,
+                                        })
+                                    }
+                                    placeholder="www.example.com"
+                                />
                             </div>
                         </div>
                         <div className="mt-4">
@@ -1096,7 +1095,7 @@ export default function DetailRelation({
                         <div className="mt-4" id="relationLob">
                             <InputLabel
                                 htmlFor="RELATION_LOB_ID"
-                                value="Relation Lob"
+                                value="Business Sector"
                             />
                             <SelectTailwind
                                 classNames={{
@@ -1543,10 +1542,33 @@ export default function DetailRelation({
                     </div>
                     <div className="xs:col-span-2 lg:col-span-1">
                         <div className="font-semibold">
-                            <span>Email</span>
+                            {dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                                "" ||
+                            dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                                null ? (
+                                <span>Website</span>
+                            ) : (
+                                <span>Email</span>
+                            )}
                         </div>
                         {dataRelationNew.RELATION_ORGANIZATION_EMAIL === "" ||
                         dataRelationNew.RELATION_ORGANIZATION_EMAIL === null ? (
+                            dataRelationNew.RELATION_ORGANIZATION_WEBSITE ===
+                                "" ||
+                            dataRelationNew.RELATION_ORGANIZATION_WEBSITE ===
+                                null ? (
+                                <div className="text-sm text-gray-400">-</div>
+                            ) : (
+                                <div className="text-sm text-gray-400">
+                                    {
+                                        dataRelationNew.RELATION_ORGANIZATION_WEBSITE
+                                    }
+                                </div>
+                            )
+                        ) : dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                              "" ||
+                          dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                              null ? (
                             <div className="text-sm text-gray-400">-</div>
                         ) : (
                             <div className="text-sm text-gray-400">
