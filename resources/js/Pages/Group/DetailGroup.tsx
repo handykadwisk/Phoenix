@@ -172,7 +172,7 @@ export default function DetailGroup({
                           <div className="pt-0 pl-[0.32rem]" key={a}>
                               <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                   <li>
-                                      <div className="relative flex justify-between hover:text-red-600">
+                                      <div className="relative flex justify-between hover:text-red-600 w-fit">
                                           <div className="flex items-center justify-center pr-2">
                                               <span
                                                   className={
@@ -280,7 +280,7 @@ export default function DetailGroup({
 
             <div className="grid grid-cols-1">
                 <div className="col-span-2 bg-white rounded-lg shadow-md pb-10">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mt-4 mb-4">
                         <div className="w-fit px-4 text-md font-semibold">
                             <span className="border-b-2 border-red-600">
                                 Relation
@@ -296,7 +296,7 @@ export default function DetailGroup({
                             className="cursor-pointer"
                             title="Edit Relation"
                         >
-                            <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white hover:bg-red-500 text-sm">
+                            <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white hover:bg-red-500 text-sm hidden">
                                 Add Relation To Group
                             </div>
                         </a>
@@ -318,7 +318,7 @@ export default function DetailGroup({
                                         )
                                         .map((item: any, i: number) => (
                                             <li className="" key={i}>
-                                                <div className="relative flex justify-between font-semibold hover:text-red-600">
+                                                <div className="relative flex justify-between font-semibold hover:text-red-600 w-fit">
                                                     <div className="flex items-center justify-center pr-2">
                                                         <span
                                                             className={
@@ -355,7 +355,7 @@ export default function DetailGroup({
                                                         >
                                                             <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                                 <li>
-                                                                    <div className="relative flex justify-between hover:text-red-600">
+                                                                    <div className="relative flex justify-between hover:text-red-600 w-fit">
                                                                         <div className="flex items-center justify-center pr-2">
                                                                             <span
                                                                                 className={
