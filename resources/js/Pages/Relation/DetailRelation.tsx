@@ -485,6 +485,30 @@ export default function DetailRelation({
             return selected[0].label;
         }
     };
+
+    const [existingAbb, setExistingAbb] = useState<any>([]);
+
+    const cekAbbreviationRelationEdit = async (name: any, id: any) => {
+        const flag = "edit";
+        await axios
+            .post(`/getCekAbbreviation`, { name, flag, id })
+            .then((res: any) => {
+                setExistingAbb(res.data);
+                if (res.data.length >= 1) {
+                    Swal.fire({
+                        title: "Warning",
+                        text: "Abbreviation already exists",
+                        icon: "warning",
+                    }).then((result: any) => {
+                        // console.log(result);
+                    });
+                }
+                // cekAbbreviation(existingAbb);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -694,6 +718,12 @@ export default function DetailRelation({
                                         })
                                     }
                                     required
+                                    onBlur={() => {
+                                        cekAbbreviationRelationEdit(
+                                            dataById.RELATION_ORGANIZATION_ABBREVIATION,
+                                            dataById.RELATION_ORGANIZATION_ID
+                                        );
+                                    }}
                                 />
                             </div>
                         </div>

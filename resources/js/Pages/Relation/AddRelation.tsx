@@ -212,11 +212,12 @@ export default function AddRelation({
     const [existingAbb, setExistingAbb] = useState<any>([]);
 
     const cekAbbreviationRelation = async (name: any) => {
+        const flag = "";
         await axios
-            .post(`/getCekAbbreviation`, { name })
+            .post(`/getCekAbbreviation`, { name, flag })
             .then((res: any) => {
                 setExistingAbb(res.data);
-                if (res.data.length === 1) {
+                if (res.data.length >= 1) {
                     Swal.fire({
                         title: "Warning",
                         text: "Abbreviation already exists",

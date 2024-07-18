@@ -47,7 +47,7 @@ class RelationController extends Controller
              });
             }
         } 
-            // dd($data->toSql());
+            // dd($data->get());
 
             return $data->paginate($dataPerPage);
     }
@@ -564,17 +564,48 @@ class RelationController extends Controller
     }
 
     public function getCekAbbreviation(Request $request){
-        // cek abbreviation
-        // dd($request->name);
-        $flag = "0";
-        $message = "Existing";
-        $data = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
-        return response()->json($data);
-        // if ($abbreviation->count() > 0) {
-        //     $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
-        //     if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
-        //         return $message;
-        //     }
-        // }
+
+
+        if ($request->flag != "edit") {
+            $flag = "0";
+            $message = "Existing";
+            $data = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
+            return response()->json($data);
+            // if ($abbreviation->count() > 0) {
+            //     $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
+            //     if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
+            //         return $message;
+            //     }
+            // }
+        }else{
+            // cek abbrev apakah sama seperti sebelumnya
+            // dd($request->id);
+            $abbre = Relation::find($request->id);
+            $abbreOld = $abbre->RELATION_ORGANIZATION_ABBREVIATION;
+            // dd($abbreOld);
+            
+            // cek jika sama tidak melakukan cek abbreviation existing
+            if ($abbreOld != trim(strtoupper($request->name))) {
+                // dd("masuk sini");
+                // cek abbreviation
+                $flag = "0";
+                $message = "Abbreviation already exists";
+                $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
+                return response()->json($abbreviation);
+                // if ($abbreviation->count() > 0) {
+                //     $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
+                //     if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
+                //         return new JsonResponse([
+                //             $flag,
+                //             $message
+                //         ], 201, [
+                //             'X-Inertia' => true
+                //         ]);
+                //     }
+                // }
+            }
+        }
+
+        
     }
 }
