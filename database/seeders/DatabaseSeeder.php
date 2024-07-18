@@ -141,6 +141,48 @@ class DatabaseSeeder extends Seeder
             ]
         )->id;
 
+        $setting = Menu::create(
+            [
+                'menu_name'       => 'Setting',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 99,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
+        $ACLMenu = Menu::create(
+            [
+                'menu_name'       => 'ACL - Menu',
+                'menu_parent_id'  => $setting->id,
+                'menu_url'        => 'setting/menu',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 6,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
+        $ACLPermission = Menu::create(
+            [
+                'menu_name'       => 'ACL - Permission',
+                'menu_parent_id'  => $setting->id,
+                'menu_url'        => 'setting/permission',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 6,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
+        $ACLRole = Menu::create(
+            [
+                'menu_name'       => 'ACL - Role',
+                'menu_parent_id'  => $setting->id,
+                'menu_url'        => 'setting/role',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 6,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
         // create role
         $admin = Role::create([
             'role_name' => 'Admin'
@@ -186,6 +228,27 @@ class DatabaseSeeder extends Seeder
             'role_id' => $admin->id,
             'menu_id' => $approvalLimit
         ]);
+
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $setting->id
+        ]);
+
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $ACLMenu->id
+        ]);
+
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $ACLPermission->id
+        ]);
+
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $ACLRole->id
+        ]);
+
 
         // create user
         User::create(
@@ -295,7 +358,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // create 2024_30_05_r_proffesion
-        $file_path8 = resource_path('../database/LogDB/2024_30_05_r_proffesion.sql');
+        $file_path8 = resource_path('../database/LogDB/2024_18_07_r_proffesion.sql');
 
         \DB::unprepared(
             file_get_contents($file_path8)
