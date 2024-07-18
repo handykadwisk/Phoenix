@@ -83,7 +83,6 @@ export default function DetailPerson({
             .post(`/getWilayah`)
             .then((res) => {
                 setWilayah(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -615,6 +614,13 @@ export default function DetailPerson({
         }
     };
 
+    const wilayahSelect = wilayah?.map((query: any) => {
+        return {
+            value: query.kode,
+            label: query.nama,
+        };
+    });
+
     return (
         <>
             {/* address Person */}
@@ -715,19 +721,37 @@ export default function DetailPerson({
                                         htmlFor="ADDRESS_PROVINCE"
                                         value="Province"
                                     />
-                                    <TextInput
-                                        type="text"
+                                    <SelectTailwind
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                    isSelected
+                                                        ? `text-white bg-red-500`
+                                                        : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                                }`,
+                                        }}
+                                        options={wilayahSelect}
+                                        isSearchable={true}
+                                        placeholder={"--Select Province--"}
                                         value={dataAddress.ADDRESS_PROVINCE}
-                                        className=""
-                                        onChange={(e) => {
+                                        // onChange={(e) =>
+                                        //     inputDataBank(
+                                        //         "BANK_ID",
+                                        //         e.target.value,
+                                        //         i
+                                        //     )
+                                        // }
+                                        onChange={(val: any) => {
+                                            // getRegency(val);
                                             setDataAddress({
                                                 ...dataAddress,
-                                                ADDRESS_PROVINCE:
-                                                    e.target.value,
+                                                ADDRESS_PROVINCE: val,
                                             });
                                         }}
-                                        // required
-                                        placeholder="Province"
+                                        primaryColor={"bg-red-500"}
                                     />
                                 </div>
                                 <div className="mt-2">
