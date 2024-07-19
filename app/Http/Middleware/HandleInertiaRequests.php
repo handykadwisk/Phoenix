@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
                     'user'       => $request->user(),
                     'role'       => $request->user()->role,
                     'menu'       => $request->user()->role->menu,
+                    'additional' => $request->user()->additional
                 ],
                 'custom_menu' => Menu::where(['menu_is_deleted' => 0, 'menu_parent_id' => null])->get(),
                 'flash' => [

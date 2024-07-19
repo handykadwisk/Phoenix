@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\UserAdditional;
 
 class User extends Authenticatable
 {
@@ -51,6 +52,10 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id');
+    }
+    
+    public function additional() {
+        return $this->hasOne(UserAdditional::class, 'user_id');
     }
 
     // public function cash_advance(): HasMany

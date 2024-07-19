@@ -5,13 +5,18 @@ import {
 } from '@heroicons/react/24/outline'
 import { User } from '@/types';
 import { BellIcon } from '@heroicons/react/20/solid';
+import ImageDropdown from '../ImageDropdown';
+import { FormEvent } from 'react';
+import indonesiaFlag from '../../Images/indonesia.png';
+import usFlag from '../../Images/united-states.png';
+import { router } from '@inertiajs/react'
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
   sidebarDesktopOpen: string | boolean | undefined;
   setSidebarDesktopOpen: (arg0: boolean) => void;
-  user: User;
+  user: any;
   header: string;
   children: any;
 }) => {
@@ -23,6 +28,30 @@ const Header = (props: {
       props.setSidebarDesktopOpen(false)
     }
   }
+
+  function changeLanguage (e: FormEvent, lang: string) {
+
+    e.preventDefault()
+
+    router.post('/user_additional/change_language', {
+      lang: lang,
+      user_id: props.user?.id
+    })
+    
+  }
+
+  const languages = [
+    {
+      'value': 'en',
+      'label': 'English',
+      'flag': usFlag
+    },
+    {
+      'value': 'id',
+      'label': 'Indonesia',
+      'flag': indonesiaFlag
+    }
+  ]
 
   return (
     <div className={`${props.sidebarDesktopOpen?'':'lg:pl-72'}`}>
@@ -46,6 +75,39 @@ const Header = (props: {
           <div className="flex flex-1 gap-x-4 self-center lg:gap-x-6">
             <Breadcrumb pageName={props.header} />
           </div>
+
+          <ImageDropdown
+              image={
+                <img 
+                  src={
+                    props.user?.additional.user_language === 'en' ?
+                    usFlag : indonesiaFlag
+                  } 
+                  width="25" 
+                />
+              }
+              children={
+                <>
+                  {
+                    languages.map((language: any, i: number) => {
+                      return (
+                        <div 
+                          key={i} 
+                          className={`
+                              px-4 py-2 grid grid-rows grid-flow-col gap-4 hover:bg-gray-200 hover:cursor-pointer 
+                              ${props.user?.additional.user_language === language.value ? 'bg-gray-200' : ''}
+                          `} 
+                          onClick={(e) => changeLanguage(e, language.value)}
+                        >
+                         <img src={language.flag} width="25" />
+                         <p>{language.label}</p>
+                        </div>
+                      )
+                    })
+                  }
+                </>
+              }
+          />
 
           <div className="flex items-center gap-3 2xsm:gap-7">
             <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">

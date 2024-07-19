@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\UserAdditional;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -31,9 +32,23 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        $request->session()->regenerate();
+        $attempt = $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($attempt) {
+            // check language user
+            $isUserLanguageExist = UserAdditional::where('user_id', Auth::user()->id)->get();
+            if (count($isUserLanguageExist) < 1) {
+                UserAdditional::create([
+                    'user_id'                       => Auth::user()->id,
+                    'user_language'                 => 'en',
+                    'user_additional_created_by'    => Auth::user()->id,
+                    'user_additional_created_date'  => now()
+                ]);
+            }
+
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
     }
 
     /**

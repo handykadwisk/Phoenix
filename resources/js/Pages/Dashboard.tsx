@@ -2,16 +2,22 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
 
-export default function Dashboard({ auth }: PageProps) {
+export default function Dashboard({ auth, language }: any) {
+
+    // props language dikirim langsung dari middleware Language yang diinject langsung melalui Inertia. cek file Language.php di folder Middleware
+    // kemudian ambil array pertama dari language
+    // selanjutnya, tinggal panggil di tiap string yang mau diambil dari file language. contoh: lang.policy --ada di bawah contohnya--
+    const lang: any = language[0]
+
     const stats = [
-        { name: "Policy", stat: "71,897" },
-        { name: "Claim", stat: "58.16%" },
-        { name: "Assets", stat: "24.57%" },
+        { name: lang.policy, stat: "71,897" },
+        { name: lang.claim, stat: "58.16%" },
+        { name: lang.assets, stat: "24.57%" },
     ];
 
     return (
-        <AuthenticatedLayout user={auth.user} header={"Dashboard"}>
-            <Head title="Dashboard" />
+        <AuthenticatedLayout user={auth.user} header={lang.dashboard}>
+            <Head title={lang.dashboard} />
 
             <div>
                 <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">

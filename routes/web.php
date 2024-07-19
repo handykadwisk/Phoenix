@@ -17,6 +17,7 @@ use App\Http\Controllers\TRelationAgentController;
 use App\Http\Controllers\TRelationDivisionController;
 use App\Http\Controllers\TRelationOfficeController;
 use App\Http\Controllers\TRelationStructureController;
+use App\Http\Controllers\UserAdditionalController;
 use App\Models\Role;
 use App\Models\TPermission;
 use App\Models\TRelationAgent;
@@ -26,6 +27,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
+use App\Http\Middleware\Language;
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
@@ -34,11 +36,17 @@ Route::get('/', function () {
     ]);
 })->middleware('guest');
 
+// TAMBAHKAN " ->middleware(Language:class) " di tiap route di class index saja
+// Tidak perlu semua method ditambahkan middleware language, cukup di route yang memuat halaman pertama kali (biasanya class index)
+// Di bawah/ route dashboard contoh penggunaannya.
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard')->middleware(Language::class);
 
 Route::middleware('auth')->group(function () {
+    // user additional
+    Route::post('/user_additional/change_language', [UserAdditionalController::class, 'change_language'])->name('user_additional.change_language');
+
     // BR
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
