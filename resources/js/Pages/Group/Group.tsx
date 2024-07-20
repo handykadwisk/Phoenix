@@ -28,8 +28,13 @@ import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import ModalDetailGroup from "./DetailGroup";
 import Swal from "sweetalert2";
+import SelectTailwind from "react-tailwindcss-select";
 
 export default function Group({ auth }: PageProps) {
+    // useEffect(() => {
+    //     getMappingParentGroup();
+    // }, []);
+
     // variabel relation Group
     const [relationsGroup, setRelationsGroup] = useState<any>([]);
     const [searchGroup, setSearchGroup] = useState<any>({
@@ -38,6 +43,31 @@ export default function Group({ auth }: PageProps) {
     const [idGroup, setIdGroup] = useState<any>({
         RELATION_GROUP_ID: "",
         RELATION_GROUP_NAME: "",
+    });
+
+    const [mappingGroup, setMappingGroup] = useState<any>([]);
+
+    // get combo group parent
+    const getMappingParentGroup = async () => {
+        // setIsLoading(true)
+
+        // if (name) {
+        await axios
+            .post(`/getMappingParentGroup`)
+            .then((res: any) => {
+                setMappingGroup(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const mappingParentGroup = mappingGroup?.map((query: any) => {
+        return {
+            value: query.RELATION_GROUP_ID,
+            label: query.text_combo,
+        };
     });
 
     // Get Relation Group
@@ -82,8 +112,9 @@ export default function Group({ auth }: PageProps) {
         custom_menu,
     }: any = usePage().props;
 
-    const { data, setData, errors, reset } = useForm({
+    const { data, setData, errors, reset } = useForm<any>({
         RELATION_GROUP_NAME: "",
+        RELATION_GROUP_PARENT: "",
         RELATION_GROUP_DESCRIPTION: "",
     });
 
@@ -104,14 +135,6 @@ export default function Group({ auth }: PageProps) {
                 setIdGroup({
                     RELATION_GROUP_ID: message[0],
                     RELATION_GROUP_NAME: message[1],
-                });
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: true,
-                    document: false,
-                    search: false,
                 });
             }
         });
@@ -150,6 +173,7 @@ export default function Group({ auth }: PageProps) {
             {/* Modal Add Group */}
             <ModalToAdd
                 show={modal.add}
+                buttonAddOns={""}
                 onClose={() =>
                     setModal({
                         add: false,
@@ -191,6 +215,41 @@ export default function Group({ auth }: PageProps) {
                                     }
                                     required
                                     placeholder="Name Relation Group"
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <InputLabel
+                                    className=""
+                                    htmlFor="RELATION_GROUP_NAME"
+                                    value="Parent Group"
+                                />
+                                <SelectTailwind
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={mappingParentGroup}
+                                    isSearchable={true}
+                                    placeholder={"--Select Province--"}
+                                    value={data.RELATION_GROUP_PARENT}
+                                    // onChange={(e) =>
+                                    //     inputDataBank(
+                                    //         "BANK_ID",
+                                    //         e.target.value,
+                                    //         i
+                                    //     )
+                                    // }
+                                    onChange={(val: any) => {
+                                        setData("RELATION_GROUP_PARENT", val);
+                                    }}
+                                    primaryColor={"bg-red-500"}
                                 />
                             </div>
                             <div className="mt-4">
@@ -274,6 +333,7 @@ export default function Group({ auth }: PageProps) {
                                     document: false,
                                     search: false,
                                 });
+                                getMappingParentGroup();
                             }}
                         >
                             {"Add Group"}

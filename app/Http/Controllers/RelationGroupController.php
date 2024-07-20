@@ -14,6 +14,7 @@ use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class RelationGroupController extends Controller
@@ -21,7 +22,7 @@ class RelationGroupController extends Controller
 
     public function getRelationGroupData($dataPerPage = 2, $searchQuery = null)
     {
-        $data = RelationGroup::orderBy('RELATION_GROUP_ID', 'desc');
+        $data = RelationGroup::orderBy('RELATION_GROUP_ID', 'desc')->where('RELATION_GROUP_PARENT', 0);
         if ($searchQuery) {
             if ($searchQuery->input('RELATION_GROUP_NAME')) {
                 $data->where('RELATION_GROUP_NAME', 'like', '%'.$searchQuery->RELATION_GROUP_NAME.'%');
@@ -74,18 +75,31 @@ class RelationGroupController extends Controller
     }
 
     public function store(Request $request){
-
+        // dd($request);
         // toupper
         $nameGroup = strtoupper($request->RELATION_GROUP_NAME);
+
+        // Cek Relation Perent Id 
+        $parentID = $request->RELATION_GROUP_PARENT['value'];
+        if ($request->RELATION_GROUP_PARENT == '' || $request->RELATION_GROUP_PARENT == NULL) {
+            $parentID = "0";
+        }
+
 
         // Created Relation
         $group = RelationGroup::create([
             'RELATION_GROUP_NAME' => $nameGroup,
+            'RELATION_GROUP_PARENT' => $parentID,
             'RELATION_GROUP_DESCRIPTION' => $request->RELATION_GROUP_DESCRIPTION,
             'RELATION_GROUP_CREATED_BY' => Auth::user()->id,
             'RELATION_GROUP_CREATED_DATE' => now(),
 
         ]);
+
+
+        // Mapping Parent Id and Update
+        $name = NULL;
+        DB::select('call sp_set_mapping_relation_group(?)', [$name]);
 
         // Created Log
         UserLog::create([
@@ -132,7 +146,7 @@ class RelationGroupController extends Controller
     }
 
     public function get_detail(Request $request){
-        $detailRelation = RelationGroup::with('rGroup')->find($request->id);
+        $detailRelation = RelationGroup::find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
@@ -143,6 +157,13 @@ class RelationGroupController extends Controller
         // dd($getGroup);
         // print_r($detailRelation);die;
         return response()->json($getGroup);
+    }
+
+    public function get_mapping(Request $request)
+    {
+        $name = NULL;
+        $data = DB::select('call sp_combo_relation_group(?)', [$name]);
+        return response()->json($data);
     }
     
 }

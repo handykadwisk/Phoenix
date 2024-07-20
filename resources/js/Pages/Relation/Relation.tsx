@@ -60,11 +60,6 @@ export default function Relation({ auth }: PageProps) {
                         document: false,
                         search: false,
                     });
-                    setSearchRelation({
-                        ...searchRelation,
-                        RELATION_ORGANIZATION_NAME: "",
-                        RELATION_TYPE_ID: "",
-                    });
                 }
             })
             .catch((err) => {
@@ -547,11 +542,6 @@ export default function Relation({ auth }: PageProps) {
                                         ""
                                     ) {
                                         getRelation();
-                                        setSearchRelation({
-                                            ...searchRelation,
-                                            RELATION_ORGANIZATION_NAME: "",
-                                            RELATION_TYPE_ID: "",
-                                        });
                                     }
                                 }
                             }}
@@ -615,11 +605,6 @@ export default function Relation({ auth }: PageProps) {
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
                                     getRelation();
-                                    setSearchRelation({
-                                        ...searchRelation,
-                                        RELATION_ORGANIZATION_NAME: "",
-                                        RELATION_TYPE_ID: "",
-                                    });
                                 }}
                             >
                                 Search

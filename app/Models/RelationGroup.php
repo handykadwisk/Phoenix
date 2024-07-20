@@ -13,6 +13,8 @@ class RelationGroup extends Model
 
     protected $table = 't_relation_group';
 
+    public $with = ['children', 'rGroup'];
+
     // public $with = ['rGroup'];
     protected $guarded = [
         'RELATION_GROUP_ID',
@@ -22,6 +24,10 @@ class RelationGroup extends Model
 
     public function rGroup()
     {
-        return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_GROUP');
+        return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_GROUP', 'RELATION_GROUP_ID');
+    }
+
+    public function children() {
+        return $this->hasMany(RelationGroup::class, 'RELATION_GROUP_PARENT');
     }
 }

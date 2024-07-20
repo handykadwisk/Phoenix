@@ -13,7 +13,7 @@ class Relation extends Model
 
     protected $table = 't_relation';
 
-    public $with = ['mTagging','mRelationType','mRelationAka', 'children','groupRelation'];
+    public $with = ['mTagging','mRelationType','mRelationAka', 'children'];
 
     protected $guarded = [
         'RELATION_ORGANIZATION_ID',

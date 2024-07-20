@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/group/detailGroup/{id}', [RelationGroupController::class, 'detailGroup'])->name('group.detailGroup.Group');
     Route::post('/getRelationGroupDetail', [RelationGroupController::class, 'get_detail'])->name('getRelationGroupDetail.get_detail');
     Route::post('/getGroup', [RelationGroupController::class, 'get_group'])->name('getGroup.get_group');
+    Route::post('/getMappingParentGroup', [RelationGroupController::class, 'get_mapping'])->name('getMappingParentGroup.get_mapping');
 
 
     // Agent

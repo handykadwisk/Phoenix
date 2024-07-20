@@ -61,7 +61,7 @@ export default function DetailGroup({
             .post(`/getRelationGroupDetail`, { id })
             .then((res) => {
                 setDataRelationGroupNew(res.data);
-                // console.log(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -169,8 +169,8 @@ export default function DetailGroup({
             <>
                 {dataChildrenNew?.length !== 0
                     ? dataChildrenNew?.map((dChild: any, a: number) => (
-                          <div className="pt-0 pl-[0.32rem]" key={a}>
-                              <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                          <div className="pt-1 pl-[0.32rem]" key={a}>
+                              <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700">
                                   <li>
                                       <div className="relative flex justify-between hover:text-red-600 w-fit">
                                           <div className="flex items-center justify-center pr-2">
@@ -180,24 +180,59 @@ export default function DetailGroup({
                                                   }
                                               ></span>
                                           </div>
-                                          <div className="flex items-center w-full">
-                                              <a
-                                                  href="#"
-                                                  className="inline-block w-full py-1 pr-4 text-sm"
-                                                  onClick={(e) =>
-                                                      handleDetailPopup(
-                                                          e,
-                                                          dChild.RELATION_ORGANIZATION_ID,
-                                                          dChild.RELATION_ORGANIZATION_NAME
-                                                      )
-                                                  }
-                                              >
-                                                  {
-                                                      dChild.RELATION_ORGANIZATION_NAME
-                                                  }
-                                              </a>
+                                          <div className="flex items-center w-full gap-1">
+                                              <div className="text-sm">
+                                                  <span>
+                                                      {
+                                                          dChild.RELATION_GROUP_NAME
+                                                      }
+                                                  </span>
+                                              </div>
+                                              <div className="text-xs text-gray-300">
+                                                  / Sub Group
+                                              </div>
                                           </div>
                                       </div>
+                                      {dChild.r_group?.length !== 0
+                                          ? dChild.r_group?.map(
+                                                (
+                                                    dataRelationsNew: any,
+                                                    z: number
+                                                ) => (
+                                                    <div
+                                                        className="pt-1 pl-[0.32rem]"
+                                                        key={z}
+                                                    >
+                                                        <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                                                            <li>
+                                                                <div className="relative flex justify-between hover:text-red-600 w-fit">
+                                                                    <div className="flex items-center justify-center pr-2">
+                                                                        <span
+                                                                            className={
+                                                                                "bg-green-500 h-3 w-3 rounded-full"
+                                                                            }
+                                                                        ></span>
+                                                                    </div>
+                                                                    <div className="flex items-center w-full gap-1">
+                                                                        <div className="text-sm">
+                                                                            <span>
+                                                                                {
+                                                                                    dataRelationsNew.RELATION_ORGANIZATION_NAME
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="text-xs text-gray-300">
+                                                                            /
+                                                                            Relation
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                )
+                                            )
+                                          : null}
                                       {BasicInfo(dChild.children)}
                                   </li>
                               </ul>
@@ -303,22 +338,17 @@ export default function DetailGroup({
                     </div>
                     <div className="px-4 pb-6">
                         {/* <Card data={relationGroup} /> */}
-                        {dataRelationGroupNew.r_group?.length === 0 ? (
+                        {dataRelationGroupNew.children?.length === 0 ? (
                             <>
                                 <span>No Data Available</span>
                             </>
                         ) : (
                             <>
-                                <ul className="flex flex-col space-y-2 text-lg">
-                                    {dataRelationGroupNew.r_group
-                                        ?.filter(
-                                            (m: any) =>
-                                                m.RELATION_ORGANIZATION_PARENT_ID ===
-                                                0
-                                        )
-                                        .map((item: any, i: number) => (
+                                <ul className="flex flex-col space-y-0 text-lg">
+                                    {dataRelationGroupNew.children?.map(
+                                        (item: any, i: number) => (
                                             <li className="" key={i}>
-                                                <div className="relative flex justify-between font-semibold hover:text-red-600 w-fit">
+                                                <div className="relative flex justify-between font-semibold text-black hover:text-red-600 w-fit">
                                                     <div className="flex items-center justify-center pr-2">
                                                         <span
                                                             className={
@@ -326,34 +356,69 @@ export default function DetailGroup({
                                                             }
                                                         ></span>
                                                     </div>
-                                                    <div className="flex items-center w-full">
-                                                        <a
-                                                            href="#"
-                                                            className="inline-block w-full py-1 pr-4 text-sm"
-                                                            onClick={(e) =>
-                                                                handleDetailPopup(
-                                                                    e,
-                                                                    item.RELATION_ORGANIZATION_ID,
-                                                                    item.RELATION_ORGANIZATION_NAME
-                                                                )
-                                                            }
-                                                        >
-                                                            {
-                                                                item.RELATION_ORGANIZATION_NAME
-                                                            }
-                                                        </a>
+                                                    <div className="flex items-center w-full gap-1">
+                                                        <div className="text-sm">
+                                                            <span>
+                                                                {
+                                                                    item.RELATION_GROUP_NAME
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-xs text-gray-300">
+                                                            / Sub Group
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                {item.r_group?.length !== 0
+                                                    ? item.r_group?.map(
+                                                          (
+                                                              dataRelation: any,
+                                                              z: number
+                                                          ) => (
+                                                              <div
+                                                                  className="pt-1 pl-[0.32rem]"
+                                                                  key={z}
+                                                              >
+                                                                  <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                                                                      <li>
+                                                                          <div className="relative flex justify-between hover:text-red-600 w-fit">
+                                                                              <div className="flex items-center justify-center pr-2">
+                                                                                  <span
+                                                                                      className={
+                                                                                          "bg-green-500 h-3 w-3 rounded-full"
+                                                                                      }
+                                                                                  ></span>
+                                                                              </div>
+                                                                              <div className="flex items-center w-full gap-1">
+                                                                                  <div className="text-sm">
+                                                                                      <span>
+                                                                                          {
+                                                                                              dataRelation.RELATION_ORGANIZATION_NAME
+                                                                                          }
+                                                                                      </span>
+                                                                                  </div>
+                                                                                  <div className="text-xs text-gray-300">
+                                                                                      /
+                                                                                      Relation
+                                                                                  </div>
+                                                                              </div>
+                                                                          </div>
+                                                                      </li>
+                                                                  </ul>
+                                                              </div>
+                                                          )
+                                                      )
+                                                    : null}
                                                 {item.children?.map(
                                                     (
                                                         dataChildren: any,
                                                         a: number
                                                     ) => (
                                                         <div
-                                                            className="pt-0 pl-[0.32rem]"
+                                                            className="pt-1 pl-[0.32rem]"
                                                             key={a}
                                                         >
-                                                            <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                                                            <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700">
                                                                 <li>
                                                                     <div className="relative flex justify-between hover:text-red-600 w-fit">
                                                                         <div className="flex items-center justify-center pr-2">
@@ -363,26 +428,66 @@ export default function DetailGroup({
                                                                                 }
                                                                             ></span>
                                                                         </div>
-                                                                        <div className="flex items-center w-full">
-                                                                            <a
-                                                                                href="#"
-                                                                                className="inline-block w-full py-1 pr-4 text-sm"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    handleDetailPopup(
-                                                                                        e,
-                                                                                        dataChildren.RELATION_ORGANIZATION_ID,
-                                                                                        dataChildren.RELATION_ORGANIZATION_NAME
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    dataChildren.RELATION_ORGANIZATION_NAME
-                                                                                }
-                                                                            </a>
+                                                                        <div className="flex items-center w-full gap-1">
+                                                                            <div className="text-sm">
+                                                                                <span>
+                                                                                    {
+                                                                                        dataChildren.RELATION_GROUP_NAME
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="text-xs text-gray-300">
+                                                                                /
+                                                                                Sub
+                                                                                Group
+                                                                            </div>
                                                                         </div>
                                                                     </div>
+                                                                    {dataChildren
+                                                                        .r_group
+                                                                        ?.length !==
+                                                                    0
+                                                                        ? dataChildren.r_group?.map(
+                                                                              (
+                                                                                  dataRelations: any,
+                                                                                  z: number
+                                                                              ) => (
+                                                                                  <div
+                                                                                      className="pt-1 pl-[0.32rem]"
+                                                                                      key={
+                                                                                          z
+                                                                                      }
+                                                                                  >
+                                                                                      <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
+                                                                                          <li>
+                                                                                              <div className="relative flex justify-between hover:text-red-600 w-fit">
+                                                                                                  <div className="flex items-center justify-center pr-2">
+                                                                                                      <span
+                                                                                                          className={
+                                                                                                              "bg-green-500 h-3 w-3 rounded-full"
+                                                                                                          }
+                                                                                                      ></span>
+                                                                                                  </div>
+                                                                                                  <div className="flex items-center w-full gap-1">
+                                                                                                      <div className="text-sm">
+                                                                                                          <span>
+                                                                                                              {
+                                                                                                                  dataRelations.RELATION_ORGANIZATION_NAME
+                                                                                                              }
+                                                                                                          </span>
+                                                                                                      </div>
+                                                                                                      <div className="text-xs text-gray-300">
+                                                                                                          /
+                                                                                                          Relation
+                                                                                                      </div>
+                                                                                                  </div>
+                                                                                              </div>
+                                                                                          </li>
+                                                                                      </ul>
+                                                                                  </div>
+                                                                              )
+                                                                          )
+                                                                        : null}
                                                                     {BasicInfo(
                                                                         dataChildren.children
                                                                     )}
@@ -392,7 +497,8 @@ export default function DetailGroup({
                                                     )
                                                 )}
                                             </li>
-                                        ))}
+                                        )
+                                    )}
                                 </ul>
                             </>
                         )}
