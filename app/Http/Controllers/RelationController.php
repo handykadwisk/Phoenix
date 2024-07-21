@@ -154,10 +154,10 @@ class RelationController extends Controller
         // }
         // die;
         // Cek Relation Perent Id 
-        $parentID = $request->parent_id;
-        if ($request->parent_id == '' || $request->parent_id == NULL) {
-            $parentID = "0";
-        }
+        // $parentID = $request->parent_id;
+        // if ($request->parent_id == '' || $request->parent_id == NULL) {
+        //     $parentID = "0";
+        // }
 
         // ubah ke to lower dan huruf besar di awal
         $nameRelation = strtolower($request->name_relation);
@@ -181,10 +181,10 @@ class RelationController extends Controller
         // Created Relation
         $relation = Relation::create([
             'RELATION_ORGANIZATION_NAME' => $addTBK,
-            'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
+            'RELATION_ORGANIZATION_PARENT_ID' => 0,
             'RELATION_ORGANIZATION_ABBREVIATION' => strtoupper($request->abbreviation),
             // 'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
-            'RELATION_ORGANIZATION_GROUP' => $request->group_id,
+            // 'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
             'HR_MANAGED_BY_APP' => $request->is_managed,
             'IS_TBK' => $request->mark_tbk_relation,
@@ -210,7 +210,7 @@ class RelationController extends Controller
         ]);
 
         // Mapping Parent Id and Update
-        DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
+        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
@@ -339,59 +339,59 @@ class RelationController extends Controller
 
 
 
-        // cek apakah ganti group apa engga
-        $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
-        $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
-        if ($oldGroup !== $request->RELATION_ORGANIZATION_GROUP) {
-            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_GROUP'         => $request->RELATION_ORGANIZATION_GROUP,
-                ]);
-        }
+        // // cek apakah ganti group apa engga
+        // $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
+        // $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
+        // if ($oldGroup !== $request->RELATION_ORGANIZATION_GROUP) {
+        //     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_GROUP'         => $request->RELATION_ORGANIZATION_GROUP,
+        //         ]);
+        // }
 
 
         // cek apakah dia parent ?
-        $relationParent = Relation::find($request->RELATION_ORGANIZATION_ID);
-        $parentId = $relationParent->RELATION_ORGANIZATION_PARENT_ID;
-        if ($parentId == 0 && $request->RELATION_ORGANIZATION_PARENT_ID != null) {
-            // cek satu group atau tidak
-            $return = Relation::where('RELATION_ORGANIZATION_MAPPING', 'like', '%' . $request->RELATION_ORGANIZATION_PARENT_ID .".". '%')->get();
-            if ($return->count() > 0) {
-                // update parent to child
-                $updateParent = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_PARENT_ID)
-                                ->update([
-                                    'RELATION_ORGANIZATION_PARENT_ID'         => 0,
-                                ]);
+        // $relationParent = Relation::find($request->RELATION_ORGANIZATION_ID);
+        // $parentId = $relationParent->RELATION_ORGANIZATION_PARENT_ID;
+        // if ($parentId == 0 && $request->RELATION_ORGANIZATION_PARENT_ID != null) {
+        //     // cek satu group atau tidak
+        //     $return = Relation::where('RELATION_ORGANIZATION_MAPPING', 'like', '%' . $request->RELATION_ORGANIZATION_PARENT_ID .".". '%')->get();
+        //     if ($return->count() > 0) {
+        //         // update parent to child
+        //         $updateParent = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_PARENT_ID)
+        //                         ->update([
+        //                             'RELATION_ORGANIZATION_PARENT_ID'         => 0,
+        //                         ]);
                                 
-                // update child to parent
-                if ($updateParent) {
-                    Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                                ->update([
-                                    'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
-                                ]);
-                }
-            }else{
-                Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
-                ]);
-            }
-        }
+        //         // update child to parent
+        //         if ($updateParent) {
+        //             Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //                         ->update([
+        //                             'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
+        //                         ]);
+        //         }
+        //     }else{
+        //         Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
+        //         ]);
+        //     }
+        // }
 
 
         // Cek Relation Perent Id 
-        $parentID = $request->RELATION_ORGANIZATION_PARENT_ID;
-        if ($request->RELATION_ORGANIZATION_PARENT_ID == '' || $request->RELATION_ORGANIZATION_PARENT_ID == NULL) {
-            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_PARENT_ID'         => 0,
-                ]);
-        }else{
-            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_PARENT_ID'         => $parentID,
-                ]);
-        }
+        // $parentID = $request->RELATION_ORGANIZATION_PARENT_ID;
+        // if ($request->RELATION_ORGANIZATION_PARENT_ID == '' || $request->RELATION_ORGANIZATION_PARENT_ID == NULL) {
+        //     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_PARENT_ID'         => 0,
+        //         ]);
+        // }else{
+        //     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_PARENT_ID'         => $parentID,
+        //         ]);
+        // }
 
         // ubah ke to lower dan huruf besar di awal
         $nameRelation = strtolower($request->RELATION_ORGANIZATION_NAME);
@@ -436,7 +436,7 @@ class RelationController extends Controller
             ]);
 
         // Mapping Parent Id and Update
-        DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
+        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
 
         // check existing relation AKA
         $existingRelationAKA = MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();

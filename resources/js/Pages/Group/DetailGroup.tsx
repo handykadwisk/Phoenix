@@ -9,12 +9,23 @@ import {
     PencilSquareIcon,
     UserIcon,
 } from "@heroicons/react/20/solid";
-import { FormEvent, PropsWithChildren, useEffect, useState } from "react";
+import React, {
+    FormEvent,
+    PropsWithChildren,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import AddRelationPopup from "../Relation/AddRelation";
 import DetailRelationPopup from "../Relation/DetailRelation";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ModalToAction from "@/Components/Modal/ModalToAction";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import TextArea from "@/Components/TextArea";
+import SelectTailwind from "react-tailwindcss-select";
 
 export default function DetailGroup({
     idGroup,
@@ -34,7 +45,7 @@ export default function DetailGroup({
     const [dataRelationGroupNew, setDataRelationGroupNew] = useState<any>([]);
     const [relationGroupNew, setRelationGroupNew] = useState<any>([]);
     const [relationId, setRelationId] = useState<any>({
-        idGroup: "",
+        idRelation: "",
         nameRelation: "",
     });
 
@@ -61,7 +72,6 @@ export default function DetailGroup({
             .post(`/getRelationGroupDetail`, { id })
             .then((res) => {
                 setDataRelationGroupNew(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -89,7 +99,7 @@ export default function DetailGroup({
         // if (modal.add) {
         Swal.fire({
             title: "Success",
-            text: "New Relation Added",
+            text: "New Sub Group Added",
             icon: "success",
         }).then((result: any) => {
             // console.log(result);
@@ -103,6 +113,49 @@ export default function DetailGroup({
                     view: false,
                     document: false,
                     search: false,
+                });
+                setDataSubGroup({
+                    ...dataSubGroup,
+                    RELATION_GROUP_NAME: "",
+                    RELATION_GROUP_PARENT: "",
+                    RELATION_GROUP_DESCRIPTION: "",
+                });
+            }
+        });
+        // }
+        // setIsSuccess(message);
+    };
+
+    const [dataRelation, setDataRelation] = useState<any>({
+        RELATION_ORGANIZATION_GROUP: "",
+        name_relation: [],
+    });
+
+    const handleSuccessAddRelation = (message: string) => {
+        // setIsSuccess("");
+        // reset();
+        // if (modal.add) {
+        Swal.fire({
+            title: "Success",
+            text: "New Relation Added",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                getDetailGroup(idGroup);
+                getGroupName(idGroup);
+                // setModal({
+                //     add: false,
+                //     delete: false,
+                //     edit: false,
+                //     view: false,
+                //     document: false,
+                //     search: false,
+                // });
+                setDataRelation({
+                    ...dataRelation,
+                    RELATION_ORGANIZATION_GROUP: "",
+                    name_relation: [],
                 });
             }
         });
@@ -126,13 +179,13 @@ export default function DetailGroup({
 
     const handleDetailPopup = async (
         e: FormEvent,
-        idGroup: string,
+        idRelation: string,
         nameRelation: string
     ) => {
         e.preventDefault();
 
         setRelationId({
-            idGroup: idGroup,
+            idRelation: idRelation,
             nameRelation: nameRelation,
         });
         setModal({
@@ -164,15 +217,70 @@ export default function DetailGroup({
         relation_type_id: [],
     });
 
+    const [modalAddSubGroup, setModalAddSubGroup] = useState({
+        add: false,
+    });
+
+    const [modalAddRelation, setModalAddRelation] = useState({
+        add: false,
+    });
+
+    const [modalChangeSubGroup, setModalChangeSubGroup] = useState({
+        edit: false,
+    });
+
+    const [dataSubGroup, setDataSubGroup] = useState<any>({
+        RELATION_GROUP_NAME: "",
+        RELATION_GROUP_PARENT: "",
+        RELATION_GROUP_DESCRIPTION: "",
+    });
+    const [dataDetailSubGroupParent, setDataDetailSubGroupParent] =
+        useState<any>([]);
+
+    // get detail sub group parent
+    const getDetailSubGroupParent = async (id: string) => {
+        await axios
+            .post(`/getDetailSubGroupParent`, { id })
+            .then((res) => {
+                setDataDetailSubGroupParent(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // Onclick Add Sub Group
+    const handleClickAddSubGroup = async (e: FormEvent, idGroup: string) => {
+        e.preventDefault();
+
+        getDetailSubGroupParent(idGroup);
+        setDataSubGroup({
+            ...dataSubGroup,
+            RELATION_GROUP_PARENT: idGroup,
+        });
+        setModalAddSubGroup({
+            add: !modalAddSubGroup.add,
+        });
+    };
+    // end Add Sub Group
+
     function BasicInfo(dataChildrenNew: any): React.ReactElement {
         return (
             <>
                 {dataChildrenNew?.length !== 0
                     ? dataChildrenNew?.map((dChild: any, a: number) => (
                           <div className="pt-1 pl-[0.32rem]" key={a}>
-                              <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700">
+                              <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700 hover:cursor-pointer">
                                   <li>
-                                      <div className="relative flex justify-between hover:text-red-600 w-fit">
+                                      <div
+                                          className="relative flex justify-between hover:text-red-600 w-fit"
+                                          onClick={() => {
+                                              handleClick(
+                                                  dChild.RELATION_GROUP_ID
+                                              );
+                                          }}
+                                      >
                                           <div className="flex items-center justify-center pr-2">
                                               <span
                                                   className={
@@ -193,6 +301,47 @@ export default function DetailGroup({
                                               </div>
                                           </div>
                                       </div>
+                                      <div
+                                          className="hidden"
+                                          key={a}
+                                          id={"item" + dChild.RELATION_GROUP_ID}
+                                      >
+                                          <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
+                                              <li>
+                                                  <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
+                                                      <div
+                                                          className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                          onClick={(e) =>
+                                                              handleClickAddSubGroup(
+                                                                  e,
+                                                                  dChild.RELATION_GROUP_ID
+                                                              )
+                                                          }
+                                                      >
+                                                          <span>
+                                                              Add Sub Group
+                                                          </span>
+                                                      </div>
+                                                      <div
+                                                          className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                          onClick={(e) =>
+                                                              handleClickAddRelation(
+                                                                  e,
+                                                                  dChild.RELATION_GROUP_ID
+                                                              )
+                                                          }
+                                                      >
+                                                          <span>
+                                                              Add Relation
+                                                          </span>
+                                                      </div>
+                                                      <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                          <span>Detail</span>
+                                                      </div>
+                                                  </div>
+                                              </li>
+                                          </ul>
+                                      </div>
                                       {dChild.r_group?.length !== 0
                                           ? dChild.r_group?.map(
                                                 (
@@ -205,7 +354,14 @@ export default function DetailGroup({
                                                     >
                                                         <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                             <li>
-                                                                <div className="relative flex justify-between hover:text-red-600 w-fit">
+                                                                <div
+                                                                    className="relative flex justify-between hover:text-red-600 w-fit"
+                                                                    onClick={() => {
+                                                                        handleClickRelation(
+                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                        );
+                                                                    }}
+                                                                >
                                                                     <div className="flex items-center justify-center pr-2">
                                                                         <span
                                                                             className={
@@ -227,6 +383,59 @@ export default function DetailGroup({
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <div
+                                                                    className="hidden"
+                                                                    key={z}
+                                                                    id={
+                                                                        "item" +
+                                                                        dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                    }
+                                                                >
+                                                                    <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
+                                                                        <li>
+                                                                            <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
+                                                                                <div
+                                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        handleClickChangeSubGroup(
+                                                                                            e,
+                                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <span>
+                                                                                        Change
+                                                                                        Sub
+                                                                                        Group
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div
+                                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        handleDetailPopup(
+                                                                                            e,
+                                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID,
+                                                                                            dataRelationsNew.RELATION_ORGANIZATION_NAME
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <span>
+                                                                                        Detail
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                                                    <span>
+                                                                                        Delete
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -243,8 +452,507 @@ export default function DetailGroup({
         );
     }
 
+    const handleClick = (i: any) => {
+        const element = document.getElementById("item" + i);
+        if (!element?.className) {
+            element?.setAttribute("class", "hidden");
+        } else {
+            element?.setAttribute("class", "");
+        }
+    };
+
+    const handleClickRelation = (i: any) => {
+        const element = document.getElementById("item" + i);
+        if (!element?.className) {
+            element?.setAttribute("class", "hidden");
+        } else {
+            element?.setAttribute("class", "");
+        }
+    };
+
+    // Onclick Add Relation
+    const handleClickAddRelation = async (e: FormEvent, idGroup: string) => {
+        e.preventDefault();
+        getRelationNoGroup();
+        // getDetailSubGroupParent(idGroup);
+        setDataRelation({
+            ...dataRelation,
+            RELATION_ORGANIZATION_GROUP: idGroup,
+        });
+        setModalAddRelation({
+            add: !modalAddRelation.add,
+        });
+    };
+    // end Add Relation
+
+    const inputRefTag = useRef<HTMLInputElement>(null);
+    const [query, setQuery] = useState("");
+    const [menuOpen, setMenuOpen] = useState(true);
+    const [relationNoGroup, setRelationNoGroup] = useState<any>([]);
+    // get relation yang group nya null
+    const getRelationNoGroup = async () => {
+        await axios
+            .post(`/getRelationNoGroup`)
+            .then((res) => {
+                setRelationNoGroup(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const filteredTags = relationNoGroup.filter(
+        (item: any) =>
+            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+                query.toLocaleLowerCase()?.trim()
+            ) &&
+            !dataRelation.name_relation?.includes(
+                item.RELATION_ORGANIZATION_NAME
+            )
+    );
+
+    const [dataRelationChange, setDataRelationChange] = useState<any>([]);
+    const [subGroupById, setSubGroupById] = useState<any>([]);
+    const [dataChangeSubGroup, setDataChangeSubGroup] = useState<any>({
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_GROUP: "",
+    });
+    const handleSuccessChangeGroup = (message: string) => {
+        // setIsSuccess("");
+        // reset();
+        // if (modal.add) {
+        Swal.fire({
+            title: "Success",
+            text: "Change Sub Group Added",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                getDetailGroup(idGroup);
+                getGroupName(idGroup);
+                // setModal({
+                //     add: false,
+                //     delete: false,
+                //     edit: false,
+                //     view: false,
+                //     document: false,
+                //     search: false,
+                // });
+                setDataChangeSubGroup({
+                    ...dataChangeSubGroup,
+                    RELATION_ORGANIZATION_ID: "",
+                    RELATION_ORGANIZATION_GROUP: "",
+                });
+            }
+        });
+        // }
+        // setIsSuccess(message);
+    };
+
+    const getRelationChange = async (idRelation: any) => {
+        await axios
+            .post(`/getRelationChange`, { idRelation })
+            .then((res) => {
+                setDataRelationChange(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getSubGroupById = async (idGroup: any) => {
+        // setIsLoading(true)
+
+        // if (name) {
+        await axios
+            .post(`/getSubGroupById`, { idGroup })
+            .then((res: any) => {
+                setSubGroupById(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const mappingSubGroupById = subGroupById?.map((query: any) => {
+        return {
+            value: query.RELATION_GROUP_ID,
+            label: query.RELATION_GROUP_NAME,
+        };
+    });
+
+    const handleClickChangeSubGroup = async (
+        e: FormEvent,
+        idRelation: string
+    ) => {
+        e.preventDefault();
+
+        // getDetailSubGroupParent(idRelation);
+        setDataChangeSubGroup({
+            ...dataChangeSubGroup,
+            RELATION_ORGANIZATION_ID: idRelation,
+        });
+        getSubGroupById(idGroup);
+        getRelationChange(idRelation);
+        setModalChangeSubGroup({
+            edit: !modalChangeSubGroup.edit,
+        });
+    };
     return (
         <>
+            {/* modal change sub group */}
+            <ModalToAdd
+                show={modalChangeSubGroup.edit}
+                buttonAddOns={""}
+                onClose={() =>
+                    setModalChangeSubGroup({
+                        edit: false,
+                    })
+                }
+                title={"Change Sub Group"}
+                url={`/changeSubGroup`}
+                data={dataChangeSubGroup}
+                onSuccess={handleSuccessChangeGroup}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                body={
+                    <>
+                        <div>
+                            <div className="mt-1">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="RELATION_GROUP_NAME"
+                                    value="Name Relation"
+                                />
+                                <div className="ml-[6.8rem] text-red-600">
+                                    *
+                                </div>
+                                <div className="bg-gray-500 py-1 px-2 rounded-md">
+                                    <span>
+                                        {
+                                            dataRelationChange.RELATION_ORGANIZATION_NAME
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-2 mb-56">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="RELATION_GROUP_NAME"
+                                    value="Sub Group"
+                                />
+                                <div className="ml-[4.8rem] text-red-600">
+                                    *
+                                </div>
+                                <SelectTailwind
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={mappingSubGroupById}
+                                    isSearchable={true}
+                                    placeholder={"--Select Sub Group--"}
+                                    value={
+                                        dataChangeSubGroup.RELATION_ORGANIZATION_GROUP
+                                    }
+                                    // onChange={(e) =>
+                                    //     inputDataBank(
+                                    //         "BANK_ID",
+                                    //         e.target.value,
+                                    //         i
+                                    //     )
+                                    // }
+                                    onChange={(val: any) => {
+                                        setDataChangeSubGroup({
+                                            ...dataChangeSubGroup,
+                                            RELATION_ORGANIZATION_GROUP: val,
+                                        });
+                                    }}
+                                    primaryColor={"bg-red-500"}
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal change sub group */}
+
+            {/* modal option */}
+            <ModalToAdd
+                show={modalAddSubGroup.add}
+                buttonAddOns={""}
+                onClose={() =>
+                    setModalAddSubGroup({
+                        add: false,
+                    })
+                }
+                title={"Add Sub Group"}
+                url={`/addSubGroup`}
+                data={dataSubGroup}
+                onSuccess={handleSuccess}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                body={
+                    <>
+                        <div>
+                            <div className="mt-4">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="RELATION_GROUP_NAME"
+                                    value="Name Sub Group Parent"
+                                />
+                                <div className="ml-[10.8rem] text-red-600">
+                                    *
+                                </div>
+                                <div className="bg-gray-500 py-1 px-2 rounded-md">
+                                    <span>
+                                        {
+                                            dataDetailSubGroupParent.RELATION_GROUP_NAME
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-2">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="RELATION_GROUP_NAME"
+                                    value="Name Sub Group"
+                                />
+                                <div className="ml-[7.8rem] text-red-600">
+                                    *
+                                </div>
+                                <TextInput
+                                    type="text"
+                                    value={dataSubGroup.RELATION_GROUP_NAME}
+                                    className="mt-2"
+                                    onChange={(e) => {
+                                        setDataSubGroup({
+                                            ...dataSubGroup,
+                                            RELATION_GROUP_NAME: e.target.value,
+                                        });
+                                    }}
+                                    required
+                                    placeholder="Name Sub Group"
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <InputLabel
+                                    htmlFor="RELATION_GROUP_DESCRIPTION"
+                                    value="Sub Group Description"
+                                />
+                                <TextArea
+                                    className="mt-2"
+                                    id="RELATION_GROUP_DESCRIPTION"
+                                    name="RELATION_GROUP_DESCRIPTION"
+                                    defaultValue={
+                                        dataSubGroup.RELATION_GROUP_DESCRIPTION
+                                    }
+                                    onChange={(e: any) => {
+                                        setDataSubGroup({
+                                            ...dataSubGroup,
+                                            RELATION_GROUP_DESCRIPTION:
+                                                e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal option */}
+
+            {/* modal add Relation existing */}
+            <ModalToAdd
+                show={modalAddRelation.add}
+                buttonAddOns={""}
+                onClose={() =>
+                    setModalAddRelation({
+                        add: false,
+                    })
+                }
+                title={"Add Relation"}
+                url={`/addRelation`}
+                data={dataRelation}
+                onSuccess={handleSuccessAddRelation}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                body={
+                    <>
+                        <div className="mt-4">
+                            {dataRelation.name_relation?.length ? (
+                                <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
+                                    {dataRelation.name_relation?.map(
+                                        (tag: any, i: number) => {
+                                            return (
+                                                // <>
+                                                <div
+                                                    key={i}
+                                                    className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
+                                                >
+                                                    {tag}
+                                                    <div>
+                                                        {/* <a href=""> */}
+                                                        <div
+                                                            className="text-red-600"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                const updatedData =
+                                                                    dataRelation.name_relation.filter(
+                                                                        (
+                                                                            data: any
+                                                                        ) =>
+                                                                            data !==
+                                                                            tag
+                                                                    );
+                                                                setDataRelation(
+                                                                    {
+                                                                        ...dataRelation,
+                                                                        name_relation:
+                                                                            updatedData,
+                                                                    }
+                                                                );
+                                                            }}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={
+                                                                    1.5
+                                                                }
+                                                                stroke="currentColor"
+                                                                className="w-6 h-6"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                        {/* </a> */}
+                                                    </div>
+                                                </div>
+                                                // </>
+                                            );
+                                        }
+                                    )}
+                                    <div className="w-full text-right">
+                                        <span
+                                            className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
+                                            onClick={() => {
+                                                setDataRelation({
+                                                    ...dataRelation,
+                                                    name_relation: [],
+                                                });
+                                                inputRefTag.current?.focus();
+                                            }}
+                                        >
+                                            Clear all
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : null}
+                            <TextInput
+                                ref={inputRefTag}
+                                type="text"
+                                value={query}
+                                onChange={(e) =>
+                                    setQuery(e.target.value.trimStart())
+                                }
+                                placeholder="Search Relations"
+                                className=""
+                                onFocus={() => setMenuOpen(true)}
+                                // onBlur={() => setMenuOpen(false)}
+                                // onKeyDown={(e) => {
+                                //     if (e.key === "Enter" && !isDisableTag) {
+                                //         setDataRelation((prev: any) => [
+                                //             ...prev,
+                                //             query,
+                                //         ]);
+                                //         setQuery("");
+                                //         setMenuOpen(true);
+                                //     }
+                                // }}
+                            />
+                            {/* <button
+                                className="text-sm disabled:text-gray-300 text-rose-500 disabled:cursor-not-allowed"
+                                disabled={isDisableTag}
+                                onClick={() => {
+                                    if (isDisableTag) {
+                                        return;
+                                    }
+                                    setDataRelation("relation_name", [
+                                        ...dataRelation,
+                                        {
+                                            name_relation: query,
+                                        },
+                                    ]);
+                                    setQuery("");
+                                    inputRefTag.current?.focus();
+                                    setMenuOpen(true);
+                                }}
+                            >
+                                + Add
+                            </button> */}
+                            {menuOpen ? (
+                                <div className="bg-white rounded-md shadow-md w-full max-h-52 mt-2 p-1 flex overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-200">
+                                    <ul className="w-full">
+                                        {filteredTags?.length ? (
+                                            filteredTags?.map(
+                                                (tag: any, i: number) => (
+                                                    <li
+                                                        key={i}
+                                                        className="p-2 cursor-pointer hover:bg-rose-50 hover:text-rose-500 rounded-md w-full"
+                                                        onMouseDown={(e) =>
+                                                            e.preventDefault()
+                                                        }
+                                                        onClick={() => {
+                                                            setMenuOpen(true);
+                                                            setDataRelation({
+                                                                ...dataRelation,
+                                                                name_relation: [
+                                                                    ...dataRelation.name_relation,
+                                                                    tag.RELATION_ORGANIZATION_NAME,
+                                                                ],
+                                                            });
+                                                            setQuery("");
+                                                        }}
+                                                    >
+                                                        {
+                                                            tag.RELATION_ORGANIZATION_NAME
+                                                        }
+                                                    </li>
+                                                )
+                                            )
+                                        ) : (
+                                            <li className="p-2 text-gray-500">
+                                                No options available
+                                            </li>
+                                        )}
+                                    </ul>
+                                </div>
+                            ) : null}
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal relation existing */}
+
             {/* modal add relation */}
             <AddRelationPopup
                 show={modal.add}
@@ -302,7 +1010,7 @@ export default function DetailGroup({
                 body={
                     <>
                         <DetailRelationPopup
-                            detailRelation={relationId.idGroup}
+                            detailRelation={relationId.idRelation}
                             relationStatus={relationStatus}
                             relationGroup={relationGroup}
                             relationType={relationType}
@@ -318,7 +1026,7 @@ export default function DetailGroup({
                     <div className="flex justify-between items-center mt-4 mb-4">
                         <div className="w-fit px-4 text-md font-semibold">
                             <span className="border-b-2 border-red-600">
-                                Relation
+                                Sub Group & Relation
                             </span>
                         </div>
                         <a
@@ -348,7 +1056,22 @@ export default function DetailGroup({
                                     {dataRelationGroupNew.children?.map(
                                         (item: any, i: number) => (
                                             <li className="" key={i}>
-                                                <div className="relative flex justify-between font-semibold text-black hover:text-red-600 w-fit">
+                                                <div
+                                                    className="relative flex justify-between font-semibold text-black hover:text-red-600 w-fit hover:cursor-pointer"
+                                                    // onClick={(e) => {
+                                                    //     e.preventDefault();
+                                                    //     const bb =
+                                                    //         document.getElementById(
+                                                    //             "item" + i
+                                                    //         );
+                                                    //     bb?.hidden === false;
+                                                    // }}
+                                                    onClick={() => {
+                                                        handleClick(
+                                                            item.RELATION_GROUP_ID
+                                                        );
+                                                    }}
+                                                >
                                                     <div className="flex items-center justify-center pr-2">
                                                         <span
                                                             className={
@@ -369,6 +1092,58 @@ export default function DetailGroup({
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div
+                                                    className="hidden"
+                                                    key={i}
+                                                    id={
+                                                        "item" +
+                                                        item.RELATION_GROUP_ID
+                                                    }
+                                                >
+                                                    <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
+                                                        <li>
+                                                            <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
+                                                                <div
+                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleClickAddSubGroup(
+                                                                            e,
+                                                                            item.RELATION_GROUP_ID
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <span>
+                                                                        Add Sub
+                                                                        Group
+                                                                    </span>
+                                                                </div>
+                                                                <div
+                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleClickAddRelation(
+                                                                            e,
+                                                                            item.RELATION_GROUP_ID
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <span>
+                                                                        Add
+                                                                        Relation
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                                    <span>
+                                                                        Detail
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                                 {item.r_group?.length !== 0
                                                     ? item.r_group?.map(
                                                           (
@@ -381,7 +1156,14 @@ export default function DetailGroup({
                                                               >
                                                                   <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                                       <li>
-                                                                          <div className="relative flex justify-between hover:text-red-600 w-fit">
+                                                                          <div
+                                                                              className="relative flex justify-between hover:text-red-600 w-fit"
+                                                                              onClick={() => {
+                                                                                  handleClickRelation(
+                                                                                      dataRelation.RELATION_ORGANIZATION_ID
+                                                                                  );
+                                                                              }}
+                                                                          >
                                                                               <div className="flex items-center justify-center pr-2">
                                                                                   <span
                                                                                       className={
@@ -403,99 +1185,68 @@ export default function DetailGroup({
                                                                                   </div>
                                                                               </div>
                                                                           </div>
+                                                                          <div
+                                                                              className="hidden"
+                                                                              key={
+                                                                                  z
+                                                                              }
+                                                                              id={
+                                                                                  "item" +
+                                                                                  dataRelation.RELATION_ORGANIZATION_ID
+                                                                              }
+                                                                          >
+                                                                              <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
+                                                                                  <li>
+                                                                                      <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
+                                                                                          <div
+                                                                                              className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                              onClick={(
+                                                                                                  e
+                                                                                              ) =>
+                                                                                                  handleClickChangeSubGroup(
+                                                                                                      e,
+                                                                                                      dataRelation.RELATION_ORGANIZATION_ID
+                                                                                                  )
+                                                                                              }
+                                                                                          >
+                                                                                              <span>
+                                                                                                  Change
+                                                                                                  Sub
+                                                                                                  Group
+                                                                                              </span>
+                                                                                          </div>
+                                                                                          <div
+                                                                                              className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                              onClick={(
+                                                                                                  e
+                                                                                              ) =>
+                                                                                                  handleDetailPopup(
+                                                                                                      e,
+                                                                                                      dataRelation.RELATION_ORGANIZATION_ID,
+                                                                                                      dataRelation.RELATION_ORGANIZATION_NAME
+                                                                                                  )
+                                                                                              }
+                                                                                          >
+                                                                                              <span>
+                                                                                                  Detail
+                                                                                              </span>
+                                                                                          </div>
+                                                                                          <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                                                              <span>
+                                                                                                  Delete
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  </li>
+                                                                              </ul>
+                                                                          </div>
                                                                       </li>
                                                                   </ul>
                                                               </div>
                                                           )
                                                       )
                                                     : null}
-                                                {item.children?.map(
-                                                    (
-                                                        dataChildren: any,
-                                                        a: number
-                                                    ) => (
-                                                        <div
-                                                            className="pt-1 pl-[0.32rem]"
-                                                            key={a}
-                                                        >
-                                                            <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700">
-                                                                <li>
-                                                                    <div className="relative flex justify-between hover:text-red-600 w-fit">
-                                                                        <div className="flex items-center justify-center pr-2">
-                                                                            <span
-                                                                                className={
-                                                                                    "bg-red-500 h-3 w-3 rounded-full"
-                                                                                }
-                                                                            ></span>
-                                                                        </div>
-                                                                        <div className="flex items-center w-full gap-1">
-                                                                            <div className="text-sm">
-                                                                                <span>
-                                                                                    {
-                                                                                        dataChildren.RELATION_GROUP_NAME
-                                                                                    }
-                                                                                </span>
-                                                                            </div>
-                                                                            <div className="text-xs text-gray-300">
-                                                                                /
-                                                                                Sub
-                                                                                Group
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    {dataChildren
-                                                                        .r_group
-                                                                        ?.length !==
-                                                                    0
-                                                                        ? dataChildren.r_group?.map(
-                                                                              (
-                                                                                  dataRelations: any,
-                                                                                  z: number
-                                                                              ) => (
-                                                                                  <div
-                                                                                      className="pt-1 pl-[0.32rem]"
-                                                                                      key={
-                                                                                          z
-                                                                                      }
-                                                                                  >
-                                                                                      <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
-                                                                                          <li>
-                                                                                              <div className="relative flex justify-between hover:text-red-600 w-fit">
-                                                                                                  <div className="flex items-center justify-center pr-2">
-                                                                                                      <span
-                                                                                                          className={
-                                                                                                              "bg-green-500 h-3 w-3 rounded-full"
-                                                                                                          }
-                                                                                                      ></span>
-                                                                                                  </div>
-                                                                                                  <div className="flex items-center w-full gap-1">
-                                                                                                      <div className="text-sm">
-                                                                                                          <span>
-                                                                                                              {
-                                                                                                                  dataRelations.RELATION_ORGANIZATION_NAME
-                                                                                                              }
-                                                                                                          </span>
-                                                                                                      </div>
-                                                                                                      <div className="text-xs text-gray-300">
-                                                                                                          /
-                                                                                                          Relation
-                                                                                                      </div>
-                                                                                                  </div>
-                                                                                              </div>
-                                                                                          </li>
-                                                                                      </ul>
-                                                                                  </div>
-                                                                              )
-                                                                          )
-                                                                        : null}
-                                                                    {BasicInfo(
-                                                                        dataChildren.children
-                                                                    )}
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    )
-                                                )}
+                                                {BasicInfo(item.children)}
                                             </li>
                                         )
                                     )}

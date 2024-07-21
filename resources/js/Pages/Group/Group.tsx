@@ -194,7 +194,7 @@ export default function Group({ auth }: PageProps) {
                 body={
                     <>
                         <div>
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="RELATION_GROUP_NAME"
@@ -220,7 +220,7 @@ export default function Group({ auth }: PageProps) {
                             <div className="mt-4">
                                 <InputLabel
                                     className=""
-                                    htmlFor="RELATION_GROUP_NAME"
+                                    htmlFor="RELATION_GROUP_PARENT"
                                     value="Parent Group"
                                 />
                                 <SelectTailwind
@@ -237,7 +237,7 @@ export default function Group({ auth }: PageProps) {
                                     }}
                                     options={mappingParentGroup}
                                     isSearchable={true}
-                                    placeholder={"--Select Province--"}
+                                    placeholder={"--Select Parent--"}
                                     value={data.RELATION_GROUP_PARENT}
                                     // onChange={(e) =>
                                     //     inputDataBank(

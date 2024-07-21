@@ -64,6 +64,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRelationGroupDetail', [RelationGroupController::class, 'get_detail'])->name('getRelationGroupDetail.get_detail');
     Route::post('/getGroup', [RelationGroupController::class, 'get_group'])->name('getGroup.get_group');
     Route::post('/getMappingParentGroup', [RelationGroupController::class, 'get_mapping'])->name('getMappingParentGroup.get_mapping');
+    Route::post('/getDetailSubGroupParent', [RelationGroupController::class, 'get_detail_group_parent'])->name('getDetailSubGroupParent.get_detail_group_parent');
+    Route::post('/addSubGroup', [RelationGroupController::class, 'add_subGroup'])->name('addSubGroup.add_subGroup');
+    Route::post('/getRelationNoGroup', [RelationGroupController::class, 'relation_nogroup'])->name('getRelationNoGroup.relation_nogroup');
+    Route::post('/addRelation', [RelationGroupController::class, 'add_Relation'])->name('addRelation.add_Relation');
+    Route::post('/getRelationChange', [RelationGroupController::class, 'relation_change'])->name('getRelationChange.relation_change');
+    Route::post('/getSubGroupById', [RelationGroupController::class, 'subGroupById'])->name('getSubGroupById.subGroupById');
+    Route::post('/changeSubGroup', [RelationGroupController::class, 'changeSubGroup'])->name('changeSubGroup.changeSubGroup');
+    
 
 
     // Agent

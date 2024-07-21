@@ -125,9 +125,7 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const { data, setData, errors, reset } = useForm<any>({
-        group_id: "",
         name_relation: "",
-        parent_id: "",
         abbreviation: "",
         relation_aka: [],
         relation_email: "",
@@ -199,9 +197,7 @@ export default function Relation({ auth }: PageProps) {
             setIsSuccess("");
             reset();
             setData({
-                group_id: "",
                 name_relation: "",
-                parent_id: "",
                 abbreviation: "",
                 relation_aka: [],
                 relation_email: "",

@@ -38,7 +38,6 @@ export default function DetailRelation({
     relationType,
     profession,
     relationLOB,
-    getDetailMap,
     setGetDetailRelation,
 }: PropsWithChildren<{
     detailRelation: any;
@@ -47,7 +46,6 @@ export default function DetailRelation({
     relationType: any;
     profession: any;
     relationLOB: any;
-    getDetailMap: any;
     setGetDetailRelation: any;
 }>) {
     // const { success, detailRelation }: any = usePage().props;
@@ -132,7 +130,6 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
-                // console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -175,9 +172,7 @@ export default function DetailRelation({
     };
 
     const [dataById, setDataById] = useState<any>({
-        RELATION_ORGANIZATION_GROUP: "",
         RELATION_ORGANIZATION_NAME: "",
-        RELATION_ORGANIZATION_PARENT_ID: "",
         RELATION_ORGANIZATION_ABBREVIATION: "",
         RELATION_ORGANIZATION_AKA: "",
         RELATION_ORGANIZATION_EMAIL: "",
@@ -884,7 +879,7 @@ export default function DetailRelation({
                                 </ul>
                             </div>
                         </div>
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <InputLabel
                                 htmlFor="RELATION_ORGANIZATION_GROUP"
                                 value="Group"
@@ -919,8 +914,8 @@ export default function DetailRelation({
                                     }
                                 )}
                             </select>
-                        </div>
-                        <div className="mt-4">
+                        </div> */}
+                        {/* <div className="mt-4">
                             <InputLabel
                                 htmlFor="RELATION_ORGANIZATION_PARENT_ID"
                                 value="Parent"
@@ -941,7 +936,7 @@ export default function DetailRelation({
                                 </option>
                                 {/* {mappingParent.mapping_parent.map(
                                     (parents: any, i: number) => { */}
-                                {mappingParent.mapping_parent
+                        {/* {mappingParent.mapping_parent
                                     ?.filter(
                                         (m: any) =>
                                             m.RELATION_ORGANIZATION_ALIAS !==
@@ -959,8 +954,8 @@ export default function DetailRelation({
                                             </option>
                                         );
                                     })}
-                            </select>
-                        </div>
+                            </select> */}
+                        {/* </div> */}
                         <div className="xs:grid xs:gap-4 xs:grid-cols-1 lg:grid lg:gap-4 lg:grid-cols-2">
                             <div className="mt-4">
                                 <InputLabel

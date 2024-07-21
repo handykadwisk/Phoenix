@@ -584,7 +584,7 @@ export default function AddRelation({
                                 </ul>
                             </div>
                         </div>
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <InputLabel
                                 htmlFor="group_id"
                                 value="Group"
@@ -615,8 +615,8 @@ export default function AddRelation({
                                     }
                                 )}
                             </select>
-                        </div>
-                        <div className="mt-4">
+                        </div> */}
+                        {/* <div className="mt-4">
                             <InputLabel htmlFor="parent_id" value="Parent" />
                             <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -643,7 +643,7 @@ export default function AddRelation({
                                     }
                                 )}
                             </select>
-                        </div>
+                        </div> */}
                         <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
                             <div className="mt-4">
                                 <InputLabel

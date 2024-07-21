@@ -79,10 +79,11 @@ class RelationGroupController extends Controller
         // toupper
         $nameGroup = strtoupper($request->RELATION_GROUP_NAME);
 
-        // Cek Relation Perent Id 
-        $parentID = $request->RELATION_GROUP_PARENT['value'];
+        // Cek Relation Perent Id
         if ($request->RELATION_GROUP_PARENT == '' || $request->RELATION_GROUP_PARENT == NULL) {
             $parentID = "0";
+        }else{
+            $parentID = $request->RELATION_GROUP_PARENT['value'];
         }
 
 
@@ -151,6 +152,12 @@ class RelationGroupController extends Controller
         return response()->json($detailRelation);
     }
 
+    public function get_detail_group_parent(Request $request){
+        $detailRelation = RelationGroup::find($request->id);
+        // print_r($detailRelation);die;
+        return response()->json($detailRelation);
+    }
+
     public function get_group(Request $request){
         
         $getGroup = RelationGroup::where("RELATION_GROUP_ID",$request->idGroup)->get();
@@ -164,6 +171,129 @@ class RelationGroupController extends Controller
         $name = NULL;
         $data = DB::select('call sp_combo_relation_group(?)', [$name]);
         return response()->json($data);
+    }
+
+    // for add sub group parent
+    public function add_subGroup(Request $request){
+        // dd($request);
+        // toupper
+        $nameGroup = strtoupper($request->RELATION_GROUP_NAME);
+
+        // Cek Relation Perent Id
+        // if ($request->RELATION_GROUP_PARENT == '' || $request->RELATION_GROUP_PARENT == NULL) {
+        //     $parentID = "0";
+        // }else{
+        //     $parentID = $request->RELATION_GROUP_PARENT['value'];
+        // }
+
+
+        // Created Relation
+        $group = RelationGroup::create([
+            'RELATION_GROUP_NAME' => $nameGroup,
+            'RELATION_GROUP_PARENT' => $request->RELATION_GROUP_PARENT,
+            'RELATION_GROUP_DESCRIPTION' => $request->RELATION_GROUP_DESCRIPTION,
+            'RELATION_GROUP_CREATED_BY' => Auth::user()->id,
+            'RELATION_GROUP_CREATED_DATE' => now(),
+
+        ]);
+
+
+        // Mapping Parent Id and Update
+        $name = NULL;
+        DB::select('call sp_set_mapping_relation_group(?)', [$name]);
+
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Created Sub Group (Group).",
+                "module"      => "Group",
+                "id"          => $group->RELATION_GROUP_NAME
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+
+        return new JsonResponse([
+            $group->RELATION_GROUP_ID,
+            $group->RELATION_GROUP_NAME
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function relation_nogroup(Request $request){
+        $data = Relation::where('RELATION_ORGANIZATION_GROUP', NULL)->get();
+
+        return response()->json($data);
+    }
+
+    public function add_Relation(Request $request){
+        // dd($request);
+        for ($i=0; $i < sizeof($request->name_relation); $i++) { 
+            $nameRelation = trim($request->name_relation[$i]);
+            $idGroup = $request->RELATION_ORGANIZATION_GROUP;
+
+            // get id relation from name relation
+            $idRelation = Relation::select('RELATION_ORGANIZATION_ID')->where('RELATION_ORGANIZATION_NAME', $nameRelation)->first();
+            $idRelationNew = $idRelation['RELATION_ORGANIZATION_ID'];
+
+            // add Store M Relation Agent
+            $mRelationAgent = Relation::where('RELATION_ORGANIZATION_ID', $idRelationNew)->update([
+                "RELATION_ORGANIZATION_GROUP" => $idGroup,
+            ]);
+
+            // Created Log
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Add Relation (Group).",
+                    "module"      => "Group",
+                    "id"          => $idRelationNew
+                ]),
+                'action_by'  => Auth::user()->email
+            ]);
+        }
+        return new JsonResponse([
+            $request->idAgent,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function relation_change(Request $request){
+        $data = Relation::find($request->idRelation);
+
+        return response()->json($data);
+    }
+
+    public function subGroupById(Request $request){
+        $data = RelationGroup::where('RELATION_GROUP_MAPPING', 'like', '%' . $request->idGroup .".". '%')->where('RELATION_GROUP_PARENT', '<>', 0)->get();
+
+        return response()->json($data);
+    }
+
+    public function changeSubGroup(Request $request){
+        $changeSubgroup = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->update([
+            "RELATION_ORGANIZATION_GROUP" => $request->RELATION_ORGANIZATION_GROUP['value'],
+        ]);
+
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Change Sub Group (Group).",
+                "module"      => "Group",
+                "id"          => $request->RELATION_ORGANIZATION_GROUP
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->RELATION_ORGANIZATION_GROUP,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
     
 }
