@@ -147,7 +147,7 @@ class RelationGroupController extends Controller
     }
 
     public function get_detail(Request $request){
-        $detailRelation = RelationGroup::find($request->id);
+        $detailRelation = RelationGroup::where('RELATION_GROUP_ID', $request->id)->get();
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
@@ -223,7 +223,11 @@ class RelationGroupController extends Controller
     }
 
     public function relation_nogroup(Request $request){
-        $data = Relation::where('RELATION_ORGANIZATION_GROUP', NULL)->get();
+        $clientId = 1;
+        $data = Relation::where('RELATION_ORGANIZATION_GROUP', NULL)->whereHas('mRelationType', function($q) use($clientId) {
+            // Query the name field in status table
+            $q->where('RELATION_TYPE_ID', 'like', '%'.$clientId.'%');
+        })->get();
 
         return response()->json($data);
     }
@@ -268,7 +272,7 @@ class RelationGroupController extends Controller
     }
 
     public function subGroupById(Request $request){
-        $data = RelationGroup::where('RELATION_GROUP_MAPPING', 'like', '%' . $request->idGroup .".". '%')->where('RELATION_GROUP_PARENT', '<>', 0)->get();
+        $data = RelationGroup::where('RELATION_GROUP_MAPPING', 'like', '%' . $request->idGroup .".". '%')->get();
 
         return response()->json($data);
     }
@@ -287,6 +291,18 @@ class RelationGroupController extends Controller
                 "id"          => $request->RELATION_ORGANIZATION_GROUP
             ]),
             'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->RELATION_ORGANIZATION_GROUP,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function remove_relation(Request $request){
+        $removeRelationFromGroup = Relation::where('RELATION_ORGANIZATION_ID', $request->idRelation)->update([
+            "RELATION_ORGANIZATION_GROUP" => NULL,
         ]);
 
         return new JsonResponse([

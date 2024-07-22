@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRelationChange', [RelationGroupController::class, 'relation_change'])->name('getRelationChange.relation_change');
     Route::post('/getSubGroupById', [RelationGroupController::class, 'subGroupById'])->name('getSubGroupById.subGroupById');
     Route::post('/changeSubGroup', [RelationGroupController::class, 'changeSubGroup'])->name('changeSubGroup.changeSubGroup');
+    Route::post('/removeRelation', [RelationGroupController::class, 'remove_relation'])->name('removeRelation.remove_relation');
     
 
 

@@ -265,6 +265,46 @@ export default function DetailGroup({
     };
     // end Add Sub Group
 
+    const alertRemove = async (e: FormEvent, idRelation: any) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Remove Relation From This Group!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                removeRelation(e, idRelation);
+            }
+        });
+    };
+
+    // remove Relation From Group
+    const removeRelation = async (e: FormEvent, idRelation: any) => {
+        e.preventDefault();
+        // console.log(data);
+        await axios
+            .post(`/removeRelation`, { idRelation })
+            .then((res) => {
+                Swal.fire({
+                    title: "Success",
+                    text: "Remove Relation From Group",
+                    icon: "success",
+                }).then((result: any) => {
+                    // console.log(result);
+                    if (result.value) {
+                        getDetailGroup(idGroup);
+                        getGroupName(idGroup);
+                    }
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     function BasicInfo(dataChildrenNew: any): React.ReactElement {
         return (
             <>
@@ -310,7 +350,20 @@ export default function DetailGroup({
                                               <li>
                                                   <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
                                                       <div
-                                                          className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                          className="text-sm bg-yellow-500 p-2 rounded-md text-white cursor-pointer hover:bg-yellow-400"
+                                                          onClick={(e) =>
+                                                              handleClickAddSubGroup(
+                                                                  e,
+                                                                  dChild.RELATION_GROUP_ID
+                                                              )
+                                                          }
+                                                      >
+                                                          <span>
+                                                              Change Parent
+                                                          </span>
+                                                      </div>
+                                                      <div
+                                                          className="text-sm bg-green-500 p-2 rounded-md text-white cursor-pointer hover:bg-green-400"
                                                           onClick={(e) =>
                                                               handleClickAddSubGroup(
                                                                   e,
@@ -323,7 +376,7 @@ export default function DetailGroup({
                                                           </span>
                                                       </div>
                                                       <div
-                                                          className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                          className="text-sm bg-blue-500 p-2 rounded-md text-white cursor-pointer hover:bg-blue-400"
                                                           onClick={(e) =>
                                                               handleClickAddRelation(
                                                                   e,
@@ -395,7 +448,7 @@ export default function DetailGroup({
                                                                         <li>
                                                                             <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
                                                                                 <div
-                                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                    className="text-sm bg-yellow-500 p-2 rounded-md text-white cursor-pointer hover:bg-yellow-400"
                                                                                     onClick={(
                                                                                         e
                                                                                     ) =>
@@ -407,12 +460,11 @@ export default function DetailGroup({
                                                                                 >
                                                                                     <span>
                                                                                         Change
-                                                                                        Sub
                                                                                         Group
                                                                                     </span>
                                                                                 </div>
                                                                                 <div
-                                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                    className="text-sm bg-blue-500 p-2 rounded-md text-white cursor-pointer hover:bg-blue-400"
                                                                                     onClick={(
                                                                                         e
                                                                                     ) =>
@@ -427,9 +479,21 @@ export default function DetailGroup({
                                                                                         Detail
                                                                                     </span>
                                                                                 </div>
-                                                                                <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                                                <div
+                                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                    onClick={(
+                                                                                        e: any
+                                                                                    ) =>
+                                                                                        alertRemove(
+                                                                                            e,
+                                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                                        )
+                                                                                    }
+                                                                                >
                                                                                     <span>
-                                                                                        Delete
+                                                                                        Remove
+                                                                                        From
+                                                                                        Group
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -1022,14 +1086,14 @@ export default function DetailGroup({
             />
 
             <div className="grid grid-cols-1">
-                <div className="col-span-2 bg-white rounded-lg shadow-md pb-10">
-                    <div className="flex justify-between items-center mt-4 mb-4">
-                        <div className="w-fit px-4 text-md font-semibold">
+                <div className="col-span-2 bg-white rounded-lg shadow-md pb-10 mb-5">
+                    {/* <div className="flex justify-between items-center mt-4 mb-4"> */}
+                    {/* <div className="w-fit px-4 text-md font-semibold">
                             <span className="border-b-2 border-red-600">
                                 Sub Group & Relation
                             </span>
-                        </div>
-                        <a
+                        </div> */}
+                    {/* <a
                             onClick={(e) =>
                                 handleAddRelationGroup(
                                     e,
@@ -1042,9 +1106,9 @@ export default function DetailGroup({
                             <div className="bg-red-600 w-fit p-2 m-5 rounded-lg text-white hover:bg-red-500 text-sm hidden">
                                 Add Relation To Group
                             </div>
-                        </a>
-                    </div>
-                    <div className="px-4 pb-6">
+                        </a> */}
+                    {/* </div> */}
+                    <div className="px-4 py-3 pb-6">
                         {/* <Card data={relationGroup} /> */}
                         {dataRelationGroupNew.children?.length === 0 ? (
                             <>
@@ -1053,7 +1117,7 @@ export default function DetailGroup({
                         ) : (
                             <>
                                 <ul className="flex flex-col space-y-0 text-lg">
-                                    {dataRelationGroupNew.children?.map(
+                                    {dataRelationGroupNew?.map(
                                         (item: any, i: number) => (
                                             <li className="" key={i}>
                                                 <div
@@ -1088,7 +1152,7 @@ export default function DetailGroup({
                                                             </span>
                                                         </div>
                                                         <div className="text-xs text-gray-300">
-                                                            / Sub Group
+                                                            / Group
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1104,7 +1168,7 @@ export default function DetailGroup({
                                                         <li>
                                                             <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
                                                                 <div
-                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                    className="text-sm bg-green-600 p-2 rounded-md text-white cursor-pointer hover:bg-green-400"
                                                                     onClick={(
                                                                         e
                                                                     ) =>
@@ -1120,7 +1184,7 @@ export default function DetailGroup({
                                                                     </span>
                                                                 </div>
                                                                 <div
-                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                    className="text-sm bg-blue-600 p-2 rounded-md text-white cursor-pointer hover:bg-blue-400"
                                                                     onClick={(
                                                                         e
                                                                     ) =>
@@ -1199,7 +1263,7 @@ export default function DetailGroup({
                                                                                   <li>
                                                                                       <div className="bg-gray-200 w-fit p-4 rounded-md flex gap-2 items-center transition delay-700 duration-300 ease-in-out">
                                                                                           <div
-                                                                                              className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                              className="text-sm bg-yellow-500 p-2 rounded-md text-white cursor-pointer hover:bg-yellow-400"
                                                                                               onClick={(
                                                                                                   e
                                                                                               ) =>
@@ -1211,12 +1275,11 @@ export default function DetailGroup({
                                                                                           >
                                                                                               <span>
                                                                                                   Change
-                                                                                                  Sub
                                                                                                   Group
                                                                                               </span>
                                                                                           </div>
                                                                                           <div
-                                                                                              className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                              className="text-sm bg-blue-500 p-2 rounded-md text-white cursor-pointer hover:bg-blue-400"
                                                                                               onClick={(
                                                                                                   e
                                                                                               ) =>
@@ -1231,9 +1294,21 @@ export default function DetailGroup({
                                                                                                   Detail
                                                                                               </span>
                                                                                           </div>
-                                                                                          <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                                                          <div
+                                                                                              className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                                              onClick={(
+                                                                                                  e: any
+                                                                                              ) =>
+                                                                                                  alertRemove(
+                                                                                                      e,
+                                                                                                      dataRelation.RELATION_ORGANIZATION_ID
+                                                                                                  )
+                                                                                              }
+                                                                                          >
                                                                                               <span>
-                                                                                                  Delete
+                                                                                                  Remove
+                                                                                                  From
+                                                                                                  Group
                                                                                               </span>
                                                                                           </div>
                                                                                       </div>
