@@ -10,6 +10,7 @@ use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
+use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
@@ -90,6 +91,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/getDataInsured/{id}', [PolicyInsuredController::class, 'getDataInsured'])->name('policyInsured.getDataInsured');
     Route::get('/getInsuredById/{id}', [PolicyInsuredController::class, 'getInsuredById'])->name('policyCoverage.getInsuredById');
     Route::post('/editInsured', [PolicyInsuredController::class, 'editInsured'])->name('policyCoverage.editInsured');
+
+    // Partners
+    Route::post('/insertPartners', [PolicyPartnerController::class, 'store'])->name('policyInsured.store');
     
     
 });

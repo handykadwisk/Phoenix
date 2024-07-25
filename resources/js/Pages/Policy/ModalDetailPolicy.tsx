@@ -535,7 +535,7 @@ export default function ModalDetailPolicy({
         INSURANCE_ID: "",
         POLICY_ID: policy.POLICY_ID,
         IP_POLICY_SHARE: "",
-        IP_POLICY_LEADER: "",
+        IP_POLICY_LEADER: 0,
         POLICY_COST: 0,
         premium: [
             // {
@@ -1451,6 +1451,7 @@ export default function ModalDetailPolicy({
     };
     const [dataIncome, setDataIncome] = useState<any>([]);
     const [dataNettIncome, setDataNettIncome] = useState<any>([]);
+    const [grandTotalNettIncome, setGrandTotalNettIncome] = useState<number>(0);
     const [dataPartners, setDataPartners] = useState<any>([]);
      const handleAddPartners = async (policy_id: any) => {
          setDataPartners(arrDataPartners);
@@ -1497,12 +1498,8 @@ export default function ModalDetailPolicy({
          };
          items[i] = item;
          setDataIncome(items);
-        //  console.log("items end: ", items);
-        //  console.log("item: ", item);
-         
-        //  console.log("i: ", i);
      };
-
+console.log("dataIncome: ", dataIncome);
      const inputDataIncome = (
          name: string,
          value: string | undefined,
@@ -1525,17 +1522,53 @@ export default function ModalDetailPolicy({
         //  console.log("detailItem: ", detailItem);
         //  items[i] = item;
          setDataIncome(items);
+        
+        setTimeout(function() {
+            setTriggerSumIncome(triggerSumIncome +1);
+        }, 1000);
+        
      };
 
-    //  useEffect(() => {
-    //      getSumNettIncome();
-    //  }, [triggerSumIncome]);
+     const deleteRowIncome = (incomeNum: number, detailNum: number) => {
+         const items = [...dataIncome];
+         const item = { ...items[incomeNum] };
+         const detail = [...item.income_detail];
+         detail.splice(detailNum, 1);
+         item.income_detail = detail
+         items[incomeNum] = item;
+
+         setDataIncome(items);
+
+         console.log("items: ", items);
+         console.log('item: ',item)
+         console.log("detail :", detail);
+
+        //  const items = [...dataInsurer];
+        //  const item = { ...items[insurerNum] };
+        //  item.premium.splice(coverageNum, 1);
+        //  items[insurerNum] = item;
+        //  setDataInsurer(items);
+     };
+
+     useEffect(() => {
+        if (triggerSumIncome != 0) {
+            // alert("a: " + triggerSumIncome);
+            getSumNettIncome();
+        }        
+        //  getSumNettIncome();
+         
+     }, [triggerSumIncome]);
 
      const getSumNettIncome = () => {
-         const changeVal: any = [...dataById.policy_premium];
-         const fbi_by_pks = {...dataIncome[0]};
-         const agent_commission = {...dataIncome[1]};
-         const acquisition_cost = {...dataIncome[2]};
+         const items = [...dataIncome];
+         const fbi_by_pks = { ...items[0] };
+         const agent_commission = { ...items[1] };
+         const acquisition_cost = { ...items[2] };
+        //  console.log("items: ", items);
+        //  console.log("fbi_by_pks: ", fbi_by_pks.income_detail);
+        //  console.log("agent_commission: ", agent_commission.income_detail);
+        //  console.log("acquisition_cost: ", acquisition_cost.income_detail);
+         
 
          // Nett Brokerage Fee
          const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
@@ -1545,70 +1578,81 @@ export default function ModalDetailPolicy({
              return prev + +current.BROKERAGE_FEE_AMOUNT;
          },
          0);
-        //  const nettBF_agent = agent_commission.income_detail.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.BROKERAGE_FEE_AMOUNT;
-        //  },
-        //  0);
-        //  const nettBF_acquisition = acquisition_cost.income_detail.reduce(
-        //      function (prev: any, current: any) {
-        //          return prev + +current.BROKERAGE_FEE_AMOUNT;
-        //      },
-        //      0
-        //  );
+         const nettBF_agent = agent_commission.income_detail.reduce(function (
+             prev: any,
+             current: any
+         ) {
+             return prev + +current.BROKERAGE_FEE_AMOUNT;
+         },
+         0);
 
-        //  // Nett Engineering Fee
-        //  const nettEF_fbi = fbi_by_pks.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.ENGINEERING_FEE_AMOUNT;
-        //  },
-        //  0);
-        //  const nettEF_agent = agent_commission.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.ENGINEERING_FEE_AMOUNT;
-        //  },
-        //  0);
-        //  const nettEF_acquisition = acquisition_cost.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.ENGINEERING_FEE_AMOUNT;
-        //  },
-        //  0);
+         const nettBF_acquisition = acquisition_cost.income_detail.reduce(
+             function (prev: any, current: any) {
+                 return prev + +current.BROKERAGE_FEE_AMOUNT;
+             },
+             0
+         );
 
-        //  // Nett Consultancy Fee
-        //  const nettCF_fbi = fbi_by_pks.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.CONSULTANCY_FEE_AMOUNT;
-        //  },
-        //  0);
-        //  const nettCF_agent = agent_commission.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.CONSULTANCY_FEE_AMOUNT;
-        //  },
-        //  0);
-        //  const nettCF_acquisition = acquisition_cost.reduce(function (
-        //      prev: any,
-        //      current: any
-        //  ) {
-        //      return prev + +current.CONSULTANCY_FEE_AMOUNT;
-        //  },
-        //  0);
+         // Nett Engineering Fee
+         const nettEF_fbi = fbi_by_pks.income_detail.reduce(function (
+             prev: any,
+             current: any
+         ) {
+             return prev + +current.ENGINEERING_FEE_AMOUNT;
+         },
+         0);
+         const nettEF_agent = agent_commission.income_detail.reduce(function (
+             prev: any,
+             current: any
+         ) {
+             return prev + +current.ENGINEERING_FEE_AMOUNT;
+         },
+         0);
+         const nettEF_acquisition = acquisition_cost.income_detail.reduce(
+             function (prev: any, current: any) {
+                 return prev + +current.ENGINEERING_FEE_AMOUNT;
+             },
+             0
+         );
 
-        //  const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition
-         // setDataNettIncome();
-        //  console.log("nettBF: ", nettBF);
-         console.log("fbi_by_pks: ", fbi_by_pks.income_detail);
+         
+          // Nett Consultancy Fee
+          const nettCF_fbi = fbi_by_pks.income_detail.reduce(function (
+              prev: any,
+              current: any
+          ) {
+              return prev + +current.CONSULTANCY_FEE_AMOUNT;
+          },
+          0);
+          const nettCF_agent = agent_commission.income_detail.reduce(function (
+              prev: any,
+              current: any
+          ) {
+              return prev + +current.CONSULTANCY_FEE_AMOUNT;
+          },
+          0);
+          const nettCF_acquisition = acquisition_cost.income_detail.reduce(
+              function (prev: any, current: any) {
+                  return prev + +current.CONSULTANCY_FEE_AMOUNT;
+              },
+              0
+          );
+
+          console.log("nettCF_fbi: ", nettCF_fbi);
+          console.log("nettCF_agent: ", nettCF_agent);
+          console.log("nettCF_acquisition: ", nettCF_acquisition);
+
+         const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition;
+         const nettEF = nettEF_fbi + nettEF_agent + nettEF_acquisition;
+         const nettCF = nettCF_fbi + nettCF_agent + nettCF_acquisition;
+         setDataNettIncome([
+            {
+            nettBf: nettBF,
+            nettEf : nettEF,
+            nettCf: nettCF
+            }
+         ]);
+         setGrandTotalNettIncome(nettBF + nettEF + nettCF);
      }
      console.log("triggerSumIncome: ", triggerSumIncome);
     // End Add Partners
@@ -1674,6 +1718,7 @@ export default function ModalDetailPolicy({
              }
          });
          setDataPartners([]);
+         setTriggerSumIncome(0);
      };
 
     const handleSuccess = (message: string) => {
@@ -3302,8 +3347,14 @@ export default function ModalDetailPolicy({
                                                         <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
                                                             <div className="flex items-center">
                                                                 <input
-                                                                    id="radio1"
-                                                                    name="ip_policy_leader"
+                                                                    id={
+                                                                        "radio-" +
+                                                                        i
+                                                                    }
+                                                                    name={
+                                                                        "ip_policy_leader-" +
+                                                                        i
+                                                                    }
                                                                     type="radio"
                                                                     value={1}
                                                                     onChange={(
@@ -3317,6 +3368,12 @@ export default function ModalDetailPolicy({
                                                                             i
                                                                         )
                                                                     }
+                                                                    checked={
+                                                                        dataIns.IP_POLICY_LEADER ==
+                                                                        1
+                                                                            ? true
+                                                                            : false
+                                                                    }
                                                                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                                                 />
                                                                 <label
@@ -3328,8 +3385,14 @@ export default function ModalDetailPolicy({
                                                             </div>
                                                             <div className="flex items-center">
                                                                 <input
-                                                                    id="radio2"
-                                                                    name="ip_policy_leader"
+                                                                    id={
+                                                                        "radio-" +
+                                                                        i
+                                                                    }
+                                                                    name={
+                                                                        "ip_policy_leader-" +
+                                                                        i
+                                                                    }
                                                                     type="radio"
                                                                     value={0}
                                                                     onChange={(
@@ -3342,6 +3405,12 @@ export default function ModalDetailPolicy({
                                                                                 .value,
                                                                             i
                                                                         )
+                                                                    }
+                                                                    checked={
+                                                                        dataIns.IP_POLICY_LEADER ==
+                                                                        0
+                                                                            ? true
+                                                                            : false
                                                                     }
                                                                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                                                 />
@@ -6271,10 +6340,11 @@ export default function ModalDetailPolicy({
                         setSumByCurrency([]);
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
+                    setTriggerSumIncome(0);
                 }}
                 title={"Add Business Partners"}
                 url={`/insertPartners`}
-                data={dataPartners}
+                data={dataIncome}
                 onSuccess={handleSuccessPartners}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-6xl"
@@ -6321,6 +6391,13 @@ export default function ModalDetailPolicy({
                                             className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
                                         >
                                             Admin Cost
+                                        </th>
+                                        <th
+                                            rowSpan={2}
+                                            scope="col"
+                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                        >
+                                            Action
                                         </th>
                                     </tr>
                                     <tr>
@@ -6388,7 +6465,7 @@ export default function ModalDetailPolicy({
                                                 <tr className="border-t border-gray-200">
                                                     <th
                                                         scope="colgroup"
-                                                        colSpan={8}
+                                                        colSpan={9}
                                                         className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
                                                     >
                                                         <td className="text-left w-32">
@@ -6404,7 +6481,7 @@ export default function ModalDetailPolicy({
                                                                 onClick={(e) =>
                                                                     addRowPartners(
                                                                         e,
-                                                                        1,
+                                                                        income.INCOME_CATEGORY_ID,
                                                                         i
                                                                     )
                                                                 }
@@ -6449,7 +6526,7 @@ export default function ModalDetailPolicy({
                                                                     //     );
                                                                     // }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    // required
                                                                 />
                                                             </td>
                                                             <td className="whitespace-nowrap  text-sm text-gray-500 border-[1px]">
@@ -6473,11 +6550,7 @@ export default function ModalDetailPolicy({
                                                                             values,
                                                                             i,
                                                                             detailIdx
-                                                                        ),
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
+                                                                        );
                                                                     }}
                                                                     className="block w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
@@ -6504,11 +6577,7 @@ export default function ModalDetailPolicy({
                                                                             values,
                                                                             i,
                                                                             detailIdx
-                                                                        ),
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
+                                                                        );
                                                                     }}
                                                                     className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
@@ -6535,11 +6604,7 @@ export default function ModalDetailPolicy({
                                                                             values,
                                                                             i,
                                                                             detailIdx
-                                                                        ),
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
+                                                                        );
                                                                     }}
                                                                     className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
@@ -6566,11 +6631,7 @@ export default function ModalDetailPolicy({
                                                                             values,
                                                                             i,
                                                                             detailIdx
-                                                                        ),
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
+                                                                        );
                                                                     }}
                                                                     className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
@@ -6597,11 +6658,7 @@ export default function ModalDetailPolicy({
                                                                             values,
                                                                             i,
                                                                             detailIdx
-                                                                        ),
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
+                                                                        );
                                                                     }}
                                                                     className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
@@ -6628,887 +6685,132 @@ export default function ModalDetailPolicy({
                                                                             values,
                                                                             i,
                                                                             detailIdx
-                                                                        ),
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
+                                                                        );
                                                                     }}
                                                                     className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
                                                                 />
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]">
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    strokeWidth={
+                                                                        1.5
+                                                                    }
+                                                                    stroke="currentColor"
+                                                                    className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        deleteRowIncome(
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                        setTriggerSumIncome(
+                                                                            triggerSumIncome +
+                                                                                1
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <path
+                                                                        fill="#AB7C94"
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M6 18 18 6M6 6l12 12"
+                                                                    />
+                                                                </svg>
+                                                            </td>
                                                         </tr>
                                                     )
                                                 )}
                                             </Fragment>
                                         )
                                     )}
+                                    {dataNettIncome?.map(
+                                        (nett: any, x: number) => (
+                                            <tr
+                                                key={x}
+                                                className={"border-gray-200"}
+                                            >
+                                                <th
+                                                    scope="colgroup"
+                                                    // colSpan={8}
+                                                    className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                                >
+                                                    Nett Margin
+                                                </th>
 
-                                    <tr key={1} className={"border-gray-200"}>
-                                        <th
-                                            scope="colgroup"
-                                            // colSpan={8}
-                                            className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                        >
-                                            Nett Margin
-                                        </th>
+                                                <td
+                                                    colSpan={2}
+                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                >
+                                                    {new Intl.NumberFormat(
+                                                        "id",
+                                                        {
+                                                            style: "decimal",
+                                                        }
+                                                    ).format(nett.nettBf)}
+                                                </td>
 
-                                        <td
-                                            colSpan={2}
-                                            className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                        >
-                                            Total Brokerage fee
-                                        </td>
+                                                <td
+                                                    colSpan={2}
+                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                >
+                                                    {new Intl.NumberFormat(
+                                                        "id",
+                                                        {
+                                                            style: "decimal",
+                                                        }
+                                                    ).format(nett.nettEf)}
+                                                </td>
 
-                                        <td
-                                            colSpan={2}
-                                            className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                        >
-                                            Total Engineering Fee
-                                        </td>
-
-                                        <td
-                                            colSpan={2}
-                                            className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                        >
-                                            Total Consultancy Fee
-                                        </td>
-                                        <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]">
-                                            Admin Cost
-                                        </td>
-                                    </tr>
+                                                <td
+                                                    colSpan={2}
+                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                >
+                                                    {new Intl.NumberFormat(
+                                                        "id",
+                                                        {
+                                                            style: "decimal",
+                                                        }
+                                                    ).format(nett.nettCf)}
+                                                </td>
+                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]">
+                                                    Admin Cost
+                                                </td>
+                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
+                                            </tr>
+                                        )
+                                    )}
 
                                     {/* Gran Total */}
-                                    <tr key={1} className={"border-gray-200"}>
-                                        <th
-                                            scope="colgroup"
-                                            // colSpan={8}
-                                            className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                    {grandTotalNettIncome != 0 ? (
+                                        <tr
+                                            key={1}
+                                            className={"border-gray-200"}
                                         >
-                                            Grand Total Nett Margin
-                                        </th>
-                                        <td
-                                            colSpan={2}
-                                            className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                        >
-                                            Total Semuanya
-                                        </td>
-
-                                        <td
-                                            colSpan={6}
-                                            className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                        ></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
-                            <table className="table-auto w-full">
-                                <thead className="border-b bg-[#5CB25A]">
-                                    <tr className="text-white font-bold h-10">
-                                        <th className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300">
-                                            Type of Income
-                                        </th>
-                                        <th className="text-center md:p-4 p-0 block w-40 border-r border-gray-300 ">
-                                            Name
-                                        </th>
-
-                                        <th
-                                            colSpan={2}
-                                            className="text-center p-4 border border-t-0 border-gray-300"
-                                        >
-                                            Brokerage Fee
-                                        </th>
-                                        <th
-                                            colSpan={2}
-                                            className="text-center p-4 border border-t-0 border-gray-300"
-                                        >
-                                            Engineering Fee
-                                        </th>
-                                        <th
-                                            // colSpan={2}
-                                            className="text-center p-4 border border-t-0 border-gray-300"
-                                        >
-                                            Admin Cost
-                                        </th>
-                                        <th
-                                            colSpan={2}
-                                            className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
-                                        >
-                                            Consultancy Fee
-                                        </th>
-                                    </tr>
-                                    <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                        <th className="text-center p-4 border-r text-base"></th>
-                                        <th className="text-center p-4 border-r"></th>
-
-                                        <th className="text-center p-4 border ">
-                                            %
-                                        </th>
-                                        <th className="text-center p-4 border ">
-                                            Amount
-                                        </th>
-                                        <th className="text-center p-4 border ">
-                                            %
-                                        </th>
-                                        <th className="text-center p-4 border ">
-                                            Amount
-                                        </th>
-                                        {/* <th className="text-center p-4 border ">
-                                            %
-                                        </th> */}
-                                        <th className="text-center p-4 border ">
-                                            Amount
-                                        </th>
-                                        <th className="text-center p-4 border ">
-                                            %
-                                        </th>
-                                        <th className="text-center p-4 border ">
-                                            Amount
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {dataPartners.fbi_by_pks?.map(
-                                        (name: any, i: number) => (
-                                            <tr key={i}>
-                                                <td className="p-4 border">
-                                                    <div className="ml-4 w-40 mb-2 mt-2">
-                                                        FBI By PKS
-                                                    </div>
-
-                                                    <div className="ml-4 w-40 mb-2 mt-2">
-                                                        <a
-                                                            href=""
-                                                            className="text-xs mt-1 text-primary-pelindo ms-1"
-                                                            // onClick={(e) =>
-                                                            //     addRowPartners(
-                                                            //         e,
-                                                            //         1
-                                                            //     )
-                                                            // }
-                                                        >
-                                                            + Add Row
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <TextInput
-                                                        id="income_name"
-                                                        type="text"
-                                                        name="income_name"
-                                                        // value={
-                                                        //     dataById.POLICY_THE_INSURED
-                                                        // }
-                                                        // className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        // autoComplete="income_name"
-                                                        // onChange={(e) =>
-                                                        //     setDataById({
-                                                        //         ...dataById,
-                                                        //         POLICY_THE_INSURED:
-                                                        //             e.target.value,
-                                                        //     })
-                                                        // }
-                                                        // required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_bf_percentage"
-                                                        name="DISC_BF_PERCENTAGE"
-                                                        // value={
-                                                        //     detail.DISC_BF_PERCENTAGE
-                                                        // }
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_BF_PERCENTAGE",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_bf_amount"
-                                                        name="DISC_BF_AMOUNT"
-                                                        // value={detail.DISC_BF_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_BF_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_admin_percentage"
-                                                        name="DISC_ADMIN_PERCENTAGE"
-                                                        // value={
-                                                        //     detail.DISC_ADMIN_PERCENTAGE
-                                                        // }
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_ADMIN_PERCENTAGE",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_admin_amount"
-                                                        name="DISC_ADMIN_AMOUNT"
-                                                        // value={detail.DISC_ADMIN_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_ADMIN_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                {/* <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_ef_percentage"
-                                                name="DISC_EF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_EF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </td> */}
-                                                <td className="p-4 border">
-                                                    {/* <CurrencyInput
-                                                        id="disc_ef_amount"
-                                                        name="DISC_EF_AMOUNT"
-                                                        // value={detail.DISC_EF_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_EF_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        required
-                                                    /> */}
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_ef_percentage"
-                                                        name="DISC_EF_PERCENTAGE"
-                                                        // value={
-                                                        //     detail.DISC_EF_PERCENTAGE
-                                                        // }
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_EF_PERCENTAGE",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_ef_amount"
-                                                        name="DISC_EF_AMOUNT"
-                                                        // value={detail.DISC_EF_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_EF_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                            </tr>
-                                        )
-                                    )}
-                                    {dataPartners.agent_commission?.map(
-                                        (name: any, i: number) => (
-                                            <tr key={i}>
-                                                <td className="p-4 border">
-                                                    <div className="ml-4 w-40 mb-2 mt-2">
-                                                        Agent Commission
-                                                    </div>
-
-                                                    <div className="ml-4 w-40 mb-2 mt-2">
-                                                        <a
-                                                            href=""
-                                                            className="text-xs mt-1 text-primary-pelindo ms-1"
-                                                            // onClick={(e) =>
-                                                            //     addRowPartners(
-                                                            //         e,
-                                                            //         2
-                                                            //     )
-                                                            // }
-                                                        >
-                                                            + Add Row
-                                                        </a>
-                                                    </div>
-                                                </td>
-
-                                                <td className="p-4 border">
-                                                    <TextInput
-                                                        id="income_name"
-                                                        type="text"
-                                                        name="income_name"
-                                                        // value={
-                                                        //     dataById.POLICY_THE_INSURED
-                                                        // }
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        autoComplete="income_name"
-                                                        // onChange={(e) =>
-                                                        //     setDataById({
-                                                        //         ...dataById,
-                                                        //         POLICY_THE_INSURED:
-                                                        //             e.target.value,
-                                                        //     })
-                                                        // }
-                                                        // required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_bf_percentage"
-                                                        name="DISC_BF_PERCENTAGE"
-                                                        // value={
-                                                        //     detail.DISC_BF_PERCENTAGE
-                                                        // }
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_BF_PERCENTAGE",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_bf_amount"
-                                                        name="DISC_BF_AMOUNT"
-                                                        // value={detail.DISC_BF_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_BF_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_admin_percentage"
-                                                        name="DISC_ADMIN_PERCENTAGE"
-                                                        // value={
-                                                        //     detail.DISC_ADMIN_PERCENTAGE
-                                                        // }
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_ADMIN_PERCENTAGE",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_admin_amount"
-                                                        name="DISC_ADMIN_AMOUNT"
-                                                        // value={detail.DISC_ADMIN_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_ADMIN_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                {/* <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_ef_percentage"
-                                                name="DISC_EF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_EF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </td> */}
-                                                <td className="p-4 border">
-                                                    {/* <CurrencyInput
-                                                id="disc_ef_amount"
-                                                name="DISC_EF_AMOUNT"
-                                                // value={detail.DISC_EF_AMOUNT}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_AMOUNT",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            /> */}
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_ef_percentage"
-                                                        name="DISC_EF_PERCENTAGE"
-                                                        // value={
-                                                        //     detail.DISC_EF_PERCENTAGE
-                                                        // }
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_EF_PERCENTAGE",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td className="p-4 border">
-                                                    <CurrencyInput
-                                                        id="disc_ef_amount"
-                                                        name="DISC_EF_AMOUNT"
-                                                        // value={detail.DISC_EF_AMOUNT}
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        // onValueChange={(values) => {
-                                                        //     inputInsuredDetail(
-                                                        //         "DISC_EF_AMOUNT",
-                                                        //         values,
-                                                        //         i,
-                                                        //         j
-                                                        //     );
-                                                        // }}
-                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                        required
-                                                    />
-                                                </td>
-                                            </tr>
-                                        )
-                                    )}
-
-                                    <tr key={1}>
-                                        <td className="p-4 border">
-                                            <div className="ml-4 w-40 mb-2 mt-2">
-                                                Acquisition Cost
-                                            </div>
-
-                                            <div className="ml-4 w-40 mb-2 mt-2">
-                                                <a
-                                                    href=""
-                                                    className="text-xs mt-1 text-primary-pelindo ms-1"
-                                                    // onClick={(e) =>
-                                                    //     addRowPartners(e, 3)
-                                                    // }
-                                                >
-                                                    + Add Row
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 border">
-                                            <TextInput
-                                                id="income_name"
-                                                type="text"
-                                                name="income_name"
-                                                // value={
-                                                //     dataById.POLICY_THE_INSURED
-                                                // }
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                autoComplete="income_name"
-                                                // onChange={(e) =>
-                                                //     setDataById({
-                                                //         ...dataById,
-                                                //         POLICY_THE_INSURED:
-                                                //             e.target.value,
-                                                //     })
-                                                // }
-                                                // required
-                                            />
-                                        </td>
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_bf_percentage"
-                                                name="DISC_BF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_BF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_BF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_bf_amount"
-                                                name="DISC_BF_AMOUNT"
-                                                // value={detail.DISC_BF_AMOUNT}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_BF_AMOUNT",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_admin_percentage"
-                                                name="DISC_ADMIN_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_ADMIN_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_ADMIN_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_admin_amount"
-                                                name="DISC_ADMIN_AMOUNT"
-                                                // value={detail.DISC_ADMIN_AMOUNT}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_ADMIN_AMOUNT",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="p-4 border">
-                                            {/* <CurrencyInput
-                                                id="disc_ef_percentage"
-                                                name="DISC_EF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_EF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            /> */}
-                                        </td>
-                                        {/* <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_ef_amount"
-                                                name="DISC_EF_AMOUNT"
-                                                // value={detail.DISC_EF_AMOUNT}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_AMOUNT",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </td> */}
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_ef_percentage"
-                                                name="DISC_EF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_EF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_ef_amount"
-                                                name="DISC_EF_AMOUNT"
-                                                // value={detail.DISC_EF_AMOUNT}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_AMOUNT",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr key={1}>
-                                        <td className="p-4 border">
-                                            <div className="ml-4 w-40 mb-2 mt-2">
-                                                Nett Margin
-                                            </div>
-                                        </td>
-                                        <td className="p-4 border"></td>
-                                        <td className="p-4 border" colSpan={2}>
-                                            <CurrencyInput
-                                                id="disc_bf_percentage"
-                                                name="DISC_BF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_BF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_BF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-
-                                        <td className="p-4 border" colSpan={2}>
-                                            <CurrencyInput
-                                                id="disc_admin_percentage"
-                                                name="DISC_ADMIN_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_ADMIN_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_ADMIN_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-
-                                        <td className="p-4 border">
-                                            <CurrencyInput
-                                                id="disc_ef_percentage"
-                                                name="DISC_EF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_EF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-
-                                        <td className="p-4 border" colSpan={2}>
-                                            <CurrencyInput
-                                                id="disc_ef_percentage"
-                                                name="DISC_EF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_EF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_EF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                required
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr key={1}>
-                                        <td className="p-4 border">
-                                            <div className="ml-4 w-40 mb-2 mt-2">
+                                            <th
+                                                scope="colgroup"
+                                                // colSpan={8}
+                                                className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                            >
                                                 Grand Total Nett Margin
-                                            </div>
-                                        </td>
-                                        <td className="p-4 border"></td>
-                                        <td className="p-4 border" colSpan={9}>
-                                            <CurrencyInput
-                                                id="disc_bf_percentage"
-                                                name="DISC_BF_PERCENTAGE"
-                                                // value={
-                                                //     detail.DISC_BF_PERCENTAGE
-                                                // }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                // onValueChange={(values) => {
-                                                //     inputInsuredDetail(
-                                                //         "DISC_BF_PERCENTAGE",
-                                                //         values,
-                                                //         i,
-                                                //         j
-                                                //     );
-                                                // }}
-                                                className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </td>
-                                    </tr>
+                                            </th>
+                                            <td
+                                                colSpan={2}
+                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                            >
+                                                {grandTotalNettIncome}
+                                            </td>
+
+                                            <td
+                                                colSpan={7}
+                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                            ></td>
+                                        </tr>
+                                    ) : (
+                                        ""
+                                    )}
                                 </tbody>
                             </table>
                         </div>
