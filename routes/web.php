@@ -9,6 +9,7 @@ use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\PolicyCoverageController;
+use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\RelationController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
@@ -78,9 +79,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/getEndorsementInstallment/{id}', [EndorsementController::class, 'endorsementInstallment'])->name('endorsement.endorsementInstallment');
 
     // Policy Coverage Name
-    Route::get('/getCoverageNameByPolicyId/{id}', [PolicyCoverageController::class, 'get_by_policy_id'])->name('policyCoverage.get_by_policy_id');
-    Route::post('/policyCoverage', [PolicyCoverageController::class, 'store'])->name('policyCoverage.store');
-    Route::post('/editManyCoverage', [PolicyCoverageController::class, 'editManyCoverage'])->name('policyCoverage.editManyCoverage');
+    Route::get('/getCoverageByPolicyId/{id}', [PolicyCoverageController::class, 'get_by_policy_id'])->name('policyCoverage.get_by_policy_id');
+    Route::get('/getDataCoverage/{id}', [PolicyCoverageController::class, 'getDataCoverage'])->name('policyCoverage.getDataCoverage');
+    Route::get('/getCoverageById/{id}', [PolicyCoverageController::class, 'getCoverageById'])->name('policyCoverage.getCoverageById');
+    Route::post('/insertManyCoverage', [PolicyCoverageController::class, 'store'])->name('policyCoverage.store');
+    Route::post('/editCoverage', [PolicyCoverageController::class, 'editCoverage'])->name('policyCoverage.editCoverage');
+
+    // Policy Insured
+    Route::post('/insertManyInsured', [PolicyInsuredController::class, 'store'])->name('policyInsured.store');
+    Route::get('/getDataInsured/{id}', [PolicyInsuredController::class, 'getDataInsured'])->name('policyInsured.getDataInsured');
+    Route::get('/getInsuredById/{id}', [PolicyInsuredController::class, 'getInsuredById'])->name('policyCoverage.getInsuredById');
+    Route::post('/editInsured', [PolicyInsuredController::class, 'editInsured'])->name('policyCoverage.editInsured');
     
     
 });

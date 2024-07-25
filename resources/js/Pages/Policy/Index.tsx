@@ -111,7 +111,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         policy_the_insured: "",
         policy_inception_date: "",
         policy_due_date: "",
-        policy_status_id: "",
+        policy_status_id: 1,
         self_insured: "",
         policyPremium: [
             {
@@ -203,7 +203,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             policy_the_insured: "",
             policy_inception_date: "",
             policy_due_date: "",
-            policy_status_id: "",
+            policy_status_id: 1,
             self_insured: "",
             policyPremium: [
                 {
@@ -236,9 +236,9 @@ export default function PolicyIndex({ auth }: PageProps) {
         
 
     } 
-
+console.log('data: ', data)
     const handleSuccess = (message: number) => {
-        
+        console.log("message: ", message);
         setIsSuccess("");
         reset();
         setData({
@@ -248,7 +248,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             policy_the_insured: "",
             policy_inception_date: "",
             policy_due_date: "",
-            policy_status_id: "",
+            policy_status_id: 1,
             self_insured: "",
             policyPremium: [
                 {
@@ -276,15 +276,16 @@ export default function PolicyIndex({ auth }: PageProps) {
                 },
             ],
         });
+        getData(message);
 
         Swal.fire({
             title: "Success",
-            text: "New Group Added",
+            text: "Success Registered Policy",
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
                 // setPolicyId(message);
-                getData(message);
+                // getData(message);
                 setModal({
                     add: false,
                     delete: false,
@@ -296,7 +297,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             }
         });
         // setIsSuccess(message);
-        getPolicy();
+        // getPolicy();
     };
 
     const deletePolicy = (e: FormEvent, id: number, name: string) => {
@@ -902,35 +903,6 @@ console.log("sumByCurrency: ", sumByCurrency);
                                     required
                                 />
                             </div>
-                        </div>
-                        <div className="grid grid-rows grid-cols-2 gap-4 mb-4 ml-4 mr-4">
-                            <div>
-                                <InputLabel
-                                    htmlFor="policy_status_id"
-                                    value="Policy Status"
-                                />
-                                <select
-                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.policy_status_id}
-                                    onChange={(e) =>
-                                        setData(
-                                            "policy_status_id",
-                                            e.target.value
-                                        )
-                                    }
-                                >
-                                    <option value={""}>
-                                        -- <i>Choose</i> --
-                                    </option>
-                                    {policyStatus.map((ps: any, i: number) => {
-                                        return (
-                                            <option key={i} value={ps.id}>
-                                                {ps.stat}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                            </div>
                             <div className="w-60">
                                 <InputLabel
                                     // htmlFor="self_insured"
@@ -945,23 +917,28 @@ console.log("sumByCurrency: ", sumByCurrency);
                                         />
                                     </div>
                                     {flagSwitch ? (
-                                        <div className="col-span-4 ">
-                                            <CurrencyInput
-                                                id="self_insured"
-                                                name="self_insured"
-                                                value={data.self_insured}
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                onValueChange={(values) =>
-                                                    setData(
-                                                        "self_insured",
-                                                        values
-                                                    )
-                                                }
-                                                className="block w-15  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </div>
+                                        <>
+                                            <div className="col-span-3 ">
+                                                <CurrencyInput
+                                                    id="self_insured"
+                                                    name="self_insured"
+                                                    value={data.self_insured}
+                                                    decimalScale={2}
+                                                    decimalsLimit={2}
+                                                    onValueChange={(values) =>
+                                                        setData(
+                                                            "self_insured",
+                                                            values
+                                                        )
+                                                    }
+                                                    className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    required
+                                                    placeholder="Percentage (%)"
+                                                />
+                                                {/* {"%"} */}
+                                            </div>
+                                            <div className="mt-2">{"%"}</div>
+                                        </>
                                     ) : (
                                         ""
                                     )}

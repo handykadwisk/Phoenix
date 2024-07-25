@@ -12,11 +12,11 @@ class MPolicyCoverage extends Model
     protected $table = 'm_policy_coverage';
 
     public $timestamps = false;
-    // public $with = ['currency'];
+    public $with = ['policyCoverageDetail'];
 
     protected $guarded = ['POLICY_COVERAGE_ID'];
 
-    // public function currency() {
-    //     return $this->hasOne(RCurrency::class, 'CURRENCY_ID', 'CURRENCY_ID');
-    // }
+    public function policyCoverageDetail() {
+        return $this->hasMany(MPolicyCoverageDetail::class, 'POLICY_COVERAGE_ID', 'POLICY_COVERAGE_ID');
+    }
 }
