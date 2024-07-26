@@ -11,8 +11,8 @@ export default function Button({
             {...props}
             className={
                 `${className.includes("rounded") ? className : "rounded-md"} ${
-                    className.includes("bg-") ? "" : "bg-red-600"
-                } text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                    className.includes("bg-") ? className : "bg-red-600"
+                } ${className.includes("text") ? className : "text-white"} ${className.includes("shadow") ? className : "shadow-sm"} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
                     disabled && "opacity-25 cursor-not-allowed"
                 } ` + className
             }

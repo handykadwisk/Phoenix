@@ -24,7 +24,9 @@ return new class extends Migration
             $table->decimal('REPORT_CASH_ADVANCE_DETAIL_AMOUNT', 15, 2)->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_DETAIL_STATUS')->nullable();
             $table->string('REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID')->nullable();
-            $table->text('REPORT_CASH_ADVANCE_DETAIL_NOTE')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION')->nullable();
+            $table->decimal('REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE', 16, 2)->nullable();
+            $table->text('REPORT_CASH_ADVANCE_DETAIL_REMARKS')->nullable();
             $table->timestamps();
         });
     }

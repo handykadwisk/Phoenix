@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CashAdvanceReport extends Model
 {
@@ -27,6 +28,11 @@ class CashAdvanceReport extends Model
         'user_approval',
         'approval_status'
     ];
+
+    public function cash_advance_report(): HasOne
+    {
+        return $this->hasOne(CashAdvanceReport::class, 'CASH_ADVANCE_ID');
+    }
 
     public function cash_advance_detail_report(): HasMany
     {

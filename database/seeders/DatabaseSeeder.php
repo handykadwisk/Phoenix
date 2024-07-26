@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceStatus;
 use App\Models\User;
@@ -357,6 +358,20 @@ class DatabaseSeeder extends Seeder
             'CASH_ADVANCE_PURPOSE' => 'Lain - lain'
         ]);
 
-        
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Fully Approve'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Partially Approve'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Reject'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Request Explanation'
+        ]);
     }
 }

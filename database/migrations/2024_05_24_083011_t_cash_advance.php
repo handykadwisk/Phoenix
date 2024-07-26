@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('CASH_ADVANCE_DIVISION')->nullable();
             $table->smallInteger('CASH_ADVANCE_USED_BY')->nullable();
             $table->smallInteger('CASH_ADVANCE_REQUESTED_BY')->nullable();
-            $table->dateTime('CASH_ADVANCE_REQUESTED_DATE')->nullable();
+            $table->date('CASH_ADVANCE_REQUESTED_DATE')->nullable();
             $table->smallInteger('CASH_ADVANCE_FIRST_APPROVAL_BY')->nullable();
             $table->string('CASH_ADVANCE_FIRST_APPROVAL_USER')->nullable();
             $table->dateTime('CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE')->nullable();

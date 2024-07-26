@@ -18,7 +18,6 @@ import ToastMessage from "@/Components/ToastMessage";
 import Pagination from "@/Components/Pagination";
 import {
     ArrowDownTrayIcon,
-    HandThumbUpIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import dateFormat, { masks } from "dateformat";
@@ -52,20 +51,18 @@ export default function CashAdvance({ auth }: PageProps) {
         view_report: false,
         approve_report: false,
         revised_report: false,
-        execute_report: false,
+        add_files: false,
     });
     // Modal Add End
 
     // Modal Add Files Start
-    const [modalFiles, setModalFiles] = useState<any>({
+    const [modalFiles, setModalFiles] = useState({
         add_files: false,
-        add_files_report: false,
-        index: "",
     });
     // Modal Add Files End
 
-    const { data, setData, errors, reset } = useForm<any>({
-        cash_advance_id: "",
+    const { data, setData, errors, reset } = useForm({
+        cash_advance_number: "",
         cash_advance_used_by: "",
         cash_advance_requested_by: "",
         cash_advance_division: "",
@@ -93,49 +90,8 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_detail_relation_organization_id: "",
                 cash_advance_detail_location: "",
                 cash_advance_detail_amount: "",
-                cash_advance_detail_document_id: [],
+                cash_advance_detail_document_id: "",
                 cash_advance_detail_note: "",
-                cash_advance_detail_cost_classification: "",
-                cash_advance_detail_amount_approve: "",
-                cash_advance_detail_remarks: "",
-            },
-        ],
-    });
-    
-    const [dataCAReport, setDataCAReport] = useState<any>({
-        cash_advance_id: "",
-        cash_advance_used_by: "",
-        cash_advance_requested_by: "",
-        cash_advance_division: "",
-        cash_advance_first_approval_by: "",
-        cash_advance_request_note: "",
-        cash_advance_delivery_method_transfer: "",
-        cash_advance_transfer_amount: "",
-        cash_advance_delivery_method_cash: "",
-        cash_advance_cash_amount: "",
-        cash_advance_total_amount: "",
-        cash_advance_transfer_date: "",
-        cash_advance_from_bank_account: "",
-        cash_advance_receive_date: "",
-        cash_advance_receive_name: "",
-        refund_amount: "",
-        refund_type: "",
-        refund_proof: "",
-        CashAdvanceDetail: [
-            {
-                cash_advance_detail_start_date: "",
-                cash_advance_detail_end_date: "",
-                cash_advance_detail_purpose: "",
-                cash_advance_detail_relation_name: "",
-                cash_advance_detail_relation_position: "",
-                cash_advance_detail_relation_organization_id: "",
-                cash_advance_detail_location: "",
-                cash_advance_detail_amount: "",
-                cash_advance_detail_document_id: [],
-                cash_advance_detail_note: "",
-                cash_advance_detail_cost_classification: "",
-                cash_advance_detail_amount_approve: "",
-                cash_advance_detail_remarks: "",
             },
         ],
     });
@@ -147,7 +103,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setIsSuccess("");
         reset();
         setData({
-            cash_advance_id: "",
+            cash_advance_number: "",
             cash_advance_used_by: "",
             cash_advance_requested_by: "",
             cash_advance_division: "",
@@ -162,7 +118,6 @@ export default function CashAdvance({ auth }: PageProps) {
             cash_advance_from_bank_account: "",
             cash_advance_receive_date: "",
             cash_advance_receive_name: "",
-            amount_approve: "",
             refund_amount: "",
             refund_type: "",
             refund_proof: "",
@@ -176,11 +131,8 @@ export default function CashAdvance({ auth }: PageProps) {
                     cash_advance_detail_relation_organization_id: "",
                     cash_advance_detail_location: "",
                     cash_advance_detail_amount: "",
-                    cash_advance_detail_document_id: [],
+                    cash_advance_detail_document_id: "",
                     cash_advance_detail_note: "",
-                    cash_advance_detail_cost_classification: "",
-                    cash_advance_detail_amount_approve: "",
-                    cash_advance_detail_remarks: "",
                 },
             ],
         });
@@ -251,11 +203,8 @@ export default function CashAdvance({ auth }: PageProps) {
             cash_advance_detail_relation_organization_id: "",
             cash_advance_detail_location: "",
             cash_advance_detail_amount: "",
-            cash_advance_detail_document_id: [],
+            cash_advance_detail_document_id: "",
             cash_advance_detail_note: "",
-            cash_advance_detail_cost_classification: "",
-            cash_advance_detail_amount_approve: "",
-            cash_advance_detail_remarks: "",
         },
     ]);
 
@@ -273,11 +222,8 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_detail_relation_organization_id: "",
                 cash_advance_detail_location: "",
                 cash_advance_detail_amount: "",
-                cash_advance_detail_document_id: [],
+                cash_advance_detail_document_id: "",
                 cash_advance_detail_note: "",
-                cash_advance_detail_cost_classification: "",
-                cash_advance_detail_amount_approve: "",
-                cash_advance_detail_remarks: "",
             },
         ]);
 
@@ -292,11 +238,8 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_detail_relation_organization_id: "",
                 cash_advance_detail_location: "",
                 cash_advance_detail_amount: "",
-                cash_advance_detail_document_id: [],
+                cash_advance_detail_document_id: "",
                 cash_advance_detail_note: "",
-                cash_advance_detail_cost_classification: "",
-                cash_advance_detail_amount_approve: "",
-                cash_advance_detail_remarks: "",
             },
         ]);
     };
@@ -329,166 +272,82 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Remove Row End
 
     // Handle Add Row Files Start
-    const [DataFilesRow, setDataFilesRow] = useState<any>({
-        cash_advance_detail_start_date: "",
-        cash_advance_detail_end_date: "",
-        cash_advance_detail_purpose: "",
-        cash_advance_detail_relation_name: "",
-        cash_advance_detail_relation_position: "",
-        cash_advance_detail_relation_organization_id: "",
-        cash_advance_detail_location: "",
-        cash_advance_detail_amount: "",
-        cash_advance_detail_document_id: [],
-        cash_advance_detail_note: "",
-        cash_advance_detail_cost_classification: "",
-        cash_advance_detail_amount_approve: "",
-        cash_advance_detail_remarks: "",
-    });
+    const [DataFilesRow, setDataFilesRow] = useState([
+        {
+            cash_advance_detail_start_date: "",
+            cash_advance_detail_end_date: "",
+            cash_advance_detail_purpose: "",
+            cash_advance_detail_relation_name: "",
+            cash_advance_detail_relation_position: "",
+            cash_advance_detail_relation_organization_id: "",
+            cash_advance_detail_location: "",
+            cash_advance_detail_amount: "",
+            cash_advance_detail_document_id: "",
+            cash_advance_detail_note: "",
+        },
+    ]);
 
     const handleAddRowFiles = (e: FormEvent) => {
         e.preventDefault();
 
-        const CashAdvanceDetail: any = [...data.CashAdvanceDetail]
-
-        CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id = [
-            ...CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id,
-            {
-                cash_advance_detail_document_id: "",
-            }
-        ];
-
-        setDataFilesRow({
+        setDataFilesRow([
             ...DataFilesRow,
-            cash_advance_detail_document_id: [
-                ...DataFilesRow.cash_advance_detail_document_id,
-                {
-                    cash_advance_detail_document_id: ""
-                }
-            ]
-        });
+            {
+                cash_advance_detail_start_date: "",
+                cash_advance_detail_end_date: "",
+                cash_advance_detail_purpose: "",
+                cash_advance_detail_relation_name: "",
+                cash_advance_detail_relation_position: "",
+                cash_advance_detail_relation_organization_id: "",
+                cash_advance_detail_location: "",
+                cash_advance_detail_amount: "",
+                cash_advance_detail_document_id: "",
+                cash_advance_detail_note: "",
+            },
+        ]);
 
-        setData({
-            ...data,
-            CashAdvanceDetail: CashAdvanceDetail
-        });
+        setData("CashAdvanceDetail", [
+            ...data.CashAdvanceDetail,
+            {
+                cash_advance_detail_start_date: "",
+                cash_advance_detail_end_date: "",
+                cash_advance_detail_purpose: "",
+                cash_advance_detail_relation_name: "",
+                cash_advance_detail_relation_position: "",
+                cash_advance_detail_relation_organization_id: "",
+                cash_advance_detail_location: "",
+                cash_advance_detail_amount: "",
+                cash_advance_detail_document_id: "",
+                cash_advance_detail_note: "",
+            },
+        ]);
     };
 
     // Handle Add Row Files Start
     const handleChangeAddFiles = (e: any, i: number) => {
         const { name, files } = e.target;
 
-        const onchangeFile: any = [...DataFilesRow.cash_advance_detail_document_id];
-        const onchangeFileData: any = [...data.CashAdvanceDetail];
+        const onchangeFile: any = [...data.CashAdvanceDetail];
 
         onchangeFile[i][name] = files[0];
-        onchangeFileData[modalFiles.index][name][i] = files[0];
 
-        setData("CashAdvanceDetail", onchangeFileData);
+        setData("CashAdvanceDetail", onchangeFile);
 
-        setDataFilesRow({...DataFilesRow, cash_advance_detail_document_id: onchangeFile});
+        // setDataById({ ...dataById, CashAdvanceDetail: onchangeFile });
     };
     // Handle Add Row Files End
 
     // Handle Remove Files Row Start
-    const handleRemoveFilesRow = (e: any, i: number) => {
-        e.preventDefault()
-
-        const deleteFilesRow = [...DataFilesRow.cash_advance_detail_document_id];
-
-        const deleteFilesData: any = [...data.CashAdvanceDetail];
+    const handleRemoveFilesRow = (i: number) => {
+        const deleteFilesRow = [...data.CashAdvanceDetail];
 
         deleteFilesRow.splice(i, 1);
 
-        deleteFilesData[modalFiles.index].cash_advance_detail_document_id.splice(i, 1);
+        setDataFilesRow(deleteFilesRow);
 
-        setDataFilesRow({...DataFilesRow, cash_advance_detail_document_id: deleteFilesRow});
-
-        setData({...data, CashAdvanceDetail: deleteFilesData});
+        setData("CashAdvanceDetail", deleteFilesRow);
     };
     // Handle Remove Files Row End
-
-    // Handle Add Row Files Report Start
-    const [DataFilesReportRow, setDataFilesReportRow] = useState<any>({
-        cash_advance_detail_start_date: "",
-        cash_advance_detail_end_date: "",
-        cash_advance_detail_purpose: "",
-        cash_advance_detail_relation_name: "",
-        cash_advance_detail_relation_position: "",
-        cash_advance_detail_relation_organization_id: "",
-        cash_advance_detail_location: "",
-        cash_advance_detail_amount: "",
-        cash_advance_detail_document_id: [],
-        cash_advance_detail_note: "",
-        cash_advance_detail_cost_classification: "",
-        cash_advance_detail_amount_approve: "",
-        cash_advance_detail_remarks: "",
-    });
-
-    const handleAddRowFilesReport = (e: FormEvent) => {
-        e.preventDefault();
-
-        const CashAdvanceDetail: any = [...dataCAReport.CashAdvanceDetail]
-
-        CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id = [
-            ...CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id,
-            {
-                cash_advance_detail_document_id: "",
-            }
-        ];
-
-        // setDataFilesReportRow({
-        //     ...DataFilesReportRow,
-        //     cash_advance_detail_document_id: [
-        //         ...DataFilesReportRow.cash_advance_detail_document_id,
-        //         {
-        //             cash_advance_detail_document_id: ""
-        //         }
-        //     ]
-        // });
-
-        setDataCAReport({
-            ...dataCAReport,
-            CashAdvanceDetail: CashAdvanceDetail
-        });
-    };
-
-    console.log("Data Row : ", DataRow);
-    console.log("Button index : ", modalFiles.index);
-    console.log("Data File CA", dataCAReport);
-
-    // Handle Add Row Files Report Start
-    const handleChangeAddFilesReport = (e: any, i: number) => {
-        const { name, files } = e.target;
-
-        // const onchangeFile: any = [...DataFilesReportRow.cash_advance_detail_document_id];
-        const onchangeFileData: any = [...dataCAReport.CashAdvanceDetail];
-
-        // onchangeFile[i][name] = files[0];
-        onchangeFileData[modalFiles.index][name][i] = files[0];
-
-        setDataCAReport({...dataCAReport, CashAdvanceDetail: onchangeFileData});
-
-        // setDataFilesReportRow({...DataFilesReportRow, cash_advance_detail_document_id: onchangeFile});
-    };
-    // Handle Add Row Files End
-
-    // Handle Remove Files Report Row Start
-    const handleRemoveFilesReportRow = (e: any, i: number) => {
-        e.preventDefault()
-
-        // const deleteFilesRow = [...DataFilesReportRow.cash_advance_detail_document_id];
-
-        const deleteFilesData: any = [...dataCAReport.CashAdvanceDetail];
-
-        // deleteFilesRow.splice(i, 1);
-
-        deleteFilesData[modalFiles.index].cash_advance_detail_document_id.splice(i, 1);
-
-        // setDataFilesReportRow({...DataFilesReportRow, cash_advance_detail_document_id: deleteFilesRow});
-
-        setDataCAReport({...dataCAReport, CashAdvanceDetail: deleteFilesData});
-    };
-    // Handle Remove Files Report Row End
 
     const handleUploadFile = (e: any, i: number) => {
         const { name, files } = e.target;
@@ -557,11 +416,8 @@ export default function CashAdvance({ auth }: PageProps) {
             cash_advance_detail_relation_organization_id: "",
             cash_advance_detail_location: "",
             cash_advance_detail_amount: "",
-            cash_advance_detail_document_id: [],
+            cash_advance_detail_document_id: "",
             cash_advance_detail_note: "",
-            cash_advance_detail_cost_classification: "",
-            cash_advance_detail_amount_approve: "",
-            cash_advance_detail_remarks: "",
         },
     ]);
 
@@ -579,11 +435,8 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_detail_relation_organization_id: "",
                 cash_advance_detail_location: "",
                 cash_advance_detail_amount: "",
-                cash_advance_detail_document_id: [],
+                cash_advance_detail_document_id: "",
                 cash_advance_detail_note: "",
-                cash_advance_detail_cost_classification: "",
-                cash_advance_detail_amount_approve: "",
-                cash_advance_detail_remarks: "",
             },
         ]);
 
@@ -598,34 +451,10 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_detail_relation_organization_id: "",
                 cash_advance_detail_location: "",
                 cash_advance_detail_amount: "",
-                cash_advance_detail_document_id: [],
+                cash_advance_detail_document_id: "",
                 cash_advance_detail_note: "",
-                cash_advance_detail_cost_classification: "",
-                cash_advance_detail_amount_approve: "",
-                cash_advance_detail_remarks: "",
             },
         ]);
-
-        setDataCAReport({
-            ...dataCAReport, CashAdvanceDetail: [
-                ...dataCAReport.CashAdvanceDetail,
-                {
-                    cash_advance_detail_start_date: "",
-                    cash_advance_detail_end_date: "",
-                    cash_advance_detail_purpose: "",
-                    cash_advance_detail_relation_name: "",
-                    cash_advance_detail_relation_position: "",
-                    cash_advance_detail_relation_organization_id: "",
-                    cash_advance_detail_location: "",
-                    cash_advance_detail_amount: "",
-                    cash_advance_detail_document_id: [],
-                    cash_advance_detail_note: "",
-                    cash_advance_detail_cost_classification: "",
-                    cash_advance_detail_amount_approve: "",
-                    cash_advance_detail_remarks: "",
-                }
-            ]
-        });
     };
     // Handle Add Row Report CA End
 
@@ -633,25 +462,25 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleChangeAddReport = (e: any, i: number) => {
         const { name, value } = e.target;
 
-        const onchangeVal: any = [...dataCAReport.CashAdvanceDetail];
+        const onchangeVal: any = [...data.CashAdvanceDetail];
 
         onchangeVal[i][name] = value;
 
         setDataReportRow(onchangeVal);
 
-        setDataCAReport({...dataCAReport, CashAdvanceDetail: onchangeVal});
+        setData("CashAdvanceDetail", onchangeVal);
     };
     // Handle Change Add Report CA End
 
     // Handle Remove Row Report CA Start
     const handleRemoveReportRow = (i: number) => {
-        const deleteRow = [...dataCAReport.CashAdvanceDetail];
+        const deleteRow = [...data.CashAdvanceDetail];
 
         deleteRow.splice(i, 1);
 
         setDataReportRow(deleteRow);
 
-        setDataCAReport({...dataCAReport, CashAdvanceDetail: deleteRow});
+        setData("CashAdvanceDetail", deleteRow);
     };
     // Handle Remove Row Report CA End
 
@@ -675,7 +504,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCANumber`)
             .then(function (response) {
                 setCANumber(response.data);
-                // console.log("xxx", response.data);
+                console.log("xxx", response.data);
             })
             .catch(function (error) {
                 console.log(error);
@@ -690,7 +519,6 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_end_date: "",
         cash_advance_division: "",
     });
-
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const getCA = async (pageNumber = "page=1", status:number) => {
@@ -724,7 +552,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 //         view_report: false,
                 //         approve_report: false,
                 //         revised_report: false,
-                //         execute_report: false,
+                //         add_files: false,
                 //     });
                 // }
             })
@@ -783,7 +611,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     });
                 }
             })
@@ -805,11 +633,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // };
 
     // Data Start
-    const { 
-        users, 
-        cash_advance_purpose,
-        cash_advance_cost_classification
-    }: any = usePage().props;
+    const { users, cash_advance_purpose }: any = usePage().props;
 
     const purposes = [
         {
@@ -844,11 +668,11 @@ export default function CashAdvance({ auth }: PageProps) {
     const types = [
         {
             id: 1,
-            name: "Settlement",
+            type: "Cash Advance",
         },
         {
             id: 2,
-            name: "Refund",
+            type: "Reimburse",
         },
     ];
 
@@ -931,7 +755,7 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: false,
             revised_report: false,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Approve End
@@ -962,7 +786,7 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: false,
             revised_report: false,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Revised End
@@ -972,9 +796,9 @@ export default function CashAdvance({ auth }: PageProps) {
         e.preventDefault();
 
         await axios
-            .get(`/getCAById/${id}`)
+            .get(`/getCAReportById/${id}`)
             .then((res) => {
-                setDataById(res.data);
+                setDataReportById(res.data);
                 console.log(res.data);
             })
             .catch((err) => console.log(err));
@@ -993,41 +817,10 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: false,
             revised_report: false,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Execute End
-
-    // Handle Add Cash Advance Report Start
-    const handleAddCAReportModal = async (e: FormEvent, id: number) => {
-        e.preventDefault();
-
-        await axios
-            .get(`/getCAById/${id}`)
-            .then((res) => {
-                setDataById(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => console.log(err));
-
-        setModal({
-            add: false,
-            delete: false,
-            edit: false,
-            view: false,
-            document: false,
-            search: false,
-            search_ca_report: false,
-            approve: false,
-            report: !modal.report,
-            execute: false,
-            view_report: false,
-            approve_report: false,
-            revised_report: false,
-            execute_report: false,
-        });
-    };
-    // Handle Add Cash Advance Report End
 
     // Handle Show Start
     const handleShowModal = async (e: FormEvent, id: number) => {
@@ -1055,7 +848,7 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: false,
             revised_report: false,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Show End
@@ -1088,7 +881,7 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: !modal.view_report,
             approve_report: false,
             revised_report: false,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Show Report End
@@ -1119,7 +912,7 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: !modal.approve_report,
             revised_report: false,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Approve Report End
@@ -1150,41 +943,10 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: false,
             revised_report: !modal.revised_report,
-            execute_report: false,
+            add_files: false,
         });
     };
     // Handle Revised Report End
-
-    // Handle Execute Report Start
-    const handleExecuteReportModal = async (e: FormEvent, id: number) => {
-        e.preventDefault();
-
-        await axios
-            .get(`/getCAReportById/${id}`)
-            .then((res) => {
-                setDataReportById(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => console.log(err));
-
-        setModal({
-            add: false,
-            delete: false,
-            edit: false,
-            view: false,
-            document: false,
-            search: false,
-            search_ca_report: false,
-            approve: false,
-            report: false,
-            execute: false,
-            view_report: false,
-            approve_report: false,
-            revised_report: false,
-            execute_report: !modal.execute_report,
-        });
-    };
-    // Handle Execute Report End
 
     const handleBtnStatus = async (status: number) => {
         setDataById({
@@ -1202,6 +964,7 @@ export default function CashAdvance({ auth }: PageProps) {
             })
             .then((res) => {
                 console.log(res);
+                close();
             })
             .catch((err) => {
                 console.log(err);
@@ -1250,7 +1013,7 @@ export default function CashAdvance({ auth }: PageProps) {
             view_report: false,
             approve_report: false,
             revised_report: false,
-            execute_report: false,
+            add_files: !modal.add_files,
         });
     };
     // Handle Add Files End
@@ -1354,49 +1117,19 @@ export default function CashAdvance({ auth }: PageProps) {
         })
         setCheckedCashEdit(!checkedCashEdit); 
     };
+        
+    const [startDate, setStartDate] = useState(new Date());
 
-    const timeline = [
-        {
-            id: 1,
-            content: 'Applied to',
-            target: 'Front End Developer',
-            href: '#',
-            date: 'Sep 20',
-            datetime: '2020-09-20',
-            icon: '',
-            iconBackground: 'bg-gray-400',
-        },
-        {
-            id: 2,
-            content: 'Applied to',
-            target: 'Front End Developer',
-            href: '#',
-            date: 'Sep 20',
-            datetime: '2020-09-20',
-            icon: '',
-            iconBackground: 'bg-gray-400',
-        },
-    ]
-    
-    function classNames(...classes:any) {
-        return classes.filter(Boolean).join(' ')
-    }
+    const [value, onChange] = useState<Value>(new Date());
 
-    // const [files, setFiles] = useState<any>();
 
-    // const handleAddFiles = () => {
-
-    // };
-    // console.log("Data", data);
-    // console.log("Data Files", DataFilesRow);
-    // console.log(files);
+    console.log(data);
     // console.log(DataReportRow);
-    console.log("Cash Advance", cashAdvance.data);
-    // console.log("Cash Advance Report", cashAdvanceReport.data);
-    console.log("Data CA By Id", dataById);
+    // console.log("Cash Advance", cashAdvance.data);
+    console.log("Cash Advance Report", cashAdvanceReport.data);
+    // console.log("Data By Id", dataById);
     console.log("Data Report By Id", dataReportById);
-    console.log("Data CA Report", dataCAReport);
-    // console.log("Search CA", searchCA);
+    console.log("Search CA", searchCA);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Cash Advance"}>
@@ -1429,7 +1162,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title={"Add Cash Advance"}
@@ -1659,7 +1392,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                {/* <TextInput
+                                                <TextInput
                                                     id="cash_advance_detail_purpose"
                                                     type="text"
                                                     name="cash_advance_detail_purpose"
@@ -1669,8 +1402,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
-                                                /> */}
-                                                <select
+                                                />
+                                                {/* <select
                                                     id="cash_advance_detail_purpose"
                                                     name="cash_advance_detail_purpose"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -1690,7 +1423,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             {purpose.CASH_ADVANCE_PURPOSE}
                                                         </option>
                                                     ))}
-                                                </select>
+                                                </select> */}
                                             </TD>
                                             <TD className="border">
                                                 <select
@@ -1776,27 +1509,17 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     required
                                                 />
                                             </TD>
-                                            <TD className="border px-2">
-                                                <div className="">
-                                                    <button type="button" 
-                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
-                                                        onClick={() => {
-                                                            setModalFiles({
-                                                                add_files: true,
-                                                                add_files_report: false,
-                                                                index: i
-                                                            });
-                                                        }}
-                                                    >
-                                                        {
-                                                            data.CashAdvanceDetail[i]?.cash_advance_detail_document_id.length > 0 
-                                                            ? 
-                                                                (data.CashAdvanceDetail[i]?.cash_advance_detail_document_id?.length + ' Files') 
-                                                            : 
-                                                                'Add Files'
-                                                        }
-                                                    </button>
-                                                </div>
+                                            <TD className="border">
+                                                <button type="button" 
+                                                    className="bg-black hover:bg-slate-800 text-sm text-white px-3 py-1 mx-4"
+                                                    onClick={() => {
+                                                        setModalFiles({
+                                                            add_files: true,
+                                                        });
+                                                    }}
+                                                >
+                                                    Choose Files
+                                                </button>
                                                 {/* <input
                                                     type="file"
                                                     id="cash_advance_detail_document_id"
@@ -1991,61 +1714,47 @@ export default function CashAdvance({ auth }: PageProps) {
                             onClose={() =>
                                 setModalFiles({
                                     add_files: false,
-                                    add_files_report: false,
-                                    index: ""
                                 })
                             }
-                            title="Add Files"
+                            title="Add Files Cash Advance"
                             url=""
-                            data=""
-                            method=""
+                            data={data}
+                            method="post"
                             onSuccess=""
                             headers={null}
-                            submitButtonName=""
+                            submitButtonName="Add Files"
                             panelWidth=""
                             body={
                                 <>
-                                    {data.CashAdvanceDetail[modalFiles.index]?.cash_advance_detail_document_id.map((val: any, i:number) => (
-                                        <div className="grid grid-cols-12 my-5" key={i}>
-                                                <div className={`w-full col-span-11`}>
+                                    {DataFilesRow.map((val, i) => (
+                                        <div className="grid grid-cols-12 my-5">
+                                                <div className={`w-full ${DataFilesRow.length > 1 ? "col-span-11" : "col-span-12" }`} key={i}>
                                                     <InputLabel
                                                         htmlFor="files"
                                                         value="File"
                                                         className="mb-2"
                                                     />
-                                                    {/* <Input 
+                                                    <Input 
                                                         name="cash_advance_detail_document_id"
                                                         type="file"
                                                         className="w-full"
                                                         // value={val.cash_advance_detail_document_id}
+                                                        required
                                                         onChange={(e) =>
                                                             handleChangeAddFiles(e, i)
                                                         }
-                                                    />  */}
-
-                                                    {data.CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id[i]?.name ? (
-                                                        <p>
-                                                            {data.CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id[i]?.name}
-                                                        </p>
-                                                    ) : (
-                                                        <Input 
-                                                            name="cash_advance_detail_document_id"
-                                                            type="file"
-                                                            className="w-full"
-                                                            onChange={(e) =>
-                                                                handleChangeAddFiles(e, i)
-                                                            }
-                                                        />
-                                                    )}
+                                                    />
                                                 </div>
-                                                <button 
-                                                    className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
-                                                    onClick={(e) =>
-                                                        handleRemoveFilesRow(e, i)
-                                                    }
-                                                >
-                                                    X
-                                                </button>
+                                                {DataFilesRow.length > 1 && (
+                                                    <button 
+                                                        className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
+                                                        onClick={() =>
+                                                            handleRemoveFilesRow(i)
+                                                        }
+                                                    >
+                                                        X
+                                                    </button>
+                                                )}
                                         </div>
                                     ))}
                                     <button 
@@ -2057,7 +1766,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </button>
                                 </>
                             }
-                        />  
+                        />
                     </>
                 }
             />
@@ -2065,7 +1774,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Detail Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.view}
                 closeable={true}
                 onClose={() =>
@@ -2083,7 +1792,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title="Detail Cash Advance"
@@ -2206,25 +1915,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="tanggalPengajuan"
-                                    value="Request Date"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="tanggalPengajuan"
-                                    type="text"
-                                    name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataById.CASH_ADVANCE_REQUESTED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
-                                    className=""
-                                    autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
                                     htmlFor="divisi"
                                     value="Division"
                                     className="mb-2"
@@ -2242,6 +1932,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                             CASH_ADVANCE_DIVISION: e.target.value,
                                         })
                                     }
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="tanggalPengajuan"
+                                    value="Request Date"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="tanggalPengajuan"
+                                    type="text"
+                                    name="tanggalPengajuan"
+                                    value={dateFormat(
+                                        dataById.CASH_ADVANCE_REQUESTED_DATE,
+                                        "dd-mm-yyyy"
+                                    )}
+                                    className=""
+                                    autoComplete="tanggalPengajuan"
                                     readOnly
                                 />
                             </div>
@@ -2530,44 +2239,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
-
-                        <div className="flow-root mt-10">
-                            <p>Status</p>
-                            <ul role="list" className="mt-5">
-                                {/* {timeline.map((event, eventIdx) => ( */}
-                                <li>
-                                    <div className="relative pb-8">
-                                        {/* {eventIdx !== timeline.length - 1 ? ( */}
-                                            <span aria-hidden="true" className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-red-300" />
-                                        {/* ) : null} */}
-                                        <div className="relative flex space-x-3">
-                                            <div>
-                                                <span
-                                                    className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"
-                                                >
-                                                    {/* <event.icon aria-hidden="true" className="h-5 w-5 text-white" /> */}
-                                                    
-                                                </span>
-                                            </div>
-                                            <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                                <div>
-                                                    <p className="text-sm text-gray-500">
-                                                    Created{' '}
-                                                    {/* <a href={event.href} className="font-medium text-gray-900">
-                                                        {event.target}
-                                                    </a> */}
-                                                    </p>
-                                                </div>
-                                                <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                                                    <time dateTime="2024-07-19">2024-07-19</time>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                {/* ))} */}
-                            </ul>
-                        </div>
                     </>
                 }
             />
@@ -2575,7 +2246,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Approve Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.approve}
                 closeable={true}
                 onClose={() =>
@@ -2593,7 +2264,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title="Approve Cash Advance"
@@ -2686,6 +2357,22 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value={dataById.CASH_ADVANCE_DIVISION}
+                                    className=""
+                                    autoComplete="divisi"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
                                     htmlFor="tanggalPengajuan"
                                     value="Request Date"
                                     className="mb-2"
@@ -2700,22 +2387,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     )}
                                     className=""
                                     autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataById.CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -2927,7 +2598,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             cad.CASH_ADVANCE_DETAIL_NOTE
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="off"
+                                                        autoComplete="CASH_ADVANCE_DETAIL_NOTE"
                                                         onChange={(e) =>
                                                             handleChangeApprove(
                                                                 e,
@@ -2963,125 +2634,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
                                 <legend className="ml-12 bg-gray-300 px-3 font-medium">Delivery Method</legend>
                                 <div className="mt-4 mx-5 space-y-5">
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="transfer"
-                                            name="transfer"
-                                            type="checkbox"
-                                            aria-describedby="transfer-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={1}
-                                            defaultChecked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER && true}
-                                            onChange={(e) => handleCheckedTransferEdit(e)}
-                                            required
-                                            />
-                                        </div>
-                                        <div className="flex w-full gap-4">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="transfer" className="font-medium text-gray-900">
-                                                Transfer
-                                                </label>
-                                            </div>
-                                            {checkedTransferEdit === true ? (
-                                                <TextInput
-                                                    id="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                    type="number"
-                                                    name="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                    value={dataById.CASH_ADVANCE_TRANSFER_AMOUNT}
-                                                    className="w-full lg:w-1/4 text-right"
-                                                    placeholder="0"
-                                                    defaultChecked={true}
-                                                    onChange={(e) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            CASH_ADVANCE_TRANSFER_AMOUNT: e.target.value,
-                                                        })
-                                                    }
-                                                    required
-                                                />
-                                            ) : (
-                                                <TextInput
-                                                    id="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                    type="number"
-                                                    name="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                    value={dataById.CASH_ADVANCE_TRANSFER_AMOUNT}
-                                                    className="w-full lg:w-1/4 text-right"
-                                                    placeholder="0"
-                                                    // required
-                                                    readOnly
-                                                />
-                                            )}
-                                            <TextInput
-                                                id="account_number"
-                                                type="text"
-                                                name="account_number"
-                                                value=""
-                                                className="w-full lg:w-1/4"
-                                                placeholder="Bank Account Name - Bank Account - Account Number"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
-                                                required
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="cash"
-                                            name="cash"
-                                            type="checkbox"
-                                            aria-describedby="cash-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={2}
-                                            defaultChecked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_CASH && true}
-                                            onChange={(e) => handleCheckedCashEdit(e)}
-                                            required
-                                            />
-                                        </div>
-                                        <div className="flex w-full">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="cash" className="font-medium text-gray-900">
-                                                Cash
-                                                </label>
-                                            </div>
-                                            {checkedCashEdit === true ? (
-                                                <TextInput
-                                                    id="CASH_ADVANCE_CASH_AMOUNT"
-                                                    type="number"
-                                                    name="CASH_ADVANCE_CASH_AMOUNT"
-                                                    value={dataById.CASH_ADVANCE_CASH_AMOUNT}
-                                                    className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            CASH_ADVANCE_CASH_AMOUNT: e.target.value,
-                                                        })
-                                                    }
-                                                    required
-                                                />
-                                            ) : (
-                                                <TextInput
-                                                    id="CASH_ADVANCE_CASH_AMOUNT"
-                                                    type="number"
-                                                    name="CASH_ADVANCE_CASH_AMOUNT"
-                                                    value={dataById.CASH_ADVANCE_CASH_AMOUNT}
-                                                    className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                    placeholder="0"
-                                                    // onChange={(e) =>
-                                                    //     handleChangeAdd(e, i)
-                                                    // }
-                                                    required
-                                                    readOnly
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* <div className="mt-4 mx-5 space-y-5">
                                     <div className="relative flex items-start">
                                         <div className="flex h-9 items-center">
                                             <input
@@ -3158,7 +2710,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             />
                                         </div>
                                     </div>
-                                </div> */}
+                                </div>
                             </fieldset>
                         </div>
 
@@ -3177,6 +2729,32 @@ export default function CashAdvance({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
+
+                        {/* <div className="w-1/2 p-2 mt-5">
+                            <InputLabel
+                                htmlFor="DELIVERY_METHOD"
+                                value="Delivery Method"
+                                className="mb-2"
+                            />
+                            {dataById.DELIVERY_METHOD === 1 &&(
+                                <TextInput
+                                    id="DELIVERY_METHOD"
+                                    type="text"
+                                    name="DELIVERY_METHOD"
+                                    value="Cash"
+                                    readOnly
+                                />
+                            )}
+                            {dataById.DELIVERY_METHOD === 2 &&(
+                                <TextInput
+                                    id="DELIVERY_METHOD"
+                                    type="text"
+                                    name="DELIVERY_METHOD"
+                                    value="Transfer"
+                                    readOnly
+                                />
+                            )}
+                        </div> */}
 
                         {/* <div className="p-2 my-5">
                             <table className="w-2/6 table-auto">
@@ -3218,13 +2796,15 @@ export default function CashAdvance({ auth }: PageProps) {
                             </table>
                         </div> */}
                         <div className="md:absolute mt-7">
-                            <button
-                                type="submit"
-                                className="mt-3 inline-flex w-full justify-center rounded-md bg-yellow-400 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-300 sm:ml-3 sm:mt-0 sm:w-auto"
-                                onClick={() => handleBtnStatus(3)}
-                            >
-                                Need Revision
-                            </button>
+                            {count_approve > 0 && (
+                                <button
+                                    type="submit"
+                                    className="mt-3 inline-flex w-full justify-center rounded-md bg-yellow-400 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-300 sm:ml-3 sm:mt-0 sm:w-auto"
+                                    onClick={() => handleBtnStatus(3)}
+                                >
+                                    Need Revision
+                                </button>
+                            )}
                             <button
                                 type="submit"
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500 sm:ml-3 sm:mt-0 sm:w-auto"
@@ -3247,7 +2827,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Revised Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.edit}
                 closeable={true}
                 onClose={() =>
@@ -3265,7 +2845,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title="Revised Cash Advance"
@@ -3382,6 +2962,25 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="cash_advance_division"
+                                    type="text"
+                                    name="cash_advance_division"
+                                    value={dataById.CASH_ADVANCE_DIVISION}
+                                    className=""
+                                    autoComplete="cash_advance_division"
+                                    onChange={(e) =>
+                                        setData("cash_advance_division", e.target.value)
+                                    }
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
                                     htmlFor="tanggalPengajuan"
                                     value="Request Date"
                                     className="mb-2"
@@ -3402,25 +3001,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     //         e.target.value
                                     //     )
                                     // }
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="cash_advance_division"
-                                    type="text"
-                                    name="cash_advance_division"
-                                    value={dataById.CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="cash_advance_division"
-                                    onChange={(e) =>
-                                        setData("cash_advance_division", e.target.value)
-                                    }
                                     readOnly
                                 />
                             </div>
@@ -3486,6 +3066,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <TH
                                             label="Document"
                                             className="border py-2"
+                                            rowSpan={2}
+                                        />
+                                        <TH
+                                            label="Status"
+                                            className="border px-3 py-2"
                                             rowSpan={2}
                                         />
                                         <TH
@@ -3740,7 +3325,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         }
                                                     />
                                                 </TD>
-                                                {/* <TD className="border px-3">
+                                                <TD className="border px-3">
                                                     {cad.CASH_ADVANCE_DETAIL_STATUS ===
                                                         0 && (
                                                         <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
@@ -3753,7 +3338,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             Reject
                                                         </span>
                                                     )}
-                                                </TD> */}
+                                                </TD>
                                                 <TD className="border text-left px-3">
                                                     {cad.CASH_ADVANCE_DETAIL_NOTE}
                                                 </TD>
@@ -3994,7 +3579,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Execute Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.execute}
                 closeable={true}
                 onClose={() =>
@@ -4012,10 +3597,10 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
-                title="Cash Advance Execute"
+                title="Cash Advance Execute Report"
                 url={`/cashAdvanceExecute/${dataById.CASH_ADVANCE_ID}`}
                 data={dataById}
                 method="patch"
@@ -4036,7 +3621,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="cashAdvanceNumber"
                                     type="text"
                                     name="cashAdvanceNumber"
-                                    value={dataById.CASH_ADVANCE_NUMBER}
+                                    value={dataReportById?.cash_advance.CASH_ADVANCE_NUMBER}
                                     className=""
                                     autoComplete="cashAdvanceNumber"
                                     readOnly
@@ -4071,7 +3656,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     />
                                 )}
                             </div> */}
-                            <div className="w-full p-2">
+                            {/* <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
                                     value="Used By"
@@ -4081,12 +3666,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
+                                    value={dataReportById?.user_used_by.name}
                                     className=""
                                     autoComplete="namaPemohon"
                                     readOnly
                                 />
-                            </div>
+                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPengguna"
@@ -4097,9 +3682,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={dataById.user.name}
+                                    value={dataReportById?.user.name}
                                     className=""
                                     autoComplete="namaPengguna"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
+                                    className=""
+                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -4114,27 +3715,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="TEXT"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
-                                        dataById.CASH_ADVANCE_REQUESTED_DATE,
+                                        dataReportById?.REPORT_CASH_ADVANCE_REQUESTED_DATE,
                                         "dd-mm-yyyy"
                                     )}
                                     className=""
                                     autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataById.CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -4148,7 +3733,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
+                                    value={dataReportById?.user_approval.name}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     readOnly
@@ -4197,6 +3782,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             rowSpan={2}
                                         />
                                         <TH
+                                            label="Approval"
+                                            className="border px-3 py-2"
+                                            rowSpan={2}
+                                        />
+                                        <TH
                                             label="Note"
                                             className="border px-3 py-2"
                                             rowSpan={2}
@@ -4226,7 +3816,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>{" "}
                                 <tbody id="form_table">
-                                    {dataById?.cash_advance_detail.map(
+                                    {dataReportById?.cash_advance_detail_report.map(
                                         (cad: any, i: number) => (
                                             <tr
                                                 className="text-center text-sm"
@@ -4237,54 +3827,54 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {dateFormat(
-                                                        cad.CASH_ADVANCE_DETAIL_START_DATE,
+                                                        cad.REPORT_CASH_ADVANCE_DETAIL_START_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {dateFormat(
-                                                        cad.CASH_ADVANCE_DETAIL_END_DATE,
+                                                        cad.REPORT_CASH_ADVANCE_DETAIL_END_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.purpose?.CASH_ADVANCE_PURPOSE}
+                                                    {cad.purpose?.REPORT_CASH_ADVANCE_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         1 && "Perusahaan A"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         2 && "Perusahaan B"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
+                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
                                                         3 && "Perusahaan C"}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.CASH_ADVANCE_DETAIL_RELATION_NAME
+                                                        cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.CASH_ADVANCE_DETAIL_RELATION_POSITION
+                                                        cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
-                                                        cad.CASH_ADVANCE_DETAIL_LOCATION
+                                                        cad.REPORT_CASH_ADVANCE_DETAIL_LOCATION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {formatCurrency.format(
-                                                        cad.CASH_ADVANCE_DETAIL_AMOUNT
+                                                        cad.REPORT_CASH_ADVANCE_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.CASH_ADVANCE_DETAIL_DOCUMENT_ID !== null ? (
+                                                {cad.REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID !== null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
                                                             onClick={() =>
                                                                 handleFileDownload(
-                                                                    cad.CASH_ADVANCE_DETAIL_ID
+                                                                    cad.REPORT_CASH_ADVANCE_DETAIL_ID
                                                                 )
                                                             }
                                                         >
@@ -4294,8 +3884,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 ) : (
                                                     <TD className="border px-3 py-2">-</TD>
                                                 )}
+                                                <TD className="border px-3">
+                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_STATUS ===
+                                                        0 && (
+                                                        <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                            Approve
+                                                        </span>
+                                                    )}
+                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_STATUS ===
+                                                        1 && (
+                                                        <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
+                                                            Reject
+                                                        </span>
+                                                    )}
+                                                </TD>
                                                 <TD className="border">
-                                                    {cad.CASH_ADVANCE_DETAIL_NOTE}
+                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_NOTE}
                                                 </TD>
                                             </tr>
                                         )
@@ -4311,7 +3915,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TD>
                                         <TD className="border text-center py-2">
                                             {formatCurrency.format(
-                                                dataById.CASH_ADVANCE_TOTAL_AMOUNT
+                                                dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT
                                             )}
                                         </TD>
                                     </tr>
@@ -4334,7 +3938,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
                                             onChange={(e) => handleCheckedTransferEdit(e)}
-                                            defaultChecked={dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
                                             required
                                             />
                                         </div>
@@ -4345,16 +3949,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </label>
                                             </div>
                                             <TextInput
-                                                id="CASH_ADVANCE_TRANSFER_AMOUNT"
+                                                id="REPORT_CASH_ADVANCE_TRANSFER_AMOUNT"
                                                 type="number"
-                                                name="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                value={dataById.CASH_ADVANCE_TRANSFER_AMOUNT}
+                                                name="REPORT_CASH_ADVANCE_TRANSFER_AMOUNT"
+                                                value={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_TRANSFER_AMOUNT}
                                                 className="w-full lg:w-1/4 text-right"
                                                 placeholder="0"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_TRANSFER_AMOUNT: e.target.value,
+                                                        REPORT_CASH_ADVANCE_TRANSFER_AMOUNT: e.target.value,
                                                     })
                                                 }
                                                 required
@@ -4382,39 +3986,39 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="mb-2"
                                             >
                                                 Transfer Date
-                                                {/* <span className="text-red-600">*</span> */}
+                                                <span className="text-red-600">*</span>
                                             </InputLabel>
                                             <TextInput
-                                                id="CASH_ADVANCE_TRANSFER_DATE"
+                                                id="REPORT_CASH_ADVANCE_TRANSFER_DATE"
                                                 type="date"
-                                                name="CASH_ADVANCE_TRANSFER_DATE"
-                                                value={dataById.CASH_ADVANCE_TRANSFER_DATE}
+                                                name="REPORT_CASH_ADVANCE_TRANSFER_DATE"
+                                                value={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_TRANSFER_DATE}
                                                 className="w-full lg:w-7/12"    
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_TRANSFER_DATE: e.target.value,
+                                                        REPORT_CASH_ADVANCE_TRANSFER_DATE: e.target.value,
                                                     })
                                                 }
-                                                // required
+                                                required
                                             />
                                         </div>
                                         <div className="mb-5">
                                             <InputLabel
-                                                htmlFor="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                htmlFor="REPORT_CASH_ADVANCE_FROM_BANK_ACCOUNT"
                                                 className="mb-2"
                                             >
                                                 From Bank Account
-                                                {/* <span className="text-red-600">*</span> */}
+                                                <span className="text-red-600">*</span>
                                             </InputLabel>
-                                            <select name="CASH_ADVANCE_FROM_BANK_ACCOUNT" id="CASH_ADVANCE_FROM_BANK_ACCOUNT" className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            <select name="REPORT_CASH_ADVANCE_FROM_BANK_ACCOUNT" id="REPORT_CASH_ADVANCE_FROM_BANK_ACCOUNT" className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             onChange={(e) =>
                                                 setDataById({
                                                     ...dataById,
-                                                    CASH_ADVANCE_FROM_BANK_ACCOUNT: e.target.value,
+                                                    REPORT_CASH_ADVANCE_FROM_BANK_ACCOUNT: e.target.value,
                                                 })
                                             }
-                                            // required
+                                            required
                                             >
                                                 <option value="">-- Choose Bank Account --</option>
                                                 <option value="Bank 1">Bank 1</option>
@@ -4433,7 +4037,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
                                             onChange={(e) => handleCheckedCashEdit(e)}
-                                            defaultChecked={dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
                                             required
                                             />
                                         </div>
@@ -4444,16 +4048,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </label>
                                             </div>
                                             <TextInput
-                                                id="CASH_ADVANCE_CASH_AMOUNT"
+                                                id="REPORT_CASH_ADVANCE_CASH_AMOUNT"
                                                 type="number"
-                                                name="CASH_ADVANCE_CASH_AMOUNT"
-                                                value={dataById.CASH_ADVANCE_CASH_AMOUNT}
+                                                name="REPORT_CASH_ADVANCE_CASH_AMOUNT"
+                                                value={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_CASH_AMOUNT}
                                                 className="w-full lg:w-6/12 text-right ml-9"
                                                 placeholder="0"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_CASH_AMOUNT: e.target.value,
+                                                        REPORT_CASH_ADVANCE_CASH_AMOUNT: e.target.value,
                                                     })
                                                 }
                                                 required
@@ -4464,26 +4068,26 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <div className="ml-7">
                                         <div className="mb-5">
                                             <InputLabel
-                                                htmlFor="CASH_ADVANCE_RECEIVE_DATE"
+                                                htmlFor="REPORT_CASH_ADVANCE_RECEIVE_DATE"
                                                 className="mb-2"
                                             >
                                                 Receive Date
-                                                {/* <span className="text-red-600">*</span> */}
+                                                <span className="text-red-600">*</span>
                                             </InputLabel>
                                             <TextInput
-                                                id="CASH_ADVANCE_RECEIVE_DATE"
+                                                id="REPORT_CASH_ADVANCE_RECEIVE_DATE"
                                                 type="date"
-                                                name="CASH_ADVANCE_RECEIVE_DATE"
-                                                value={dataById.CASH_ADVANCE_RECEIVE_DATE}
+                                                name="REPORT_CASH_ADVANCE_RECEIVE_DATE"
+                                                value={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_RECEIVE_DATE}
                                                 className="w-full lg:w-7/12"
                                                 placeholder="Bank Account Name - Bank Account - Account Number"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_RECEIVE_DATE: e.target.value,
+                                                        REPORT_CASH_ADVANCE_RECEIVE_DATE: e.target.value,
                                                     })
                                                 }
-                                                // required
+                                                required
                                             />
                                         </div>
                                         <div className="mb-2">
@@ -4492,21 +4096,21 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="mb-2"
                                             >
                                                 Receive Name
-                                                {/* <span className="text-red-600">*</span> */}
+                                                <span className="text-red-600">*</span>
                                             </InputLabel>
                                             <TextInput
-                                                id="CASH_ADVANCE_RECEIVE_NAME"
+                                                id="REPORT_CASH_ADVANCE_RECEIVE_NAME"
                                                 type="text"
-                                                name="CASH_ADVANCE_RECEIVE_NAME"
-                                                value={dataById.CASH_ADVANCE_RECEIVE_NAME}
+                                                name="REPORT_CASH_ADVANCE_RECEIVE_NAME"
+                                                value={dataReportById?.cash_advance.REPORT_CASH_ADVANCE_RECEIVE_NAME}
                                                 className="w-full lg:w-7/12"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_RECEIVE_NAME: e.target.value,
+                                                        REPORT_CASH_ADVANCE_RECEIVE_NAME: e.target.value,
                                                     })
                                                 }
-                                                // required
+                                                required
                                             />
                                         </div>
                                     </div>
@@ -4526,7 +4130,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.CASH_ADVANCE_REQUEST_NOTE}
+                                value={dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE}
                                 readOnly
                             />
                         </div>
@@ -4577,7 +4181,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Report Start */}
             <ModalToAdd
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.report}
                 onClose={() =>
                     setModal({
@@ -4594,12 +4198,12 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title={"Cash Advance Report"}
                 url={`/cashAdvanceReport`}
-                data={dataCAReport}
+                data={data}
                 onSuccess={handleSuccess}
                 panelWidth={"65%"}
                 body={
@@ -4613,22 +4217,15 @@ export default function CashAdvance({ auth }: PageProps) {
                                     CA Number{" "}
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <TextInput
-                                    id="cashAdvanceNumber"
-                                    type="text"
-                                    name="cashAdvanceNumber"
-                                    value={dataById.CASH_ADVANCE_NUMBER}
-                                    className=""
-                                    readOnly
-                                />
-                                {/* <select
+                                <select
                                     id="cashAdvanceNumber"
                                     name="cashAdvanceNumber"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
-                                        setDataCAReport({
-                                            ...dataCAReport, cash_advance_id: e.target.value
-                                        })
+                                        setData(
+                                            "cash_advance_number",
+                                            e.target.value
+                                        )
                                     }
                                     required
                                 >
@@ -4641,7 +4238,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             {ca.CASH_ADVANCE_NUMBER}
                                         </option>
                                     ))}
-                                </select> */}
+                                </select>
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
@@ -4651,22 +4248,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     Used By
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <TextInput
-                                    id="cashAdvanceNumber"
-                                    type="text"
-                                    name="cashAdvanceNumber"
-                                    value={dataById.user_used_by.name}
-                                    className=""
-                                    readOnly
-                                />
-                                {/* <select
+                                <select
                                     id="namaPemohon"
                                     name="namaPemohon"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
-                                        setDataCAReport({
-                                            ...dataCAReport, cash_advance_used_by: e.target.value
-                                        })
+                                        setData("cash_advance_used_by", e.target.value)
                                     }
                                     required
                                 >
@@ -4678,7 +4265,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             {user.name}
                                         </option>
                                     ))}
-                                </select> */}
+                                </select>
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
@@ -4703,22 +4290,15 @@ export default function CashAdvance({ auth }: PageProps) {
                                     Request for Approval{" "}
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <TextInput
-                                    id="cashAdvanceNumber"
-                                    type="text"
-                                    name="cashAdvanceNumber"
-                                    value={dataById.user_approval.name}
-                                    className=""
-                                    readOnly
-                                />
-                                {/* <select
+                                <select
                                     id="namaPemberiApproval"
                                     name="namaPemberiApproval"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
-                                        setDataCAReport({
-                                            ...dataCAReport, cash_advance_first_approval_by: e.target.value
-                                        })
+                                        setData(
+                                            "cash_advance_first_approval_by",
+                                            e.target.value
+                                        )
                                     }
                                     required
                                 >
@@ -4730,7 +4310,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             {user.name}
                                         </option>
                                     ))}
-                                </select> */}
+                                </select>
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
@@ -4745,6 +4325,21 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value="IT"
                                     className=""
                                     readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="cash_advance_amount_approve"
+                                    value="Amount Approve"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="cash_advance_amount_approve"
+                                    type="number"
+                                    name="cash_advance_amount_approve"
+                                    value="IT"
+                                    placeholder="0"
+                                    className="text-right"
                                 />
                             </div>
                         </div>
@@ -4789,6 +4384,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Document"
+                                            className="border"
+                                            rowSpan="2"
+                                        />
+                                        <TH
+                                            label="Cost Classification"
+                                            className="border"
+                                            rowSpan="2"
+                                        />
+                                        <TH
+                                            label="Remarks"
                                             className="border"
                                             rowSpan="2"
                                         />
@@ -4838,7 +4443,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     name="cash_advance_detail_start_date"
                                                     value={val.cash_advance_detail_start_date}
                                                     className="w-1/2"
-                                                    autoComplete="off"
+                                                    autoComplete="cash_advance_detail_start_date"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -4854,7 +4459,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     name="cash_advance_detail_end_date"
                                                     value={val.cash_advance_detail_end_date}
                                                     className="w-1/2"
-                                                    autoComplete="off"
+                                                    autoComplete="cash_advance_detail_end_date"
                                                     onChange={(e) =>
                                                         handleChangeAddReport(
                                                             e,
@@ -4875,7 +4480,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         handleChangeAddReport(e, i)
                                                     }
                                                 />
-                                                {/* <select
+                                            {/* <select
                                                     id="cash_advance_detail_purpose"
                                                     name="cash_advance_detail_purpose"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -4998,26 +4603,63 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                <div className="">
-                                                    <button type="button" 
-                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
-                                                        onClick={() => {
-                                                            setModalFiles({
-                                                                add_files: false,
-                                                                add_files_report: true,
-                                                                index: i
-                                                            });
-                                                        }}
-                                                    >
-                                                        {
-                                                            dataCAReport.CashAdvanceDetail[i]?.cash_advance_detail_document_id.length > 0 
-                                                            ? 
-                                                                (dataCAReport.CashAdvanceDetail[i]?.cash_advance_detail_document_id?.length + ' Files') 
-                                                            : 
-                                                                'Add Files'
-                                                        }
-                                                    </button>
-                                                </div>
+                                                <input
+                                                    type="file"
+                                                    id="cash_advance_detail_document_id"
+                                                    name="cash_advance_detail_document_id"
+                                                    className="bg-white leading-4"
+                                                    multiple
+                                                    onChange={(e) =>
+                                                        handleUploadFile(e, i)
+                                                    }
+                                                />
+                                            </TD>
+                                            <TD className="border">
+                                                <select
+                                                    id="cash_advance_detail_cost_classification"
+                                                    name="cash_advance_detail_cost_classification"
+                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    onChange={(e) =>
+                                                        handleChangeAddReport(
+                                                            e,
+                                                            i
+                                                        )
+                                                    }
+                                                >
+                                                    <option value="">
+                                                        -- Choose Cost Classification --
+                                                    </option>
+                                                    {cost_classification.map(
+                                                        (cost) => (
+                                                            <option
+                                                                key={cost.index}
+                                                                value={
+                                                                    cost.index
+                                                                }
+                                                            >
+                                                                {
+                                                                    cost.name
+                                                                }
+                                                            </option>
+                                                        )
+                                                    )}
+                                                </select>
+                                            </TD>
+                                            <TD className="border">
+                                                <TextInput
+                                                    id="cash_advance_detail_remarks"
+                                                    type="text"
+                                                    name="cash_advance_detail_remarks"
+                                                    value={val.cash_advance_detail_remarks}
+                                                    className="w-1/2 text-right"
+                                                    autoComplete="off"
+                                                    onChange={(e) =>
+                                                        handleChangeAddReport(
+                                                            e,
+                                                            i
+                                                        )
+                                                    }
+                                                />
                                             </TD>
                                             <TD className="border">
                                                 {DataReportRow.length > 1 && (
@@ -5042,7 +4684,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <TD></TD>
                                         <TD>
                                             <Button
-                                                className="mt-5 px-2 py-1 text-black bg-none shadow-none hover:underline text-sm"
+                                                className="mt-5 px-2 py-1 ml-2 text-sm bg-transparent text-slate-950 shadow-none"
                                                 onClick={(e) =>
                                                     handleAddReportRow(e)
                                                 }
@@ -5079,77 +4721,85 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataCAReport.cash_advance_request_note}
+                                value={data.cash_advance_request_note}
                                 onChange={(e) =>
-                                    setDataCAReport({...dataCAReport, cash_advance_request_note: e.target.value})
+                                    setData("cash_advance_request_note", e.target.value)
                                 }
                             />
                         </div>
-
-                        <ModalToAction
-                            classPanel={"relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"}
-                            show={modalFiles.add_files_report}
-                            closeable={true}
-                            onClose={() =>
-                                setModalFiles({
-                                    add_files: false,
-                                    add_files_report: false,
-                                    index: ""
-                                })
-                            }
-                            title="Add Files Report"
-                            url=""
-                            data=""
-                            method=""
-                            onSuccess=""
-                            headers={null}
-                            submitButtonName=""
-                            panelWidth=""
-                            body={
-                                <>
-                                    {dataCAReport.CashAdvanceDetail[modalFiles.index]?.cash_advance_detail_document_id.map((val: any, i:number) => (
-                                        <div className="grid grid-cols-12 my-5" key={i}>
-                                                <div className={`w-full col-span-11`}>
-                                                    <InputLabel
-                                                        htmlFor="files"
-                                                        value="File"
-                                                        className="mb-2"
-                                                    />
-                                                    {dataCAReport.CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id[i]?.name ? (
-                                                        <p>
-                                                            {dataCAReport.CashAdvanceDetail[modalFiles.index].cash_advance_detail_document_id[i]?.name}
-                                                        </p>
-                                                    ) : (
-                                                        <Input 
-                                                            name="cash_advance_detail_document_id"
-                                                            type="file"
-                                                            className="w-full"
-                                                            onChange={(e) =>
-                                                                handleChangeAddFilesReport(e, i)
-                                                            }
-                                                        />
-                                                    )}
-                                                </div>
-                                                <button 
-                                                    className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
-                                                    onClick={(e) =>
-                                                        handleRemoveFilesReportRow(e, i)
-                                                    }
-                                                >
-                                                    X
-                                                </button>
-                                        </div>
+                        <div className="grid md:grid-cols-2 my-10">
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="refundType"
+                                    className="mb-2"
+                                >
+                                    Refund Amount
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <TextInput
+                                    id="refund_amount"
+                                    type="number"
+                                    name="refund_amount"
+                                    value={data.refund_amount}
+                                    className="w-1/2 text-right"
+                                    autoComplete="off"
+                                    placeholder="0"
+                                    required
+                                    onChange={(e) =>
+                                        setData("refund_amount", e.target.value)
+                                    }
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="refundType"
+                                    className="mb-2"
+                                >
+                                    Refund Type
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <select
+                                    id="refundType"
+                                    name="refundType"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    onChange={(e) =>
+                                        setData("refund_type", e.target.value)
+                                    }
+                                    required
+                                >
+                                    <option value="">
+                                        -- Pilih Refund Type --
+                                    </option>
+                                    {payments.map((refund: any) => (
+                                        <option
+                                            key={refund.id}
+                                            value={refund.id}
+                                        >
+                                            {refund.name}
+                                        </option>
                                     ))}
-                                    <button 
-                                        type="button" 
-                                        className="text-sm cursor-pointer hover:underline" 
-                                        onClick={(e) => handleAddRowFilesReport(e)}
-                                    >
-                                        + Add Row
-                                    </button>
-                                </>
-                            }
-                        />
+                                </select>
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="refundProof"
+                                    className="mb-2"
+                                >
+                                    Refund Proof
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <input
+                                    type="file"
+                                    id="refundProof"
+                                    name="refundProof"
+                                    className="w-full bg-white leading-4"
+                                    onChange={(e: any) =>
+                                        setData("refund_proof", e.target.files)
+                                    }
+                                    required
+                                />
+                            </div>
+                        </div>
                     </>
                 }
             />
@@ -5157,7 +4807,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Detail Report Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.view_report}
                 closeable={true}
                 onClose={() =>
@@ -5175,7 +4825,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title="Cash Advance Detail Report"
@@ -5199,13 +4849,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="cashAdvanceNumber"
                                     type="text"
                                     name="cashAdvanceNumber"
-                                    value={dataReportById?.REPORT_CASH_ADVANCE_NUMBER}
+                                    value={dataReportById?.cash_advance.CASH_ADVANCE_NUMBER}
                                     className=""
                                     autoComplete="cashAdvanceNumber"
                                     readOnly
                                 />
                             </div>
-                            <div className="w-full p-2">
+                            {/* <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
                                     value="Used By"
@@ -5220,7 +4870,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     autoComplete="namaPemohon"
                                     readOnly
                                 />
-                            </div>
+                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPengguna"
@@ -5234,6 +4884,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value={dataReportById?.user.name}
                                     className=""
                                     autoComplete="namaPengguna"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
+                                    className=""
+                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -5253,22 +4919,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     )}
                                     className=""
                                     autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -5558,7 +5208,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Approve Report Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.approve_report}
                 closeable={true}
                 onClose={() =>
@@ -5576,11 +5226,11 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title="Cash Advance Approve Report"
-                url={`/cashAdvanceApproveReport/${dataById.CASH_ADVANCE_ID}`}
+                url={`/cashAdvanceApproveReport/${dataReportById?.cash_advance.REPORT_CASH_ADVANCE_ID}`}
                 data={dataReportById}
                 method="patch"
                 onSuccess={handleSuccess}
@@ -5635,7 +5285,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     />
                                 )}
                             </div> */}
-                            <div className="w-full p-2">
+                            {/* <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
                                     value="Used By"
@@ -5650,7 +5300,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     autoComplete="namaPemohon"
                                     readOnly
                                 />
-                            </div>
+                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPengguna"
@@ -5664,6 +5314,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value={dataReportById?.user.name}
                                     className=""
                                     autoComplete="namaPengguna"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
+                                    className=""
+                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -5683,22 +5349,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     )}
                                     className=""
                                     autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -5762,23 +5412,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                         />
                                         <TH
                                             label="Approval"
-                                            className="border"
-                                            rowSpan="2"
+                                            className="border px-3 py-2"
+                                            rowSpan={2}
                                         />
                                         <TH
-                                            label="Cost Classification"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Amount Approve"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Remarks"
-                                            className="border"
-                                            rowSpan="2"
+                                            label="Note"
+                                            className="border px-3 py-2"
+                                            rowSpan={2}
                                         />
                                     </tr>
                                     <tr className="text-center">
@@ -5912,88 +5552,24 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     </select>
                                                 </TD>
                                                 <TD className="border">
-                                                <select
-                                                    id="cash_advance_detail_cost_classification"
-                                                    name="cash_advance_detail_cost_classification"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Cost Classification --
-                                                    </option>
-                                                    {cash_advance_cost_classification.map(
-                                                        (cost_classification:any) => (
-                                                            <option
-                                                                key={cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_ID}
-                                                                value={
-                                                                    cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_ID
-                                                                }
-                                                            >
-                                                                {
-                                                                    cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_NAME
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </select>
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
-                                                    type="number"
-                                                    name="CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
-                                                    value={cad.CASH_ADVANCE_DETAIL_AMOUNT_APPROVE}
-                                                    className="w-1/2 text-right"
-                                                    autoComplete="off"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="CASH_ADVANCE_DETAIL_REMARKS"
-                                                    type="text"
-                                                    name="CASH_ADVANCE_DETAIL_REMARKS"
-                                                    value={cad.CASH_ADVANCE_DETAIL_REMARKS}
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            {/* <TD className="border">
-                                                <TextInput
-                                                    id="REPORT_CASH_ADVANCE_DETAIL_NOTE"
-                                                    type="text"
-                                                    name="REPORT_CASH_ADVANCE_DETAIL_NOTE"
-                                                    value={
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_NOTE
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="REPORT_CASH_ADVANCE_DETAIL_NOTE"
-                                                    onChange={(e) =>
-                                                        handleChangeApproveReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD> */}
-                                        </tr>
+                                                    <TextInput
+                                                        id="REPORT_CASH_ADVANCE_DETAIL_NOTE"
+                                                        type="text"
+                                                        name="REPORT_CASH_ADVANCE_DETAIL_NOTE"
+                                                        value={
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_NOTE
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="REPORT_CASH_ADVANCE_DETAIL_NOTE"
+                                                        onChange={(e) =>
+                                                            handleChangeApproveReport(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                            </tr>
                                         )
                                     )}
                                 </tbody>
@@ -6213,7 +5789,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Revised Report Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
                 show={modal.revised_report}
                 closeable={true}
                 onClose={() =>
@@ -6231,7 +5807,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title="Cash Advance Revised Report"
@@ -6267,7 +5843,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     readOnly
                                 />
                             </div>
-                            <div className="w-full p-2">
+                            {/* <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
                                     value="Used By"
@@ -6285,7 +5861,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     }
                                     readOnly
                                 />
-                            </div>
+                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPengguna"
@@ -6301,6 +5877,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
                                         setData("cash_advance_requested_by", e.target.value)
+                                    }
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="cash_advance_division"
+                                    type="text"
+                                    name="cash_advance_division"
+                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
+                                    className=""
+                                    autoComplete="cash_advance_division"
+                                    onChange={(e) =>
+                                        setData("cash_advance_division", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -6327,25 +5922,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     //         e.target.value
                                     //     )
                                     // }
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="cash_advance_division"
-                                    type="text"
-                                    name="cash_advance_division"
-                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="cash_advance_division"
-                                    onChange={(e) =>
-                                        setData("cash_advance_division", e.target.value)
-                                    }
                                     readOnly
                                 />
                             </div>
@@ -6862,7 +6438,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE}
+                                value={dataReportById?.cash_advance.CASH_ADVANCE_REQUEST_NOTE}
                                 readOnly
                             />
                         </div>
@@ -6922,651 +6498,6 @@ export default function CashAdvance({ auth }: PageProps) {
             />
             {/* Modal Revised Report End */}
 
-            {/* Modal Execute Report Start */}
-            <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
-                show={modal.execute_report}
-                closeable={true}
-                onClose={() =>
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        search_ca_report: false,
-                        approve: false,
-                        report: false,
-                        execute: false,
-                        view_report: false,
-                        approve_report: false,
-                        revised_report: false,
-                        execute_report: false,
-                    })
-                }
-                title="Cash Advance Execute Report"
-                url={`/cashAdvanceExecuteReport/${dataById.CASH_ADVANCE_ID}`}
-                data={dataReportById}
-                method="patch"
-                onSuccess={handleSuccess}
-                headers={null}
-                submitButtonName={""}
-                panelWidth={"70%"}
-                body={
-                    <>
-                        <div className="grid md:grid-cols-2 my-10">
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="cashAdvanceNumber"
-                                    value="CA Number"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="cashAdvanceNumber"
-                                    type="text"
-                                    name="cashAdvanceNumber"
-                                    value={dataReportById?.cash_advance.CASH_ADVANCE_NUMBER}
-                                    className=""
-                                    autoComplete="cashAdvanceNumber"
-                                    readOnly
-                                />
-                            </div>
-                            {/* <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tipe"
-                                    value="Type"
-                                    className="mb-2"
-                                />
-                                {dataReportById.CASH_ADVANCE_TYPE === 1 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Cash Advance"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        readOnly
-                                    />
-                                )}
-                                {dataReportById.CASH_ADVANCE_TYPE === 2 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        readOnly
-                                    />
-                                )}
-                            </div> */}
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPemohon"
-                                    type="text"
-                                    name="namaPemohon"
-                                    value={dataReportById?.user_used_by.name}
-                                    className=""
-                                    autoComplete="namaPemohon"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPengguna"
-                                    value="Applicant"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPengguna"
-                                    type="text"
-                                    name="namaPengguna"
-                                    value={dataReportById?.user.name}
-                                    className=""
-                                    autoComplete="namaPengguna"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tanggalPengajuan"
-                                    value="Request Date"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="tanggalPengajuan"
-                                    type="text"
-                                    name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataReportById?.REPORT_CASH_ADVANCE_REQUESTED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
-                                    className=""
-                                    autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataReportById?.REPORT_CASH_ADVANCE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemberiApproval"
-                                    value="Request for Approval"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPemberiApproval"
-                                    type="text"
-                                    name="namaPemberiApproval"
-                                    value={dataReportById?.user_approval.name}
-                                    className=""
-                                    autoComplete="namaPemberiApproval"
-                                    readOnly
-                                />
-                            </div>
-                        </div>
-
-                        {/* Table form start */}
-                        <div className="max-w-full overflow-x-auto overflow-visible">
-                            <table className="w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-100 leading-8">
-                                    <tr className="text-center dark:bg-meta-4">
-                                        <TH
-                                            label="No."
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Intended Activity"
-                                            className="border px-3 py-2"
-                                            colSpan={2}
-                                        />
-                                        <TH
-                                            label="Purpose"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Relation"
-                                            className="border px-3 py-2"
-                                            colSpan={3}
-                                        />
-                                        <TH
-                                            label="Location"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Amount"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Document"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Approval"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Cost Classification"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Amount Approve"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Remarks"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                    </tr>
-                                    <tr className="text-center">
-                                    <TH
-                                            label="Start Date"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="End Date"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Name"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Person"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Position"
-                                            className="border px-3 py-2"
-                                        />
-                                    </tr>
-                                </thead>{" "}
-                                <tbody id="form_table">
-                                    {dataReportById?.cash_advance_detail_report.map(
-                                        (cad: any, i: number) => (
-                                            <tr
-                                                className="text-center text-sm"
-                                                key={i}
-                                            >
-                                                <TD className="border">
-                                                    {i + 1 + "."}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {dateFormat(
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_START_DATE,
-                                                        "dd-mm-yyyy"
-                                                    )}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {dateFormat(
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_END_DATE,
-                                                        "dd-mm-yyyy"
-                                                    )}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.purpose?.REPORT_CASH_ADVANCE_PURPOSE}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_LOCATION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {formatCurrency.format(
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_AMOUNT
-                                                    )}
-                                                </TD>
-                                                {cad.REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID !== null ? (
-                                                    <TD className="border px-3 py-2">
-                                                        <button
-                                                            type="button"
-                                                            title="Download File"
-                                                            onClick={() =>
-                                                                handleFileDownload(
-                                                                    cad.REPORT_CASH_ADVANCE_DETAIL_ID
-                                                                )
-                                                            }
-                                                        >
-                                                            <ArrowDownTrayIcon className="w-6 m-auto" />
-                                                        </button>
-                                                    </TD>
-                                                ) : (
-                                                    <TD className="border px-3 py-2">-</TD>
-                                                )}
-                                                <TD className="border">
-                                                    
-                                                </TD>
-                                                <TD className="border">
-                                                
-                                            </TD>
-                                            <TD className="border">
-                                                
-                                            </TD>
-                                            <TD className="border">
-                                                
-                                            </TD>
-                                            {/* <TD className="border">
-                                                <TextInput
-                                                    id="REPORT_CASH_ADVANCE_DETAIL_NOTE"
-                                                    type="text"
-                                                    name="REPORT_CASH_ADVANCE_DETAIL_NOTE"
-                                                    value={
-                                                        cad.REPORT_CASH_ADVANCE_DETAIL_NOTE
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="REPORT_CASH_ADVANCE_DETAIL_NOTE"
-                                                    onChange={(e) =>
-                                                        handleChangeExecuteReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD> */}
-                                        </tr>
-                                        )
-                                    )}
-                                </tbody>
-                                <tfoot>
-                                    <tr className="text-center text-black text-sm leading-7">
-                                        <TD
-                                            className="border text-right pr-5 py-2"
-                                            colSpan={8}
-                                        >
-                                            TOTAL AMOUNT
-                                        </TD>
-                                        <TD className="border text-center py-2">
-                                            {formatCurrency.format(
-                                                dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT
-                                            )}
-                                        </TD>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        {/* Table form end */}
-
-                        <div className="mt-10">
-                            <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
-                                <legend className="ml-12 bg-gray-300 px-3 font-medium">Delivery Method</legend>
-                                <div className="mt-4 mx-5 space-y-5">
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="transfer"
-                                            name="transfer"
-                                            type="checkbox"
-                                            aria-describedby="transfer-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={1}
-                                            checked={dataReportById?.cash_advance.CASH_ADVANCE_TRANSFER_AMOUNT && true}
-                                            onChange={(e) => handleCheckedTransfer(e)}
-                                            required
-                                            />
-                                        </div>
-                                        <div className="flex w-full gap-4">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="transfer" className="font-medium text-gray-900">
-                                                Transfer
-                                                </label>
-                                            </div>
-                                            <TextInput
-                                                id="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                type="number"
-                                                name="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                value={dataReportById?.cash_advance.CASH_ADVANCE_TRANSFER_AMOUNT}
-                                                className="w-full lg:w-1/4 text-right"
-                                                placeholder="0"
-                                                readOnly
-                                                required
-                                            />
-                                            <TextInput
-                                                id="account_number"
-                                                type="text"
-                                                name="account_number"
-                                                value=""
-                                                className="w-full lg:w-1/4"
-                                                placeholder="Bank Account Name - Bank Account - Account Number"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
-                                                required
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="cash"
-                                            name="cash"
-                                            type="checkbox"
-                                            aria-describedby="cash-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={2}
-                                            checked={dataReportById?.cash_advance.CASH_ADVANCE_CASH_AMOUNT && true}
-                                            onChange={(e) => handleCheckedCash(e)}
-                                            />
-                                        </div>
-                                        <div className="flex w-full">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="cash" className="font-medium text-gray-900">
-                                                Cash
-                                                </label>
-                                            </div>
-                                            <TextInput
-                                                id="CASH_ADVANCE_CASH_AMOUNT"
-                                                type="number"
-                                                name="CASH_ADVANCE_CASH_AMOUNT"
-                                                value={dataReportById?.cash_advance.CASH_ADVANCE_CASH_AMOUNT}
-                                                className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                placeholder="0"
-                                                readOnly
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 my-10">
-                        <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="type"
-                                    className="mb-2"
-                                >
-                                    Type
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <select
-                                    id="type"
-                                    name="type"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setDataCAReport({...dataCAReport, refund_type: e.target.value})
-                                    }
-                                    // required
-                                >
-                                    <option value="">
-                                        -- Choose Type --
-                                    </option>
-                                    {types.map((type: any) => (
-                                        <option
-                                            key={type.id}
-                                            value={type.id}
-                                        >
-                                            {type.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="refundType"
-                                    className="mb-2"
-                                >
-                                    Refund Amount
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <TextInput
-                                    id="refund_amount"
-                                    type="number"
-                                    name="refund_amount"
-                                    value={dataCAReport.refund_amount}
-                                    className="w-1/2 text-right"
-                                    autoComplete="off"
-                                    placeholder="0"
-                                    // required
-                                    onChange={(e) =>
-                                        setDataCAReport({...dataCAReport, refund_amount: e.target.value})
-                                    }
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="refundType"
-                                    className="mb-2"
-                                >
-                                    Refund Type
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <select
-                                    id="refundType"
-                                    name="refundType"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setDataCAReport({...dataCAReport, refund_type: e.target.value})
-                                    }
-                                    // required
-                                >
-                                    <option value="">
-                                        -- Choose Refund Type --
-                                    </option>
-                                    {payments.map((refund: any) => (
-                                        <option
-                                            key={refund.id}
-                                            value={refund.id}
-                                        >
-                                            {refund.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="refundProof"
-                                    className="mb-2"
-                                >
-                                    Refund Proof
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <input
-                                    type="file"
-                                    id="refundProof"
-                                    name="refundProof"
-                                    className="w-full bg-white leading-4"
-                                    onChange={(e) =>
-                                        setDataCAReport({...dataCAReport, refund_proof: e.target.value})
-                                    }
-                                    // required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="w-full p-2 mt-5">
-                            <InputLabel
-                                htmlFor="cash_advance_request_note"
-                                value="Note"
-                                className="mb-2"
-                            />
-                            <Textarea
-                                id="cash_advance_request_note"
-                                name="cash_advance_request_note"
-                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                rows={5}
-                                value={dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE}
-                                readOnly
-                            />
-                        </div>
-
-                        {/* <div className="w-1/2 p-2 mt-5">
-                            <InputLabel
-                                htmlFor="DELIVERY_METHOD"
-                                value="Delivery Method"
-                                className="mb-2"
-                            />
-                            {dataById.DELIVERY_METHOD === 1 &&(
-                                <TextInput
-                                    id="DELIVERY_METHOD"
-                                    type="text"
-                                    name="DELIVERY_METHOD"
-                                    value="Cash"
-                                    readOnly
-                                />
-                            )}
-                            {dataById.DELIVERY_METHOD === 2 &&(
-                                <TextInput
-                                    id="DELIVERY_METHOD"
-                                    type="text"
-                                    name="DELIVERY_METHOD"
-                                    value="Transfer"
-                                    readOnly
-                                />
-                            )}
-                        </div> */}
-
-                        {/* <div className="p-2 my-5">
-                            <table className="w-2/6 table-auto">
-                                <thead>
-                                    <tr>
-                                        <TableTH
-                                            label="STATUS"
-                                            className="uppercase"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTH
-                                            label="Date & Time"
-                                            className=""
-                                        />
-                                        <TableTH label="Name" className="" />
-                                        <TableTH label="Status" className="" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <TableTD
-                                            value={dateFormat(
-                                                dataById.created_at,
-                                                "dd-mm-yyyy HH:MM:ss"
-                                            )}
-                                            className="w-48 border-none"
-                                        />
-                                        <TableTD
-                                            value={dataById.user_used_by.name}
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Created"
-                                            className="border-none"
-                                        />
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> */}
-                    </>
-                }
-            />
-            {/* Modal Execute Report End */}
-
             {/* Modal Search CA */}
             <ModalSearch
                 show={modal.search}
@@ -7585,7 +6516,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title={"Search Cash Advance"}
@@ -7638,7 +6569,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         view_report: false,
                         approve_report: false,
                         revised_report: false,
-                        execute_report: false,
+                        add_files: false,
                     })
                 }
                 title={"Search Cash Advance Report"}
@@ -7674,8 +6605,7 @@ export default function CashAdvance({ auth }: PageProps) {
             {/* Content Start */}
             {/* <div className="max-w-0xl mx-auto sm:px-6 lg:px-0"> */}
             <div className="p-6 text-gray-900 mb-60">
-                {/* Tabs Start */}
-                {/* <div className="flex hover:cursor-pointer">
+                <div className="flex hover:cursor-pointer">
                     {tabs.map((tab, i) => (
                         <div
                             key={i}
@@ -7689,8 +6619,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             {tab.name}
                         </div>
                     ))}
-                </div> */}
-                {/* Tabs End */}
+                </div>
                 <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
                     <div className="grid sm:gap-2 sm:grid-cols-2 md:grid-cols-6 md:gap-4 lg:grid-cols-8">
                         {toggleState === 1 && (
@@ -7711,14 +6640,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                         view_report: false,
                                         approve_report: false,
                                         revised_report: false,
-                                        execute_report: false,
+                                        add_files: false,
                                     });
                                 }}
                             >
                                 {"Add Cash Advance"}
                             </Button>
                         )}
-                        {/* {toggleState === 2 && (
+                        {toggleState === 2 && (
                             <Button
                                 className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                                 onClick={() => {
@@ -7736,340 +6665,221 @@ export default function CashAdvance({ auth }: PageProps) {
                                         view_report: false,
                                         approve_report: false,
                                         revised_report: false,
-                                        execute_report: false,
+                                        add_files: false,
                                     });
                                 }}
                             >
                                 {"Add CA Report"}
                             </Button>
-                        )} */}
+                        )}
                     </div>
                 </div>
                 <div className={toggleState === 1 ? "" : "hidden"}>
                     <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
                         <div className="bg-white rounded-md mb-5 lg:mb-0 p-10">
-                            <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                <legend className="ml-8 bg-gray-300 px-3 text-sm">Search</legend>
-                                <div className="mt-3 px-4">
-                                    <div className="mb-5">
-                                        <Input 
-                                            id="cash_advance_requested_by"
-                                            name="cash_advance_requested_by"
-                                            type="text"
-                                            value={searchCA.cash_advance_requested_by}
-                                            placeholder="Applicant"
-                                            className="focus:ring-red-600"
-                                            autoComplete="off"
-                                            onChange={(e:any) =>
-                                            setSearchCA({
-                                                ...searchCA,
-                                                cash_advance_requested_by: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        <Input 
-                                            id="cash_advance_used_by"
-                                            name="cash_advance_used_by"
-                                            type="text"
-                                            value={searchCA.cash_advance_used_by}
-                                            placeholder="Used By"
-                                            className="focus:ring-red-600"
-                                            autoComplete="off"
-                                            onChange={(e:any) =>
-                                            setSearchCA({
-                                                ...searchCA,
-                                                cash_advance_used_by: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        <Input 
-                                            id="cash_advance_start_date"
-                                            name="cash_advance_start_date"
-                                            type="date"
-                                            value={searchCA.cash_advance_start_date}
-                                            className="focus:ring-red-600"
-                                            onChange={(e:any) =>
-                                            setSearchCA({
-                                                ...searchCA,
-                                                cash_advance_start_date: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        {/* <DatePicker 
-                                            className="w-full" 
-                                            format="dd-MM-y" 
-                                            dayPlaceholder="dd" 
-                                            monthPlaceholder="mm"
-                                            yearPlaceholder="yyyy" 
-                                            onChange={onChange} 
-                                            value={value} 
-                                        /> */}
-                                        <Input 
-                                            id="cash_advance_end_date"
-                                            name="cash_advance_end_date"
-                                            type="date"
-                                            value={searchCA.cash_advance_end_date}
-                                            className="focus:ring-red-600"
-                                            onChange={(e:any) =>
-                                            setSearchCA({
-                                                ...searchCA,
-                                                cash_advance_end_date: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        <Input 
-                                            id="cash_advance_division"
-                                            name="cash_advance_division"
-                                            type="text"
-                                            value={searchCA.cash_advance_division}
-                                            placeholder="Division"
-                                            className="focus:ring-red-600"
-                                            autoComplete="off"
-                                            onChange={(e:any) =>
-                                                setSearchCA({
-                                                    ...searchCA,
-                                                    cash_advance_division: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        <select name="cash_advance_type" id="cash_advance_type" className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
-                                            onChange={(e:any) =>
-                                                setSearchCA({
-                                                    ...searchCA,
-                                                    cash_advance_type: e.target.value,
-                                                })
-                                            }
-                                            required
-                                            >
-                                                <option value="1">Cash Advace</option>
-                                                <option value="2">CashAdvance Report</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            className="mb-4 w-40 py-1.5 px-2 bg-green-600 hover:bg-green-500"
-                                            onClick={() => getCA()}
-                                        >
-                                            Submit
-                                        </Button>
-                                        <Button
-                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                            onClick={() => clearSearchCA()}
-                                        >
-                                            Clear Search
-                                        </Button>
-                                    </div>
+                            <div className="mb-5">
+                                <div className="mb-5">
+                                    <Input 
+                                        id="cash_advance_requested_by"
+                                        name="cash_advance_requested_by"
+                                        type="text"
+                                        value={searchCA.cash_advance_requested_by}
+                                        placeholder="Applicant"
+                                        className="focus:ring-red-600"
+                                        autoComplete="off"
+                                        onChange={(e:any) =>
+                                        setSearchCA({
+                                            ...searchCA,
+                                            cash_advance_requested_by: e.target.value,
+                                            })
+                                        }
+                                    />
                                 </div>
-                            </fieldset>
-                            <div className="mt-10">
-                                <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                    <legend className="ml-8 bg-gray-300 px-3 text-sm">Cash Advance Status</legend>
-                                    <div className="flex flex-wrap content-between gap-10 justify-center mt-5 mx-1">
-                                        <div className="flex relative">
-                                            <Button className="bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
-                                                Request
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
-                                                Approve 1
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
-                                                Approve 2
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
-                                                Pending Report
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
-                                                Need Revision
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-red-600 px-2 py-1 hover:bg-red-500">
-                                                Reject
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </fieldset>
+                                <div className="mb-5">
+                                    <Input 
+                                        id="cash_advance_used_by"
+                                        name="cash_advance_used_by"
+                                        type="text"
+                                        value={searchCA.cash_advance_used_by}
+                                        placeholder="Used By"
+                                        className="focus:ring-red-600"
+                                        autoComplete="off"
+                                        onChange={(e:any) =>
+                                        setSearchCA({
+                                            ...searchCA,
+                                            cash_advance_used_by: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="mb-5">
+                                    <Input 
+                                        id="cash_advance_start_date"
+                                        name="cash_advance_start_date"
+                                        type="date"
+                                        value={searchCA.cash_advance_start_date}
+                                        className="focus:ring-red-600"
+                                        onChange={(e:any) =>
+                                        setSearchCA({
+                                            ...searchCA,
+                                            cash_advance_start_date: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="mb-5">
+                                    {/* <DatePicker 
+                                        className="w-full" 
+                                        format="dd-MM-y" 
+                                        dayPlaceholder="dd" 
+                                        monthPlaceholder="mm"
+                                        yearPlaceholder="yyyy" 
+                                        onChange={onChange} 
+                                        value={value} 
+                                    /> */}
+                                    <Input 
+                                        id="cash_advance_end_date"
+                                        name="cash_advance_end_date"
+                                        type="date"
+                                        value={searchCA.cash_advance_end_date}
+                                        className="focus:ring-red-600"
+                                        onChange={(e:any) =>
+                                        setSearchCA({
+                                            ...searchCA,
+                                            cash_advance_end_date: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="mb-5">
+                                <Input 
+                                        id="cash_advance_division"
+                                        name="cash_advance_division"
+                                        type="text"
+                                        value={searchCA.cash_advance_division}
+                                        placeholder="Division"
+                                        className="focus:ring-red-600"
+                                        autoComplete="off"
+                                        onChange={(e:any) =>
+                                        setSearchCA({
+                                            ...searchCA,
+                                            cash_advance_division: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-2">
+                                    <Button
+                                        className="mb-4 w-40 py-1.5 px-2 bg-green-600 hover:bg-green-500"
+                                        onClick={() => getCA()}
+                                    >
+                                        Submit
+                                    </Button>
+                                    <Button
+                                        className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                        onClick={() => clearSearchCA()}
+                                    >
+                                        Clear Search
+                                    </Button>
+                                </div>
                             </div>
-
-                            <div className="mt-10">
-                                <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                    <legend className="ml-8 bg-gray-300 px-3 text-sm">Cash Advance Report Status</legend>
-                                    <div className="flex flex-wrap content-between gap-10 justify-center mt-5 mx-1">
-                                        <div className="flex relative">
-                                            <Button className="bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
-                                                Request
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
-                                                Approve 1
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
-                                                Approve 2
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
-                                                Need Revision
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-red-600 px-2 py-1 hover:bg-red-500">
-                                                Reject
-                                                <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                    0
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button className="bg-green-500 px-2 py-1 hover:bg-green-600">
-                                                Complited
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </fieldset>
+                            <hr />
+                            <div className="flex flex-wrap content-between gap-10 justify-center mt-10">
+                                <div className="flex relative">
+                                    <Button className="bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
+                                        Request
+                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                            0
+                                        </span>
+                                    </Button>
+                                </div>
+                                <div className="flex relative">
+                                    <Button className="bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
+                                        Approve 1
+                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                            0
+                                        </span>
+                                    </Button>
+                                </div>
+                                <div className="flex relative">
+                                    <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
+                                        Approve 2
+                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                            0
+                                        </span>
+                                    </Button>
+                                </div>
+                                <div className="flex relative">
+                                    <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
+                                        Pending Report
+                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                            0
+                                        </span>
+                                    </Button>
+                                </div>
+                                <div className="flex relative">
+                                    <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
+                                        Need Revision
+                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                            0
+                                        </span>
+                                    </Button>
+                                </div>
+                                <div className="flex relative">
+                                    <Button className="bg-red-600 px-2 py-1 hover:bg-red-500">
+                                        Reject
+                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                            0
+                                        </span>
+                                    </Button>
+                                </div>
+                                <div className="flex relative">
+                                    <Button className="bg-green-500 px-2 py-1 hover:bg-green-600">
+                                        Complited
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                         <div className="bg-white rounded-md col-span-2 p-10">
-                            <div className={`max-w-full overflow-x-auto ${cashAdvance.data ? "h-[70%]" : "h-auto" } ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible`}>
-                                <table className="min-w-full divide-y divide-gray-300">
+                            <div className="max-w-full overflow-x-auto h-auto h-75 ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible">
+                                <table className="w-full divide-y divide-gray-300">
                                     <thead className="bg-gray-100">
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                                             <TableTH
-                                                className="border whitespace-nowrap"
+                                                className="max-w-[0px]"
                                                 label={"No"}
-                                                colSpan=""
-                                                rowSpan="2"
                                             />
                                             <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Cash Advance Number"}
-                                                colSpan=""
-                                                rowSpan="2"
+                                                className="min-w-[50px]"
+                                                label={"CA Number"}
                                             />
                                             <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Cash Advance Report Number"}
-                                                colSpan=""
-                                                rowSpan="2"
-                                            />
-                                            <TableTH
-                                                className="border whitespace-nowrap"
+                                                className="min-w-[50px]"
                                                 label={"Request Date"}
-                                                colSpan=""
-                                                rowSpan="2"
                                             />
                                             <TableTH
-                                                className="border whitespace-nowrap"
+                                                className="min-w-[50px]"
                                                 label={"Amount"}
-                                                colSpan=""
-                                                rowSpan="2"
                                             />
                                             <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Cash Advance"}
-                                                colSpan="3"
-                                                rowSpan=""
+                                                className="min-w-[50px]"
+                                                label={"Status"}
                                             />
                                             <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Cash Advance Report"}
-                                                colSpan="3"
-                                                rowSpan=""
+                                                className="min-w-[50px]"
+                                                label={"Approve 1"}
                                             />
                                             <TableTH
-                                                className={"border whitespace-nowrap"}
+                                                className="min-w-[50px]"
+                                                label={"Approve 2"}
+                                            />
+                                            <TableTH
+                                                className="min-w-[50px]"
+                                                label={"Approve 3"}
+                                            />
+                                            <TableTH
+                                                className={"min-w-[50px]"}
                                                 label={"Action"}
-                                                colSpan=""
-                                                rowSpan="2"
-                                            />
-                                        </tr>
-                                        <tr>
-                                            <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Approve 1"}
-                                                colSpan=""
-                                                rowSpan=""
-                                            />
-                                            <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Approve 2"}
-                                                colSpan=""
-                                                rowSpan=""
-                                            />
-                                            <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Approve 3"}
-                                                colSpan=""
-                                                rowSpan=""
-                                            />
-                                            <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Approve 1"}
-                                                colSpan=""
-                                                rowSpan=""
-                                            />
-                                            <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Approve 2"}
-                                                colSpan=""
-                                                rowSpan=""
-                                            />
-                                            <TableTH
-                                                className="border whitespace-nowrap"
-                                                label={"Approve 3"}
-                                                colSpan=""
-                                                rowSpan=""
                                             />
                                         </tr>
                                     </thead>
@@ -8078,7 +6888,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <tr>
                                                 <TD
                                                     className="leading-10 text-gray-500"
-                                                    colSpan="12"
+                                                    colSpan="9"
                                                 >
                                                     Please Search Cash Advance
                                                 </TD>
@@ -8088,7 +6898,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <tr>
                                                 <TD
                                                     className="leading-10 text-gray-500"
-                                                    colSpan="12"
+                                                    colSpan="9"
                                                 >
                                                     Data not available
                                                 </TD>
@@ -8115,10 +6925,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             className=""
                                                         />
                                                         <TableTD
-                                                            value="-"
-                                                            className=""
-                                                        />
-                                                        <TableTD
                                                             value={dateFormat(
                                                                 ca.CASH_ADVANCE_REQUESTED_DATE,
                                                                 "dd mmmm yyyy"
@@ -8138,153 +6944,73 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                 value={
                                                                     <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
                                                                         {
-                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                            ca
+                                                                                .approval_status
+                                                                                .CA_STATUS_NAME
                                                                         }
                                                                     </span>
                                                                 }
                                                                 className=""
                                                             />
                                                         )}
-                                                        {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                        {ca.approval_status
+                                                            .CA_STATUS_ID ===
                                                             1 && (
                                                             <TableTD
                                                                 value={
                                                                     <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700">
                                                                         {
-                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                            ca
+                                                                                .approval_status
+                                                                                .CA_STATUS_NAME
                                                                         }
                                                                     </span>
                                                                 }
                                                                 className=""
                                                             />
                                                         )}
-                                                        {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                        {ca.approval_status
+                                                            .CA_STATUS_ID ===
                                                             2 && (
                                                             <TableTD
                                                                 value={
                                                                     <span className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700">
                                                                         {
-                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                            ca
+                                                                                .approval_status
+                                                                                .CA_STATUS_NAME
                                                                         }
                                                                     </span>
                                                                 }
                                                                 className=""
                                                             />
                                                         )}
-                                                        {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                        {ca.approval_status
+                                                            .CA_STATUS_ID ===
                                                             3 && (
                                                             <TableTD
                                                                 value={
                                                                     <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">
                                                                         {
-                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                            ca
+                                                                                .approval_status
+                                                                                .CA_STATUS_NAME
                                                                         }
                                                                     </span>
                                                                 }
                                                                 className=""
                                                             />
                                                         )}
-                                                        {
-                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS === '' || ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS === null &&(
-                                                                <TableTD
-                                                                    value="-"
-                                                                    className=""
-                                                                />
-                                                            )
-                                                        }
-                                                        {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                            1 && (
-                                                            <TableTD
-                                                                value={
-                                                                    <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700">
-                                                                        {
-                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                                className=""
-                                                            />
-                                                        )}
-                                                        {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                            2 && (
-                                                            <TableTD
-                                                                value={
-                                                                    <span className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700">
-                                                                        {
-                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                                className=""
-                                                            />
-                                                        )}
-                                                        {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                            3 && (
-                                                            <TableTD
-                                                                value={
-                                                                    <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">
-                                                                        {
-                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                                className=""
-                                                            />
-                                                        )}
-                                                        {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                        {ca.approval_status
+                                                            .CA_STATUS_ID ===
                                                             4 && (
                                                             <TableTD
                                                                 value={
-                                                                    <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700">
-                                                                        {
-                                                                            "-"
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                                className=""
-                                                            />
-                                                        )}
-                                                        {
-                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS === '' || ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS === null &&(
-                                                                <TableTD
-                                                                    value="-"
-                                                                    className=""
-                                                                />
-                                                            )
-                                                        }
-                                                        {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                            1 && (
-                                                            <TableTD
-                                                                value={
-                                                                    <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700">
-                                                                        {
-                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                                className=""
-                                                            />
-                                                        )}
-                                                        {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                            2 && (
-                                                            <TableTD
-                                                                value={
-                                                                    <span className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700">
-                                                                        {
-                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                                className=""
-                                                            />
-                                                        )}
-                                                        {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                            3 && (
-                                                            <TableTD
-                                                                value={
                                                                     <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">
                                                                         {
-                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                            ca
+                                                                                .approval_status
+                                                                                .CA_STATUS_NAME
                                                                         }
                                                                     </span>
                                                                 }
@@ -8327,20 +7053,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                                 onClick={(
                                                                                     e
                                                                                 ) =>
-                                                                                    handleShowModal(
-                                                                                        e,
-                                                                                        ca.CASH_ADVANCE_ID
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                Detail
-                                                                            </a>
-                                                                            <a
-                                                                                href=""
-                                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) =>
                                                                                     handleApproveModal(
                                                                                         e,
                                                                                         ca.CASH_ADVANCE_ID
@@ -8355,13 +7067,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                                 onClick={(
                                                                                     e
                                                                                 ) =>
-                                                                                    handleExecuteModal(
+                                                                                    handleShowModal(
                                                                                         e,
                                                                                         ca.CASH_ADVANCE_ID
                                                                                     )
                                                                                 }
                                                                             >
-                                                                                Execute
+                                                                                Detail
                                                                             </a>
                                                                             <a
                                                                                 href=""
@@ -8377,78 +7089,20 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             >
                                                                                 Revised
                                                                             </a>
-                                                                            {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS === 4 &&(
-                                                                                <a
-                                                                                    href=""
-                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleAddCAReportModal(
-                                                                                            e,
-                                                                                            ca.CASH_ADVANCE_ID
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    Create CA Report
-                                                                                </a>
-                                                                            )}
-                                                                            <a
+                                                                            {/* <a
                                                                                 href=""
                                                                                 className="block px-4 py-2 text-sm hover:bg-gray-100"
                                                                                 onClick={(
                                                                                     e
                                                                                 ) =>
-                                                                                    handleShowReportModal(
+                                                                                    handleExecuteModal(
                                                                                         e,
                                                                                         ca.CASH_ADVANCE_ID
                                                                                     )
                                                                                 }
                                                                             >
-                                                                                Detail CA Report
-                                                                            </a>
-                                                                            <a
-                                                                                href=""
-                                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    handleApproveReportModal(
-                                                                                        e,
-                                                                                        ca.CASH_ADVANCE_ID
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                Approve CA Report
-                                                                            </a>
-                                                                            <a
-                                                                                href=""
-                                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    handleRevisedReportModal(
-                                                                                        e,
-                                                                                        ca.CASH_ADVANCE_ID
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                Revised CA Report
-                                                                            </a>
-                                                                            <a
-                                                                                href=""
-                                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    handleExecuteReportModal(
-                                                                                        e,
-                                                                                        ca.CASH_ADVANCE_ID
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                Execute CA Report
-                                                                            </a>
+                                                                                Execute
+                                                                            </a> */}
                                                                         </>
                                                                     }
                                                                 />
@@ -8475,7 +7129,7 @@ export default function CashAdvance({ auth }: PageProps) {
                     </div>
                 </div>
 
-                {/* <div className={toggleState === 2 ? "" : "hidden"}>
+                <div className={toggleState === 2 ? "" : "hidden"}>
                     <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
                         <div className="bg-white rounded-md mb-5 lg:mb-0 p-10">
                             <div className="grid grid-cols-3 gap-2">
@@ -8496,7 +7150,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 view_report: false,
                                                 approve_report: false,
                                                 revised_report: false,
-                                                execute_report: false,                                         
+                                                add_files: false,                                               
                                                 execute: false,
                                             });
                                         }}
@@ -8835,7 +7489,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             />
                         </div>
                     </div>
-                </div> */}
+                </div>
             </div>
             {/* </div> */}
             {/* Content End */}
