@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::rename('t_relation_type', 'r_relation_type');
-        // Schema::table('r_relation_type', function (Blueprint $table) {
-        //     //
-        // });
+        //Schema::rename('t_relation_type', 'r_relation_type');
+        Schema::table('t_relation_type', function (Blueprint $table) {
+            //
+        });
     }
 
     /**

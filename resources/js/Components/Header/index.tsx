@@ -37,7 +37,7 @@ const Header = (props: {
       lang: lang,
       user_id: props.user?.id
     })
-    
+
   }
 
   const languages = [
@@ -78,12 +78,12 @@ const Header = (props: {
 
           <ImageDropdown
               image={
-                <img 
+                <img
                   src={
                     props.user?.additional.user_language === 'en' ?
                     usFlag : indonesiaFlag
-                  } 
-                  width="25" 
+                  }
+                  width="25"
                 />
               }
               children={
@@ -91,12 +91,12 @@ const Header = (props: {
                   {
                     languages.map((language: any, i: number) => {
                       return (
-                        <div 
-                          key={i} 
+                        <div
+                          key={i}
                           className={`
-                              px-4 py-2 grid grid-rows grid-flow-col gap-4 hover:bg-gray-200 hover:cursor-pointer 
+                              px-4 py-2 grid grid-rows grid-flow-col gap-4 hover:bg-gray-200 hover:cursor-pointer
                               ${props.user?.additional.user_language === language.value ? 'bg-gray-200' : ''}
-                          `} 
+                          `}
                           onClick={(e) => changeLanguage(e, language.value)}
                         >
                          <img src={language.flag} width="25" />

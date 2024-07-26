@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('m_policy_coverage', function (Blueprint $table) {
             $table->increments('POLICY_COVERAGE_ID')->primary();
-            $table->unsignedBigInteger('POLICY_ID')->nullable();
+            $table->unsignedInteger('POLICY_ID')->nullable();
             $table->string('POLICY_COVERAGE_NAME')->nullable();
             $table->foreign('POLICY_ID')->references('POLICY_ID')->on('t_policy')->onDelete('cascade');
         });

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('t_endorsement', function (Blueprint $table) {
             $table->increments('ENDORSEMENT_ID')->primary();
-            $table->unsignedBigInteger('POLICY_ID');
+            $table->unsignedInteger('POLICY_ID');
             $table->string('ENDORSEMENT_NUMBER')->nullable();
             $table->smallInteger('ENDORSEMENT_STATUS')->comment('0: Ongoing; 1: Finalized; 2: Canceled')->nullable();
             $table->date('ENDORSEMENT_EFFECTIVE_DATE')->nullable();

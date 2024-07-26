@@ -16,7 +16,7 @@ return new class extends Migration
             // $table->timestamps();
             $table->increments('DEBIT_NOTE_ID');
             $table->char('DEBIT_NOTE_NUMBER', length:255)->nullable();
-            $table->unsignedBigInteger('POLICY_ID');
+            $table->unsignedInteger('POLICY_ID');
             $table->unsignedBigInteger('POLICY_INSTALLMENT_ID');
             $table->tinyInteger('DEBIT_NOTE_TYPE')->comment('1:DN Initial Premium; 2:DN Additional Premium; 3:CN Refund Premium')->nullable();
             $table->decimal('TERM_RATE',20,2)->nullable();
