@@ -18,7 +18,6 @@ export default {
         extend: {
             fontFamily: {
                 sans: ["Poppins", ...defaultTheme.fontFamily.sans],
-                sans: ["Figtree", ...defaultTheme.fontFamily.sans],
             },
             zIndex: {
                 999999: "999999",
