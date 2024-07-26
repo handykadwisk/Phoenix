@@ -26,6 +26,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import SelectTailwind from "react-tailwindcss-select";
+import DetailSubGroup from "./DetailSubGroup";
 
 export default function DetailGroup({
     idGroup,
@@ -34,6 +35,7 @@ export default function DetailGroup({
     relationType,
     profession,
     relationLOB,
+    setIdGroup,
 }: PropsWithChildren<{
     idGroup: any;
     relationStatus: any;
@@ -41,6 +43,7 @@ export default function DetailGroup({
     relationType: any;
     profession: any;
     relationLOB: any;
+    setIdGroup: any;
 }>) {
     const [dataRelationGroupNew, setDataRelationGroupNew] = useState<any>([]);
     const [relationGroupNew, setRelationGroupNew] = useState<any>([]);
@@ -229,6 +232,20 @@ export default function DetailGroup({
         edit: false,
     });
 
+    const [modalDetailGroup, setModalDetailGroup] = useState({
+        view: false,
+        edit: false,
+    });
+
+    const [modalChangeParent, setModalChangeParent] = useState<any>({
+        edit: false,
+    });
+
+    const [dataChangeParent, setDataChangeParent] = useState<any>({
+        RELATION_GROUP_ID: "",
+        RELATION_GROUP_PARENT: "",
+    });
+
     const [dataSubGroup, setDataSubGroup] = useState<any>({
         RELATION_GROUP_NAME: "",
         RELATION_GROUP_PARENT: "",
@@ -243,7 +260,6 @@ export default function DetailGroup({
             .post(`/getDetailSubGroupParent`, { id })
             .then((res) => {
                 setDataDetailSubGroupParent(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -264,6 +280,22 @@ export default function DetailGroup({
         });
     };
     // end Add Sub Group
+
+    // Onclick Change Parent
+    const handleClickChangeParent = async (e: FormEvent, idGroup: string) => {
+        e.preventDefault();
+
+        getDetailSubGroupParent(idGroup);
+        getSubGroupById(idGroup);
+        setDataChangeParent({
+            ...dataChangeParent,
+            RELATION_GROUP_ID: idGroup,
+        });
+        setModalChangeParent({
+            edit: !modalChangeParent.edit,
+        });
+    };
+    // end Change Parent
 
     const alertRemove = async (e: FormEvent, idRelation: any) => {
         Swal.fire({
@@ -352,7 +384,7 @@ export default function DetailGroup({
                                                       <div
                                                           className="text-sm bg-yellow-500 p-2 rounded-md text-white cursor-pointer hover:bg-yellow-400"
                                                           onClick={(e) =>
-                                                              handleClickAddSubGroup(
+                                                              handleClickChangeParent(
                                                                   e,
                                                                   dChild.RELATION_GROUP_ID
                                                               )
@@ -388,8 +420,16 @@ export default function DetailGroup({
                                                               Add Relation
                                                           </span>
                                                       </div>
-                                                      <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
-                                                          <span>Detail</span>
+                                                      <div
+                                                          className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                          onClick={(e) =>
+                                                              handleClickDetailGroup(
+                                                                  e,
+                                                                  dChild.RELATION_GROUP_ID
+                                                              )
+                                                          }
+                                                      >
+                                                          <span>Edit</span>
                                                       </div>
                                                   </div>
                                               </li>
@@ -549,6 +589,22 @@ export default function DetailGroup({
     };
     // end Add Relation
 
+    // Onclick detail group
+    const handleClickDetailGroup = async (e: FormEvent, idGroup: string) => {
+        e.preventDefault();
+        // getRelationNoGroup();
+        getDetailSubGroupParent(idGroup);
+        // setDataRelation({
+        //     ...dataRelation,
+        //     RELATION_ORGANIZATION_GROUP: idGroup,
+        // });
+        setModalDetailGroup({
+            view: false,
+            edit: !modalDetailGroup.edit,
+        });
+    };
+    // end Add Detail Group
+
     const inputRefTag = useRef<HTMLInputElement>(null);
     const [query, setQuery] = useState("");
     const [menuOpen, setMenuOpen] = useState(true);
@@ -559,7 +615,6 @@ export default function DetailGroup({
             .post(`/getRelationNoGroup`)
             .then((res) => {
                 setRelationNoGroup(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -613,6 +668,65 @@ export default function DetailGroup({
         // setIsSuccess(message);
     };
 
+    const handleSuccessChangeParent = (message: string) => {
+        // setIsSuccess("");
+        // reset();
+        // if (modal.add) {
+        Swal.fire({
+            title: "Success",
+            text: "Change Parent",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                getDetailGroup(idGroup);
+                getGroupName(idGroup);
+                // setModal({
+                //     add: false,
+                //     delete: false,
+                //     edit: false,
+                //     view: false,
+                //     document: false,
+                //     search: false,
+                // });
+                setDataChangeParent({
+                    ...dataChangeParent,
+                    RELATION_GROUP_PARENT: "",
+                });
+            }
+        });
+        // }
+        // setIsSuccess(message);
+    };
+
+    const handleSuccessEdit = async (message: any) => {
+        Swal.fire({
+            title: "Success",
+            text: "Edit Group",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                getDetailGroup(idGroup);
+                getGroupName(idGroup);
+
+                setIdGroup({
+                    ...idGroup,
+                    RELATION_GROUP_ID: message[0],
+                    RELATION_GROUP_NAME: message[1],
+                });
+                // setModal({
+                //     add: false,
+                //     delete: false,
+                //     edit: false,
+                //     view: false,
+                //     document: false,
+                //     search: false,
+                // });
+            }
+        });
+    };
+
     const getRelationChange = async (idRelation: any) => {
         await axios
             .post(`/getRelationChange`, { idRelation })
@@ -624,7 +738,7 @@ export default function DetailGroup({
             });
     };
 
-    const getSubGroupById = async (idGroup: any) => {
+    const getSubGroupById = async (idGroupNew: any) => {
         // setIsLoading(true)
 
         // if (name) {
@@ -632,7 +746,6 @@ export default function DetailGroup({
             .post(`/getSubGroupById`, { idGroup })
             .then((res: any) => {
                 setSubGroupById(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -645,6 +758,19 @@ export default function DetailGroup({
             label: query.RELATION_GROUP_NAME,
         };
     });
+
+    const mappingChangeParent = subGroupById
+        ?.filter(
+            (m: any) =>
+                m.RELATION_GROUP_NAME !==
+                dataDetailSubGroupParent.RELATION_GROUP_NAME
+        )
+        .map((query: any) => {
+            return {
+                value: query.RELATION_GROUP_ID,
+                label: query.RELATION_GROUP_NAME,
+            };
+        });
 
     const handleClickChangeSubGroup = async (
         e: FormEvent,
@@ -665,6 +791,87 @@ export default function DetailGroup({
     };
     return (
         <>
+            {/* modal detail group */}
+            <DetailSubGroup
+                show={modalDetailGroup.edit}
+                modal={() =>
+                    setModalDetailGroup({
+                        view: false,
+                        edit: false,
+                    })
+                }
+                dataDetailGroups={dataDetailSubGroupParent}
+                handleSuccessEdit={handleSuccessEdit}
+            />
+
+            <ModalToAdd
+                show={modalChangeParent.edit}
+                buttonAddOns={""}
+                onClose={() => {
+                    setModalChangeParent({
+                        edit: false,
+                    });
+                    getDetailGroup(idGroup);
+                    getGroupName(idGroup);
+                }}
+                title={"Change Parent"}
+                url={`/changeParent`}
+                data={dataChangeParent}
+                onSuccess={handleSuccessChangeParent}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                body={
+                    <>
+                        <div className="mb-16">
+                            <div className="mt-1 relative">
+                                <InputLabel
+                                    className="absolute"
+                                    value="Change Parent"
+                                />
+                                <div className="ml-[6.8rem] text-red-600">
+                                    *
+                                </div>
+                                <SelectTailwind
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={mappingChangeParent}
+                                    isSearchable={true}
+                                    placeholder={"--Select Parent--"}
+                                    value={
+                                        dataChangeParent.RELATION_GROUP_PARENT
+                                    }
+                                    // onChange={(e) =>
+                                    //     inputDataBank(
+                                    //         "BANK_ID",
+                                    //         e.target.value,
+                                    //         i
+                                    //     )
+                                    // }
+                                    onChange={(val: any) => {
+                                        setDataChangeParent({
+                                            ...dataChangeParent,
+                                            RELATION_GROUP_PARENT: val,
+                                        });
+                                    }}
+                                    primaryColor={"bg-red-500"}
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal detail group */}
+
             {/* modal change sub group */}
             <ModalToAdd
                 show={modalChangeSubGroup.edit}
@@ -1199,9 +1406,19 @@ export default function DetailGroup({
                                                                         Relation
                                                                     </span>
                                                                 </div>
-                                                                <div className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400">
+                                                                <div
+                                                                    className="text-sm bg-red-500 p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleClickDetailGroup(
+                                                                            e,
+                                                                            item.RELATION_GROUP_ID
+                                                                        )
+                                                                    }
+                                                                >
                                                                     <span>
-                                                                        Detail
+                                                                        Edit
                                                                     </span>
                                                                 </div>
                                                             </div>

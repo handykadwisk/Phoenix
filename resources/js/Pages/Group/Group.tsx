@@ -78,10 +78,6 @@ export default function Group({ auth }: PageProps) {
             })
             .then((res) => {
                 setRelationsGroup(res.data);
-                setSearchGroup({
-                    ...searchGroup,
-                    RELATION_GROUP_NAME: "",
-                });
                 if (modal.search) {
                     setModal({
                         add: false,
@@ -237,7 +233,7 @@ export default function Group({ auth }: PageProps) {
                                     }}
                                     options={mappingParentGroup}
                                     isSearchable={true}
-                                    placeholder={"--Select Province--"}
+                                    placeholder={"--Select Parent--"}
                                     value={data.RELATION_GROUP_PARENT}
                                     // onChange={(e) =>
                                     //     inputDataBank(
@@ -282,7 +278,7 @@ export default function Group({ auth }: PageProps) {
             {/* modal detail */}
             <ModalToAction
                 show={modal.view}
-                onClose={() =>
+                onClose={() => {
                     setModal({
                         add: false,
                         delete: false,
@@ -290,8 +286,9 @@ export default function Group({ auth }: PageProps) {
                         view: false,
                         document: false,
                         search: false,
-                    })
-                }
+                    });
+                    getRelationGroup();
+                }}
                 title={"GROUP OF " + idGroup.RELATION_GROUP_NAME}
                 url={""}
                 data={""}
@@ -306,6 +303,7 @@ export default function Group({ auth }: PageProps) {
                     <>
                         <ModalDetailGroup
                             idGroup={idGroup.RELATION_GROUP_ID}
+                            setIdGroup={setIdGroup}
                             relationStatus={relationStatus}
                             relationGroup={relationGroup}
                             relationType={relationType}

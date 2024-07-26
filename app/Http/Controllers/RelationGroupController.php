@@ -311,5 +311,73 @@ class RelationGroupController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function edit_subgroup(Request $request){
+        
+        $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)->update([
+            "RELATION_GROUP_NAME"           => $request->RELATION_GROUP_NAME,
+            "RELATION_GROUP_DESCRIPTION"    => $request->RELATION_GROUP_DESCRIPTION,
+            "RELATION_GROUP_UPDATED_BY"     => Auth::user()->id,
+            "RELATION_GROUP_UPDATED_DATE"   => now()
+        ]);
+
+        // Created Log
+        if ($updateGroup) {
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Edit Group (Group).",
+                    "module"      => "Group",
+                    "id"          => $request->RELATION_GROUP_ID
+                ]),
+                'action_by'  => Auth::user()->email
+            ]);
+        }
+
+        return new JsonResponse([
+            $request->RELATION_GROUP_ID,
+            $request->RELATION_GROUP_NAME
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function change_parent(Request $request){
+        // cek id yang ingin di ganti masuk mapping atau tidak?
+        $concatID = ".".$request->RELATION_GROUP_PARENT['value'].'.';
+        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)->where('.'.'RELATION_ORGANIZATION_MAPPING', 'like', '%' . $concatID . '%');
+        dd($cekExisting->toSql());
+
+
+
+
+        // dd($request->RELATION_GROUP_PARENT['value']);
+        $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
+        ->update([
+            'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
+        ]);
+
+        // Mapping Parent Id and Update
+        $name = NULL;
+        DB::select('call sp_set_mapping_relation_group(?)', [$name]);
+
+        if ($updateGroup) {
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Edit Group (Group).",
+                    "module"      => "Group",
+                    "id"          => $request->RELATION_GROUP_ID
+                ]),
+                'action_by'  => Auth::user()->email
+            ]);
+        }
+
+        return new JsonResponse([
+            $request->RELATION_GROUP_ID,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
     
 }

@@ -51,4 +51,12 @@ class TPerson extends Model
         return $this->hasOne(TDocument::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
     }
 
+    public function mPersonContact(){
+        return $this->hasMany(MPersonContact::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function mAddressPerson(){
+        return $this->hasMany(MPersonAddress::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
 }

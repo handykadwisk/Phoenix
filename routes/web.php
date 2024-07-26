@@ -72,6 +72,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/getSubGroupById', [RelationGroupController::class, 'subGroupById'])->name('getSubGroupById.subGroupById');
     Route::post('/changeSubGroup', [RelationGroupController::class, 'changeSubGroup'])->name('changeSubGroup.changeSubGroup');
     Route::post('/removeRelation', [RelationGroupController::class, 'remove_relation'])->name('removeRelation.remove_relation');
+    Route::post('/editSubGroup', [RelationGroupController::class, 'edit_subgroup'])->name('editSubGroup.edit_subgroup');
+    Route::post('/changeParent', [RelationGroupController::class, 'change_parent'])->name('changeParent.change_parent');
+    
+    
     
 
 
@@ -100,6 +104,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
     Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
+    Route::post('/getDistrict', [TPersonController::class, 'get_district'])->name('getDistrict.get_district');
+    Route::post('/getVillage', [TPersonController::class, 'get_village'])->name('getVillage.get_village');
+    Route::post('/get_regency', [TPersonController::class, 'get_regency'])->name('get_regency.get_regency');
+    Route::post('/getAddressStatus', [TPersonController::class, 'get_address_status'])->name('getAddressStatus.get_address_status');
+    Route::post('/addAddressPerson', [TPersonController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
+    Route::post('/getPersonAddress', [TPersonController::class, 'getPersonAddress'])->name('getPersonAddress.getPersonAddress');
+    Route::post('/detailAddress', [TPersonController::class, 'getDetailAddress'])->name('detailAddress.getDetailAddress');
+    Route::post('/editAddress', [TPersonController::class, 'editAddress'])->name('editAddress.geteditAddress');
+    
+    
+    
+    
 
     // Structure
     Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');

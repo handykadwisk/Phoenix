@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MPersonAddress;
+use App\Models\MPersonContact;
+use App\Models\RAddressStatus;
 use App\Models\RBank;
 use App\Models\RPersonRelationship;
 use App\Models\RTaxStatus;
+use App\Models\RWilayahKemendagri;
+use App\Models\TAddress;
 use App\Models\TDocument;
 use App\Models\TPerson;
 use App\Models\TPersonBankAccount;
+use App\Models\TPersonContact;
 use App\Models\TPersonEmergencyContact;
 use App\Models\TRelationStructure;
 use App\Models\UserLog;
@@ -56,6 +62,14 @@ class TPersonController extends Controller
         return response()->json($taxStatus);
     }
 
+    public function get_address_status(){
+        $dataAddressStatus = RAddressStatus::get();
+
+        return response()->json($dataAddressStatus);
+    }
+
+    
+
     public function edit(Request $request){
         $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
             ->update([
@@ -63,8 +77,8 @@ class TPersonController extends Controller
                 'PERSON_GENDER' => $request->PERSON_GENDER,
                 'PERSON_BIRTH_PLACE' => $request->PERSON_BIRTH_PLACE,
                 'PERSON_BIRTH_DATE' => $request->PERSON_BIRTH_DATE,
-                'PERSON_EMAIL' => $request->PERSON_EMAIL,
-                'PERSON_CONTACT' => $request->PERSON_CONTACT,
+                // 'PERSON_EMAIL' => $request->PERSON_EMAIL,
+                // 'PERSON_CONTACT' => $request->PERSON_CONTACT,
                 'PERSON_UPDATED_BY' => Auth::user()->id,
                 'PERSON_UPDATED_DATE' => now(),
                 'PERSON_KTP' => $request->PERSON_KTP,
@@ -74,6 +88,40 @@ class TPersonController extends Controller
                 'PERSON_BLOOD_RHESUS' => $request->PERSON_BLOOD_RHESUS,
                 'PERSON_MARITAL_STATUS' => $request->PERSON_MARITAL_STATUS,
             ]);
+
+        // cek existing PErson Contact
+        $personContact = MPersonContact::where('PERSON_ID', $request->PERSON_ID)->get();
+        for ($i=0; $i < sizeof($personContact); $i++) { 
+            $idPersonContact = $personContact[$i]['PERSON_CONTACT_ID'];
+            // delete person contact
+            $deleteMPerson = TPersonContact::where('PERSON_CONTACT_ID', $idPersonContact)->delete();
+        }
+
+        if ($personContact->count()>0) { //jika ada delete data sebelumnya
+            MPersonContact::where('PERSON_ID', $request->PERSON_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->m_person_contact)) {
+            // Created Mapping Relation AKA
+            for ($i=0; $i < sizeof($request->m_person_contact); $i++) { 
+                $phoneNumber = $request->m_person_contact[$i]['t_person_contact']['PERSON_PHONE_NUMBER'];
+                $email = $request->m_person_contact[$i]['t_person_contact']['PERSON_EMAIL'];
+                $createPersonContact = TPersonContact::create([
+                    "PERSON_PHONE_NUMBER"   => $phoneNumber,
+                    "PERSON_EMAIL"          => $email
+                ]);
+
+                // create mapping
+                if ($createPersonContact) {
+                    MPersonContact::create([
+                        "PERSON_ID"         => $request->PERSON_ID,
+                        "PERSON_CONTACT_ID" => $createPersonContact->PERSON_CONTACT_ID
+                    ]);
+                }
+            }
+        }
+
 
         // cek existing contact emergency
         $contactEmergency = TPersonEmergencyContact::where('PERSON_ID', $request->PERSON_ID)->get();
@@ -120,9 +168,10 @@ class TPersonController extends Controller
         // Remove Object "CONTACT EMERGENCY" agar bisa insert dengan request all
         $removeArray = collect($request->all());
         $filtered = $removeArray->except(['CONTACT_EMERGENCY']);
+        $newFiltered = $filtered->except(['PERSON_CONTACT']);
         
         // Created Person
-        $person = TPerson::insertGetId($filtered->all());
+        $person = TPerson::insertGetId($newFiltered->all());
 
         // add created date
         if ($person) {
@@ -131,6 +180,29 @@ class TPersonController extends Controller
                 'PERSON_CREATED_BY' => Auth::user()->id,
                 'PERSON_CREATED_DATE' => now()
             ]);
+        }
+
+        // created Person contact
+        if (is_countable($request->PERSON_CONTACT)) {
+            // Created Mapping Relation AKA
+            for ($i=0; $i < sizeof($request->PERSON_CONTACT); $i++) { 
+                $phoneNumber = $request->PERSON_CONTACT[$i]["PERSON_PHONE_NUMBER"];
+                $email = $request->PERSON_CONTACT[$i]["PERSON_EMAIL"];
+                $createPersonContact = TPersonContact::create([
+                    "PERSON_PHONE_NUMBER"   => $phoneNumber,
+                    "PERSON_EMAIL"          => $email
+                ]);
+
+                // create mapping
+                if ($createPersonContact) {
+                    MPersonContact::create([
+                        "PERSON_ID"         => $person,
+                        "PERSON_CONTACT_ID" => $createPersonContact->PERSON_CONTACT_ID
+                    ]);
+                }
+                
+                
+            }
         }
 
         // created emergency contact
@@ -166,7 +238,7 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -370,6 +442,237 @@ class TPersonController extends Controller
 
         return new JsonResponse([
             $request->BANK_ACCOUNT[0]["idPerson"]
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function get_regency(Request $request){
+        // dd($request);
+        $idValue = $request->valueKode.".";
+        $data = RWilayahKemendagri::where('tipe_wilayah', 'regency')->where('kode_mapping', 'like', '%'. $idValue .'%')->get();
+        return response()->json($data);
+    }
+
+    public function get_district(Request $request){
+        // dd($request);
+        // $idValue = $request->valueKode.".";
+        $data = RWilayahKemendagri::where('tipe_wilayah', 'district')->where('kode_mapping', 'like', '%'. $request->valueKode .'%')->get();
+        return response()->json($data);
+    }
+    public function get_village(Request $request){
+        // dd($request);
+        // $idValue = $request->valueKode.".";
+        $data = RWilayahKemendagri::where('tipe_wilayah', 'village')->where('kode_mapping', 'like', '%'. $request->valueKode .'%')->get();
+        return response()->json($data);
+    }
+
+    public function add_address_person(Request $request){
+        // 1. address_ktp
+        // 2. address_domicile
+        // 3. other_address
+        // cek array kosong atau tidak, klo kosong false klo ada true
+        $addressKtp = is_countable($request->address_ktp);
+        $addressDomisili = is_countable($request->address_domicile);
+        $addressOther = is_countable($request->other_address);
+
+        // jika other dan domisili gaada create ktp address dan domisili 
+        if ($addressKtp) {
+            for ($i=0; $i < sizeof($request->address_ktp); $i++) { 
+                $createAddressKTP = TAddress::create([
+                    "ADDRESS_LOCATION_TYPE"         => 1,
+                    "ADDRESS_DETAIL"                => $request->address_ktp[$i]['ADDRESS_DETAIL'], 
+                    "ADDRESS_RT_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RT_NUMBER'],
+                    "ADDRESS_RW_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RW_NUMBER'],
+                    "ADDRESS_VILLAGE"               => $request->address_ktp[$i]['ADDRESS_VILLAGE']['value'],
+                    "ADDRESS_DISTRICT"              => $request->address_ktp[$i]['ADDRESS_DISTRICT']['value'],
+                    "ADDRESS_PROVINCE"              => $request->address_ktp[$i]['ADDRESS_PROVINCE']['value'],
+                    "ADDRESS_REGENCY"               => $request->address_ktp[$i]['ADDRESS_REGENCY']['value'],
+                    "ADDRESS_STATUS"                => null
+                ]);
+
+                // create mapping
+                if ($createAddressKTP) {
+                    MPersonAddress::create([
+                        "PERSON_ID"          => $request->address_ktp[$i]['idPerson'],
+                        "ADDRESS_ID"         => $createAddressKTP->ADDRESS_ID
+                    ]);
+                }
+
+                // jika address dom kosong ambil data dari address ktp
+                if (!$addressDomisili) {
+                    $createDom = TAddress::create([
+                        "ADDRESS_LOCATION_TYPE"         => 2,
+                        "ADDRESS_DETAIL"                => $request->address_ktp[$i]['ADDRESS_DETAIL'], 
+                        "ADDRESS_RT_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RT_NUMBER'],
+                        "ADDRESS_RW_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RW_NUMBER'],
+                        "ADDRESS_VILLAGE"               => $request->address_ktp[$i]['ADDRESS_VILLAGE']['value'],
+                        "ADDRESS_DISTRICT"              => $request->address_ktp[$i]['ADDRESS_DISTRICT']['value'],
+                        "ADDRESS_PROVINCE"              => $request->address_ktp[$i]['ADDRESS_PROVINCE']['value'],
+                        "ADDRESS_REGENCY"               => $request->address_ktp[$i]['ADDRESS_REGENCY']['value'],
+                        "ADDRESS_STATUS"                => 1
+                    ]);
+    
+                    // create mapping
+                    if ($createDom) {
+                        MPersonAddress::create([
+                            "PERSON_ID"          => $request->address_ktp[$i]['idPerson'],
+                            "ADDRESS_ID"         => $createDom->ADDRESS_ID
+                        ]);
+                    }
+                }else{
+                    // jika ada data dari dom address make data dom address
+                    for ($a=0; $a < sizeof($request->address_domicile); $a++) { 
+                        $createDom = TAddress::create([
+                            "ADDRESS_LOCATION_TYPE"         => 2,
+                            "ADDRESS_DETAIL"                => $request->address_domicile[$a]['ADDRESS_DETAIL'], 
+                            "ADDRESS_RT_NUMBER"             => $request->address_domicile[$a]['ADDRESS_RT_NUMBER'],
+                            "ADDRESS_RW_NUMBER"             => $request->address_domicile[$a]['ADDRESS_RW_NUMBER'],
+                            "ADDRESS_VILLAGE"               => $request->address_domicile[$a]['ADDRESS_VILLAGE']['value'],
+                            "ADDRESS_DISTRICT"              => $request->address_domicile[$a]['ADDRESS_DISTRICT']['value'],
+                            "ADDRESS_PROVINCE"              => $request->address_domicile[$a]['ADDRESS_PROVINCE']['value'],
+                            "ADDRESS_REGENCY"               => $request->address_domicile[$a]['ADDRESS_REGENCY']['value'],
+                            "ADDRESS_STATUS"                => $request->address_domicile[$a]['ADDRESS_STATUS']
+                        ]);
+        
+                        // create mapping
+                        if ($createDom) {
+                            MPersonAddress::create([
+                                "PERSON_ID"          => $request->address_domicile[$a]['idPerson'],
+                                "ADDRESS_ID"         => $createDom->ADDRESS_ID
+                            ]);
+                        }
+                    }
+                }
+
+                // jika ada other address
+                if ($addressOther) {
+                    for ($z=0; $z < sizeof($request->other_address); $z++) { 
+                        $createOther = TAddress::create([
+                            "ADDRESS_LOCATION_TYPE"         => 3,
+                            "ADDRESS_DETAIL"                => $request->other_address[$z]['ADDRESS_DETAIL'], 
+                            "ADDRESS_RT_NUMBER"             => $request->other_address[$z]['ADDRESS_RT_NUMBER'],
+                            "ADDRESS_RW_NUMBER"             => $request->other_address[$z]['ADDRESS_RW_NUMBER'],
+                            "ADDRESS_VILLAGE"               => $request->other_address[$z]['ADDRESS_VILLAGE']['value'],
+                            "ADDRESS_DISTRICT"              => $request->other_address[$z]['ADDRESS_DISTRICT']['value'],
+                            "ADDRESS_PROVINCE"              => $request->other_address[$z]['ADDRESS_PROVINCE']['value'],
+                            "ADDRESS_REGENCY"               => $request->other_address[$z]['ADDRESS_REGENCY']['value'],
+                            "ADDRESS_STATUS"                => $request->other_address[$z]['ADDRESS_STATUS']
+                        ]);
+        
+                        // create mapping
+                        if ($createOther) {
+                            MPersonAddress::create([
+                                "PERSON_ID"          => $request->other_address[$z]['idPerson'],
+                                "ADDRESS_ID"         => $createOther->ADDRESS_ID
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Add Address (Person).",
+            "module"      => "Person",
+                "id"          => $request->address_ktp[0]['idPerson']
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->address_ktp[0]['idPerson']
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function getPersonAddress(Request $request){
+        $data = MPersonAddress::where('PERSON_ID', $request->id)->get();
+
+        return response()->json($data);
+    }
+    
+    public function getDetailAddress(Request $request){
+        $data = TAddress::find($request->idAddress);
+
+        return response()->json($data);
+    }
+
+    public function editAddress(Request $request){
+        // dd($request);
+        for ($i=0; $i < sizeof($request->dataEdit); $i++) { 
+            if ($request->dataEdit[$i]['ADDRESS_LOCATION_TYPE'] != "1") {
+                $editAddress = TAddress::where('ADDRESS_ID', $request->dataEdit[$i]['ADDRESS_ID'])->update([
+                    "ADDRESS_LOCATION_TYPE"         =>  $request->dataEdit[$i]['ADDRESS_LOCATION_TYPE'],
+                    "ADDRESS_DETAIL"                =>  $request->dataEdit[$i]['ADDRESS_DETAIL'],
+                    "ADDRESS_RT_NUMBER"             =>  $request->dataEdit[$i]['ADDRESS_RT_NUMBER'],
+                    "ADDRESS_RW_NUMBER"             =>  $request->dataEdit[$i]['ADDRESS_RW_NUMBER'],
+                    "ADDRESS_VILLAGE"               =>  $request->dataEdit[$i]['ADDRESS_VILLAGE'],
+                    "ADDRESS_DISTRICT"              =>  $request->dataEdit[$i]['ADDRESS_DISTRICT'],
+                    "ADDRESS_PROVINCE"              =>  $request->dataEdit[$i]['ADDRESS_PROVINCE'],
+                    "ADDRESS_REGENCY"               =>  $request->dataEdit[$i]['ADDRESS_REGENCY'],
+                    "ADDRESS_STATUS"                =>  $request->dataEdit[$i]['ADDRESS_STATUS'],
+                ]);
+            }else{
+                $editAddress = TAddress::where('ADDRESS_ID', $request->dataEdit[$i]['ADDRESS_ID'])->update([
+                    "ADDRESS_LOCATION_TYPE"         =>  $request->dataEdit[$i]['ADDRESS_LOCATION_TYPE'],
+                    "ADDRESS_DETAIL"                =>  $request->dataEdit[$i]['ADDRESS_DETAIL'],
+                    "ADDRESS_RT_NUMBER"             =>  $request->dataEdit[$i]['ADDRESS_RT_NUMBER'],
+                    "ADDRESS_RW_NUMBER"             =>  $request->dataEdit[$i]['ADDRESS_RW_NUMBER'],
+                    "ADDRESS_VILLAGE"               =>  $request->dataEdit[$i]['ADDRESS_VILLAGE'],
+                    "ADDRESS_DISTRICT"              =>  $request->dataEdit[$i]['ADDRESS_DISTRICT'],
+                    "ADDRESS_PROVINCE"              =>  $request->dataEdit[$i]['ADDRESS_PROVINCE'],
+                    "ADDRESS_REGENCY"               =>  $request->dataEdit[$i]['ADDRESS_REGENCY'],
+                    // "ADDRESS_STATUS"                =>  $request->dataEdit[$i]['ADDRESS_STATUS'] == NULL ? NULL : $request->dataEdit[$i]['ADDRESS_STATUS'],
+                ]);
+            }
+        }
+
+
+        $addressOther = is_countable($request->other_address);
+        // jika ada other address
+        if ($addressOther) {
+            for ($z=0; $z < sizeof($request->other_address); $z++) { 
+                $createOther = TAddress::create([
+                    "ADDRESS_LOCATION_TYPE"         => 3,
+                    "ADDRESS_DETAIL"                => $request->other_address[$z]['ADDRESS_DETAIL'], 
+                    "ADDRESS_RT_NUMBER"             => $request->other_address[$z]['ADDRESS_RT_NUMBER'],
+                    "ADDRESS_RW_NUMBER"             => $request->other_address[$z]['ADDRESS_RW_NUMBER'],
+                    "ADDRESS_VILLAGE"               => $request->other_address[$z]['ADDRESS_VILLAGE']['value'],
+                    "ADDRESS_DISTRICT"              => $request->other_address[$z]['ADDRESS_DISTRICT']['value'],
+                    "ADDRESS_PROVINCE"              => $request->other_address[$z]['ADDRESS_PROVINCE']['value'],
+                    "ADDRESS_REGENCY"               => $request->other_address[$z]['ADDRESS_REGENCY']['value'],
+                    "ADDRESS_STATUS"                => $request->other_address[$z]['ADDRESS_STATUS']
+                ]);
+
+                // create mapping
+                if ($createOther) {
+                    MPersonAddress::create([
+                        "PERSON_ID"          => $request->other_address[$z]['idPerson'],
+                        "ADDRESS_ID"         => $createOther->ADDRESS_ID
+                    ]);
+                }
+            }
+        }
+        
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Edit Address (Person).",
+            "module"      => "Person",
+                "id"          => $request->ADDRESS_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->ADDRESS_ID
         ], 201, [
             'X-Inertia' => true
         ]);

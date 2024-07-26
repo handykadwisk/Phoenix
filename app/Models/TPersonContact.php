@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RWilayahKemendagri extends Model
+class TPersonContact extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'kode';
+    protected $primaryKey = 'PERSON_CONTACT_ID';
 
-    protected $table = 'r_wilayah_kemendagri';
+    protected $table = 't_person_contact';
 
     protected $guarded = [
-        'kode',
+        'PERSON_CONTACT_ID',
     ];
 
     public $timestamps = false;
