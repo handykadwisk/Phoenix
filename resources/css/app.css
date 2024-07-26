@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+
     /* width */
     .custom-scrollbar::-webkit-scrollbar {
         width: 8px;
     }
+
 
     /* Track */
     .custom-scrollbar::-webkit-scrollbar-track {
@@ -14,14 +16,20 @@
         border-radius: 0.5rem;
     }
 
+
     /* Handle */
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #c1c1c1;
         border-radius: 0.5rem;
     }
 
+
     /* Handle on hover */
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #aeaeae;
     }
 }
+
+    .datePicker {
+        width: 100% !important;
+    }

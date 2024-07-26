@@ -15,7 +15,7 @@ export default function Pagination({
     clickHref: CallableFunction;
 }>) {
     return (
-        <div className="sm:flex sm:flex-1 sm:items-center sm:justify-between mt-2">
+        <div className="sm:flex sm:flex-1 sm:items-center sm:justify-between mt-5">
             <div>
                 <p className="text-sm text-gray-700 mb-2 md:mb-0">
                     Showing <span className="font-medium">{fromData}</span> to{" "}
@@ -35,12 +35,10 @@ export default function Pagination({
                     <span className="sr-only">Previous</span>
                     <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
                     </a> */}
-                    {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
-                    {links?.map((link: any, i: number) => {
+                    {links?.map((link: any) => {
                         if (link.label.includes("&laquo;")) {
                             return (
                                 <a
-                                    key={i}
                                     href=""
                                     className={`
                                         relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0
@@ -64,7 +62,6 @@ export default function Pagination({
                         } else if (link.label.includes("&raquo;")) {
                             return (
                                 <a
-                                    key={i}
                                     href=""
                                     className={`
                                     relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0
@@ -88,12 +85,15 @@ export default function Pagination({
                         } else {
                             return (
                                 <a
-                                    key={i}
                                     href=""
                                     aria-current="page"
                                     className={`${
                                         link.active
                                             ? "relative z-10 inline-flex items-center bg-red-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+                                            : "relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                                    }
+
+                                            ? "relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                             : "relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                                     }
 

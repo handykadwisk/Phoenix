@@ -41,6 +41,7 @@ export default function ModalToAction({
     const close = () => {
         if (closeable) {
             onClose();
+            setIsError("");
         }
     };
 
@@ -54,17 +55,23 @@ export default function ModalToAction({
 
         setIsProcessing(true);
         onSuccess("");
+        e.preventDefault();
+
+        setIsProcessing(true);
+        // onSuccess("");
 
         await callAxios({ url, data, method })
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
+                onSuccess(res.data[0]);
                 close();
             })
             .catch((err) => {
                 setIsProcessing(false);
                 setIsError(err);
+                setIsError(err.response.data[0]);
                 console.log(err);
             });
     };

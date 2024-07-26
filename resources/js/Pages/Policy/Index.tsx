@@ -1,0 +1,2160 @@
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, useForm, usePage } from "@inertiajs/react";
+import { PageProps } from "@/types";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import Button from "@/Components/Button/Button";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import { FormEvent, useEffect, useState } from "react";
+import dateFormat from "dateformat";
+import { InertiaFormProps } from "@inertiajs/react/types/useForm";
+import Dropdown from "@/Components/Dropdown";
+import { MagnifyingGlassIcon, TrashIcon } from "@heroicons/react/20/solid";
+import axios from "axios";
+import ModalToAction from "@/Components/Modal/ModalToAction";
+import Relation from "../Relation/Relation";
+import Table from "@/Components/Table/Table";
+import TableTH from "@/Components/Table/TableTH";
+import TableTD from "@/Components/Table/TableTD";
+import Badge from "@/Components/Badge";
+import Pagination from "@/Components/Pagination";
+import CurrencyInput from "react-currency-input-field";
+import ModalSearch from "@/Components/Modal/ModalSearch";
+import Swal from "sweetalert2";
+import ModalDetailPolicy from "./ModalDetailPolicy";
+import Switch from "@/Components/Switch";
+import { group } from "console";
+import Alert from "@/Components/Alert";
+
+export default function PolicyIndex({ auth }: PageProps) {
+    
+    const [flagSwitch, setFlagSwitch] = useState<boolean>(false);
+    const [relations, setRelations] = useState<any>([]);
+    const [policies, setPolicies] = useState<any>([]);
+    const { flash, policy, custom_menu }: any = usePage().props;
+    const { currency }: any = usePage().props;
+    const { insuranceType }: any = usePage().props;
+    const { insurance }: any = usePage().props;
+    const [isSuccess, setIsSuccess] = useState<string>("");
+    const [searchPolicy, setSearchPolicy] = useState<any>({});
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [policyId, setPolicyId] = useState<string>("");
+    const [arrCurrency, setarrCurrency] = useState<any>([]);
+    const [sumByCurrency, setSumByCurrency] = useState<any>([]);
+
+    useEffect(() => {
+        if (
+            Object.keys(searchPolicy).length == 0 ||
+            (searchPolicy.POLICY_NUMBER == "" &&
+            searchPolicy.CLIENT_ID == "")
+        ) {
+            setPolicies([]);
+        } else {
+            getPolicy();
+        }
+    }, [searchPolicy]);
+
+    const getPolicy = async (pageNumber = "page=1") => {
+        setIsLoading(true);
+        await axios
+            .post(`/getPolicy?${pageNumber}`, {
+                policy_number: searchPolicy.POLICY_NUMBER,
+                client_id:searchPolicy.CLIENT_ID,
+            })
+            .then((res) => {
+                setPolicies(res.data);
+                setIsLoading(false);
+                if (modal.search) {
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        // setPolicies(policy)
+    };
+
+    const client = [
+        { id: "1", stat: "CHUBB" },
+        { id: "2", stat: "BRINS" },
+        { id: "3", stat: "ACA" },
+    ];
+    const policyStatus = [
+        { id: "1", stat: "Current" },
+        { id: "0", stat: "Lapse" },
+    ];
+    const premiumType = [
+        { id: "1", stat: "Initial Premium" },
+        { id: "2", stat: "Additional Premium" },
+    ];
+
+    const [modal, setModal] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    const { data, setData, errors, reset } = useForm({
+        relation_id: "",
+        policy_number: "",
+        insurance_type_id: "",
+        policy_the_insured: "",
+        policy_inception_date: "",
+        policy_due_date: "",
+        policy_status_id: 1,
+        self_insured: "",
+        policyPremium: [
+            {
+                currency_id: "",
+                coverage_name: "",
+                gross_premi: 0,
+                admin_cost: 0,
+                disc_broker: 0,
+                disc_consultation: 0,
+                disc_admin: 0,
+                nett_premi: 0,
+                fee_based_income: 0,
+                agent_commision: 0,
+                acquisition_cost: 0
+            },
+        ],
+        policyInstallment: [
+            {
+                policy_installment_id: "",
+                policy_id: "",
+                policy_installment_term: "",
+                policy_installment_percentage: "",
+                policy_installment_amount: "",
+                installment_due_date: "",
+            },
+        ],
+    });
+    const [dataById, setDataById] = useState<any>({
+        RELATION_ID: "",
+        POLICY_NUMBER: "",
+        INSURANCE_TYPE_ID: "",
+        POLICY_THE_INSURED: "",
+        POLICY_INCEPTION_DATE: "",
+        POLICY_DUE_DATE: "",
+        POLICY_STATUS_ID: "",
+        SELF_INSURED: "",
+        policy_premium: [
+            {
+                CURRENCY_ID: "",
+                COVERAGE_NAME: "",
+                GROSS_PREMI: 0,
+                ADMIN_COST: 0,
+                DISC_BROKER: 0,
+                DISC_CONSULTATION: 0,
+                DISC_ADMIN: 0,
+                NETT_PREMI: 0,
+                FEE_BASED_INCOME: 0,
+                AGENT_COMMISION: 0,
+                ACQUISITION_COST: 0,
+                // SUM_INSURED: "",
+                // RATE: "",
+                // INITIAL_PREMIUM: "",
+                // INSTALLMENT: "",
+            },
+        ],
+        policy_installment: [
+            {
+                POLICY_INSTALLMENT_ID: "",
+                POLICY_ID: "",
+                POLICY_INSTALLMENT_TERM: "",
+                POLICY_INSTALLMENT_PERCENTAGE: "",
+                INSTALLMENT_DUE_DATE: "",
+                POLICY_INSTALLMENT_AMOUNT: "",
+            },
+        ],
+        deletedPolicyPremium: [
+            {
+                policy_initial_premium_id: "",
+            },
+        ],
+        deletedInstallment: [
+            {
+                policy_installment_id: "",
+            },
+        ],
+    });
+
+    const [dataToDeactivate, setDataToDeactivate] = useState<any>({
+        id: "",
+        notes: "",
+        name: "",
+    });
+
+    const resetData = () => {
+        setData({
+            relation_id: "",
+            policy_number: "",
+            insurance_type_id: "",
+            policy_the_insured: "",
+            policy_inception_date: "",
+            policy_due_date: "",
+            policy_status_id: 1,
+            self_insured: "",
+            policyPremium: [
+                {
+                    currency_id: "",
+                    coverage_name: "",
+                    gross_premi: 0,
+                    admin_cost: 0,
+                    disc_broker: 0,
+                    disc_consultation: 0,
+                    disc_admin: 0,
+                    nett_premi: 0,
+                    fee_based_income: 0,
+                    agent_commision: 0,
+                    acquisition_cost: 0,
+                },
+            ],
+            policyInstallment: [
+                {
+                    policy_installment_id: "",
+                    policy_id: "",
+                    policy_installment_term: "",
+                    policy_installment_percentage: "",
+                    policy_installment_amount: "",
+                    installment_due_date: "",
+                },
+            ],
+        });
+
+        setSumByCurrency([])
+        
+
+    } 
+console.log('data: ', data)
+    const handleSuccess = (message: number) => {
+        console.log("message: ", message);
+        setIsSuccess("");
+        reset();
+        setData({
+            relation_id: "",
+            policy_number: "",
+            insurance_type_id: "",
+            policy_the_insured: "",
+            policy_inception_date: "",
+            policy_due_date: "",
+            policy_status_id: 1,
+            self_insured: "",
+            policyPremium: [
+                {
+                    currency_id: "",
+                    coverage_name: "",
+                    gross_premi: 0,
+                    admin_cost: 0,
+                    disc_broker: 0,
+                    disc_consultation: 0,
+                    disc_admin: 0,
+                    nett_premi: 0,
+                    fee_based_income: 0,
+                    agent_commision: 0,
+                    acquisition_cost: 0,
+                },
+            ],
+            policyInstallment: [
+                {
+                    policy_installment_id: "",
+                    policy_id: "",
+                    policy_installment_term: "",
+                    policy_installment_percentage: "",
+                    policy_installment_amount: "",
+                    installment_due_date: "",
+                },
+            ],
+        });
+        getData(message);
+
+        Swal.fire({
+            title: "Success",
+            text: "Success Registered Policy",
+            icon: "success",
+        }).then((result: any) => {
+            if (result.value) {
+                // setPolicyId(message);
+                // getData(message);
+                setModal({
+                    add: false,
+                    delete: false,
+                    edit: false,
+                    view: true,
+                    document: false,
+                    search: false,
+                });
+            }
+        });
+        // setIsSuccess(message);
+        // getPolicy();
+    };
+
+    const deletePolicy = (e: FormEvent, id: number, name: string) => {
+        e.preventDefault();
+        setDataToDeactivate({
+            ...dataToDeactivate,
+            id: id,
+            name: name,
+        });
+        setModal({
+            add: false,
+            delete: true,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+        });
+    };
+
+    const handleSuccessDelete = (message: string) => {
+        setIsSuccess("");
+        setDataToDeactivate({
+            id: "",
+            notes: "",
+            status: "",
+            name: "",
+        });
+        getPolicy();
+        setIsSuccess(message);
+        if (message) {
+            setModal({
+                ...modal,
+                view: false
+            })
+            // setModal({
+            //     add: false,
+            //     delete: true,
+            //     edit: false,
+            //     view: false,
+            //     document: false,
+            //     search: false,
+            // });
+        }
+    };
+
+    const inputPolicyPremium = (name: string, value: any, i: number) => {
+        const changeVal: any = [...data.policyPremium];
+        changeVal[i][name] = value;
+        setData("policyPremium", changeVal);
+
+        if (name == 'currency_id') {
+            setarrCurrency([...arrCurrency, value]);
+        }
+        
+        
+    };
+
+    const addRowPolicyPremium = (e: FormEvent) => {
+        e.preventDefault();
+        setData("policyPremium", [
+            ...data.policyPremium,
+            {
+                currency_id: "",
+                coverage_name: "",
+                gross_premi: 0,
+                admin_cost: 0,
+                disc_broker: 0,
+                disc_consultation: 0,
+                disc_admin: 0,
+                nett_premi: 0,
+                fee_based_income: 0,
+                agent_commision: 0,
+                acquisition_cost: 0,
+            },
+        ]);
+    };
+
+    const deleteRowPolicyPremium = (i: number) => {
+        const val = [...data.policyPremium];
+        val.splice(i, 1);
+        setData("policyPremium", val);
+        getSummaryPremi()
+    };
+
+    const inputPolicyInstallment = (name: string, value: any, i: number) => {
+        const changeVal: any = [...data.policyInstallment];
+        changeVal[i][name] = value;
+        setData("policyInstallment", changeVal);
+    };
+
+    const addRowPolicyInstallment = (e: FormEvent) => {
+        e.preventDefault();
+        setData("policyInstallment", [
+            ...data.policyInstallment,
+            {
+                policy_installment_id: "",
+                policy_id: "",
+                policy_installment_term: "",
+                policy_installment_percentage: "",
+                policy_installment_amount: "",
+                installment_due_date: "",
+            },
+        ]);
+    };
+
+    const deleteRowPolicyInstallment = (i: number) => {
+        const val = [...data.policyInstallment];
+        val.splice(i, 1);
+        setData("policyInstallment", val);
+    };
+
+    const getData = async (id: number) => {
+        
+        await axios
+            .get(`/getPolicy/${id}`)
+            .then((res) => setDataById(res.data))
+            .catch((err) => console.log(err));
+
+    };
+
+    
+    // edit
+    const handleEditModal = async (e: FormEvent, id: number) => {
+        e.preventDefault();
+
+        await axios
+            .get(`/getPolicy/${id}`)
+            .then((res) => setDataById(res.data))
+            .catch((err) => console.log(err));
+
+        setModal({
+            add: false,
+            delete: false,
+            edit: !modal.edit,
+            view: false,
+            document: false,
+            search: false,
+        });
+    };
+    const editPolicyPremium = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...dataById.policy_premium];
+        changeVal[i][name] = value;
+        setDataById({ ...dataById, policy_premium: changeVal });
+    };
+
+    const addRowEditPolicyPremium = (e: FormEvent) => {
+        e.preventDefault();
+        
+        setDataById({
+            ...dataById,
+            policy_premium: [
+                ...dataById.policy_premium,
+                {
+                    POLICY_INITIAL_PREMIUM_ID: null,
+                    POLICY_ID: dataById.POLICY_ID,
+                    CURRENCY_ID: "",
+                    COVERAGE_NAME: "",
+                    GROSS_PREMI: 0,
+                    ADMIN_COST: 0,
+                    DISC_BROKER: 0,
+                    DISC_CONSULTATION: 0,
+                    DISC_ADMIN: 0,
+                    NETT_PREMI: 0,
+                    FEE_BASED_INCOME: 0,
+                    AGENT_COMMISION: 0,
+                    ACQUISITION_COST: 0,
+                    // SUM_INSURED: "",
+                    // RATE: "",
+                    // INITIAL_PREMIUM: "",
+                    // INSTALLMENT: "",
+                },
+            ],
+        });
+    };
+
+    const deleteRowEditPolicyPremium = (i: number) => {
+        const val = [...dataById.policy_premium];
+        val.splice(i, 1);
+        if (
+            dataById.policy_premium[i].policy_initial_premium_id !==
+            null
+        ) {
+            if (dataById.deletedPolicyPremium) {
+                // alert("a");
+                setDataById({
+                    ...dataById,
+                    policy_premium: val,
+                    deletedPolicyPremium: [
+                        ...dataById.deletedPolicyPremium,
+                        {
+                            policy_initial_premium_id:
+                                dataById.policy_premium[i]
+                                    .POLICY_INITIAL_PREMIUM_ID,
+                        },
+                    ],
+                });
+            } else {
+                // alert("b");
+                setDataById({
+                    ...dataById,
+                    policy_premium: val,
+                    deletedPolicyPremium: [
+                        {
+                            policy_initial_premium_id:
+                                dataById.policy_premium[i]
+                                    .POLICY_INITIAL_PREMIUM_ID,
+                        },
+                    ],
+                });
+            }
+        } else {
+            setDataById({
+                ...dataById,
+                policy_premium: val,
+            });
+        }
+    };
+
+    const editPolicyInstallment = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...dataById.policy_installment];
+        changeVal[i][name] = value;
+        setDataById({ ...dataById, policy_installment: changeVal });
+    };
+
+    const addRowEditInstallment = (e: FormEvent) => {
+        e.preventDefault();
+        
+        setDataById({
+            ...dataById,
+            policy_installment: [
+                ...dataById.policy_installment,
+                {
+                    POLICY_INSTALLMENT_ID: null,
+                    POLICY_ID: dataById.POLICY_ID,
+                    POLICY_INSTALLMENT_TERM: "",
+                    POLICY_INSTALLMENT_PERCENTAGE: "",
+                    INSTALLMENT_DUE_DATE: "",
+                    POLICY_INSTALLMENT_AMOUNT: "",
+                },
+            ],
+        });
+    };
+
+    const deleteRowEditInstallment = (i: number) => {
+        const val = [...dataById.policy_installment];
+        val.splice(i, 1);
+        if (dataById.policy_installment[i].policy_installment_id !== null) {
+            if (dataById.deletedInstallment) {
+                // alert("a");
+                setDataById({
+                    ...dataById,
+                    policy_installment: val,
+                    deletedPolicyPremium: [
+                        ...dataById.deletedInstallment,
+                        {
+                            policy_installment_id:
+                                dataById.policy_installment[i]
+                                    .POLICY_INISTALLMENT_ID,
+                        },
+                    ],
+                });
+            } else {
+                // alert("b");
+                setDataById({
+                    ...dataById,
+                    policy_installment: val,
+                    deletedPolicyPremium: [
+                        {
+                            policy_installment_id:
+                                dataById.policy_installment[i]
+                                    .POLICY_INSTALLMENT_ID,
+                        },
+                    ],
+                });
+            }
+        } else {
+            setDataById({
+                ...dataById,
+                policy_installment: val,
+            });
+        }
+    };
+    // end edit
+
+    // view
+    const handleViewModal = async (e: FormEvent, id: number) => {
+        e.preventDefault();
+
+        await axios
+            .get(`/getPolicy/${id}`)
+            .then((res) => setDataById(res.data))
+            .catch((err) => console.log(err));
+
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !modal.view,
+            document: false,
+            search: false,
+        });
+    };
+    // end view
+
+    const getRelation = async (id: string) => {
+        
+        await axios
+            .get(`/getRelation/${id}`)
+            .then((res) => {
+                
+                setData(
+                    "policy_the_insured",
+                    res.data.RELATION_ORGANIZATION_NAME
+                );
+            })
+            .catch((err) => console.log(err));
+    };
+
+    useEffect(() => {
+        if (data.relation_id) {
+            getRelation(data.relation_id);
+        }
+    }, [data.relation_id]);
+
+    const getCurrencyById = (currId:any) => {
+        const dataCurr = currency
+        const result = dataCurr.find((id: any) => id.CURRENCY_ID == currId);
+
+        return result.CURRENCY_SYMBOL;
+    }
+
+
+    const getSummaryPremi = () => {
+        const dataToGroup = data.policyPremium;
+        const groupBy = (data: any, keys: any) => {
+            return Object.values(
+                data.reduce((acc: any, val: any) => {
+                    const currency_id = keys.reduce(
+                        (finalName: any, key: any) => finalName + val[key],
+                        ""
+                    );
+                    if (acc[currency_id]) {
+                        acc[currency_id].values.push(val.nett_premi);
+                        acc[currency_id].sum += val.nett_premi;
+                        acc[currency_id].sum_gross_premi += val.gross_premi;
+                        acc[currency_id].sum_admin_cost += val.admin_cost;
+                        acc[currency_id].sum_disc_broker += val.disc_broker;
+                        acc[currency_id].sum_disc_consultation += val.disc_consultation;
+                        acc[currency_id].sum_disc_admin += val.disc_admin;
+                        acc[currency_id].sum_fee_based_income += val.fee_based_income;
+                        acc[currency_id].sum_agent_commision += val.agent_commision;
+                        acc[currency_id].sum_acquisition_cost += val.acquisition_cost;
+                    } else {
+                        acc[currency_id] = {
+                            currency_id,
+                            sum: val.nett_premi,
+                            sum_gross_premi: val.gross_premi,
+                            sum_admin_cost: val.admin_cost,
+                            sum_disc_broker: val.disc_broker,
+                            sum_disc_consultation: val.disc_consultation,
+                            sum_disc_admin: val.disc_admin,
+                            sum_fee_based_income: val.fee_based_income,
+                            sum_agent_commision: val.agent_commision,
+                            sum_acquisition_cost: val.acquisition_cost,
+                            // values: [val.nett_premi],
+                        };
+                    }
+                    return acc;
+                }, {})
+            );
+        };
+        setSumByCurrency(groupBy(dataToGroup, ["currency_id"]));
+
+    }
+    useEffect(() => {
+        if (data.policyPremium) {
+            getSummaryPremi()            
+        }
+    }, [data.policyPremium]);
+
+console.log("sumByCurrency: ", sumByCurrency);
+    // Start fungsi hitung initial premium
+    const inputCalculate = (i: number) => {
+        const changeVal: any = [...data.policyPremium];
+        // const si = changeVal[i]["sum_insured"];
+        // const rate = changeVal[i]["rate"];
+        // if (si && rate) {
+        //     changeVal[i]["initial_premium"] = (si * rate) / 100;
+        // } else [(changeVal[i]["initial_premium"] = 0)];
+        const gross_premi = changeVal[i]["gross_premi"];
+        const admin_cost = changeVal[i]["admin_cost"];
+        const disc_broker = changeVal[i]["disc_broker"];
+        const disc_consultation = changeVal[i]["disc_consultation"];
+        const disc_admin = changeVal[i]["disc_admin"];
+        changeVal[i]["nett_premi"] = parseFloat(gross_premi) + parseFloat(admin_cost) - parseFloat(disc_broker) - parseFloat(disc_admin) - parseFloat(disc_consultation)
+
+        setData("policyPremium", changeVal);
+    };
+    const editCalculate = (i: number) => {
+        const changeVal: any = [...dataById.policy_premium];
+        // changeVal[i][name] = value;
+        const si = changeVal[i]["SUM_INSURED"];
+        const rate = changeVal[i]["RATE"];
+        if (si && rate) {
+            changeVal[i]["INITIAL_PREMIUM"] = (si * rate) / 100;
+        } else [(changeVal[i]["INITIAL_PREMIUM"] = 0)];
+        
+        setDataById({ ...dataById, policy_premium: changeVal });
+    };
+    // End fungsi hitung initial premium
+    
+
+    const handleSwitch = () => {
+        setFlagSwitch(!flagSwitch)
+    }
+
+    return (
+        <AuthenticatedLayout user={auth.user} header={"Policy"}>
+            <Head title="Policy" />
+
+            {/* modal add policy */}
+            <ModalToAdd
+                show={modal.add}
+                onClose={() => {
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                    resetData();
+                }}
+                title={"Register Policy"}
+                url={`/policy`}
+                data={data}
+                onSuccess={handleSuccess}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-6xl"
+                }
+                body={
+                    <>
+                        <div className="mb-4 ml-4 mr-4">
+                            <InputLabel
+                                htmlFor="client_name"
+                                value="Client Name"
+                            />
+                            <select
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                value={data.relation_id}
+                                onChange={(e) => {
+                                    setData("relation_id", e.target.value);
+                                    // getRelation(
+                                    //     e.target.value
+                                    // );
+                                }}
+                            >
+                                <option value={""}>
+                                    -- <i>Choose Client Name</i> --
+                                </option>
+                                {insurance.map((insurances: any, i: number) => {
+                                    return (
+                                        <option
+                                            key={i}
+                                            value={
+                                                insurances.RELATION_ORGANIZATION_ID
+                                            }
+                                        >
+                                            {
+                                                insurances.RELATION_ORGANIZATION_NAME
+                                            }
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                            <div>
+                                <InputLabel
+                                    htmlFor="policy_number"
+                                    value="Policy Number"
+                                />
+                                <TextInput
+                                    id="policy_number"
+                                    type="text"
+                                    name="policy_number"
+                                    value={data.policy_number}
+                                    className=""
+                                    autoComplete="policy_number"
+                                    onChange={(e) =>
+                                        setData("policy_number", e.target.value)
+                                    }
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <InputLabel
+                                    htmlFor="insurance_type_id"
+                                    value="Insurance Type"
+                                />
+                                <select
+                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={data.insurance_type_id}
+                                    onChange={(e) =>
+                                        setData(
+                                            "insurance_type_id",
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value={""}>
+                                        -- <i>Choose Insurance Type</i> --
+                                    </option>
+                                    {insuranceType.map(
+                                        (insuranceTypes: any, i: number) => {
+                                            return (
+                                                <option
+                                                    key={i}
+                                                    value={
+                                                        insuranceTypes.INSURANCE_TYPE_ID
+                                                    }
+                                                >
+                                                    {
+                                                        insuranceTypes.INSURANCE_TYPE_NAME
+                                                    }
+                                                </option>
+                                            );
+                                        }
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="mb-4 ml-4 mr-4">
+                            <InputLabel
+                                htmlFor="the_insured"
+                                value="The Insured"
+                            />
+                            <TextInput
+                                id="the_insured"
+                                type="text"
+                                name="the_insured"
+                                value={data.policy_the_insured}
+                                className=""
+                                autoComplete="the_insured"
+                                onChange={(e) =>
+                                    setData(
+                                        "policy_the_insured",
+                                        e.target.value
+                                    )
+                                }
+                                required
+                            />
+                        </div>
+                        <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
+                            <div>
+                                <InputLabel
+                                    htmlFor="inception_date"
+                                    value="Inception Date"
+                                />
+                                <TextInput
+                                    id="inception_date"
+                                    type="date"
+                                    name="inception_date"
+                                    value={data.policy_inception_date}
+                                    className=""
+                                    autoComplete="inception_date"
+                                    onChange={(e) =>
+                                        setData(
+                                            "policy_inception_date",
+                                            e.target.value
+                                        )
+                                    }
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <InputLabel
+                                    htmlFor="due_date"
+                                    value="Expiry Date"
+                                />
+                                <TextInput
+                                    id="due_date"
+                                    type="date"
+                                    name="due_date"
+                                    value={data.policy_due_date}
+                                    className=""
+                                    autoComplete="due_date"
+                                    onChange={(e) =>
+                                        setData(
+                                            "policy_due_date",
+                                            e.target.value
+                                        )
+                                    }
+                                    required
+                                />
+                            </div>
+                            <div className="w-60">
+                                <InputLabel
+                                    // htmlFor="self_insured"
+                                    value="Self Insured"
+                                />
+
+                                <div className="grid grid-cols-5">
+                                    <div className="">
+                                        <Switch
+                                            enabled={flagSwitch}
+                                            onChangeButton={handleSwitch}
+                                        />
+                                    </div>
+                                    {flagSwitch ? (
+                                        <>
+                                            <div className="col-span-3 ">
+                                                <CurrencyInput
+                                                    id="self_insured"
+                                                    name="self_insured"
+                                                    value={data.self_insured}
+                                                    decimalScale={2}
+                                                    decimalsLimit={2}
+                                                    onValueChange={(values) =>
+                                                        setData(
+                                                            "self_insured",
+                                                            values
+                                                        )
+                                                    }
+                                                    className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    required
+                                                    placeholder="Percentage (%)"
+                                                />
+                                                {/* {"%"} */}
+                                            </div>
+                                            <div className="mt-2">{"%"}</div>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* <div className="mt-10 ml-4 mr-4">
+                            <h3 className="text-xl font-semibold leading-6 text-gray-900">
+                                Policy Premium
+                            </h3>
+                            <hr className="my-3" />
+                        </div>
+                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
+                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr className="bg-gray-2 dark:bg-meta-4">
+                                        <th className="min-w-[10px] py-4 px-4 text-sm text-black dark:text-white">
+                                            No.
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Coverage Name
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Currency
+                                        </th>
+                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Gross Premi
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Admin Cost
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Disc Broker
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Disc Consultation
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Disc Admin
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Nett Premi
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Fee Based Income
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Agen Commission
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Acquisition Costs
+                                        </th>
+                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Delete
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data.policyPremium.map(
+                                        (iP: any, i: number) => {
+                                            return (
+                                                <tr key={i}>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        {i + 1}
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <TextInput
+                                                            type="text"
+                                                            id="coverage_name"
+                                                            name="coverage_name"
+                                                            value={
+                                                                iP.coverage_name
+                                                            }
+                                                            onChange={(e) =>
+                                                                inputPolicyPremium(
+                                                                    "coverage_name",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <select
+                                                            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            value={
+                                                                iP.currency_id
+                                                            }
+                                                            onChange={(e) =>
+                                                                inputPolicyPremium(
+                                                                    "currency_id",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                        >
+                                                            <option value={""}>
+                                                                --{" "}
+                                                                <i>
+                                                                    Choose
+                                                                    Currency
+                                                                </i>{" "}
+                                                                --
+                                                            </option>
+                                                            {currency.map(
+                                                                (
+                                                                    currencies: any,
+                                                                    i: number
+                                                                ) => {
+                                                                    return (
+                                                                        <option
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            value={
+                                                                                currencies.CURRENCY_ID
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                currencies.CURRENCY_SYMBOL
+                                                                            }
+                                                                        </option>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </select>
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="gross_premi"
+                                                            name="gross_premi"
+                                                            value={
+                                                                iP.gross_premi
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "gross_premi",
+                                                                    values,
+                                                                    i
+                                                                ),
+                                                                    inputCalculate(
+                                                                        i
+                                                                    );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="admin_cost"
+                                                            name="admin_cost"
+                                                            value={
+                                                                iP.admin_cost
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "admin_cost",
+                                                                    values,
+                                                                    i
+                                                                ),
+                                                                    inputCalculate(
+                                                                        i
+                                                                    );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="disc_broker"
+                                                            name="disc_broker"
+                                                            value={
+                                                                iP.disc_broker
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "disc_broker",
+                                                                    values,
+                                                                    i
+                                                                ),
+                                                                    inputCalculate(
+                                                                        i
+                                                                    );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="disc_consultation"
+                                                            name="disc_consultation"
+                                                            value={
+                                                                iP.disc_consultation
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "disc_consultation",
+                                                                    values,
+                                                                    i
+                                                                ),
+                                                                    inputCalculate(
+                                                                        i
+                                                                    );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="disc_admin"
+                                                            name="disc_admin"
+                                                            value={
+                                                                iP.disc_admin
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "disc_admin",
+                                                                    values,
+                                                                    i
+                                                                ),
+                                                                    inputCalculate(
+                                                                        i
+                                                                    );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="nett_premi"
+                                                            name="nett_premi"
+                                                            value={
+                                                                iP.nett_premi
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "nett_premi",
+                                                                    values,
+                                                                    i
+                                                                ),
+                                                                    inputCalculate(
+                                                                        i
+                                                                    );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="fee_based_income"
+                                                            name="fee_based_income"
+                                                            value={
+                                                                iP.fee_based_income
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "fee_based_income",
+                                                                    values,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="agent_commision"
+                                                            name="agent_commision"
+                                                            value={
+                                                                iP.agent_commision
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "agent_commision",
+                                                                    values,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="acquisition_cost"
+                                                            name="acquisition_cost"
+                                                            value={
+                                                                iP.acquisition_cost
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyPremium(
+                                                                    "acquisition_cost",
+                                                                    values,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                        {data.policyPremium
+                                                            .length !== 1 && (
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={
+                                                                    1.5
+                                                                }
+                                                                stroke="currentColor"
+                                                                className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                onClick={() =>
+                                                                    deleteRowPolicyPremium(
+                                                                        i
+                                                                    )
+                                                                }
+                                                            >
+                                                                <path
+                                                                    fill="#AB7C94"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        }
+                                    )}
+                                    {sumByCurrency?.map(
+                                        (sum: any, i: number) => {
+                                            if (sum.currency_id) {
+                                                const curr = getCurrencyById(
+                                                    sum.currency_id
+                                                );
+                                                return (
+                                                    <>
+                                                        <div className="w-40 mb-2 mt-1">
+                                                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td className="text-sm">
+                                                                            <div className="block w-80 mx-auto rounded-md border-0 py-1.5 text-gray-900  sm:text-sm sm:leading-6">
+                                                                                Total
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee] dark:border-strokedark">
+                                                                            <div className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {
+                                                                                    curr
+                                                                                }
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_gross_premi
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_admin_cost
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_disc_broker
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_disc_consultation
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_disc_admin
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_fee_based_income
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_agent_commision
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee]  dark:border-strokedark">
+                                                                            <div className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    sum.sum_acquisition_cost
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </>
+                                                );
+                                            }
+                                        }
+                                    )}
+
+                                    <div className="w-40 mb-2 mt-2">
+                                        <a
+                                            href=""
+                                            className="text-xs mt-1 text-primary ms-1 w-auto"
+                                            onClick={(e) =>
+                                                addRowPolicyPremium(e)
+                                            }
+                                        >
+                                            + Add Row
+                                        </a>
+                                    </div>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="grid grid-cols-3">
+                            <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4 mt-4">
+                                <div className="ml-6 mb-4">
+                                    <h2 className=" text-lg font-semibold text-gray-900 dark:text-white">
+                                        Summary Premium:
+                                    </h2>
+                                    <ol className="max-w-md space-y-1 text-gray-500 list-decimal list-inside dark:text-gray-400">
+                                        {sumByCurrency?.map(
+                                            (sum: any, i: number) => {
+                                                if (sum.currency_id) {
+                                                    const curr =
+                                                        getCurrencyById(
+                                                            sum.currency_id
+                                                        );
+                                                    return (
+                                                        <li key={i}>
+                                                            {curr +
+                                                                " = " +
+                                                                new Intl.NumberFormat(
+                                                                    "id",
+                                                                    {
+                                                                        style: "decimal",
+                                                                    }
+                                                                ).format(
+                                                                    sum.sum
+                                                                )}
+                                                        </li>
+                                                    );
+                                                }
+                                            }
+                                        )}
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-10">
+                            <h3 className="text-xl font-semibold leading-6 text-gray-900 ml-4 mr-4">
+                                Debit Note Installment
+                            </h3>
+                            <hr className="my-3" />
+                        </div>
+                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4">
+                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr className="bg-gray-2 dark:bg-meta-4">
+                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Installment
+                                        </th>
+                                        <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Term Rate
+                                        </th>
+                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Due Date
+                                        </th>
+
+                                        <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                            Delete
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data.policyInstallment.map(
+                                        (pI: any, i: number) => {
+                                            return (
+                                                <tr key={i}>
+                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                        <TextInput
+                                                            id="policy_installment_term"
+                                                            name="policy_installment_term"
+                                                            value={
+                                                                pI.policy_installment_term
+                                                            }
+                                                            onChange={(e) =>
+                                                                inputPolicyInstallment(
+                                                                    "policy_installment_term",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                        <CurrencyInput
+                                                            id="policy_installment_percentage"
+                                                            name="policy_installment_percentage"
+                                                            value={
+                                                                pI.policy_installment_percentage
+                                                            }
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                inputPolicyInstallment(
+                                                                    "policy_installment_percentage",
+                                                                    values,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                        <TextInput
+                                                            type="date"
+                                                            id="installment_due_date"
+                                                            name="installment_due_date"
+                                                            value={
+                                                                pI.installment_due_date
+                                                            }
+                                                            onChange={(e) =>
+                                                                inputPolicyInstallment(
+                                                                    "installment_due_date",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                            className="block w-15 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-pelindo sm:text-sm sm:leading-6"
+                                                            required
+                                                        />
+                                                    </td>
+
+                                                    <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                        {data.policyInstallment
+                                                            .length !== 1 && (
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={
+                                                                    1.5
+                                                                }
+                                                                stroke="currentColor"
+                                                                className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                onClick={() =>
+                                                                    deleteRowPolicyInstallment(
+                                                                        i
+                                                                    )
+                                                                }
+                                                            >
+                                                                <path
+                                                                    fill="#AB7C94"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        }
+                                    )}
+                                    <div className="w-40 mb-2 mt-2">
+                                        <a
+                                            href=""
+                                            className="text-xs mt-1 text-primary ms-1 w-auto"
+                                            onClick={(e) =>
+                                                addRowPolicyInstallment(e)
+                                            }
+                                        >
+                                            + Add Row
+                                        </a>
+                                    </div>
+                                </tbody>
+                            </table>
+                        </div> */}
+                    </>
+                }
+            />
+            {/* end Modal add Policy */}
+
+            {/* modal delete policy */}
+            <ModalToAction
+                show={modal.delete}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Delete Policy"}
+                url={`/deactivatePolicy/${dataToDeactivate.id}`}
+                method={"patch"}
+                data={dataToDeactivate}
+                onSuccess={handleSuccessDelete}
+                headers={null}
+                submitButtonName={"Submit"}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                }
+                body={
+                    <>
+                        <div className="mb-4">
+                            <InputLabel htmlFor="name" value="For Policy:" />
+                            <TextInput
+                                id="name"
+                                type="text"
+                                name="name"
+                                value={dataToDeactivate.name}
+                                className="bg-gray-200"
+                                readOnly
+                            />
+                        </div>
+                    </>
+                }
+            />
+
+            {/* modal search */}
+            <ModalSearch
+                show={modal.search}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Search Relation"}
+                submitButtonName={"Search"}
+                onAction={() => {
+                    getPolicy();
+                }}
+                isLoading={isLoading}
+                body={
+                    <>
+                        <div className="mb-4">
+                            <InputLabel
+                                htmlFor="POLICY_NUMBER"
+                                value="Policy Number"
+                            />
+                            <TextInput
+                                id="POLICY_NUMBER"
+                                type="text"
+                                name="POLICY_NUMBER"
+                                value={searchPolicy.POLICY_NUMBER}
+                                className="mt-2"
+                                onChange={(e) =>
+                                    setSearchPolicy({
+                                        ...searchPolicy,
+                                        POLICY_NUMBER: e.target.value,
+                                    })
+                                }
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        getPolicy();
+                                    }
+                                }}
+                            />
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal search */}
+
+            {/* modal detail */}
+            <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Detail Policy"}
+                url={""}
+                data={""}
+                // addOns={""}
+
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                // editButtonName={"Edit"}
+                // deleteButtonName={"Delete"}
+                body={
+                    <>
+                        <ModalDetailPolicy
+                            onDeleteSuccess={handleSuccessDelete}
+                            policy={dataById}
+                            insurance={insurance}
+                            insuranceType={insuranceType}
+                            policyStatus={policyStatus}
+                            currency={currency}
+                        />
+                    </>
+                }
+            />
+            {/* modal end detail  */}
+
+            {/* Mekanisme Search */}
+            <div>
+                <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
+                    <div className="p-6 text-gray-900 mb-60">
+                        <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                            {/* header table */}
+                            <div className="md:grid md:grid-cols-8 md:gap-4">
+                                <Button
+                                    className="text-sm w-full lg:w-1/2 font-semibold px-6 py-1.5 mb-4 md:col-span-2"
+                                    onClick={() => {
+                                        // setSwitchPage(false);
+                                        setModal({
+                                            add: true,
+                                            delete: false,
+                                            edit: false,
+                                            view: false,
+                                            document: false,
+                                            search: false,
+                                        });
+                                    }}
+                                >
+                                    {"Register Policy"}
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 xs:gap-0 lg:grid-cols-3 lg:grid-4 lg:gap-4">
+                            <div className="bg-white rounded-md p-10 shdow-md mb-5 lg:mb-0">
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
+                                        <div>
+                                            <InputLabel
+                                                htmlFor="search_policy_number"
+                                                value="Policy Number"
+                                            />
+                                            <TextInput
+                                                id="search_policy_number"
+                                                type="text"
+                                                name="search_policy_number"
+                                                // value={data.search_policy_number}
+                                                value={
+                                                    searchPolicy.POLICY_NUMBER
+                                                }
+                                                className=""
+                                                autoComplete="search_policy_number"
+                                                onChange={(e) => {
+                                                    setSearchPolicy({
+                                                        ...searchPolicy,
+                                                        POLICY_NUMBER:
+                                                            e.target.value,
+                                                    });
+                                                    // getPolicy()
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
+                                        <div>
+                                            <InputLabel
+                                                htmlFor="search_relation"
+                                                value="Client Name"
+                                            />
+                                            <select
+                                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                value={searchPolicy.CLIENT_ID}
+                                                onChange={(e) =>
+                                                    setSearchPolicy({
+                                                        ...searchPolicy,
+                                                        CLIENT_ID:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                            >
+                                                <option value={""}>
+                                                    -- <i>Choose Client</i> --
+                                                </option>
+                                                {insurance?.map(
+                                                    (status: any) => {
+                                                        return (
+                                                            <option
+                                                                value={
+                                                                    status.RELATION_ORGANIZATION_ID
+                                                                }
+                                                            >
+                                                                {
+                                                                    status.RELATION_ORGANIZATION_NAME
+                                                                }
+                                                            </option>
+                                                        );
+                                                    }
+                                                )}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-md col-span-2 p-10">
+                                <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                                    <table className="w-full table-auto divide-y divide-gray-300">
+                                        <thead className="bg-gray-100">
+                                            <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                                <TableTH
+                                                    className={
+                                                        "max-w-[0px] text-center"
+                                                    }
+                                                    label={"No"}
+                                                />
+                                                <TableTH
+                                                    className={"min-w-[50px]"}
+                                                    label={"Policy Number"}
+                                                />
+                                                <TableTH
+                                                    className={"min-w-[50px]"}
+                                                    label={"Client Name"}
+                                                />
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {policies.data?.map(
+                                                (policy: any, i: number) => {
+                                                    return (
+                                                        <tr
+                                                            key={i}
+                                                            className={
+                                                                i % 2 === 0
+                                                                    ? ""
+                                                                    : "bg-gray-100"
+                                                            }
+                                                        >
+                                                            <TableTD
+                                                                value={
+                                                                    policies.from +
+                                                                    i
+                                                                }
+                                                                className={
+                                                                    "text-center"
+                                                                }
+                                                            />
+                                                            <TableTD
+                                                                value={
+                                                                    <>
+                                                                        <a
+                                                                            href=""
+                                                                            onClick={(
+                                                                                e
+                                                                            ) =>
+                                                                                // handleEditModal(
+                                                                                //     e,
+                                                                                //     policy.POLICY_ID
+                                                                                // )
+                                                                                handleViewModal(
+                                                                                    e,
+                                                                                    policy.POLICY_ID
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                policy.POLICY_NUMBER
+                                                                            }
+                                                                            <br />
+                                                                            {policy.POLICY_STATUS_ID ==
+                                                                            1 ? (
+                                                                                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-small text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                                                    Current
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-small text-red-700 ring-1 ring-inset ring-red-600/20">
+                                                                                    Lapse
+                                                                                </span>
+                                                                            )}
+                                                                        </a>
+                                                                    </>
+                                                                }
+                                                                className={""}
+                                                            />
+                                                            <TableTD
+                                                                value={
+                                                                    <>
+                                                                        {
+                                                                            policy
+                                                                                .relation
+                                                                                .RELATION_ORGANIZATION_NAME
+                                                                        }
+                                                                    </>
+                                                                }
+                                                                className={""}
+                                                            />
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <Pagination
+                                    links={policies.links}
+                                    fromData={policies.from}
+                                    toData={policies.to}
+                                    totalData={policies.total}
+                                    clickHref={(url: string) =>
+                                        getPolicy(url.split("?").pop())
+                                    }
+                                />
+                                {/* {policies.length === 0 ? (
+                                    <span>tidak ada</span>
+                                ) : (
+                                    <>
+                                        <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                                            <table className="w-full table-auto divide-y divide-gray-300">
+                                                <thead className="bg-gray-100">
+                                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                                        <TableTH
+                                                            className={
+                                                                "max-w-[0px] text-center"
+                                                            }
+                                                            label={"No"}
+                                                        />
+                                                        <TableTH
+                                                            className={
+                                                                "min-w-[50px]"
+                                                            }
+                                                            label={
+                                                                "Policy Number"
+                                                            }
+                                                        />
+                                                        <TableTH
+                                                            className={
+                                                                "min-w-[50px]"
+                                                            }
+                                                            label={
+                                                                "Client Name"
+                                                            }
+                                                        />
+                                                        <TableTH
+                                                            className={
+                                                                "min-w-[50px] text-center"
+                                                            }
+                                                            label={"Action"}
+                                                        />
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {policies.data?.map(
+                                                        (
+                                                            policy: any,
+                                                            i: number
+                                                        ) => {
+                                                            return (
+                                                                <tr
+                                                                    key={i}
+                                                                    className={
+                                                                        i %
+                                                                            2 ===
+                                                                        0
+                                                                            ? ""
+                                                                            : "bg-gray-100"
+                                                                    }
+                                                                >
+                                                                    <TableTD
+                                                                        value={
+                                                                            policies.from +
+                                                                            i
+                                                                        }
+                                                                        className={
+                                                                            "text-center"
+                                                                        }
+                                                                    />
+                                                                    <TableTD
+                                                                        value={
+                                                                            <>
+                                                                                {
+                                                                                    policy.POLICY_NUMBER
+                                                                                }
+                                                                                <br />
+                                                                                {policy.POLICY_STATUS_ID ==
+                                                                                1 ? (
+                                                                                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-small text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                                                        Current
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-small text-red-700 ring-1 ring-inset ring-red-600/20">
+                                                                                        Lapse
+                                                                                    </span>
+                                                                                )}
+                                                                            </>
+                                                                        }
+                                                                        className={
+                                                                            ""
+                                                                        }
+                                                                    />
+                                                                    <TableTD
+                                                                        value={
+                                                                            <>
+                                                                                {
+                                                                                    policy
+                                                                                        .relation
+                                                                                        .RELATION_ORGANIZATION_NAME
+                                                                                }
+                                                                            </>
+                                                                        }
+                                                                        className={
+                                                                            ""
+                                                                        }
+                                                                    />
+                                                                    <TableTD
+                                                                        value={
+                                                                            <>
+                                                                                <a
+                                                                                    href={
+                                                                                        "detailPolicy/" +
+                                                                                        policy.POLICY_ID
+                                                                                    }
+                                                                                    // rel="noopener"
+                                                                                    target="_blank"
+                                                                                >
+                                                                                    <div
+                                                                                        className="flex justify-center items-center"
+                                                                                        title="Detail"
+                                                                                    >
+                                                                                        <svg
+                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                            fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            strokeWidth={
+                                                                                                1.5
+                                                                                            }
+                                                                                            stroke="currentColor"
+                                                                                            className="size-6 text-red-700 cursor-pointer"
+                                                                                        >
+                                                                                            <path
+                                                                                                strokeLinecap="round"
+                                                                                                strokeLinejoin="round"
+                                                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                                                            />
+                                                                                            <path
+                                                                                                strokeLinecap="round"
+                                                                                                strokeLinejoin="round"
+                                                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                                                            />
+                                                                                        </svg>
+                                                                                    </div>
+                                                                                </a>
+                                                                            </>
+                                                                        }
+                                                                        className={
+                                                                            ""
+                                                                        }
+                                                                    />
+                                                                </tr>
+                                                            );
+                                                        }
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <Pagination
+                                            links={policies.links}
+                                            fromData={policies.from}
+                                            toData={policies.to}
+                                            totalData={policies.total}
+                                            clickHref={(url: string) =>
+                                                getPolicy(url.split("?").pop())
+                                            }
+                                        />
+                                    </>
+                                )} */}
+                            </div>
+                        </div>
+                        {/* table page*/}
+                    </div>
+                </div>
+            </div>
+        </AuthenticatedLayout>
+    );
+}
