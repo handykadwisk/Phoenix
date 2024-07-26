@@ -53,6 +53,16 @@ class DatabaseSeeder extends Seeder
         );
         $group = Menu::create(
             [
+                'menu_name'       => 'Policy',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'policy/policy',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 8,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $group = Menu::create(
+            [
                 'menu_name'       => 'Group',
                 'menu_parent_id'  => $relation->id,
                 'menu_url'        => 'relation/group',

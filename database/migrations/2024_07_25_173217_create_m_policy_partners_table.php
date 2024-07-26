@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('m_policy_partner', function (Blueprint $table) {
             $table->increments('POLICY_PARTNER_ID')->primary();
-            $table->unsignedBigInteger('POLICY_ID')->nullable();
+            // $table->unsignedBigInteger('POLICY_ID')->nullable();
+            $table->integer('POLICY_ID')->nullable();
             $table->integer('INCOME_TYPE')->nullable();
             $table->string('PARTNER_NAME')->nullable();
             $table->decimal('BROKERAGE_FEE_PERCENTAGE',20,2)->default(0)->nullable();
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->decimal('ADMIN_COST',20,2)->default(0)->nullable();
             $table->decimal('CONSULTANCY_FEE_PERCENTAGE',20,2)->default(0)->nullable();
             $table->decimal('CONSULTANCY_FEE_AMOUNT',20,2)->default(0)->nullable();
-            $table->foreign('POLICY_ID')->references('POLICY_ID')->on('t_policy')->onDelete('cascade');
+            // $table->foreign('POLICY_ID')->references('POLICY_ID')->on('t_policy')->onDelete('cascade');
         });
     }
 
