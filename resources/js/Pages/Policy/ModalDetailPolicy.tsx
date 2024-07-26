@@ -1717,8 +1717,10 @@ console.log("dataIncome: ", dataIncome);
                  });
              }
          });
-         setDataPartners([]);
+         setDataIncome([]);
          setTriggerSumIncome(0);
+         setDataNettIncome([]);
+         setGrandTotalNettIncome(0);
      };
 
     const handleSuccess = (message: string) => {
@@ -6341,6 +6343,8 @@ console.log("dataIncome: ", dataIncome);
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                     setTriggerSumIncome(0);
+                    setDataNettIncome([]);
+                    setGrandTotalNettIncome(0);
                 }}
                 title={"Add Business Partners"}
                 url={`/insertPartners`}
@@ -6360,7 +6364,7 @@ console.log("dataIncome: ", dataIncome);
                                         <th
                                             rowSpan={2}
                                             scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                            className="py-3.5 pl-4 pr-3 w-40 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
                                         >
                                             Name
                                         </th>
@@ -6505,7 +6509,29 @@ console.log("dataIncome: ", dataIncome);
                                                             }
                                                         >
                                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3 border-[1px]">
-                                                                <CurrencyInput
+                                                                <div className="block w-40 mx-auto text-left">
+                                                                    <TextInput
+                                                                        id="name"
+                                                                        type="text"
+                                                                        name="name"
+                                                                        value={
+                                                                            detail.NAME
+                                                                        }
+                                                                        className=""
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputDataIncome(
+                                                                                "NAME",
+                                                                                e.target.value,
+                                                                                i,
+                                                                                detailIdx
+                                                                            )
+                                                                        }
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                {/* <CurrencyInput
                                                                     id="disc_bf_percentage"
                                                                     name="DISC_BF_PERCENTAGE"
                                                                     // value={
@@ -6527,7 +6553,7 @@ console.log("dataIncome: ", dataIncome);
                                                                     // }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     // required
-                                                                />
+                                                                /> */}
                                                             </td>
                                                             <td className="whitespace-nowrap  text-sm text-gray-500 border-[1px]">
                                                                 <CurrencyInput
