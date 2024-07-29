@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceStatus;
 use App\Models\User;
@@ -397,6 +398,98 @@ class DatabaseSeeder extends Seeder
 
         RelationStatus::create([
             'relation_status_name' => 'Individu',
+        ]);
+
+        // Created Cash Advance Status
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 0,
+            'CA_STATUS_NAME' => 'Request'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 1,
+            'CA_STATUS_NAME' => 'Approved'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 2,
+            'CA_STATUS_NAME' => 'Reject'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 3,
+            'CA_STATUS_NAME' => 'Need Revision'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 4,
+            'CA_STATUS_NAME' => 'Execute'
+        ]);
+
+        CashAdvanceStatus::create([
+            'CA_STATUS_ID' => 5,
+            'CA_STATUS_NAME' => 'Pending Report'
+        ]);
+
+        // Created Cash Advance Purpose
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Biaya Perjalanan Dinas (Sesuai SK)'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Makan'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Hotel'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Pesawat'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Kereta Api'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Kapal Laut'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Travel'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Transportasi Lainnya'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Perjamuan'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Kegiatan Olahraga'
+        ]);
+
+        CashAdvancePurpose::create([
+            'CASH_ADVANCE_PURPOSE' => 'Lain - lain'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Fully Approve'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Partially Approve'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Reject'
+        ]);
+
+        CashAdvanceCostClassification::create([
+            'CASH_ADVANCE_COST_CLASSIFICATION_NAME' => 'Request Explanation'
         ]);
     }
 }
