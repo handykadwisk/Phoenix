@@ -3008,7 +3008,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     value={dataById.CASH_ADVANCE_TRANSFER_AMOUNT}
                                                     className="w-full lg:w-1/4 text-right"
                                                     placeholder="0"
-                                                    // required
                                                     readOnly
                                                 />
                                             )}
