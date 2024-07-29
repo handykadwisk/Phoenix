@@ -59,4 +59,8 @@ class TPerson extends Model
         return $this->hasMany(MPersonAddress::class, 'PERSON_ID', 'PERSON_ID');
     }
 
+    public function PersonEducation(){
+        return $this->hasMany(TPersonEducation::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
 }

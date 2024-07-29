@@ -26,6 +26,11 @@ export default {
                 9: "9",
                 1: "1",
             },
+            gridTemplateColumns: {
+                // Simple 13 column grid
+                13: "repeat(13, minmax(0, 1fr))",
+                14: "repeat(14, minmax(0, 1fr))",
+            },
         },
         screens: {
             xs: "360px",

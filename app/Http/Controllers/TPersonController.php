@@ -6,6 +6,8 @@ use App\Models\MPersonAddress;
 use App\Models\MPersonContact;
 use App\Models\RAddressStatus;
 use App\Models\RBank;
+use App\Models\RCertificateQualification;
+use App\Models\REducationDegree;
 use App\Models\RPersonRelationship;
 use App\Models\RTaxStatus;
 use App\Models\RWilayahKemendagri;
@@ -14,6 +16,7 @@ use App\Models\TDocument;
 use App\Models\TPerson;
 use App\Models\TPersonBankAccount;
 use App\Models\TPersonContact;
+use App\Models\TPersonEducation;
 use App\Models\TPersonEmergencyContact;
 use App\Models\TRelationStructure;
 use App\Models\UserLog;
@@ -238,7 +241,7 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->with('PersonEducation')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -247,7 +250,10 @@ class TPersonController extends Controller
     public function addPersonEmployment(Request $request){
         // dd($request);
         // print_r($request);die;
-
+        $endDate = $request->PERSON_END_DATE;
+        if ($request->PERSON_CATEGORY == "1") {
+            $endDate = NULL;
+        }
         // Update Person
         $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
             ->update([
@@ -256,7 +262,48 @@ class TPersonController extends Controller
                 'PERSON_IS_DELETED' => $request->PERSON_IS_DELETED,
                 'TAX_STATUS_ID' => $request->TAX_STATUS_ID,
                 'PERSON_HIRE_DATE' => $request->PERSON_HIRE_DATE,
-                'PERSON_END_DATE' => $request->PERSON_END_DATE,
+                'PERSON_END_DATE' => $endDate,
+                'PERSON_RECRUITMENT_LOCATION' => $request->PERSON_RECRUITMENT_LOCATION,
+                'PERSON_SALARY_ADJUSTMENT1' => $request->PERSON_SALARY_ADJUSTMENT1,
+                'PERSON_SALARY_ADJUSTMENT2' => $request->PERSON_SALARY_ADJUSTMENT2,
+                'PERSON_UPDATED_BY' => Auth::user()->id,
+                'PERSON_UPDATED_DATE' => now()
+            ]);
+
+        // Created Log
+        UserLog::create([
+                "created_by" => Auth::user()->id,
+                "action"     => json_encode([
+                "description" => "Updated (Person).",
+                "module"      => "Person",
+                "id"          => $request->PERSON_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->PERSON_ID
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function editPersonEmployment(Request $request){
+        // dd($request);
+        // print_r($request);die;
+        $endDate = $request->PERSON_END_DATE;
+        if ($request->PERSON_CATEGORY == "1") {
+            $endDate = NULL;
+        }
+        // Update Person
+        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+            ->update([
+                'PERSONE_ID' => $request->PERSONE_ID,
+                'PERSON_CATEGORY' => $request->PERSON_CATEGORY,
+                'PERSON_IS_DELETED' => $request->PERSON_IS_DELETED,
+                'TAX_STATUS_ID' => $request->TAX_STATUS_ID,
+                'PERSON_HIRE_DATE' => $request->PERSON_HIRE_DATE,
+                'PERSON_END_DATE' => $endDate,
                 'PERSON_RECRUITMENT_LOCATION' => $request->PERSON_RECRUITMENT_LOCATION,
                 'PERSON_SALARY_ADJUSTMENT1' => $request->PERSON_SALARY_ADJUSTMENT1,
                 'PERSON_SALARY_ADJUSTMENT2' => $request->PERSON_SALARY_ADJUSTMENT2,
@@ -677,4 +724,96 @@ class TPersonController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function getEducationDegree(){
+        $data = REducationDegree::get();
+
+        return response()->json($data);
+    }
+
+    public function add_education_degree(Request $request){
+        $educationDegree = is_countable($request->dataEducations);
+        if ($educationDegree) {
+            for ($i=0; $i < sizeof($request->dataEducations); $i++) { 
+                $createEducationDegree = TPersonEducation::create([
+                    "PERSON_ID"                             => $request->dataEducations[$i]['PERSON_ID'],
+                    "PERSON_EDUCATION_START"                => $request->dataEducations[$i]['PERSON_EDUCATION_START'], 
+                    "PERSON_EDUCATION_END"                  => $request->dataEducations[$i]['PERSON_EDUCATION_END'],
+                    "EDUCATION_DEGREE_ID"                   => $request->dataEducations[$i]['EDUCATION_DEGREE_ID'],
+                    "PERSON_EDUCATION_MAJOR"                => $request->dataEducations[$i]['PERSON_EDUCATION_MAJOR'],
+                    "PERSON_EDUCATION_SCHOOL"               => $request->dataEducations[$i]['PERSON_EDUCATION_SCHOOL'],
+                    "PERSON_EDUCATION_CREATED_BY"           => Auth::user()->id,
+                    "PERSON_EDUCATION_CREATED_DATE"         => now(),
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Add Person Education (Person).",
+            "module"      => "Person",
+                "id"          => $request->dataEducations[0]['PERSON_ID']
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->dataEducations[0]['PERSON_ID']
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    
+    public function edit_education_degree(Request $request){
+        // cek existing
+        $dataExisting = TPersonEducation::where('PERSON_ID', $request->person_education[0]['PERSON_ID'])->get();
+        if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+            TPersonEducation::where('PERSON_ID', $request->person_education[0]['PERSON_ID'])->delete();
+        }
+
+
+        $educationDegree = is_countable($request->person_education);
+        if ($educationDegree) {
+            for ($i=0; $i < sizeof($request->person_education); $i++) { 
+                $createEducationDegree = TPersonEducation::create([
+                    "PERSON_ID"                             => $request->person_education[$i]['PERSON_ID'],
+                    "PERSON_EDUCATION_START"                => $request->person_education[$i]['PERSON_EDUCATION_START'], 
+                    "PERSON_EDUCATION_END"                  => $request->person_education[$i]['PERSON_EDUCATION_END'],
+                    "EDUCATION_DEGREE_ID"                   => $request->person_education[$i]['EDUCATION_DEGREE_ID'],
+                    "PERSON_EDUCATION_MAJOR"                => $request->person_education[$i]['PERSON_EDUCATION_MAJOR'],
+                    "PERSON_EDUCATION_SCHOOL"               => $request->person_education[$i]['PERSON_EDUCATION_SCHOOL'],
+                    "PERSON_EDUCATION_CREATED_BY"           => Auth::user()->id,
+                    "PERSON_EDUCATION_CREATED_DATE"         => now(),
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Edit Person Education (Person).",
+            "module"      => "Person",
+                "id"          => $request->person_education[0]['PERSON_ID']
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->person_education[0]['PERSON_ID']
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function getQualification(){
+        $data = RCertificateQualification::get();
+
+        return response()->json($data);
+    }
+    
 }   
+

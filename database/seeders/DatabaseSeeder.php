@@ -280,11 +280,25 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path12)
         );
 
-        // create 2024_16_05_r_salutation
+        // create 2024_24_07_r_address_status
         $file_path13 = resource_path('../database/LogDB/2024_24_07_r_address_status.sql');
 
         \DB::unprepared(
             file_get_contents($file_path13)
+        );
+
+        // create 2024_29_07_r_education_degree
+        $r_education_degree = resource_path('../database/LogDB/2024_29_07_r_education_degree.sql');
+
+        \DB::unprepared(
+            file_get_contents($r_education_degree)
+        );
+
+        // create 2024_29_07_r_certificate_qualification
+        $r_certificate_qualification = resource_path('../database/LogDB/2024_29_07_r_certificate_qualification.sql');
+
+        \DB::unprepared(
+            file_get_contents($r_certificate_qualification)
         );
     
     }

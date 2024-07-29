@@ -344,22 +344,37 @@ class RelationGroupController extends Controller
 
     public function change_parent(Request $request){
         // cek id yang ingin di ganti masuk mapping atau tidak?
+        $relationParent = RelationGroup::find($request->RELATION_GROUP_ID);
+        $parentId = $relationParent->RELATION_GROUP_PARENT;
         $concatID = ".".$request->RELATION_GROUP_PARENT['value'].'.';
-        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)->where('.'.'RELATION_ORGANIZATION_MAPPING', 'like', '%' . $concatID . '%');
-        dd($cekExisting->toSql());
+        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT)->where('RELATION_GROUP_MAPPING', 'like', '%' . $concatID . '%')->get();
+        if ($cekExisting->count() > 0) {
+            // $idParent= $cekExisting[0]['RELATION_GROUP_PARENT'];
+            $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT)
+            ->update([
+                'RELATION_GROUP_PARENT'         => $parentId,
+            ]);
 
+            
+            RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
+            ->update([
+                'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
+            ]);
+            // Mapping Parent Id and Update
+            $name = NULL;
+            DB::select('call sp_set_mapping_relation_group(?)', [$name]);
+        }else{
+            // dd($request->RELATION_GROUP_PARENT['value']);
+            $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
+            ->update([
+                'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
+            ]);
+            // Mapping Parent Id and Update
+            $name = NULL;
+            DB::select('call sp_set_mapping_relation_group(?)', [$name]);
+        }
 
-
-
-        // dd($request->RELATION_GROUP_PARENT['value']);
-        $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
-        ->update([
-            'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
-        ]);
-
-        // Mapping Parent Id and Update
-        $name = NULL;
-        DB::select('call sp_set_mapping_relation_group(?)', [$name]);
+        
 
         if ($updateGroup) {
             UserLog::create([

@@ -454,6 +454,19 @@ export default function DetailPerson({
               });
     };
 
+    const handleEmploymentNew = async (e: FormEvent) => {
+        e.preventDefault();
+
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !modal.view,
+            document: false,
+            search: false,
+        });
+    };
+
     const [addressStatus, setAddressStatus] = useState<any>([]);
     const getAddressStatus = async () => {
         await axios
@@ -638,7 +651,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({
@@ -784,6 +797,35 @@ export default function DetailPerson({
 
     return (
         <>
+            {/* <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Detail Employment"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <span>alo</span>
+                    </>
+                }
+            /> */}
+
             {/* modal detail address person */}
             <ModalToAction
                 show={modalAddressPerson.view}
@@ -1696,7 +1738,7 @@ export default function DetailPerson({
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-4xl"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
                 }
                 submitButtonName={""}
                 body={
@@ -1704,6 +1746,7 @@ export default function DetailPerson({
                         <DetailEmployment
                             idPerson={idPerson}
                             taxStatus={taxStatus}
+                            handleSuccessEmployment={handleSuccessEmployment}
                         />
                     </>
                 }
@@ -2506,7 +2549,7 @@ export default function DetailPerson({
                                 <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
                                     <a
                                         className="m-auto"
-                                        onClick={(e) => handleEmployment(e)}
+                                        onClick={(e) => handleEmploymentNew(e)}
                                     >
                                         Employment Information
                                     </a>
