@@ -31,6 +31,9 @@ import 'react-calendar/dist/Calendar.css';
 type ValuePiece = Date | null;
 
 type Value = ValuePiece | [ValuePiece, ValuePiece];
+import 'react-date-picker/dist/DatePicker.css';
+import 'react-calendar/dist/Calendar.css';
+
 
 export default function CashAdvance({ auth }: PageProps) {
     useEffect(() => {
@@ -1354,11 +1357,6 @@ export default function CashAdvance({ auth }: PageProps) {
         })
         setCheckedCashEdit(!checkedCashEdit);
     };
-
-    const [startDate, setStartDate] = useState(new Date());
-
-    const [value, onChange] = useState<Value>(new Date());
-
 
     const timeline = [
         {
@@ -4655,33 +4653,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     Used By
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <select
-                                    id="namaPemohon"
-                                    name="namaPemohon"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setData("cash_advance_used_by", e.target.value)
-                                    }
-                                    required
-                                >
-                                    <option value="">
-                                        -- Choose Used By --
-                                    </option>
-                                    {users.map((user: any) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemohon"
-                                    className="mb-2"
-                                >
-                                    Used By
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
                                 <TextInput
                                     id="cashAdvanceNumber"
                                     type="text"
@@ -4776,36 +4747,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     value="IT"
                                     className=""
                                     readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value="IT"
-                                    className=""
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="cash_advance_amount_approve"
-                                    value="Amount Approve"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="cash_advance_amount_approve"
-                                    type="number"
-                                    name="cash_advance_amount_approve"
-                                    value="IT"
-                                    placeholder="0"
-                                    className="text-right"
                                 />
                             </div>
                         </div>
@@ -5079,53 +5020,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         }
                                                     </button>
                                                 </div>
-                                            </TD>
-                                            <TD className="border">
-                                                <select
-                                                    id="cash_advance_detail_cost_classification"
-                                                    name="cash_advance_detail_cost_classification"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Cost Classification --
-                                                    </option>
-                                                    {cost_classification.map(
-                                                        (cost) => (
-                                                            <option
-                                                                key={cost.index}
-                                                                value={
-                                                                    cost.index
-                                                                }
-                                                            >
-                                                                {
-                                                                    cost.name
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </select>
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_remarks"
-                                                    type="text"
-                                                    name="cash_advance_detail_remarks"
-                                                    value={val.cash_advance_detail_remarks}
-                                                    className="w-1/2 text-right"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
                                             </TD>
                                             <TD className="border">
                                                 {DataReportRow.length > 1 && (

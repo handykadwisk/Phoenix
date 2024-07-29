@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CashAdvance extends Model
 {
@@ -20,12 +21,18 @@ class CashAdvance extends Model
     public $timestamps = false;
 
     protected $with = [
+        'cash_advance_report',
         'cash_advance_detail',
         'user',
         'user_used_by',
         'user_approval',
         'approval_status'
     ];
+
+    public function cash_advance_report(): HasOne
+    {
+        return $this->hasOne(CashAdvanceReport::class, 'CASH_ADVANCE_ID');
+    }
 
     public function cash_advance_detail(): HasMany
     {

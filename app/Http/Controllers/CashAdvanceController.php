@@ -31,6 +31,12 @@ class CashAdvanceController extends Controller
         $cash_advance_end_date = $searchQuery->cash_advance_end_date;
         $cash_advance_first_approval_status = $searchQuery->cash_advance_first_approval_status;
 
+        $cash_advance_requested_by = $searchQuery->cash_advance_requested_by;
+        $cash_advance_used_by = $searchQuery->cash_advance_used_by;
+        $cash_advance_start_date = $searchQuery->cash_advance_start_date;
+        $cash_advance_end_date = $searchQuery->cash_advance_end_date;
+        $cash_advance_first_approval_status = $searchQuery->cash_advance_first_approval_status;
+
         $data = CashAdvance::orderBy('CASH_ADVANCE_ID', 'desc');
 
         if ($searchQuery) {
