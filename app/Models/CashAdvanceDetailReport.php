@@ -16,7 +16,11 @@ class CashAdvanceDetailReport extends Model
 
     protected $guarded = ['REPORT_CASH_ADVANCE_DETAIL_ID'];
 
-    protected $with = ['document', 'purpose'];
+    protected $with = [
+        'document', 
+        'purpose',
+        'cost_classification'
+    ];
 
     public function cash_advance_report(): BelongsTo
     {
@@ -31,5 +35,10 @@ class CashAdvanceDetailReport extends Model
     public function purpose(): BelongsTo
     {
         return $this->belongsTo(CashAdvancePurpose::class, 'REPORT_CASH_ADVANCE_DETAIL_PURPOSE');
+    }
+
+    public function cost_classification()
+    {
+        return $this->belongsTo(CashAdvanceCostClassification::class, 'REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION');
     }
 }

@@ -115,7 +115,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/getStructureDetail', [TRelationStructureController::class, 'get_detail'])->name('getStructureDetail.get_detail');
     Route::post('/editStructure', [TRelationStructureController::class, 'edit'])->name('editStructure.edit');
 
-
     // Division
     Route::post('/getDivision', [TRelationDivisionController::class, 'getDivisionJson'])->name('getDivision.getDivisionJson');
     Route::post('/addDivision', [TRelationDivisionController::class, 'store'])->name('addDivision.store');
@@ -180,6 +179,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/getCAReport', [CashAdvanceReportController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
     Route::get('/getCAReportById/{id}', [CashAdvanceReportController::class, 'getCAReportById'])->name('getCAReportById');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
+    Route::patch('/cashAdvanceReportApprove/{id}', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
+    Route::patch('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
     Route::patch('/cashAdvanceReportExecute/{id}', [CashAdvanceReportController::class, 'cash_advance_report_execute'])->name('cashAdvanceReport.execute');
 
     // Reimburse

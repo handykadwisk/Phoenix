@@ -39,10 +39,12 @@ return new class extends Migration
             $table->smallInteger('REPORT_CASH_ADVANCE_REFUND_TYPE')->nullable();
             $table->string('REPORT_CASH_ADVANCE_REFUND_PROOF')->nullable();
             $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT', 16, 2)->nullable();
-            $table->datetime('REPORT_CASH_ADVANCE_CREATED_AT')->nullable();
+            $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT_APPROVE', 16, 2)->nullable();
+            $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT', 16, 2)->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_CREATED_BY')->nullable();
-            $table->dateTime('REPORT_CASH_ADVANCE_UPDATED_AT')->nullable();
+            $table->datetime('REPORT_CASH_ADVANCE_CREATED_AT')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_UPDATED_BY')->nullable();
+            $table->dateTime('REPORT_CASH_ADVANCE_UPDATED_AT')->nullable();
         });
     }
 
