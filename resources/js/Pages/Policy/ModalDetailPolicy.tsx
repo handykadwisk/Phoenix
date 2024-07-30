@@ -46,6 +46,7 @@ export default function ModalDetailPolicy({
     onDeleteSuccess: any;
 }>) {
     const [insurancePanels, setInsurancePanels] = useState<any>([]);
+    const [currencyFromCoverage, setCurrencyFromCoverage] = useState<any>([]);
     const [dataById, setDataById] = useState<any>(policy);
     const [flagSwitch, setFlagSwitch] = useState<boolean>(false);
     const [sumByCurrency, setSumByCurrency] = useState<any>([]);
@@ -137,8 +138,16 @@ export default function ModalDetailPolicy({
         getDataCoverageName(policy.POLICY_ID);
         getDataInsured(policy.POLICY_ID);
         getSummaryPremi();
+        getCurrencyOnPolicyCoverage(policy.POLICY_ID);
         // setFlagSwitch(policy.SELF_INSURED? true:false)
     }, [policy.POLICY_ID]);
+
+    const getCurrencyOnPolicyCoverage = async (id: number) => {
+        await axios
+            .get(`/getCurrencyOnPolicyCoverage/${id}`)
+            .then((res) => setCurrencyFromCoverage(res.data))
+            .catch((err) => console.log(err));
+    };
 
     const getInsurancePanel = async (id: number) => {
         await axios
@@ -1780,6 +1789,7 @@ export default function ModalDetailPolicy({
         }).then((result: any) => {
             if (result.value) {
                 getInsurancePanel(policy.POLICY_ID);
+                getCurrencyOnPolicyCoverage(policy.POLICY_ID);
                 setModal({
                     add: false,
                     delete: false,
@@ -1938,7 +1948,7 @@ export default function ModalDetailPolicy({
                                     name="edit_policy_number"
                                     value={dataById.POLICY_NUMBER}
                                     className=""
-                                    autoComplete="edit_policy_number"
+                                    autoComplete="off"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
@@ -1989,7 +1999,7 @@ export default function ModalDetailPolicy({
                                 name="edit_the_insured"
                                 value={dataById.POLICY_THE_INSURED}
                                 className=""
-                                autoComplete="edit_the_insured"
+                                autoComplete="off"
                                 onChange={(e) =>
                                     setDataById({
                                         ...dataById,
@@ -2012,7 +2022,7 @@ export default function ModalDetailPolicy({
                                     name="edit_policy_inception_date"
                                     value={dataById.POLICY_INCEPTION_DATE}
                                     className=""
-                                    autoComplete="edit_policy_inception_date"
+                                    autoComplete="off"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
@@ -2034,7 +2044,7 @@ export default function ModalDetailPolicy({
                                     name="edit_policy_due_date"
                                     value={dataById.POLICY_DUE_DATE}
                                     className=""
-                                    autoComplete="edit_policy_due_date"
+                                    autoComplete="off"
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
@@ -2176,7 +2186,7 @@ export default function ModalDetailPolicy({
                                                         coverage.POLICY_COVERAGE_NAME
                                                     }
                                                     className=""
-                                                    autoComplete="coverage_name"
+                                                    autoComplete="off"
                                                     onChange={(e) =>
                                                         inputDataCoverage(
                                                             "POLICY_COVERAGE_NAME",
@@ -2688,7 +2698,7 @@ export default function ModalDetailPolicy({
                                                     dataEditPolicyCoverage.POLICY_COVERAGE_NAME
                                                 }
                                                 className=""
-                                                autoComplete="coverage_name"
+                                                autoComplete="off"
                                                 onChange={(e) =>
                                                     setDataEditPolicyCoverage({
                                                         ...dataEditPolicyCoverage,
@@ -3226,7 +3236,7 @@ export default function ModalDetailPolicy({
                                                 dataById.POLICY_INSURANCE_PANEL
                                             }
                                             className=""
-                                            autoComplete="insurer_number"
+                                            autoComplete="off"
                                             onChange={(e) => {
                                                 setDataById({
                                                     ...dataById,
@@ -3619,7 +3629,7 @@ export default function ModalDetailPolicy({
                                                                                     </i>{" "}
                                                                                     --
                                                                                 </option>
-                                                                                {currency.map(
+                                                                                {currencyFromCoverage.map(
                                                                                     (
                                                                                         currencies: any,
                                                                                         k: number
@@ -4251,7 +4261,7 @@ export default function ModalDetailPolicy({
                                             name="insurer_number"
                                             value={dataEditInsurer.length}
                                             className=""
-                                            autoComplete="insurer_number"
+                                            autoComplete="off"
                                             // onChange={(e) => {
                                             //     setDataById({
                                             //         ...dataById,
@@ -4610,7 +4620,7 @@ export default function ModalDetailPolicy({
                                                                                     </i>{" "}
                                                                                     --
                                                                                 </option>
-                                                                                {currency.map(
+                                                                                {currencyFromCoverage.map(
                                                                                     (
                                                                                         currencies: any,
                                                                                         k: number
@@ -5231,7 +5241,7 @@ export default function ModalDetailPolicy({
                                                         insured.POLICY_INSURED_NAME
                                                     }
                                                     className=""
-                                                    autoComplete="insured_name"
+                                                    autoComplete="off"
                                                     onChange={(e) =>
                                                         inputDataInsured(
                                                             "POLICY_INSURED_NAME",
@@ -5448,7 +5458,7 @@ export default function ModalDetailPolicy({
                                                                             </i>{" "}
                                                                             --
                                                                         </option>
-                                                                        {currency.map(
+                                                                        {currencyFromCoverage.map(
                                                                             (
                                                                                 currencies: any,
                                                                                 k: number
@@ -5807,7 +5817,7 @@ export default function ModalDetailPolicy({
                                                     dataEditInsured.POLICY_INSURED_NAME
                                                 }
                                                 className=""
-                                                autoComplete="insured_name"
+                                                autoComplete="off"
                                                 onChange={(e) => {
                                                     setDataEditInsured({
                                                         ...dataEditInsured,
@@ -5997,7 +6007,7 @@ export default function ModalDetailPolicy({
                                                                         </i>{" "}
                                                                         --
                                                                     </option>
-                                                                    {currency.map(
+                                                                    {currencyFromCoverage.map(
                                                                         (
                                                                             currencies: any,
                                                                             k: number
