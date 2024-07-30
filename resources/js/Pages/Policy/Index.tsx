@@ -25,6 +25,7 @@ import ModalDetailPolicy from "./ModalDetailPolicy";
 import Switch from "@/Components/Switch";
 import { group } from "console";
 import Alert from "@/Components/Alert";
+import Select from "react-tailwindcss-select";
 
 export default function PolicyIndex({ auth }: PageProps) {
     
@@ -36,30 +37,33 @@ export default function PolicyIndex({ auth }: PageProps) {
     const { insuranceType }: any = usePage().props;
     const { insurance }: any = usePage().props;
     const [isSuccess, setIsSuccess] = useState<string>("");
-    const [searchPolicy, setSearchPolicy] = useState<any>({});
+    const [searchPolicy, setSearchPolicy] = useState<any>({
+        POLICY_NUMBER: "",
+        CLIENT_ID: "",
+    });
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [policyId, setPolicyId] = useState<string>("");
     const [arrCurrency, setarrCurrency] = useState<any>([]);
     const [sumByCurrency, setSumByCurrency] = useState<any>([]);
 
-    useEffect(() => {
-        if (
-            Object.keys(searchPolicy).length == 0 ||
-            (searchPolicy.POLICY_NUMBER == "" &&
-            searchPolicy.CLIENT_ID == "")
-        ) {
-            setPolicies([]);
-        } else {
-            getPolicy();
-        }
-    }, [searchPolicy]);
+    // useEffect(() => {
+    //     if (
+    //         Object.keys(searchPolicy).length == 0 ||
+    //         (searchPolicy.POLICY_NUMBER == "" &&
+    //         searchPolicy.CLIENT_ID == "")
+    //     ) {
+    //         setPolicies([]);
+    //     } else {
+    //         getPolicy();
+    //     }
+    // }, [searchPolicy]);
 
     const getPolicy = async (pageNumber = "page=1") => {
         setIsLoading(true);
         await axios
             .post(`/getPolicy?${pageNumber}`, {
                 policy_number: searchPolicy.POLICY_NUMBER,
-                client_id:searchPolicy.CLIENT_ID,
+                client_id:searchPolicy.CLIENT_ID.value,
             })
             .then((res) => {
                 setPolicies(res.data);
@@ -73,12 +77,29 @@ export default function PolicyIndex({ auth }: PageProps) {
                         document: false,
                         search: false,
                     });
+                    
                 }
             })
             .catch((err) => {
                 console.log(err);
             });
         // setPolicies(policy)
+    };
+
+    const clearSearchPolicy = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getPolicy?${pageNumber}`)
+            .then((res) => {
+                setPolicies([]);
+                setSearchPolicy({
+                    ...searchPolicy,
+                    POLICY_NUMBER: "",
+                    CLIENT_ID: "",
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     const client = [
@@ -102,6 +123,13 @@ export default function PolicyIndex({ auth }: PageProps) {
         view: false,
         document: false,
         search: false,
+    });
+    
+    const selectInsurance = insurance?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
     });
 
     const { data, setData, errors, reset } = useForm({
@@ -236,7 +264,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         
 
     } 
-console.log('data: ', data)
+console.log('searchPolicy: ', searchPolicy)
     const handleSuccess = (message: number) => {
         console.log("message: ", message);
         setIsSuccess("");
@@ -686,7 +714,7 @@ console.log('data: ', data)
         }
     }, [data.policyPremium]);
 
-console.log("sumByCurrency: ", sumByCurrency);
+// console.log("sumByCurrency: ", sumByCurrency);
     // Start fungsi hitung initial premium
     const inputCalculate = (i: number) => {
         const changeVal: any = [...data.policyPremium];
@@ -795,7 +823,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                                     name="policy_number"
                                     value={data.policy_number}
                                     className=""
-                                    autoComplete="policy_number"
+                                    autoComplete="off"
                                     onChange={(e) =>
                                         setData("policy_number", e.target.value)
                                     }
@@ -850,7 +878,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                                 name="the_insured"
                                 value={data.policy_the_insured}
                                 className=""
-                                autoComplete="the_insured"
+                                autoComplete="off"
                                 onChange={(e) =>
                                     setData(
                                         "policy_the_insured",
@@ -872,7 +900,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                                     name="inception_date"
                                     value={data.policy_inception_date}
                                     className=""
-                                    autoComplete="inception_date"
+                                    autoComplete="off"
                                     onChange={(e) =>
                                         setData(
                                             "policy_inception_date",
@@ -893,7 +921,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                                     name="due_date"
                                     value={data.policy_due_date}
                                     className=""
-                                    autoComplete="due_date"
+                                    autoComplete="off"
                                     onChange={(e) =>
                                         setData(
                                             "policy_due_date",
@@ -934,6 +962,7 @@ console.log("sumByCurrency: ", sumByCurrency);
                                                     className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     required
                                                     placeholder="Percentage (%)"
+                                                    autoComplete="off"
                                                 />
                                                 {/* {"%"} */}
                                             </div>
@@ -1783,378 +1812,195 @@ console.log("sumByCurrency: ", sumByCurrency);
             {/* modal end detail  */}
 
             {/* Mekanisme Search */}
-            <div>
-                <div className="max-w-0xl mx-auto sm:px-6 lg:px-0">
-                    <div className="p-6 text-gray-900 mb-60">
-                        <div className="rounded-md bg-white pt-6 pl-10 pr-10 pb-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-                            {/* header table */}
-                            <div className="md:grid md:grid-cols-8 md:gap-4">
-                                <Button
-                                    className="text-sm w-full lg:w-1/2 font-semibold px-6 py-1.5 mb-4 md:col-span-2"
-                                    onClick={() => {
-                                        // setSwitchPage(false);
-                                        setModal({
-                                            add: true,
-                                            delete: false,
-                                            edit: false,
-                                            view: false,
-                                            document: false,
-                                            search: false,
-                                        });
-                                    }}
-                                >
-                                    {"Register Policy"}
-                                </Button>
+
+            <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
+                <div className="flex flex-col">
+                    <div className="bg-white mb-4 rounded-md shadow-md p-4">
+                        <Button
+                            className="p-2"
+                            onClick={() => {
+                                // setSwitchPage(false);
+                                setModal({
+                                    add: true,
+                                    delete: false,
+                                    edit: false,
+                                    view: false,
+                                    document: false,
+                                    search: false,
+                                });
+                            }}
+                        >
+                            {"Register Policy"}
+                        </Button>
+                    </div>
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
+                        <TextInput
+                            id="search_policy_number"
+                            type="text"
+                            name="search_policy_number"
+                            // value={data.search_policy_number}
+                            value={searchPolicy.POLICY_NUMBER}
+                            className="mt-2 ring-1 ring-red-600"
+                            autoComplete="off"
+                            onChange={(e) => {
+                                setSearchPolicy({
+                                    ...searchPolicy,
+                                    POLICY_NUMBER: e.target.value,
+                                });
+                                // getPolicy()
+                            }}
+                            placeholder="Search Policy Number"
+                            // required
+                        />
+                        <Select
+                            classNames={{
+                                menuButton: () =>
+                                    `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                listItem: ({ isSelected }: any) =>
+                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                        isSelected
+                                            ? `text-white bg-primary-pelindo`
+                                            : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                    }`,
+                            }}
+                            options={selectInsurance}
+                            isSearchable={true}
+                            placeholder={"Search Client"}
+                            value={searchPolicy.CLIENT_ID}
+                            onChange={(val: any) =>
+                                setSearchPolicy({
+                                    ...searchPolicy,
+                                    CLIENT_ID: val,
+                                })
+                            }
+                            primaryColor={"bg-red-500"}
+                        />
+                        <div className="mt-4 flex justify-end gap-2">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    getPolicy();
+                                    // setSearchPolicy({
+                                    //     ...searchPolicy,
+                                    //     POLICY_NUMBER: "",
+                                    //     CLIENT_ID: "",
+                                    // });
+                                }}
+                            >
+                                Search
+                            </div>
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => clearSearchPolicy()}
+                            >
+                                Clear Search
                             </div>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-4 mt-5 xs:grid-cols-1 xs:gap-0 lg:grid-cols-3 lg:grid-4 lg:gap-4">
-                            <div className="bg-white rounded-md p-10 shdow-md mb-5 lg:mb-0">
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
-                                        <div>
-                                            <InputLabel
-                                                htmlFor="search_policy_number"
-                                                value="Policy Number"
-                                            />
-                                            <TextInput
-                                                id="search_policy_number"
-                                                type="text"
-                                                name="search_policy_number"
-                                                // value={data.search_policy_number}
-                                                value={
-                                                    searchPolicy.POLICY_NUMBER
-                                                }
-                                                className=""
-                                                autoComplete="search_policy_number"
-                                                onChange={(e) => {
-                                                    setSearchPolicy({
-                                                        ...searchPolicy,
-                                                        POLICY_NUMBER:
-                                                            e.target.value,
-                                                    });
-                                                    // getPolicy()
-                                                }}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2 xs:col-span-3 lg:col-span-2">
-                                        <div>
-                                            <InputLabel
-                                                htmlFor="search_relation"
-                                                value="Client Name"
-                                            />
-                                            <select
-                                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                value={searchPolicy.CLIENT_ID}
-                                                onChange={(e) =>
-                                                    setSearchPolicy({
-                                                        ...searchPolicy,
-                                                        CLIENT_ID:
-                                                            e.target.value,
-                                                    })
+                    </div>
+                </div>
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
+                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
+                        <table className="w-full table-auto divide-y divide-gray-300">
+                            <thead className="bg-gray-100">
+                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                    <TableTH
+                                        className={"max-w-[0px] text-center"}
+                                        label={"No"}
+                                    />
+                                    <TableTH
+                                        className={"min-w-[50px]"}
+                                        label={"Policy Number"}
+                                    />
+                                    <TableTH
+                                        className={"min-w-[50px]"}
+                                        label={"Client Name"}
+                                    />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {policies.data?.map(
+                                    (policy: any, i: number) => {
+                                        return (
+                                            <tr
+                                                key={i}
+                                                className={
+                                                    i % 2 === 0
+                                                        ? ""
+                                                        : "bg-gray-100"
                                                 }
                                             >
-                                                <option value={""}>
-                                                    -- <i>Choose Client</i> --
-                                                </option>
-                                                {insurance?.map(
-                                                    (status: any) => {
-                                                        return (
-                                                            <option
-                                                                value={
-                                                                    status.RELATION_ORGANIZATION_ID
+                                                <TableTD
+                                                    value={policies.from + i}
+                                                    className={"text-center"}
+                                                />
+                                                <TableTD
+                                                    value={
+                                                        <>
+                                                            <a
+                                                                href=""
+                                                                onClick={(e) =>
+                                                                    // handleEditModal(
+                                                                    //     e,
+                                                                    //     policy.POLICY_ID
+                                                                    // )
+                                                                    handleViewModal(
+                                                                        e,
+                                                                        policy.POLICY_ID
+                                                                    )
                                                                 }
                                                             >
                                                                 {
-                                                                    status.RELATION_ORGANIZATION_NAME
+                                                                    policy.POLICY_NUMBER
                                                                 }
-                                                            </option>
-                                                        );
+                                                                <br />
+                                                                {policy.POLICY_STATUS_ID ==
+                                                                1 ? (
+                                                                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-small text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                                        Current
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-small text-red-700 ring-1 ring-inset ring-red-600/20">
+                                                                        Lapse
+                                                                    </span>
+                                                                )}
+                                                            </a>
+                                                        </>
                                                     }
-                                                )}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-md col-span-2 p-10">
-                                <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                                    <table className="w-full table-auto divide-y divide-gray-300">
-                                        <thead className="bg-gray-100">
-                                            <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                                <TableTH
-                                                    className={
-                                                        "max-w-[0px] text-center"
+                                                    className={""}
+                                                />
+                                                <TableTD
+                                                    value={
+                                                        <>
+                                                            {
+                                                                policy.relation
+                                                                    .RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </>
                                                     }
-                                                    label={"No"}
-                                                />
-                                                <TableTH
-                                                    className={"min-w-[50px]"}
-                                                    label={"Policy Number"}
-                                                />
-                                                <TableTH
-                                                    className={"min-w-[50px]"}
-                                                    label={"Client Name"}
+                                                    className={""}
                                                 />
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {policies.data?.map(
-                                                (policy: any, i: number) => {
-                                                    return (
-                                                        <tr
-                                                            key={i}
-                                                            className={
-                                                                i % 2 === 0
-                                                                    ? ""
-                                                                    : "bg-gray-100"
-                                                            }
-                                                        >
-                                                            <TableTD
-                                                                value={
-                                                                    policies.from +
-                                                                    i
-                                                                }
-                                                                className={
-                                                                    "text-center"
-                                                                }
-                                                            />
-                                                            <TableTD
-                                                                value={
-                                                                    <>
-                                                                        <a
-                                                                            href=""
-                                                                            onClick={(
-                                                                                e
-                                                                            ) =>
-                                                                                // handleEditModal(
-                                                                                //     e,
-                                                                                //     policy.POLICY_ID
-                                                                                // )
-                                                                                handleViewModal(
-                                                                                    e,
-                                                                                    policy.POLICY_ID
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                policy.POLICY_NUMBER
-                                                                            }
-                                                                            <br />
-                                                                            {policy.POLICY_STATUS_ID ==
-                                                                            1 ? (
-                                                                                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-small text-green-700 ring-1 ring-inset ring-green-600/20">
-                                                                                    Current
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-small text-red-700 ring-1 ring-inset ring-red-600/20">
-                                                                                    Lapse
-                                                                                </span>
-                                                                            )}
-                                                                        </a>
-                                                                    </>
-                                                                }
-                                                                className={""}
-                                                            />
-                                                            <TableTD
-                                                                value={
-                                                                    <>
-                                                                        {
-                                                                            policy
-                                                                                .relation
-                                                                                .RELATION_ORGANIZATION_NAME
-                                                                        }
-                                                                    </>
-                                                                }
-                                                                className={""}
-                                                            />
-                                                        </tr>
-                                                    );
-                                                }
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <Pagination
-                                    links={policies.links}
-                                    fromData={policies.from}
-                                    toData={policies.to}
-                                    totalData={policies.total}
-                                    clickHref={(url: string) =>
-                                        getPolicy(url.split("?").pop())
+                                        );
                                     }
-                                />
-                                {/* {policies.length === 0 ? (
-                                    <span>tidak ada</span>
-                                ) : (
-                                    <>
-                                        <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                                            <table className="w-full table-auto divide-y divide-gray-300">
-                                                <thead className="bg-gray-100">
-                                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                                        <TableTH
-                                                            className={
-                                                                "max-w-[0px] text-center"
-                                                            }
-                                                            label={"No"}
-                                                        />
-                                                        <TableTH
-                                                            className={
-                                                                "min-w-[50px]"
-                                                            }
-                                                            label={
-                                                                "Policy Number"
-                                                            }
-                                                        />
-                                                        <TableTH
-                                                            className={
-                                                                "min-w-[50px]"
-                                                            }
-                                                            label={
-                                                                "Client Name"
-                                                            }
-                                                        />
-                                                        <TableTH
-                                                            className={
-                                                                "min-w-[50px] text-center"
-                                                            }
-                                                            label={"Action"}
-                                                        />
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {policies.data?.map(
-                                                        (
-                                                            policy: any,
-                                                            i: number
-                                                        ) => {
-                                                            return (
-                                                                <tr
-                                                                    key={i}
-                                                                    className={
-                                                                        i %
-                                                                            2 ===
-                                                                        0
-                                                                            ? ""
-                                                                            : "bg-gray-100"
-                                                                    }
-                                                                >
-                                                                    <TableTD
-                                                                        value={
-                                                                            policies.from +
-                                                                            i
-                                                                        }
-                                                                        className={
-                                                                            "text-center"
-                                                                        }
-                                                                    />
-                                                                    <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                {
-                                                                                    policy.POLICY_NUMBER
-                                                                                }
-                                                                                <br />
-                                                                                {policy.POLICY_STATUS_ID ==
-                                                                                1 ? (
-                                                                                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-small text-green-700 ring-1 ring-inset ring-green-600/20">
-                                                                                        Current
-                                                                                    </span>
-                                                                                ) : (
-                                                                                    <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-small text-red-700 ring-1 ring-inset ring-red-600/20">
-                                                                                        Lapse
-                                                                                    </span>
-                                                                                )}
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    />
-                                                                    <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                {
-                                                                                    policy
-                                                                                        .relation
-                                                                                        .RELATION_ORGANIZATION_NAME
-                                                                                }
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    />
-                                                                    <TableTD
-                                                                        value={
-                                                                            <>
-                                                                                <a
-                                                                                    href={
-                                                                                        "detailPolicy/" +
-                                                                                        policy.POLICY_ID
-                                                                                    }
-                                                                                    // rel="noopener"
-                                                                                    target="_blank"
-                                                                                >
-                                                                                    <div
-                                                                                        className="flex justify-center items-center"
-                                                                                        title="Detail"
-                                                                                    >
-                                                                                        <svg
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            fill="none"
-                                                                                            viewBox="0 0 24 24"
-                                                                                            strokeWidth={
-                                                                                                1.5
-                                                                                            }
-                                                                                            stroke="currentColor"
-                                                                                            className="size-6 text-red-700 cursor-pointer"
-                                                                                        >
-                                                                                            <path
-                                                                                                strokeLinecap="round"
-                                                                                                strokeLinejoin="round"
-                                                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                                                                            />
-                                                                                            <path
-                                                                                                strokeLinecap="round"
-                                                                                                strokeLinejoin="round"
-                                                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </div>
-                                                                                </a>
-                                                                            </>
-                                                                        }
-                                                                        className={
-                                                                            ""
-                                                                        }
-                                                                    />
-                                                                </tr>
-                                                            );
-                                                        }
-                                                    )}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <Pagination
-                                            links={policies.links}
-                                            fromData={policies.from}
-                                            toData={policies.to}
-                                            totalData={policies.total}
-                                            clickHref={(url: string) =>
-                                                getPolicy(url.split("?").pop())
-                                            }
-                                        />
-                                    </>
-                                )} */}
-                            </div>
+                                )}
+                            </tbody>
+                        </table>
+                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
+                            <Pagination
+                                links={relations.links}
+                                fromData={relations.from}
+                                toData={relations.to}
+                                totalData={relations.total}
+                                clickHref={(url: string) =>
+                                    getPolicy(url.split("?").pop())
+                                }
+                            />
                         </div>
-                        {/* table page*/}
                     </div>
                 </div>
             </div>
+
         </AuthenticatedLayout>
     );
 }

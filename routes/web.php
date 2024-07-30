@@ -254,6 +254,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelation/{id}', [PolicyController::class, 'getRelationById'])->name('policy.getRelationById');
     Route::patch('/editPolicy/{id}', [PolicyController::class, 'edit'])->name('policy.edit');
     Route::patch('/deactivatePolicy/{id}', [PolicyController::class, 'deactivate'])->name('policy.deactivate');
+    Route::get('/getCurrencyOnPolicyCoverage/{id}', [PolicyController::class, 'getCurrencyOnPolicyCoverage'])->name('policy.getCurrencyOnPolicyCoverage');
 
     // Insurance Panel
     Route::get('/insurancePanel', [InsurancePanelController::class, 'index'])->name('insurancePanel');

@@ -230,6 +230,18 @@ class PolicyController extends Controller
 
     }
 
+    function getCurrencyOnPolicyCoverage($policy_id) {
+        $query = DB::table('m_policy_coverage_detail as pcd')
+            ->select('c.*')
+            ->leftJoin('m_policy_coverage as pc', 'pcd.POLICY_COVERAGE_ID', '=', 'pc.POLICY_COVERAGE_ID')
+            ->leftJoin('r_currency AS c', 'pcd.CURRENCY_ID', '=', 'c.CURRENCY_ID')
+            ->where('pc.POLICY_ID', $policy_id)
+            ->groupBy('pcd.CURRENCY_ID')
+            ->get();
+            // dd($query);
+            return response()->json($query);
+    }
+
     // public function edit(Request $request, MPolicyPremium $insurancePanel) {
     public function edit(Request $request) {
        
