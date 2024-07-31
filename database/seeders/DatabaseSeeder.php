@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CashAdvanceCostClassification;
-use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceStatus;
 use App\Models\User;
@@ -324,77 +323,77 @@ class DatabaseSeeder extends Seeder
         // // create 2024_21_05_Store_Procedure_And_Function
         // $file_path1 = resource_path('../database/LogDB/2024_21_05_Store_Procedure_And_Function.sql');
 
-        // \DB::unprepared(
+        // DB::unprepared(
         //     file_get_contents($file_path1)
         // );
 
         // create 2024_25_06_r_grade
         $file_path2 = resource_path('../database/LogDB/2024_25_06_r_grade.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path2)
         );
 
         // create 2024_27_06_r_relation_location_type
         $file_path3 = resource_path('../database/LogDB/2024_27_06_r_relation_location_type.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path3)
         );
 
         // create 2024_27_06_r_wilayah_kemendagri
         $file_path4 = resource_path('../database/LogDB/2024_27_06_r_wilayah_kemendagri.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path4)
         );
 
         // create 2024_20_06_r_bank
         $file_path5 = resource_path('../database/LogDB/2024_20_06_r_bank.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path5)
         );
 
         // create 2024_16_06_r_tax-status
         $file_path6 = resource_path('../database/LogDB/2024_16_06_r_tax-status.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path6)
         );
 
         // create 2024_12_06_r_person_relationship
         $file_path7 = resource_path('../database/LogDB/2024_12_06_r_person_relationship.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path7)
         );
 
         // create 2024_30_05_r_proffesion
         $file_path8 = resource_path('../database/LogDB/2024_18_07_r_proffesion.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path8)
         );
 
         // create 2024_30_05_r_relation_type
         $file_path9 = resource_path('../database/LogDB/2024_30_05_r_relation_type.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path9)
         );
 
         // create 2024_16_05_r_relation_lob
         $file_path10 = resource_path('../database/LogDB/2024_16_05_r_relation_lob.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path10)
         );
 
         // create 2024_16_05_r_relation_status
         $file_path11 = resource_path('../database/LogDB/2024_16_05_r_relation_status.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path11)
         );
 
@@ -419,5 +418,11 @@ class DatabaseSeeder extends Seeder
         DB::unprepared(
             file_get_contents($file_path14)
         );
+
+        // $file_path15 = resource_path('../database/LogDB/2024_07_30_relation.sql');
+
+        // DB::unprepared(
+        //     file_get_contents($file_path15)
+        // );
     }
 }
