@@ -7690,7 +7690,7 @@ export default function ModalDetailPolicy({
                                             >
                                                 {new Intl.NumberFormat("id", {
                                                     style: "decimal",
-                                                }).format(grandTotalNettIncome)}
+                                                }).format(grandTotalEditNettIncome)}
                                             </td>
 
                                             <td
