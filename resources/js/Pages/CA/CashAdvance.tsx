@@ -18,6 +18,7 @@ import ToastMessage from "@/Components/ToastMessage";
 import Pagination from "@/Components/Pagination";
 import {
     ArrowDownTrayIcon,
+    ArrowPathIcon,
     HandThumbUpIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
@@ -33,11 +34,13 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
+import Select from "react-tailwindcss-select";
 
 
 export default function CashAdvance({ auth }: PageProps) {
     useEffect(() => {
         getCANumber();
+        getCAPerson();
     }, []);
 
     // Modal Add Start
@@ -83,6 +86,7 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_from_bank_account: "",
         cash_advance_receive_date: "",
         cash_advance_receive_name: "",
+        type: "",
         refund_amount: "",
         refund_type: "",
         refund_proof: "",
@@ -121,6 +125,7 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_from_bank_account: "",
         cash_advance_receive_date: "",
         cash_advance_receive_name: "",
+        type: "",
         refund_amount: "",
         refund_type: "",
         refund_proof: "",
@@ -166,6 +171,7 @@ export default function CashAdvance({ auth }: PageProps) {
             cash_advance_receive_date: "",
             cash_advance_receive_name: "",
             amount_approve: "",
+            type: "",
             refund_amount: "",
             refund_type: "",
             refund_proof: "",
@@ -192,6 +198,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCA();
         getCAReport();
         getCANumber();
+        getCAPerson();
     };
     // Handle Success End
 
@@ -316,6 +323,28 @@ export default function CashAdvance({ auth }: PageProps) {
         setDataRow(onchangeVal);
 
         setData("CashAdvanceDetail", onchangeVal);
+        // let totalDataRow.forEach((item) => {
+        //     total_amount += Number(item.cash_advance_detail_amount);
+        // });
+        // setData("cash_advance_transfer_amount",)
+    };
+    // Handle Change Add End
+
+    // Handle Change Add Start
+    const handleChangeAddSelect = (value: any, name: any, i: number) => {
+        // const { name, value } = e.target;
+
+        const onchangeVal: any = [...data.CashAdvanceDetail];
+
+        onchangeVal[i][name] = value;
+
+        setDataRow(onchangeVal);
+
+        setData("CashAdvanceDetail", onchangeVal);
+        // let totalDataRow.forEach((item) => {
+        //     total_amount += Number(item.cash_advance_detail_amount);
+        // });
+        // setData("cash_advance_transfer_amount",)
     };
     // Handle Change Add End
 
@@ -646,6 +675,20 @@ export default function CashAdvance({ auth }: PageProps) {
     };
     // Handle Change Add Report CA End
 
+    // Handle Change Add Report CA Start
+    const handleChangeAddReportSelect = (value: any, name: any, i: number) => {
+        // const { name, value } = e.target;
+
+        const onchangeVal: any = [...dataCAReport.CashAdvanceDetail];
+
+        onchangeVal[i][name] = value;
+
+        setDataReportRow(onchangeVal);
+
+        setDataCAReport({...dataCAReport, CashAdvanceDetail: onchangeVal});
+    };
+    // Handle Change Add Report CA End
+
     // Handle Remove Row Report CA Start
     const handleRemoveReportRow = (i: number) => {
         const deleteRow = [...dataCAReport.CashAdvanceDetail];
@@ -694,12 +737,25 @@ export default function CashAdvance({ auth }: PageProps) {
 
     const [cashAdvance, setCA] = useState<any>([]);
     const [CANumber, setCANumber] = useState<any>([]);
+    const [CAPerson, setCAPerson] = useState<any>([]);
 
     const getCANumber = async () => {
         await axios
             .get(`/getCANumber`)
             .then(function (response) {
                 setCANumber(response.data);
+                // console.log("xxx", response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    };
+
+    const getCAPerson = async () => {
+        await axios
+            .get(`/getCAPerson`)
+            .then(function (response) {
+                setCAPerson(response.data);
                 // console.log("xxx", response.data);
             })
             .catch(function (error) {
@@ -835,7 +891,10 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_purpose,
         cash_advance_cost_classification,
         relations,
-        coa
+        coa,
+        persons,
+        count_request,
+        count_approve1
     }: any = usePage().props;
 
     const purposes = [
@@ -1349,6 +1408,12 @@ export default function CashAdvance({ auth }: PageProps) {
     DataRow.forEach((item) => {
         total_amount += Number(item.cash_advance_detail_amount);
     });
+    
+    useEffect(() => {
+        if(total_amount != 0 ){
+            setData("cash_advance_transfer_amount", total_amount)
+        }         
+    }, [total_amount]);
 
     let total_amount_report = 0;
 
@@ -1380,7 +1445,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setToggleState(i);
     };
 
-    const [checkedTransfer, setCheckedTransfer] = useState(false);
+    const [checkedTransfer, setCheckedTransfer] = useState(true);
     const handleCheckedTransfer = (e:any) => {
         setData("cash_advance_delivery_method_transfer", e.target.value)
         setDataById({
@@ -1488,7 +1553,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // const handleAddFiles = () => {
 
     // };
-    // console.log("Data", data);
+    console.log("Data", data);
     // console.log("Data Files", DataFilesRow);
     // console.log(files);
     // console.log(DataReportRow);
@@ -1497,7 +1562,22 @@ export default function CashAdvance({ auth }: PageProps) {
     console.log("Data CA By Id", dataById);
     console.log("Data Report By Id", dataReportById);
     console.log("Data CA Report", dataCAReport);
-    // console.log("Search CA", searchCA);
+    // console.log("Search CA", persons);
+
+    const selectPerson = persons?.filter((m:any)=> m.DIVISION_ID === auth.user.person?.DIVISION_ID).map((query: any) => {
+        return {
+            value: query.PERSON_ID,
+            label: query.PERSON_FIRST_NAME,
+        };
+    });
+
+    const selectRelation = relations?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
+    });
+    console.log("Auth", auth);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Cash Advance"}>
@@ -1660,7 +1740,41 @@ export default function CashAdvance({ auth }: PageProps) {
                                     Used By
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <select
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={selectPerson}
+                                    isSearchable={true}
+                                    placeholder={"Choose Used By"}
+                                    value={data.cash_advance_used_by}
+                                    // onChange={(e) =>
+                                    //     inputDataBank(
+                                    //         "BANK_ID",
+                                    //         e.target.value,
+                                    //         i
+                                    //     )
+                                    // }
+                                    // onChange={(val: any) =>
+                                    //     setSearchRelation({
+                                    //         ...searchRelation,
+                                    //         RELATION_TYPE_ID: val,
+                                    //     })
+                                    // }
+                                    onChange={(val: any) =>
+                                        setData("cash_advance_used_by", val)
+                                    }
+                                    primaryColor={"bg-red-500"}
+                                />
+                                {/* <select
                                     id="namaPemohon"
                                     name="namaPemohon"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -1672,12 +1786,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <option value="">
                                         -- Choose Used By --
                                     </option>
-                                    {users.map((user: any) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
+                                    {persons.map((person: any) => (
+                                        <option key={person.PERSON_ID} value={person.PERSON_ID}>
+                                            {person.PERSON_FIRST_NAME}
                                         </option>
                                     ))}
-                                </select>
+                                </select> */}
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
@@ -1689,7 +1803,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="cash_advance_division"
                                     type="text"
                                     name="cash_advance_division"
-                                    value="IT"
+                                    value={auth.user.person.division.RELATION_DIVISION_ALIAS}
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -1702,7 +1816,41 @@ export default function CashAdvance({ auth }: PageProps) {
                                     Request for Approval
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <select
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={selectPerson}
+                                    isSearchable={true}
+                                    placeholder={"Choose Request To"}
+                                    value={data.cash_advance_first_approval_by}
+                                    // onChange={(e) =>
+                                    //     inputDataBank(
+                                    //         "BANK_ID",
+                                    //         e.target.value,
+                                    //         i
+                                    //     )
+                                    // }
+                                    // onChange={(val: any) =>
+                                    //     setSearchRelation({
+                                    //         ...searchRelation,
+                                    //         RELATION_TYPE_ID: val,
+                                    //     })
+                                    // }
+                                    onChange={(val: any) =>
+                                        setData("cash_advance_first_approval_by", val)
+                                    }
+                                    primaryColor={"bg-red-500"}
+                                />
+                                {/* <select
                                     id="namaPemberiApproval"
                                     name="namaPemberiApproval"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -1717,12 +1865,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <option value="">
                                         -- Choose Request To --
                                     </option>
-                                    {users.map((user: any) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
+                                    {persons.map((person: any) => (
+                                        <option key={person.PERSON_ID} value={person.PERSON_ID}>
+                                            {person.PERSON_FIRST_NAME}
                                         </option>
                                     ))}
-                                </select>
+                                </select> */}
                             </div>
                         </div>
 
@@ -1871,7 +2019,41 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </select>
                                             </TD>
                                             <TD className="border">
-                                                <select
+                                                <Select
+                                                    classNames={{
+                                                        menuButton: () =>
+                                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                        listItem: ({ isSelected }: any) =>
+                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                isSelected
+                                                                    ? `text-white bg-red-600`
+                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                            }`,
+                                                    }}
+                                                    options={selectRelation}
+                                                    isSearchable={true}
+                                                    placeholder={"Choose Business Relation"}
+                                                    value={val.cash_advance_detail_relation_organization_id}
+                                                    // onChange={(e) =>
+                                                    //     inputDataBank(
+                                                    //         "BANK_ID",
+                                                    //         e.target.value,
+                                                    //         i
+                                                    //     )
+                                                    // }
+                                                    // onChange={(val: any) =>
+                                                    //     setSearchRelation({
+                                                    //         ...searchRelation,
+                                                    //         RELATION_TYPE_ID: val,
+                                                    //     })
+                                                    // }
+                                                    onChange={(val: any) =>
+                                                        handleChangeAddSelect(val, "cash_advance_detail_relation_organization_id", i)
+                                                    }
+                                                    primaryColor={"bg-red-500"}
+                                                />
+                                                {/* <select
                                                     id="cash_advance_detail_relation_organization_id"
                                                     name="cash_advance_detail_relation_organization_id"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -1897,7 +2079,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             </option>
                                                         )
                                                     )}
-                                                </select>
+                                                </select> */}
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
@@ -2042,6 +2224,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
+                                            defaultChecked={true}
                                             onChange={(e) => handleCheckedTransfer(e)}
                                             required
                                             />
@@ -2070,7 +2253,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="cash_advance_transfer_amount"
                                                     type="number"
                                                     name="cash_advance_transfer_amount"
-                                                    value={""}
+                                                    value={data.cash_advance_transfer_amount}
                                                     className="w-full lg:w-1/4 text-right"
                                                     placeholder="0"
                                                     // required
@@ -2273,7 +2456,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
+                                    value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     onChange={(e) =>
@@ -2358,7 +2541,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
+                                    value={dataById.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     onChange={(e) =>
@@ -2539,7 +2722,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            checked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            checked={dataById?.CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedTransfer(e)}
                                             required
                                             />
@@ -2584,7 +2767,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            checked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_CASH !== null && true}
+                                            checked={dataById?.CASH_ADVANCE_CASH_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedCash(e)}
                                             />
                                         </div>
@@ -2760,7 +2943,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
+                                    value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     readOnly
@@ -2827,7 +3010,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
+                                    value={dataById.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     readOnly
@@ -3065,7 +3248,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            defaultChecked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataById?.CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedTransferEdit(e)}
                                             required
                                             />
@@ -3128,7 +3311,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            defaultChecked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_CASH !== null && true}
+                                            defaultChecked={dataById?.CASH_ADVANCE_CASH_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedCashEdit(e)}
                                             // required
                                             />
@@ -3298,7 +3481,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="w-48 border-none"
                                         />
                                         <TableTD
-                                            value={dataById.user_used_by.name}
+                                            value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                             className="border-none"
                                         />
                                         <TableTD
@@ -3444,7 +3627,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
+                                    value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     onChange={(e) =>
@@ -3526,7 +3709,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
+                                    value={dataById.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     onChange={(e) =>
@@ -3899,7 +4082,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            defaultChecked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataById?.CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedTransferEdit(e)}
                                             required
                                             />
@@ -3963,7 +4146,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            defaultChecked={dataById?.CASH_ADVANCE_DELIVERY_METHOD_CASH !== null && true}
+                                            defaultChecked={dataById?.CASH_ADVANCE_CASH_AMOUNT !== null && true}
                                             onChange={(e) => handleCheckedCashEdit(e)}
                                             // required
                                             />
@@ -4171,7 +4354,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
+                                    value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     readOnly
@@ -4238,7 +4421,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
+                                    value={dataById.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     readOnly
@@ -4419,7 +4602,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
                                             onChange={(e) => handleCheckedTransferEdit(e)}
-                                            defaultChecked={dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataById.CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             required
                                             />
                                         </div>
@@ -4518,7 +4701,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
                                             onChange={(e) => handleCheckedCashEdit(e)}
-                                            defaultChecked={dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH !== null  && true}
+                                            defaultChecked={dataById.CASH_ADVANCE_CASH_AMOUNT > 0  && true}
                                             // required
                                             />
                                         </div>
@@ -4644,7 +4827,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="w-48 border-none"
                                         />
                                         <TableTD
-                                            value={dataById.user_used_by.name}
+                                            value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                             className="border-none"
                                         />
                                         <TableTD
@@ -4741,7 +4924,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="cashAdvanceNumber"
                                     type="text"
                                     name="cashAdvanceNumber"
-                                    value={dataById.user_used_by.name}
+                                    value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     readOnly
                                 />
@@ -4759,7 +4942,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <option value="">
                                         -- Choose Used By --
                                     </option>
-                                    {users.map((user: any) => (
+                                    {persons.map((user: any) => (
                                         <option key={user.id} value={user.id}>
                                             {user.name}
                                         </option>
@@ -4812,7 +4995,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="cashAdvanceNumber"
                                     type="text"
                                     name="cashAdvanceNumber"
-                                    value={dataById.user_approval.name}
+                                    value={dataById.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     readOnly
                                 />
@@ -4830,7 +5013,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <option value="">
                                         -- Choose Request To --
                                     </option>
-                                    {users.map((user: any) => (
+                                    {persons.map((user: any) => (
                                         <option key={user.id} value={user.id}>
                                             {user.name}
                                         </option>
@@ -5006,7 +5189,41 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 </select> */}
                                             </TD>
                                             <TD className="border">
-                                                <select
+                                            <Select
+                                                    classNames={{
+                                                        menuButton: () =>
+                                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                        listItem: ({ isSelected }: any) =>
+                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                isSelected
+                                                                    ? `text-white bg-red-600`
+                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                            }`,
+                                                    }}
+                                                    options={selectRelation}
+                                                    isSearchable={true}
+                                                    placeholder={"Choose Business Relation"}
+                                                    value={val.cash_advance_detail_relation_organization_id}
+                                                    // onChange={(e) =>
+                                                    //     inputDataBank(
+                                                    //         "BANK_ID",
+                                                    //         e.target.value,
+                                                    //         i
+                                                    //     )
+                                                    // }
+                                                    // onChange={(val: any) =>
+                                                    //     setSearchRelation({
+                                                    //         ...searchRelation,
+                                                    //         RELATION_TYPE_ID: val,
+                                                    //     })
+                                                    // }
+                                                    onChange={(val: any) =>
+                                                        handleChangeAddReportSelect(val, "cash_advance_detail_relation_organization_id", i)
+                                                    }
+                                                    primaryColor={"bg-red-500"}
+                                                />
+                                                {/* <select
                                                     id="cash_advance_detail_relation_organization_id"
                                                     name="cash_advance_detail_relation_organization_id"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -5035,7 +5252,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             </option>
                                                         )
                                                     )}
-                                                </select>
+                                                </select> */}
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
@@ -5435,7 +5652,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataReportById?.user_used_by.name}
+                                    value={dataReportById?.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     readOnly
@@ -5502,7 +5719,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataReportById?.user_approval.name}
+                                    value={dataReportById?.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     readOnly
@@ -5677,7 +5894,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            checked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            checked={dataReportById?.REPORT_CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedTransfer(e)}
                                             required
                                             />
@@ -5722,7 +5939,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            checked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH !== null && true}
+                                            checked={dataReportById?.REPORT_CASH_ADVANCE_CASH_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedCash(e)}
                                             />
                                         </div>
@@ -5860,7 +6077,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataReportById?.user_used_by.name}
+                                    value={dataReportById?.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     readOnly
@@ -5927,7 +6144,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataReportById?.user_approval.name}
+                                    value={dataReportById?.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     readOnly
@@ -6267,7 +6484,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedTransferEditReport(e)}
                                             required
                                             />
@@ -6330,7 +6547,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH !== null && true}
+                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_CASH_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedCashEditReport(e)}
                                             // required
                                             />
@@ -6448,7 +6665,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="w-48 border-none"
                                         />
                                         <TableTD
-                                            value={dataById.user_used_by.name}
+                                            value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                             className="border-none"
                                         />
                                         <TableTD
@@ -6553,7 +6770,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataReportById?.user_used_by.name}
+                                    value={dataReportById?.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     onChange={(e) =>
@@ -6635,7 +6852,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataReportById?.user_approval.name}
+                                    value={dataReportById?.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     onChange={(e) =>
@@ -7013,7 +7230,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER !== null && true}
+                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_TRANSFER_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedTransferEditReport(e)}
                                             required
                                             />
@@ -7076,7 +7293,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH !== null && true}
+                                            defaultChecked={dataReportById?.REPORT_CASH_ADVANCE_CASH_AMOUNT > 0 && true}
                                             onChange={(e) => handleCheckedCashEditReport(e)}
                                             // required
                                             />
@@ -7288,7 +7505,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataReportById?.user_used_by.name}
+                                    value={dataReportById?.person_used_by?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemohon"
                                     readOnly
@@ -7355,7 +7572,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataReportById?.user_approval.name}
+                                    value={dataReportById?.person_approval?.PERSON_FIRST_NAME}
                                     className=""
                                     autoComplete="namaPemberiApproval"
                                     readOnly
@@ -7606,8 +7823,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="transfer-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={1}
-                                            checked={dataReportById?.cash_advance.CASH_ADVANCE_TRANSFER_AMOUNT && true}
-                                            onChange={(e) => handleCheckedTransfer(e)}
+                                            checked={dataReportById?.REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRASFER !== null && true}
+                                            onChange={(e) => handleCheckedTransferEditReport(e)}
                                             required
                                             />
                                         </div>
@@ -7621,7 +7838,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 id="CASH_ADVANCE_TRANSFER_AMOUNT"
                                                 type="number"
                                                 name="CASH_ADVANCE_TRANSFER_AMOUNT"
-                                                value={dataReportById?.cash_advance.CASH_ADVANCE_TRANSFER_AMOUNT}
+                                                value={dataReportById?.REPORT_CASH_ADVANCE_TRANSFER_AMOUNT}
                                                 className="w-full lg:w-1/4 text-right"
                                                 placeholder="0"
                                                 readOnly
@@ -7651,8 +7868,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             aria-describedby="cash-description"
                                             className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             value={2}
-                                            checked={dataReportById?.cash_advance.CASH_ADVANCE_CASH_AMOUNT && true}
-                                            onChange={(e) => handleCheckedCash(e)}
+                                            checked={dataReportById?.REPORT_CASH_ADVANCE_CASH_AMOUNT > 0 && true}
+                                            onChange={(e) => handleCheckedCashEditReport(e)}
                                             />
                                         </div>
                                         <div className="flex w-full">
@@ -7665,7 +7882,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 id="CASH_ADVANCE_CASH_AMOUNT"
                                                 type="number"
                                                 name="CASH_ADVANCE_CASH_AMOUNT"
-                                                value={dataReportById?.cash_advance.CASH_ADVANCE_CASH_AMOUNT}
+                                                value={dataReportById?.REPORT_CASH_ADVANCE_CASH_AMOUNT}
                                                 className="w-5/12 lg:w-1/4 text-right ml-9"
                                                 placeholder="0"
                                                 readOnly
@@ -7691,7 +7908,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="type"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
-                                        setDataCAReport({...dataCAReport, refund_type: e.target.value})
+                                        setDataCAReport({...dataCAReport, type: e.target.value})
                                     }
                                     required
                                 >
@@ -7851,7 +8068,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="w-48 border-none"
                                         />
                                         <TableTD
-                                            value={dataById.user_used_by.name}
+                                            value={dataById.person_used_by?.PERSON_FIRST_NAME}
                                             className="border-none"
                                         />
                                         <TableTD
@@ -8174,52 +8391,53 @@ export default function CashAdvance({ auth }: PageProps) {
                                 </fieldset>
                                 <div className="mt-10">
                                     <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                        <legend className="ml-8 px-3 text-sm">Cash Advance Status</legend>
-                                        <div className="flex flex-wrap content-between gap-10 justify-center mt-5 mx-1">
+                                        <legend className="ml-8 text-sm">Cash Advance Status</legend>
+                                        <ArrowPathIcon className="w-5 text-gray-600 hover:text-gray-500 cursor-pointer ml-auto mr-3 mb-8"></ArrowPathIcon>
+                                        <div className="flex flex-wrap content-between justify-center gap-6 mt-5 text-sm">
                                             <div className="flex relative">
-                                                <Button className="bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
+                                                <Button className="w-36 bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
                                                     Request
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                        0
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                        {count_request}
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
+                                                <Button className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
                                                     Approve 1
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                                        0
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                        {count_approve1}
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
+                                                <Button className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500">
                                                     Approve 2
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
+                                                <Button className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
                                                     Pending Report
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
+                                                <Button className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
                                                     Need Revision
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-red-600 px-2 py-1 hover:bg-red-500">
+                                                <Button className="w-36 bg-red-600 px-2 py-1 hover:bg-red-500">
                                                     Reject
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
@@ -8230,50 +8448,51 @@ export default function CashAdvance({ auth }: PageProps) {
 
                                 <div className="mt-10">
                                     <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                        <legend className="ml-8 px-3 text-sm">Cash Advance Report Status</legend>
-                                        <div className="flex flex-wrap content-between gap-10 justify-center mt-5 mx-1">
+                                        <legend className="ml-8 text-sm">Cash Advance Report Status</legend>
+                                        <ArrowPathIcon className="w-5 text-gray-600 hover:text-gray-500 cursor-pointer ml-auto mr-3 mb-8"></ArrowPathIcon>
+                                        <div className="flex flex-wrap content-between gap-6 justify-center mt-5 text-sm">
                                             <div className="flex relative">
-                                                <Button className="bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
+                                                <Button className="w-36 bg-gray-500 px-2 py-1 hover:bg-gray-400" onClick={() => getCA("", 0)}>
                                                     Request
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
+                                                <Button className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500" onClick={() => getCA("", 1)}>
                                                     Approve 1
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
+                                                <Button className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500">
                                                     Approve 2
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
+                                                <Button className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
                                                     Need Revision
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-red-600 px-2 py-1 hover:bg-red-500">
+                                                <Button className="w-36 bg-red-600 px-2 py-1 hover:bg-red-500">
                                                     Reject
-                                                    <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
+                                                    <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                         0
                                                     </span>
                                                 </Button>
                                             </div>
                                             <div className="flex relative">
-                                                <Button className="bg-green-500 px-2 py-1 hover:bg-green-600">
+                                                <Button className="w-36 bg-green-500 px-2 py-1 hover:bg-green-600">
                                                     Complited
                                                 </Button>
                                             </div>

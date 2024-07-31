@@ -23,6 +23,8 @@ class CashAdvanceReport extends Model
     protected $with = [
         'cash_advance',
         'cash_advance_detail_report',
+        'person_used_by',
+        'person_approval',
         'user',
         'user_used_by',
         'user_approval',
@@ -37,6 +39,16 @@ class CashAdvanceReport extends Model
     public function cash_advance_detail_report(): HasMany
     {
         return $this->hasMany(CashAdvanceDetailReport::class, 'REPORT_CASH_ADVANCE_ID');
+    }
+
+    public function person_used_by(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REPORT_CASH_ADVANCE_USED_BY');
+    }
+
+    public function person_approval(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REPORT_CASH_ADVANCE_FIRST_APPROVAL_BY');
     }
 
     public function user(): BelongsTo

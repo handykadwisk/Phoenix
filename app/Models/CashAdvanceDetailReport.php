@@ -51,6 +51,6 @@ class CashAdvanceDetailReport extends Model
 
     public function cost_classification()
     {
-        return $this->belongsTo(CashAdvanceCostClassification::class, 'REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION');
+        return $this->belongsTo(CashAdvanceCostClassification::class, 'REPORT_CASH_ADVANCE_DETAIL_APPROVAL');
     }
 }

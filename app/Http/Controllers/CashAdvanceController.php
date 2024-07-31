@@ -12,6 +12,7 @@ use App\Models\CashAdvanceDetailReport;
 use App\Models\COA;
 use App\Models\MCashAdvanceDocument;
 use App\Models\Relation;
+use App\Models\TPerson;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -104,13 +105,16 @@ class CashAdvanceController extends Controller
     }
 
     public function index()
-    {
+    {   
         $data = [
             'users' => User::where('role_id', 2)->get(),
             'cash_advance_purpose' => CashAdvancePurpose::all(),
             'cash_advance_cost_classification' => CashAdvanceCostClassification::all(),
             'relations' => Relation::all(),
-            'coa' => COA::all()
+            'coa' => COA::all(),
+            'persons' => TPerson::all(),
+            'count_request' => CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0)->count(),
+            'count_approve1' => CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count()
         ];
 
         return Inertia::render('CA/CashAdvance', $data);
@@ -122,6 +126,13 @@ class CashAdvanceController extends Controller
             CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)
                         ->orderBy('CASH_ADVANCE_ID', 'desc')
                         ->get();
+
+        return response()->json($data);
+    }
+
+    public function getCAPerson()
+    {
+        $data = TPerson::all();
 
         return response()->json($data);
     }
@@ -220,10 +231,10 @@ class CashAdvanceController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->file('CashAdvanceDetail'));
+        // dd($request);
 
         $user_id = auth()->user()->id;
-        $user = User::find($request->cash_advance_first_approval_by);
+        $user = User::find($request->cash_advance_first_approval_by['value']);
 
         $total_amount = 0;
 
@@ -232,11 +243,11 @@ class CashAdvanceController extends Controller
         }
 
         $cash_advance_number = $this->getCashAdvanceNumber();
-        $cash_advance_used_by = $request->cash_advance_used_by;
+        $cash_advance_used_by = $request->cash_advance_used_by['value'];
         $cash_advance_requested_by = $user_id;
         $cash_advance_division = 'IT';
         $cash_advance_requested_date = now();
-        $cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
+        $cash_advance_first_approval_by = $request->cash_advance_first_approval_by['value'];
         $cash_advance_first_approval_user = $user->name;
         $cash_advance_first_approval_status = 0;
         $cash_advance_request_note = $request->cash_advance_request_note;
@@ -284,7 +295,7 @@ class CashAdvanceController extends Controller
             $cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
             $cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
             $cash_advance_detail_location = $cad['cash_advance_detail_location'];
-            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id']['value'];
             $cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
             $cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
             $cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
