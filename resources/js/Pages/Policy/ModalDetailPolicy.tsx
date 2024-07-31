@@ -5639,34 +5639,34 @@ export default function ModalDetailPolicy({
                                         {/* <div className="container mx-auto overflow-x-auto border-x border-t my-10"> */}
                                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                             <table className="table-auto w-full">
-                                                <thead className="border-b bg-[#5CB25A]">
-                                                    <tr className="text-white font-bold h-10">
+                                                <thead className="border-b bg-gray-50">
+                                                    <tr className="text-sm font-semibold text-gray-900">
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
                                                         >
                                                             No
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Coverage
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Currency
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Consultancy Fee
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Insurer Nett Premium
@@ -5690,17 +5690,20 @@ export default function ModalDetailPolicy({
                                                             Discount Engineering
                                                             Fee
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                        >
                                                             Nett Premium To
                                                             Insured
                                                         </th>
                                                     </tr>
-                                                    <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                                        <th className="text-center p-4 border-r text-base"></th>
+                                                    <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
+                                                        {/* <th className="text-center p-4 border-r text-base"></th> */}
+                                                        {/* <th className="text-center p-4 border-r"></th> */}
+                                                        {/* <th className="text-center p-4 border-r"></th>
                                                         <th className="text-center p-4 border-r"></th>
-                                                        <th className="text-center p-4 border-r"></th>
-                                                        <th className="text-center p-4 border-r"></th>
-                                                        <th className="text-center p-4 border-r"></th>
+                                                        <th className="text-center p-4 border-r"></th> */}
                                                         <th className="text-center p-4 border ">
                                                             %
                                                         </th>
@@ -5719,7 +5722,7 @@ export default function ModalDetailPolicy({
                                                         <th className="text-center p-4 border ">
                                                             Amount
                                                         </th>
-                                                        <th className="text-center p-4"></th>
+                                                        {/* <th className="text-center p-4"></th> */}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -6189,34 +6192,34 @@ export default function ModalDetailPolicy({
                                     {/* <div className="container mx-auto overflow-x-auto border-x border-t my-10"> */}
                                     <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                         <table className="table-auto w-full">
-                                            <thead className="border-b bg-[#5CB25A]">
-                                                <tr className="text-white font-bold h-10">
+                                            <thead className="border-b bg-gray-50">
+                                                <tr className="text-sm font-semibold text-gray-900">
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
                                                     >
                                                         No
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Coverage
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Currency
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Consultancy Fee
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Insurer Nett Premium
@@ -6239,19 +6242,25 @@ export default function ModalDetailPolicy({
                                                     >
                                                         Discount Engineering Fee
                                                     </th>
-                                                    <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                    <th
+                                                        rowSpan={2}
+                                                        className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                    >
                                                         Nett Premium To Insured
                                                     </th>
-                                                    <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                    <th
+                                                        rowSpan={2}
+                                                        className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                    >
                                                         Action
                                                     </th>
                                                 </tr>
-                                                <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                                    <th className="text-center p-4 border-r text-base"></th>
+                                                <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
+                                                    {/* <th className="text-center p-4 border-r text-base"></th>
                                                     <th className="text-center p-4 border-r"></th>
                                                     <th className="text-center p-4 border-r"></th>
                                                     <th className="text-center p-4 border-r"></th>
-                                                    <th className="text-center p-4 border-r"></th>
+                                                    <th className="text-center p-4 border-r"></th> */}
                                                     <th className="text-center p-4 border ">
                                                         %
                                                     </th>
@@ -6270,8 +6279,8 @@ export default function ModalDetailPolicy({
                                                     <th className="text-center p-4 border ">
                                                         Amount
                                                     </th>
-                                                    <th className="text-center border-r p-4"></th>
-                                                    <th className="text-center p-4"></th>
+                                                    {/* <th className="text-center border-r p-4"></th> */}
+                                                    {/* <th className="text-center p-4"></th> */}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -7690,7 +7699,9 @@ export default function ModalDetailPolicy({
                                             >
                                                 {new Intl.NumberFormat("id", {
                                                     style: "decimal",
-                                                }).format(grandTotalEditNettIncome)}
+                                                }).format(
+                                                    grandTotalEditNettIncome
+                                                )}
                                             </td>
 
                                             <td
@@ -8222,19 +8233,32 @@ export default function ModalDetailPolicy({
                                                 </div>
                                                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                                     <table className="table-auto w-full">
-                                                        <thead className="border-b bg-[#5CB25A]">
-                                                            <tr className="text-white font-bold h-10">
-                                                                <th className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300">
+                                                        <thead className="border-b bg-gray-50">
+                                                            <tr className="text-sm font-semibold text-gray-900">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    // scope="col"
+                                                                    className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
+                                                                >
                                                                     No
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
                                                                     Coverage
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
                                                                     Consultancy
                                                                     Fee
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
                                                                     Insurer Nett
                                                                     Premium
                                                                 </th>
@@ -8260,16 +8284,19 @@ export default function ModalDetailPolicy({
                                                                     Engineering
                                                                     Fee
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                                >
                                                                     Nett Premium
                                                                     To Insured
                                                                 </th>
                                                             </tr>
-                                                            <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                                                <th className="text-center p-4 border-r text-base"></th>
+                                                            <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
+                                                                {/* <th className="text-center p-4 border-r text-base"></th>
                                                                 <th className="text-center p-4 border-r"></th>
                                                                 <th className="text-center p-4 border-r"></th>
-                                                                <th className="text-center p-4 border-r"></th>
+                                                                <th className="text-center p-4 border-r"></th> */}
                                                                 <th className="text-center p-4 border ">
                                                                     %
                                                                 </th>
@@ -8288,7 +8315,7 @@ export default function ModalDetailPolicy({
                                                                 <th className="text-center p-4 border ">
                                                                     Amount
                                                                 </th>
-                                                                <th className="text-center p-4"></th>
+                                                                {/* <th className="text-center p-4"></th> */}
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -8299,7 +8326,7 @@ export default function ModalDetailPolicy({
                                                                     j: number
                                                                 ) => (
                                                                     <tr key={j}>
-                                                                        <td className="p-4 border">
+                                                                        <td className="p-4 border text-center">
                                                                             {j +
                                                                                 1}
                                                                         </td>
