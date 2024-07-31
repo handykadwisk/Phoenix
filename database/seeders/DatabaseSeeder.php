@@ -419,10 +419,34 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path14)
         );
 
-        // $file_path15 = resource_path('../database/LogDB/2024_07_30_relation.sql');
+        $file_path15 = resource_path('../database/LogDB/2024_07_31_r_coa.sql');
 
-        // DB::unprepared(
-        //     file_get_contents($file_path15)
-        // );
+        DB::unprepared(
+            file_get_contents($file_path15)
+        );
+
+        $file_path16 = resource_path('../database/LogDB/2024_07_31_r_coa_class.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path16)
+        );
+
+        $file_path17 = resource_path('../database/LogDB/2024_07_31_r_coa_group.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path17)
+        );
+
+        $file_path18 = resource_path('../database/LogDB/2024_07_31_t_relation.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path18)
+        );
+
+        $file_path19 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path19)
+        );
     }
 }

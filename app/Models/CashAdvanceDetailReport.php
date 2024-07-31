@@ -19,12 +19,24 @@ class CashAdvanceDetailReport extends Model
     protected $with = [
         'document', 
         'purpose',
-        'cost_classification'
+        'cost_classification',
+        'relation_organization',
+        'coa'
     ];
 
     public function cash_advance_report(): BelongsTo
     {
         return $this->belongsTo(CashAdvanceReport::class);
+    }
+
+    public function relation_organization(): BelongsTo
+    {
+        return $this->belongsTo(Relation::class, 'REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID');
+    }
+
+    public function coa(): BelongsTo
+    {
+        return $this->belongsTo(COA::class, 'REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION');
     }
 
     public function document(): BelongsTo

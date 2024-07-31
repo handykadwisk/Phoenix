@@ -9,7 +9,9 @@ use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceReport;
 use App\Models\Document;
 use App\Models\CashAdvanceDetailReport;
+use App\Models\COA;
 use App\Models\MCashAdvanceDocument;
+use App\Models\Relation;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -106,7 +108,9 @@ class CashAdvanceController extends Controller
         $data = [
             'users' => User::where('role_id', 2)->get(),
             'cash_advance_purpose' => CashAdvancePurpose::all(),
-            'cash_advance_cost_classification' => CashAdvanceCostClassification::all()
+            'cash_advance_cost_classification' => CashAdvanceCostClassification::all(),
+            'relations' => Relation::all(),
+            'coa' => COA::all()
         ];
 
         return Inertia::render('CA/CashAdvance', $data);

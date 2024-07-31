@@ -209,7 +209,7 @@ class RelationController extends Controller
         ]);
 
         // Mapping Parent Id and Update
-        DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
+        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
@@ -433,7 +433,7 @@ class RelationController extends Controller
             ]);
 
         // Mapping Parent Id and Update
-        DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
+        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
 
         // check existing relation AKA
         $existingRelationAKA = MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();

@@ -833,7 +833,9 @@ export default function CashAdvance({ auth }: PageProps) {
     const {
         users,
         cash_advance_purpose,
-        cash_advance_cost_classification
+        cash_advance_cost_classification,
+        relations,
+        coa
     }: any = usePage().props;
 
     const purposes = [
@@ -1881,16 +1883,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         -- Choose Business
                                                         Relation --
                                                     </option>
-                                                    {companies.map(
-                                                        (company) => (
+                                                    {relations.map(
+                                                        (relation: any) => (
                                                             <option
-                                                                key={company.id}
+                                                                key={relation.RELATION_ORGANIZATION_ID}
                                                                 value={
-                                                                    company.id
+                                                                    relation.RELATION_ORGANIZATION_ID
                                                                 }
                                                             >
                                                                 {
-                                                                    company.nama_perusahaan
+                                                                    relation.RELATION_ORGANIZATION_NAME
                                                                 }
                                                             </option>
                                                         )
@@ -2460,12 +2462,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.purpose?.CASH_ADVANCE_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {cad.relation_organization?.RELATION_ORGANIZATION_NAME}
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {
@@ -2938,12 +2935,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.purpose?.CASH_ADVANCE_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {cad.relation_organization?.RELATION_ORGANIZATION_NAME}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
@@ -3731,18 +3723,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             -- Choose Business
                                                             Relation --
                                                         </option>
-                                                        {companies.map(
-                                                            (company) => (
+                                                        {relations.map(
+                                                            (relation: any) => (
                                                                 <option
-                                                                    key={
-                                                                        company.id
-                                                                    }
+                                                                    key={relation.RELATION_ORGANIZATION_ID}
                                                                     value={
-                                                                        company.id
+                                                                        relation.RELATION_ORGANIZATION_ID
                                                                     }
                                                                 >
                                                                     {
-                                                                        company.nama_perusahaan
+                                                                        relation.RELATION_ORGANIZATION_NAME
                                                                     }
                                                                 </option>
                                                             )
@@ -4351,12 +4341,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.purpose?.CASH_ADVANCE_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {cad.relation_organization?.RELATION_ORGANIZATION_NAME}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
@@ -5036,16 +5021,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         -- Choose Business
                                                         Relation --
                                                     </option>
-                                                    {companies.map(
-                                                        (company) => (
+                                                    {relations.map(
+                                                        (relation: any) => (
                                                             <option
-                                                                key={company.id}
+                                                                key={relation.RELATION_ORGANIZATION_ID}
                                                                 value={
-                                                                    company.id
+                                                                    relation.RELATION_ORGANIZATION_ID
                                                                 }
                                                             >
                                                                 {
-                                                                    company.nama_perusahaan
+                                                                    relation.RELATION_ORGANIZATION_NAME
                                                                 }
                                                             </option>
                                                         )
@@ -5615,12 +5600,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.REPORT_CASH_ADVANCE_DETAIL_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {cad.relation_organization?.RELATION_ORGANIZATION_NAME}
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {
@@ -6065,12 +6045,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.REPORT_CASH_ADVANCE_DETAIL_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {cad.relation_organization?.RELATION_ORGANIZATION_NAME}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
@@ -6161,18 +6136,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         <option value="">
                                                             Choose Cost Classification
                                                         </option>
-                                                        {approval.map(
-                                                            (approve) => (
+                                                        {coa.map(
+                                                            (coa_item: any) => (
                                                                 <option
                                                                     key={
-                                                                        approve.id
+                                                                        coa_item.COA_ID
                                                                     }
                                                                     value={
-                                                                        approve.id
+                                                                        coa_item.COA_ID
                                                                     }
                                                                 >
                                                                     {
-                                                                        approve.name
+                                                                        coa_item.COA_CODE + '-' + coa_item.COA_TITLE
                                                                     }
                                                                 </option>
                                                             )
@@ -6862,18 +6837,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             -- Choose Business
                                                             Relation --
                                                         </option>
-                                                        {companies.map(
-                                                            (company) => (
+                                                        {relations.map(
+                                                            (relation: any) => (
                                                                 <option
-                                                                    key={
-                                                                        company.id
-                                                                    }
+                                                                    key={relation.RELATION_ORGANIZATION_ID}
                                                                     value={
-                                                                        company.id
+                                                                        relation.RELATION_ORGANIZATION_ID
                                                                     }
                                                                 >
                                                                     {
-                                                                        company.nama_perusahaan
+                                                                        relation.RELATION_ORGANIZATION_NAME
                                                                     }
                                                                 </option>
                                                             )
@@ -7256,7 +7229,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={""}
-                panelWidth={"70%"}
+                // panelWidth={"70%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -7500,12 +7473,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.REPORT_CASH_ADVANCE_DETAIL_PURPOSE}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {cad.relation_organization?.RELATION_ORGANIZATION_NAME}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {
@@ -7548,7 +7516,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {cad.cost_classification?.CASH_ADVANCE_COST_CLASSIFICATION_NAME}
                                                 </TD>
                                                 <TD className="border">
-
+                                                    {cad.coa?.COA_CODE + ' - ' + cad.coa?.COA_TITLE}
                                                 </TD>
                                             <TD className="border">
                                                 {formatCurrency.format(
