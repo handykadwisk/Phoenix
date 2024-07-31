@@ -13,9 +13,15 @@ class TPersonCertificate extends Model
 
     protected $table = 't_person_certificate';
 
+    protected $with = ['CertificateQualification'];
+
     protected $guarded = [
         'PERSON_CERTIFICATE_ID',
     ];
 
     public $timestamps = false;
+
+    public function CertificateQualification(){
+        return $this->hasOne(RCertificateQualification::class, 'CERTIFICATE_QUALIFICATION_ID', 'CERTIFICATE_QUALIFICATION_ID');
+    }
 }

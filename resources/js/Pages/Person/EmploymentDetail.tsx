@@ -122,8 +122,14 @@ export default function EmploymentDetail({
         edit: false,
     });
 
-    // modal add education
+    // modal add certificate
     const [modalCertificate, setModalCertificate] = useState<any>({
+        add: false,
+        edit: false,
+    });
+
+    // modal add document
+    const [modalDocument, setModalDocument] = useState<any>({
         add: false,
         edit: false,
     });
@@ -148,6 +154,23 @@ export default function EmploymentDetail({
     const handleAddCertificate = async (e: FormEvent) => {
         setModalCertificate({
             add: !modalCertificate.add,
+        });
+        getQualification();
+    };
+
+    const handleEditCertificate = async (e: FormEvent) => {
+        setModalCertificate({
+            edit: !modalCertificate.edit,
+        });
+        setDataEditCertificate({
+            person_certificate: detailPerson.person_certificate,
+        });
+        getQualification();
+    };
+
+    const handleAddDocument = async (e: FormEvent) => {
+        setModalDocument({
+            add: !modalDocument.add,
         });
         getQualification();
     };
@@ -195,7 +218,22 @@ export default function EmploymentDetail({
         ],
     });
 
-    console.log(dataCertificate.dataCertificates);
+    // data edit certificate
+    const [dataEditCertificate, setDataEditCertificate] = useState<any>({
+        person_certificate: [
+            {
+                PERSON_ID: idPerson,
+                PERSON_CERTIFICATE_NAME: "",
+                PERSON_CERTIFICATE_IS_QUALIFICATION: "",
+                CERTIFICATE_QUALIFICATION_ID: "",
+                PERSON_CERTIFICATE_POINT: "",
+                PERSON_CERTIFICATE_START_DATE: "",
+                PERSON_CERTIFICATE_EXPIRES_DATE: "",
+            },
+        ],
+    });
+
+    console.log("acaca", dataEditCertificate);
 
     const addRowAddEducation = (e: FormEvent) => {
         e.preventDefault();
@@ -239,6 +277,24 @@ export default function EmploymentDetail({
             ...dataCertificate,
             dataCertificates: [
                 ...dataCertificate.dataCertificates,
+                {
+                    PERSON_ID: idPerson,
+                    PERSON_CERTIFICATE_NAME: "",
+                    PERSON_CERTIFICATE_IS_QUALIFICATION: "",
+                    CERTIFICATE_QUALIFICATION_ID: "",
+                    PERSON_CERTIFICATE_POINT: "",
+                    PERSON_CERTIFICATE_START_DATE: "",
+                    PERSON_CERTIFICATE_EXPIRES_DATE: "",
+                },
+            ],
+        });
+    };
+    const addRowEditCertificate = (e: FormEvent) => {
+        e.preventDefault();
+        setDataEditCertificate({
+            ...dataEditCertificate,
+            person_certificate: [
+                ...dataEditCertificate.person_certificate,
                 {
                     PERSON_ID: idPerson,
                     PERSON_CERTIFICATE_NAME: "",
@@ -302,7 +358,7 @@ export default function EmploymentDetail({
         });
     };
 
-    const inputEditCertificate = (
+    const inputAddCertificate = (
         name: string,
         value: string | undefined,
         i: number
@@ -312,6 +368,19 @@ export default function EmploymentDetail({
         setDataCertificate({
             ...dataCertificate,
             dataCertificates: changeVal,
+        });
+    };
+
+    const inputEditCertificate = (
+        name: string,
+        value: string | undefined | number,
+        i: number
+    ) => {
+        const changeVal: any = [...dataEditCertificate.person_certificate];
+        changeVal[i][name] = value;
+        setDataEditCertificate({
+            ...dataEditCertificate,
+            person_certificate: changeVal,
         });
     };
 
@@ -343,8 +412,574 @@ export default function EmploymentDetail({
             });
         }
     };
+
+    const handleSuccessAddCertificate = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            Swal.fire({
+                title: "Success",
+                text: "Person Certificate Add",
+                icon: "success",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                }
+            });
+        }
+    };
+    const handleSuccessEditCertificate = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            Swal.fire({
+                title: "Success",
+                text: "Person Certificate Edit",
+                icon: "success",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                }
+            });
+        }
+    };
+
+    const handleSuccessAddDocument = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            Swal.fire({
+                title: "Success",
+                text: "Person Document Add",
+                icon: "success",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    setDataDocument({
+                        PERSON_ID: idPerson,
+                        ktp_document: "",
+                        other_document: "",
+                    });
+                }
+            });
+        }
+    };
+
+    const [dataDocument, setDataDocument] = useState<any>({
+        PERSON_ID: idPerson,
+        ktp_document: "",
+        other_document: "",
+    });
+
+    const handleChange = (e: any) => {
+        // setFile(URL.createObjectURL(e.target.files[0]));
+        setDataDocument({
+            ...dataDocument,
+            ktp_document: e.target.files,
+        });
+    };
+
+    const handleChangeOther = (e: any) => {
+        // setFile(URL.createObjectURL(e.target.files[0]));
+        setDataDocument({
+            ...dataDocument,
+            other_document: e.target.files,
+        });
+    };
+
+    console.log(dataDocument);
+
+    const alertDelete = async (idDocument: string, idPerson: string) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't delete document!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Swal.fire({
+                //     title: "Deleted!",
+                //     text: "Your file has been deleted.",
+                //     icon: "success",
+                // });
+                deleteDocument(idDocument, idPerson);
+            }
+        });
+    };
+
+    const deleteDocument = async (idDocument: string, idPerson: string) => {
+        // console.log(data);
+        await axios
+            .post(`/deleteDocument`, { idDocument, idPerson })
+            .then((res) => {
+                Swal.fire({
+                    title: "Success",
+                    text: "Images Delete",
+                    icon: "success",
+                }).then((result: any) => {
+                    // console.log(result);
+                    if (result.value) {
+                        getPersonDetail(idPerson);
+                        // getPersons();
+                        // setGetDetailRelation(message);
+                        // setModal({
+                        //     add: false,
+                        //     delete: false,
+                        //     edit: false,
+                        //     view: true,
+                        //     document: false,
+                        //     search: false,
+                        // });
+                    }
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const downloadImage = async (id: string) => {
+        // console.log(data);
+        await axios
+            .get(`/downloadImage/${id}`)
+            .then((res) => {
+                // Swal.fire({
+                //     title: "Success",
+                //     text: "Images Delete",
+                //     icon: "success",
+                // }).then((result: any) => {
+                //     // console.log(result);
+                //     if (result.value) {
+                //         getPersonDetail(idPerson);
+                //         // getPersons();
+                //         // setGetDetailRelation(message);
+                //         // setModal({
+                //         //     add: false,
+                //         //     delete: false,
+                //         //     edit: false,
+                //         //     view: true,
+                //         //     document: false,
+                //         //     search: false,
+                //         // });
+                //     }
+                // });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <>
+            {/* Edit Document */}
+            <ModalToAdd
+                show={modalDocument.add}
+                onClose={() => {
+                    setModalDocument({
+                        add: false,
+                    });
+                    getPersonDetail(idPerson);
+                }}
+                title={"Add Document"}
+                url={`/addDocumentPerson`}
+                data={dataDocument}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
+                }
+                onSuccess={handleSuccessAddDocument}
+                body={
+                    <>
+                        <div>
+                            <div className="bg-white rounded-md p-4">
+                                <div>
+                                    <span>Photo KTP</span>
+                                </div>
+                                <div>
+                                    {/* <TextInput
+                                        type="file"
+                                        // value={pC.PERSON_CERTIFICATE_NAME}
+                                        className="mt-1"
+                                        onChange={(e) => {
+                                            inputEditCertificate(
+                                                "PERSON_CERTIFICATE_NAME",
+                                                e.target.value,
+                                                i
+                                            );
+                                        }}
+                                        placeholder="Certificate Name"
+                                        required
+                                    /> */}
+                                    <input
+                                        className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
+                                        id="file_input"
+                                        type="file"
+                                        onChange={(e) => handleChange(e)}
+                                    ></input>
+                                </div>
+                                <div className="mt-3">
+                                    <span>Other Document</span>
+                                </div>
+                                <div>
+                                    {/* <TextInput
+                                        type="file"
+                                        // value={pC.PERSON_CERTIFICATE_NAME}
+                                        className="mt-1"
+                                        onChange={(e) => {
+                                            inputEditCertificate(
+                                                "PERSON_CERTIFICATE_NAME",
+                                                e.target.value,
+                                                i
+                                            );
+                                        }}
+                                        placeholder="Certificate Name"
+                                        required
+                                    /> */}
+                                    <input
+                                        className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
+                                        id="file_input"
+                                        type="file"
+                                        multiple
+                                        onChange={(e) => handleChangeOther(e)}
+                                    ></input>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* End Certificate */}
+
+            {/* Edit Certificate */}
+            <ModalToAdd
+                show={modalCertificate.edit}
+                onClose={() => {
+                    setModalCertificate({
+                        edit: false,
+                    });
+                    getPersonDetail(idPerson);
+                }}
+                title={"Edit Certificate"}
+                url={`/EditCertificate`}
+                data={dataEditCertificate}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
+                }
+                onSuccess={handleSuccessEditCertificate}
+                body={
+                    <>
+                        <div className="mb-2">
+                            <div className="grid grid-cols-14 gap-3">
+                                <div className="col-span-3">
+                                    <div className="text-sm">
+                                        <span>Certificate Name</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Is Qualification</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Qualification</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Point</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Certificate Date</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Certificate Expiry Date</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {dataEditCertificate.person_certificate?.map(
+                                (pC: any, i: number) => {
+                                    return (
+                                        <div className="grid grid-cols-14 gap-3">
+                                            <div className="col-span-3">
+                                                <div>
+                                                    <TextInput
+                                                        type="text"
+                                                        value={
+                                                            pC.PERSON_CERTIFICATE_NAME
+                                                        }
+                                                        className="mt-1"
+                                                        onChange={(e) => {
+                                                            inputEditCertificate(
+                                                                "PERSON_CERTIFICATE_NAME",
+                                                                e.target.value,
+                                                                i
+                                                            );
+                                                        }}
+                                                        placeholder="Certificate Name"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div className="mt-2">
+                                                    <Checkbox
+                                                        value={
+                                                            pC.PERSON_CERTIFICATE_IS_QUALIFICATION
+                                                        }
+                                                        defaultChecked={
+                                                            pC.PERSON_CERTIFICATE_IS_QUALIFICATION
+                                                        }
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.checked
+                                                            ) {
+                                                                inputEditCertificate(
+                                                                    "PERSON_CERTIFICATE_IS_QUALIFICATION",
+                                                                    1,
+                                                                    i
+                                                                );
+                                                            } else {
+                                                                inputEditCertificate(
+                                                                    "PERSON_CERTIFICATE_IS_QUALIFICATION",
+                                                                    0,
+                                                                    i
+                                                                );
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span className="text-sm">
+                                                        {"   "}
+                                                        Yes
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {pC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
+                                            1 ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <select
+                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            value={
+                                                                pC.CERTIFICATE_QUALIFICATION_ID
+                                                            }
+                                                            onChange={(e) => {
+                                                                inputEditCertificate(
+                                                                    "CERTIFICATE_QUALIFICATION_ID",
+                                                                    parseInt(
+                                                                        e.target
+                                                                            .value
+                                                                    ),
+                                                                    i
+                                                                );
+                                                            }}
+                                                            required
+                                                        >
+                                                            <option
+                                                                value={""}
+                                                                className="text-white"
+                                                            >
+                                                                -- Choose
+                                                                Qualification --
+                                                            </option>
+                                                            {dataQualification?.map(
+                                                                (
+                                                                    dataQua: any,
+                                                                    a: number
+                                                                ) => {
+                                                                    return (
+                                                                        <option
+                                                                            key={
+                                                                                a
+                                                                            }
+                                                                            value={
+                                                                                dataQua.CERTIFICATE_QUALIFICATION_ID
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                dataQua.CERTIFICATE_QUALIFICATION_NAME
+                                                                            }
+                                                                        </option>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <select
+                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 bg-gray-300"
+                                                            value={
+                                                                pC.CERTIFICATE_QUALIFICATION_ID
+                                                            }
+                                                            // onChange={(e) =>
+                                                            //     inputEditEducation(
+                                                            //         "EDUCATION_DEGREE_ID",
+                                                            //         e.target.value,
+                                                            //         i
+                                                            //     )
+                                                            // }
+                                                            required
+                                                            disabled
+                                                        >
+                                                            <option
+                                                                value={""}
+                                                                className="text-white"
+                                                            >
+                                                                -- Choose
+                                                                Qualification --
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {pC.CERTIFICATE_QUALIFICATION_ID !==
+                                                1 &&
+                                            pC.CERTIFICATE_QUALIFICATION_ID !==
+                                                2 &&
+                                            pC.CERTIFICATE_QUALIFICATION_ID !==
+                                                3 &&
+                                            pC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
+                                                1 ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={
+                                                                pC.PERSON_CERTIFICATE_POINT
+                                                            }
+                                                            className="mt-1"
+                                                            onChange={(e) => {
+                                                                inputEditCertificate(
+                                                                    "PERSON_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={""}
+                                                            className="mt-1 bg-gray-500"
+                                                            onChange={(e) => {
+                                                                inputEditCertificate(
+                                                                    "PERSON_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="col-span-2">
+                                                <div>
+                                                    <TextInput
+                                                        type="date"
+                                                        value={
+                                                            pC.PERSON_CERTIFICATE_START_DATE
+                                                        }
+                                                        className="mt-1"
+                                                        onChange={(e) => {
+                                                            inputEditCertificate(
+                                                                "PERSON_CERTIFICATE_START_DATE",
+                                                                e.target.value,
+                                                                i
+                                                            );
+                                                        }}
+                                                        required
+                                                        placeholder="From"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div>
+                                                    <TextInput
+                                                        type="date"
+                                                        value={
+                                                            pC.PERSON_CERTIFICATE_EXPIRES_DATE
+                                                        }
+                                                        className="mt-1"
+                                                        onChange={(e) => {
+                                                            inputEditCertificate(
+                                                                "PERSON_CERTIFICATE_EXPIRES_DATE",
+                                                                e.target.value,
+                                                                i
+                                                            );
+                                                        }}
+                                                        required
+                                                        placeholder="From"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div>
+                                                    <span>
+                                                        <XMarkIcon
+                                                            className="w-6 mt-3 text-red-600 cursor-pointer"
+                                                            onClick={() => {
+                                                                const updatedData =
+                                                                    dataEditCertificate.person_certificate.filter(
+                                                                        (
+                                                                            data: any,
+                                                                            a: number
+                                                                        ) =>
+                                                                            a !==
+                                                                            i
+                                                                    );
+                                                                // console.log(
+                                                                //     "aaavv",
+                                                                //     updatedData
+                                                                // );
+                                                                setDataEditCertificate(
+                                                                    {
+                                                                        ...dataEditCertificate,
+                                                                        person_certificate:
+                                                                            updatedData,
+                                                                    }
+                                                                );
+                                                            }}
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            )}
+
+                            <div className="mt-2 w-fit">
+                                <div
+                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
+                                    onClick={(e) => addRowEditCertificate(e)}
+                                >
+                                    <span>+ Add Certificate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* End Certificate */}
+
             {/* Add Certificate */}
             <ModalToAdd
                 show={modalCertificate.add}
@@ -355,43 +990,43 @@ export default function EmploymentDetail({
                     getPersonDetail(idPerson);
                 }}
                 title={"Add Certificate"}
-                url={`/addEducationPerson`}
-                data={""}
+                url={`/addCertificate`}
+                data={dataCertificate}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
                 }
-                onSuccess={handleSuccessAddEducation}
+                onSuccess={handleSuccessAddCertificate}
                 body={
                     <>
                         <div className="mb-2">
                             <div className="grid grid-cols-14 gap-3">
                                 <div className="col-span-3">
-                                    <div>
+                                    <div className="text-sm">
                                         <span>Certificate Name</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div>
+                                    <div className="text-sm">
                                         <span>Is Qualification</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div>
+                                    <div className="text-sm">
                                         <span>Qualification</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div>
+                                    <div className="text-sm">
                                         <span>Point</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div>
+                                    <div className="text-sm">
                                         <span>Certificate Date</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div>
+                                    <div className="text-sm">
                                         <span>Certificate Expiry Date</span>
                                     </div>
                                 </div>
@@ -408,13 +1043,13 @@ export default function EmploymentDetail({
                                                             dC.PERSON_CERTIFICATE_NAME
                                                         }
                                                         className="mt-1"
-                                                        // onChange={(e) =>
-                                                        //     inputEditEducation(
-                                                        //         "PERSON_EDUCATION_MAJOR",
-                                                        //         e.target.value,
-                                                        //         i
-                                                        //     )
-                                                        // }
+                                                        onChange={(e) => {
+                                                            inputAddCertificate(
+                                                                "PERSON_CERTIFICATE_NAME",
+                                                                e.target.value,
+                                                                i
+                                                            );
+                                                        }}
                                                         placeholder="Certificate Name"
                                                         required
                                                     />
@@ -428,13 +1063,13 @@ export default function EmploymentDetail({
                                                             if (
                                                                 e.target.checked
                                                             ) {
-                                                                inputEditCertificate(
+                                                                inputAddCertificate(
                                                                     "PERSON_CERTIFICATE_IS_QUALIFICATION",
                                                                     "1",
                                                                     i
                                                                 );
                                                             } else {
-                                                                inputEditCertificate(
+                                                                inputAddCertificate(
                                                                     "PERSON_CERTIFICATE_IS_QUALIFICATION",
                                                                     "0",
                                                                     i
@@ -442,7 +1077,10 @@ export default function EmploymentDetail({
                                                             }
                                                         }}
                                                     />
-                                                    <span> Yes</span>
+                                                    <span className="text-sm">
+                                                        {"   "}
+                                                        Yes
+                                                    </span>
                                                 </div>
                                             </div>
                                             {dC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
@@ -454,13 +1092,14 @@ export default function EmploymentDetail({
                                                             value={
                                                                 dC.CERTIFICATE_QUALIFICATION_ID
                                                             }
-                                                            // onChange={(e) =>
-                                                            //     inputEditEducation(
-                                                            //         "EDUCATION_DEGREE_ID",
-                                                            //         e.target.value,
-                                                            //         i
-                                                            //     )
-                                                            // }
+                                                            onChange={(e) => {
+                                                                inputAddCertificate(
+                                                                    "CERTIFICATE_QUALIFICATION_ID",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
                                                             required
                                                         >
                                                             <option
@@ -523,27 +1162,58 @@ export default function EmploymentDetail({
                                                     </div>
                                                 </div>
                                             )}
-
-                                            <div className="col-span-2">
-                                                <div>
-                                                    <TextInput
-                                                        type="text"
-                                                        value={
-                                                            dC.PERSON_CERTIFICATE_POINT
-                                                        }
-                                                        className="mt-1"
-                                                        // onChange={(e) =>
-                                                        //     inputEditEducation(
-                                                        //         "PERSON_EDUCATION_MAJOR",
-                                                        //         e.target.value,
-                                                        //         i
-                                                        //     )
-                                                        // }
-                                                        placeholder="Point"
-                                                        required
-                                                    />
+                                            {dC.CERTIFICATE_QUALIFICATION_ID !==
+                                                "1" &&
+                                            dC.CERTIFICATE_QUALIFICATION_ID !==
+                                                "2" &&
+                                            dC.CERTIFICATE_QUALIFICATION_ID !==
+                                                "3" &&
+                                            dC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
+                                                "1" ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={
+                                                                dC.PERSON_CERTIFICATE_POINT
+                                                            }
+                                                            className="mt-1"
+                                                            onChange={(e) => {
+                                                                inputAddCertificate(
+                                                                    "PERSON_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            ) : (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={""}
+                                                            className="mt-1 bg-gray-500"
+                                                            onChange={(e) => {
+                                                                inputAddCertificate(
+                                                                    "PERSON_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className="col-span-2">
                                                 <div>
                                                     <TextInput
@@ -552,13 +1222,13 @@ export default function EmploymentDetail({
                                                             dC.PERSON_CERTIFICATE_START_DATE
                                                         }
                                                         className="mt-1"
-                                                        onChange={(e) =>
-                                                            inputEditEducation(
-                                                                "PERSON_EDUCATION_START",
+                                                        onChange={(e) => {
+                                                            inputAddCertificate(
+                                                                "PERSON_CERTIFICATE_START_DATE",
                                                                 e.target.value,
                                                                 i
-                                                            )
-                                                        }
+                                                            );
+                                                        }}
                                                         required
                                                         placeholder="From"
                                                     />
@@ -572,13 +1242,13 @@ export default function EmploymentDetail({
                                                             dC.PERSON_CERTIFICATE_EXPIRES_DATE
                                                         }
                                                         className="mt-1"
-                                                        onChange={(e) =>
-                                                            inputEditEducation(
-                                                                "PERSON_EDUCATION_START",
+                                                        onChange={(e) => {
+                                                            inputAddCertificate(
+                                                                "PERSON_CERTIFICATE_EXPIRES_DATE",
                                                                 e.target.value,
                                                                 i
-                                                            )
-                                                        }
+                                                            );
+                                                        }}
                                                         required
                                                         placeholder="From"
                                                     />
@@ -620,7 +1290,7 @@ export default function EmploymentDetail({
                                 }
                             )}
 
-                            <div className="mt-2">
+                            <div className="mt-2 w-fit">
                                 <div
                                     className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
                                     onClick={(e) => addRowAddCertificate(e)}
@@ -647,7 +1317,7 @@ export default function EmploymentDetail({
                 url={`/editEducationPerson`}
                 data={dataEditEducation}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
                 onSuccess={handleSuccessEditEducation}
                 body={
@@ -860,7 +1530,7 @@ export default function EmploymentDetail({
                 url={`/addEducationPerson`}
                 data={dataEducation}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
                 onSuccess={handleSuccessAddEducation}
                 body={
@@ -1010,7 +1680,7 @@ export default function EmploymentDetail({
                                                             i
                                                         )
                                                     }
-                                                    placeholder="Major"
+                                                    placeholder="School/Collage/University"
                                                     required
                                                 />
                                             </div>
@@ -1040,7 +1710,7 @@ export default function EmploymentDetail({
                                 }
                             )}
 
-                            <div className="mt-2">
+                            <div className="mt-2 w-fit">
                                 <div
                                     className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
                                     onClick={(e) => addRowAddEducation(e)}
@@ -1747,28 +2417,28 @@ export default function EmploymentDetail({
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-13 gap-3 px-4 py-0">
+                                <div className="grid grid-cols-13 gap-3 px-4 divide-x py-0">
                                     <div className="col-span-2 text-md font-semibold">
                                         <div>
                                             <span>From</span>
                                         </div>
                                     </div>
-                                    <div className="col-span-2 text-md font-semibold">
+                                    <div className="col-span-2 text-md font-semibold px-2">
                                         <div>
                                             <span>To</span>
                                         </div>
                                     </div>
-                                    <div className="col-span-2 text-md font-semibold">
+                                    <div className="col-span-2 text-md font-semibold px-2">
                                         <div>
                                             <span>Degree</span>
                                         </div>
                                     </div>
-                                    <div className="col-span-3 text-md font-semibold">
+                                    <div className="col-span-3 text-md font-semibold px-2">
                                         <div>
                                             <span>Major</span>
                                         </div>
                                     </div>
-                                    <div className="col-span-4 text-md font-semibold">
+                                    <div className="col-span-4 text-md font-semibold px-2">
                                         <div className="flex justify-between items-center">
                                             <div>
                                                 <span>
@@ -1795,7 +2465,7 @@ export default function EmploymentDetail({
                                     (pE: any, i: number) => {
                                         return (
                                             <div
-                                                className="grid grid-cols-13 gap-3 px-4"
+                                                className="grid grid-cols-13 gap-3 px-4 divide-x mb-2 mt-2"
                                                 key={i}
                                             >
                                                 <div className="col-span-2 text-sm text-gray-500">
@@ -1807,7 +2477,7 @@ export default function EmploymentDetail({
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="col-span-2 text-sm text-gray-500">
+                                                <div className="col-span-2 text-sm text-gray-500 px-2">
                                                     <div>
                                                         <span>
                                                             {
@@ -1816,16 +2486,18 @@ export default function EmploymentDetail({
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="col-span-2 text-sm text-gray-500">
+                                                <div className="col-span-2 text-sm text-gray-500 px-2">
                                                     <div>
                                                         <span>
                                                             {
-                                                                pE.EDUCATION_DEGREE_ID
+                                                                pE
+                                                                    .education_degree
+                                                                    .EDUCATION_DEGREE_NAME
                                                             }
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="col-span-3 text-gray-500 text-sm">
+                                                <div className="col-span-3 text-gray-500 px-2 text-sm">
                                                     <div>
                                                         <span>
                                                             {
@@ -1834,7 +2506,7 @@ export default function EmploymentDetail({
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="col-span-3 text-gray-500 text-sm">
+                                                <div className="col-span-3 text-gray-500 px-2 text-sm">
                                                     <div>
                                                         <span>
                                                             {
@@ -1851,59 +2523,260 @@ export default function EmploymentDetail({
                         )}
                     </div>
                 ) : tab.nameTab === "Certificate" ? (
-                    <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md">
-                        <div className="px-2 p-4">
-                            <div
-                                className="bg-red-500 w-fit p-2 rounded-md text-white hover:cursor-pointer hover:bg-red-400"
-                                onClick={(e) => handleAddCertificate(e)}
-                            >
-                                <span>Add Certificate</span>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-13 gap-3 px-4 py-0">
-                            <div className="col-span-2 text-md font-semibold">
-                                <div>
-                                    <span>From</span>
+                    <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md h-40">
+                        {detailPerson.person_certificate?.length === 0 ? (
+                            <div className="px-2 p-4">
+                                <div
+                                    className="bg-red-500 w-fit p-2 rounded-md text-white hover:cursor-pointer hover:bg-red-400"
+                                    onClick={(e) => handleAddCertificate(e)}
+                                >
+                                    <span>Add Certificate</span>
                                 </div>
                             </div>
-                            <div className="col-span-2 text-md font-semibold">
-                                <div>
-                                    <span>To</span>
-                                </div>
-                            </div>
-                            <div className="col-span-2 text-md font-semibold">
-                                <div>
-                                    <span>Degree</span>
-                                </div>
-                            </div>
-                            <div className="col-span-3 text-md font-semibold">
-                                <div>
-                                    <span>Major</span>
-                                </div>
-                            </div>
-                            <div className="col-span-4 text-md font-semibold">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <span>School/College/University</span>
+                        ) : (
+                            <>
+                                <div className="grid grid-cols-14 gap-3 divide-x">
+                                    <div className="col-span-3">
+                                        <div className="text-sm font-semibold">
+                                            <span>Certificate Name</span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span>
-                                            <PencilSquareIcon
-                                                className="w-6 text-red-600 cursor-pointer"
-                                                title="Edit Education"
-                                                onClick={(e: any) => {
-                                                    handleEditEducation(e);
-                                                }}
-                                            />
-                                        </span>
+                                    <div className="col-span-2 px-1">
+                                        <div className="text-sm font-semibold">
+                                            <span>Is Qualification</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 px-1">
+                                        <div className="text-sm font-semibold">
+                                            <span>Qualification</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 px-1">
+                                        <div className="text-sm font-semibold">
+                                            <span>Point</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 px-1">
+                                        <div className="text-sm font-semibold">
+                                            <span>Certificate Date</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-3 px-1">
+                                        <div className="text-sm font-semibold flex justify-between">
+                                            <div>
+                                                <span>
+                                                    Certificate Expiry Date
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span>
+                                                    <PencilSquareIcon
+                                                        className="w-5 text-red-600 cursor-pointer"
+                                                        title="Edit Certificate"
+                                                        onClick={(e) => {
+                                                            handleEditCertificate(
+                                                                e
+                                                            );
+                                                        }}
+                                                    />
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                                {detailPerson.person_certificate?.map(
+                                    (pC: any, a: number) => {
+                                        return (
+                                            <div
+                                                className="grid grid-cols-14 gap-3 divide-x mb-2 mt-2"
+                                                key={a}
+                                            >
+                                                <div className="col-span-3">
+                                                    <div className="text-sm text-gray-500">
+                                                        <span>
+                                                            {
+                                                                pC.PERSON_CERTIFICATE_NAME
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 px-1">
+                                                    <div className="text-sm text-gray-500">
+                                                        {pC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
+                                                        1 ? (
+                                                            <div className="bg-green-600 px-3 py-1 rounded-md w-fit text-white">
+                                                                <span>Yes</span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="bg-red-600 px-3 py-1 rounded-md w-fit text-white">
+                                                                <span>No</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 px-1">
+                                                    <div className="text-sm text-gray-500">
+                                                        {pC.certificate_qualification ===
+                                                        null ? (
+                                                            <span>{"-"}</span>
+                                                        ) : (
+                                                            <span>
+                                                                {
+                                                                    pC
+                                                                        .certificate_qualification
+                                                                        .CERTIFICATE_QUALIFICATION_NAME
+                                                                }
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 px-1">
+                                                    <div className="text-sm text-gray-500">
+                                                        {pC.PERSON_CERTIFICATE_POINT ===
+                                                        null ? (
+                                                            <span>{"-"}</span>
+                                                        ) : (
+                                                            <span>
+                                                                {
+                                                                    pC.PERSON_CERTIFICATE_POINT
+                                                                }
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 px-1">
+                                                    <div className="text-sm text-gray-500">
+                                                        <span>
+                                                            {
+                                                                pC.PERSON_CERTIFICATE_START_DATE
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 px-1">
+                                                    <div className="text-sm text-gray-500">
+                                                        <span>
+                                                            {
+                                                                pC.PERSON_CERTIFICATE_EXPIRES_DATE
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </>
+                        )}
                     </div>
                 ) : (
-                    <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md">
-                        <div>Document</div>
+                    <div className="bg-white shadow-md p-4 rounded-bl-md rounded-br-md rounded-tr-md h-full">
+                        <div>
+                            <div
+                                className="bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
+                                onClick={(e) => {
+                                    handleAddDocument(e);
+                                }}
+                            >
+                                <span>Add Document</span>
+                            </div>
+                        </div>
+                        <div className="mt-2 grid-cols-4 grid gap-4">
+                            <div className="text-sm font-semibold ">
+                                <span>Images</span>
+                            </div>
+                            <div className="text-sm font-semibold ">
+                                <span>Name Document</span>
+                            </div>
+                            <div className="text-sm font-semibold ">
+                                <span>Type / Size</span>
+                            </div>
+                        </div>
+                        {detailPerson.m_person_document?.map(
+                            (mPD: any, l: number) => {
+                                return (
+                                    <div className="grid-cols-4 grid gap-4 mb-2">
+                                        <div className="text-sm ">
+                                            <span>
+                                                <img
+                                                    className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                                                    src={
+                                                        window.location.origin +
+                                                        "/storage/" +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_DIRNAME +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_FILENAME
+                                                    }
+                                                    alt="Image Person"
+                                                    // onClick={(e) => {
+                                                    //     downloadImage(
+                                                    //         mPD.document_person
+                                                    //             ?.DOCUMENT_ID
+                                                    //     );
+                                                    // }}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        window.open(
+                                                            window.location
+                                                                .origin +
+                                                                "/storage/" +
+                                                                mPD
+                                                                    .document_person
+                                                                    ?.DOCUMENT_DIRNAME +
+                                                                mPD
+                                                                    .document_person
+                                                                    ?.DOCUMENT_FILENAME,
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                />
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-500 font-semibold ">
+                                            <span>
+                                                {
+                                                    mPD.document_person
+                                                        .DOCUMENT_ORIGINAL_NAME
+                                                }
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <div className="text-sm font-semibold text-gray-500">
+                                                <span>
+                                                    {
+                                                        mPD.document_person
+                                                            .DOCUMENT_FILETYPE
+                                                    }
+                                                </span>
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                <span className="text-xs">
+                                                    {
+                                                        mPD.document_person
+                                                            .DOCUMENT_FILESIZE
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span>
+                                                <XMarkIcon
+                                                    className="w-7 text-red-600 hover:cursor-pointer"
+                                                    title="Delete Images"
+                                                    onClick={(e) =>
+                                                        alertDelete(
+                                                            mPD.DOCUMENT_ID,
+                                                            mPD.PERSON_ID
+                                                        )
+                                                    }
+                                                />
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                        )}
                     </div>
                 )}
             </div>

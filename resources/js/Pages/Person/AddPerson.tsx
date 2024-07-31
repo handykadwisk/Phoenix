@@ -183,9 +183,7 @@ export default function AddPerson({
                                 />
                                 <div className="ml-24 text-red-600">*</div>
                                 <TextInput
-                                    id="PERSON_FIRST_NAME"
                                     type="text"
-                                    name="PERSON_FIRST_NAME"
                                     value={data.PERSON_FIRST_NAME}
                                     className="mt-2"
                                     onChange={(e) =>
@@ -214,6 +212,7 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Gender --
@@ -229,9 +228,7 @@ export default function AddPerson({
                                         value={"Place Of Birth "}
                                     />
                                     <TextInput
-                                        id="PERSON_BIRTH_PLACE"
                                         type="text"
-                                        name="PERSON_BIRTH_PLACE"
                                         value={data.PERSON_BIRTH_PLACE}
                                         className="mt-2"
                                         onChange={(e) =>
@@ -240,21 +237,17 @@ export default function AddPerson({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="Place Of Birth"
                                     />
                                 </div>
-                                <div className="relative">
+                                <div className="">
                                     <InputLabel
-                                        className="absolute"
+                                        className=""
                                         htmlFor="PERSON_BIRTH_DATE"
                                         value={"Date Of Birth "}
                                     />
-                                    <div className="ml-24 text-red-600">*</div>
                                     <TextInput
-                                        id="PERSON_BIRTH_DATE"
                                         type="date"
-                                        name="PERSON_BIRTH_DATE"
                                         value={data.PERSON_BIRTH_DATE}
                                         className="mt-2"
                                         onChange={(e) =>
@@ -263,7 +256,6 @@ export default function AddPerson({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="Date Of Birth"
                                     />
                                 </div>
@@ -345,9 +337,7 @@ export default function AddPerson({
                                         value={"Person KTP"}
                                     />
                                     <TextInput
-                                        id="PERSON_KTP"
                                         type="text"
-                                        name="PERSON_KTP"
                                         value={data.PERSON_KTP}
                                         className="mt-2"
                                         onChange={(e) => {
@@ -356,7 +346,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                         placeholder="Person KTP"
                                     />
                                 </div>
@@ -367,9 +356,7 @@ export default function AddPerson({
                                         value={"Person NPWP "}
                                     />
                                     <TextInput
-                                        id="PERSON_NPWP"
                                         type="text"
-                                        name="PERSON_NPWP"
                                         value={data.PERSON_NPWP}
                                         className="mt-2"
                                         onChange={(e) => {
@@ -378,7 +365,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                         placeholder="Person NPWP"
                                     />
                                 </div>
@@ -389,9 +375,7 @@ export default function AddPerson({
                                         value={"Person KK "}
                                     />
                                     <TextInput
-                                        id="PERSON_KK"
                                         type="text"
-                                        name="PERSON_KK"
                                         value={data.PERSON_KK}
                                         className="mt-2"
                                         onChange={(e) => {
@@ -400,7 +384,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                         placeholder="Person KK"
                                     />
                                 </div>
@@ -532,9 +515,7 @@ export default function AddPerson({
                                                                         {i + 1}
                                                                     </span>
                                                                     <TextInput
-                                                                        id="NAME_CONTACT_EMERGENCY"
                                                                         type="text"
-                                                                        name="NAME_CONTACT_EMERGENCY"
                                                                         value={
                                                                             cm.NAME_CONTACT_EMERGENCY
                                                                         }
@@ -555,9 +536,7 @@ export default function AddPerson({
                                                                 </td>
                                                                 <td className="py-3 px-2">
                                                                     <TextInput
-                                                                        id="PHONE_CONTACT_EMERGENCY"
                                                                         type="text"
-                                                                        name="PHONE_CONTACT_EMERGENCY"
                                                                         value={
                                                                             cm.PHONE_CONTACT_EMERGENCY
                                                                         }

@@ -1738,7 +1738,7 @@ export default function DetailPerson({
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
                 }
                 submitButtonName={""}
                 body={
@@ -2144,12 +2144,9 @@ export default function DetailPerson({
                                             window.location.origin +
                                             "/storage/" +
                                             detailPerson.document
-                                                ?.DOCUMENT_PATHNAME +
+                                                ?.DOCUMENT_DIRNAME +
                                             detailPerson.document
-                                                ?.DOCUMENT_FILENAME +
-                                            "." +
-                                            detailPerson.document
-                                                ?.DOCUMENT_EXTENTION
+                                                ?.DOCUMENT_FILENAME
                                         }
                                         alt="Image Person"
                                     />

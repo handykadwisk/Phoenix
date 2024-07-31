@@ -12,9 +12,11 @@ use App\Models\RPersonRelationship;
 use App\Models\RTaxStatus;
 use App\Models\RWilayahKemendagri;
 use App\Models\TAddress;
-use App\Models\TDocument;
+use App\Models\Document;
+use App\Models\MPersonDocument;
 use App\Models\TPerson;
 use App\Models\TPersonBankAccount;
+use App\Models\TPersonCertificate;
 use App\Models\TPersonContact;
 use App\Models\TPersonEducation;
 use App\Models\TPersonEmergencyContact;
@@ -25,6 +27,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TPersonController extends Controller
 {
@@ -165,6 +168,41 @@ class TPersonController extends Controller
         
     }
 
+    public function RemoveSpecialChar($str)
+    {
+        $replace = Str::of($str)->replace(
+            [
+                '`',
+                '~',
+                ' ',
+                '!',
+                '@',
+                '#',
+                '$',
+                '%',
+                '^',
+                '&',
+                '*',
+                '(',
+                ')',
+                '+',
+                '=',
+                '<',
+                '>',
+                '{',
+                '}',
+                '[',
+                ']',
+                '?',
+                '/',
+                ':',
+                ';'
+            ],
+            '-'
+        );
+        return $replace;
+    }
+
 
 
     public function store(Request $request){
@@ -241,7 +279,7 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->with('PersonEducation')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->with('PersonEducation')->with('PersonCertificate')->with('MPersonDocument')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -398,7 +436,7 @@ class TPersonController extends Controller
         Storage::disk('public')->putFileAs($uploadPath, $file[0], $file[0]->getClientOriginalName());
 
         if ($documentId) {
-            TDocument::where('DOCUMENT_ID', $documentId)
+            Document::where('DOCUMENT_ID', $documentId)
                     ->update([
                         'DOCUMENT_FILENAME'         => pathinfo($file[0]->getClientOriginalName(), PATHINFO_FILENAME),
                         'DOCUMENT_PATHNAME'         => $uploadPath,
@@ -411,7 +449,7 @@ class TPersonController extends Controller
             $document = $documentId;
             
         } else {
-            $document = TDocument::create([
+            $document = Document::create([
                 'DOCUMENT_FILENAME'         => pathinfo($file[0]->getClientOriginalName(), PATHINFO_FILENAME),
                 'DOCUMENT_PATHNAME'         => $uploadPath,
                 'DOCUMENT_EXTENTION'        => pathinfo($file[0]->getClientOriginalName(), PATHINFO_EXTENSION),
@@ -433,13 +471,47 @@ class TPersonController extends Controller
         $imgProfile = $request->file('files');
         // print_r($imgProfile);die;
         if ($imgProfile) {
-                $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
-    
-                if ($document) {
-                    TPerson::where('PERSON_ID', $request->id)
-                      ->update([
-                        'PERSON_IMAGE_ID'    => $document
-                      ]);
+                // $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
+                $documentImg = is_countable($request->file('files'));
+                if($documentImg){
+                    for ($i=0; $i < sizeof($request->file('files')); $i++) { 
+                        $uploadDocument = $request->file('files');
+                        
+                        // Create Folder For Person Document
+                        $parentDir = ((floor(($request->id)/1000))*1000).'/';
+                        $personID = $request->id . '/';
+                        $typeDir = "";
+                        $uploadPath = 'images/'. $parentDir . $personID . $typeDir;
+        
+        
+                        // get Data Document
+                        $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                        $documentFileName = $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                        $documentDirName = $uploadPath;
+                        $documentFileType = $uploadDocument[$i]->getMimeType();
+                        $documentFileSize = $uploadDocument[$i]->getSize();
+        
+                        // create folder in directory laravel
+                        Storage::makeDirectory($uploadPath, 0777, true, true);
+                        Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+        
+                        // masukan data file ke database
+                        $document = Document::create([
+                            'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                            'DOCUMENT_FILENAME'             => $documentFileName,
+                            'DOCUMENT_DIRNAME'              => $documentDirName,
+                            'DOCUMENT_FILETYPE'             => $documentFileType,
+                            'DOCUMENT_FILESIZE'             => $documentFileSize,
+                            'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                        ])->DOCUMENT_ID;
+        
+                        if ($document) {
+                            TPerson::where('PERSON_ID', $request->id)
+                              ->update([
+                                'PERSON_IMAGE_ID'    => $document
+                              ]);
+                        }
+                    }
                 }
     
             }
@@ -813,6 +885,249 @@ class TPersonController extends Controller
         $data = RCertificateQualification::get();
 
         return response()->json($data);
+    }
+
+    public function add_Certificate(Request $request){
+        $certificate = is_countable($request->dataCertificates);
+        if ($certificate) {
+            for ($i=0; $i < sizeof($request->dataCertificates); $i++) { 
+                $createCertificate = TPersonCertificate::create([
+                    "PERSON_ID"                                 => $request->dataCertificates[$i]['PERSON_ID'],
+                    "PERSON_CERTIFICATE_NAME"                   => $request->dataCertificates[$i]['PERSON_CERTIFICATE_NAME'], 
+                    "PERSON_CERTIFICATE_IS_QUALIFICATION"       => $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'],
+                    "CERTIFICATE_QUALIFICATION_ID"              => $request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'],
+                    "PERSON_CERTIFICATE_POINT"                  => $request->dataCertificates[$i]['PERSON_CERTIFICATE_POINT'],
+                    "PERSON_CERTIFICATE_START_DATE"             => $request->dataCertificates[$i]['PERSON_CERTIFICATE_START_DATE'],
+                    "PERSON_CERTIFICATE_EXPIRES_DATE"           => $request->dataCertificates[$i]['PERSON_CERTIFICATE_EXPIRES_DATE'],
+                    "PERSON_CERTIFICATE_CREATED_BY"             => Auth::user()->id,
+                    "PERSON_CERTIFICATE_CREATED_DATE"           => now(),
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Add Person Certificate (Person).",
+            "module"      => "Person",
+                "id"          => $request->dataCertificates[0]['PERSON_ID']
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->dataCertificates[0]['PERSON_ID']
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function edit_Certificate(Request $request){
+        // cek existing
+        $dataExisting = TPersonCertificate::where('PERSON_ID', $request->person_certificate[0]['PERSON_ID'])->get();
+        if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+            TPersonCertificate::where('PERSON_ID', $request->person_certificate[0]['PERSON_ID'])->delete();
+        }
+
+        $certificate = is_countable($request->person_certificate);
+        if ($certificate) {
+            for ($i=0; $i < sizeof($request->person_certificate); $i++) { 
+
+                $pointNew = NULL;
+                $qualification = NULL;
+                if ($request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 1 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 2 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 3) {
+                    $pointNew = $request->person_certificate[$i]['PERSON_CERTIFICATE_POINT'];
+                    // $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
+                }
+
+                if ($request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] == 1) {
+                    $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
+                }
+
+
+                $createCertificate = TPersonCertificate::create([
+                    "PERSON_ID"                                 => $request->person_certificate[$i]['PERSON_ID'],
+                    "PERSON_CERTIFICATE_NAME"                   => $request->person_certificate[$i]['PERSON_CERTIFICATE_NAME'], 
+                    "PERSON_CERTIFICATE_IS_QUALIFICATION"       => $request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'],
+                    "CERTIFICATE_QUALIFICATION_ID"              => $qualification,
+                    "PERSON_CERTIFICATE_POINT"                  => $pointNew,
+                    "PERSON_CERTIFICATE_START_DATE"             => $request->person_certificate[$i]['PERSON_CERTIFICATE_START_DATE'],
+                    "PERSON_CERTIFICATE_EXPIRES_DATE"           => $request->person_certificate[$i]['PERSON_CERTIFICATE_EXPIRES_DATE'],
+                    "PERSON_CERTIFICATE_CREATED_BY"             => Auth::user()->id,
+                    "PERSON_CERTIFICATE_CREATED_DATE"           => now(),
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Edit Person Certificate (Person).",
+            "module"      => "Person",
+                "id"          => $request->person_certificate[0]['PERSON_ID']
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->person_certificate[0]['PERSON_ID']
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function add_document(Request $request){
+        // add Document KTP
+        $ktpDocument = is_countable($request->file('ktp_document'));
+        $otherDocument = is_countable($request->file('other_document'));
+        
+        //upload file ktp
+        if ($ktpDocument) {
+            for ($i=0; $i < sizeof($request->file('ktp_document')); $i++) { 
+                $uploadDocument = $request->file('ktp_document');
+                
+                // Create Folder For Person Document
+                $parentDir = ((floor(($request->PERSON_ID)/1000))*1000).'/';
+                $personID = $request->PERSON_ID . '/';
+                $typeDir = "";
+                $uploadPath = 'documents/' . 'Person/'. $parentDir . $personID . $typeDir;
+
+
+                // get Data Document
+                $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                $documentFileName = $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                $documentDirName = $uploadPath;
+                $documentFileType = $uploadDocument[$i]->getMimeType();
+                $documentFileSize = $uploadDocument[$i]->getSize();
+
+                // create folder in directory laravel
+                Storage::makeDirectory($uploadPath, 0777, true, true);
+                Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+
+                // masukan data file ke database
+                $document = Document::create([
+                    'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                    'DOCUMENT_FILENAME'             => $documentFileName,
+                    'DOCUMENT_DIRNAME'              => $documentDirName,
+                    'DOCUMENT_FILETYPE'             => $documentFileType,
+                    'DOCUMENT_FILESIZE'             => $documentFileSize,
+                    'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                ])->DOCUMENT_ID;
+
+                if($document){
+                    MPersonDocument::create([
+                        'PERSON_ID'     => $request->PERSON_ID,
+                        'DOCUMENT_ID'   => $document
+                    ]);
+                }
+            }
+        }
+
+
+        // upload file other document
+        if ($otherDocument) {
+            for ($i=0; $i < sizeof($request->file('other_document')); $i++) { 
+                $uploadDocument = $request->file('other_document');
+                
+                // Create Folder For Person Document
+                $parentDir = ((floor(($request->PERSON_ID)/1000))*1000).'/';
+                $personID = $request->PERSON_ID . '/';
+                $typeDir = "";
+                $uploadPath = 'documents/' . 'Person/'. $parentDir . $personID . $typeDir;
+
+
+                // get Data Document
+                $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                $documentFileName = $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                $documentDirName = $uploadPath;
+                $documentFileType = $uploadDocument[$i]->getMimeType();
+                $documentFileSize = $uploadDocument[$i]->getSize();
+
+                // create folder in directory laravel
+                Storage::makeDirectory($uploadPath, 0777, true, true);
+                Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+
+                // masukan data file ke database
+                $document = Document::create([
+                    'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                    'DOCUMENT_FILENAME'             => $documentFileName,
+                    'DOCUMENT_DIRNAME'              => $documentDirName,
+                    'DOCUMENT_FILETYPE'             => $documentFileType,
+                    'DOCUMENT_FILESIZE'             => $documentFileSize,
+                    'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                ])->DOCUMENT_ID;
+
+                if($document){
+                    MPersonDocument::create([
+                        'PERSON_ID'     => $request->PERSON_ID,
+                        'DOCUMENT_ID'   => $document
+                    ]);
+                }
+            }
+        }
+
+
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Add Person Document (Person).",
+            "module"      => "Person",
+                "id"          => $request->PERSON_ID
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->PERSON_ID
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function delete_document(Request $request){
+        // Delete Document 
+        $idDocument = $request->idDocument;
+        // delete MPersonDocument
+        if($idDocument){
+            $mPersonDocument = MPersonDocument::where('DOCUMENT_ID', $request->idDocument)->delete();
+
+            if($mPersonDocument){
+                // delete image from folder
+                $data = Document::find($request->idDocument);
+                Storage::disk('public')->delete($data->DOCUMENT_DIRNAME.$data->DOCUMENT_FILENAME);
+
+                // delete document from database
+                Document::where('DOCUMENT_ID', $request->idDocument)->delete();
+
+            }
+        }
+
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Person Document Delete (Person).",
+            "module"      => "Person",
+            "id"          => $request->idPerson
+        ]),
+        'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->idPerson
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function download_document($id){
+        $data = Document::find($id);
+        $downloadFile = Storage::path('public/'.$data->DOCUMENT_DIRNAME.$data->DOCUMENT_FILENAME);
+        return response()->download($downloadFile);
+
     }
     
 }   

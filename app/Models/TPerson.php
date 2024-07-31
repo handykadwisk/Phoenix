@@ -48,7 +48,7 @@ class TPerson extends Model
     }
 
     public function Document(){
-        return $this->hasOne(TDocument::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
+        return $this->hasOne(Document::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
     }
 
     public function mPersonContact(){
@@ -61,6 +61,14 @@ class TPerson extends Model
 
     public function PersonEducation(){
         return $this->hasMany(TPersonEducation::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function PersonCertificate(){
+        return $this->hasMany(TPersonCertificate::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function MPersonDocument(){
+        return $this->hasMany(MPersonDocument::class, 'PERSON_ID', 'PERSON_ID');
     }
 
 }
