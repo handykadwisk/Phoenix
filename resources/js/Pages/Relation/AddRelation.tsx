@@ -209,6 +209,39 @@ export default function AddRelation({
         };
     });
 
+    const [existingAbb, setExistingAbb] = useState<any>([]);
+
+    const cekAbbreviationRelation = async (name: any) => {
+        const flag = "";
+        await axios
+            .post(`/getCekAbbreviation`, { name, flag })
+            .then((res: any) => {
+                setExistingAbb(res.data);
+                if (res.data.length >= 1) {
+                    Swal.fire({
+                        title: "Warning",
+                        text: "Abbreviation already exists",
+                        icon: "warning",
+                    }).then((result: any) => {
+                        // console.log(result);
+                    });
+                }
+                // cekAbbreviation(existingAbb);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // const cekAbbreviation = (result: any) => {
+    //     console.log(result.length);
+    //     if (result.length === 1) {
+    //         alert("ADA");
+    //     } else {
+    //         alert("gaada");
+    //     }
+    // };
+
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -402,6 +435,11 @@ export default function AddRelation({
                                     }
                                     required
                                     placeholder="Abbreviation"
+                                    onBlur={() => {
+                                        cekAbbreviationRelation(
+                                            data.abbreviation
+                                        );
+                                    }}
                                 />
                             </div>
                         </div>
@@ -486,7 +524,7 @@ export default function AddRelation({
                                     onChange={(e) =>
                                         setQuery(e.target.value.trimStart())
                                     }
-                                    placeholder="Create AKA *"
+                                    placeholder="Create AKA"
                                     className=""
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter" && !isDisable) {
@@ -546,7 +584,7 @@ export default function AddRelation({
                                 </ul>
                             </div>
                         </div>
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <InputLabel
                                 htmlFor="group_id"
                                 value="Group"
@@ -577,8 +615,8 @@ export default function AddRelation({
                                     }
                                 )}
                             </select>
-                        </div>
-                        <div className="mt-4">
+                        </div> */}
+                        {/* <div className="mt-4">
                             <InputLabel htmlFor="parent_id" value="Parent" />
                             <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -605,7 +643,7 @@ export default function AddRelation({
                                     }
                                 )}
                             </select>
-                        </div>
+                        </div> */}
                         <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
                             <div className="mt-4">
                                 <InputLabel
@@ -626,27 +664,22 @@ export default function AddRelation({
                                 />
                             </div>
                             <div className="xs:mt-0 lg:mt-4">
-                                {/* <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED BY APP"
-                                /> */}
-                                <ul role="list" className="mt-8">
-                                    <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            <span className="mt-1 ml-2">
-                                                <Switch
-                                                    enabled={switchPageTBK}
-                                                    onChangeButton={(e: any) =>
-                                                        handleCheckboxTBK(e)
-                                                    }
-                                                />
-                                            </span>
-                                            <span className="ml-2 text-sm">
-                                                MARK TBK RELATION
-                                            </span>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <InputLabel
+                                    htmlFor="relation_website"
+                                    value="Website"
+                                />
+                                <TextInput
+                                    type="text"
+                                    value={data.relation_website}
+                                    className="mt-2"
+                                    onChange={(e) =>
+                                        setData(
+                                            "relation_website",
+                                            e.target.value
+                                        )
+                                    }
+                                    placeholder="www.example.com"
+                                />
                             </div>
                         </div>
                         <div className="mt-4">
@@ -758,7 +791,7 @@ export default function AddRelation({
                         <div className="mt-4" id="relationLob">
                             <InputLabel
                                 htmlFor="relation_lob_id"
-                                value="Relation Lob"
+                                value="Business Sector"
                             />
                             <SelectTailwind
                                 classNames={{

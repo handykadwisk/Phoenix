@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Document extends Model
+class RCertificateQualification extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'DOCUMENT_ID';
+    protected $primaryKey = 'CERTIFICATE_QUALIFICATION_ID';
 
-    protected $table = 't_document';
+    protected $table = 'r_certificate_qualification';
 
     protected $guarded = [
-        'DOCUMENT_ID',
+        'CERTIFICATE_QUALIFICATION_ID',
     ];
 
     public $timestamps = false;

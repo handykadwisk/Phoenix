@@ -65,6 +65,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/editRelation/{id}', [RelationController::class, 'edit'])->name('relation.edit');
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');
     Route::post('/getRelationDetail', [RelationController::class, 'get_detail'])->name('getRelationDetail.get_detail');
+    Route::post('/getCekAbbreviation', [RelationController::class, 'getCekAbbreviation'])->name('getCekAbbreviation.getCekAbbreviation');
+    
 
 
     //Policy
@@ -79,6 +81,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/group/detailGroup/{id}', [RelationGroupController::class, 'detailGroup'])->name('group.detailGroup.Group');
     Route::post('/getRelationGroupDetail', [RelationGroupController::class, 'get_detail'])->name('getRelationGroupDetail.get_detail');
     Route::post('/getGroup', [RelationGroupController::class, 'get_group'])->name('getGroup.get_group');
+    Route::post('/getMappingParentGroup', [RelationGroupController::class, 'get_mapping'])->name('getMappingParentGroup.get_mapping');
+    Route::post('/getDetailSubGroupParent', [RelationGroupController::class, 'get_detail_group_parent'])->name('getDetailSubGroupParent.get_detail_group_parent');
+    Route::post('/addSubGroup', [RelationGroupController::class, 'add_subGroup'])->name('addSubGroup.add_subGroup');
+    Route::post('/getRelationNoGroup', [RelationGroupController::class, 'relation_nogroup'])->name('getRelationNoGroup.relation_nogroup');
+    Route::post('/addRelation', [RelationGroupController::class, 'add_Relation'])->name('addRelation.add_Relation');
+    Route::post('/getRelationChange', [RelationGroupController::class, 'relation_change'])->name('getRelationChange.relation_change');
+    Route::post('/getSubGroupById', [RelationGroupController::class, 'subGroupById'])->name('getSubGroupById.subGroupById');
+    Route::post('/changeSubGroup', [RelationGroupController::class, 'changeSubGroup'])->name('changeSubGroup.changeSubGroup');
+    Route::post('/removeRelation', [RelationGroupController::class, 'remove_relation'])->name('removeRelation.remove_relation');
+    Route::post('/editSubGroup', [RelationGroupController::class, 'edit_subgroup'])->name('editSubGroup.edit_subgroup');
+    Route::post('/changeParent', [RelationGroupController::class, 'change_parent'])->name('changeParent.change_parent');
+    
+    
+    
 
 
     // Agent
@@ -98,6 +114,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editPersons', [TPersonController::class, 'edit'])->name('editPersons.edit');
     Route::post('/getPersonDetail', [TPersonController::class, 'get_detail'])->name('getPersonDetail.get_detail');
     Route::post('/personEmployment', [TPersonController::class, 'addPersonEmployment'])->name('personEmployment.addPersonEmployment');
+    Route::post('/editPersonEmployment', [TPersonController::class, 'editPersonEmployment'])->name('editPersonEmployment.editPersonEmployment');
     Route::get('/getTaxStatus', [TPersonController::class, 'getTStatus'])->name('getTaxStatus.getTStatus');
     Route::post('/getStructurePerson', [TPersonController::class, 'getStructure'])->name('getStructurePerson.getStructure');
     Route::post('/getDivisionPerson', [TPersonController::class, 'getDivision'])->name('getDivisionPerson.getDivision');
@@ -106,6 +123,31 @@ Route::middleware('auth')->group(function () {
     Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
     Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
+    Route::post('/getDistrict', [TPersonController::class, 'get_district'])->name('getDistrict.get_district');
+    Route::post('/getVillage', [TPersonController::class, 'get_village'])->name('getVillage.get_village');
+    Route::post('/get_regency', [TPersonController::class, 'get_regency'])->name('get_regency.get_regency');
+    Route::post('/getAddressStatus', [TPersonController::class, 'get_address_status'])->name('getAddressStatus.get_address_status');
+    Route::post('/addAddressPerson', [TPersonController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
+    Route::post('/getPersonAddress', [TPersonController::class, 'getPersonAddress'])->name('getPersonAddress.getPersonAddress');
+    Route::post('/detailAddress', [TPersonController::class, 'getDetailAddress'])->name('detailAddress.getDetailAddress');
+    Route::post('/editAddress', [TPersonController::class, 'editAddress'])->name('editAddress.geteditAddress');
+    Route::post('/getEducationDegree', [TPersonController::class, 'getEducationDegree'])->name('getEducationDegree.getEducationDegree');
+    Route::post('/addEducationPerson', [TPersonController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
+    Route::post('/editEducationPerson', [TPersonController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
+    Route::post('/getQualification', [TPersonController::class, 'getQualification'])->name('getQualification.getQualification');
+    Route::post('/addCertificate', [TPersonController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
+    Route::post('/EditCertificate', [TPersonController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
+    Route::post('/addDocumentPerson', [TPersonController::class, 'add_document'])->name('addDocumentPerson.add_document');
+    Route::post('/deleteDocument', [TPersonController::class, 'delete_document'])->name('deleteDocument.delete_document');
+    Route::get('/downloadImage/{id}', [TPersonController::class, 'download_document'])->name('downloadImage.download_document');
+    
+    
+    
+    
+    
+    
+    
+    
 
     // Structure
     Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');

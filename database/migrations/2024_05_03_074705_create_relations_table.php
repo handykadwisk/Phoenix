@@ -25,6 +25,7 @@ return new class extends Migration
             $table->text('RELATION_ORGANIZATION_DESCRIPTION')->nullable();
             $table->string('RELATION_ORGANIZATION_ALIAS')->nullable();
             $table->string('RELATION_ORGANIZATION_EMAIL')->nullable();
+            $table->string('RELATION_ORGANIZATION_WEBSITE')->nullable();
             $table->string('RELATION_ORGANIZATION_MAPPING')->nullable();
             $table->bigInteger('HR_MANAGED_BY_APP')->nullable()->comment("0 = No, 1 = Yes");
             $table->bigInteger('IS_TBK')->nullable();

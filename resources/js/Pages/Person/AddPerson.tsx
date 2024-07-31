@@ -12,7 +12,11 @@ import {
 } from "react";
 import { spawn } from "child_process";
 import axios from "axios";
-import { PencilIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
+import {
+    PencilIcon,
+    PencilSquareIcon,
+    XMarkIcon,
+} from "@heroicons/react/20/solid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -49,6 +53,17 @@ export default function AddPerson({
                 NAME_CONTACT_EMERGENCY: "",
                 PHONE_CONTACT_EMERGENCY: "",
                 PERSON_RELATIONSHIP: "",
+            },
+        ]);
+    };
+
+    const addRowPersonContact = (e: FormEvent) => {
+        e.preventDefault();
+        setData("PERSON_CONTACT", [
+            ...data.PERSON_CONTACT,
+            {
+                PERSON_PHONE_NUMBER: "",
+                PERSON_EMAIL: "",
             },
         ]);
     };
@@ -127,12 +142,22 @@ export default function AddPerson({
     //         });
     //     }
     // };
+    const inputDataPersonContact = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...data.PERSON_CONTACT];
+        changeVal[i][name] = value;
+        setData({ ...data, PERSON_CONTACT: changeVal });
+    };
 
     return (
         <>
             <ModalToAdd
                 show={show}
                 onClose={modal}
+                buttonAddOns={""}
                 title={"Add Person"}
                 url={`/person`}
                 data={data}
@@ -143,14 +168,14 @@ export default function AddPerson({
                 body={
                     <>
                         {/* From Add Person */}
-                        <div className="mt-5">
+                        <div className="">
                             {/* <div className="">
                                 <span className="w-fit border-b-4 border-red-500">
                                     Personal Information
                                 </span> */}
                             {/* <div className=""></div> */}
                             {/* </div> */}
-                            <div className="mt-4 relative">
+                            <div className="relative">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="PERSON_FIRST_NAME"
@@ -158,9 +183,7 @@ export default function AddPerson({
                                 />
                                 <div className="ml-24 text-red-600">*</div>
                                 <TextInput
-                                    id="PERSON_FIRST_NAME"
                                     type="text"
-                                    name="PERSON_FIRST_NAME"
                                     value={data.PERSON_FIRST_NAME}
                                     className="mt-2"
                                     onChange={(e) =>
@@ -189,6 +212,7 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Gender --
@@ -204,9 +228,7 @@ export default function AddPerson({
                                         value={"Place Of Birth "}
                                     />
                                     <TextInput
-                                        id="PERSON_BIRTH_PLACE"
                                         type="text"
-                                        name="PERSON_BIRTH_PLACE"
                                         value={data.PERSON_BIRTH_PLACE}
                                         className="mt-2"
                                         onChange={(e) =>
@@ -215,21 +237,17 @@ export default function AddPerson({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="Place Of Birth"
                                     />
                                 </div>
-                                <div className="relative">
+                                <div className="">
                                     <InputLabel
-                                        className="absolute"
+                                        className=""
                                         htmlFor="PERSON_BIRTH_DATE"
                                         value={"Date Of Birth "}
                                     />
-                                    <div className="ml-24 text-red-600">*</div>
                                     <TextInput
-                                        id="PERSON_BIRTH_DATE"
                                         type="date"
-                                        name="PERSON_BIRTH_DATE"
                                         value={data.PERSON_BIRTH_DATE}
                                         className="mt-2"
                                         onChange={(e) =>
@@ -238,12 +256,11 @@ export default function AddPerson({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="Date Of Birth"
                                     />
                                 </div>
                             </div>
-                            <div className="grid gap-4 grid-cols-3 mt-4">
+                            {/* <div className="grid gap-4 grid-cols-3 mt-4">
                                 <div>
                                     <InputLabel
                                         className=""
@@ -311,7 +328,7 @@ export default function AddPerson({
                                         <option value={"4"}>Widowed</option>
                                     </select>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="grid gap-4 grid-cols-3 mt-4">
                                 <div>
                                     <InputLabel
@@ -320,9 +337,7 @@ export default function AddPerson({
                                         value={"Person KTP"}
                                     />
                                     <TextInput
-                                        id="PERSON_KTP"
                                         type="text"
-                                        name="PERSON_KTP"
                                         value={data.PERSON_KTP}
                                         className="mt-2"
                                         onChange={(e) => {
@@ -331,7 +346,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                         placeholder="Person KTP"
                                     />
                                 </div>
@@ -342,9 +356,7 @@ export default function AddPerson({
                                         value={"Person NPWP "}
                                     />
                                     <TextInput
-                                        id="PERSON_NPWP"
                                         type="text"
-                                        name="PERSON_NPWP"
                                         value={data.PERSON_NPWP}
                                         className="mt-2"
                                         onChange={(e) => {
@@ -353,7 +365,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                         placeholder="Person NPWP"
                                     />
                                 </div>
@@ -364,9 +375,7 @@ export default function AddPerson({
                                         value={"Person KK "}
                                     />
                                     <TextInput
-                                        id="PERSON_KK"
                                         type="text"
-                                        name="PERSON_KK"
                                         value={data.PERSON_KK}
                                         className="mt-2"
                                         onChange={(e) => {
@@ -375,7 +384,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                         placeholder="Person KK"
                                     />
                                 </div>
@@ -384,54 +392,97 @@ export default function AddPerson({
                                 <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
                                     <thead className="border-slate-300 bg-slate-300">
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
-                                            <th className="py-2 px-2 text-slate-900-700">
+                                            <th
+                                                className="py-2 px-2 text-slate-900-700"
+                                                colSpan={3}
+                                            >
                                                 <span>Person Contact</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {data.PERSON_CONTACT?.map(
+                                            (
+                                                dataPersonContact: any,
+                                                i: number
+                                            ) => {
+                                                return (
+                                                    <tr key={i}>
+                                                        <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                            <TextInput
+                                                                type="text"
+                                                                value={
+                                                                    dataPersonContact.PERSON_PHONE_NUMBER
+                                                                }
+                                                                className="mt-2"
+                                                                onChange={(e) =>
+                                                                    inputDataPersonContact(
+                                                                        "PERSON_PHONE_NUMBER",
+                                                                        e.target
+                                                                            .value,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                required
+                                                                placeholder="Person Number"
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <TextInput
+                                                                type="email"
+                                                                value={
+                                                                    dataPersonContact.PERSON_EMAIL
+                                                                }
+                                                                className="mt-2"
+                                                                onChange={(e) =>
+                                                                    inputDataPersonContact(
+                                                                        "PERSON_EMAIL",
+                                                                        e.target
+                                                                            .value,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                required
+                                                                placeholder="Email"
+                                                            />
+                                                        </td>
+                                                        <td className="">
+                                                            <XMarkIcon
+                                                                className="w-6 mt-2 text-red-600 hover:cursor-pointer"
+                                                                onClick={() => {
+                                                                    const updatedData =
+                                                                        data.PERSON_CONTACT.filter(
+                                                                            (
+                                                                                data: any,
+                                                                                a: number
+                                                                            ) =>
+                                                                                a !==
+                                                                                i
+                                                                        );
+                                                                    setData({
+                                                                        ...data,
+                                                                        PERSON_CONTACT:
+                                                                            updatedData,
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            }
+                                        )}
                                         <tr>
-                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
-                                                <InputLabel
-                                                    className=""
-                                                    htmlFor="PERSON_CONTACT"
-                                                    value={"Phone Number"}
-                                                />
-                                                <TextInput
-                                                    id="PERSON_CONTACT"
-                                                    type="text"
-                                                    name="PERSON_CONTACT"
-                                                    value={data.PERSON_CONTACT}
-                                                    className="mt-2"
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "PERSON_CONTACT",
-                                                            e.target.value
-                                                        )
+                                            <td>
+                                                <a
+                                                    className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                    onClick={(e) =>
+                                                        addRowPersonContact(e)
                                                     }
-                                                    required
-                                                    placeholder="Person Number"
-                                                />
-                                                <InputLabel
-                                                    className="mt-2"
-                                                    htmlFor="PERSON_EMAIL"
-                                                    value={"Email"}
-                                                />
-                                                <TextInput
-                                                    id="PERSON_EMAIL"
-                                                    type="email"
-                                                    name="PERSON_EMAIL"
-                                                    value={data.PERSON_EMAIL}
-                                                    className="mt-2 mb-2"
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "PERSON_EMAIL",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    required
-                                                    placeholder="Email"
-                                                />
+                                                >
+                                                    <span className="hover:underline hover:decoration-from-font">
+                                                        + Add Person Contact
+                                                    </span>
+                                                </a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -443,7 +494,7 @@ export default function AddPerson({
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
                                             <th
                                                 className="py-2 px-2 text-red-700"
-                                                colSpan={3}
+                                                colSpan={4}
                                             >
                                                 Emergency Contact
                                             </th>
@@ -464,9 +515,7 @@ export default function AddPerson({
                                                                         {i + 1}
                                                                     </span>
                                                                     <TextInput
-                                                                        id="NAME_CONTACT_EMERGENCY"
                                                                         type="text"
-                                                                        name="NAME_CONTACT_EMERGENCY"
                                                                         value={
                                                                             cm.NAME_CONTACT_EMERGENCY
                                                                         }
@@ -487,9 +536,7 @@ export default function AddPerson({
                                                                 </td>
                                                                 <td className="py-3 px-2">
                                                                     <TextInput
-                                                                        id="PHONE_CONTACT_EMERGENCY"
                                                                         type="text"
-                                                                        name="PHONE_CONTACT_EMERGENCY"
                                                                         value={
                                                                             cm.PHONE_CONTACT_EMERGENCY
                                                                         }
@@ -554,6 +601,29 @@ export default function AddPerson({
                                                                             }
                                                                         )}
                                                                     </select>
+                                                                </td>
+                                                                <td>
+                                                                    <XMarkIcon
+                                                                        className="w-7 mt-7 text-red-600 hover:cursor-pointer"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                data.CONTACT_EMERGENCY.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setData(
+                                                                                {
+                                                                                    ...data,
+                                                                                    CONTACT_EMERGENCY:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    />
                                                                 </td>
                                                             </tr>
                                                         );
