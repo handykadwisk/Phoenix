@@ -54,6 +54,7 @@ export default function ModalDetailPolicy({
     const [dataEditInsurer, setDataEditInsurer] = useState<any>([]);
     const [flagDelete, setFlagDelete] = useState<number>(0);
     const [triggerSumIncome, setTriggerSumIncome] = useState<number>(0);
+    const [triggerEditSumIncome, setTriggerEditSumIncome] = useState<number>(0);
     const [coverageName, setCoverageName] = useState<any>([]);
     const [dataCoverageName, setDataCoverageName] = useState<any>([]);
     const [dataPolicyCoverage, setDataPolicyCoverage] = useState<any>([]);
@@ -139,6 +140,7 @@ export default function ModalDetailPolicy({
         getDataInsured(policy.POLICY_ID);
         getSummaryPremi();
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
+        getDataPartner(policy.POLICY_ID);
         // setFlagSwitch(policy.SELF_INSURED? true:false)
     }, [policy.POLICY_ID]);
 
@@ -256,6 +258,7 @@ export default function ModalDetailPolicy({
         addInsured: false,
         editInsured: false,
         addPartners: false,
+        editPartners: false
     });
 
     const getCurrencyById = (currId: any) => {
@@ -304,6 +307,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
+            editPartners: false
         });
     };
 
@@ -417,6 +421,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
+            editPartners: false
         });
     };
 
@@ -538,6 +543,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
+            editPartners: false
         });
     };
     const fieldDataInsurer: any = {
@@ -699,6 +705,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
+            editPartners: false
         });
     };
 
@@ -929,6 +936,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
+            editPartners: false
         });
     };
     const editPolicyPremium = (
@@ -1142,6 +1150,7 @@ export default function ModalDetailPolicy({
             addInsured: !modal.addInsured,
             editInsured: false,
             addPartners: false,
+            editPartners: false
         });
     };
 
@@ -1252,6 +1261,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: !modal.editInsured,
             addPartners: false,
+            editPartners: false
         });
     };
 
@@ -1455,7 +1465,12 @@ export default function ModalDetailPolicy({
     const [dataIncome, setDataIncome] = useState<any>([]);
     const [dataNettIncome, setDataNettIncome] = useState<any>([]);
     const [grandTotalNettIncome, setGrandTotalNettIncome] = useState<number>(0);
+    const [dataEditNettIncome, setDataEditNettIncome] = useState<any>([]);
+    const [grandTotalEditNettIncome, setGrandTotalEditNettIncome] = useState<number>(0);
     const [dataPartners, setDataPartners] = useState<any>([]);
+    const [listDataPartners, setListDataPartners] = useState<any>([]);
+
+    
     const handleAddPartners = async (policy_id: any) => {
         setDataPartners(arrDataPartners);
         setDataIncome(arrDataIncome);
@@ -1473,6 +1488,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: !modal.addPartners,
+            editPartners: false
         });
     };
 
@@ -1656,6 +1672,333 @@ export default function ModalDetailPolicy({
     console.log("triggerSumIncome: ", triggerSumIncome);
     // End Add Partners
 
+    const fieldPartner = [
+        {
+            INCOME_CATEGORY_ID: 1,
+            INCOME_NAME: "FBI by PKS",
+            income_detail: [],
+        },
+        {
+            INCOME_CATEGORY_ID: 2,
+            INCOME_NAME: "Agent Commission",
+            income_detail: [],
+        },
+        {
+            INCOME_CATEGORY_ID: 3,
+            INCOME_NAME: "Acquisition Cost",
+            income_detail: [],
+        },
+    ];
+    const getDataPartner = async (policy_id: number) => {
+        await axios
+            .get(`/getDataPartner/${policy_id}`)
+            .then((res) => {
+                const data = res.data;
+                const items = fieldPartner;
+                data.map((val: any, i: number) => {
+                    if (val["INCOME_TYPE"] == 1) {
+                        const item: any = {
+                            ...items[0],
+                            income_detail: [
+                                ...items[0].income_detail,
+                                {
+                                    INCOME_TYPE: val["INCOME_TYPE"],
+                                    POLICY_ID: val["POLICY_ID"],
+                                    PARTNER_NAME: val["PARTNER_NAME"],
+                                    BROKERAGE_FEE_PERCENTAGE:
+                                        val["BROKERAGE_FEE_PERCENTAGE"],
+                                    BROKERAGE_FEE_AMOUNT:
+                                        val["BROKERAGE_FEE_AMOUNT"],
+                                    ENGINEERING_FEE_PERCENTAGE:
+                                        val["ENGINEERING_FEE_PERCENTAGE"],
+                                    ENGINEERING_FEE_AMOUNT:
+                                        val["ENGINEERING_FEE_AMOUNT"],
+                                    ADMIN_COST: val["ADMIN_COST"],
+                                    CONSULTANCY_FEE_PERCENTAGE:
+                                        val["CONSULTANCY_FEE_PERCENTAGE"],
+                                    CONSULTANCY_FEE_AMOUNT:
+                                        val["CONSULTANCY_FEE_AMOUNT"],
+                                },
+                            ],
+                        };
+                        items[0] = item;
+                        // console.log("item: ", item);
+                        // console.log("items: ", items);
+                    } else if (val["INCOME_TYPE"] == 2) {
+                        const item: any = {
+                            ...items[1],
+                            income_detail: [
+                                ...items[1].income_detail,
+                                {
+                                    INCOME_TYPE: val["INCOME_TYPE"],
+                                    POLICY_ID: val["POLICY_ID"],
+                                    PARTNER_NAME: val["PARTNER_NAME"],
+                                    BROKERAGE_FEE_PERCENTAGE:
+                                        val["BROKERAGE_FEE_PERCENTAGE"],
+                                    BROKERAGE_FEE_AMOUNT:
+                                        val["BROKERAGE_FEE_AMOUNT"],
+                                    ENGINEERING_FEE_PERCENTAGE:
+                                        val["ENGINEERING_FEE_PERCENTAGE"],
+                                    ENGINEERING_FEE_AMOUNT:
+                                        val["ENGINEERING_FEE_AMOUNT"],
+                                    ADMIN_COST: val["ADMIN_COST"],
+                                    CONSULTANCY_FEE_PERCENTAGE:
+                                        val["CONSULTANCY_FEE_PERCENTAGE"],
+                                    CONSULTANCY_FEE_AMOUNT:
+                                        val["CONSULTANCY_FEE_AMOUNT"],
+                                },
+                            ],
+                        };
+                        items[1] = item;
+                    } else if (val["INCOME_TYPE"] == 3) {
+                        const item: any = {
+                            ...items[2],
+                            income_detail: [
+                                ...items[2].income_detail,
+                                {
+                                    INCOME_TYPE: val["INCOME_TYPE"],
+                                    POLICY_ID: val["POLICY_ID"],
+                                    PARTNER_NAME: val["PARTNER_NAME"],
+                                    BROKERAGE_FEE_PERCENTAGE:
+                                        val["BROKERAGE_FEE_PERCENTAGE"],
+                                    BROKERAGE_FEE_AMOUNT:
+                                        val["BROKERAGE_FEE_AMOUNT"],
+                                    ENGINEERING_FEE_PERCENTAGE:
+                                        val["ENGINEERING_FEE_PERCENTAGE"],
+                                    ENGINEERING_FEE_AMOUNT:
+                                        val["ENGINEERING_FEE_AMOUNT"],
+                                    ADMIN_COST: val["ADMIN_COST"],
+                                    CONSULTANCY_FEE_PERCENTAGE:
+                                        val["CONSULTANCY_FEE_PERCENTAGE"],
+                                    CONSULTANCY_FEE_AMOUNT:
+                                        val["CONSULTANCY_FEE_AMOUNT"],
+                                },
+                            ],
+                        };
+                        items[2] = item;
+                    }
+                    // console.log('tmp: ', tmp);
+                });
+                // console.log("item: ", item);
+                console.log("items: ", items);
+                // console.log(data)
+                setListDataPartners(items);
+            })
+            .catch((err) => console.log(err));
+    };
+
+    // Edit Partners
+    const handleEditPartners = async (policy_id: any) => {
+        // setDataPartners(arrDataPartners);
+        // setDataIncome(arrDataIncome);
+        getDataPartner(policy_id);
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: !modal.editPartners,
+        });
+    };
+    const addRowEditPartners = (e: FormEvent, income_type: number, i: number) => {
+        e.preventDefault();
+
+        const items = [...listDataPartners];
+        //  console.log("items: ", items);
+        const item = {
+            ...items[i],
+            income_detail: [
+                ...items[i].income_detail,
+                {
+                    INCOME_TYPE: income_type,
+                    POLICY_ID: policy.POLICY_ID,
+                    PARTNER_NAME: "",
+                    BROKERAGE_FEE_PERCENTAGE: 0,
+                    BROKERAGE_FEE_AMOUNT: 0,
+                    ENGINEERING_FEE_PERCENTAGE: 0,
+                    ENGINEERING_FEE_AMOUNT: 0,
+                    ADMIN_COST: 0,
+                    CONSULTANCY_FEE_PERCENTAGE: 0,
+                    CONSULTANCY_FEE_AMOUNT: 0,
+                },
+            ],
+        };
+        items[i] = item;
+        setListDataPartners(items);
+    };
+    
+    const inputDataEditIncome = (
+        name: string,
+        value: string | undefined,
+        incomeNum: number,
+        detailNum: number
+    ) => {
+        const items = [...listDataPartners];
+        const item = { ...items[incomeNum] };
+        const detail = [...item.income_detail];
+        const detailItem = { ...detail[detailNum] };
+        detailItem[name] = value;
+        detail[detailNum] = detailItem;
+        item.income_detail = detail;
+        items[incomeNum] = item;
+        setListDataPartners(items);
+
+        setTimeout(function () {
+            setTriggerEditSumIncome(triggerEditSumIncome + 1);
+        }, 1000);
+    };
+
+    useEffect(() => {
+        if (triggerEditSumIncome != 0) {
+            // alert("a: " + triggerEditSumIncome);
+            getEditSumNettIncome();
+        }
+        //  getSumNettIncome();
+    }, [triggerEditSumIncome]);
+
+    const getEditSumNettIncome = () => {
+        const items = [...listDataPartners];
+        const fbi_by_pks = { ...items[0] };
+        const agent_commission = { ...items[1] };
+        const acquisition_cost = { ...items[2] };
+        // Nett Brokerage Fee
+        const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.BROKERAGE_FEE_AMOUNT;
+        },
+        0);
+        const nettBF_agent = agent_commission.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.BROKERAGE_FEE_AMOUNT;
+        },
+        0);
+
+        const nettBF_acquisition = acquisition_cost.income_detail.reduce(
+            function (prev: any, current: any) {
+                return prev + +current.BROKERAGE_FEE_AMOUNT;
+            },
+            0
+        );
+
+        // Nett Engineering Fee
+        const nettEF_fbi = fbi_by_pks.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.ENGINEERING_FEE_AMOUNT;
+        },
+        0);
+        const nettEF_agent = agent_commission.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.ENGINEERING_FEE_AMOUNT;
+        },
+        0);
+        const nettEF_acquisition = acquisition_cost.income_detail.reduce(
+            function (prev: any, current: any) {
+                return prev + +current.ENGINEERING_FEE_AMOUNT;
+            },
+            0
+        );
+
+        // Nett Consultancy Fee
+        const nettCF_fbi = fbi_by_pks.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.CONSULTANCY_FEE_AMOUNT;
+        },
+        0);
+        const nettCF_agent = agent_commission.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.CONSULTANCY_FEE_AMOUNT;
+        },
+        0);
+        const nettCF_acquisition = acquisition_cost.income_detail.reduce(
+            function (prev: any, current: any) {
+                return prev + +current.CONSULTANCY_FEE_AMOUNT;
+            },
+            0
+        );
+
+        console.log("nettCF_fbi: ", nettCF_fbi);
+        console.log("nettCF_agent: ", nettCF_agent);
+        console.log("nettCF_acquisition: ", nettCF_acquisition);
+
+        const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition;
+        const nettEF = nettEF_fbi + nettEF_agent + nettEF_acquisition;
+        const nettCF = nettCF_fbi + nettCF_agent + nettCF_acquisition;
+        setDataEditNettIncome([
+            {
+                nettBf: nettBF,
+                nettEf: nettEF,
+                nettCf: nettCF,
+            },
+        ]);
+        setGrandTotalEditNettIncome(nettBF + nettEF + nettCF);
+    };
+
+    const deleteRowEditIncome = (incomeNum: number, detailNum: number) => {
+        const items = [...listDataPartners];
+        const item = { ...items[incomeNum] };
+        const detail = [...item.income_detail];
+        detail.splice(detailNum, 1);
+        item.income_detail = detail;
+        items[incomeNum] = item;
+
+        setListDataPartners(items);
+
+    };
+    const handleSuccessEditPartners = (message: string) => {
+        Swal.fire({
+            title: "Success",
+            text: "Succeed Register Business Partners",
+            icon: "success",
+        }).then((result: any) => {
+            if (result.value) {
+                //  getDataInsured(policy.POLICY_ID);
+                setModal({
+                    add: false,
+                    delete: false,
+                    edit: false,
+                    view: false,
+                    document: false,
+                    search: false,
+                    addInsurer: false,
+                    editInsurer: false,
+                    addCoverage: false,
+                    editCoverage: false,
+                    addInsured: false,
+                    editInsured: false,
+                    addPartners: false,
+                    editPartners: false,
+                });
+            }
+        });
+        getDataPartner(policy.POLICY_ID);
+        // setDataIncome([]);
+        // setTriggerSumIncome(0);
+        // setDataNettIncome([]);
+        // setGrandTotalNettIncome(0);
+    };
+    // End Edit Partners
+
     const getDataInsured = async (policy_id: number) => {
         await axios
             .get(`/getDataInsured/${policy_id}`)
@@ -1685,6 +2028,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
+                    editPartners: false
                 });
             }
         });
@@ -1713,6 +2057,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
+                    editPartners: false
                 });
             }
         });
@@ -1746,6 +2091,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
+                    editPartners: false
                 });
             }
         });
@@ -1775,6 +2121,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
+                    editPartners: false
                 });
             }
         });
@@ -1804,6 +2151,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
+                    editPartners: false
                 });
             }
         });
@@ -1889,6 +2237,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                 }}
@@ -2136,6 +2485,7 @@ export default function ModalDetailPolicy({
 
             {/* Modal Add Coverage */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.addCoverage}
                 onClose={() => {
                     setModal({
@@ -2152,6 +2502,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -2662,6 +3013,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -3175,6 +3527,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -4202,6 +4555,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -5191,6 +5545,7 @@ export default function ModalDetailPolicy({
 
             {/* modal Add Insured */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.addInsured}
                 onClose={() => {
                     setModal({
@@ -5207,6 +5562,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -5781,6 +6137,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -6322,6 +6679,7 @@ export default function ModalDetailPolicy({
 
             {/* modal Add Partners */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.addPartners}
                 onClose={() => {
                     setModal({
@@ -6338,6 +6696,7 @@ export default function ModalDetailPolicy({
                         addInsured: false,
                         editInsured: false,
                         addPartners: false,
+                        editPartners: false,
                     }),
                         setSumByCurrency([]);
                     setDataInsurer([]);
@@ -6830,6 +7189,525 @@ export default function ModalDetailPolicy({
                 }
             />
             {/* end modal Add Partners  */}
+
+            {/* modal Edit Partners */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modal.editPartners}
+                onClose={() => {
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                        addInsurer: false,
+                        editInsurer: false,
+                        addCoverage: false,
+                        editCoverage: false,
+                        addInsured: false,
+                        editInsured: false,
+                        addPartners: false,
+                        editPartners: false,
+                    }),
+                        setSumByCurrency([]);
+                    setDataInsurer([]);
+                    setDataPolicyCoverage([]);
+                    setTriggerSumIncome(0);
+                    setDataNettIncome([]);
+                    setGrandTotalNettIncome(0);
+                    setDataEditNettIncome([]);
+                    setGrandTotalEditNettIncome(0);
+                }}
+                title={"Edit Business Partners"}
+                url={`/editPartners`}
+                data={listDataPartners}
+                onSuccess={handleSuccessEditPartners}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-6xl"
+                }
+                body={
+                    <>
+                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
+                            <table className="table-auto w-full">
+                                {/* <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                            <table className="min-w-full"> */}
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            rowSpan={2}
+                                            scope="col"
+                                            className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                        >
+                                            Name
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Brokerage Fee
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Engineering Fee
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Consultancy Fee
+                                        </th>
+                                        <th
+                                            rowSpan={2}
+                                            scope="col"
+                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                        >
+                                            Admin Cost
+                                        </th>
+                                        <th
+                                            rowSpan={2}
+                                            scope="col"
+                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                        >
+                                            Action
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        {/* <th
+                                            scope="col"
+                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                        ></th> */}
+                                        <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            %
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Amount
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            %
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Amount
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            %
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Amount
+                                        </th>
+                                        {/* <th
+                                            scope="col"
+                                            // colSpan={2}
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            
+                                        </th> */}
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white">
+                                    {listDataPartners.map(
+                                        (editPartner: any, i: number) => (
+                                            <Fragment
+                                                key={
+                                                    editPartner.INCOME_CATEGORY_ID
+                                                }
+                                            >
+                                                <tr className="border-t border-gray-200">
+                                                    <th
+                                                        scope="colgroup"
+                                                        colSpan={9}
+                                                        className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                                    >
+                                                        <td className="text-left w-32">
+                                                            Type of Income:
+                                                        </td>
+                                                        <td className="text-left w-40">
+                                                            {
+                                                                editPartner.INCOME_NAME
+                                                            }
+                                                        </td>
+                                                        <td className="text-left w-32">
+                                                            <a
+                                                                href=""
+                                                                className="text-xs mt-1 text-primary ms-1"
+                                                                onClick={(e) =>
+                                                                    addRowEditPartners(
+                                                                        e,
+                                                                        editPartner.INCOME_CATEGORY_ID,
+                                                                        i
+                                                                    )
+                                                                }
+                                                            >
+                                                                + Add Row
+                                                            </a>
+                                                        </td>
+                                                    </th>
+                                                </tr>
+                                                {editPartner.income_detail.map(
+                                                    (
+                                                        detail: any,
+                                                        detailIdx: number
+                                                    ) => (
+                                                        <tr
+                                                            key={detailIdx}
+                                                            className={
+                                                                detailIdx === 0
+                                                                    ? "border-gray-300"
+                                                                    : "border-gray-200"
+                                                            }
+                                                        >
+                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm  text-gray-900 sm:pl-3 border-[1px]">
+                                                                <div className="block w-40 mx-auto text-left">
+                                                                    <TextInput
+                                                                        id="name"
+                                                                        type="text"
+                                                                        name="name"
+                                                                        value={
+                                                                            detail.PARTNER_NAME
+                                                                        }
+                                                                        className=""
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputDataEditIncome(
+                                                                                "PARTNER_NAME",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i,
+                                                                                detailIdx
+                                                                            )
+                                                                        }
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                <CurrencyInput
+                                                                    id="brokerage_fee_percentage"
+                                                                    name="BROKERAGE_FEE_PERCENTAGE"
+                                                                    value={
+                                                                        detail.BROKERAGE_FEE_PERCENTAGE
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataIncome(
+                                                                            "BROKERAGE_FEE_PERCENTAGE",
+                                                                            values,
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                    }}
+                                                                    className="block w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                <CurrencyInput
+                                                                    id="brokerage_fee_amount"
+                                                                    name="BROKERAGE_FEE_AMOUNT"
+                                                                    value={
+                                                                        detail.BROKERAGE_FEE_AMOUNT
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataEditIncome(
+                                                                            "BROKERAGE_FEE_AMOUNT",
+                                                                            values,
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                    }}
+                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
+                                                                <CurrencyInput
+                                                                    id="engineering_fee_percentage"
+                                                                    name="ENGINEERING_FEE_PERCENTAGE"
+                                                                    value={
+                                                                        detail.ENGINEERING_FEE_PERCENTAGE
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataEditIncome(
+                                                                            "ENGINEERING_FEE_PERCENTAGE",
+                                                                            values,
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                    }}
+                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                <CurrencyInput
+                                                                    id="engineering_fee_amount"
+                                                                    name="ENGINEERING_FEE_AMOUNT"
+                                                                    value={
+                                                                        detail.ENGINEERING_FEE_AMOUNT
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataEditIncome(
+                                                                            "ENGINEERING_FEE_AMOUNT",
+                                                                            values,
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                    }}
+                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
+                                                                <CurrencyInput
+                                                                    id="consultancy_fee_percentage"
+                                                                    name="CONSULTANCY_FEE_PERCENTAGE"
+                                                                    value={
+                                                                        detail.CONSULTANCY_FEE_PERCENTAGE
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataEditIncome(
+                                                                            "CONSULTANCY_FEE_PERCENTAGE",
+                                                                            values,
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                    }}
+                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                <CurrencyInput
+                                                                    id="consultancy_fee_amount"
+                                                                    name="CONSULTANCY_FEE_AMOUNT"
+                                                                    value={
+                                                                        detail.CONSULTANCY_FEE_AMOUNT
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataEditIncome(
+                                                                            "CONSULTANCY_FEE_AMOUNT",
+                                                                            values,
+                                                                            i,
+                                                                            detailIdx
+                                                                        );
+                                                                    }}
+                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]"></td>
+                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                {detailIdx >
+                                                                0 ? (
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                        onClick={() => {
+                                                                            deleteRowEditIncome(
+                                                                                i,
+                                                                                detailIdx
+                                                                            );
+                                                                            setTriggerEditSumIncome(
+                                                                                triggerEditSumIncome +
+                                                                                    1
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <path
+                                                                            fill="#AB7C94"
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M6 18 18 6M6 6l12 12"
+                                                                        />
+                                                                    </svg>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                )}
+                                            </Fragment>
+                                        )
+                                    )}
+                                    {dataEditNettIncome?.map(
+                                        (nett: any, x: number) => (
+                                            <tr
+                                                key={x}
+                                                className={"border-gray-200"}
+                                            >
+                                                <th
+                                                    scope="colgroup"
+                                                    // colSpan={8}
+                                                    className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                                >
+                                                    Nett Margin
+                                                </th>
+
+                                                <td
+                                                    colSpan={2}
+                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                >
+                                                    {new Intl.NumberFormat(
+                                                        "id",
+                                                        {
+                                                            style: "decimal",
+                                                        }
+                                                    ).format(nett.nettBf)}
+                                                </td>
+
+                                                <td
+                                                    colSpan={2}
+                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                >
+                                                    {new Intl.NumberFormat(
+                                                        "id",
+                                                        {
+                                                            style: "decimal",
+                                                        }
+                                                    ).format(nett.nettEf)}
+                                                </td>
+
+                                                <td
+                                                    colSpan={2}
+                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                >
+                                                    {new Intl.NumberFormat(
+                                                        "id",
+                                                        {
+                                                            style: "decimal",
+                                                        }
+                                                    ).format(nett.nettCf)}
+                                                </td>
+                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]">
+                                                    Admin Cost
+                                                </td>
+                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
+                                            </tr>
+                                        )
+                                    )}
+
+                                    {/* Gran Total */}
+                                    {grandTotalEditNettIncome != 0 ? (
+                                        <tr
+                                            key={1}
+                                            className={"border-gray-200"}
+                                        >
+                                            <th
+                                                scope="colgroup"
+                                                // colSpan={8}
+                                                className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                            >
+                                                Grand Total Nett Margin
+                                            </th>
+                                            <td
+                                                colSpan={2}
+                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                            >
+                                                {new Intl.NumberFormat("id", {
+                                                    style: "decimal",
+                                                }).format(grandTotalNettIncome)}
+                                            </td>
+
+                                            <td
+                                                colSpan={7}
+                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                            ></td>
+                                        </tr>
+                                    ) : (
+                                        ""
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                }
+            />
+            {/* end modal Edit Partners  */}
 
             <div>
                 <dl className="mt-0">
@@ -7750,7 +8628,239 @@ export default function ModalDetailPolicy({
                                             Add Business Partners
                                         </button>
                                     </div>
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
+                                            onClick={() => {
+                                                handleEditPartners(
+                                                    policy.POLICY_ID
+                                                );
+                                                setTriggerEditSumIncome(
+                                                    triggerEditSumIncome + 1
+                                                );
+                                            }}
+                                        >
+                                            Edit Business Partners
+                                        </button>
+                                    </div>
                                 </div>
+                                {listDataPartners.length > 0 ? (
+                                    <div className="w-full mt-4 align-middle">
+                                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
+                                            <table className="table-auto w-full">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th
+                                                            rowSpan={2}
+                                                            scope="col"
+                                                            className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                        >
+                                                            Name
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            Brokerage Fee
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            Engineering Fee
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            Consultancy Fee
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            scope="col"
+                                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                        >
+                                                            Admin Cost
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th
+                                                            scope="col"
+                                                            // colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            %
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            // colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            Amount
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            // colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            %
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            // colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            Amount
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            // colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            %
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            // colSpan={2}
+                                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                                        >
+                                                            Amount
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white">
+                                                    {listDataPartners.map(
+                                                        (
+                                                            dataPartner: any,
+                                                            i: number
+                                                        ) => (
+                                                            <Fragment
+                                                                key={
+                                                                    dataPartner.INCOME_CATEGORY_ID
+                                                                }
+                                                            >
+                                                                <tr className="border-t border-gray-200">
+                                                                    <th
+                                                                        scope="colgroup"
+                                                                        colSpan={
+                                                                            9
+                                                                        }
+                                                                        className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                                                    >
+                                                                        <td className="text-left w-32">
+                                                                            Type
+                                                                            of
+                                                                            Income:
+                                                                        </td>
+                                                                        <td className="text-left w-40">
+                                                                            {
+                                                                                dataPartner.INCOME_NAME
+                                                                            }
+                                                                        </td>
+                                                                        <td className="text-left w-32"></td>
+                                                                    </th>
+                                                                </tr>
+                                                                {dataPartner.income_detail.map(
+                                                                    (
+                                                                        detail: any,
+                                                                        detailIdx: number
+                                                                    ) => (
+                                                                        <tr
+                                                                            key={
+                                                                                detailIdx
+                                                                            }
+                                                                            className={
+                                                                                detailIdx ===
+                                                                                0
+                                                                                    ? "border-gray-300"
+                                                                                    : "border-gray-200"
+                                                                            }
+                                                                        >
+                                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm  text-gray-900 sm:pl-3 border-[1px]">
+                                                                                <div className="block w-40 mx-auto text-left">
+                                                                                    {
+                                                                                        detail.PARTNER_NAME
+                                                                                    }
+                                                                                </div>
+                                                                            </td>
+                                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.BROKERAGE_FEE_PERCENTAGE
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.BROKERAGE_FEE_AMOUNT
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-right border-[1px]">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.ENGINEERING_FEE_PERCENTAGE
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.ENGINEERING_FEE_AMOUNT
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-right border-[1px]">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.CONSULTANCY_FEE_PERCENTAGE
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.CONSULTANCY_FEE_AMOUNT
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]"></td>
+                                                                        </tr>
+                                                                    )
+                                                                )}
+                                                            </Fragment>
+                                                        )
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                             {/* End Partners */}
                         </div>

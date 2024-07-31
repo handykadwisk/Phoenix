@@ -298,7 +298,9 @@ Route::middleware('auth')->group(function () {
 
 
     // Partners
-    Route::post('/insertPartners', [PolicyPartnerController::class, 'store'])->name('policyInsured.store');
+    Route::post('/insertPartners', [PolicyPartnerController::class, 'store'])->name('policyPartner.store');
+    Route::post('/editPartners', [PolicyPartnerController::class, 'editPartners'])->name('policyPartner.editPartners');
+    Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
 
 
 });
