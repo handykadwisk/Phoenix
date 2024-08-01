@@ -35,7 +35,7 @@ export default function PolicyIndex({ auth }: PageProps) {
     const { flash, policy, custom_menu }: any = usePage().props;
     const { currency }: any = usePage().props;
     const { insuranceType }: any = usePage().props;
-    const { insurance }: any = usePage().props;
+    const { insurance, clients }: any = usePage().props;
     const [isSuccess, setIsSuccess] = useState<string>("");
     const [searchPolicy, setSearchPolicy] = useState<any>({
         POLICY_NUMBER: "",
@@ -795,17 +795,15 @@ console.log('searchPolicy: ', searchPolicy)
                                 <option value={""}>
                                     -- <i>Choose Client Name</i> --
                                 </option>
-                                {insurance.map((insurances: any, i: number) => {
+                                {clients.map((client: any, i: number) => {
                                     return (
                                         <option
                                             key={i}
                                             value={
-                                                insurances.RELATION_ORGANIZATION_ID
+                                                client.RELATION_ORGANIZATION_ID
                                             }
                                         >
-                                            {
-                                                insurances.RELATION_ORGANIZATION_NAME
-                                            }
+                                            {client.RELATION_ORGANIZATION_NAME}
                                         </option>
                                     );
                                 })}
@@ -1802,6 +1800,7 @@ console.log('searchPolicy: ', searchPolicy)
                             onDeleteSuccess={handleSuccessDelete}
                             policy={dataById}
                             insurance={insurance}
+                            clients={clients}
                             insuranceType={insuranceType}
                             policyStatus={policyStatus}
                             currency={currency}
@@ -1905,7 +1904,7 @@ console.log('searchPolicy: ', searchPolicy)
                             <thead className="bg-gray-100">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
-                                        className={"max-w-[0px] text-center"}
+                                        className={"max-w-[20px] text-center"}
                                         label={"No"}
                                     />
                                     <TableTH
@@ -2000,7 +1999,6 @@ console.log('searchPolicy: ', searchPolicy)
                     </div>
                 </div>
             </div>
-
         </AuthenticatedLayout>
     );
 }

@@ -33,6 +33,7 @@ import ModalInsured from "./ModalInsured";
 export default function ModalDetailPolicy({
     policy,
     insurance,
+    clients,
     insuranceType,
     policyStatus,
     currency,
@@ -40,6 +41,7 @@ export default function ModalDetailPolicy({
 }: PropsWithChildren<{
     policy: any;
     insurance: any | null;
+    clients: any | null;
     insuranceType: any | null;
     policyStatus: any | null;
     currency: any | null;
@@ -523,6 +525,7 @@ export default function ModalDetailPolicy({
         setFlagSwitch(policy.SELF_INSURED ? true : false);
 
         getCoverageNameByPolicyId(id);
+        getCurrencyOnPolicyCoverage(policy.POLICY_ID);
 
         await axios
             .get(`/getPolicy/${id}`)
@@ -679,6 +682,34 @@ export default function ModalDetailPolicy({
     // End Add Insurer
 
     // Edit Insurer
+    const handleSuccessEditInsurer = (message: string) => {
+        Swal.fire({
+            title: "Success",
+            text: "Success Edit Insurer",
+            icon: "success",
+        }).then((result: any) => {
+            if (result.value) {
+                getInsurancePanel(policy.POLICY_ID);
+                getCurrencyOnPolicyCoverage(policy.POLICY_ID);
+                setModal({
+                    add: false,
+                    delete: false,
+                    edit: false,
+                    view: false,
+                    document: false,
+                    search: false,
+                    addInsurer: false,
+                    editInsurer: false,
+                    addCoverage: false,
+                    editCoverage: false,
+                    addInsured: false,
+                    editInsured: false,
+                    addPartners: false,
+                    editPartners: false,
+                });
+            }
+        });
+    };
     const handleEditInsurer = async () => {
         // e.preventDefault();
         const id = policy.POLICY_ID;
@@ -1968,7 +1999,7 @@ export default function ModalDetailPolicy({
     const handleSuccessEditPartners = (message: string) => {
         Swal.fire({
             title: "Success",
-            text: "Succeed Register Business Partners",
+            text: "Succeed Edit Business Partners",
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
@@ -2061,6 +2092,7 @@ export default function ModalDetailPolicy({
                 });
             }
         });
+        getDataPartner(policy.POLICY_ID);
         setDataIncome([]);
         setTriggerSumIncome(0);
         setDataNettIncome([]);
@@ -2270,9 +2302,9 @@ export default function ModalDetailPolicy({
                                 }
                             >
                                 <option>
-                                    -- <i>Choose Status</i> --
+                                    -- <i>Choose Client</i> --
                                 </option>
-                                {insurance?.map((status: any) => {
+                                {clients?.map((status: any) => {
                                     return (
                                         <option
                                             value={
@@ -2612,7 +2644,7 @@ export default function ModalDetailPolicy({
                                                             Amount
                                                         </th>
                                                         <th className="min-w-[100px] py-2 px-2 text-sm text-black dark:text-white">
-                                                            Premium
+                                                            Coverage Premium
                                                         </th>
                                                         <th className="min-w-[50px] py-2 px-2 text-sm text-black dark:text-white">
                                                             Delete
@@ -2719,10 +2751,10 @@ export default function ModalDetailPolicy({
                                                                                 detail.RATE
                                                                             }
                                                                             decimalScale={
-                                                                                2
+                                                                                6
                                                                             }
                                                                             decimalsLimit={
-                                                                                2
+                                                                                6
                                                                             }
                                                                             onValueChange={(
                                                                                 values
@@ -3098,7 +3130,7 @@ export default function ModalDetailPolicy({
                                                         Amount
                                                     </th>
                                                     <th className="min-w-[100px] py-2 px-2 text-sm text-black dark:text-white">
-                                                        Premium
+                                                        Coverage Premium
                                                     </th>
                                                     <th className="min-w-[50px] py-2 px-2 text-sm text-black dark:text-white">
                                                         Delete
@@ -3203,10 +3235,10 @@ export default function ModalDetailPolicy({
                                                                             editDetail.RATE
                                                                         }
                                                                         decimalScale={
-                                                                            2
+                                                                            6
                                                                         }
                                                                         decimalsLimit={
-                                                                            2
+                                                                            6
                                                                         }
                                                                         onValueChange={(
                                                                             values
@@ -3679,6 +3711,7 @@ export default function ModalDetailPolicy({
                                                             value={
                                                                 dataIns.IP_POLICY_SHARE
                                                             }
+                                                            autoComplete="off"
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             onValueChange={(
@@ -3804,6 +3837,7 @@ export default function ModalDetailPolicy({
                                                                         i
                                                                     );
                                                                 }}
+                                                                autoComplete="off"
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                                 required
                                                             />
@@ -4563,7 +4597,7 @@ export default function ModalDetailPolicy({
                 title={"Edit Insurer"}
                 url={`/editManyInsurer`}
                 data={dataEditInsurer}
-                onSuccess={handleSuccessInsurer}
+                onSuccess={handleSuccessEditInsurer}
                 // onSuccess={""}
                 method={"post"}
                 headers={null}
@@ -5582,11 +5616,16 @@ export default function ModalDetailPolicy({
                                 <div className="shadow-md border-2 mt-3">
                                     <div className=" ml-4 mr-4 mb-4 mt-3">
                                         <div className="grid grid-cols-5 mb-4">
-                                            <div className="">
-                                                <InputLabel
-                                                    htmlFor="insured_name"
-                                                    value="Insured Name"
-                                                />
+                                            <div className="grid grid-cols-2">
+                                                <div>
+                                                    <InputLabel
+                                                        htmlFor="insured_name"
+                                                        value="Insured Name"
+                                                    />
+                                                </div>
+                                                <div className=" text-red-600">
+                                                    *
+                                                </div>
                                             </div>
                                             <div className="col-span-3">
                                                 <TextInput
@@ -5639,34 +5678,34 @@ export default function ModalDetailPolicy({
                                         {/* <div className="container mx-auto overflow-x-auto border-x border-t my-10"> */}
                                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                             <table className="table-auto w-full">
-                                                <thead className="border-b bg-[#5CB25A]">
-                                                    <tr className="text-white font-bold h-10">
+                                                <thead className="border-b bg-gray-50">
+                                                    <tr className="text-sm font-semibold text-gray-900">
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
                                                         >
                                                             No
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Coverage
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Currency
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Consultancy Fee
                                                         </th>
                                                         <th
-                                                            // rowSpan={2}
+                                                            rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
                                                             Insurer Nett Premium
@@ -5690,17 +5729,20 @@ export default function ModalDetailPolicy({
                                                             Discount Engineering
                                                             Fee
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                        >
                                                             Nett Premium To
                                                             Insured
                                                         </th>
                                                     </tr>
-                                                    <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                                        <th className="text-center p-4 border-r text-base"></th>
+                                                    <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
+                                                        {/* <th className="text-center p-4 border-r text-base"></th> */}
+                                                        {/* <th className="text-center p-4 border-r"></th> */}
+                                                        {/* <th className="text-center p-4 border-r"></th>
                                                         <th className="text-center p-4 border-r"></th>
-                                                        <th className="text-center p-4 border-r"></th>
-                                                        <th className="text-center p-4 border-r"></th>
-                                                        <th className="text-center p-4 border-r"></th>
+                                                        <th className="text-center p-4 border-r"></th> */}
                                                         <th className="text-center p-4 border ">
                                                             %
                                                         </th>
@@ -5719,7 +5761,7 @@ export default function ModalDetailPolicy({
                                                         <th className="text-center p-4 border ">
                                                             Amount
                                                         </th>
-                                                        <th className="text-center p-4"></th>
+                                                        {/* <th className="text-center p-4"></th> */}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -6151,7 +6193,7 @@ export default function ModalDetailPolicy({
                 headers={null}
                 submitButtonName={"Submit"}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-4xl"
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-6xl"
                 }
                 body={
                     <>
@@ -6159,11 +6201,16 @@ export default function ModalDetailPolicy({
                             <div className="shadow-md border-2 mt-3">
                                 <div className=" ml-4 mr-4 mb-4 mt-3">
                                     <div className="grid grid-cols-5 mb-4">
-                                        <div className="">
-                                            <InputLabel
-                                                htmlFor="insured_name"
-                                                value="Insured Name"
-                                            />
+                                        <div className="grid grid-cols-2">
+                                            <div>
+                                                <InputLabel
+                                                    htmlFor="insured_name"
+                                                    value="Insured Name"
+                                                />
+                                            </div>
+                                            <div className=" text-red-600">
+                                                *
+                                            </div>
                                         </div>
                                         <div className="col-span-3">
                                             <TextInput
@@ -6187,36 +6234,37 @@ export default function ModalDetailPolicy({
                                         </div>
                                     </div>
                                     {/* <div className="container mx-auto overflow-x-auto border-x border-t my-10"> */}
+
                                     <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                         <table className="table-auto w-full">
-                                            <thead className="border-b bg-[#5CB25A]">
-                                                <tr className="text-white font-bold h-10">
+                                            <thead className="border-b bg-gray-50">
+                                                <tr className="text-sm font-semibold text-gray-900">
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
                                                     >
                                                         No
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Coverage
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Currency
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Consultancy Fee
                                                     </th>
                                                     <th
-                                                        // rowSpan={2}
+                                                        rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                     >
                                                         Insurer Nett Premium
@@ -6239,19 +6287,25 @@ export default function ModalDetailPolicy({
                                                     >
                                                         Discount Engineering Fee
                                                     </th>
-                                                    <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                    <th
+                                                        rowSpan={2}
+                                                        className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                    >
                                                         Nett Premium To Insured
                                                     </th>
-                                                    <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                    <th
+                                                        rowSpan={2}
+                                                        className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                    >
                                                         Action
                                                     </th>
                                                 </tr>
-                                                <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                                    <th className="text-center p-4 border-r text-base"></th>
+                                                <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
+                                                    {/* <th className="text-center p-4 border-r text-base"></th>
                                                     <th className="text-center p-4 border-r"></th>
                                                     <th className="text-center p-4 border-r"></th>
                                                     <th className="text-center p-4 border-r"></th>
-                                                    <th className="text-center p-4 border-r"></th>
+                                                    <th className="text-center p-4 border-r"></th> */}
                                                     <th className="text-center p-4 border ">
                                                         %
                                                     </th>
@@ -6270,8 +6324,8 @@ export default function ModalDetailPolicy({
                                                     <th className="text-center p-4 border ">
                                                         Amount
                                                     </th>
-                                                    <th className="text-center border-r p-4"></th>
-                                                    <th className="text-center p-4"></th>
+                                                    {/* <th className="text-center border-r p-4"></th> */}
+                                                    {/* <th className="text-center p-4"></th> */}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -6832,6 +6886,9 @@ export default function ModalDetailPolicy({
                                                         className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
                                                     >
                                                         <td className="text-left w-32">
+                                                            <sup className="text-red-600">
+                                                                *
+                                                            </sup>{" "}
                                                             Type of Income:
                                                         </td>
                                                         <td className="text-left w-40">
@@ -6890,6 +6947,7 @@ export default function ModalDetailPolicy({
                                                                             )
                                                                         }
                                                                         required
+                                                                        autoComplete="off"
                                                                     />
                                                                 </div>
                                                             </td>
@@ -7349,6 +7407,9 @@ export default function ModalDetailPolicy({
                                                         className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
                                                     >
                                                         <td className="text-left w-32">
+                                                            <sup className="text-red-600">
+                                                                *
+                                                            </sup>{" "}
                                                             Type of Income:
                                                         </td>
                                                         <td className="text-left w-40">
@@ -7409,6 +7470,7 @@ export default function ModalDetailPolicy({
                                                                             )
                                                                         }
                                                                         required
+                                                                        autoComplete="off"
                                                                     />
                                                                 </div>
                                                             </td>
@@ -7690,7 +7752,9 @@ export default function ModalDetailPolicy({
                                             >
                                                 {new Intl.NumberFormat("id", {
                                                     style: "decimal",
-                                                }).format(grandTotalNettIncome)}
+                                                }).format(
+                                                    grandTotalEditNettIncome
+                                                )}
                                             </td>
 
                                             <td
@@ -7943,7 +8007,7 @@ export default function ModalDetailPolicy({
                                                                 scope="col"
                                                                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                                             >
-                                                                Premium
+                                                                Coverage Premium
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -7974,6 +8038,7 @@ export default function ModalDetailPolicy({
                                                                             "id",
                                                                             {
                                                                                 style: "decimal",
+                                                                                maximumFractionDigits:6
                                                                             }
                                                                         ).format(
                                                                             detail.RATE
@@ -8222,19 +8287,38 @@ export default function ModalDetailPolicy({
                                                 </div>
                                                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                                     <table className="table-auto w-full">
-                                                        <thead className="border-b bg-[#5CB25A]">
-                                                            <tr className="text-white font-bold h-10">
-                                                                <th className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300">
+                                                        <thead className="border-b bg-gray-50">
+                                                            <tr className="text-sm font-semibold text-gray-900">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    // scope="col"
+                                                                    className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
+                                                                >
                                                                     No
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
                                                                     Coverage
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
+                                                                    Currency
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
                                                                     Consultancy
                                                                     Fee
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                                >
                                                                     Insurer Nett
                                                                     Premium
                                                                 </th>
@@ -8260,16 +8344,19 @@ export default function ModalDetailPolicy({
                                                                     Engineering
                                                                     Fee
                                                                 </th>
-                                                                <th className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
+                                                                >
                                                                     Nett Premium
                                                                     To Insured
                                                                 </th>
                                                             </tr>
-                                                            <tr className="border-b border-gray-400 font-bold h-10 text-white">
-                                                                <th className="text-center p-4 border-r text-base"></th>
+                                                            <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
+                                                                {/* <th className="text-center p-4 border-r text-base"></th>
                                                                 <th className="text-center p-4 border-r"></th>
                                                                 <th className="text-center p-4 border-r"></th>
-                                                                <th className="text-center p-4 border-r"></th>
+                                                                <th className="text-center p-4 border-r"></th> */}
                                                                 <th className="text-center p-4 border ">
                                                                     %
                                                                 </th>
@@ -8288,7 +8375,7 @@ export default function ModalDetailPolicy({
                                                                 <th className="text-center p-4 border ">
                                                                     Amount
                                                                 </th>
-                                                                <th className="text-center p-4"></th>
+                                                                {/* <th className="text-center p-4"></th> */}
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -8299,7 +8386,7 @@ export default function ModalDetailPolicy({
                                                                     j: number
                                                                 ) => (
                                                                     <tr key={j}>
-                                                                        <td className="p-4 border">
+                                                                        <td className="p-4 border text-center">
                                                                             {j +
                                                                                 1}
                                                                         </td>
@@ -8346,6 +8433,56 @@ export default function ModalDetailPolicy({
                                                                                             >
                                                                                                 {
                                                                                                     item.POLICY_COVERAGE_NAME
+                                                                                                }
+                                                                                            </option>
+                                                                                        );
+                                                                                    }
+                                                                                )}
+                                                                            </select>
+                                                                        </td>
+                                                                        <td className="p-4 border">
+                                                                            <select
+                                                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                                value={
+                                                                                    detail.CURRENCY_ID
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    inputInsuredDetail(
+                                                                                        "CURRENCY_ID",
+                                                                                        e
+                                                                                            .target
+                                                                                            .value,
+                                                                                        i,
+                                                                                        j
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                <option>
+                                                                                    --{" "}
+                                                                                    <i>
+                                                                                        Choose
+                                                                                        Currency
+                                                                                    </i>{" "}
+                                                                                    --
+                                                                                </option>
+                                                                                {currency.map(
+                                                                                    (
+                                                                                        item: any,
+                                                                                        i: number
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <option
+                                                                                                key={
+                                                                                                    i
+                                                                                                }
+                                                                                                value={
+                                                                                                    item.CURRENCY_ID
+                                                                                                }
+                                                                                            >
+                                                                                                {
+                                                                                                    item.CURRENCY_SYMBOL
                                                                                                 }
                                                                                             </option>
                                                                                         );
