@@ -77,9 +77,13 @@ class PolicyController extends Controller
             'policy' => $policy,
             'currency' => RCurrency::get(),
             'insuranceType' => RInsuranceType::where('INSURANCE_TYPE_STATUS', '=', 1)->get(),
-            'insurance' => DB::table('t_relation')
+            'clients' => DB::table('t_relation')
                 ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
                 ->where('RELATION_TYPE_ID', '=', 1)
+                ->get(),
+            'insurance' => DB::table('t_relation')
+                ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
+                ->where('RELATION_TYPE_ID', '=', 2)
                 ->get()
         ]);
     }
@@ -261,14 +265,14 @@ class PolicyController extends Controller
             'POLICY_STATUS_ID.required'          => 'Policy Status is required.',
         ]);
 
-        $totalRateInstallment = collect($request->policy_installment)->sum('POLICY_INSTALLMENT_PERCENTAGE');
-        if ($totalRateInstallment != 100) {
-            return new JsonResponse([
-                ['Rate Installment must equal to 100 %.']
-            ], 422, [
-                'X-Inertia' => true
-            ]);
-        }
+        // $totalRateInstallment = collect($request->policy_installment)->sum('POLICY_INSTALLMENT_PERCENTAGE');
+        // if ($totalRateInstallment != 100) {
+        //     return new JsonResponse([
+        //         ['Rate Installment must equal to 100 %.']
+        //     ], 422, [
+        //         'X-Inertia' => true
+        //     ]);
+        // }
         if (trim($request->POLICY_NUMBER)) {
             $cekPolicy = $this->checkPolicyNumber(trim($request->POLICY_NUMBER));
             if (sizeof($cekPolicy) > 1) {
