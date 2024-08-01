@@ -419,16 +419,16 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path14)
         );
 
-        // $file_path15 = resource_path('../database/LogDB/2024_07_30_relation.sql');
+        $file_path15 = resource_path('../database/LogDB/2024_07_31_r_coa.sql');
 
         // DB::unprepared(
         //     file_get_contents($file_path15)
         // );
         // create 2024_24_07_r_address_status
-        $file_path15 = resource_path('../database/LogDB/2024_24_07_r_address_status.sql');
+        $file_path16 = resource_path('../database/LogDB/2024_24_07_r_address_status.sql');
 
         DB::unprepared(
-            file_get_contents($file_path15)
+            file_get_contents($file_path16)
         );
 
         // create 2024_29_07_r_education_degree
@@ -445,5 +445,28 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_certificate_qualification)
         );
 
+        $file_path17 = resource_path('../database/LogDB/2024_07_31_r_coa_class.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path17)
+        );
+
+        $file_path18 = resource_path('../database/LogDB/2024_07_31_r_coa_group.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path18)
+        );
+
+        $file_path19 = resource_path('../database/LogDB/2024_07_31_t_relation.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path19)
+        );
+
+        $file_path20 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path20)
+        );
     }
 }

@@ -16,11 +16,20 @@ class CashAdvanceDetail extends Model
 
     protected $guarded = ['CASH_ADVANCE_DETAIL_ID'];
 
-    protected $with = ['document', 'purpose'];
+    protected $with = [
+        'document',
+        'purpose',
+        'relation_organization'
+    ];
 
     public function cash_advance(): BelongsTo
     {
         return $this->belongsTo(CashAdvance::class);
+    }
+
+    public function relation_organization(): BelongsTo
+    {
+        return $this->belongsTo(Relation::class, 'CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID');
     }
 
     public function document(): BelongsTo

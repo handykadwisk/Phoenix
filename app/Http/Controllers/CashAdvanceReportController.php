@@ -188,7 +188,7 @@ class CashAdvanceReportController extends Controller
             $report_cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
             $report_cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
             $report_cash_advance_detail_location = $cad['cash_advance_detail_location'];
-            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id']['value'];
             $report_cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
             $report_cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
             $report_cash_advance_detail_amount = $cad['cash_advance_detail_amount'];

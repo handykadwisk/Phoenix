@@ -67,7 +67,7 @@ export default function ModalToAdd({
     return (
         <>
             <Transition.Root show={show} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={() => {}}>
+                <Dialog as="div" className="relative z-9999" onClose={() => {}}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
