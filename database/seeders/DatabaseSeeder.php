@@ -400,14 +400,14 @@ class DatabaseSeeder extends Seeder
         // create 2024_16_05_r_insurance_type
         $file_path12 = resource_path('../database/LogDB/2024_16_05_r_insurance_type.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path12)
         );
-        
+
         // create 2024_16_05_r_currency
         $file_path13 = resource_path('../database/LogDB/2024_16_05_r_currency.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($file_path13)
         );
 
