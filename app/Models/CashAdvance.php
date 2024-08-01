@@ -24,6 +24,7 @@ class CashAdvance extends Model
         // 'cash_advance_report',
         'cash_advance_detail',
         'user',
+        'person',
         'person_used_by',
         'person_approval',
         'user_used_by',
@@ -39,6 +40,11 @@ class CashAdvance extends Model
     public function cash_advance_detail(): HasMany
     {
         return $this->hasMany(CashAdvanceDetail::class, 'CASH_ADVANCE_ID');
+    }
+
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'CASH_ADVANCE_REQUESTED_BY');
     }
 
     public function person_used_by(): BelongsTo

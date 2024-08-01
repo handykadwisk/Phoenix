@@ -42,38 +42,40 @@ class CashAdvanceController extends Controller
 
         $data = CashAdvance::orderBy('CASH_ADVANCE_ID', 'desc');
 
-        if ($searchQuery) {
-            if ($searchQuery->input('cash_advance_requested_by')) {
-                $data->whereHas('user',
-                function($query) use($cash_advance_requested_by)
-                {
-                    $query->where('name', 'like', '%'. $cash_advance_requested_by .'%');
-                });
-            }
+        if ($searchQuery->cash_advance_type === 1) {
+            if ($searchQuery) {
+                if ($searchQuery->input('cash_advance_requested_by')) {
+                    $data->whereHas('person',
+                    function($query) use($cash_advance_requested_by)
+                    {
+                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
+                    });
+                }
 
-            if ($searchQuery->input('cash_advance_used_by')) {
-                $data->whereHas('user_used_by',
-                function($query) use($cash_advance_used_by)
-                {
-                    $query->where('name', 'like', '%'. $cash_advance_used_by .'%');
-                });
-            }
+                if ($searchQuery->input('cash_advance_used_by')) {
+                    $data->whereHas('person_used_by',
+                    function($query) use($cash_advance_used_by)
+                    {
+                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
+                    });
+                }
 
-            if (
-                $searchQuery->input('cash_advance_start_date') &&
-                $searchQuery->input('cash_advance_end_date')
-            ) {
-                $data->whereBetween('CASH_ADVANCE_REQUESTED_DATE', [$cash_advance_start_date, $cash_advance_end_date]);
-            }
+                if (
+                    $searchQuery->input('cash_advance_start_date') &&
+                    $searchQuery->input('cash_advance_end_date')
+                ) {
+                    $data->whereBetween('CASH_ADVANCE_REQUESTED_DATE', [$cash_advance_start_date, $cash_advance_end_date]);
+                }
 
-            if ($searchQuery->input('cash_advance_division')) {
-                $data->where('CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
-            }
+                if ($searchQuery->input('cash_advance_division')) {
+                    $data->where('CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
+                }
 
-            if ($cash_advance_first_approval_status === 0) {
-                $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0);
-            } else if ($cash_advance_first_approval_status === 1) {
-                $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
+                if ($cash_advance_first_approval_status === 0) {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0);
+                } else if ($cash_advance_first_approval_status === 1) {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
+                }
             }
         }
         // dd($data->toSql());
@@ -234,7 +236,7 @@ class CashAdvanceController extends Controller
         // dd($request);
 
         $user_id = auth()->user()->id;
-        $user = User::find($request->cash_advance_first_approval_by['value']);
+        $person = TPerson::find($request->cash_advance_first_approval_by['value']);
 
         $total_amount = 0;
 
@@ -248,7 +250,7 @@ class CashAdvanceController extends Controller
         $cash_advance_division = 'IT';
         $cash_advance_requested_date = now();
         $cash_advance_first_approval_by = $request->cash_advance_first_approval_by['value'];
-        $cash_advance_first_approval_user = $user->name;
+        $cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
         $cash_advance_first_approval_status = 0;
         $cash_advance_request_note = $request->cash_advance_request_note;
         $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;

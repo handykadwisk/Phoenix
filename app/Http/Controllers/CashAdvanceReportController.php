@@ -7,6 +7,7 @@ use App\Models\CashAdvanceDetailReport;
 use App\Models\CashAdvanceReport;
 use App\Models\Document;
 use App\Models\MCashAdvanceDocument;
+use App\Models\TPerson;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -120,7 +121,7 @@ class CashAdvanceReportController extends Controller
         // dd($request);
 
         $user_id = auth()->user()->id;
-        $user = User::find($request->cash_advance_first_approval_by);
+        $person = TPerson::find($request->cash_advance_first_approval_by);
 
         $total_amount_report = 0;
 
@@ -135,16 +136,16 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_requested_by = $user_id;
         $report_cash_advance_requested_date = now();
         $report_cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
-        $report_cash_advance_first_approval_user = $user->name;
+        $report_cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
         $report_cash_advance_first_approval_status = 0;
         $report_cash_advance_request_note = $request->cash_advance_request_note;
-        $report_cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
-        $report_cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
-        $report_cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
-        $report_cash_advance_cash_amount = $request->cash_advance_cash_amount;
-        $report_cash_advance_refund_amount = $request->refund_amount;
-        $report_cash_advance_refund_type = $request->refund_type;
-        // $report_refund_proof = $request->file('refund_proof')[0];
+        // $report_cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
+        // $report_cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
+        // $report_cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
+        // $report_cash_advance_cash_amount = $request->cash_advance_cash_amount;
+        $report_cash_advance_amount = $request->amount;
+        $report_cash_advance_type = $request->type;
+        // $report_proof = $request->file('proof')[0];
         $report_cash_advance_total_amount = $total_amount_report;
         $cash_advance_created_at = now();
         $cash_advance_created_by = $user_id;
@@ -161,12 +162,12 @@ class CashAdvanceReportController extends Controller
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER' => $report_cash_advance_first_approval_user,
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
             'REPORT_CASH_ADVANCE_REQUEST_NOTE' => $report_cash_advance_request_note,
-            'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
-            'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
-            'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
-            'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
-            'REPORT_CASH_ADVANCE_REFUND_AMOUNT' => $report_cash_advance_refund_amount,
-            'REPORT_CASH_ADVANCE_REFUND_TYPE' => $report_cash_advance_refund_type,
+            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
+            // 'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
+            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
+            // 'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
+            'REPORT_CASH_ADVANCE_TYPE' => $report_cash_advance_type,
+            'REPORT_CASH_ADVANCE_AMOUNT' => $report_cash_advance_amount,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
             'REPORT_CASH_ADVANCE_CREATED_AT' => $cash_advance_created_at,
             'REPORT_CASH_ADVANCE_CREATED_BY' => $cash_advance_created_by
@@ -325,10 +326,10 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_id = $request->REPORT_CASH_ADVANCE_ID;
         $report_cash_advance_first_approval_change_status_date = date('Y-m-d H:i:s');
         $report_cash_advance_first_approval_status = $request->REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS;
-        $report_cash_advance_delivery_method_transfer = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
-        $report_cash_advance_transfer_amount = $request->REPORT_CASH_ADVANCE_TRANSFER_AMOUNT;
-        $report_cash_advance_delivery_method_cash = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH;
-        $report_cash_advance_cash_amount = $request->REPORT_CASH_ADVANCE_CASH_AMOUNT;
+        // $report_cash_advance_delivery_method_transfer = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
+        // $report_cash_advance_transfer_amount = $request->REPORT_CASH_ADVANCE_TRANSFER_AMOUNT;
+        // $report_cash_advance_delivery_method_cash = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH;
+        // $report_cash_advance_cash_amount = $request->REPORT_CASH_ADVANCE_CASH_AMOUNT;
         $report_cash_advance_total_amount = $request->REPORT_CASH_ADVANCE_TOTAL_AMOUNT;
         $report_cash_advance_total_amount_approve = $total_amount_approve;
         $report_cash_advance_total_amount_different = $report_cash_advance_total_amount - $report_cash_advance_total_amount_approve;
@@ -336,10 +337,10 @@ class CashAdvanceReportController extends Controller
         CashAdvanceReport::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance_id)->update([
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $report_cash_advance_first_approval_change_status_date,
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
-            'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
-            'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
-            'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
-            'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
+            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
+            // 'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
+            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
+            // 'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_APPROVE' => $report_cash_advance_total_amount_approve,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT' => $report_cash_advance_total_amount_different,
@@ -360,7 +361,7 @@ class CashAdvanceReportController extends Controller
             foreach ($cash_advance_detail_report as $cad) {
                 $report_cash_advance_detail_id = $cad['REPORT_CASH_ADVANCE_DETAIL_ID'];
                 $report_cash_advance_detail_approval = $cad['REPORT_CASH_ADVANCE_DETAIL_APPROVAL'];
-                $report_cash_advance_detail_cost_classification = $cad['REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION'];
+                $report_cash_advance_detail_cost_classification = $cad['REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION']['value'];
                 $report_cash_advance_detail_amount_approve = $cad['REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE'];
                 $report_cash_advance_detail_remarks = $cad['REPORT_CASH_ADVANCE_DETAIL_REMARKS'];
 
@@ -413,20 +414,20 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_total_amount = $total_amount;
         $report_cash_advance_first_approval_status = 0;
         $report_cash_advance_request_note = $request->REPORT_CASH_ADVANCE_REQUEST_NOTE;
-        $report_cash_advance_delivery_method_transfer = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
-        $report_cash_advance_transfer_amount = $request->REPORT_CASH_ADVANCE_TRANSFER_AMOUNT;
-        $report_cash_advance_delivery_method_cash = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH;
-        $report_cash_advance_cash_amount = $request->REPORT_CASH_ADVANCE_CASH_AMOUNT;
+        // $report_cash_advance_delivery_method_transfer = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
+        // $report_cash_advance_transfer_amount = $request->REPORT_CASH_ADVANCE_TRANSFER_AMOUNT;
+        // $report_cash_advance_delivery_method_cash = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH;
+        // $report_cash_advance_cash_amount = $request->REPORT_CASH_ADVANCE_CASH_AMOUNT;
         $report_cash_advance_updated_at = now();
         $report_cash_advance_updated_by = $user_id;
 
         CashAdvanceReport::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance_id)->update([
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
             'REPORT_CASH_ADVANCE_REQUEST_NOTE' => $report_cash_advance_request_note,
-            'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
-            'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
-            'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
-            'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
+            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
+            // 'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
+            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
+            // 'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
             'REPORT_CASH_ADVANCE_UPDATED_AT' => $report_cash_advance_updated_at,
             'REPORT_CASH_ADVANCE_UPDATED_BY' => $report_cash_advance_updated_by
