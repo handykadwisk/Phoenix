@@ -6,7 +6,6 @@ use App\Models\InsurancePanel;
 use App\Models\MPolicyCoverage;
 use App\Models\MPolicyCoverageDetail;
 use App\Models\MPolicyPremium;
-// use App\Models\MPolicyPremium;
 use App\Models\Policy;
 use App\Models\PolicyInstallment;
 use App\Models\RCurrency;
@@ -28,7 +27,6 @@ class PolicyCoverageController extends Controller
        
     }
 
-
     public function store(Request $request) {
 
         foreach ($request->input() as $key => $value) {
@@ -37,8 +35,7 @@ class PolicyCoverageController extends Controller
                 'POLICY_COVERAGE_NAME'  => trim($value['POLICY_COVERAGE_NAME']),
             ]);
             
-            foreach ($value['policy_coverage_detail'] as $details => $detail) {
-                
+            foreach ($value['policy_coverage_detail'] as $details => $detail) {                
                 $detail = MPolicyCoverageDetail::insertGetId([
                     'POLICY_COVERAGE_ID' => $coverage,
                     'CURRENCY_ID' => $detail['CURRENCY_ID'],
@@ -60,7 +57,6 @@ class PolicyCoverageController extends Controller
             'action'     => json_encode([
                 "description" => "Add Coverage.",
                 "module"      => "Add Coverage",
-                // "id"          => $request->id
             ]),
             'action_by'  => Auth::user()->email
         ]);
@@ -74,7 +70,6 @@ class PolicyCoverageController extends Controller
     }
 
     public function editCoverage(Request $request) {
-        // dd($request['POLICY_COVERAGE_NAME']);
 
         $insurerCoverage = MPolicyCoverage::where('POLICY_COVERAGE_ID', $request['POLICY_COVERAGE_ID'])
             ->update([
@@ -136,9 +131,19 @@ class PolicyCoverageController extends Controller
                 ->orderBy('m_policy_coverage.POLICY_COVERAGE_NAME', 'ASC')
                 ->get();
 
-        // $data = MPolicyCoverage::where('POLICY_ID', $id)->get();
-        // dd($data);
-        // $data = $this->getPolice($id);
+        return response()->json($data);
+
+    }
+
+     public function getCoverageGroupingByPolicyId($id) {
+        
+        $data = MPolicyCoverage::leftJoin('m_policy_coverage_detail', 'm_policy_coverage.POLICY_COVERAGE_ID', '=', 'm_policy_coverage_detail.POLICY_COVERAGE_ID')
+                ->select('m_policy_coverage.*')
+                ->where('m_policy_coverage.POLICY_ID', $id)
+                ->orderBy('m_policy_coverage.POLICY_COVERAGE_NAME', 'ASC')
+                ->groupBy('m_policy_coverage.POLICY_COVERAGE_ID')
+                ->get();
+
         return response()->json($data);
 
     }
@@ -146,8 +151,6 @@ class PolicyCoverageController extends Controller
     public function getDataCoverage($id) {
        
         $data = MPolicyCoverage::where('POLICY_ID', $id)->orderBy('POLICY_COVERAGE_NAME', 'ASC')->get();
-        // dd($data);
-        // $data = $this->getPolice($id);
         return response()->json($data);
 
     }
@@ -159,7 +162,6 @@ class PolicyCoverageController extends Controller
 
     }
 
-    // public function edit(Request $request, MPolicyPremium $insurancePanel) {
     public function edit(Request $request) {
        
         $validateData = Validator::make(
@@ -204,9 +206,6 @@ class PolicyCoverageController extends Controller
                             'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
                             'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
                             'SELF_INSURED'          => $request->SELF_INSURED,
-                            // 'POLICY_INSURANCE_PANEL' => $request->POLICY_INSURANCE_PANEL,
-                            // 'POLICY_SHARE'          => $policy_share,
-                            // 'POLICY_INSTALLMENT'          => $request->POLICY_INSTALLMENT,
                             'POLICY_UPDATED_BY'      => Auth::user()->id,
                             'POLICY_UPDATED_DATE'   => now()
                         ]);

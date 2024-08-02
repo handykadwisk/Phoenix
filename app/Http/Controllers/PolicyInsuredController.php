@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InsurancePanel;
 use App\Models\MPolicyInsured;
 use App\Models\MPolicyInsuredDetail;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PolicyInsuredController extends Controller
 {
@@ -130,5 +132,21 @@ class PolicyInsuredController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function getInsurerNettPremi(Request $request) {
+        // dd($request->input());
+
+        $query = DB::table('t_insurance_panel as i')
+            // ->select('SUM(NETT_PREMI) AS insurer_nett_premium')
+            ->leftJoin('m_insurer_coverage AS ic', 'i.IP_ID', '=', 'ic.IP_ID')
+            ->where('POLICY_ID', $request->input('policy_id'))
+            ->where('CURRENCY_ID', $request->input('currency_id'))
+            ->where('POLICY_COVERAGE_ID', $request->input('policy_coverage_id'))
+            ->sum('NETT_PREMI');
+
+        return response()->json($query);
+
+    }
+
 
 }

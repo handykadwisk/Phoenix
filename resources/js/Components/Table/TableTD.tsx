@@ -4,7 +4,7 @@ export default function TableTD({
     value,
     className = "",
 }: PropsWithChildren<{
-    onButton: MouseEventHandler;
+    // onButton: MouseEventHandler;
     value: any;
     className: string;
 }>) {
