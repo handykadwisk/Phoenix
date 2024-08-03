@@ -29,6 +29,7 @@ import TableTD from "@/Components/Table/TableTD";
 import ModalInsured from "./ModalInsured";
 import { BeatLoader } from "react-spinners";
 import dateFormat from "dateformat";
+import DatePicker from "react-datepicker";
 
 export default function ModalDetailPolicy({
     policy,
@@ -62,8 +63,9 @@ export default function ModalDetailPolicy({
     const [coverageGrouping, setCoverageGrouping] = useState<any>([]);
     const [dataCoverageName, setDataCoverageName] = useState<any>([]);
     const [dataPolicyCoverage, setDataPolicyCoverage] = useState<any>([]);
-    const [searchInsurerNettPremi, setSearchInsurerNettPremi] = useState<any>({});
-    const [insurerNettPremi, setInsurerNettPremi] = useState<number>(0);
+    // const [searchInsurerNettPremi, setSearchInsurerNettPremi] = useState<any>({});
+    const [insurerNettPremi, setInsurerNettPremi] = useState<any>({});
+    // let myValue=0;
 
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
@@ -1075,7 +1077,9 @@ export default function ModalDetailPolicy({
     const getInsurerNettPremi = (
         policy_id: any,
         currency_id: any,
-        policy_coverage_id:any
+        policy_coverage_id:any,
+        insuredNum:any,
+        detailNum:any
     ) => {
         return axios
             .post(`/getInsurerNettPremi?`, {
@@ -1084,16 +1088,57 @@ export default function ModalDetailPolicy({
                 policy_coverage_id: policy_coverage_id,
             })
             .then((res) => {
-                console.log("Insurer Nett Premi : ", res.data);
+                setInsurerNettPremi({
+                    ...insurerNettPremi,
+                    insuredNum:insuredNum,
+                    detailNum:detailNum,
+                    insurerNettPremium: res.data
+                });
+
+                // setDataInsured(items);
+                // console.log("Insurer Nett Premi : ", res.data);
                 // const data = res.data
-                return res.data
-                setInsurerNettPremi(res.data);
+                // setInsurerNettPremi(res.data);
+                // myValue = res.data
+                // return res.data
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
+    console.log("Insurer Nett Premi : ", insurerNettPremi);
+
+      useEffect(() => {
+         if (
+             Object.keys(insurerNettPremi).length > 0 
+         ) {
+             console.log(insurerNettPremi);
+
+             const items = [...dataInsured];
+             const item = { ...items[insurerNettPremi.insuredNum] };
+             const policy_insured_details = [...item.policy_insured_detail];
+             const policy_insured_detail = {
+                 ...policy_insured_details[insurerNettPremi.detailNum],
+             };
+
+             let currency_id = policy_insured_detail["CURRENCY_ID"];
+             let policy_coverage_id =
+                 policy_insured_detail["POLICY_COVERAGE_ID"];
+             policy_insured_detail["PREMIUM_AMOUNT"] = insurerNettPremi.insurerNettPremium;
+           
+           
+             policy_insured_details[insurerNettPremi.detailNum] = policy_insured_detail;
+             item.policy_insured_detail = policy_insured_details;
+             items[insurerNettPremi.insuredNum] = item;
+             setDataInsured(items);
+             
+            //  setInsurerNettPremi(result);
+            // console.log("result xxx : ", result);
+         }
+     }, [insurerNettPremi]);
+
+    
     // Add Insured
     const [dataInsured, setDataInsured] = useState<any>([]);
     const [dataInsuredView, setdataInsuredView] = useState<any>([]);
@@ -1121,7 +1166,8 @@ export default function ModalDetailPolicy({
     const handleAddInsured = async (policy_id: any) => {
         setDataInsured([{ ...fieldDataInsured, POLICY_ID: policy_id }]);
         // setInsurerNettPremi(0);
-        setSearchInsurerNettPremi({})
+        // setSearchInsurerNettPremi({})
+        setInsurerNettPremi({});
         setModal({
             add: false,
             delete: false,
@@ -1218,12 +1264,15 @@ export default function ModalDetailPolicy({
             // const currency_id = value;
             // let result = 7;
             
-            const result = getInsurerNettPremi(
+            getInsurerNettPremi(
                 policy.POLICY_ID,
                 currency_id,
-                policy_coverage_id
-            ).then((response) => response.json());
-            console.log("resultxx: ", result);
+                policy_coverage_id,
+                insuredNum,
+                detailNum
+            );
+            // console.log("resultxx: ", insurerNettPremi);
+            // console.log("myValue: ", myValue);
             // let userToken = AuthUser(data);
             // console.log(userToken); // Promise { <pending> }
 
@@ -1244,7 +1293,7 @@ export default function ModalDetailPolicy({
         items[insuredNum] = item;
         setDataInsured(items);
     };
-    console.log("insurerNettPremi luar: ", insurerNettPremi);
+    // console.log("insurerNettPremi luar: ", insurerNettPremi);
 
     const inputDataInsured = (
         name: string,
@@ -2332,7 +2381,22 @@ export default function ModalDetailPolicy({
                                     htmlFor="edit_policy_inception_date"
                                     value="Inception Date"
                                 />
-                                <TextInput
+                                <DatePicker
+                                    selected={dataById.POLICY_INCEPTION_DATE}
+                                    onChange={(date: any) =>
+                                        setDataById({
+                                            ...dataById,
+                                            POLICY_INCEPTION_DATE:
+                                                date.toLocaleDateString(
+                                                    "en-CA"
+                                                ),
+                                        })
+                                    }
+                                    dateFormat={"dd-MM-yyyy"}
+                                    placeholderText="dd-mm-yyyyy"
+                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                />
+                                {/* <TextInput
                                     id="edit_policy_inception_date"
                                     type="date"
                                     name="edit_policy_inception_date"
@@ -2347,14 +2411,29 @@ export default function ModalDetailPolicy({
                                         })
                                     }
                                     required
-                                />
+                                /> */}
                             </div>
                             <div>
                                 <InputLabel
                                     htmlFor="edit_policy_due_date"
                                     value="Expiry Date"
                                 />
-                                <TextInput
+                                <DatePicker
+                                    selected={dataById.POLICY_DUE_DATE}
+                                    onChange={(date: any) =>
+                                        setDataById({
+                                            ...dataById,
+                                            POLICY_DUE_DATE:
+                                                date.toLocaleDateString(
+                                                    "en-CA"
+                                                ),
+                                        })
+                                    }
+                                    dateFormat={"dd-MM-yyyy"}
+                                    placeholderText="dd-mm-yyyyy"
+                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                />
+                                {/* <TextInput
                                     id="edit_policy_due_date"
                                     type="date"
                                     name="edit_policy_due_date"
@@ -2368,7 +2447,7 @@ export default function ModalDetailPolicy({
                                         })
                                     }
                                     required
-                                />
+                                /> */}
                             </div>
                         </div>
 
@@ -2431,6 +2510,7 @@ export default function ModalDetailPolicy({
                                                     className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                     required
                                                     placeholder="Percentage (%)"
+                                                    autoComplete="off"
                                                 />
                                             </div>
                                             <div className="mt-2">{"%"}</div>
@@ -4121,9 +4201,12 @@ export default function ModalDetailPolicy({
                             <div className="">
                                 <div className="grid grid-cols-5 ">
                                     <div className="col-span-3">
-                                        <span>How many Insurer? :</span>
+                                        <span>
+                                            How many Insurer? :{" "}
+                                            {dataEditInsurer.length}
+                                        </span>
                                     </div>
-                                    <div className="col-span-2">
+                                    {/* <div className="col-span-2">
                                         <TextInput
                                             id="insurer_number"
                                             type="number"
@@ -4133,7 +4216,7 @@ export default function ModalDetailPolicy({
                                             autoComplete="off"
                                             readOnly
                                         />
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className=""></div>
@@ -4635,8 +4718,9 @@ export default function ModalDetailPolicy({
                         setSumByCurrency([]);
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
-                    setInsurerNettPremi(0);
-                    setSearchInsurerNettPremi({});
+                    // setInsurerNettPremi(0);
+                    // setSearchInsurerNettPremi({});
+                    setInsurerNettPremi({});
                 }}
                 title={"Add Insured"}
                 url={`/insertManyInsured`}
@@ -4812,17 +4896,6 @@ export default function ModalDetailPolicy({
                                                                         onChange={(
                                                                             e
                                                                         ) => {
-                                                                            setSearchInsurerNettPremi(
-                                                                                {
-                                                                                    ...searchInsurerNettPremi,
-                                                                                    policy_id:
-                                                                                        policy.POLICY_ID,
-                                                                                    policy_coverage_id:
-                                                                                        e
-                                                                                            .target
-                                                                                            .value,
-                                                                                }
-                                                                            );
                                                                             inputInsuredDetail(
                                                                                 "POLICY_COVERAGE_ID",
                                                                                 e
@@ -4877,18 +4950,6 @@ export default function ModalDetailPolicy({
                                                                         onChange={(
                                                                             e
                                                                         ) => {
-                                                                            setSearchInsurerNettPremi(
-                                                                                {
-                                                                                    ...searchInsurerNettPremi,
-                                                                                    policy_id:
-                                                                                        policy.POLICY_ID,
-                                                                                    currency_id:
-                                                                                        e
-                                                                                            .target
-                                                                                            .value,
-                                                                                }
-                                                                            );
-
                                                                             inputInsuredDetail(
                                                                                 "CURRENCY_ID",
                                                                                 e
@@ -6834,7 +6895,23 @@ export default function ModalDetailPolicy({
                                         </div>
                                     </div>
                                 </div>
-                                <div className=""></div>
+                                <div className="">
+                                    {policyDetail.SELF_INSURED ? (
+                                        <div className="grid grid-cols-4 gap-4">
+                                            <div className="">
+                                                <span>Self Insured</span>
+                                            </div>
+                                            <div className=" col-span-3">
+                                                <span className="font-normal text-gray-500">
+                                                    {policyDetail.SELF_INSURED}{" "}
+                                                    {" %"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
                                 <div className="">

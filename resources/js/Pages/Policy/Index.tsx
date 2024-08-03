@@ -899,10 +899,10 @@ console.log('searchPolicy: ', searchPolicy)
                                 />
                                 <DatePicker
                                     selected={data.policy_inception_date}
-                                    onChange={(date:any) =>
+                                    onChange={(date: any) =>
                                         setData(
                                             "policy_inception_date",
-                                            date.toLocaleDateString('en-CA')
+                                            date.toLocaleDateString("en-CA")
                                         )
                                     }
                                     dateFormat={"dd-MM-yyyy"}
@@ -930,7 +930,19 @@ console.log('searchPolicy: ', searchPolicy)
                                     htmlFor="due_date"
                                     value="Expiry Date"
                                 />
-                                <TextInput
+                                <DatePicker
+                                    selected={data.policy_due_date}
+                                    onChange={(date: any) =>
+                                        setData(
+                                            "policy_due_date",
+                                            date.toLocaleDateString("en-CA")
+                                        )
+                                    }
+                                    dateFormat={"dd-MM-yyyy"}
+                                    placeholderText="dd-mm-yyyyy"
+                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                />
+                                {/* <TextInput
                                     id="due_date"
                                     type="date"
                                     name="due_date"
@@ -944,7 +956,7 @@ console.log('searchPolicy: ', searchPolicy)
                                         )
                                     }
                                     required
-                                />
+                                /> */}
                             </div>
                             <div className="w-60">
                                 <InputLabel
