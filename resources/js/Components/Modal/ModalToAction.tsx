@@ -74,7 +74,7 @@ export default function ModalToAction({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-50"
+                    className="relative z-9999"
                     onClose={close}
                     initialFocus={modalRef}
                 >

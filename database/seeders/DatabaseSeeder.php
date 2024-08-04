@@ -460,5 +460,11 @@ class DatabaseSeeder extends Seeder
         DB::unprepared(
             file_get_contents($file_path21)
         );
+
+        $file_path22 = resource_path('../database/LogDB/2024_08_04_t_person.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path22)
+        );
     }
 }

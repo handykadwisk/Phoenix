@@ -21,7 +21,7 @@ class CashAdvance extends Model
     public $timestamps = false;
 
     protected $with = [
-        // 'cash_advance_report',
+        'cash_advance_report',
         'cash_advance_detail',
         'user',
         'person',
@@ -32,10 +32,10 @@ class CashAdvance extends Model
         'approval_status'
     ];
 
-    // public function cash_advance_report(): HasOne
-    // {
-    //     return $this->hasOne(CashAdvanceReport::class);
-    // }
+    public function cash_advance_report()
+    {
+        return $this->hasOne(CashAdvanceReport::class, 'REPORT_CASH_ADVANCE_CASH_ADVANCE_ID');
+    }
 
     public function cash_advance_detail(): HasMany
     {

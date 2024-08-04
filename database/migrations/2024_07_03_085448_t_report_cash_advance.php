@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('t_report_cash_advance', function (Blueprint $table) {
             $table->increments('REPORT_CASH_ADVANCE_ID')->primary();
-            $table->smallInteger('CASH_ADVANCE_ID')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID')->nullable();
             $table->string('REPORT_CASH_ADVANCE_NUMBER')->nullable();
             $table->string('REPORT_CASH_ADVANCE_DIVISION')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_USED_BY')->nullable();
