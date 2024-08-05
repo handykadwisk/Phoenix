@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CashAdvanceCostClassification;
-use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceStatus;
 use App\Models\User;
