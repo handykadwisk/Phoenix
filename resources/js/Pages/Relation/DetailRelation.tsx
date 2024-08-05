@@ -38,7 +38,6 @@ export default function DetailRelation({
     relationType,
     profession,
     relationLOB,
-    getDetailMap,
     setGetDetailRelation,
 }: PropsWithChildren<{
     detailRelation: any;
@@ -47,7 +46,6 @@ export default function DetailRelation({
     relationType: any;
     profession: any;
     relationLOB: any;
-    getDetailMap: any;
     setGetDetailRelation: any;
 }>) {
     // const { success, detailRelation }: any = usePage().props;
@@ -132,7 +130,6 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
-                // console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -175,12 +172,11 @@ export default function DetailRelation({
     };
 
     const [dataById, setDataById] = useState<any>({
-        RELATION_ORGANIZATION_GROUP: "",
         RELATION_ORGANIZATION_NAME: "",
-        RELATION_ORGANIZATION_PARENT_ID: "",
         RELATION_ORGANIZATION_ABBREVIATION: "",
         RELATION_ORGANIZATION_AKA: "",
         RELATION_ORGANIZATION_EMAIL: "",
+        RELATION_ORGANIZATION_WEBSITE: "",
         relation_description: "",
         RELATION_PROFESSION_ID: "",
         RELATION_LOB_ID: "",
@@ -484,6 +480,30 @@ export default function DetailRelation({
             return selected[0].label;
         }
     };
+
+    const [existingAbb, setExistingAbb] = useState<any>([]);
+
+    const cekAbbreviationRelationEdit = async (name: any, id: any) => {
+        const flag = "edit";
+        await axios
+            .post(`/getCekAbbreviation`, { name, flag, id })
+            .then((res: any) => {
+                setExistingAbb(res.data);
+                if (res.data.length >= 1) {
+                    Swal.fire({
+                        title: "Warning",
+                        text: "Abbreviation already exists",
+                        icon: "warning",
+                    }).then((result: any) => {
+                        // console.log(result);
+                    });
+                }
+                // cekAbbreviation(existingAbb);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -693,6 +713,12 @@ export default function DetailRelation({
                                         })
                                     }
                                     required
+                                    onBlur={() => {
+                                        cekAbbreviationRelationEdit(
+                                            dataById.RELATION_ORGANIZATION_ABBREVIATION,
+                                            dataById.RELATION_ORGANIZATION_ID
+                                        );
+                                    }}
                                 />
                             </div>
                         </div>
@@ -853,7 +879,7 @@ export default function DetailRelation({
                                 </ul>
                             </div>
                         </div>
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <InputLabel
                                 htmlFor="RELATION_ORGANIZATION_GROUP"
                                 value="Group"
@@ -888,8 +914,8 @@ export default function DetailRelation({
                                     }
                                 )}
                             </select>
-                        </div>
-                        <div className="mt-4">
+                        </div> */}
+                        {/* <div className="mt-4">
                             <InputLabel
                                 htmlFor="RELATION_ORGANIZATION_PARENT_ID"
                                 value="Parent"
@@ -910,7 +936,7 @@ export default function DetailRelation({
                                 </option>
                                 {/* {mappingParent.mapping_parent.map(
                                     (parents: any, i: number) => { */}
-                                {mappingParent.mapping_parent
+                        {/* {mappingParent.mapping_parent
                                     ?.filter(
                                         (m: any) =>
                                             m.RELATION_ORGANIZATION_ALIAS !==
@@ -928,8 +954,8 @@ export default function DetailRelation({
                                             </option>
                                         );
                                     })}
-                            </select>
-                        </div>
+                            </select> */}
+                        {/* </div> */}
                         <div className="xs:grid xs:gap-4 xs:grid-cols-1 lg:grid lg:gap-4 lg:grid-cols-2">
                             <div className="mt-4">
                                 <InputLabel
@@ -951,27 +977,25 @@ export default function DetailRelation({
                                 />
                             </div>
                             <div className="xs:-mt-5 lg:mt-4">
-                                {/* <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED BY APP"
-                                /> */}
-                                <ul role="list" className="mt-8">
-                                    <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            <span className="mt-1 ml-2">
-                                                <Switch
-                                                    enabled={switchPageTBK}
-                                                    onChangeButton={(e: any) =>
-                                                        handleCheckboxTBKEdit(e)
-                                                    }
-                                                />
-                                            </span>
-                                            <span className="ml-2 text-sm">
-                                                MARK TBK RELATION
-                                            </span>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <InputLabel
+                                    htmlFor="RELATION_ORGANIZATION_WEBSITE"
+                                    value="Email"
+                                />
+                                <TextInput
+                                    type="text"
+                                    value={
+                                        dataById.RELATION_ORGANIZATION_WEBSITE
+                                    }
+                                    className="mt-2"
+                                    onChange={(e) =>
+                                        setDataById({
+                                            ...dataById,
+                                            RELATION_ORGANIZATION_WEBSITE:
+                                                e.target.value,
+                                        })
+                                    }
+                                    placeholder="www.example.com"
+                                />
                             </div>
                         </div>
                         <div className="mt-4">
@@ -1096,7 +1120,7 @@ export default function DetailRelation({
                         <div className="mt-4" id="relationLob">
                             <InputLabel
                                 htmlFor="RELATION_LOB_ID"
-                                value="Relation Lob"
+                                value="Business Sector"
                             />
                             <SelectTailwind
                                 classNames={{
@@ -1543,10 +1567,33 @@ export default function DetailRelation({
                     </div>
                     <div className="xs:col-span-2 lg:col-span-1">
                         <div className="font-semibold">
-                            <span>Email</span>
+                            {dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                                "" ||
+                            dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                                null ? (
+                                <span>Website</span>
+                            ) : (
+                                <span>Email</span>
+                            )}
                         </div>
                         {dataRelationNew.RELATION_ORGANIZATION_EMAIL === "" ||
                         dataRelationNew.RELATION_ORGANIZATION_EMAIL === null ? (
+                            dataRelationNew.RELATION_ORGANIZATION_WEBSITE ===
+                                "" ||
+                            dataRelationNew.RELATION_ORGANIZATION_WEBSITE ===
+                                null ? (
+                                <div className="text-sm text-gray-400">-</div>
+                            ) : (
+                                <div className="text-sm text-gray-400">
+                                    {
+                                        dataRelationNew.RELATION_ORGANIZATION_WEBSITE
+                                    }
+                                </div>
+                            )
+                        ) : dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                              "" ||
+                          dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
+                              null ? (
                             <div className="text-sm text-gray-400">-</div>
                         ) : (
                             <div className="text-sm text-gray-400">

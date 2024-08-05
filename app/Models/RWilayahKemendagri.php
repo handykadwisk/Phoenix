@@ -9,5 +9,13 @@ class RWilayahKemendagri extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'kode';
+
     protected $table = 'r_wilayah_kemendagri';
+
+    protected $guarded = [
+        'kode',
+    ];
+
+    public $timestamps = false;
 }

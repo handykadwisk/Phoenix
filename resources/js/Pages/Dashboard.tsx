@@ -10,9 +10,12 @@ export default function Dashboard({ auth, language }: any) {
     const lang: any = language[0]
 
     const stats = [
-        { name: lang.policy, stat: "71,897" },
-        { name: lang.claim, stat: "58.16%" },
-        { name: lang.assets, stat: "24.57%" },
+        // { name: lang.policy, stat: "71,897" },
+        // { name: lang.claim, stat: "58.16%" },
+        // { name: lang.assets, stat: "24.57%" },
+        { name: lang.policy, stat: "0" },
+        { name: lang.claim, stat: "0" },
+        { name: lang.assets, stat: "0" },
     ];
 
     return (

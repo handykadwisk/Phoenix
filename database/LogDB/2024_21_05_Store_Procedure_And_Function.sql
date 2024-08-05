@@ -1,8 +1,8 @@
 /*
-SQLyog Ultimate v13.1.1 (32 bit)
-MySQL - 8.3.0 : Database - phoenix
+SQLyog Ultimate v11.33 (64 bit)
+MySQL - 8.2.0 : Database - phoenix
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -12,6 +12,25 @@ MySQL - 8.3.0 : Database - phoenix
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/* Function  structure for function  `f_get_last_note_claim` */
+
+/*!50003 DROP FUNCTION IF EXISTS `f_get_last_note_claim` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`admin`@`%` FUNCTION `f_get_last_note_claim`(`var_claim_id` BIGINT) RETURNS text CHARSET latin1
+BEGIN
+  DECLARE LAST_NOTE TEXT;
+  SELECT 
+    CLAIM_HISTORY_NOTE into LAST_NOTE 
+  FROM
+    photclaimhistory 
+  where CLAIM_ID = var_claim_id 
+  ORDER BY CLAIM_HISTORY_ID DESC 
+  LIMIT 1 ;
+  RETURN LAST_NOTE ;
+END */$$
+DELIMITER ;
+
 /* Function  structure for function  `f_get_path_relation_division` */
 
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_division` */;
@@ -20,6 +39,18 @@ DELIMITER $$
 /*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_division`(`input_relation_organization_id` INT, `input` INT) RETURNS text CHARSET latin1
 BEGIN
   CALL `sp_path_relation_division`(input_relation_organization_id,input, @path);
+  RETURN @path;
+END */$$
+DELIMITER ;
+
+/* Function  structure for function  `f_get_path_relation_group` */
+
+/*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_group` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_relation_group`(`input_relation_group_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_relation_group`(input_relation_group_id,input, @path);
   RETURN @path;
 END */$$
 DELIMITER ;
@@ -134,6 +165,71 @@ BEGIN
     t_relation_division 
   WHERE RELATION_ORGANIZATION_ID = input_relation_organization_id 
   ORDER BY RELATION_ORGANIZATION_ID,
+    mapping ;
+  END IF ;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_combo_relation_group` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_combo_relation_group` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_relation_group`(IN `input_relation_group_group_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_group_group_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_GROUP_ID,
+    RELATION_GROUP_PARENT,
+    RELATION_GROUP_NAME,
+    @path_combo := `f_get_path_relation_group` (NULL, RELATION_GROUP_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      RELATION_GROUP_NAME,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        RELATION_GROUP_NAME
+      )
+    ) text_combo 
+  FROM
+    t_relation_group 
+  ORDER BY RELATION_GROUP_ID,
+    mapping ;
+  ELSE 
+  SELECT 
+    RELATION_GROUP_ID,
+    RELATION_GROUP_PARENT_ID,
+    RELATION_GROUP_NAME,
+    @path_combo := `f_get_path_relation_group` (input_relation_group_group_id, RELATION_GROUP_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      RELATION_GROUP_NAME,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        RELATION_GROUP_NAME
+      )
+    ) text_combo 
+  FROM
+    t_relation_group 
+  WHERE RELATION_GROUP_ID = input_relation_group_group_id 
+  ORDER BY RELATION_GROUP_ID,
     mapping ;
   END IF ;
 END */$$
@@ -498,6 +594,53 @@ BEGIN
 END */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `sp_path_relation_group` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_path_relation_group` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_relation_group`(IN `input_relation_group_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_relation_group_id IS NULL 
+  THEN 
+  SELECT 
+    RELATION_GROUP_ID,
+    RELATION_GROUP_PARENT INTO _id,
+    _parent 
+  FROM
+    t_relation_group 
+  WHERE RELATION_GROUP_ID = input ;
+  ELSE 
+  SELECT 
+    RELATION_GROUP_ID,
+    RELATION_ORGANIZATION_PARENT INTO _id,
+    _parent 
+  FROM
+    t_relation 
+  WHERE RELATION_GROUP_ID = input 
+    AND RELATION_ORGANIZATION_GROUP = input_relation_group_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_relation_group` (
+    input_relation_group_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
+END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `sp_path_relation_job_desc` */
 
 /*!50003 DROP PROCEDURE IF EXISTS  `sp_path_relation_job_desc` */;
@@ -698,6 +841,22 @@ IF input_relation_organization_id IS NULL THEN
 UPDATE t_relation_division SET RELATION_DIVISION_MAPPING=f_get_path_relation_division(input_relation_organization_id, RELATION_DIVISION_ID); 
 ELSE
 UPDATE t_relation_division SET RELATION_DIVISION_MAPPING=f_get_path_relation_division(input_relation_organization_id, RELATION_DIVISION_ID) WHERE RELATION_ORGANIZATION_ID=input_relation_organization_id; 
+END IF;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_set_mapping_relation_group` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_set_mapping_relation_group` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_relation_group`(IN `input_group_id` INT)
+BEGIN
+IF input_group_id IS NULL THEN
+UPDATE t_relation_group SET RELATION_GROUP_MAPPING=f_get_path_relation_group(input_group_id, RELATION_GROUP_ID); 
+ELSE
+UPDATE t_relation_group SET RELATION_GROUP_MAPPING=f_get_path_relation_group(input_group_id, RELATION_GROUP_ID) WHERE RELATION_ORGANIZATION_GROUP=input_group_id; 
 END IF;
 END */$$
 DELIMITER ;

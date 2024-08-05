@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('t_relation_group', function (Blueprint $table) {
             $table->increments('RELATION_GROUP_ID')->primary()->unique();
             $table->string('RELATION_GROUP_NAME')->nullable();
+            $table->bigInteger('RELATION_GROUP_PARENT')->nullable();
+            $table->string('RELATION_GROUP_MAPPING', 255)->nullable();
             $table->string('RELATION_GROUP_DESCRIPTION')->nullable();
             $table->bigInteger('RELATION_GROUP_CREATED_BY')->nullable();
             $table->timestamp('RELATION_GROUP_CREATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'));
             $table->bigInteger('RELATION_GROUP_UPDATED_BY')->nullable();
             $table->timestamp('RELATION_GROUP_UPDATED_DATE')->default(\DB::raw('CURRENT_TIMESTAMP'));
-            $table->bigInteger('RELATION_GROUP_PARENT')->nullable();
             $table->string('RELATION_GROUP_ALIAS')->nullable();
         });
     }
