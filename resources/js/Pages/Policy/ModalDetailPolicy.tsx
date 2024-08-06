@@ -509,7 +509,7 @@ export default function ModalDetailPolicy({
         IP_POLICY_LEADER: 0,
         POLICY_COST: 0,
         premium: [
-            
+
         ],
     };
     const addRowDataInsurer = (jml: string) => {
@@ -1062,7 +1062,7 @@ export default function ModalDetailPolicy({
 
     //  useEffect(() => {
     //      if (
-    //          Object.keys(searchInsurerNettPremi).length > 0 
+    //          Object.keys(searchInsurerNettPremi).length > 0
     //      ) {
     //          console.log(searchInsurerNettPremi);
     //          const result = getInsurerNettPremi(
@@ -1111,7 +1111,7 @@ export default function ModalDetailPolicy({
 
       useEffect(() => {
          if (
-             Object.keys(insurerNettPremi).length > 0 
+             Object.keys(insurerNettPremi).length > 0
          ) {
              console.log(insurerNettPremi);
 
@@ -1126,19 +1126,19 @@ export default function ModalDetailPolicy({
              let policy_coverage_id =
                  policy_insured_detail["POLICY_COVERAGE_ID"];
              policy_insured_detail["PREMIUM_AMOUNT"] = insurerNettPremi.insurerNettPremium;
-           
-           
+
+
              policy_insured_details[insurerNettPremi.detailNum] = policy_insured_detail;
              item.policy_insured_detail = policy_insured_details;
              items[insurerNettPremi.insuredNum] = item;
              setDataInsured(items);
-             
+
             //  setInsurerNettPremi(result);
             // console.log("result xxx : ", result);
          }
      }, [insurerNettPremi]);
 
-    
+
     // Add Insured
     const [dataInsured, setDataInsured] = useState<any>([]);
     const [dataInsuredView, setdataInsuredView] = useState<any>([]);
@@ -1243,7 +1243,7 @@ export default function ModalDetailPolicy({
     ) => {
         // let currency_id = "";
         // let policy_coverage_id = "";
-        
+
         const items = [...dataInsured];
         const item = { ...items[insuredNum] };
         const policy_insured_details = [...item.policy_insured_detail];
@@ -1263,7 +1263,7 @@ export default function ModalDetailPolicy({
         if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
             // const currency_id = value;
             // let result = 7;
-            
+
             getInsurerNettPremi(
                 policy.POLICY_ID,
                 currency_id,
@@ -1284,7 +1284,7 @@ export default function ModalDetailPolicy({
         }
         policy_insured_detail[name] = value;
         // if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
-            
+
         //     // policy_insured_detail["PREMIUM_AMOUNT"] = insurerNettPremi;
         //     console.log("insurerNettPremi: ", insurerNettPremi);
         // }
@@ -1537,7 +1537,7 @@ export default function ModalDetailPolicy({
     const [dataPartners, setDataPartners] = useState<any>([]);
     const [listDataPartners, setListDataPartners] = useState<any>([]);
 
-    
+
     const handleAddPartners = async (policy_id: any) => {
         setDataPartners(arrDataPartners);
         setDataIncome(arrDataIncome);
@@ -1584,7 +1584,7 @@ export default function ModalDetailPolicy({
         items[i] = item;
         setDataIncome(items);
     };
-    
+
     const inputDataIncome = (
         name: string,
         value: string | undefined,
@@ -1697,7 +1697,7 @@ export default function ModalDetailPolicy({
             0
         );
 
-        
+
         const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition;
         const nettEF = nettEF_fbi + nettEF_agent + nettEF_acquisition;
         const nettCF = nettCF_fbi + nettCF_agent + nettCF_acquisition;
@@ -1820,7 +1820,7 @@ export default function ModalDetailPolicy({
                         items[2] = item;
                     }
                 });
-                
+
                 setListDataPartners(items);
                 setIsLoading({
                     ...isLoading,
@@ -1875,7 +1875,7 @@ export default function ModalDetailPolicy({
         items[i] = item;
         setListDataPartners(items);
     };
-    
+
     const inputDataEditIncome = (
         name: string,
         value: string | undefined,
@@ -2099,7 +2099,7 @@ export default function ModalDetailPolicy({
     const handleSuccess = (message: string) => {
 
         getDetailPolicy(policy.POLICY_ID);
-        
+
         Swal.fire({
             title: "Success",
             text: "Success Edit Policy",
@@ -2185,7 +2185,7 @@ export default function ModalDetailPolicy({
         });
     };
 
-   
+
     const handleDeleteModal = async () => {
         const id = policy.POLICY_ID;
         Swal.fire({
