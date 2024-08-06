@@ -1411,6 +1411,7 @@ export default function ModalDetailPolicy({
             });
         }
     };
+    console.log("dataEditInsured: ", dataEditInsured);
     // End Edit Insured
 
     // Add Partners
@@ -2381,73 +2382,74 @@ export default function ModalDetailPolicy({
                                     htmlFor="edit_policy_inception_date"
                                     value="Inception Date"
                                 />
-                                <DatePicker
-                                    selected={dataById.POLICY_INCEPTION_DATE}
-                                    onChange={(date: any) =>
-                                        setDataById({
-                                            ...dataById,
-                                            POLICY_INCEPTION_DATE:
-                                                date.toLocaleDateString(
-                                                    "en-CA"
-                                                ),
-                                        })
-                                    }
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy"
-                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                />
-                                {/* <TextInput
-                                    id="edit_policy_inception_date"
-                                    type="date"
-                                    name="edit_policy_inception_date"
-                                    value={dataById.POLICY_INCEPTION_DATE}
-                                    className=""
-                                    autoComplete="off"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            POLICY_INCEPTION_DATE:
-                                                e.target.value,
-                                        })
-                                    }
-                                    required
-                                /> */}
+                                <div className="relative max-w-sm">
+                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 pointer-events-none">
+                                        <svg
+                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </div>
+                                    <DatePicker
+                                        selected={
+                                            dataById.POLICY_INCEPTION_DATE
+                                        }
+                                        onChange={(date: any) =>
+                                            setDataById({
+                                                ...dataById,
+                                                POLICY_INCEPTION_DATE:
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    ),
+                                            })
+                                        }
+                                        showMonthDropdown
+                                        showYearDropdown
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyyy"
+                                        className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                    />
+                                </div>
                             </div>
                             <div>
                                 <InputLabel
                                     htmlFor="edit_policy_due_date"
                                     value="Expiry Date"
                                 />
-                                <DatePicker
-                                    selected={dataById.POLICY_DUE_DATE}
-                                    onChange={(date: any) =>
-                                        setDataById({
-                                            ...dataById,
-                                            POLICY_DUE_DATE:
-                                                date.toLocaleDateString(
-                                                    "en-CA"
-                                                ),
-                                        })
-                                    }
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy"
-                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                />
-                                {/* <TextInput
-                                    id="edit_policy_due_date"
-                                    type="date"
-                                    name="edit_policy_due_date"
-                                    value={dataById.POLICY_DUE_DATE}
-                                    className=""
-                                    autoComplete="off"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            POLICY_DUE_DATE: e.target.value,
-                                        })
-                                    }
-                                    required
-                                /> */}
+                                <div className="relative max-w-sm">
+                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                        <svg
+                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </div>
+                                    <DatePicker
+                                        selected={dataById.POLICY_DUE_DATE}
+                                        onChange={(date: any) =>
+                                            setDataById({
+                                                ...dataById,
+                                                POLICY_DUE_DATE:
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    ),
+                                            })
+                                        }
+                                        showMonthDropdown
+                                        showYearDropdown
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyyy"
+                                        className="border-0 rounded-md shadow-md text-sm h-9 w-full px-10 focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -2640,13 +2642,13 @@ export default function ModalDetailPolicy({
                                                             Gross Premium
                                                         </th>
                                                         <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                            Lost Limit %
+                                                            Loss Limit %
                                                         </th>
                                                         <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                            Lost Limit Amount
+                                                            Loss Limit Amount
                                                         </th>
                                                         <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                            Lost Limit Scale
+                                                            Loss Limit Scale
                                                         </th>
                                                         <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
                                                             Insurance Discount %
@@ -3130,13 +3132,13 @@ export default function ModalDetailPolicy({
                                                         Gross Premium
                                                     </th>
                                                     <th className="min-w-[50px] py-2 px-2 text-sm text-black dark:text-white">
-                                                        Lost Limit %
+                                                        Loss Limit %
                                                     </th>
                                                     <th className="min-w-[100px] py-2 px-2 text-sm text-black dark:text-white">
-                                                        Lost Limit Amount
+                                                        Loss Limit Amount
                                                     </th>
                                                     <th className="min-w-[100px] py-2 px-2 text-sm text-black dark:text-white">
-                                                        Lost Limit Scale
+                                                        Loss Limit Scale
                                                     </th>
                                                     <th className="min-w-[100px] py-2 px-2 text-sm text-black dark:text-white">
                                                         Insurance Discount %
@@ -7049,20 +7051,20 @@ export default function ModalDetailPolicy({
                                                                 scope="col"
                                                                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                                             >
-                                                                Lost Limit %
+                                                                Loss Limit %
                                                             </th>
                                                             <th
                                                                 scope="col"
                                                                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                                             >
-                                                                Lost Limit
+                                                                Loss Limit
                                                                 Amount
                                                             </th>
                                                             <th
                                                                 scope="col"
                                                                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                                             >
-                                                                Lost Limit Scale
+                                                                Loss Limit Scale
                                                             </th>
                                                             <th
                                                                 scope="col"
@@ -7860,7 +7862,7 @@ export default function ModalDetailPolicy({
                                                 );
                                             }}
                                         >
-                                            Add/Edit Business Partners
+                                            Edit Business Partners
                                         </button>
                                     </div>
                                 </div>
