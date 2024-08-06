@@ -41,6 +41,7 @@ return new class extends Migration
             $table->string('REPORT_CASH_ADVANCE_PROOF_OF_DOCUMENT')->nullable();
             $table->date('REPORT_CASH_ADVANCE_TRANSACTION_DATE')->nullable();
             $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT', 16, 2)->nullable();
+            $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST', 16, 2)->nullable();
             $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT_APPROVE', 16, 2)->nullable();
             $table->decimal('REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT', 16, 2)->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_CREATED_BY')->nullable();

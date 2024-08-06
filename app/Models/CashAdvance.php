@@ -21,7 +21,7 @@ class CashAdvance extends Model
     public $timestamps = false;
 
     protected $with = [
-        'cash_advance_report',
+        // 'cash_advance_report',
         'cash_advance_detail',
         'user',
         'person',

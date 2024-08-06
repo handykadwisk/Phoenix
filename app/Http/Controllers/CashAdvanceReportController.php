@@ -9,6 +9,7 @@ use App\Models\Document;
 use App\Models\MCashAdvanceDocument;
 use App\Models\MCashAdvanceProofOfDocument;
 use App\Models\MCashAdvanceReportDocument;
+use App\Models\RCashAdvanceDifferent;
 use App\Models\TDocument;
 use App\Models\TPerson;
 use App\Models\User;
@@ -41,9 +42,64 @@ class CashAdvanceReportController extends Controller
 
     public function getCAReportById(string $id) 
     {
-        $data = CashAdvanceReport::findOrFail($id);
+        $data = CashAdvanceReport::with('cash_advance')->findOrFail($id);
         // $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID', $id);
         // dd($data);
+        return response()->json($data);
+    }
+
+    public function getCountCAReportRequestStatus()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAReportApprove1Status()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAReportApprove2Status()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 1)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAReportPendingReportStatus()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAReportNeedRevisionStatus()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
+                            ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
+                            ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 3)
+                            ->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAReportRejectStatus()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
+                            ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
+                            ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)
+                            ->count();
+
+        return response()->json($data);
+    }
+
+    public function getCashAdvanceDifferents()
+    {
+        $data = RCashAdvanceDifferent::all();
+
         return response()->json($data);
     }
 
@@ -152,6 +208,16 @@ class CashAdvanceReportController extends Controller
         foreach ($request->CashAdvanceDetail as $value) {
             $total_amount_report += $value['cash_advance_detail_amount'];
         }
+
+        $report_cash_advance_total_amount_different = $request->cash_advance_total_amount_request - $total_amount_report;
+
+        if ($report_cash_advance_total_amount_different > 0) {
+            $type = 1;
+        } else if ($report_cash_advance_total_amount_different < 0) {
+            $type = 2;
+        } else {
+            $type = 3;
+        }
         
         $report_cash_advance_id = $request->cash_advance_id;
         $report_cash_advance_number = $this->getCashAdvanceReportNumber();
@@ -163,13 +229,9 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
         $report_cash_advance_first_approval_status = 0;
         $report_cash_advance_request_note = $request->cash_advance_request_note;
-        // $report_cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
-        // $report_cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
-        // $report_cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
-        // $report_cash_advance_cash_amount = $request->cash_advance_cash_amount;
-        $report_cash_advance_amount = $request->amount;
-        $report_cash_advance_type = $request->type;
+        $report_cash_advance_type = $type;
         $report_cash_advance_total_amount = $total_amount_report;
+        $report_cash_advance_total_amount_request = $request->cash_advance_total_amount_request;
         $cash_advance_created_at = now();
         $cash_advance_created_by = $user_id;
 
@@ -185,13 +247,10 @@ class CashAdvanceReportController extends Controller
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER' => $report_cash_advance_first_approval_user,
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
             'REPORT_CASH_ADVANCE_REQUEST_NOTE' => $report_cash_advance_request_note,
-            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
-            // 'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
-            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
-            // 'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
             'REPORT_CASH_ADVANCE_TYPE' => $report_cash_advance_type,
-            'REPORT_CASH_ADVANCE_AMOUNT' => $report_cash_advance_amount,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
+            'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST' => $report_cash_advance_total_amount_request,
+            'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT' => $report_cash_advance_total_amount_different,
             'REPORT_CASH_ADVANCE_CREATED_AT' => $cash_advance_created_at,
             'REPORT_CASH_ADVANCE_CREATED_BY' => $cash_advance_created_by
         ])->REPORT_CASH_ADVANCE_ID;
@@ -268,6 +327,12 @@ class CashAdvanceReportController extends Controller
                         'DOCUMENT_FILESIZE'               => $documentFileSize,
                         'DOCUMENT_CREATED_BY'             => $userId
                     ])->DOCUMENT_ID;
+
+                    // if($document) {
+                    //     TDocument::where('DOCUMENT_ID', $document)->update([
+                    //         'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
+                    //     ]);
+                    // }
                         
                     if ($document) {
                         MCashAdvanceReportDocument::create([
@@ -320,7 +385,7 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_amount = $request->REPORT_CASH_ADVANCE_AMOUNT;
         $report_cash_advance_total_amount = $request->REPORT_CASH_ADVANCE_TOTAL_AMOUNT;
         $report_cash_advance_total_amount_approve = $total_amount_approve;
-        $report_cash_advance_total_amount_different = $report_cash_advance_total_amount - $report_cash_advance_total_amount_approve;
+        $report_cash_advance_total_amount_different = $request->REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST - $report_cash_advance_total_amount_approve;
 
         CashAdvanceReport::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance_id)->update([
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $report_cash_advance_first_approval_change_status_date,
@@ -391,30 +456,34 @@ class CashAdvanceReportController extends Controller
         $CountRequestDataById = sizeof($cash_advance_detail_report);
         $CountCashAdvanceDetail = CashAdvanceDetailReport::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance_id)->count();
 
-        $total_amount = 0;
+        $total_amount_report = 0;
 
         foreach ($cash_advance_detail_report as $value) {
-            $total_amount += $value['REPORT_CASH_ADVANCE_DETAIL_AMOUNT'];
+            $total_amount_report += $value['REPORT_CASH_ADVANCE_DETAIL_AMOUNT'];
         }
 
-        $report_cash_advance_total_amount = $total_amount;
+        $report_cash_advance_total_amount_different = $request->REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST - $total_amount_report;
+
+        if ($report_cash_advance_total_amount_different > 0) {
+            $type = 1;
+        } else if ($report_cash_advance_total_amount_different < 0) {
+            $type = 2;
+        } else {
+            $type = 3;
+        }
+
+        $report_cash_advance_total_amount = $total_amount_report;
         $report_cash_advance_first_approval_status = 0;
         $report_cash_advance_request_note = $request->REPORT_CASH_ADVANCE_REQUEST_NOTE;
-        // $report_cash_advance_delivery_method_transfer = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
-        // $report_cash_advance_transfer_amount = $request->REPORT_CASH_ADVANCE_TRANSFER_AMOUNT;
-        // $report_cash_advance_delivery_method_cash = $request->REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH;
-        // $report_cash_advance_cash_amount = $request->REPORT_CASH_ADVANCE_CASH_AMOUNT;
         $report_cash_advance_updated_at = now();
         $report_cash_advance_updated_by = $user_id;
 
         CashAdvanceReport::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance_id)->update([
             'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $report_cash_advance_first_approval_status,
             'REPORT_CASH_ADVANCE_REQUEST_NOTE' => $report_cash_advance_request_note,
-            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $report_cash_advance_delivery_method_transfer,
-            // 'REPORT_CASH_ADVANCE_TRANSFER_AMOUNT' => $report_cash_advance_transfer_amount,
-            // 'REPORT_CASH_ADVANCE_DELIVERY_METHOD_CASH' => $report_cash_advance_delivery_method_cash,
-            // 'REPORT_CASH_ADVANCE_CASH_AMOUNT' => $report_cash_advance_cash_amount,
+            'REPORT_CASH_ADVANCE_TYPE' => $type,
             'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
+            'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT' => $report_cash_advance_total_amount_different,
             'REPORT_CASH_ADVANCE_UPDATED_AT' => $report_cash_advance_updated_at,
             'REPORT_CASH_ADVANCE_UPDATED_BY' => $report_cash_advance_updated_by
         ]);
@@ -555,6 +624,12 @@ class CashAdvanceReportController extends Controller
                     'DOCUMENT_FILESIZE'               => $documentFileSize,
                     'DOCUMENT_CREATED_BY'             => $userId
                 ])->DOCUMENT_ID;
+
+                // if($document) {
+                //     TDocument::where('DOCUMENT_ID', $document)->update([
+                //         'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
+                //     ]);
+                // }
                     
                 if ($document) {
                     MCashAdvanceProofOfDocument::create([
