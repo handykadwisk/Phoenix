@@ -73,19 +73,9 @@ class PolicyPartnerController extends Controller
                 ];
                 array_push($arrData, $tmpArr3);
         }
-        // print_r($arrData);
+        
         MPolicyPartners::insert($arrData);
-        
-        // UserLog::create([
-        //     'created_by' => Auth::user()->id,
-        //     'action'     => json_encode([
-        //         "description" => "Add Coverage.",
-        //         "module"      => "Add Coverage",
-        //         // "id"          => $request->id
-        //     ]),
-        //     'action_by'  => Auth::user()->email
-        // ]);
-        
+               
         return new JsonResponse([
             'Success Registered Partners.'
             // $policy
@@ -101,16 +91,13 @@ class PolicyPartnerController extends Controller
 
     public function editPartners(Request $request) {
         
-        // dd($request);
         $data = $request->input();
         $data_fbi_pks = $data[0]['income_detail'];
         $data_agent_comm = $data[1]['income_detail'];
         $data_acquisition =$data[2]['income_detail'];
-        // print_r($data_fbi_pks);
         $policy_id = "";
         $arrData = [];
         foreach ($data_fbi_pks as $details1 => $detail1) {
-            // print_r($detail1);
             $tmpArr = [
                     'INCOME_TYPE' => $detail1['INCOME_TYPE'],
                     'POLICY_ID' => $detail1['POLICY_ID'],
@@ -128,7 +115,6 @@ class PolicyPartnerController extends Controller
         }
 
         foreach ($data_agent_comm as $details2 => $detail2) {
-            // print_r($detail2);
             $tmpArr2 = [
                     'INCOME_TYPE' => $detail2['INCOME_TYPE'],
                     'POLICY_ID' => $detail2['POLICY_ID'],
@@ -146,7 +132,6 @@ class PolicyPartnerController extends Controller
         }
 
         foreach ($data_acquisition as $details3 => $detail3) {
-            // print_r($detail3);
             $tmpArr3 = [
                     'INCOME_TYPE' => $detail3['INCOME_TYPE'],
                     'POLICY_ID' => $detail3['POLICY_ID'],
@@ -162,10 +147,10 @@ class PolicyPartnerController extends Controller
                 array_push($arrData, $tmpArr3);
                 $policy_id = $detail3['POLICY_ID'];
         }
-        // print_r($arrData);
+        
         MPolicyPartners::where('POLICY_ID', $policy_id)->delete();
         MPolicyPartners::insert($arrData);
-        // dd($data);
+        
         return new JsonResponse([
             'Update Succeed'
         ], 201, [
