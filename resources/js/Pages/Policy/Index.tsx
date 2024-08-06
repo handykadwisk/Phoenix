@@ -270,7 +270,7 @@ export default function PolicyIndex({ auth }: PageProps) {
     } 
 console.log('searchPolicy: ', searchPolicy)
     const handleSuccess = (message: number) => {
-        console.log("message: ", message);
+        // console.log("message: ", message);
         setIsSuccess("");
         reset();
         setData({
@@ -897,51 +897,66 @@ console.log('searchPolicy: ', searchPolicy)
                                     htmlFor="inception_date"
                                     value="Inception Date"
                                 />
-                                <DatePicker
-                                    selected={data.policy_inception_date}
-                                    onChange={(date: any) =>
-                                        setData(
-                                            "policy_inception_date",
-                                            date.toLocaleDateString("en-CA")
-                                        )
-                                    }
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy"
-                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                />
-                                {/* <TextInput
-                                    id="inception_date"
-                                    type="date"
-                                    name="inception_date"
-                                    value={data.policy_inception_date}
-                                    className=""
-                                    autoComplete="off"
-                                    onChange={(e) =>
-                                        setData(
-                                            "policy_inception_date",
-                                            e.target.value
-                                        )
-                                    }
-                                    required
-                                /> */}
+                                <div className="relative max-w-sm">
+                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                        <svg
+                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </div>
+                                    <DatePicker
+                                        selected={data.policy_inception_date}
+                                        onChange={(date: any) =>
+                                            setData(
+                                                "policy_inception_date",
+                                                date.toLocaleDateString("en-CA")
+                                            )
+                                        }
+                                        showMonthDropdown
+                                        showYearDropdown
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyyy"
+                                        className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                    />
+                                </div>
                             </div>
                             <div>
                                 <InputLabel
                                     htmlFor="due_date"
                                     value="Expiry Date"
                                 />
-                                <DatePicker
-                                    selected={data.policy_due_date}
-                                    onChange={(date: any) =>
-                                        setData(
-                                            "policy_due_date",
-                                            date.toLocaleDateString("en-CA")
-                                        )
-                                    }
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy"
-                                    className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                />
+                                <div className="relative max-w-sm">
+                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                        <svg
+                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </div>
+                                    <DatePicker
+                                        selected={data.policy_due_date}
+                                        onChange={(date: any) =>
+                                            setData(
+                                                "policy_due_date",
+                                                date.toLocaleDateString("en-CA")
+                                            )
+                                        }
+                                        showMonthDropdown
+                                        showYearDropdown
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyyy"
+                                        className="border-0 rounded-md shadow-md text-sm h-9 w-full px-10 focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                    />
+                                </div>
                                 {/* <TextInput
                                     id="due_date"
                                     type="date"

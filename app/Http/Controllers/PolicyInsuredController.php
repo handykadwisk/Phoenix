@@ -76,7 +76,7 @@ class PolicyInsuredController extends Controller
     }
 
     public function editInsured(Request $request) {
-        // dd($request['POLICY_COVERAGE_NAME']);
+        // dd($request);
 
         $insured = MPolicyInsured::where('POLICY_INSURED_ID', $request['POLICY_INSURED_ID'])
             ->update([
@@ -120,9 +120,9 @@ class PolicyInsuredController extends Controller
             }
         }
 
-        if ($request['deletedCoverageDetail']) {
-            foreach ($request['deletedCoverageDetail'] as $del) {
-                MPolicyInsuredDetail::where('POLICY_COVERAGE_DETAIL_ID', $del['POLICY_COVERAGE_DETAIL_ID'])->delete();
+        if ($request['deletedInsuredDetail']) {
+            foreach ($request['deletedInsuredDetail'] as $del) {
+                MPolicyInsuredDetail::where('POLICY_INSURED_DETAIL_ID', $del['POLICY_INSURED_DETAIL_ID'])->delete();
             }
         }
 
