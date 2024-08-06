@@ -59,12 +59,12 @@ export default function ModalToAction({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data[0]);
+                onSuccess(res.data);
                 close();
             })
             .catch((err) => {
                 setIsProcessing(false);
-                setIsError(err.response.data[0]);
+                // setIsError(err.response.data);
                 console.log(err);
             });
     };
