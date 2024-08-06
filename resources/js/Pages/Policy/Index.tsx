@@ -32,7 +32,7 @@ import "react-datepicker/dist/react-datepicker.css";
 // import { Datepicker } from "flowbite-react";
 
 export default function PolicyIndex({ auth }: PageProps) {
-    
+
     const [flagSwitch, setFlagSwitch] = useState<boolean>(false);
     const [relations, setRelations] = useState<any>([]);
     const [policies, setPolicies] = useState<any>([]);
@@ -81,7 +81,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                         document: false,
                         search: false,
                     });
-                    
+
                 }
             })
             .catch((err) => {
@@ -128,7 +128,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         document: false,
         search: false,
     });
-    
+
     const selectInsurance = insurance?.map((query: any) => {
         return {
             value: query.RELATION_ORGANIZATION_ID,
@@ -265,9 +265,9 @@ export default function PolicyIndex({ auth }: PageProps) {
         });
 
         setSumByCurrency([])
-        
 
-    } 
+
+    }
 console.log('searchPolicy: ', searchPolicy)
     const handleSuccess = (message: number) => {
         // console.log("message: ", message);
@@ -383,8 +383,8 @@ console.log('searchPolicy: ', searchPolicy)
         if (name == 'currency_id') {
             setarrCurrency([...arrCurrency, value]);
         }
-        
-        
+
+
     };
 
     const addRowPolicyPremium = (e: FormEvent) => {
@@ -442,7 +442,7 @@ console.log('searchPolicy: ', searchPolicy)
     };
 
     const getData = async (id: number) => {
-        
+
         await axios
             .get(`/getPolicy/${id}`)
             .then((res) => setDataById(res.data))
@@ -450,7 +450,7 @@ console.log('searchPolicy: ', searchPolicy)
 
     };
 
-    
+
     // edit
     const handleEditModal = async (e: FormEvent, id: number) => {
         e.preventDefault();
@@ -481,7 +481,7 @@ console.log('searchPolicy: ', searchPolicy)
 
     const addRowEditPolicyPremium = (e: FormEvent) => {
         e.preventDefault();
-        
+
         setDataById({
             ...dataById,
             policy_premium: [
@@ -564,7 +564,7 @@ console.log('searchPolicy: ', searchPolicy)
 
     const addRowEditInstallment = (e: FormEvent) => {
         e.preventDefault();
-        
+
         setDataById({
             ...dataById,
             policy_installment: [
@@ -643,11 +643,11 @@ console.log('searchPolicy: ', searchPolicy)
     // end view
 
     const getRelation = async (id: string) => {
-        
+
         await axios
             .get(`/getRelation/${id}`)
             .then((res) => {
-                
+
                 setData(
                     "policy_the_insured",
                     res.data.RELATION_ORGANIZATION_NAME
@@ -714,7 +714,7 @@ console.log('searchPolicy: ', searchPolicy)
     }
     useEffect(() => {
         if (data.policyPremium) {
-            getSummaryPremi()            
+            getSummaryPremi()
         }
     }, [data.policyPremium]);
 
@@ -744,11 +744,11 @@ console.log('searchPolicy: ', searchPolicy)
         if (si && rate) {
             changeVal[i]["INITIAL_PREMIUM"] = (si * rate) / 100;
         } else [(changeVal[i]["INITIAL_PREMIUM"] = 0)];
-        
+
         setDataById({ ...dataById, policy_premium: changeVal });
     };
     // End fungsi hitung initial premium
-    
+
 
     const handleSwitch = () => {
         setFlagSwitch(!flagSwitch)
@@ -1237,16 +1237,13 @@ console.log('searchPolicy: ', searchPolicy)
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
                                         className={"max-w-[20px] text-center"}
-                                        label={"No"}
-                                    />
+                                        label={"No"} colSpan={undefined} rowSpan={undefined}                                    />
                                     <TableTH
                                         className={"min-w-[50px]"}
-                                        label={"Policy Number"}
-                                    />
+                                        label={"Policy Number"} colSpan={undefined} rowSpan={undefined}                                    />
                                     <TableTH
                                         className={"min-w-[50px]"}
-                                        label={"Client Name"}
-                                    />
+                                        label={"Client Name"} colSpan={undefined} rowSpan={undefined}                                    />
                                 </tr>
                             </thead>
                             <tbody>
