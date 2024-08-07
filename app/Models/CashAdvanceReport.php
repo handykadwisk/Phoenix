@@ -23,6 +23,7 @@ class CashAdvanceReport extends Model
     protected $with = [
         'cash_advance_detail_report',
         'cash_advance_differents',
+        'cash_advance_method',
         'person',
         'person_used_by',
         'person_approval',
@@ -45,6 +46,11 @@ class CashAdvanceReport extends Model
     public function cash_advance_differents(): BelongsTo
     {
         return $this->belongsTo(RCashAdvanceDifferent::class, 'REPORT_CASH_ADVANCE_TYPE');
+    }
+
+    public function cash_advance_method(): BelongsTo
+    {
+        return $this->belongsTo(RCashAdvanceMethod::class, 'REPORT_CASH_ADVANCE_METHOD');
     }
 
     public function person(): BelongsTo
@@ -79,6 +85,6 @@ class CashAdvanceReport extends Model
 
     public function approval_status(): BelongsTo
     {
-        return $this->belongsTo(CashAdvanceStatus::class, 'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
+        return $this->belongsTo(CashAdvanceStatus::class, 'REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CASH_ADVANCE_STATUS_ID');
     }
 }

@@ -71,22 +71,22 @@ class CashAdvanceController extends Controller
                     $data->where('CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
                 }
 
-                if ($status == 0 && $status_type == "Approve1") {
-                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0);
-                } else if ($status == 1 && $status_type == "Approve1") {
+                if ($status == 1 && $status_type == "Approve1") {
                     $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
-                } else if ($status == 1 && $status_type == "Approve2") {
-                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 1);
-                } else if ($status == 4 && $status_type == "Pending Report") {
-                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4);
+                } else if ($status == 2 && $status_type == "Approve1") {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
+                } else if ($status == 2 && $status_type == "Approve2") {
+                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
+                } else if ($status == 5 && $status_type == "Pending Report") {
+                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
                 } else if ($status == 3 && $status_type == "Need Revision") {
                     $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
                         ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
                         ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 3);
-                } else if ($status == 2 && $status_type == "Reject") {
-                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
-                    ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
-                    ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2);
+                } else if ($status == 4 && $status_type == "Reject") {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                    ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                    ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4);
                 }
             }
         } else if ($cash_advance_type == 2) {
@@ -120,22 +120,24 @@ class CashAdvanceController extends Controller
                     $data->where('REPORT_CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
                 }
 
-                if ($status == 0 && $status_type == "Approve1") {
-                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0);
-                } else if ($status == 1 && $status_type == "Approve1") {
+                if ($status == 1 && $status_type == "Report Request") {
                     $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
-                } else if ($status == 1 && $status_type == "Approve2") {
-                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 1);
-                } else if ($status == 4 && $status_type == "Pending Report") {
-                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4);
-                } else if ($status == 3 && $status_type == "Need Revision") {
+                } else if ($status == 2 && $status_type == "Report Approve1") {
+                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
+                } else if ($status == 2 && $status_type == "Report Approve2") {
+                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
+                } else if ($status == 5 && $status_type == "Report Execute") {
+                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
+                } else if ($status == 3 && $status_type == "Report Need Revision") {
                     $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
                         ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
                         ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 3);
-                } else if ($status == 2 && $status_type == "Reject") {
-                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
-                    ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
-                    ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2);
+                } else if ($status == 4 && $status_type == "Report Reject") {
+                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                    ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                    ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4);
+                } else if ($status == 6 && $status_type == "Report Complited") {
+                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 6);
                 }
             }
         }
@@ -163,28 +165,28 @@ class CashAdvanceController extends Controller
 
     public function getCountCARequestStatus()
     {
-        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0)->count();
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count();
 
         return response()->json($data);
     }
 
     public function getCountCAApprove1Status()
     {
-        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count();
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)->count();
 
         return response()->json($data);
     }
 
     public function getCountCAApprove2Status()
     {
-        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 1)->count();
+        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)->count();
 
         return response()->json($data);
     }
 
     public function getCountCAPendingReportStatus()
     {
-        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)->count();
+        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)->count();
 
         return response()->json($data);
     }
@@ -201,9 +203,9 @@ class CashAdvanceController extends Controller
 
     public function getCountCARejectStatus()
     {
-        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
-                            ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
-                            ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                            ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                            ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4)
                             ->count();
 
         return response()->json($data);
@@ -226,7 +228,7 @@ class CashAdvanceController extends Controller
     public function getCANumber()
     {
         $data =
-            CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)
+            CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
                         ->orderBy('CASH_ADVANCE_ID', 'desc')
                         ->get();
 
@@ -353,7 +355,7 @@ class CashAdvanceController extends Controller
         $cash_advance_requested_date = now();
         $cash_advance_first_approval_by = $request->cash_advance_first_approval_by['value'];
         $cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
-        $cash_advance_first_approval_status = 0;
+        $cash_advance_first_approval_status = 1;
         $cash_advance_request_note = $request->cash_advance_request_note;
         $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
         $cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
@@ -559,7 +561,7 @@ class CashAdvanceController extends Controller
         }
 
         $cash_advance_total_amount = $total_amount;
-        $cash_advance_first_approval_status = 0;
+        $cash_advance_first_approval_status = 1;
         $cash_advance_request_note = $request->CASH_ADVANCE_REQUEST_NOTE;
         $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
         $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
@@ -725,7 +727,7 @@ class CashAdvanceController extends Controller
         // $cash_advance_second_approval_by = auth()->user()->id;
         // $cash_advance_second_approval_user = auth()->user()->name;
         // $cash_advance_second_approval_change_status_date = date('Y-m-d H:i:s');
-        $cash_advance_second_approval_status = 4;
+        $cash_advance_second_approval_status = 5;
         $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
         $cash_advance_transfer_date = $request->CASH_ADVANCE_TRANSFER_DATE;
         $cash_advance_from_bank_account = $request->CASH_ADVANCE_FROM_BANK_ACCOUNT;

@@ -176,6 +176,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCAReportPendingReportStatus', [CashAdvanceReportController::class, 'getCountCAReportPendingReportStatus'])->name('getCountCAReportPendingReportStatus');
     Route::get('/getCountCAReportNeedRevisionStatus', [CashAdvanceReportController::class, 'getCountCAReportNeedRevisionStatus'])->name('getCountCAReportNeedRevisionStatus');
     Route::get('/getCountCAReportRejectStatus', [CashAdvanceReportController::class, 'getCountCAReportRejectStatus'])->name('getCountCARejectStatus');
+    Route::get('/getCountCAReportComplitedStatus', [CashAdvanceReportController::class, 'getCountCAReportComplitedStatus'])->name('getCountCAReportComplitedStatus');
 
     // Cash Advance
     Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
@@ -193,6 +194,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/getCAReport', [CashAdvanceReportController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
     Route::get('/getCAReportById/{id}', [CashAdvanceReportController::class, 'getCAReportById'])->name('getCAReportById');
     Route::get('/getCashAdvanceDifferents', [CashAdvanceReportController::class, 'getCashAdvanceDifferents'])->name('getCashAdvanceDifferents');
+    Route::get('/getCashAdvanceApproval', [CashAdvanceReportController::class, 'getCashAdvanceApproval'])->name('getCashAdvanceApproval');
+    Route::get('/getCashAdvanceMethod', [CashAdvanceReportController::class, 'getCashAdvanceMethod'])->name('getCashAdvanceMethod');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
     Route::patch('/cashAdvanceReportApprove/{id}', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
     Route::patch('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');

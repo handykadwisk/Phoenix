@@ -74,6 +74,6 @@ class CashAdvance extends Model
 
     public function approval_status(): BelongsTo
     {
-        return $this->belongsTo(CashAdvanceStatus::class, 'CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
+        return $this->belongsTo(CashAdvanceStatus::class, 'CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CASH_ADVANCE_STATUS_ID');
     }
 }

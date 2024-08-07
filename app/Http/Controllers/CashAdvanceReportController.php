@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashAdvance;
+use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvanceDetailReport;
 use App\Models\CashAdvanceReport;
 use App\Models\Document;
@@ -10,6 +11,7 @@ use App\Models\MCashAdvanceDocument;
 use App\Models\MCashAdvanceProofOfDocument;
 use App\Models\MCashAdvanceReportDocument;
 use App\Models\RCashAdvanceDifferent;
+use App\Models\RCashAdvanceMethod;
 use App\Models\TDocument;
 use App\Models\TPerson;
 use App\Models\User;
@@ -50,28 +52,28 @@ class CashAdvanceReportController extends Controller
 
     public function getCountCAReportRequestStatus()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count();
 
         return response()->json($data);
     }
 
     public function getCountCAReportApprove1Status()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)->count();
 
         return response()->json($data);
     }
 
     public function getCountCAReportApprove2Status()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 1)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)->count();
 
         return response()->json($data);
     }
 
     public function getCountCAReportPendingReportStatus()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)->count();
 
         return response()->json($data);
     }
@@ -88,9 +90,9 @@ class CashAdvanceReportController extends Controller
 
     public function getCountCAReportRejectStatus()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
-                            ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
-                            ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                            ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                            ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4)
                             ->count();
 
         return response()->json($data);
@@ -99,6 +101,20 @@ class CashAdvanceReportController extends Controller
     public function getCashAdvanceDifferents()
     {
         $data = RCashAdvanceDifferent::all();
+
+        return response()->json($data);
+    }
+
+    public function getCashAdvanceApproval()
+    {
+        $data = CashAdvanceCostClassification::all();
+
+        return response()->json($data);
+    }
+
+    public function getCashAdvanceMethod()
+    {
+        $data = RCashAdvanceMethod::all();
 
         return response()->json($data);
     }
@@ -227,7 +243,7 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_requested_date = now();
         $report_cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
         $report_cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
-        $report_cash_advance_first_approval_status = 0;
+        $report_cash_advance_first_approval_status = 1;
         $report_cash_advance_request_note = $request->cash_advance_request_note;
         $report_cash_advance_type = $type;
         $report_cash_advance_total_amount = $total_amount_report;
@@ -473,7 +489,7 @@ class CashAdvanceReportController extends Controller
         }
 
         $report_cash_advance_total_amount = $total_amount_report;
-        $report_cash_advance_first_approval_status = 0;
+        $report_cash_advance_first_approval_status = 1;
         $report_cash_advance_request_note = $request->REPORT_CASH_ADVANCE_REQUEST_NOTE;
         $report_cash_advance_updated_at = now();
         $report_cash_advance_updated_by = $user_id;
@@ -585,7 +601,7 @@ class CashAdvanceReportController extends Controller
     {
         // dd($request->file('proof_of_document'));
         $report_cash_advance_id = $request->cash_advance_id;
-        $report_cash_advance_second_approval_status = 4;
+        $report_cash_advance_second_approval_status = 6;
         $report_cash_advance_method = $request->method;
         $report_cash_advance_transaction_date = $request->transaction_date;
 
