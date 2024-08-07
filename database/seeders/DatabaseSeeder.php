@@ -94,6 +94,17 @@ class DatabaseSeeder extends Seeder
                 'menu_created_by' => 'admin'
             ]
         );
+        
+        $childBAA = Menu::create(
+            [
+                'menu_name'       => 'BAA',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation/baa',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 7,
+                'menu_created_by' => 'admin'
+            ]
+        );
 
         $finance = Menu::create(
             [
@@ -260,6 +271,25 @@ class DatabaseSeeder extends Seeder
             'role_id' => $admin->id,
             'menu_id' => $ACLRole->id
         ]);
+
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $group->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childRelation->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childAgent->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childBAA->id
+        ]);
+
+        
 
 
         // create user
@@ -443,6 +473,13 @@ class DatabaseSeeder extends Seeder
 
         DB::unprepared(
             file_get_contents($r_certificate_qualification)
+        );
+
+        // create 2024_16_05_r_salutation
+        $r_salutation = resource_path('../database/LogDB/2024_16_05_r_salutation.sql');
+
+        DB::unprepared(
+            file_get_contents($r_salutation)
         );
 
     }
