@@ -444,7 +444,7 @@ class DatabaseSeeder extends Seeder
         // create 2024_08_07_r_interest_insured
         $r_interest_insured = resource_path('../database/LogDB/2024_08_07_r_interest_insured.sql');
 
-        \DB::unprepared(
+        DB::unprepared(
             file_get_contents($r_interest_insured)
         );
 
