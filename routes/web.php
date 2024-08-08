@@ -201,6 +201,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
     Route::post('/cashAdvanceReportExecute', [CashAdvanceReportController::class, 'cash_advance_report_execute'])->name('cashAdvanceReport.execute');
     Route::get('/cashAdvanceReportDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_download'])->name('cashAdvanceReport.download');
+    Route::get('/cashAdvanceReportProofOfDocumentDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_download'])->name('cashAdvanceReportProofOfDocument.download');
 
     // Reimburse
     Route::post('/getReimburse', [ReimburseController::class, 'getReimburse'])->name('cashAdvance.getReimburse');

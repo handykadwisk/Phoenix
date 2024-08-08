@@ -193,13 +193,34 @@ class CashAdvanceReportController extends Controller
         return $cash_advance_report_number;
     }
 
-    public function cash_advance_report_download($cash_advance_detail_id, $key)
+    public function cash_advance_report_download($cash_advance_detail_report_id, $document_id)
     {
-        $CashAdvanceDetail = MCashAdvanceReportDocument::where('CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_ID', $cash_advance_detail_id)->get();
+        $document = TDocument::find($document_id);
 
-        $document_filename = $CashAdvanceDetail[$key]['document']['DOCUMENT_FILENAME'];
+        $document_filename = $cash_advance_detail_report_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
 
-        $filePath = public_path('/storage/documents/CashAdvanceReport/0/' . $cash_advance_detail_id . '/'. $document_filename);
+        $filePath = public_path('/storage' . '/'. $document_dirname . '/' . $document_filename);
+
+        $headers = [
+            'filename' => $document_filename
+        ];
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $document_filename, $headers);
+        } else {
+            abort(404, 'File not found');
+        }
+    }
+
+    public function cash_advance_report_proof_of_document_download($report_cash_advance_id, $document_id)
+    {
+        $document = TDocument::find($document_id);
+
+        $document_filename = $report_cash_advance_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = public_path('/storage' . '/'. $document_dirname . '/' . $document_filename);
 
         $headers = [
             'filename' => $document_filename
@@ -641,11 +662,11 @@ class CashAdvanceReportController extends Controller
                     'DOCUMENT_CREATED_BY'             => $userId
                 ])->DOCUMENT_ID;
 
-                // if($document) {
-                //     TDocument::where('DOCUMENT_ID', $document)->update([
-                //         'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
-                //     ]);
-                // }
+                if($document) {
+                    TDocument::where('DOCUMENT_ID', $document)->update([
+                        'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
+                    ]);
+                }
                     
                 if ($document) {
                     MCashAdvanceProofOfDocument::create([

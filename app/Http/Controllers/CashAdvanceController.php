@@ -316,13 +316,14 @@ class CashAdvanceController extends Controller
         return $cash_advance_number;
     }
 
-    public function cash_advance_download($cash_advance_detail_id, $key)
+    public function cash_advance_download($cash_advance_detail_id, $document_id)
     {
-        $CashAdvanceDetail = MCashAdvanceDocument::where('CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID', $cash_advance_detail_id)->get();
+        $document = TDocument::find($document_id);
 
-        $document_filename = $CashAdvanceDetail[$key]['document']['DOCUMENT_FILENAME'];
+        $document_filename = $cash_advance_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
 
-        $filePath = public_path('/storage/documents/CashAdvance/0/' . $cash_advance_detail_id . '/'. $document_filename);
+        $filePath = public_path('/storage' . '/'. $document_dirname . '/' . $document_filename);
 
         $headers = [
             'filename' => $document_filename
@@ -337,8 +338,6 @@ class CashAdvanceController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request);
-
         $user_id = auth()->user()->id;
         $person = TPerson::find($request->cash_advance_first_approval_by['value']);
 
@@ -451,11 +450,11 @@ class CashAdvanceController extends Controller
                         'DOCUMENT_CREATED_BY'             => $userId
                     ])->DOCUMENT_ID;
 
-                    // if($document){
-                    //     Document::where('DOCUMENT_ID', $document)->update([
-                    //         'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
-                    //     ]);
-                    // }
+                    if($document){
+                        Document::where('DOCUMENT_ID', $document)->update([
+                            'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                        ]);
+                    }
 
                     if ($document) {
                         MCashAdvanceDocument::create([
@@ -546,7 +545,7 @@ class CashAdvanceController extends Controller
 
     public function cash_advance_revised(Request $request)
     {
-        // dd($key);
+        dd($request->file('cash_advance_detail'));
         $user_id = auth()->user()->id;
 
         $cash_advance_id = $request->CASH_ADVANCE_ID;
@@ -645,11 +644,11 @@ class CashAdvanceController extends Controller
                             'DOCUMENT_CREATED_BY'             => $userId
                         ])->DOCUMENT_ID;
 
-                        // if($document){
-                        //     Document::where('DOCUMENT_ID', $document)->update([
-                        //         'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
-                        //     ]);
-                        // }
+                        if($document){
+                            Document::where('DOCUMENT_ID', $document)->update([
+                                'DOCUMENT_FILENAME'           => $document."-".$documentOriginalName,
+                            ]);
+                        }
 
                         if ($document) {
                             MCashAdvanceDocument::create([

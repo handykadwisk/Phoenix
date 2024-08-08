@@ -21,6 +21,7 @@ class CashAdvanceReport extends Model
     public $timestamps = false;
 
     protected $with = [
+        'm_cash_advance_proof_of_document',
         'cash_advance_detail_report',
         'cash_advance_differents',
         'cash_advance_method',
@@ -36,6 +37,11 @@ class CashAdvanceReport extends Model
     public function cash_advance(): BelongsTo
     {
         return $this->belongsTo(CashAdvance::class, 'REPORT_CASH_ADVANCE_CASH_ADVANCE_ID');
+    }
+
+    public function m_cash_advance_proof_of_document(): HasMany
+    {
+        return $this->hasMany(MCashAdvanceProofOfDocument::class, 'CASH_ADVANCE_PROOF_OF_DOCUMENT_REPORT_CASH_ADVANCE_ID');
     }
 
     public function cash_advance_detail_report(): HasMany
