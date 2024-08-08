@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InsurancePanel;
 use App\Models\MPolicyInsured;
 use App\Models\MPolicyInsuredDetail;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PolicyInsuredController extends Controller
 {
@@ -74,7 +76,7 @@ class PolicyInsuredController extends Controller
     }
 
     public function editInsured(Request $request) {
-        // dd($request['POLICY_COVERAGE_NAME']);
+        // dd($request);
 
         $insured = MPolicyInsured::where('POLICY_INSURED_ID', $request['POLICY_INSURED_ID'])
             ->update([
@@ -118,9 +120,9 @@ class PolicyInsuredController extends Controller
             }
         }
 
-        if ($request['deletedCoverageDetail']) {
-            foreach ($request['deletedCoverageDetail'] as $del) {
-                MPolicyInsuredDetail::where('POLICY_COVERAGE_DETAIL_ID', $del['POLICY_COVERAGE_DETAIL_ID'])->delete();
+        if ($request['deletedInsuredDetail']) {
+            foreach ($request['deletedInsuredDetail'] as $del) {
+                MPolicyInsuredDetail::where('POLICY_INSURED_DETAIL_ID', $del['POLICY_INSURED_DETAIL_ID'])->delete();
             }
         }
 
@@ -130,5 +132,25 @@ class PolicyInsuredController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function getInsurerNettPremi(Request $request) {
+        // dd($request->input());
+
+        $query = DB::table('t_insurance_panel as ip')
+                    ->select(DB::raw('ip.IP_ID, ip.POLICY_ID, ipc.INTEREST_INSURED_ID, ipc.REMARKS, ipc.POLICY_COVERAGE_ID, ipc.CURRENCY_ID, SUM(ipc.NETT_PREMI) AS INSURER_NETT_PREMIUM, SUM(ipc.BROKERAGE_FEE) AS BROKERAGE_FEE, SUM(ipc.ENGINEERING_FEE) AS ENGINEERING_FEE, SUM(ipc.CONSULTANCY_FEE) AS CONSULTANCY_FEE'))
+                     ->leftJoin('m_insurer_coverage AS ipc', 'ip.IP_ID', '=', 'ipc.IP_ID')
+            ->where('POLICY_ID', $request->input('policy_id'))
+            ->groupBy('ipc.CURRENCY_ID', 'ipc.POLICY_COVERAGE_ID')
+                     ->get();
+            // ->select('SUM(NETT_PREMI) AS insurer_nett_premium')
+            // ->leftJoin('m_insurer_coverage AS ipc', 'ip.IP_ID', '=', 'ipc.IP_ID')
+            // ->where('POLICY_ID', $request->input('policy_id'))
+            // ->groupBy('ipc.CURRENCY_ID')
+            // ->sum('ip.IP_ID, ip.POLICY_ID, ipc.INTEREST_INSURED_ID, ipc.REMARKS, ipc.POLICY_COVERAGE_ID, ipc.CURRENCY_ID, ipc.NETT_PREMI, ipc.BROKERAGE_FEE, ipc.ENGINEERING_FEE, ipc.CONSULTANCY_FEE');
+
+        return response()->json($query);
+
+    }
+
 
 }

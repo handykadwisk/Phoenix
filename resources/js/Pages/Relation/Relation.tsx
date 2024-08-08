@@ -18,23 +18,29 @@ import Swal from "sweetalert2";
 import DetailRelationPopup from "./DetailRelation";
 import AddRelationPopup from "./AddRelation";
 import Select from "react-tailwindcss-select";
-import { ArrowLongLeftIcon, ArrowLongRightIcon, EllipsisHorizontalIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/react/20/solid'
-import ModalToAdd from '@/Components/Modal/ModalToAdd';
-import ToastMessage from '@/Components/ToastMessage';
-import { FormEvent, Fragment } from 'react';
-import { InertiaFormProps } from '@inertiajs/react/types/useForm';
-import TablePage from '@/Components/Table/Index';
-import { link } from 'fs';
-import dateFormat from 'dateformat';
-import { Menu, Tab, Transition } from '@headlessui/react';
-import Dropdown from '@/Components/Dropdown';
-import { Console } from 'console';
+import {
+    ArrowLongLeftIcon,
+    ArrowLongRightIcon,
+    EllipsisHorizontalIcon,
+    EllipsisVerticalIcon,
+    TrashIcon,
+} from "@heroicons/react/20/solid";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import ToastMessage from "@/Components/ToastMessage";
+import { FormEvent, Fragment } from "react";
+import { InertiaFormProps } from "@inertiajs/react/types/useForm";
+import TablePage from "@/Components/Table/Index";
+import { link } from "fs";
+import dateFormat from "dateformat";
+import { Menu, Tab, Transition } from "@headlessui/react";
+import Dropdown from "@/Components/Dropdown";
+import { Console, log } from "console";
+import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
+import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the Data Grid
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the Data Grid
+import AGGrid from "@/Components/AgGrid";
 
 export default function Relation({ auth }: PageProps) {
-    // useEffect(() => {
-    //     getMappingParent("", "");
-    // }, []);
-
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });
@@ -70,11 +76,6 @@ export default function Relation({ auth }: PageProps) {
                         view: false,
                         document: false,
                         search: false,
-                    });
-                    setSearchRelation({
-                        ...searchRelation,
-                        RELATION_ORGANIZATION_NAME: "",
-                        RELATION_TYPE_ID: "",
                     });
                 }
             })
@@ -141,12 +142,11 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const { data, setData, errors, reset } = useForm<any>({
-        group_id: "",
         name_relation: "",
-        parent_id: "",
         abbreviation: "",
         relation_aka: [],
         relation_email: "",
+        relation_website: "",
         relation_description: "",
         relation_lob_id: "",
         pre_salutation_id: "",
@@ -166,6 +166,7 @@ export default function Relation({ auth }: PageProps) {
         RELATION_ORGANIZATION_ABBREVIATION: "",
         RELATION_ORGANIZATION_AKA: "",
         RELATION_ORGANIZATION_EMAIL: "",
+        RELATION_ORGANIZATION_WEBSITE: "",
         relation_description: "",
         RELATION_PROFESSION_ID: "",
         RELATION_LOB_ID: "",
@@ -191,7 +192,7 @@ export default function Relation({ auth }: PageProps) {
     });
 
     const handleSuccess = (message: string) => {
-        if (message[0] === "0") {
+        if (message[0] === "0" || message[0] === "rType") {
             Swal.fire({
                 title: "Warning",
                 text: message[1],
@@ -213,12 +214,11 @@ export default function Relation({ auth }: PageProps) {
             setIsSuccess("");
             reset();
             setData({
-                group_id: "",
                 name_relation: "",
-                parent_id: "",
                 abbreviation: "",
                 relation_aka: [],
                 relation_email: "",
+                relation_website: "",
                 relation_description: "",
                 relation_lob_id: "",
                 pre_salutation_id: "",
@@ -230,13 +230,11 @@ export default function Relation({ auth }: PageProps) {
                 profession_id: "",
                 relation_type_id: [],
             });
-            // if (modal.add) {
             Swal.fire({
                 title: "Success",
                 text: "New Relation Added",
                 icon: "success",
             }).then((result: any) => {
-                // console.log(result);
                 if (result.value) {
                     setGetDetailRelation({
                         RELATION_ORGANIZATION_NAME: message[1],
@@ -256,7 +254,6 @@ export default function Relation({ auth }: PageProps) {
             });
             setSwitchPage(false);
             setSwitchPageTBK(false);
-            // }
             setIsSuccess(message);
         }
     };
@@ -309,8 +306,6 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const handleCheckboxHREdit = (e: any) => {
-        // alert('aloo');
-        // const { value, checked } = e.target;
         if (e == true) {
             setSwitchPage(true);
             setDataById({ ...dataById, HR_MANAGED_BY_APP: "1" });
@@ -321,8 +316,6 @@ export default function Relation({ auth }: PageProps) {
     };
 
     const handleCheckboxTBKEdit = (e: any) => {
-        // alert('aloo');
-        // const { value, checked } = e.target;
         if (e == true) {
             setSwitchPageTBK(true);
             setDataById({ ...dataById, MARK_TBK_RELATION: "1" });
@@ -425,6 +418,49 @@ export default function Relation({ auth }: PageProps) {
             label: query.RELATION_TYPE_NAME,
         };
     });
+
+    const handleDetailRelation = async (data: any) => {
+        {
+            if (
+                data?.pre_salutation === null &&
+                data?.post_salutation !== null
+            ) {
+                setGetDetailRelation({
+                    RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
+                    RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
+                    RELATION_SALUTATION_PRE: "",
+                    RELATION_SALUTATION_POST:
+                        data.post_salutation?.salutation_name,
+                });
+            } else if (
+                data?.post_salutation === null &&
+                data?.pre_salutation !== null
+            ) {
+                setGetDetailRelation({
+                    RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
+                    RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
+                    RELATION_SALUTATION_PRE:
+                        data.pre_salutation?.salutation_name,
+                    RELATION_SALUTATION_POST: "",
+                });
+            } else {
+                setGetDetailRelation({
+                    RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
+                    RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
+                    RELATION_SALUTATION_PRE: "",
+                    RELATION_SALUTATION_POST: "",
+                });
+            }
+            setModal({
+                add: false,
+                delete: false,
+                edit: false,
+                view: true,
+                document: false,
+                search: false,
+            });
+        }
+    };
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -555,11 +591,6 @@ export default function Relation({ auth }: PageProps) {
                                         ""
                                     ) {
                                         getRelation();
-                                        setSearchRelation({
-                                            ...searchRelation,
-                                            RELATION_ORGANIZATION_NAME: "",
-                                            RELATION_TYPE_ID: "",
-                                        });
                                     }
                                 }
                             }}
@@ -581,13 +612,6 @@ export default function Relation({ auth }: PageProps) {
                             isSearchable={true}
                             placeholder={"Search Relation Type"}
                             value={searchRelation.RELATION_TYPE_ID}
-                            // onChange={(e) =>
-                            //     inputDataBank(
-                            //         "BANK_ID",
-                            //         e.target.value,
-                            //         i
-                            //     )
-                            // }
                             onChange={(val: any) =>
                                 setSearchRelation({
                                     ...searchRelation,
@@ -596,38 +620,11 @@ export default function Relation({ auth }: PageProps) {
                             }
                             primaryColor={"bg-red-500"}
                         />
-                        {/* <select
-                            className="mt-4 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 ring-1 ring-red-600"
-                            value={searchRelation.RELATION_TYPE_ID}
-                            onChange={(e) =>
-                                setSearchRelation({
-                                    ...searchRelation,
-                                    RELATION_TYPE_ID: e.target.value,
-                                })
-                            }
-                        >
-                            <option>-- Relation Type --</option>
-                            {relationType.map((rType: any, i: number) => {
-                                return (
-                                    <option
-                                        key={i}
-                                        value={rType.RELATION_TYPE_ID}
-                                    >
-                                        {rType.RELATION_TYPE_NAME}
-                                    </option>
-                                );
-                            })}
-                        </select> */}
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
                                     getRelation();
-                                    setSearchRelation({
-                                        ...searchRelation,
-                                        RELATION_ORGANIZATION_NAME: "",
-                                        RELATION_TYPE_ID: "",
-                                    });
                                 }}
                             >
                                 Search
@@ -642,126 +639,24 @@ export default function Relation({ auth }: PageProps) {
                     </div>
                 </div>
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
-                        <table className="w-full table-auto divide-y divide-gray-300">
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg"
-                                        }
-                                        label={"No"}
-                                    />
-                                    <TableTH
-                                        className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg"
-                                        }
-                                        label={"Name Relation"}
-                                    />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {relations.data?.map(
-                                    (dataRelation: any, i: number) => {
-                                        return (
-                                            <tr
-                                                onDoubleClick={() => {
-                                                    if (
-                                                        dataRelation?.pre_salutation ===
-                                                            null &&
-                                                        dataRelation?.post_salutation !==
-                                                            null
-                                                    ) {
-                                                        setGetDetailRelation({
-                                                            RELATION_ORGANIZATION_NAME:
-                                                                dataRelation.RELATION_ORGANIZATION_NAME,
-                                                            RELATION_ORGANIZATION_ID:
-                                                                dataRelation.RELATION_ORGANIZATION_ID,
-                                                            RELATION_SALUTATION_PRE:
-                                                                "",
-                                                            RELATION_SALUTATION_POST:
-                                                                dataRelation
-                                                                    .post_salutation
-                                                                    ?.salutation_name,
-                                                        });
-                                                    } else if (
-                                                        dataRelation?.post_salutation ===
-                                                            null &&
-                                                        dataRelation?.pre_salutation !==
-                                                            null
-                                                    ) {
-                                                        setGetDetailRelation({
-                                                            RELATION_ORGANIZATION_NAME:
-                                                                dataRelation.RELATION_ORGANIZATION_NAME,
-                                                            RELATION_ORGANIZATION_ID:
-                                                                dataRelation.RELATION_ORGANIZATION_ID,
-                                                            RELATION_SALUTATION_PRE:
-                                                                dataRelation
-                                                                    .pre_salutation
-                                                                    ?.salutation_name,
-                                                            RELATION_SALUTATION_POST:
-                                                                "",
-                                                        });
-                                                    } else {
-                                                        setGetDetailRelation({
-                                                            RELATION_ORGANIZATION_NAME:
-                                                                dataRelation.RELATION_ORGANIZATION_NAME,
-                                                            RELATION_ORGANIZATION_ID:
-                                                                dataRelation.RELATION_ORGANIZATION_ID,
-                                                            RELATION_SALUTATION_PRE:
-                                                                "",
-                                                            RELATION_SALUTATION_POST:
-                                                                "",
-                                                        });
-                                                    }
-                                                    setModal({
-                                                        add: false,
-                                                        delete: false,
-                                                        edit: false,
-                                                        view: true,
-                                                        document: false,
-                                                        search: false,
-                                                    });
-                                                }}
-                                                key={i}
-                                                className={
-                                                    i % 2 === 0
-                                                        ? "cursor-pointer"
-                                                        : "bg-gray-100 cursor-pointer"
-                                                }
-                                            >
-                                                <TableTD
-                                                    value={relations.from + i}
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dataRelation.RELATION_ORGANIZATION_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </tbody>
-                        </table>
-                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                            <Pagination
-                                links={relations.links}
-                                fromData={relations.from}
-                                toData={relations.to}
-                                totalData={relations.total}
-                                clickHref={(url: string) =>
-                                    getRelation(url.split("?").pop())
-                                }
-                            />
-                        </div>
-                    </div>
+                    <AGGrid
+                        // loading={isLoading.get_policy}
+                        url={"getRelation"}
+                        doubleClickEvent={handleDetailRelation}
+                        triggeringRefreshData={isSuccess}
+                        colDefs={[
+                            {
+                                headerName: "No.",
+                                valueGetter: "node.rowIndex + 1",
+                                flex: 1,
+                            },
+                            {
+                                headerName: "Relation Name",
+                                field: "RELATION_ORGANIZATION_ALIAS",
+                                flex: 7,
+                            },
+                        ]}
+                    />
                 </div>
             </div>
         </AuthenticatedLayout>

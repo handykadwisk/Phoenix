@@ -17,5 +17,11 @@ class TPersonBankAccount extends Model
         'PERSON_BANK_ACCOUNT_ID',
     ];
 
+    public $with = ['mForBank'];
+
     public $timestamps = false;
+
+    public function mForBank() {
+        return $this->hasMany(MForPersonBankAccount::class, 'PERSON_BANK_ACCOUNT_ID', 'PERSON_BANK_ACCOUNT_ID');
+    }
 }

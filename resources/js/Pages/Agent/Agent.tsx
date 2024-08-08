@@ -28,13 +28,14 @@ import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import DetailAgentPopup from "./DetailAgent";
 import Swal from "sweetalert2";
+import AGGrid from "@/Components/AgGrid";
 
 export default function Agent({ auth }: PageProps) {
-    useEffect(() => {
-        getAgent();
-    }, []);
+    // useEffect(() => {
+    //     getAgent();
+    // }, []);
     const [dataAgent, setDataAgent] = useState<any>([]);
-
+    const [isSuccess, setIsSuccess] = useState<string>("");
     // for search agent
     const [searchAgent, setSearchAgent] = useState<any>({
         RELATION_ORGANIZATION_NAME: "",
@@ -132,12 +133,26 @@ export default function Agent({ auth }: PageProps) {
         RELATION_ORGANIZATION_NAME: "",
     });
 
+    const handleDetailAgent = async (data: any) => {
+        // getDivisionCombo(idRelation);
+        setDetailAgent({
+            RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
+            RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
+        });
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: true,
+        });
+    };
+
     return (
         <AuthenticatedLayout user={auth.user} header={"Agent"}>
             <Head title="Agent" />
 
             {/* modal add*/}
-            <ModalToAdd
+            {/* <ModalToAdd
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -205,7 +220,7 @@ export default function Agent({ auth }: PageProps) {
                         </div>
                     </>
                 }
-            />
+            /> */}
             {/* end modal add */}
 
             {/* detail modal */}
@@ -232,6 +247,8 @@ export default function Agent({ auth }: PageProps) {
                 body={
                     <>
                         <DetailAgentPopup
+                            isSuccess={isSuccess}
+                            setIsSuccess={setIsSuccess}
                             auth={auth}
                             idAgent={detailAgent.RELATION_ORGANIZATION_ID}
                         />
@@ -250,7 +267,7 @@ export default function Agent({ auth }: PageProps) {
                             <span>Add Agent</span>
                         </div>
                     </div>
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100%] h-[100%]">
                         <TextInput
                             type="text"
                             value={searchAgent.RELATION_ORGANIZATION_NAME}
@@ -289,8 +306,29 @@ export default function Agent({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100%]">
+                    <AGGrid
+                        addButtonLabel={null}
+                        addButtonModalState={undefined}
+                        withParam={null}
+                        // loading={isLoading.get_policy}
+                        url={"getRelationAgent"}
+                        doubleClickEvent={handleDetailAgent}
+                        triggeringRefreshData={isSuccess}
+                        colDefs={[
+                            {
+                                headerName: "No.",
+                                valueGetter: "node.rowIndex + 1",
+                                flex: 1,
+                            },
+                            {
+                                headerName: "Relation Agent",
+                                field: "RELATION_ORGANIZATION_ALIAS",
+                                flex: 7,
+                            },
+                        ]}
+                    />
+                    {/* <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                         <table className="w-full table-auto divide-y divide-gray-300">
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
@@ -370,7 +408,7 @@ export default function Agent({ auth }: PageProps) {
                                 }
                             />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </AuthenticatedLayout>

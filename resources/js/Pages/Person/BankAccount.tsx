@@ -28,12 +28,14 @@ export default function BankAccount({
     show,
     modal,
     bank,
+    optionsBank,
     idPerson,
     handleSuccess,
 }: PropsWithChildren<{
     show: any;
     modal: any;
     bank: any;
+    optionsBank: any;
     idPerson: any;
     handleSuccess: any;
 }>) {
@@ -94,34 +96,50 @@ export default function BankAccount({
         setDataBankAccount({ ...dataBankAccount, BANK_ACCOUNT: changeVal });
     };
 
-    const optionsBank = [
-        {
-            PERSON_BANK_ACCOUNT_FOR: "1",
-            PERSON_BANK_ACCOUNT_FOR_LABEL: "Payroll",
-        },
-        {
-            PERSON_BANK_ACCOUNT_FOR: "2",
-            PERSON_BANK_ACCOUNT_FOR_LABEL: "Cash Advance",
-        },
-        {
-            PERSON_BANK_ACCOUNT_FOR: "3",
-            PERSON_BANK_ACCOUNT_FOR_LABEL: "Petty Cash",
-        },
-        { PERSON_BANK_ACCOUNT_FOR: "4", PERSON_BANK_ACCOUNT_FOR_LABEL: "Loan" },
-    ];
+    // const optionsBank = [
+    //     {
+    //         PERSON_BANK_ACCOUNT_FOR: "1",
+    //         PERSON_BANK_ACCOUNT_FOR_LABEL: "Payroll",
+    //     },
+    //     {
+    //         PERSON_BANK_ACCOUNT_FOR: "2",
+    //         PERSON_BANK_ACCOUNT_FOR_LABEL: "Cash Advance",
+    //     },
+    //     {
+    //         PERSON_BANK_ACCOUNT_FOR: "3",
+    //         PERSON_BANK_ACCOUNT_FOR_LABEL: "Petty Cash",
+    //     },
+    //     { PERSON_BANK_ACCOUNT_FOR: "4", PERSON_BANK_ACCOUNT_FOR_LABEL: "Loan" },
+    // ];
 
     const bankFor = optionsBank?.map((query: any) => {
         return {
-            value: query.PERSON_BANK_ACCOUNT_FOR,
-            label: query.PERSON_BANK_ACCOUNT_FOR_LABEL,
+            value: query.FOR_BANK_ACCOUNT_ID,
+            label: query.FOR_BANK_ACCOUNT_NAME,
         };
     });
+
+    const close = () => {
+        modal();
+        setDataBankAccount({
+            BANK_ACCOUNT: [
+                {
+                    idPerson: idPerson,
+                    PERSON_BANK_ACCOUNT_NAME: "",
+                    PERSON_BANK_ACCOUNT_NUMBER: "",
+                    PERSON_BANK_ACCOUNT_FOR: null,
+                    BANK_ID: "",
+                },
+            ],
+        });
+    };
 
     return (
         <>
             <ModalToAdd
+                buttonAddOns={""}
                 show={show}
-                onClose={modal}
+                onClose={close}
                 title={"Bank Account"}
                 url={`/addBankAccount`}
                 data={dataBankAccount}
@@ -135,7 +153,7 @@ export default function BankAccount({
                             (dB: any, i: number) => {
                                 return (
                                     <div
-                                        className="grid grid-cols-7 gap-3"
+                                        className="grid grid-cols-8 gap-3"
                                         key={i}
                                     >
                                         {/* <div>
@@ -163,7 +181,7 @@ export default function BankAccount({
                                                 }}
                                                 options={bankSelect}
                                                 isSearchable={true}
-                                                placeholder={"Bank Name"}
+                                                placeholder={"Bank Name *"}
                                                 value={dB.BANK_ID}
                                                 // onChange={(e) =>
                                                 //     inputDataBank(
@@ -203,15 +221,15 @@ export default function BankAccount({
                                                         i
                                                     )
                                                 }
-                                                placeholder="Bank Account Number"
+                                                placeholder="Bank Account Number *"
                                             />
                                         </div>
-                                        <div className="col-span-2">
+                                        <div className="col-span-3">
                                             <Select
                                                 classNames={{
                                                     menuButton: () =>
                                                         `flex text-sm text-gray-500 mt-9 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                    menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    menu: "absolute text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                     listItem: ({
                                                         isSelected,
                                                     }: any) =>
@@ -224,7 +242,9 @@ export default function BankAccount({
                                                 options={bankFor}
                                                 isSearchable={true}
                                                 isMultiple={true}
-                                                placeholder={"Select"}
+                                                placeholder={
+                                                    "Select For Bank Account *"
+                                                }
                                                 isClearable={true}
                                                 value={
                                                     dB.PERSON_BANK_ACCOUNT_FOR
@@ -279,7 +299,7 @@ export default function BankAccount({
                                 onClick={(e) => addRowBankAccount(e)}
                             >
                                 <span className="hover:underline hover:decoration-from-font">
-                                    <i>Add Bank Account</i>
+                                    <i>+ Add Bank Account</i>
                                 </span>
                             </a>
                         </div>

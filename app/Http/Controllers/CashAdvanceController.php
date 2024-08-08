@@ -9,7 +9,12 @@ use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceReport;
 use App\Models\Document;
 use App\Models\CashAdvanceDetailReport;
+use App\Models\COA;
 use App\Models\MCashAdvanceDocument;
+use App\Models\RCashAdvanceDifferent;
+use App\Models\Relation;
+use App\Models\TDocument;
+use App\Models\TPerson;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -29,59 +34,115 @@ class CashAdvanceController extends Controller
         $cash_advance_used_by = $searchQuery->cash_advance_used_by;
         $cash_advance_start_date = $searchQuery->cash_advance_start_date;
         $cash_advance_end_date = $searchQuery->cash_advance_end_date;
-        $cash_advance_first_approval_status = $searchQuery->cash_advance_first_approval_status;
+        $cash_advance_type = $searchQuery->cash_advance_type;
+        $status = $searchQuery->status;
+        $status_type = $searchQuery->status_type;
 
-        $cash_advance_requested_by = $searchQuery->cash_advance_requested_by;
-        $cash_advance_used_by = $searchQuery->cash_advance_used_by;
-        $cash_advance_start_date = $searchQuery->cash_advance_start_date;
-        $cash_advance_end_date = $searchQuery->cash_advance_end_date;
-        $cash_advance_first_approval_status = $searchQuery->cash_advance_first_approval_status;
+        // dd($searchQuery);
+        
+        if ($cash_advance_type == null || $cash_advance_type == 1) {
+            $data = CashAdvance::with('cash_advance_report')->orderBy('CASH_ADVANCE_ID', 'desc');
 
-        $data = CashAdvance::orderBy('CASH_ADVANCE_ID', 'desc');
+            if ($searchQuery) {
+                if ($searchQuery->input('cash_advance_requested_by')) {
+                    $data->whereHas('person',
+                    function($query) use($cash_advance_requested_by)
+                    {
+                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
+                    });
+                }
 
-        if ($searchQuery) {
-            if ($searchQuery->input('cash_advance_requested_by')) {
-                $data->whereHas('user',
-                function($query) use($cash_advance_requested_by)
-                {
-                    $query->where('name', 'like', '%'. $cash_advance_requested_by .'%');
-                });
+                if ($searchQuery->input('cash_advance_used_by')) {
+                    $data->whereHas('person_used_by',
+                    function($query) use($cash_advance_used_by)
+                    {
+                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
+                    });
+                }
+
+                if (
+                    $searchQuery->input('cash_advance_start_date') &&
+                    $searchQuery->input('cash_advance_end_date')
+                ) {
+                    $data->whereBetween('CASH_ADVANCE_REQUESTED_DATE', [$cash_advance_start_date, $cash_advance_end_date]);
+                }
+
+                if ($searchQuery->input('cash_advance_division')) {
+                    $data->where('CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
+                }
+
+                if ($status == 1 && $status_type == "Approve1") {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
+                } else if ($status == 2 && $status_type == "Approve1") {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
+                } else if ($status == 2 && $status_type == "Approve2") {
+                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
+                } else if ($status == 5 && $status_type == "Pending Report") {
+                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
+                } else if ($status == 3 && $status_type == "Need Revision") {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
+                        ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
+                        ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 3);
+                } else if ($status == 4 && $status_type == "Reject") {
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                    ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                    ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4);
+                }
             }
+        } else if ($cash_advance_type == 2) {
+            $data = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
 
-            if ($searchQuery->input('cash_advance_used_by')) {
-                $data->whereHas('user_used_by',
-                function($query) use($cash_advance_used_by)
-                {
-                    $query->where('name', 'like', '%'. $cash_advance_used_by .'%');
-                });
-            }
+            if ($searchQuery) {
+                if ($searchQuery->input('cash_advance_requested_by')) {
+                    $data->whereHas('person',
+                    function($query) use($cash_advance_requested_by)
+                    {
+                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
+                    });
+                }
 
-            if (
-                $searchQuery->input('cash_advance_start_date') &&
-                $searchQuery->input('cash_advance_end_date')
-            ) {
-                $data->whereBetween('CASH_ADVANCE_REQUESTED_DATE', [$cash_advance_start_date, $cash_advance_end_date]);
-            }
+                if ($searchQuery->input('cash_advance_used_by')) {
+                    $data->whereHas('person_used_by',
+                    function($query) use($cash_advance_used_by)
+                    {
+                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
+                    });
+                }
 
-            if ($searchQuery->input('cash_advance_division')) {
-                $data->where('CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
-            }
+                if (
+                    $searchQuery->input('cash_advance_start_date') &&
+                    $searchQuery->input('cash_advance_end_date')
+                ) {
+                    $data->whereBetween('REPORT_CASH_ADVANCE_REQUESTED_DATE', [$cash_advance_start_date, $cash_advance_end_date]);
+                }
 
-            if ($cash_advance_first_approval_status === 0) {
-                $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 0);
-            } else if ($cash_advance_first_approval_status === 1) {
-                $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
+                if ($searchQuery->input('cash_advance_division')) {
+                    $data->where('REPORT_CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
+                }
+
+                if ($status == 1 && $status_type == "Report Request") {
+                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
+                } else if ($status == 2 && $status_type == "Report Approve1") {
+                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
+                } else if ($status == 2 && $status_type == "Report Approve2") {
+                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
+                } else if ($status == 5 && $status_type == "Report Execute") {
+                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
+                } else if ($status == 3 && $status_type == "Report Need Revision") {
+                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
+                        ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
+                        ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 3);
+                } else if ($status == 4 && $status_type == "Report Reject") {
+                    $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                    ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                    ->orWhere('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4);
+                } else if ($status == 6 && $status_type == "Report Complited") {
+                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 6);
+                }
             }
         }
-        // dd($data->toSql());
         return $data->paginate($dataPerPage);
     }
-
-    // public function getCA()
-    // {
-    //     $data = $this->getCAData(10);
-    //     return response()->json($data);
-    // }
 
     public function getCA(Request $request)
     {
@@ -97,16 +158,68 @@ class CashAdvanceController extends Controller
 
     public function getCAReportById(string $id)
     {
-        $data = CashAdvanceReport::findOrFail($id);
+        // $data = CashAdvanceReport::findOrFail($id);
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID', $id);
+        return response()->json($data);
+    }
+
+    public function getCountCARequestStatus()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAApprove1Status()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAApprove2Status()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAPendingReportStatus()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCANeedRevisionStatus()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
+                            ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
+                            ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 3)
+                            ->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCARejectStatus()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 4)
+                            ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 4)
+                            ->orWhere('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 4)
+                            ->count();
+
         return response()->json($data);
     }
 
     public function index()
-    {
+    {   
         $data = [
             'users' => User::where('role_id', 2)->get(),
             'cash_advance_purpose' => CashAdvancePurpose::all(),
-            'cash_advance_cost_classification' => CashAdvanceCostClassification::all()
+            'cash_advance_cost_classification' => CashAdvanceCostClassification::all(),
+            'relations' => Relation::all(),
+            'coa' => COA::all(),
+            'persons' => TPerson::all()
         ];
 
         return Inertia::render('CA/CashAdvance', $data);
@@ -115,9 +228,16 @@ class CashAdvanceController extends Controller
     public function getCANumber()
     {
         $data =
-            CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1)
+            CashAdvance::where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
                         ->orderBy('CASH_ADVANCE_ID', 'desc')
                         ->get();
+
+        return response()->json($data);
+    }
+
+    public function getCAPerson()
+    {
+        $data = TPerson::all();
 
         return response()->json($data);
     }
@@ -196,19 +316,20 @@ class CashAdvanceController extends Controller
         return $cash_advance_number;
     }
 
-    public function download($cash_advance_detail_id)
+    public function cash_advance_download($cash_advance_detail_id, $key)
     {
-        $CashAdvanceDetail = CashAdvanceDetail::find($cash_advance_detail_id);
+        $CashAdvanceDetail = MCashAdvanceDocument::where('CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID', $cash_advance_detail_id)->get();
 
-        // $filePath = public_path('/storage/documents/CA/0/11/11-List-Asuransi--2-Unit-Dumptruck.pdf');
-        $filePath = public_path('/storage/documents/CA/0/' . $cash_advance_detail_id . '/'. $CashAdvanceDetail->document->DOCUMENT_FILENAME);
+        $document_filename = $CashAdvanceDetail[$key]['document']['DOCUMENT_FILENAME'];
+
+        $filePath = public_path('/storage/documents/CashAdvance/0/' . $cash_advance_detail_id . '/'. $document_filename);
 
         $headers = [
-            'filename' => $CashAdvanceDetail->document->DOCUMENT_FILENAME
+            'filename' => $document_filename
         ];
 
         if (file_exists($filePath)) {
-            return response()->download($filePath, $CashAdvanceDetail->document->DOCUMENT_FILENAME, $headers);
+            return response()->download($filePath, $document_filename, $headers);
         } else {
             abort(404, 'File not found');
         }
@@ -216,10 +337,10 @@ class CashAdvanceController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->file('CashAdvanceDetail'));
+        // dd($request);
 
         $user_id = auth()->user()->id;
-        $user = User::find($request->cash_advance_first_approval_by);
+        $person = TPerson::find($request->cash_advance_first_approval_by['value']);
 
         $total_amount = 0;
 
@@ -228,13 +349,13 @@ class CashAdvanceController extends Controller
         }
 
         $cash_advance_number = $this->getCashAdvanceNumber();
-        $cash_advance_used_by = $request->cash_advance_used_by;
+        $cash_advance_used_by = $request->cash_advance_used_by['value'];
         $cash_advance_requested_by = $user_id;
         $cash_advance_division = 'IT';
         $cash_advance_requested_date = now();
-        $cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
-        $cash_advance_first_approval_user = $user->name;
-        $cash_advance_first_approval_status = 0;
+        $cash_advance_first_approval_by = $request->cash_advance_first_approval_by['value'];
+        $cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
+        $cash_advance_first_approval_status = 1;
         $cash_advance_request_note = $request->cash_advance_request_note;
         $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
         $cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
@@ -280,7 +401,7 @@ class CashAdvanceController extends Controller
             $cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
             $cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
             $cash_advance_detail_location = $cad['cash_advance_detail_location'];
-            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+            $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id']['value'];
             $cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
             $cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
             $cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
@@ -302,11 +423,9 @@ class CashAdvanceController extends Controller
             $cash_advance_detail_id = $CashAdvanceDetail->CASH_ADVANCE_DETAIL_ID;
 
             // Start process file upload
-            $file = $request->file('CashAdvanceDetail');
-            if (is_array($file) && !empty($file)) {
-                foreach ($cad['cash_advance_detail_document_id'] as $key => $test) {
-                    // $uploadedFile = $request->file('CashAdvanceDetail' . $test);
-                    $uploadedFile = $test;
+            $files = $request->file('CashAdvanceDetail');
+            if (is_array($files) && !empty($files)) {
+                foreach ($cad['cash_advance_detail_document_id'] as $file) {
                     $parentDir = ((floor(($cash_advance_detail_id) / 1000)) * 1000) . '/';
                     $CAId = $cash_advance_detail_id . '/';
                     $typeDir = '';
@@ -314,16 +433,16 @@ class CashAdvanceController extends Controller
 
                     $userId = Auth::user()->id;
 
-                    $documentOriginalName =  $this->RemoveSpecialChar($uploadedFile->getClientOriginalName());
-                    $documentFileName =  $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($uploadedFile->getClientOriginalName());
+                    $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
+                    $documentFileName =  $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
                     $documentDirName =  $uploadPath;
-                    $documentFileType = $uploadedFile->getMimeType();
-                    $documentFileSize = $uploadedFile->getSize();
+                    $documentFileType = $file->getMimeType();
+                    $documentFileSize = $file->getSize();
 
-                    // Storage::makeDirectory($uploadPath, 0777, true, true);
-                    // Storage::disk('public')->putFileAs($uploadPath, $test, $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($uploadedFile->getClientOriginalName()));
+                    Storage::makeDirectory($uploadPath, 0777, true, true);
+                    Storage::disk('public')->putFileAs($uploadPath, $file, $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
 
-                    $document = Document::create([
+                    $document = TDocument::create([
                         'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                         'DOCUMENT_FILENAME'               => $documentFileName,
                         'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -331,6 +450,12 @@ class CashAdvanceController extends Controller
                         'DOCUMENT_FILESIZE'               => $documentFileSize,
                         'DOCUMENT_CREATED_BY'             => $userId
                     ])->DOCUMENT_ID;
+
+                    // if($document){
+                    //     Document::where('DOCUMENT_ID', $document)->update([
+                    //         'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                    //     ]);
+                    // }
 
                     if ($document) {
                         MCashAdvanceDocument::create([
@@ -421,8 +546,7 @@ class CashAdvanceController extends Controller
 
     public function cash_advance_revised(Request $request)
     {
-        // dd($request);
-
+        // dd($key);
         $user_id = auth()->user()->id;
 
         $cash_advance_id = $request->CASH_ADVANCE_ID;
@@ -437,7 +561,7 @@ class CashAdvanceController extends Controller
         }
 
         $cash_advance_total_amount = $total_amount;
-        $cash_advance_first_approval_status = 0;
+        $cash_advance_first_approval_status = 1;
         $cash_advance_request_note = $request->CASH_ADVANCE_REQUEST_NOTE;
         $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
         $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
@@ -470,7 +594,7 @@ class CashAdvanceController extends Controller
         ]);
 
         if ($CountRequestDataById === $CountCashAdvanceDetail) {
-            foreach ($request->cash_advance_detail as $cad) {
+            foreach ($request->cash_advance_detail as $key => $cad) {
                 $cash_advance_detail_id = $cad['CASH_ADVANCE_DETAIL_ID'];
                 $cash_advance_detail_start_date = $cad['CASH_ADVANCE_DETAIL_START_DATE'];
                 $cash_advance_detail_end_date = $cad['CASH_ADVANCE_DETAIL_END_DATE'];
@@ -480,7 +604,6 @@ class CashAdvanceController extends Controller
                 $cash_advance_detail_relation_name = $cad['CASH_ADVANCE_DETAIL_RELATION_NAME'];
                 $cash_advance_detail_relation_position = $cad['CASH_ADVANCE_DETAIL_RELATION_POSITION'];
                 $cash_advance_detail_amount = $cad['CASH_ADVANCE_DETAIL_AMOUNT'];
-                // $cash_advance_detail_status = null;
 
                 CashAdvanceDetail::where('CASH_ADVANCE_DETAIL_ID', $cash_advance_detail_id)->update([
                     'CASH_ADVANCE_DETAIL_START_DATE' => $cash_advance_detail_start_date,
@@ -491,8 +614,54 @@ class CashAdvanceController extends Controller
                     'CASH_ADVANCE_DETAIL_RELATION_NAME' => $cash_advance_detail_relation_name,
                     'CASH_ADVANCE_DETAIL_RELATION_POSITION' => $cash_advance_detail_relation_position,
                     'CASH_ADVANCE_DETAIL_AMOUNT' => $cash_advance_detail_amount,
-                    // 'CASH_ADVANCE_DETAIL_STATUS' => $cash_advance_detail_status
                 ]);
+
+                // Start process file upload
+                $files = $request->file('cash_advance_detail');
+                if (is_array($files) && !empty($files)) {
+                    foreach ($cad['CASH_ADVANCE_DETAIL_DOCUMENT_ID'] as $file) {
+                        $parentDir = ((floor(($cash_advance_detail_id) / 1000)) * 1000) . '/';
+                        $CAId = $cash_advance_detail_id . '/';
+                        $typeDir = '';
+                        $uploadPath = 'documents/' . 'CashAdvance/'. $parentDir . $CAId . $typeDir;
+
+                        $userId = Auth::user()->id;
+
+                        $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
+                        $documentFileName =  $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
+                        $documentDirName =  $uploadPath;
+                        $documentFileType = $file->getMimeType();
+                        $documentFileSize = $file->getSize();
+
+                        Storage::makeDirectory($uploadPath, 0777, true, true);
+                        Storage::disk('public')->putFileAs($uploadPath, $file, $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
+
+                        $document = TDocument::create([
+                            'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
+                            'DOCUMENT_FILENAME'               => $documentFileName,
+                            'DOCUMENT_DIRNAME'                => $documentDirName,
+                            'DOCUMENT_FILETYPE'               => $documentFileType,
+                            'DOCUMENT_FILESIZE'               => $documentFileSize,
+                            'DOCUMENT_CREATED_BY'             => $userId
+                        ])->DOCUMENT_ID;
+
+                        // if($document){
+                        //     Document::where('DOCUMENT_ID', $document)->update([
+                        //         'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                        //     ]);
+                        // }
+
+                        if ($document) {
+                            MCashAdvanceDocument::create([
+                                'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID' => $cash_advance_detail_id,
+                                'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
+                                'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
+                                'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
+                            ]);
+                        }
+                    }
+                }
+                // End process file upload
 
                 // Created Log CA Detail
                 UserLog::create([
@@ -558,7 +727,7 @@ class CashAdvanceController extends Controller
         // $cash_advance_second_approval_by = auth()->user()->id;
         // $cash_advance_second_approval_user = auth()->user()->name;
         // $cash_advance_second_approval_change_status_date = date('Y-m-d H:i:s');
-        $cash_advance_second_approval_status = 4;
+        $cash_advance_second_approval_status = 5;
         $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
         $cash_advance_transfer_date = $request->CASH_ADVANCE_TRANSFER_DATE;
         $cash_advance_from_bank_account = $request->CASH_ADVANCE_FROM_BANK_ACCOUNT;

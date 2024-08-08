@@ -59,12 +59,12 @@ export default function ModalToAction({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data[0]);
+                onSuccess(res.data);
                 close();
             })
             .catch((err) => {
                 setIsProcessing(false);
-                setIsError(err.response.data[0]);
+                // setIsError(err.response.data);
                 console.log(err);
             });
     };
@@ -74,7 +74,7 @@ export default function ModalToAction({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-50"
+                    className="relative z-9999"
                     onClose={close}
                     initialFocus={modalRef}
                 >
@@ -127,7 +127,7 @@ export default function ModalToAction({
                                                 <Alert body={isError} />
                                             )}
                                             <div
-                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
+                                                className="max-h-full overflow-y-auto custom-scrollbar px-2"
                                                 ref={modalRef}
                                             >
                                                 {body}

@@ -30,26 +30,56 @@ class RelationController extends Controller
         return $oldRelation;
     }
 
-    public function getRelationData($dataPerPage = 5, $searchQuery = null)
+    public function getRelationData($request)
     {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        $RType = $searchQuery->RELATION_TYPE_ID;
-        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
-        // print_r($data);
-        if ($searchQuery) {
-            if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
-                $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
-            }
-            if ($searchQuery->input('RELATION_TYPE_ID')) {
-                $data->whereHas('mRelationType', function($q) use($RType) {
-                    // Query the name field in status table
-                    $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
-             });
+        $query = Relation::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
         }
-            // dd($data->toSql());
 
-            return $data->paginate($dataPerPage);
+        // if ($filterModel) {
+        //     foreach ($filterModel as $colId => $filterValue) {
+        //         if ($colId === 'policy_number') {
+        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
+        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
+        //         } elseif ($colId === 'policy_inception_date') {
+        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
+        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
+        //         }
+        //     }
+        // }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
+
+        // $RType = $searchQuery->RELATION_TYPE_ID;
+        // $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
+        // // print_r($data);
+        // if ($searchQuery) {
+        //     if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
+        //         $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
+        //     }
+        //     if ($searchQuery->input('RELATION_TYPE_ID')) {
+        //         $data->whereHas('mRelationType', function($q) use($RType) {
+        //             // Query the name field in status table
+        //             $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
+        //      });
+        //     }
+        // }
+        //     // dd($data->get());
+
+        //     return $data->paginate($dataPerPage);
     }
 
     // Get All Relation Type
@@ -63,7 +93,8 @@ class RelationController extends Controller
 
     public function getRelationJson(Request $request)
     {
-        $data = $this->getRelationData(5, $request);
+        $data = $this->getRelationData($request);
+        // $data = Relation::get();
         // print_r($data);
         // die;
         return response()->json($data);
@@ -126,7 +157,6 @@ class RelationController extends Controller
     public function store(Request $request)
     {
 
-
         // cek abbreviation
         // dd($request->abbreviation);
         $flag = "0";
@@ -144,6 +174,17 @@ class RelationController extends Controller
             }
         }
 
+        $flag = "rType";
+        $message = "Please Choose Relation Type!";
+        if ($request->relation_type_id == null) {
+            return new JsonResponse([
+                $flag,
+                $message
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
+
 
 
 
@@ -154,10 +195,10 @@ class RelationController extends Controller
         // }
         // die;
         // Cek Relation Perent Id
-        $parentID = $request->parent_id;
-        if ($request->parent_id == '' || $request->parent_id == NULL) {
-            $parentID = "0";
-        }
+        // $parentID = $request->parent_id;
+        // if ($request->parent_id == '' || $request->parent_id == NULL) {
+        //     $parentID = "0";
+        // }
 
         // ubah ke to lower dan huruf besar di awal
         $nameRelation = strtolower($request->name_relation);
@@ -181,10 +222,10 @@ class RelationController extends Controller
         // Created Relation
         $relation = Relation::create([
             'RELATION_ORGANIZATION_NAME' => $addTBK,
-            'RELATION_ORGANIZATION_PARENT_ID' => $parentID,
+            'RELATION_ORGANIZATION_PARENT_ID' => 0,
             'RELATION_ORGANIZATION_ABBREVIATION' => strtoupper($request->abbreviation),
             // 'RELATION_ORGANIZATION_AKA' => $request->relation_aka,
-            'RELATION_ORGANIZATION_GROUP' => $request->group_id,
+            // 'RELATION_ORGANIZATION_GROUP' => $request->group_id,
             'RELATION_ORGANIZATION_MAPPING' => NULL,
             'HR_MANAGED_BY_APP' => $request->is_managed,
             'IS_TBK' => $request->mark_tbk_relation,
@@ -195,6 +236,7 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_DESCRIPTION' => $request->relation_description,
             'RELATION_ORGANIZATION_ALIAS' => $addTBK,
             'RELATION_ORGANIZATION_EMAIL' => $request->relation_email,
+            'RELATION_ORGANIZATION_WEBSITE' => $request->relation_website,
             'RELATION_ORGANIZATION_LOGO_ID' => NULL,
             'RELATION_ORGANIZATION_SIGNATURE_NAME' => NULL,
             'RELATION_ORGANIZATION_SIGNATURE_TITLE' => NULL,
@@ -209,7 +251,7 @@ class RelationController extends Controller
         ]);
 
         // Mapping Parent Id and Update
-        DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
+        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
@@ -337,59 +379,59 @@ class RelationController extends Controller
 
 
 
-        // cek apakah ganti group apa engga
-        $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
-        $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
-        if ($oldGroup !== $request->RELATION_ORGANIZATION_GROUP) {
-            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_GROUP'         => $request->RELATION_ORGANIZATION_GROUP,
-                ]);
-        }
+        // // cek apakah ganti group apa engga
+        // $oldRelation = Relation::find($request->RELATION_ORGANIZATION_ID);
+        // $oldGroup = $oldRelation->RELATION_ORGANIZATION_GROUP;
+        // if ($oldGroup !== $request->RELATION_ORGANIZATION_GROUP) {
+        //     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_GROUP'         => $request->RELATION_ORGANIZATION_GROUP,
+        //         ]);
+        // }
 
 
         // cek apakah dia parent ?
-        $relationParent = Relation::find($request->RELATION_ORGANIZATION_ID);
-        $parentId = $relationParent->RELATION_ORGANIZATION_PARENT_ID;
-        if ($parentId == 0 && $request->RELATION_ORGANIZATION_PARENT_ID != null) {
-            // cek satu group atau tidak
-            $return = Relation::where('RELATION_ORGANIZATION_MAPPING', 'like', '%' . $request->RELATION_ORGANIZATION_PARENT_ID .".". '%')->get();
-            if ($return->count() > 0) {
-                // update parent to child
-                $updateParent = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_PARENT_ID)
-                                ->update([
-                                    'RELATION_ORGANIZATION_PARENT_ID'         => 0,
-                                ]);
+        // $relationParent = Relation::find($request->RELATION_ORGANIZATION_ID);
+        // $parentId = $relationParent->RELATION_ORGANIZATION_PARENT_ID;
+        // if ($parentId == 0 && $request->RELATION_ORGANIZATION_PARENT_ID != null) {
+        //     // cek satu group atau tidak
+        //     $return = Relation::where('RELATION_ORGANIZATION_MAPPING', 'like', '%' . $request->RELATION_ORGANIZATION_PARENT_ID .".". '%')->get();
+        //     if ($return->count() > 0) {
+        //         // update parent to child
+        //         $updateParent = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_PARENT_ID)
+        //                         ->update([
+        //                             'RELATION_ORGANIZATION_PARENT_ID'         => 0,
+        //                         ]);
 
-                // update child to parent
-                if ($updateParent) {
-                    Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                                ->update([
-                                    'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
-                                ]);
-                }
-            }else{
-                Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
-                ]);
-            }
-        }
+        //         // update child to parent
+        //         if ($updateParent) {
+        //             Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //                         ->update([
+        //                             'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
+        //                         ]);
+        //         }
+        //     }else{
+        //         Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_PARENT_ID'         => $request->RELATION_ORGANIZATION_PARENT_ID,
+        //         ]);
+        //     }
+        // }
 
 
         // Cek Relation Perent Id
-        $parentID = $request->RELATION_ORGANIZATION_PARENT_ID;
-        if ($request->RELATION_ORGANIZATION_PARENT_ID == '' || $request->RELATION_ORGANIZATION_PARENT_ID == NULL) {
-            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_PARENT_ID'         => 0,
-                ]);
-        }else{
-            Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
-                ->update([
-                    'RELATION_ORGANIZATION_PARENT_ID'         => $parentID,
-                ]);
-        }
+        // $parentID = $request->RELATION_ORGANIZATION_PARENT_ID;
+        // if ($request->RELATION_ORGANIZATION_PARENT_ID == '' || $request->RELATION_ORGANIZATION_PARENT_ID == NULL) {
+        //     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_PARENT_ID'         => 0,
+        //         ]);
+        // }else{
+        //     Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)
+        //         ->update([
+        //             'RELATION_ORGANIZATION_PARENT_ID'         => $parentID,
+        //         ]);
+        // }
 
         // ubah ke to lower dan huruf besar di awal
         $nameRelation = strtolower($request->RELATION_ORGANIZATION_NAME);
@@ -425,6 +467,7 @@ class RelationController extends Controller
                 'RELATION_ORGANIZATION_DESCRIPTION' => $request->RELATION_ORGANIZATION_DESCRIPTION,
                 'RELATION_ORGANIZATION_ALIAS' => $addTBK,
                 'RELATION_ORGANIZATION_EMAIL' => $request->RELATION_ORGANIZATION_EMAIL,
+                'RELATION_ORGANIZATION_WEBSITE' => $request->RELATION_ORGANIZATION_WEBSITE,
                 'RELATION_PROFESSION_ID' => $professionId,
                 'RELATION_LOB_ID' => $lobId,
                 'PRE_SALUTATION' => $request->PRE_SALUTATION,
@@ -433,7 +476,7 @@ class RelationController extends Controller
             ]);
 
         // Mapping Parent Id and Update
-        DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
+        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->RELATION_ORGANIZATION_GROUP]);
 
         // check existing relation AKA
         $existingRelationAKA = MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
@@ -558,5 +601,51 @@ class RelationController extends Controller
         return Inertia::render('Relation/DetailRelation', [
             'detailRelation' => $detailRelation,
         ]);
+    }
+
+    public function getCekAbbreviation(Request $request){
+
+
+        if ($request->flag != "edit") {
+            $flag = "0";
+            $message = "Existing";
+            $data = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
+            return response()->json($data);
+            // if ($abbreviation->count() > 0) {
+            //     $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
+            //     if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
+            //         return $message;
+            //     }
+            // }
+        }else{
+            // cek abbrev apakah sama seperti sebelumnya
+            // dd($request->id);
+            $abbre = Relation::find($request->id);
+            $abbreOld = $abbre->RELATION_ORGANIZATION_ABBREVIATION;
+            // dd($abbreOld);
+
+            // cek jika sama tidak melakukan cek abbreviation existing
+            if ($abbreOld != trim(strtoupper($request->name))) {
+                // dd("masuk sini");
+                // cek abbreviation
+                $flag = "0";
+                $message = "Abbreviation already exists";
+                $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
+                return response()->json($abbreviation);
+                // if ($abbreviation->count() > 0) {
+                //     $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
+                //     if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
+                //         return new JsonResponse([
+                //             $flag,
+                //             $message
+                //         ], 201, [
+                //             'X-Inertia' => true
+                //         ]);
+                //     }
+                // }
+            }
+        }
+
+
     }
 }

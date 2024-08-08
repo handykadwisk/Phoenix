@@ -19,17 +19,29 @@ import TextInput from "@/Components/TextInput";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
+import AGGrid from "@/Components/AgGrid";
+import { BeatLoader } from "react-spinners";
 
 export default function DetailAgent({
     auth,
+    isSuccess,
+    setIsSuccess,
     idAgent,
-}: PropsWithChildren<{ auth: any; idAgent: any }>) {
+}: PropsWithChildren<{
+    auth: any;
+    isSuccess: any;
+    idAgent: any;
+    setIsSuccess: any;
+}>) {
     const [detailAgentNew, setDetailAgentNew] = useState<any>([]);
     const [relationAgent, setRelationAgent] = useState<any>([]);
     // console.log(dataAgent);
-    useEffect(() => {
-        getMRelationAgent(idAgent);
-    }, [idAgent]);
+    // useEffect(() => {
+    //     getMRelationAgent(idAgent);
+    // }, [idAgent]);
+    const [isLoading, setIsLoading] = useState<any>({
+        get_detail: false,
+    });
 
     // get detail agent
     const getMRelationAgent = async (id: string) => {
@@ -46,10 +58,18 @@ export default function DetailAgent({
 
     // get detail agent
     const getRelationAgent = async () => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
         await axios
             .post(`/getRelationAgentSelect`)
             .then((res) => {
                 setRelationAgent(res.data);
+                setIsLoading({
+                    ...isLoading,
+                    get_detail: false,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -62,10 +82,10 @@ export default function DetailAgent({
 
     // handle modal add relation agent
     const handleClickAddRelationAgent = async (
-        e: FormEvent,
+        // e: FormEvent,
         idRelationOrganization: string
     ) => {
-        e.preventDefault();
+        // e.preventDefault();
         getRelationAgent();
         setModalAgent({
             add: !modalAgent.false,
@@ -112,7 +132,10 @@ export default function DetailAgent({
         }).then((result: any) => {
             // console.log(message);
             if (result.value) {
-                getMRelationAgent(message[0]);
+                // getMRelationAgent(message[0]);
+                setIsSuccess({
+                    isSuccess: "success",
+                });
             }
         });
     };
@@ -121,8 +144,11 @@ export default function DetailAgent({
         await axios
             .post(`/deleteAgent`, { id })
             .then((res) => {
+                setIsSuccess({
+                    isSuccess: "success",
+                });
                 // console.log(id);
-                getMRelationAgent(idAgent);
+                // getMRelationAgent(idAgent);
             })
             .catch((err) => {
                 console.log(err);
@@ -154,6 +180,18 @@ export default function DetailAgent({
         //         deleteProcess(id);
         //     }
         // });
+    };
+    const CustomButtonComponent = (props: any) => {
+        return (
+            <span>
+                <XMarkIcon
+                    className="w-7 text-red-500 cursor-pointer"
+                    onClick={(e) =>
+                        deleteRelation(props.data.M_RELATION_AGENT_ID)
+                    }
+                />
+            </span>
+        );
     };
     return (
         <>
@@ -299,41 +337,60 @@ export default function DetailAgent({
                                 + Add
                             </button> */}
                             {menuOpen ? (
-                                <div className="bg-white rounded-md shadow-md w-full max-h-52 mt-2 p-1 flex overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-200">
-                                    <ul className="w-full">
-                                        {filteredTags?.length ? (
-                                            filteredTags?.map(
-                                                (tag: any, i: number) => (
-                                                    <li
-                                                        key={i}
-                                                        className="p-2 cursor-pointer hover:bg-rose-50 hover:text-rose-500 rounded-md w-full"
-                                                        onMouseDown={(e) =>
-                                                            e.preventDefault()
-                                                        }
-                                                        onClick={() => {
-                                                            setMenuOpen(true);
-                                                            setDataRelation({
-                                                                ...dataRelation,
-                                                                name_relation: [
-                                                                    ...dataRelation.name_relation,
-                                                                    tag.RELATION_ORGANIZATION_NAME,
-                                                                ],
-                                                            });
-                                                            setQuery("");
-                                                        }}
-                                                    >
-                                                        {
-                                                            tag.RELATION_ORGANIZATION_NAME
-                                                        }
-                                                    </li>
+                                <div className="bg-white rounded-md shadow-md w-full max-h-72 mt-2 p-1 flex overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-200">
+                                    {isLoading.get_detail ? (
+                                        <div className="m-auto py-20 sweet-loading h-[199px]">
+                                            <BeatLoader
+                                                // cssOverride={override}
+                                                size={10}
+                                                color={"#ff4242"}
+                                                loading={true}
+                                                speedMultiplier={1.5}
+                                                aria-label="Loading Spinner"
+                                                data-testid="loader"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <ul className="w-full">
+                                            {filteredTags?.length ? (
+                                                filteredTags?.map(
+                                                    (tag: any, i: number) => (
+                                                        <li
+                                                            key={i}
+                                                            className="p-2 cursor-pointer hover:bg-rose-50 hover:text-rose-500 rounded-md w-full"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                setMenuOpen(
+                                                                    true
+                                                                );
+                                                                setDataRelation(
+                                                                    {
+                                                                        ...dataRelation,
+                                                                        name_relation:
+                                                                            [
+                                                                                ...dataRelation.name_relation,
+                                                                                tag.RELATION_ORGANIZATION_NAME,
+                                                                            ],
+                                                                    }
+                                                                );
+                                                                setQuery("");
+                                                            }}
+                                                        >
+                                                            {
+                                                                tag.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </li>
+                                                    )
                                                 )
-                                            )
-                                        ) : (
-                                            <li className="p-2 text-gray-500">
-                                                No options available
-                                            </li>
-                                        )}
-                                    </ul>
+                                            ) : (
+                                                <li className="p-2 text-gray-500">
+                                                    No options available
+                                                </li>
+                                            )}
+                                        </ul>
+                                    )}
                                 </div>
                             ) : null}
                         </div>
@@ -342,8 +399,40 @@ export default function DetailAgent({
             />
             {/* end modal agent */}
 
-            <div className="max-w-full h-72 mt-2">
-                <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
+            <div className="max-w-full h-[100%] mt-2">
+                <AGGrid
+                    // loading={isLoading.get_policy}
+                    url={"getMRelationAgent"}
+                    addButtonLabel={"Add Relation"}
+                    withParam={idAgent}
+                    addButtonModalState={() =>
+                        handleClickAddRelationAgent(idAgent)
+                    }
+                    doubleClickEvent={undefined}
+                    triggeringRefreshData={isSuccess}
+                    colDefs={[
+                        {
+                            headerName: "No.",
+                            valueGetter: "node.rowIndex + 1",
+                            flex: 1,
+                        },
+                        {
+                            headerName: "Relation Name",
+                            field: "RELATION_ORGANIZATION_ALIAS",
+                            flex: 7,
+                            filter: "agTextColumnFilter",
+                            filterParams: {
+                                filterOptions: ["contains"],
+                            },
+                            floatingFilter: true,
+                        },
+                        {
+                            field: "button",
+                            cellRenderer: CustomButtonComponent,
+                        },
+                    ]}
+                />
+                {/* <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
                     <table className="w-full table-auto divide-y divide-gray-300">
                         <thead className="">
                             <tr className="bg-gray-2 text-left dark:bg-meta-4">
@@ -427,7 +516,7 @@ export default function DetailAgent({
                             No data result!
                         </div>
                     )}
-                </div>
+                </div> */}
             </div>
         </>
     );

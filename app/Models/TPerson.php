@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TPerson extends Model
 {
@@ -16,6 +17,8 @@ class TPerson extends Model
     protected $guarded = [
         'PERSON_ID',
     ];
+
+    public $with = ['division'];
 
     public $timestamps = false;
 
@@ -43,12 +46,37 @@ class TPerson extends Model
         return $this->hasOne(TRelationStructure::class, 'RELATION_STRUCTURE_ID', 'STRUCTURE_ID');
     }
 
-    public function Division(){
-        return $this->hasOne(TRelationDivision::class, 'RELATION_DIVISION_ID', 'DIVISION_ID');
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(TRelationDivision::class, 'DIVISION_ID');
     }
 
     public function Document(){
-        return $this->hasOne(TDocument::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
+        return $this->hasOne(Document::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
+    }
+
+    public function mPersonContact(){
+        return $this->hasMany(MPersonContact::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function mAddressPerson(){
+        return $this->hasMany(MPersonAddress::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function PersonEducation(){
+        return $this->hasMany(TPersonEducation::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function PersonCertificate(){
+        return $this->hasMany(TPersonCertificate::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function MPersonDocument(){
+        return $this->hasMany(MPersonDocument::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function TPersonBank(){
+        return $this->hasMany(TPersonBankAccount::class, 'PERSON_ID', 'PERSON_ID');
     }
 
 }

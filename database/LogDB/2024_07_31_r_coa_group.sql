@@ -1,0 +1,43 @@
+/*
+SQLyog Ultimate v11.33 (64 bit)
+MySQL - 8.0.31 : Database - phoenix
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`phoenix` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `phoenix`;
+
+/*Table structure for table `r_coa_group` */
+
+DROP TABLE IF EXISTS `r_coa_group`;
+
+CREATE TABLE `r_coa_group` (
+  `COA_GROUP_ID` int unsigned NOT NULL AUTO_INCREMENT,
+  `COA_GROUP_CODE` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `COA_GROUP_PARENT` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `COA_CLASS_ID` int DEFAULT NULL,
+  `COA_GROUP_TITLE` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `COA_GROUP_CREATED_BY` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `COA_GROUP_CREATED_DATE` datetime DEFAULT NULL,
+  `COA_GROUP_LAST_UPDATE_BY` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `COA_GROUP_LAST_UPDATE` datetime DEFAULT NULL,
+  PRIMARY KEY (`COA_GROUP_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `r_coa_group` */
+
+insert  into `r_coa_group`(`COA_GROUP_ID`,`COA_GROUP_CODE`,`COA_GROUP_PARENT`,`COA_CLASS_ID`,`COA_GROUP_TITLE`,`COA_GROUP_CREATED_BY`,`COA_GROUP_CREATED_DATE`,`COA_GROUP_LAST_UPDATE_BY`,`COA_GROUP_LAST_UPDATE`) values (78,'10000','0',10000,'Aktiva','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(79,'11000','10000',10000,'Aktiva Lancar','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(80,'11100','10000',10000,'Rekening Penampungan Premi','admin','2022-06-23 11:26:29','admin','2022-06-23 11:26:29'),(81,'12000','10000',10000,'Aktiva Tetap','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(82,'13000','10000',10000,'Aktiva Lain-lain','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(83,'21000','',20000,'Kewajiban Jangka Pendek','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(84,'22000','',20000,'Kewajiban Jangka Panjang','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(85,'30000','',30000,'Modal','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(86,'40000','',40000,'Pendapatan','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(87,'50000','50000',60000,'Biaya Operasional','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(88,'60000','70000',70000,'Biaya Non Operasional','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(89,'70000',NULL,70000,'Biaya Non Operasional',NULL,NULL,NULL,NULL),(90,'80000','',80000,'Pendapatan Lainnya','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48'),(91,'90000','',90000,'Biaya Lainnya','admin','2022-06-23 11:44:48','admin','2022-06-23 11:44:48');
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

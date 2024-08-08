@@ -13,7 +13,9 @@ class Document extends Model
 
     protected $table = 't_document';
 
-    protected $guarded = ['DOCUMENT_ID'];
+    protected $guarded = [
+        'DOCUMENT_ID',
+    ];
 
     public $timestamps = false;
 }

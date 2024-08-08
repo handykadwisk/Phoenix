@@ -13,6 +13,7 @@ import {
 import { spawn } from "child_process";
 import axios from "axios";
 import Select from "react-tailwindcss-select";
+import dateFormat from "dateformat";
 import {
     ArrowUpIcon,
     ArrowUpTrayIcon,
@@ -29,6 +30,7 @@ import {
     UserGroupIcon,
     UserIcon,
     UsersIcon,
+    XMarkIcon,
 } from "@heroicons/react/20/solid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import InputLabel from "@/Components/InputLabel";
@@ -45,6 +47,10 @@ import test from "node:test";
 import BankAccount from "./BankAccount";
 // import AddressPerson from "./AddressPerson";
 import SelectTailwind from "react-tailwindcss-select";
+import AddressPerson from "./AddressPerson";
+import DetailPersonAddress from "./DetailPersonAddress";
+import DatePicker from "react-datepicker";
+import DetailBankAccount from "./DetailBankAccount";
 
 export default function DetailPerson({
     idPerson,
@@ -62,10 +68,10 @@ export default function DetailPerson({
     const [division, setDivision] = useState<any>([]);
     const [office, setOffice] = useState<any>([]);
     const [bank, setBank] = useState<any>([]);
+    const [optionsBank, setOptionsBank] = useState<any>([]);
     const [file, setFile] = useState<any>();
     const [fileNew, setFileNew] = useState<any>();
     const [wilayah, setWilayah] = useState<any>([]);
-    const [regency, setRegency] = useState<any>([]);
     useEffect(() => {
         getPersonDetail(idPerson);
     }, [idPerson]);
@@ -134,6 +140,7 @@ export default function DetailPerson({
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
+                console.log("xx", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -194,6 +201,16 @@ export default function DetailPerson({
                 console.log(err);
             });
     };
+    const getForBankAccount = async () => {
+        await axios
+            .post(`/getForBankAccount`)
+            .then((res) => {
+                setOptionsBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     const { data, setData, errors, reset } = useForm<any>({
         PERSON_ID: idPerson,
@@ -214,8 +231,8 @@ export default function DetailPerson({
         PERSON_GENDER: "",
         PERSON_BIRTH_PLACE: "",
         PERSON_BIRTH_DATE: "",
-        PERSON_EMAIL: "",
-        PERSON_CONTACT: "",
+        // PERSON_EMAIL: "",
+        // PERSON_CONTACT: "",
         PERSON_UPDATED_BY: "",
         PERSON_UPDATED_DATE: "",
         PERSON_KTP: "",
@@ -224,6 +241,14 @@ export default function DetailPerson({
         PERSON_BLOOD_TYPE: "",
         PERSON_BLOOD_RHESUS: "",
         PERSON_MARITAL_STATUS: "",
+        m_person_contact: [
+            {
+                t_person_contact: {
+                    PERSON_PHONE_NUMBER: "",
+                    PERSON_EMAIL: "",
+                },
+            },
+        ],
         contact_emergency: [
             {
                 PERSON_EMERGENCY_CONTACT_NAME: "",
@@ -234,18 +259,54 @@ export default function DetailPerson({
     });
 
     const [dataAddress, setDataAddress] = useState<any>({
-        idPerson: idPerson,
-        ADDRESS_ID: "",
-        ADDRESS_CATEGORY: "",
-        ADDRESS_LOCATION_TYPE: "",
-        ADDRESS_DETAIL: "",
-        ADDRESS_RT_NUMBER: "",
-        ADDRESS_RW_NUMBER: "",
-        ADDRESS_VILLAGE: "",
-        ADDRESS_DISTRICT: "",
-        ADDRESS_PROVINCE: "",
-        ADDRESS_REGENCY: "",
-        ADDRESS_STATUS: "",
+        address_ktp: [
+            {
+                idPerson: idPerson,
+                ADDRESS_CATEGORY: "",
+                ADDRESS_LOCATION_TYPE: "",
+                ADDRESS_DETAIL: "",
+                ADDRESS_RT_NUMBER: "",
+                ADDRESS_RW_NUMBER: "",
+                ADDRESS_VILLAGE: "",
+                ADDRESS_DISTRICT: "",
+                ADDRESS_PROVINCE: "",
+                ADDRESS_REGENCY: "",
+                ADDRESS_STATUS: "",
+            },
+        ],
+        address_domicile: [
+            // {
+            //     idPerson: idPerson,
+            //     ADDRESS_ID: "",
+            //     ADDRESS_CATEGORY: "",
+            //     ADDRESS_LOCATION_TYPE: "",
+            //     ADDRESS_DETAIL: "",
+            //     ADDRESS_RT_NUMBER: "",
+            //     ADDRESS_RW_NUMBER: "",
+            //     ADDRESS_VILLAGE: "",
+            //     ADDRESS_DISTRICT: "",
+            //     ADDRESS_PROVINCE: "",
+            //     ADDRESS_REGENCY: "",
+            //     ADDRESS_STATUS: "",
+            // },
+        ],
+        other_address: [],
+        // other_address: [
+        //     {
+        //         idPerson: idPerson,
+        //         ADDRESS_ID: "",
+        //         ADDRESS_CATEGORY: "",
+        //         ADDRESS_LOCATION_TYPE: "",
+        //         ADDRESS_DETAIL: "",
+        //         ADDRESS_RT_NUMBER: "",
+        //         ADDRESS_RW_NUMBER: "",
+        //         ADDRESS_VILLAGE: "",
+        //         ADDRESS_DISTRICT: "",
+        //         ADDRESS_PROVINCE: "",
+        //         ADDRESS_REGENCY: "",
+        //         ADDRESS_STATUS: "",
+        //     },
+        // ],
     });
 
     const [dataStructure, setDataStructure] = useState<any>({
@@ -407,16 +468,51 @@ export default function DetailPerson({
               });
     };
 
-    const handleAddressPerson = async (e: FormEvent) => {
+    const handleEmploymentNew = async (e: FormEvent) => {
         e.preventDefault();
-        setModalAddressPerson({
-            add: !modalAddressPerson.add,
+
+        setModal({
+            add: false,
             delete: false,
             edit: false,
-            view: false,
+            view: !modal.view,
             document: false,
             search: false,
         });
+    };
+
+    const [addressStatus, setAddressStatus] = useState<any>([]);
+    const getAddressStatus = async () => {
+        await axios
+            .post(`/getAddressStatus`)
+            .then((res) => {
+                setAddressStatus(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const handleAddressPerson = async (e: FormEvent) => {
+        e.preventDefault();
+        detailPerson.m_address_person?.length === 0
+            ? setModalAddressPerson({
+                  add: !modalAddressPerson.add,
+                  delete: false,
+                  edit: false,
+                  view: false,
+                  document: false,
+                  search: false,
+              })
+            : setModalAddressPerson({
+                  add: false,
+                  delete: false,
+                  edit: false,
+                  view: !modalAddressPerson.view,
+                  document: false,
+                  search: false,
+              });
+        getAddressStatus();
     };
 
     const handleStructure = async (e: FormEvent) => {
@@ -447,18 +543,43 @@ export default function DetailPerson({
               });
     };
 
+    // const [dataPersonBank, setDataPersonBank] = useState<any>({
+    //     idPerson: "",
+    //     BANK_ACCOUNT: [
+    //         {
+    //             idPerson: idPerson,
+    //             PERSON_BANK_ACCOUNT_NAME: "",
+    //             PERSON_BANK_ACCOUNT_NUMBER: "",
+    //             PERSON_BANK_ACCOUNT_FOR: null,
+    //             BANK_ID: "",
+    //         },
+    //     ],
+    // });
+
     const handleBankAccount = async (e: FormEvent) => {
         e.preventDefault();
 
         getRBank();
-        setModalBank({
-            add: !modalBank.add,
-            delete: false,
-            edit: false,
-            view: false,
-            document: false,
-            search: false,
-        });
+        getForBankAccount();
+        if (detailPerson.t_person_bank?.length === 0) {
+            setModalBank({
+                add: !modalBank.add,
+                delete: false,
+                edit: false,
+                view: false,
+                document: false,
+                search: false,
+            });
+        } else {
+            setModalBank({
+                add: false,
+                delete: false,
+                edit: !modalBank.edit,
+                view: false,
+                document: false,
+                search: false,
+            });
+        }
     };
 
     const handleSuccessEditPerson = (message: string) => {
@@ -487,6 +608,66 @@ export default function DetailPerson({
         }
     };
 
+    const handleSuccessAddAddress = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            Swal.fire({
+                title: "Success",
+                text: "Add Address",
+                icon: "success",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    getPersonDetail(message[0]);
+                    // getPersons();
+                    // setGetDetailRelation(message);
+                    // setModal({
+                    //     add: false,
+                    //     delete: false,
+                    //     edit: false,
+                    //     view: true,
+                    //     document: false,
+                    //     search: false,
+                    // });
+                    setDataAddress({
+                        address_ktp: [
+                            {
+                                idPerson: idPerson,
+                                ADDRESS_CATEGORY: "",
+                                ADDRESS_LOCATION_TYPE: "",
+                                ADDRESS_DETAIL: "",
+                                ADDRESS_RT_NUMBER: "",
+                                ADDRESS_RW_NUMBER: "",
+                                ADDRESS_VILLAGE: "",
+                                ADDRESS_DISTRICT: "",
+                                ADDRESS_PROVINCE: "",
+                                ADDRESS_REGENCY: "",
+                                ADDRESS_STATUS: "",
+                            },
+                        ],
+                        address_domicile: [
+                            // {
+                            //     idPerson: idPerson,
+                            //     ADDRESS_ID: "",
+                            //     ADDRESS_CATEGORY: "",
+                            //     ADDRESS_LOCATION_TYPE: "",
+                            //     ADDRESS_DETAIL: "",
+                            //     ADDRESS_RT_NUMBER: "",
+                            //     ADDRESS_RW_NUMBER: "",
+                            //     ADDRESS_VILLAGE: "",
+                            //     ADDRESS_DISTRICT: "",
+                            //     ADDRESS_PROVINCE: "",
+                            //     ADDRESS_REGENCY: "",
+                            //     ADDRESS_STATUS: "",
+                            // },
+                        ],
+                        other_address: [],
+                    });
+                }
+            });
+        }
+    };
+
     const handleSuccessEmployment = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
@@ -509,7 +690,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({
@@ -527,23 +708,23 @@ export default function DetailPerson({
 
     const handleSuccess = (message: string) => {
         // setIsSuccess("");
-        if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Bank Account Added",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message);
-                }
-            });
-        }
+        // if (message !== "") {
+        Swal.fire({
+            title: "Success",
+            text: "Bank Account Added",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                getPersonDetail(idPerson);
+            }
+        });
+        // }
     };
 
     const handleSuccessStructure = (message: string) => {
         // setIsSuccess("");
-        if (message !== "") {
+        if (message[1] === "add") {
             setDataStructure({
                 PERSON_ID: idPerson,
                 STRUCTURE_ID: "",
@@ -557,7 +738,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({
@@ -578,7 +759,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({
@@ -621,12 +802,108 @@ export default function DetailPerson({
         };
     });
 
+    const inputDataPersonContact = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...editPerson.m_person_contact];
+        changeVal[i].t_person_contact[name] = value;
+        // console.log("zzzz", changeVal);
+        setEditPerson({
+            ...editPerson,
+            m_person_contact: changeVal,
+        });
+    };
+
+    const addRowPersonContact = (e: FormEvent) => {
+        e.preventDefault();
+        setEditPerson({
+            ...editPerson,
+            m_person_contact: [
+                ...editPerson.m_person_contact,
+                {
+                    t_person_contact: {
+                        PERSON_PHONE_NUMBER: "",
+                        PERSON_EMAIL: "",
+                    },
+                },
+            ],
+        });
+    };
+
+    // console.log("bbb", editPerson);
+
     return (
         <>
+            {/* <ModalToAction
+                show={modal.view}
+                onClose={() =>
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Detail Employment"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <span>alo</span>
+                    </>
+                }
+            /> */}
+
+            {/* modal detail address person */}
+            <ModalToAction
+                show={modalAddressPerson.view}
+                onClose={() =>
+                    setModalAddressPerson({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Address Person"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DetailPersonAddress
+                            idPerson={idPerson}
+                            wilayah={wilayah}
+                            wilayahSelect={wilayahSelect}
+                        />
+                    </>
+                }
+            />
+            {/* end modal detail address person */}
+
             {/* address Person */}
-            <ModalToAdd
+            <AddressPerson
                 show={modalAddressPerson.add}
-                onClose={() => {
+                modal={() => {
                     setModalAddressPerson({
                         add: false,
                         delete: false,
@@ -636,374 +913,14 @@ export default function DetailPerson({
                         search: false,
                     });
                 }}
-                buttonAddOns={""}
-                title={"Add Address Person"}
-                url={`/personEmployment`}
-                data={dataAddress}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
-                }
-                onSuccess={""}
-                body={
-                    <>
-                        <div className="text-gray-600 text-xs hover:underline hover:cursor-pointer w-fit border-b-2 mb-2">
-                            <span>
-                                <i>+ Add Other Address</i>
-                            </span>
-                        </div>
-                        <div className="text-red-600 font-semibold">
-                            <span>KTP Address</span>
-                        </div>
-                        <div className="mb-2">
-                            <div className="">
-                                <InputLabel
-                                    htmlFor="ADDRESS_DETAIL"
-                                    value="Address"
-                                />
-                                <TextArea
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    id="ADDRESS_DETAIL"
-                                    name="ADDRESS_DETAIL"
-                                    defaultValue={dataAddress.ADDRESS_DETAIL}
-                                    onChange={(e) => {
-                                        setDataAddress({
-                                            ...dataAddress,
-                                            ADDRESS_DETAIL: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 mt-2">
-                                <div>
-                                    <InputLabel
-                                        htmlFor="ADDRESS_RT_NUMBER"
-                                        value="RT"
-                                    />
-                                    <TextInput
-                                        type="text"
-                                        value={dataAddress.ADDRESS_RT_NUMBER}
-                                        className=""
-                                        onChange={(e) => {
-                                            setDataAddress({
-                                                ...dataAddress,
-                                                ADDRESS_RT_NUMBER:
-                                                    e.target.value,
-                                            });
-                                        }}
-                                        // required
-                                        placeholder="RT"
-                                    />
-                                </div>
-                                <div>
-                                    <InputLabel
-                                        htmlFor="ADDRESS_RW_NUMBER"
-                                        value="RW"
-                                    />
-                                    <TextInput
-                                        type="text"
-                                        value={dataAddress.ADDRESS_RW_NUMBER}
-                                        className=""
-                                        onChange={(e) => {
-                                            setDataAddress({
-                                                ...dataAddress,
-                                                ADDRESS_RW_NUMBER:
-                                                    e.target.value,
-                                            });
-                                        }}
-                                        // required
-                                        placeholder="RW"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="mt-2">
-                                    <InputLabel
-                                        htmlFor="ADDRESS_PROVINCE"
-                                        value="Province"
-                                    />
-                                    <SelectTailwind
-                                        classNames={{
-                                            menuButton: () =>
-                                                `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                            listItem: ({ isSelected }: any) =>
-                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                    isSelected
-                                                        ? `text-white bg-red-500`
-                                                        : `text-gray-500 hover:bg-red-500 hover:text-white`
-                                                }`,
-                                        }}
-                                        options={wilayahSelect}
-                                        isSearchable={true}
-                                        placeholder={"--Select Province--"}
-                                        value={dataAddress.ADDRESS_PROVINCE}
-                                        // onChange={(e) =>
-                                        //     inputDataBank(
-                                        //         "BANK_ID",
-                                        //         e.target.value,
-                                        //         i
-                                        //     )
-                                        // }
-                                        onChange={(val: any) => {
-                                            // getRegency(val);
-                                            setDataAddress({
-                                                ...dataAddress,
-                                                ADDRESS_PROVINCE: val,
-                                            });
-                                        }}
-                                        primaryColor={"bg-red-500"}
-                                    />
-                                </div>
-                                <div className="mt-2">
-                                    <InputLabel
-                                        htmlFor="ADDRESS_REGENCY"
-                                        value="Regency"
-                                    />
-                                    <TextInput
-                                        type="text"
-                                        value={dataAddress.ADDRESS_REGENCY}
-                                        className=""
-                                        onChange={(e) => {
-                                            setDataAddress({
-                                                ...dataAddress,
-                                                ADDRESS_REGENCY: e.target.value,
-                                            });
-                                        }}
-                                        // required
-                                        placeholder="Province"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="mt-2">
-                                    <InputLabel
-                                        htmlFor="ADDRESS_DISTRICT"
-                                        value="District"
-                                    />
-                                    <TextInput
-                                        type="text"
-                                        value={dataAddress.ADDRESS_DISTRICT}
-                                        className=""
-                                        onChange={(e) => {
-                                            setDataAddress({
-                                                ...dataAddress,
-                                                ADDRESS_DISTRICT:
-                                                    e.target.value,
-                                            });
-                                        }}
-                                        // required
-                                        placeholder="District"
-                                    />
-                                </div>
-                                <div className="mt-2">
-                                    <InputLabel
-                                        htmlFor="ADDRESS_VILLAGE"
-                                        value="Village"
-                                    />
-                                    <TextInput
-                                        type="text"
-                                        value={dataAddress.ADDRESS_VILLAGE}
-                                        className=""
-                                        onChange={(e) => {
-                                            setDataAddress({
-                                                ...dataAddress,
-                                                ADDRESS_VILLAGE: e.target.value,
-                                            });
-                                        }}
-                                        // required
-                                        placeholder="Village"
-                                    />
-                                </div>
-                            </div>
-                            <div className="mt-2 text-sm flex">
-                                <div className="flex w-4 flex-shrink-0 items-center justify-end rounded-l-md text-sm font-medium">
-                                    <Checkbox
-                                        // id={typeRelation.RELATION_TYPE_ID}
-                                        value={checkDomAddress.domAddress}
-                                        onChange={(e) => handleCheckbox(e)}
-                                    />
-                                </div>
-                                <div className="flex flex-1 items-center justify-between truncate rounded-r-md">
-                                    <div className="flex-1 truncate px-1 py-2 text-xs">
-                                        <span className="text-gray-900">
-                                            {/* {typeRelation.RELATION_TYPE_NAME} */}
-                                            Set KTP Address as Domicile Address
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {checkDomAddress.domAddress === "3" ? (
-                            <>
-                                <div className="border-b-2"></div>
-                                <div className="text-red-600 font-semibold">
-                                    <span>Domicile Address</span>
-                                </div>
-                                <div className="mb-2">
-                                    <div className="">
-                                        <InputLabel
-                                            htmlFor="ADDRESS_DETAIL"
-                                            value="Address"
-                                        />
-                                        <TextArea
-                                            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                            id="ADDRESS_DETAIL"
-                                            name="ADDRESS_DETAIL"
-                                            defaultValue={
-                                                dataAddress.ADDRESS_DETAIL
-                                            }
-                                            onChange={(e) => {
-                                                setDataAddress({
-                                                    ...dataAddress,
-                                                    ADDRESS_DETAIL:
-                                                        e.target.value,
-                                                });
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2 mt-2">
-                                        <div>
-                                            <InputLabel
-                                                htmlFor="ADDRESS_RT_NUMBER"
-                                                value="RT"
-                                            />
-                                            <TextInput
-                                                type="text"
-                                                value={
-                                                    dataAddress.ADDRESS_RT_NUMBER
-                                                }
-                                                className=""
-                                                onChange={(e) => {
-                                                    setDataAddress({
-                                                        ...dataAddress,
-                                                        ADDRESS_RT_NUMBER:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                // required
-                                                placeholder="RT"
-                                            />
-                                        </div>
-                                        <div>
-                                            <InputLabel
-                                                htmlFor="ADDRESS_RW_NUMBER"
-                                                value="RW"
-                                            />
-                                            <TextInput
-                                                type="text"
-                                                value={
-                                                    dataAddress.ADDRESS_RW_NUMBER
-                                                }
-                                                className=""
-                                                onChange={(e) => {
-                                                    setDataAddress({
-                                                        ...dataAddress,
-                                                        ADDRESS_RW_NUMBER:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                // required
-                                                placeholder="RW"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="mt-2">
-                                            <InputLabel
-                                                htmlFor="ADDRESS_PROVINCE"
-                                                value="Province"
-                                            />
-                                            <TextInput
-                                                type="text"
-                                                value={
-                                                    dataAddress.ADDRESS_PROVINCE
-                                                }
-                                                className=""
-                                                onChange={(e) => {
-                                                    setDataAddress({
-                                                        ...dataAddress,
-                                                        ADDRESS_PROVINCE:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                // required
-                                                placeholder="Province"
-                                            />
-                                        </div>
-                                        <div className="mt-2">
-                                            <InputLabel
-                                                htmlFor="ADDRESS_REGENCY"
-                                                value="Regency"
-                                            />
-                                            <TextInput
-                                                type="text"
-                                                value={
-                                                    dataAddress.ADDRESS_REGENCY
-                                                }
-                                                className=""
-                                                onChange={(e) => {
-                                                    setDataAddress({
-                                                        ...dataAddress,
-                                                        ADDRESS_REGENCY:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                // required
-                                                placeholder="Province"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="mt-2">
-                                            <InputLabel
-                                                htmlFor="ADDRESS_DISTRICT"
-                                                value="District"
-                                            />
-                                            <TextInput
-                                                type="text"
-                                                value={
-                                                    dataAddress.ADDRESS_DISTRICT
-                                                }
-                                                className=""
-                                                onChange={(e) => {
-                                                    setDataAddress({
-                                                        ...dataAddress,
-                                                        ADDRESS_DISTRICT:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                // required
-                                                placeholder="District"
-                                            />
-                                        </div>
-                                        <div className="mt-2">
-                                            <InputLabel
-                                                htmlFor="ADDRESS_VILLAGE"
-                                                value="Village"
-                                            />
-                                            <TextInput
-                                                type="text"
-                                                value={
-                                                    dataAddress.ADDRESS_VILLAGE
-                                                }
-                                                className=""
-                                                onChange={(e) => {
-                                                    setDataAddress({
-                                                        ...dataAddress,
-                                                        ADDRESS_VILLAGE:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                // required
-                                                placeholder="Village"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        ) : null}
-                    </>
-                }
+                dataAddress={dataAddress}
+                setDataAddress={setDataAddress}
+                wilayahSelect={wilayahSelect}
+                checkDomAddress={checkDomAddress}
+                setCheckDomAddress={setCheckDomAddress}
+                addressStatus={addressStatus}
+                idPerson={idPerson}
+                handleSuccessAddAddress={handleSuccessAddAddress}
             />
 
             {/* end address person */}
@@ -1022,13 +939,36 @@ export default function DetailPerson({
                     })
                 }
                 bank={bank}
+                optionsBank={optionsBank}
                 idPerson={idPerson}
                 handleSuccess={handleSuccess}
             />
             {/* End Bank Account */}
 
+            {/* Bank Account */}
+            <DetailBankAccount
+                show={modalBank.edit}
+                modal={() =>
+                    setModalBank({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                bank={bank}
+                optionsBank={optionsBank}
+                idPerson={idPerson}
+                handleSuccess={handleSuccess}
+                detailBank={detailPerson.t_person_bank}
+            />
+            {/* End Bank Account */}
+
             {/* Edit Person */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.edit}
                 onClose={() => {
                     setModal({
@@ -1057,7 +997,7 @@ export default function DetailPerson({
                                 </span> */}
                             {/* <div className=""></div> */}
                             {/* </div> */}
-                            <div className="mt-4">
+                            <div className="mt-4 relative">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="PERSON_FIRST_NAME"
@@ -1123,18 +1063,45 @@ export default function DetailPerson({
                                                     e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Place Of Birth"
                                     />
                                 </div>
-                                <div>
+                                <div className="">
                                     <InputLabel
-                                        className="absolute"
                                         htmlFor="PERSON_BIRTH_DATE"
                                         value={"Date Of Birth "}
                                     />
-                                    <div className="ml-24 text-red-600">*</div>
-                                    <TextInput
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                editPerson.PERSON_BIRTH_DATE
+                                            }
+                                            onChange={(date: any) => {
+                                                setEditPerson({
+                                                    ...editPerson,
+                                                    PERSON_BIRTH_DATE:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                });
+                                            }}
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_BIRTH_DATE"
                                         type="date"
                                         name="PERSON_BIRTH_DATE"
@@ -1147,12 +1114,11 @@ export default function DetailPerson({
                                                     e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Date Of Birth"
-                                    />
+                                    /> */}
                                 </div>
                             </div>
-                            <div className="grid gap-4 grid-cols-3 mt-4">
+                            <div className="grid gap-4 grid-cols-3 mt-4 hidden">
                                 <div>
                                     <InputLabel
                                         className=""
@@ -1243,7 +1209,7 @@ export default function DetailPerson({
                                                 PERSON_KTP: e.target.value,
                                             });
                                         }}
-                                        required
+                                        placeholder="Person KTP"
                                     />
                                 </div>
                                 <div>
@@ -1264,7 +1230,6 @@ export default function DetailPerson({
                                                 PERSON_NPWP: e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Person NPWP"
                                     />
                                 </div>
@@ -1286,7 +1251,6 @@ export default function DetailPerson({
                                                 PERSON_KK: e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Person KK"
                                     />
                                 </div>
@@ -1295,60 +1259,102 @@ export default function DetailPerson({
                                 <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
                                     <thead className="border-slate-300 bg-slate-300">
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
-                                            <th className="py-2 px-2 text-slate-900-700">
+                                            <th
+                                                className="py-2 px-2 text-slate-900-700"
+                                                colSpan={3}
+                                            >
                                                 <span>Person Contact</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {editPerson.m_person_contact?.map(
+                                            (Cp: any, i: number) => {
+                                                return (
+                                                    <tr key={i}>
+                                                        <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                            <TextInput
+                                                                type="text"
+                                                                value={
+                                                                    Cp
+                                                                        .t_person_contact
+                                                                        .PERSON_PHONE_NUMBER
+                                                                }
+                                                                className="mt-2"
+                                                                onChange={(e) =>
+                                                                    inputDataPersonContact(
+                                                                        "PERSON_PHONE_NUMBER",
+                                                                        e.target
+                                                                            .value,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                required
+                                                                placeholder="Person Number"
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <TextInput
+                                                                id="PERSON_EMAIL"
+                                                                type="email"
+                                                                name="PERSON_EMAIL"
+                                                                value={
+                                                                    Cp
+                                                                        .t_person_contact
+                                                                        .PERSON_EMAIL
+                                                                }
+                                                                className="mt-2"
+                                                                onChange={(e) =>
+                                                                    inputDataPersonContact(
+                                                                        "PERSON_EMAIL",
+                                                                        e.target
+                                                                            .value,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                required
+                                                                placeholder="Email"
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <XMarkIcon
+                                                                className="w-7 mt-2"
+                                                                onClick={() => {
+                                                                    const updatedData =
+                                                                        editPerson.m_person_contact.filter(
+                                                                            (
+                                                                                data: any,
+                                                                                a: number
+                                                                            ) =>
+                                                                                a !==
+                                                                                i
+                                                                        );
+                                                                    setEditPerson(
+                                                                        {
+                                                                            ...editPerson,
+                                                                            m_person_contact:
+                                                                                updatedData,
+                                                                        }
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            }
+                                        )}
                                         <tr>
-                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
-                                                <InputLabel
-                                                    className=""
-                                                    htmlFor="PERSON_CONTACT"
-                                                    value={"Phone Number"}
-                                                />
-                                                <TextInput
-                                                    id="PERSON_CONTACT"
-                                                    type="text"
-                                                    name="PERSON_CONTACT"
-                                                    value={
-                                                        editPerson.PERSON_CONTACT
+                                            <td>
+                                                <a
+                                                    className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                    onClick={(e) =>
+                                                        addRowPersonContact(e)
                                                     }
-                                                    className="mt-2"
-                                                    onChange={(e) => {
-                                                        setEditPerson({
-                                                            ...editPerson,
-                                                            PERSON_CONTACT:
-                                                                e.target.value,
-                                                        });
-                                                    }}
-                                                    required
-                                                    placeholder="Person Number"
-                                                />
-                                                <InputLabel
-                                                    className="mt-2"
-                                                    htmlFor="PERSON_EMAIL"
-                                                    value={"Email"}
-                                                />
-                                                <TextInput
-                                                    id="PERSON_EMAIL"
-                                                    type="email"
-                                                    name="PERSON_EMAIL"
-                                                    value={
-                                                        editPerson.PERSON_EMAIL
-                                                    }
-                                                    className="mt-2 mb-2"
-                                                    onChange={(e) => {
-                                                        setEditPerson({
-                                                            ...editPerson,
-                                                            PERSON_EMAIL:
-                                                                e.target.value,
-                                                        });
-                                                    }}
-                                                    required
-                                                    placeholder="Email"
-                                                />
+                                                >
+                                                    <span className="hover:underline hover:decoration-from-font">
+                                                        + Add Person Contact
+                                                    </span>
+                                                </a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -1530,7 +1536,7 @@ export default function DetailPerson({
                                                     }
                                                 >
                                                     <span className="hover:underline hover:decoration-from-font">
-                                                        Add Emergency Contact
+                                                        + Add Emergency Contact
                                                     </span>
                                                 </a>
                                             </td>
@@ -1810,14 +1816,14 @@ export default function DetailPerson({
                         search: false,
                     })
                 }
-                title={"Employment Information"}
+                title={"Detail Employee Information"}
                 url={""}
                 data={""}
                 onSuccess={""}
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-4xl"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
                 }
                 submitButtonName={""}
                 body={
@@ -1825,6 +1831,7 @@ export default function DetailPerson({
                         <DetailEmployment
                             idPerson={idPerson}
                             taxStatus={taxStatus}
+                            handleSuccessEmployment={handleSuccessEmployment}
                         />
                     </>
                 }
@@ -1844,6 +1851,7 @@ export default function DetailPerson({
                         search: false,
                     });
                 }}
+                buttonAddOns={""}
                 title={"Add Structure Division"}
                 url={`/personStructureDivision`}
                 data={dataStructure}
@@ -1855,11 +1863,13 @@ export default function DetailPerson({
                     <>
                         <div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
+                                <div className="">
                                     <InputLabel
+                                        className=""
                                         htmlFor="RELATION_ORGANIZATION_ID"
                                         value={"Entity"}
                                     />
+                                    {/* <div className="ml-10 text-red-600">*</div> */}
                                     <TextInput
                                         id="RELATION_ORGANIZATION_ID"
                                         type="text"
@@ -1880,11 +1890,15 @@ export default function DetailPerson({
                                         disabled
                                     />
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="STRUCTURE_ID"
-                                        value={"Sub Entity"}
+                                        value={"Structure"}
                                     />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.STRUCTURE_ID}
@@ -1894,6 +1908,7 @@ export default function DetailPerson({
                                                 STRUCTURE_ID: e.target.value,
                                             });
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Sub Entity --
@@ -1918,11 +1933,15 @@ export default function DetailPerson({
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="DIVISION_ID"
                                         value={"Division"}
                                     />
+                                    <div className="ml-[58px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.DIVISION_ID}
@@ -1932,6 +1951,7 @@ export default function DetailPerson({
                                                 DIVISION_ID: e.target.value,
                                             });
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Division --
@@ -1954,11 +1974,15 @@ export default function DetailPerson({
                                         )}
                                     </select>
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="OFFICE_ID"
                                         value={"Office"}
                                     />
+                                    <div className="ml-[45px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.OFFICE_ID}
@@ -1968,6 +1992,7 @@ export default function DetailPerson({
                                                 OFFICE_ID: e.target.value,
                                             });
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Office --
@@ -2188,7 +2213,7 @@ export default function DetailPerson({
                                     onClick={(e) => handleEditPerson(e)}
                                 >
                                     <PencilSquareIcon
-                                        className="w-7"
+                                        className="w-7 text-red-600"
                                         title="Edit Profile"
                                     />
                                 </a>
@@ -2222,12 +2247,9 @@ export default function DetailPerson({
                                             window.location.origin +
                                             "/storage/" +
                                             detailPerson.document
-                                                ?.DOCUMENT_PATHNAME +
+                                                ?.DOCUMENT_DIRNAME +
                                             detailPerson.document
-                                                ?.DOCUMENT_FILENAME +
-                                            "." +
-                                            detailPerson.document
-                                                ?.DOCUMENT_EXTENTION
+                                                ?.DOCUMENT_FILENAME
                                         }
                                         alt="Image Person"
                                     />
@@ -2260,7 +2282,9 @@ export default function DetailPerson({
                                     Place Of Birth
                                 </div>
                                 <div className="text-sm mt-2 text-gray-500">
-                                    {detailPerson.PERSON_BIRTH_PLACE}
+                                    {detailPerson.PERSON_BIRTH_PLACE === null
+                                        ? "-"
+                                        : detailPerson.PERSON_BIRTH_PLACE}
                                 </div>
                             </div>
                             <div className="p-2">
@@ -2268,7 +2292,12 @@ export default function DetailPerson({
                                     Date Of Birth
                                 </div>
                                 <div className="text-sm mt-2 text-gray-500">
-                                    {detailPerson.PERSON_BIRTH_DATE}
+                                    {detailPerson.PERSON_BIRTH_DATE === null
+                                        ? "-"
+                                        : dateFormat(
+                                              detailPerson.PERSON_BIRTH_DATE,
+                                              "dd-mm-yyyy"
+                                          )}
                                 </div>
                             </div>
                         </div>
@@ -2320,7 +2349,9 @@ export default function DetailPerson({
                                 <div className="text-sm mt-2 text-gray-500">
                                     {detailPerson.PERSON_GENDER === "m"
                                         ? "Laki-Laki"
-                                        : "Perempuan"}
+                                        : detailPerson.PERSON_GENDER === "f"
+                                        ? "Perempuan"
+                                        : "-"}
                                 </div>
                             </div>
                             <div className="p-2">
@@ -2367,7 +2398,56 @@ export default function DetailPerson({
                                 <div className="font-semibold text-red-600">
                                     <span>Contact</span>
                                 </div>
-                                <div className="flex justify-between mt-2">
+                                {detailPerson.m_person_contact?.length === 0 ? (
+                                    "-"
+                                ) : (
+                                    <>
+                                        {detailPerson.m_person_contact?.map(
+                                            (pc: any, i: number) => {
+                                                return (
+                                                    <div key={i}>
+                                                        <div className="flex justify-between mt-2">
+                                                            <div className="relative text-sm text-gray-500">
+                                                                <span>
+                                                                    <PhoneIcon className="w-4 absolute" />
+                                                                </span>
+                                                                <span className="ml-7">
+                                                                    {
+                                                                        pc
+                                                                            .t_person_contact
+                                                                            ?.PERSON_PHONE_NUMBER
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex justify-between mt-3">
+                                                            <div className="relative text-sm text-gray-500">
+                                                                <span>
+                                                                    <EnvelopeIcon className="w-4 absolute" />
+                                                                </span>
+                                                                <span className="ml-7">
+                                                                    {
+                                                                        pc
+                                                                            .t_person_contact
+                                                                            ?.PERSON_EMAIL
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {i !==
+                                                        detailPerson
+                                                            .m_person_contact
+                                                            ?.length -
+                                                            1 ? (
+                                                            <hr className="mt-2" />
+                                                        ) : null}
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </>
+                                )}
+                                {/* <div className="flex justify-between mt-2">
                                     <div className="relative text-sm text-gray-500">
                                         <span>
                                             <PhoneIcon className="w-4 absolute" />
@@ -2386,7 +2466,7 @@ export default function DetailPerson({
                                             {detailPerson.PERSON_EMAIL}
                                         </span>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="px-2 xs:px-0 lg:px-2">
                                 <div className="font-semibold text-red-600">
@@ -2446,7 +2526,7 @@ export default function DetailPerson({
                                                                     {
                                                                         cm
                                                                             .person_relationship
-                                                                            .PERSON_RELATIONSHIP_NAME
+                                                                            ?.PERSON_RELATIONSHIP_NAME
                                                                     }
                                                                 </span>
                                                             </div>
@@ -2478,7 +2558,7 @@ export default function DetailPerson({
                                 onClick={(e) => handleStructure(e)}
                             >
                                 <PencilSquareIcon
-                                    className="w-6"
+                                    className="w-6 text-red-600"
                                     title="Structure & Division"
                                 />
                             </a>
@@ -2552,31 +2632,55 @@ export default function DetailPerson({
 
                         {/* end structure division */}
                         <hr className="mt-5" />
+                        {/* <div className="flex justify-between mt-4">
+                            <div className="text-red-600 font-semibold">
+                                <span>Address KTP</span>
+                            </div>
+                            <a
+                                className="hover:text-red-500 cursor-pointer"
+                                onClick={(e) => handleStructure(e)}
+                            >
+                                <PencilSquareIcon
+                                    className="w-6"
+                                    title="Structure & Division"
+                                />
+                            </a>
+                        </div>
+                        {detailPerson.m_address_person?.length === 0 ? (
+                            "-"
+                        ) : (
+                            <div>
+                                <p></p>
+                            </div>
+                        )} */}
                         <div className="grid grid-cols-3 gap-3 mt-4 xs:grid xs:grid-cols-1 lg:grid lg:grid-cols-3">
-                            <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
-                                <a
-                                    className="m-auto"
-                                    onClick={(e) => handleEmployment(e)}
-                                >
-                                    Employment Information
-                                </a>
+                            {detailPerson.relation?.HR_MANAGED_BY_APP !== 0 ? (
+                                <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
+                                    <a
+                                        className="m-auto"
+                                        onClick={(e) => handleEmploymentNew(e)}
+                                    >
+                                        Employee Information
+                                    </a>
+                                </div>
+                            ) : null}
+
+                            <div
+                                className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer"
+                                onClick={(e) => handleAddressPerson(e)}
+                            >
+                                <a className="m-auto">Address Person</a>
                             </div>
-                            <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
-                                <a
-                                    className="m-auto"
-                                    onClick={(e) => handleAddressPerson(e)}
-                                >
-                                    Address Person
-                                </a>
-                            </div>
-                            <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
-                                <a
-                                    className="m-auto"
-                                    onClick={(e) => handleBankAccount(e)}
-                                >
-                                    Bank Account
-                                </a>
-                            </div>
+                            {detailPerson.relation?.HR_MANAGED_BY_APP !== 0 ? (
+                                <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
+                                    <a
+                                        className="m-auto"
+                                        onClick={(e) => handleBankAccount(e)}
+                                    >
+                                        Bank Account
+                                    </a>
+                                </div>
+                            ) : null}
                         </div>
                     </div>
                 </div>

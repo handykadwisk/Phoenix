@@ -86,7 +86,7 @@ export default function ModalToAdd({
                         <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" />
                     </Transition.Child>
 
-                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="fixed inset-0 z-999 w-screen overflow-y-auto">
                         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                             <Transition.Child
                                 as={Fragment}
@@ -125,12 +125,12 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div
-                                                className="max-h-[25rem] overflow-y-auto custom-scrollbar px-1"
-                                                ref={modalRef}
-                                            >
-                                                {body}
-                                            </div>
+                                                <div
+                                                    className="max-h-full overflow-y-auto custom-scrollbar px-1"
+                                                    ref={modalRef}
+                                                >
+                                                    {body}
+                                                </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             <PrimaryButton

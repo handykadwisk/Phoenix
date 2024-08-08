@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('salutation_name')->nullable();
             $table->string('salutation_desc')->nullable();
             $table->integer('relation_status_id')->nullable();
-            $table->smallInteger('salutation_profession')->nullable()->comment("Pre = 1, Post = 2");
+            $table->smallInteger('salutation_position')->nullable()->comment("Pre = 1, Post = 2");
         });
     }
 
