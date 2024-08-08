@@ -482,5 +482,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_salutation)
         );
 
+        // create 2024_08_08_r_for_bank_account
+        $r_for_bank_account = resource_path('../database/LogDB/2024_08_08_r_for_bank_account.sql');
+
+        DB::unprepared(
+            file_get_contents($r_for_bank_account)
+        );
+
     }
 }

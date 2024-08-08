@@ -228,12 +228,28 @@ export default function AddressPerson({
             ],
         });
     };
+
+    const close = async () => {
+        modal();
+        setCheckDomAddress({
+            ...checkDomAddress,
+            domAddress: "",
+        });
+        const updatedData = dataAddress.address_domicile.filter(
+            (data: any, a: number) => a !== 0
+        );
+        setDataAddress({
+            ...dataAddress,
+            address_domicile: updatedData,
+        });
+    };
+
     return (
         <>
             {/* address Person */}
             <ModalToAdd
                 show={show}
-                onClose={modal}
+                onClose={close}
                 buttonAddOns={""}
                 title={"Add Address Person"}
                 url={`/addAddressPerson`}
@@ -250,11 +266,15 @@ export default function AddressPerson({
                         {dataAddress.address_ktp?.map((ak: any, i: number) => {
                             return (
                                 <div className="mb-2" key={i}>
-                                    <div className="">
+                                    <div className="relative">
                                         <InputLabel
+                                            className="absolute"
                                             htmlFor="ADDRESS_DETAIL"
                                             value="Address"
                                         />
+                                        <div className="ml-[60px] text-red-600">
+                                            *
+                                        </div>
                                         <TextArea
                                             className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                             id="ADDRESS_DETAIL"
@@ -581,11 +601,15 @@ export default function AddressPerson({
                                                         )}
                                                     </select>
                                                 </div>
-                                                <div className="mt-2">
+                                                <div className="mt-2 relative">
                                                     <InputLabel
+                                                        className="absolute"
                                                         htmlFor="ADDRESS_DETAIL"
                                                         value="Address"
                                                     />
+                                                    <div className="ml-[60px] text-red-600">
+                                                        *
+                                                    </div>
                                                     <TextArea
                                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         id="ADDRESS_DETAIL"
@@ -966,11 +990,15 @@ export default function AddressPerson({
                                                         )}
                                                     </select>
                                                 </div>
-                                                <div className="mt-2">
+                                                <div className="mt-2 relative">
                                                     <InputLabel
+                                                        className="absolute"
                                                         htmlFor="ADDRESS_DETAIL"
                                                         value="Address"
                                                     />
+                                                    <div className="ml-[60px] text-red-600">
+                                                        *
+                                                    </div>
                                                     <TextArea
                                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         id="ADDRESS_DETAIL"

@@ -346,8 +346,10 @@ class RelationGroupController extends Controller
         // cek id yang ingin di ganti masuk mapping atau tidak?
         $relationParent = RelationGroup::find($request->RELATION_GROUP_ID);
         $parentId = $relationParent->RELATION_GROUP_PARENT;
-        $concatID = ".".$request->RELATION_GROUP_PARENT['value'].'.';
-        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT)->where('RELATION_GROUP_MAPPING', 'like', '%' . $concatID . '%')->get();
+        $concatID = ".".$request->RELATION_GROUP_ID.'.';
+        // dd($concatID);
+        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT['value'])->where('RELATION_GROUP_MAPPING', 'like', '%' . $concatID . '%')->get();
+        // dd($cekExisting->count());
         if ($cekExisting->count() > 0) {
             // $idParent= $cekExisting[0]['RELATION_GROUP_PARENT'];
             $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT)
