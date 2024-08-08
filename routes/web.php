@@ -340,6 +340,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCoverageById/{id}', [PolicyCoverageController::class, 'getCoverageById'])->name('policyCoverage.getCoverageById');
     Route::post('/insertManyCoverage', [PolicyCoverageController::class, 'store'])->name('policyCoverage.store');
     Route::post('/editCoverage', [PolicyCoverageController::class, 'editCoverage'])->name('policyCoverage.editCoverage');
+    Route::get('/getInterestInsured', [PolicyCoverageController::class, 'getInterestInsured'])->name('policyCoverage.getInterestInsured');
 
     // Policy Insured
     Route::post('/insertManyInsured', [PolicyInsuredController::class, 'store'])->name('policyInsured.store');
