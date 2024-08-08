@@ -24,6 +24,7 @@ class CashAdvance extends Model
         // 'cash_advance_report',
         'cash_advance_detail',
         'user',
+        'person',
         'person_used_by',
         'person_approval',
         'user_used_by',
@@ -31,14 +32,19 @@ class CashAdvance extends Model
         'approval_status'
     ];
 
-    // public function cash_advance_report(): HasOne
-    // {
-    //     return $this->hasOne(CashAdvanceReport::class);
-    // }
+    public function cash_advance_report()
+    {
+        return $this->hasOne(CashAdvanceReport::class, 'REPORT_CASH_ADVANCE_CASH_ADVANCE_ID');
+    }
 
     public function cash_advance_detail(): HasMany
     {
         return $this->hasMany(CashAdvanceDetail::class, 'CASH_ADVANCE_ID');
+    }
+
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'CASH_ADVANCE_REQUESTED_BY');
     }
 
     public function person_used_by(): BelongsTo
@@ -68,6 +74,6 @@ class CashAdvance extends Model
 
     public function approval_status(): BelongsTo
     {
-        return $this->belongsTo(CashAdvanceStatus::class, 'CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
+        return $this->belongsTo(CashAdvanceStatus::class, 'CASH_ADVANCE_FIRST_APPROVAL_STATUS', 'CASH_ADVANCE_STATUS_ID');
     }
 }

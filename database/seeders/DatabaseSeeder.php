@@ -533,5 +533,35 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_for_bank_account)
         );
 
+
+        $file_path20 = resource_path('../database/LogDB/2024_08_01_t_relation_division.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path20)
+        );
+
+        $file_path21 = resource_path('../database/LogDB/2024_08_01_t_relation_structure.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path21)
+        );
+
+        $file_path22 = resource_path('../database/LogDB/2024_08_04_t_person.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path22)
+        );
+
+        $file_path23 = resource_path('../database/LogDB/2024_08_05_r_cash_advance_method.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path23)
+        );
+
+        $file_path24 = resource_path('../database/LogDB/2024_08_05_r_cash_advance_differents.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path24)
+        );
     }
 }

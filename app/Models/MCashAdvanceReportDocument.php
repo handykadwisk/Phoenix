@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MCashAdvanceDocument extends Model
+class MCashAdvanceReportDocument extends Model
 {
     use HasFactory;
 
     protected $primaryKey = 'CASH_ADVANCE_DOCUMENT_ID';
 
-    protected $table = 'm_cash_advance_document';
+    protected $table = 'm_cash_advance_report_document';
 
     protected $guarded = ['CASH_ADVANCE_DOCUMENT_ID'];
 
@@ -22,6 +22,6 @@ class MCashAdvanceDocument extends Model
 
     public function document(): BelongsTo
     {
-        return $this->belongsTo(TDocument::class, 'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID');
+        return $this->belongsTo(TDocument::class, 'CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID');
     }
 }

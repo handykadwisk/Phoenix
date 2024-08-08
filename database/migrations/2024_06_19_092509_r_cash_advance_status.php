@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('r_cash_advance_status', function (Blueprint $table) {
-            $table->increments('ID')->primary();
-            $table->tinyInteger('CA_STATUS_ID');
-            $table->string('CA_STATUS_NAME');
+            $table->increments('CASH_ADVANCE_STATUS_ID')->primary();
+            $table->string('CASH_ADVANCE_STATUS_NAME');
             $table->timestamps();
         });
     }
