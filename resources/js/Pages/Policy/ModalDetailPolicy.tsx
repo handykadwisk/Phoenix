@@ -30,6 +30,7 @@ import ModalInsured from "./ModalInsured";
 import { BeatLoader } from "react-spinners";
 import dateFormat from "dateformat";
 import DatePicker from "react-datepicker";
+// import ModalTest from "./ModalTest";
 
 export default function ModalDetailPolicy({
     policy,
@@ -63,7 +64,7 @@ export default function ModalDetailPolicy({
     const [coverageGrouping, setCoverageGrouping] = useState<any>([]);
     const [dataCoverageName, setDataCoverageName] = useState<any>([]);
     const [dataPolicyCoverage, setDataPolicyCoverage] = useState<any>([]);
-    const [dataInsurerForInsured, setDataInsurerForInsured] = useState<any>([]);
+    // const [dataInsurerForInsured, setDataInsurerForInsured] = useState<any>([]);
     // let myValue=0;
 
     const [isLoading, setIsLoading] = useState<any>({
@@ -1176,27 +1177,27 @@ export default function ModalDetailPolicy({
         POLICY_INSURED_NAME: "",
         POLICY_ADMIN_COST:"",
         policy_insured_detail: [
-            {
-                INTEREST_INSURED_ID: "",
-                REMARKS: "",
-                POLICY_COVERAGE_ID: "",
-                CURRENCY_ID: "",
-                PREMIUM_AMOUNT: 0,
-                BF_FULL_AMOUNT: 0,
-                DISC_BF_PERCENTAGE: 0,
-                DISC_BF_AMOUNT: 0,
-                BF_NETT_AMOUNT: 0,
-                EF_FULL_AMOUNT: 0,
-                DISC_EF_PERCENTAGE: 0,
-                DISC_EF_AMOUNT: 0,
-                EF_NETT_AMOUNT: 0,
-                CONSULTANCY_FEE: 0,
-                DISC_CF_PERCENTAGE: 0,
-                DISC_CF_AMOUNT: 0,
-                CF_NETT_AMOUNT: 0,
-                INCOME_NETT_AMOUNT: 0,
-                PREMIUM_TO_INSURED: 0,
-            },
+            // {
+            //     INTEREST_INSURED_ID: "",
+            //     REMARKS: "",
+            //     POLICY_COVERAGE_ID: "",
+            //     CURRENCY_ID: "",
+            //     PREMIUM_AMOUNT: 0,
+            //     BF_FULL_AMOUNT: 0,
+            //     DISC_BF_PERCENTAGE: 0,
+            //     DISC_BF_AMOUNT: 0,
+            //     BF_NETT_AMOUNT: 0,
+            //     EF_FULL_AMOUNT: 0,
+            //     DISC_EF_PERCENTAGE: 0,
+            //     DISC_EF_AMOUNT: 0,
+            //     EF_NETT_AMOUNT: 0,
+            //     CONSULTANCY_FEE: 0,
+            //     DISC_CF_PERCENTAGE: 0,
+            //     DISC_CF_AMOUNT: 0,
+            //     CF_NETT_AMOUNT: 0,
+            //     INCOME_NETT_AMOUNT: 0,
+            //     PREMIUM_TO_INSURED: 0,
+            // },
         ],
     };
 
@@ -1206,52 +1207,52 @@ export default function ModalDetailPolicy({
                 policy_id: policy_id,
             })
             .then((res) => {
-                setDataInsurerForInsured(res.data);
+                const data = res.data
+                let policy_insured_detail: any = [];
+                data.map((val: any, i: number) => {
+                    policy_insured_detail.push({
+                        INTEREST_INSURED_ID: val["INTEREST_INSURED_ID"],
+                        REMARKS: val["REMARKS"],
+                        POLICY_COVERAGE_ID: val["POLICY_COVERAGE_ID"],
+                        CURRENCY_ID: val["CURRENCY_ID"],
+                        PREMIUM_AMOUNT: val["INSURER_NETT_PREMIUM"],
+                        BF_FULL_AMOUNT: val["BROKERAGE_FEE"],
+                        DISC_BF_PERCENTAGE: 0,
+                        DISC_BF_AMOUNT: 0,
+                        BF_NETT_AMOUNT: 0,
+                        EF_FULL_AMOUNT: val["ENGINEERING_FEE"],
+                        DISC_EF_PERCENTAGE: 0,
+                        DISC_EF_AMOUNT: 0,
+                        EF_NETT_AMOUNT: 0,
+                        CONSULTANCY_FEE: val["CONSULTANCY_FEE"],
+                        DISC_CF_PERCENTAGE: 0,
+                        DISC_CF_AMOUNT: 0,
+                        CF_NETT_AMOUNT: 0,
+                        INCOME_NETT_AMOUNT: 0,
+                        PREMIUM_TO_INSURED: 0,
+                    });
+                });
+                fieldDataInsured["policy_insured_detail"] =
+                    policy_insured_detail;
+                setDataInsured([
+                    { ...fieldDataInsured, POLICY_ID: policy.POLICY_ID },
+                ]);
+                console.log("fieldDataInsured: ", fieldDataInsured);
+
+                // setDataInsurerForInsured(res.data);
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
-    // console.log("Insurer Nett Premi : ", dataInsurerForInsured);
-
-    useEffect(() => {
-        if (dataInsurerForInsured.length > 0) {
-            let policy_insured_detail: any = [];
-            dataInsurerForInsured.map((val: any, i: number) => {
-                policy_insured_detail.push({
-                    INTEREST_INSURED_ID: val["INTEREST_INSURED_ID"],
-                    REMARKS: val["REMARKS"],
-                    POLICY_COVERAGE_ID: val["POLICY_COVERAGE_ID"],
-                    CURRENCY_ID: val["CURRENCY_ID"],
-                    PREMIUM_AMOUNT: val["INSURER_NETT_PREMIUM"],
-                    BF_FULL_AMOUNT: val["BROKERAGE_FEE"],
-                    DISC_BF_PERCENTAGE: 0,
-                    DISC_BF_AMOUNT: 0,
-                    BF_NETT_AMOUNT: 0,
-                    EF_FULL_AMOUNT: val["ENGINEERING_FEE"],
-                    DISC_EF_PERCENTAGE: 0,
-                    DISC_EF_AMOUNT: 0,
-                    EF_NETT_AMOUNT: 0,
-                    CONSULTANCY_FEE: val["CONSULTANCY_FEE"],
-                    DISC_CF_PERCENTAGE: 0,
-                    DISC_CF_AMOUNT: 0,
-                    CF_NETT_AMOUNT: 0,
-                    INCOME_NETT_AMOUNT: 0,
-                    PREMIUM_TO_INSURED: 0,
-                });
-            })
-            console.log("policy_insured_detail: ", policy_insured_detail);
-        }
-    }, [dataInsurerForInsured]);
-
-    console.log("dataInsurerForInsured: ", dataInsurerForInsured);
+    console.log("dataInsured: ", dataInsured);
 
 
     const handleAddInsured = async (policy_id: any) => {
-        setDataInsured([{ ...fieldDataInsured, POLICY_ID: policy_id }]);
+        // setDataInsured([{ ...fieldDataInsured, POLICY_ID: policy_id }]);
         // setDataInsurerForInsured([]);
-        // getInsurerNettPremi(policy.POLICY_ID);
+        getInsurerNettPremi(policy.POLICY_ID);
         setModal({
             add: false,
             delete: false,
@@ -1336,27 +1337,51 @@ export default function ModalDetailPolicy({
             ...policy_insured_details[detailNum],
         };
 
-        let currency_id = policy_insured_detail["CURRENCY_ID"];
-        let policy_coverage_id = policy_insured_detail["POLICY_COVERAGE_ID"];
-        if (name == "CURRENCY_ID") {
-            currency_id = value;
-        }
-        if (name == "POLICY_COVERAGE_ID") {
-            policy_coverage_id = value;
+        // let currency_id = policy_insured_detail["CURRENCY_ID"];
+        // let policy_coverage_id = policy_insured_detail["POLICY_COVERAGE_ID"];
+        const insurer_nett_premi = policy_insured_detail["PREMIUM_AMOUNT"];
+        const bf_full_amount = policy_insured_detail["BF_FULL_AMOUNT"];
+        const ef_full_amount = policy_insured_detail["EF_FULL_AMOUNT"];
+        const cf_full_amount = policy_insured_detail["CONSULTANCY_FEE"];
+        if (name == "DISC_BF_PERCENTAGE") {
+            policy_insured_detail["DISC_BF_AMOUNT"] =
+                (bf_full_amount * policy_insured_detail["DISC_BF_PERCENTAGE"]) /
+                100;
+            policy_insured_detail["BF_NETT_AMOUNT"] =
+                bf_full_amount - policy_insured_detail["DISC_BF_AMOUNT"];
+            policy_insured_detail["PREMIUM_TO_INSURED"] =
+                insurer_nett_premi -
+                policy_insured_detail["BF_NETT_AMOUNT"] -
+                policy_insured_detail["EF_NETT_AMOUNT"] -
+                policy_insured_detail["CF_NETT_AMOUNT"];
         }
 
-        if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
-            // const currency_id = value;
-            // let result = 7;
-
-            // getInsurerNettPremi(
-            //     policy.POLICY_ID,
-            //     currency_id,
-            //     policy_coverage_id,
-            //     insuredNum,
-            //     detailNum
-            // );
+        if (name == "DISC_EF_PERCENTAGE") {
+            policy_insured_detail["DISC_EF_AMOUNT"] =
+                (ef_full_amount * policy_insured_detail["DISC_EF_PERCENTAGE"]) /
+                100;
+            policy_insured_detail["EF_NETT_AMOUNT"] =
+                ef_full_amount - policy_insured_detail["DISC_EF_AMOUNT"];
+            policy_insured_detail["PREMIUM_TO_INSURED"] =
+                insurer_nett_premi -
+                policy_insured_detail["BF_NETT_AMOUNT"] -
+                policy_insured_detail["EF_NETT_AMOUNT"] -
+                policy_insured_detail["CF_NETT_AMOUNT"];
         }
+
+        if (name == "DISC_CF_PERCENTAGE") {
+            policy_insured_detail["DISC_CF_AMOUNT"] =
+                (cf_full_amount * policy_insured_detail["DISC_CF_PERCENTAGE"]) /
+                100;
+            policy_insured_detail["CF_NETT_AMOUNT"] =
+                cf_full_amount - policy_insured_detail["DISC_CF_AMOUNT"];
+            policy_insured_detail["PREMIUM_TO_INSURED"] =
+                insurer_nett_premi -
+                policy_insured_detail["BF_NETT_AMOUNT"] -
+                policy_insured_detail["EF_NETT_AMOUNT"] -
+                policy_insured_detail["CF_NETT_AMOUNT"];
+        }
+
         policy_insured_detail[name] = value;
         // if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
 
@@ -1906,16 +1931,16 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    const [modalTest, setModalTest] = useState<any>({
-        add:false
-    })
+    // const [modalTest, setModalTest] = useState<any>({
+    //     add:false
+    // })
 
-    const handleTest = async (e:FormEvent, policy_id: any) => {
-        getDataPartner(policy_id);
-        setModalTest({
-            add: !modalTest.add,
-        });
-    };
+    // const handleTest = async (e:FormEvent, policy_id: any) => {
+    //     getDataPartner(policy_id);
+    //     setModalTest({
+    //         add: !modalTest.add,
+    //     });
+    // };
 
     // Edit Partners
     const handleEditPartners = async (policy_id: any) => {
@@ -2153,7 +2178,7 @@ export default function ModalDetailPolicy({
             }
         });
         setDataInsured([]);
-        setDataInsurerForInsured([]);
+        // setDataInsurerForInsured([]);
     };
 
     const handleSuccessPartners = (message: string) => {
@@ -2329,7 +2354,7 @@ export default function ModalDetailPolicy({
     return (
         <>
             {/* Modal Test  */}
-            <ModalToAction
+            {/* <ModalToAction
                 show={modalTest.add}
                 onClose={() => {
                     setModalTest({
@@ -2351,7 +2376,7 @@ export default function ModalDetailPolicy({
                         <ModalTest />
                     </>
                 }
-            />
+            /> */}
             {/* End Modal Test */}
             {/* modal edit */}
             <ModalToAction
@@ -5313,7 +5338,7 @@ export default function ModalDetailPolicy({
                         setSumByCurrency([]);
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
-                    setDataInsurerForInsured([]);
+                    // setDataInsurerForInsured([]);
                 }}
                 title={"Add Interest Insured"}
                 url={`/insertManyInsured`}
