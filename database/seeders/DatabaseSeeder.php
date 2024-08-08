@@ -409,6 +409,13 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path13)
         );
 
+        // create 2024_08_07_r_interest_insured
+        $r_interest_insured = resource_path('../database/LogDB/2024_08_07_r_interest_insured.sql');
+
+        \DB::unprepared(
+            file_get_contents($r_interest_insured)
+        );
+
         RelationStatus::create([
             'relation_status_name' => 'Individu',
         ]);

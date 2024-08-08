@@ -136,13 +136,17 @@ class PolicyInsuredController extends Controller
     public function getInsurerNettPremi(Request $request) {
         // dd($request->input());
 
-        $query = DB::table('t_insurance_panel as i')
-            // ->select('SUM(NETT_PREMI) AS insurer_nett_premium')
-            ->leftJoin('m_insurer_coverage AS ic', 'i.IP_ID', '=', 'ic.IP_ID')
+        $query = DB::table('t_insurance_panel as ip')
+                    ->select(DB::raw('ip.IP_ID, ip.POLICY_ID, ipc.INTEREST_INSURED_ID, ipc.REMARKS, ipc.POLICY_COVERAGE_ID, ipc.CURRENCY_ID, SUM(ipc.NETT_PREMI) AS INSURER_NETT_PREMIUM, SUM(ipc.BROKERAGE_FEE) AS BROKERAGE_FEE, SUM(ipc.ENGINEERING_FEE) AS ENGINEERING_FEE, SUM(ipc.CONSULTANCY_FEE) AS CONSULTANCY_FEE'))
+                     ->leftJoin('m_insurer_coverage AS ipc', 'ip.IP_ID', '=', 'ipc.IP_ID')
             ->where('POLICY_ID', $request->input('policy_id'))
-            ->where('CURRENCY_ID', $request->input('currency_id'))
-            ->where('POLICY_COVERAGE_ID', $request->input('policy_coverage_id'))
-            ->sum('NETT_PREMI');
+            ->groupBy('ipc.CURRENCY_ID', 'ipc.POLICY_COVERAGE_ID')
+                     ->get();
+            // ->select('SUM(NETT_PREMI) AS insurer_nett_premium')
+            // ->leftJoin('m_insurer_coverage AS ipc', 'ip.IP_ID', '=', 'ipc.IP_ID')
+            // ->where('POLICY_ID', $request->input('policy_id'))
+            // ->groupBy('ipc.CURRENCY_ID')
+            // ->sum('ip.IP_ID, ip.POLICY_ID, ipc.INTEREST_INSURED_ID, ipc.REMARKS, ipc.POLICY_COVERAGE_ID, ipc.CURRENCY_ID, ipc.NETT_PREMI, ipc.BROKERAGE_FEE, ipc.ENGINEERING_FEE, ipc.CONSULTANCY_FEE');
 
         return response()->json($query);
 

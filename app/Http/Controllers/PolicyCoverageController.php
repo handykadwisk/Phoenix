@@ -11,6 +11,7 @@ use App\Models\PolicyInstallment;
 use App\Models\RCurrency;
 use App\Models\Relation;
 use App\Models\RInsuranceType;
+use App\Models\RInterestInsured;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,8 @@ class PolicyCoverageController extends Controller
             foreach ($value['policy_coverage_detail'] as $details => $detail) {                
                 $detail = MPolicyCoverageDetail::insertGetId([
                     'POLICY_COVERAGE_ID' => $coverage,
+                    'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
+                    'REMARKS' => $detail['REMARKS'],
                     'CURRENCY_ID' => $detail['CURRENCY_ID'],
                     'SUM_INSURED' => $detail['SUM_INSURED'],
                     'RATE' => $detail['RATE'],
@@ -45,6 +48,8 @@ class PolicyCoverageController extends Controller
                     'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
                     'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
                     'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
+                    'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
+                    'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
                     'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
                     'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
                     'PREMIUM' => $detail['PREMIUM'],
@@ -133,6 +138,11 @@ class PolicyCoverageController extends Controller
 
         return response()->json($data);
 
+    }
+
+    public function getInterestInsured() {
+        $data = RInterestInsured::get();
+        return response()->json($data);
     }
 
      public function getCoverageGroupingByPolicyId($id) {

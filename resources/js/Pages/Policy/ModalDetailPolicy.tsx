@@ -30,6 +30,7 @@ import ModalInsured from "./ModalInsured";
 import { BeatLoader } from "react-spinners";
 import dateFormat from "dateformat";
 import DatePicker from "react-datepicker";
+import ModalTest from "./ModalTest";
 
 export default function ModalDetailPolicy({
     policy,
@@ -63,13 +64,14 @@ export default function ModalDetailPolicy({
     const [coverageGrouping, setCoverageGrouping] = useState<any>([]);
     const [dataCoverageName, setDataCoverageName] = useState<any>([]);
     const [dataPolicyCoverage, setDataPolicyCoverage] = useState<any>([]);
-    // const [searchInsurerNettPremi, setSearchInsurerNettPremi] = useState<any>({});
-    const [insurerNettPremi, setInsurerNettPremi] = useState<any>({});
+    const [dataInsurerForInsured, setDataInsurerForInsured] = useState<any>([]);
     // let myValue=0;
 
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
     });
+
+    const [interestInsured, setInterestInsured] = useState<any>([]);
 
     useEffect(() => {
         getInsurancePanel(policy.POLICY_ID);
@@ -81,6 +83,7 @@ export default function ModalDetailPolicy({
         getSummaryPremi();
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
         getDataPartner(policy.POLICY_ID);
+        getInterestInsured();
     }, [policy.POLICY_ID]);
 
     const getDetailPolicy = async (id: number) => {
@@ -97,6 +100,13 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
+    const getInterestInsured = async () => {
+        await axios
+            .get(`/getInterestInsured`)
+            .then((res) => setInterestInsured(res.data))
+            .catch((err) => console.log(err));
+    };
+
     const getInsurancePanel = async (id: number) => {
         setIsLoading({
             ...isLoading,
@@ -110,7 +120,7 @@ export default function ModalDetailPolicy({
                         ...isLoading,
                         get_detail: false,
                     });
-                })
+            })
             .catch((err) => console.log(err));
     };
 
@@ -220,7 +230,7 @@ export default function ModalDetailPolicy({
         addInsured: false,
         editInsured: false,
         addPartners: false,
-        editPartners: false
+        editPartners: false,
     });
 
     const getCurrencyById = (currId: any) => {
@@ -236,6 +246,8 @@ export default function ModalDetailPolicy({
         policy_coverage_detail: [
             {
                 POLICY_COVERAGE_ID: "",
+                INTEREST_INSURED_ID: "",
+                REMARKS: "",
                 CURRENCY_ID: "",
                 SUM_INSURED: 0,
                 RATE: 0,
@@ -245,12 +257,15 @@ export default function ModalDetailPolicy({
                 LOST_LIMIT_SCALE: 0,
                 INSURANCE_DISC_PERCENTAGE: 0,
                 INSURANCE_DISC_AMOUNT: 0,
+                DEPOSIT_PREMIUM_PERCENTAGE: 0,
+                DEPOSIT_PREMIUM_AMOUNT: 0,
                 PREMIUM: 0,
             },
         ],
     };
 
     const handleAddCoverage = async (policy_id: any) => {
+        getInterestInsured();
         setDataPolicyCoverage([{ ...fieldDataCoverage, POLICY_ID: policy_id }]);
         setModal({
             add: false,
@@ -266,7 +281,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
 
@@ -334,12 +349,71 @@ export default function ModalDetailPolicy({
         const policy_coverage_detail = {
             ...policy_coverage_details[detailNum],
         };
+        
+
+        let sum_insured = policy_coverage_detail["SUM_INSURED"];
+        // let policy_coverage_id = policy_coverage_detail["POLICY_COVERAGE_ID"];
+        if (name == "RATE") {
+            console.log("xxxx: ", sum_insured,  parseFloat(value), parseFloat(value) / 100);
+            policy_coverage_detail["GROSS_PREMIUM"] = sum_insured * value / 100;
+            policy_coverage_detail["PREMIUM"] =
+                (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
+                policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
+                    ? policy_coverage_detail["GROSS_PREMIUM"]
+                    : policy_coverage_detail["LOST_LIMIT_AMOUNT"]) -
+                policy_coverage_detail["INSURANCE_DISC_AMOUNT"];
+        }
+
+        if (name == "LOST_LIMIT_SCALE") {
+            // policy_coverage_detail["LOST_LIMIT_SCALE"] = policy_coverage_detail["LOST_LIMIT_SCALE"] + 20;
+            policy_coverage_detail["LOST_LIMIT_AMOUNT"] =
+                policy_coverage_detail["GROSS_PREMIUM"] * policy_coverage_detail["LOST_LIMIT_SCALE"] / 100
+            policy_coverage_detail["PREMIUM"] =
+                (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
+                policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
+                    ? policy_coverage_detail["GROSS_PREMIUM"]
+                    : policy_coverage_detail["LOST_LIMIT_AMOUNT"]) -
+                policy_coverage_detail["INSURANCE_DISC_AMOUNT"];
+        }
+
+        if (name == "INSURANCE_DISC_PERCENTAGE") {
+            // policy_coverage_detail["LOST_LIMIT_SCALE"] = policy_coverage_detail["LOST_LIMIT_SCALE"] + 20;
+            policy_coverage_detail["INSURANCE_DISC_AMOUNT"] =
+                ((policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
+                policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
+                    ? policy_coverage_detail["GROSS_PREMIUM"]
+                    : policy_coverage_detail["LOST_LIMIT_AMOUNT"]) *
+                    policy_coverage_detail["INSURANCE_DISC_PERCENTAGE"]) /
+                100;
+            policy_coverage_detail["PREMIUM"] =
+                ((policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
+                    policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
+                    ? policy_coverage_detail["GROSS_PREMIUM"]
+                    : policy_coverage_detail["LOST_LIMIT_AMOUNT"]) -
+                    policy_coverage_detail["INSURANCE_DISC_AMOUNT"]);
+        }
+
+        if (name == "DEPOSIT_PREMIUM_PERCENTAGE") {
+            // policy_coverage_detail["LOST_LIMIT_SCALE"] = policy_coverage_detail["LOST_LIMIT_SCALE"] + 20;
+            policy_coverage_detail["DEPOSIT_PREMIUM_AMOUNT"] =
+                (policy_coverage_detail["PREMIUM"] *
+                    policy_coverage_detail["DEPOSIT_PREMIUM_PERCENTAGE"]) /
+                100;
+        }
+        // if (name == "POLICY_COVERAGE_ID") {
+        //     policy_coverage_id = value;
+        // }
+
+        // if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
+        // }
         policy_coverage_detail[name] = value;
         policy_coverage_details[detailNum] = policy_coverage_detail;
         item.policy_coverage_detail = policy_coverage_details;
         items[coverageNum] = item;
         setDataPolicyCoverage(items);
     };
+
+    console.log("DataPolicyCoverage: ", dataPolicyCoverage);
 
     const inputDataCoverage = (
         name: string,
@@ -359,6 +433,7 @@ export default function ModalDetailPolicy({
         []
     );
     const handleEditCoverage = async (id: string) => {
+        getInterestInsured();
         await axios
             .get(`/getCoverageById/${id}`)
             .then((res) => setDataEditPolicyCoverage(res.data))
@@ -378,7 +453,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
 
@@ -499,7 +574,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
     const fieldDataInsurer: any = {
@@ -508,9 +583,7 @@ export default function ModalDetailPolicy({
         IP_POLICY_SHARE: "",
         IP_POLICY_LEADER: 0,
         POLICY_COST: 0,
-        premium: [
-            
-        ],
+        premium: [],
     };
     const addRowDataInsurer = (jml: string) => {
         let arr: any = [];
@@ -523,13 +596,19 @@ export default function ModalDetailPolicy({
             let premium: any = [];
             for (let j = 0; j < coverageName.length; j++) {
                 premium.push({
+                    INTEREST_INSURED_ID: coverageName[j]["INTEREST_INSURED_ID"],
+                    REMARKS: coverageName[j]["REMARKS"],
                     CURRENCY_ID: coverageName[j]["CURRENCY_ID"],
                     POLICY_COVERAGE_ID: coverageName[j]["POLICY_COVERAGE_ID"],
                     COVERAGE_NAME: coverageName[j]["POLICY_COVERAGE_NAME"],
                     GROSS_PREMI: coverageName[j]["PREMIUM"],
-                    NETT_PREMI: 0,
+                    BROKERAGE_FEE_PERCENTAGE: 0,
                     BROKERAGE_FEE: 0,
+                    ENGINEERING_FEE_PERCENTAGE: 0,
                     ENGINEERING_FEE: 0,
+                    CONSULTANCY_FEE_PERCENTAGE: 0,
+                    CONSULTANCY_FEE: 0,
+                    NETT_PREMI: 0,
                 });
             }
 
@@ -597,6 +676,34 @@ export default function ModalDetailPolicy({
         const item = { ...items[insurerNum] };
         const premiums = [...item.premium];
         const premium = { ...premiums[coverageNum] };
+
+        let coverage_premium = premium["GROSS_PREMI"];
+
+        if (name == "BROKERAGE_FEE_PERCENTAGE") {
+            premium["BROKERAGE_FEE"] =
+                (coverage_premium * premium["BROKERAGE_FEE_PERCENTAGE"]) / 100;
+            premium["NETT_PREMI"] =
+                coverage_premium -
+                premium["BROKERAGE_FEE"] -
+                premium["ENGINEERING_FEE"];
+        }
+
+        if (name == "ENGINEERING_FEE_PERCENTAGE") {
+            premium["ENGINEERING_FEE"] =
+                (coverage_premium * premium["ENGINEERING_FEE_PERCENTAGE"]) /
+                100;
+            premium["NETT_PREMI"] =
+                coverage_premium -
+                premium["ENGINEERING_FEE"] -
+                premium["BROKERAGE_FEE"];
+        }
+
+        // if (name == "CONSULTANCY_FEE_PERCENTAGE") {
+        //     premium["CONSULTANCY_FEE_AMOUNT"] =
+        //         (coverage_premium * premium["CONSULTANCY_FEE_PERCENTAGE"]) /
+        //         100;
+        // }
+        
         premium[name] = value;
         premiums[coverageNum] = premium;
         item.premium = premiums;
@@ -661,7 +768,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
 
@@ -891,7 +998,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
     const editPolicyPremium = (
@@ -1060,84 +1167,6 @@ export default function ModalDetailPolicy({
     };
     // end edit
 
-    //  useEffect(() => {
-    //      if (
-    //          Object.keys(searchInsurerNettPremi).length > 0 
-    //      ) {
-    //          console.log(searchInsurerNettPremi);
-    //          const result = getInsurerNettPremi(
-    //              searchInsurerNettPremi.policy_id,
-    //              searchInsurerNettPremi.currency_id,
-    //              searchInsurerNettPremi.policy_coverage_id
-    //          );
-    //         //  setInsurerNettPremi(result);
-    //         // console.log("result xxx : ", result);
-    //      }
-    //  }, [searchInsurerNettPremi]);
-    const getInsurerNettPremi = (
-        policy_id: any,
-        currency_id: any,
-        policy_coverage_id:any,
-        insuredNum:any,
-        detailNum:any
-    ) => {
-        return axios
-            .post(`/getInsurerNettPremi?`, {
-                policy_id: policy_id,
-                currency_id: currency_id,
-                policy_coverage_id: policy_coverage_id,
-            })
-            .then((res) => {
-                setInsurerNettPremi({
-                    ...insurerNettPremi,
-                    insuredNum:insuredNum,
-                    detailNum:detailNum,
-                    insurerNettPremium: res.data
-                });
-
-                // setDataInsured(items);
-                // console.log("Insurer Nett Premi : ", res.data);
-                // const data = res.data
-                // setInsurerNettPremi(res.data);
-                // myValue = res.data
-                // return res.data
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    console.log("Insurer Nett Premi : ", insurerNettPremi);
-
-      useEffect(() => {
-         if (
-             Object.keys(insurerNettPremi).length > 0 
-         ) {
-             console.log(insurerNettPremi);
-
-             const items = [...dataInsured];
-             const item = { ...items[insurerNettPremi.insuredNum] };
-             const policy_insured_details = [...item.policy_insured_detail];
-             const policy_insured_detail = {
-                 ...policy_insured_details[insurerNettPremi.detailNum],
-             };
-
-             let currency_id = policy_insured_detail["CURRENCY_ID"];
-             let policy_coverage_id =
-                 policy_insured_detail["POLICY_COVERAGE_ID"];
-             policy_insured_detail["PREMIUM_AMOUNT"] = insurerNettPremi.insurerNettPremium;
-           
-           
-             policy_insured_details[insurerNettPremi.detailNum] = policy_insured_detail;
-             item.policy_insured_detail = policy_insured_details;
-             items[insurerNettPremi.insuredNum] = item;
-             setDataInsured(items);
-             
-            //  setInsurerNettPremi(result);
-            // console.log("result xxx : ", result);
-         }
-     }, [insurerNettPremi]);
-
     
     // Add Insured
     const [dataInsured, setDataInsured] = useState<any>([]);
@@ -1146,28 +1175,84 @@ export default function ModalDetailPolicy({
     const fieldDataInsured: any = {
         POLICY_ID: "",
         POLICY_INSURED_NAME: "",
+        POLICY_ADMIN_COST:"",
         policy_insured_detail: [
             {
+                INTEREST_INSURED_ID: "",
+                REMARKS: "",
                 POLICY_COVERAGE_ID: "",
                 CURRENCY_ID: "",
-                CONSULTANCY_FEE: 0,
                 PREMIUM_AMOUNT: 0,
+                BF_FULL_AMOUNT: 0,
                 DISC_BF_PERCENTAGE: 0,
                 DISC_BF_AMOUNT: 0,
-                DISC_ADMIN_PERCENTAGE: 0,
-                DISC_ADMIN_AMOUNT: 0,
+                BF_NETT_AMOUNT: 0,
+                EF_FULL_AMOUNT: 0,
                 DISC_EF_PERCENTAGE: 0,
                 DISC_EF_AMOUNT: 0,
+                EF_NETT_AMOUNT: 0,
+                CONSULTANCY_FEE: 0,
+                DISC_CF_PERCENTAGE: 0,
+                DISC_CF_AMOUNT: 0,
+                CF_NETT_AMOUNT: 0,
+                INCOME_NETT_AMOUNT: 0,
                 PREMIUM_TO_INSURED: 0,
             },
         ],
     };
 
+    const getInsurerNettPremi = (policy_id: any) => {
+        return axios
+            .post(`/getInsurerNettPremi?`, {
+                policy_id: policy_id,
+            })
+            .then((res) => {
+                setDataInsurerForInsured(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // console.log("Insurer Nett Premi : ", dataInsurerForInsured);
+
+    useEffect(() => {
+        if (dataInsurerForInsured.length > 0) {
+            let policy_insured_detail: any = [];
+            dataInsurerForInsured.map((val: any, i: number) => {
+                policy_insured_detail.push({
+                    INTEREST_INSURED_ID: val["INTEREST_INSURED_ID"],
+                    REMARKS: val["REMARKS"],
+                    POLICY_COVERAGE_ID: val["POLICY_COVERAGE_ID"],
+                    CURRENCY_ID: val["CURRENCY_ID"],
+                    PREMIUM_AMOUNT: val["INSURER_NETT_PREMIUM"],
+                    BF_FULL_AMOUNT: val["BROKERAGE_FEE"],
+                    DISC_BF_PERCENTAGE: 0,
+                    DISC_BF_AMOUNT: 0,
+                    BF_NETT_AMOUNT: 0,
+                    EF_FULL_AMOUNT: val["ENGINEERING_FEE"],
+                    DISC_EF_PERCENTAGE: 0,
+                    DISC_EF_AMOUNT: 0,
+                    EF_NETT_AMOUNT: 0,
+                    CONSULTANCY_FEE: val["CONSULTANCY_FEE"],
+                    DISC_CF_PERCENTAGE: 0,
+                    DISC_CF_AMOUNT: 0,
+                    CF_NETT_AMOUNT: 0,
+                    INCOME_NETT_AMOUNT: 0,
+                    PREMIUM_TO_INSURED: 0,
+                });
+            })
+            console.log("policy_insured_detail: ", policy_insured_detail);
+        }
+    }, [dataInsurerForInsured]);
+
+    console.log("dataInsurerForInsured: ", dataInsurerForInsured);
+
+
     const handleAddInsured = async (policy_id: any) => {
         setDataInsured([{ ...fieldDataInsured, POLICY_ID: policy_id }]);
-        // setInsurerNettPremi(0);
-        // setSearchInsurerNettPremi({})
-        setInsurerNettPremi({});
+        // setDataInsurerForInsured([]);
+        // getInsurerNettPremi(policy.POLICY_ID);
         setModal({
             add: false,
             delete: false,
@@ -1182,7 +1267,7 @@ export default function ModalDetailPolicy({
             addInsured: !modal.addInsured,
             editInsured: false,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
 
@@ -1243,7 +1328,7 @@ export default function ModalDetailPolicy({
     ) => {
         // let currency_id = "";
         // let policy_coverage_id = "";
-        
+
         const items = [...dataInsured];
         const item = { ...items[insuredNum] };
         const policy_insured_details = [...item.policy_insured_detail];
@@ -1263,28 +1348,18 @@ export default function ModalDetailPolicy({
         if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
             // const currency_id = value;
             // let result = 7;
-            
-            getInsurerNettPremi(
-                policy.POLICY_ID,
-                currency_id,
-                policy_coverage_id,
-                insuredNum,
-                detailNum
-            );
-            // console.log("resultxx: ", insurerNettPremi);
-            // console.log("myValue: ", myValue);
-            // let userToken = AuthUser(data);
-            // console.log(userToken); // Promise { <pending> }
 
-            // pending.then(function (xx) {
-            //     console.log("sdfadsf: ",xx); // "Some User token"
-            // });
-            // console.log("result: ", result);
-            // console.log("policy_coverage_id: ", policy_coverage_id);
+            // getInsurerNettPremi(
+            //     policy.POLICY_ID,
+            //     currency_id,
+            //     policy_coverage_id,
+            //     insuredNum,
+            //     detailNum
+            // );
         }
         policy_insured_detail[name] = value;
         // if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
-            
+
         //     // policy_insured_detail["PREMIUM_AMOUNT"] = insurerNettPremi;
         //     console.log("insurerNettPremi: ", insurerNettPremi);
         // }
@@ -1330,7 +1405,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: !modal.editInsured,
             addPartners: false,
-            editPartners: false
+            editPartners: false,
         });
     };
 
@@ -1411,7 +1486,7 @@ export default function ModalDetailPolicy({
             });
         }
     };
-    console.log("dataEditInsured: ", dataEditInsured);
+    // console.log("dataEditInsured: ", dataEditInsured);
     // End Edit Insured
 
     // Add Partners
@@ -1533,11 +1608,11 @@ export default function ModalDetailPolicy({
     const [dataNettIncome, setDataNettIncome] = useState<any>([]);
     const [grandTotalNettIncome, setGrandTotalNettIncome] = useState<number>(0);
     const [dataEditNettIncome, setDataEditNettIncome] = useState<any>([]);
-    const [grandTotalEditNettIncome, setGrandTotalEditNettIncome] = useState<number>(0);
+    const [grandTotalEditNettIncome, setGrandTotalEditNettIncome] =
+        useState<number>(0);
     const [dataPartners, setDataPartners] = useState<any>([]);
     const [listDataPartners, setListDataPartners] = useState<any>([]);
 
-    
     const handleAddPartners = async (policy_id: any) => {
         setDataPartners(arrDataPartners);
         setDataIncome(arrDataIncome);
@@ -1555,7 +1630,7 @@ export default function ModalDetailPolicy({
             addInsured: false,
             editInsured: false,
             addPartners: !modal.addPartners,
-            editPartners: false
+            editPartners: false,
         });
     };
 
@@ -1584,7 +1659,7 @@ export default function ModalDetailPolicy({
         items[i] = item;
         setDataIncome(items);
     };
-    
+
     const inputDataIncome = (
         name: string,
         value: string | undefined,
@@ -1615,7 +1690,6 @@ export default function ModalDetailPolicy({
         items[incomeNum] = item;
 
         setDataIncome(items);
-
     };
 
     useEffect(() => {
@@ -1697,7 +1771,6 @@ export default function ModalDetailPolicy({
             0
         );
 
-        
         const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition;
         const nettEF = nettEF_fbi + nettEF_agent + nettEF_acquisition;
         const nettCF = nettCF_fbi + nettCF_agent + nettCF_acquisition;
@@ -1820,7 +1893,7 @@ export default function ModalDetailPolicy({
                         items[2] = item;
                     }
                 });
-                
+
                 setListDataPartners(items);
                 setIsLoading({
                     ...isLoading,
@@ -1828,6 +1901,17 @@ export default function ModalDetailPolicy({
                 });
             })
             .catch((err) => console.log(err));
+    };
+
+    const [modalTest, setModalTest] = useState<any>({
+        add:false
+    })
+
+    const handleTest = async (e:FormEvent, policy_id: any) => {
+        getDataPartner(policy_id);
+        setModalTest({
+            add: !modalTest.add,
+        });
     };
 
     // Edit Partners
@@ -1850,7 +1934,11 @@ export default function ModalDetailPolicy({
             editPartners: !modal.editPartners,
         });
     };
-    const addRowEditPartners = (e: FormEvent, income_type: number, i: number) => {
+    const addRowEditPartners = (
+        e: FormEvent,
+        income_type: number,
+        i: number
+    ) => {
         e.preventDefault();
 
         const items = [...listDataPartners];
@@ -1875,7 +1963,7 @@ export default function ModalDetailPolicy({
         items[i] = item;
         setListDataPartners(items);
     };
-    
+
     const inputDataEditIncome = (
         name: string,
         value: string | undefined,
@@ -1997,7 +2085,6 @@ export default function ModalDetailPolicy({
         items[incomeNum] = item;
 
         setListDataPartners(items);
-
     };
     const handleSuccessEditPartners = (message: string) => {
         Swal.fire({
@@ -2057,11 +2144,12 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
-                    editPartners: false
+                    editPartners: false,
                 });
             }
         });
         setDataInsured([]);
+        setDataInsurerForInsured([]);
     };
 
     const handleSuccessPartners = (message: string) => {
@@ -2085,7 +2173,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
-                    editPartners: false
+                    editPartners: false,
                 });
             }
         });
@@ -2097,9 +2185,8 @@ export default function ModalDetailPolicy({
     };
 
     const handleSuccess = (message: string) => {
-
         getDetailPolicy(policy.POLICY_ID);
-        
+
         Swal.fire({
             title: "Success",
             text: "Success Edit Policy",
@@ -2121,7 +2208,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
-                    editPartners: false
+                    editPartners: false,
                 });
             }
         });
@@ -2149,7 +2236,7 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
-                    editPartners: false
+                    editPartners: false,
                 });
             }
         });
@@ -2179,13 +2266,12 @@ export default function ModalDetailPolicy({
                     addInsured: false,
                     editInsured: false,
                     addPartners: false,
-                    editPartners: false
+                    editPartners: false,
                 });
             }
         });
     };
 
-   
     const handleDeleteModal = async () => {
         const id = policy.POLICY_ID;
         Swal.fire({
@@ -2237,6 +2323,31 @@ export default function ModalDetailPolicy({
 
     return (
         <>
+            {/* Modal Test  */}
+            <ModalToAction
+                show={modalTest.add}
+                onClose={() => {
+                    setModalTest({
+                        add: false,
+                    });
+                }}
+                title={"Edit Policy"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={null}
+                submitButtonName={"Submit"}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-6xl"
+                }
+                body={
+                    <>
+                        <ModalTest />
+                    </>
+                }
+            />
+            {/* End Modal Test */}
             {/* modal edit */}
             <ModalToAction
                 show={modal.edit}
@@ -2626,42 +2737,141 @@ export default function ModalDetailPolicy({
                                             <table className="table-auto w-full">
                                                 <thead className="border-b bg-gray-50">
                                                     <tr className="text-sm font-semibold text-gray-900">
-                                                        <th className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300">
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
+                                                        >
                                                             No.
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Interest Insured
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Remarks
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Currency
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Sum Insured
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                            Rate %
-                                                        </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        <th
+                                                            colSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Gross Premium
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                            Loss Limit %
+                                                        {/* <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Gross Premium
+                                                        </th> */}
+                                                        <th
+                                                            colSpan={3}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Loss Limit Premium
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        {/* <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Loss Limit Amount
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Loss Limit Scale
+                                                        </th> */}
+                                                        <th
+                                                            colSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Insurance Discount
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                            Insurance Discount %
-                                                        </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        {/* <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Insurance Discount
                                                             Amount
-                                                        </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        </th> */}
+
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Coverage Premium
                                                         </th>
-                                                        <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                        <th
+                                                            colSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Deposit Premium
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
                                                             Delete
+                                                        </th>
+                                                    </tr>
+                                                    <tr className="text-sm font-semibold text-gray-900">
+                                                        <th className="text-center p-4 border">
+                                                            Rate %
+                                                        </th>
+                                                        <th className="text-center p-4 border">
+                                                            Amount
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center p-4 border"
+                                                        >
+                                                            %
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center p-4 border"
+                                                        >
+                                                            Scale
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center p-4 border"
+                                                        >
+                                                            Amount
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center p-4 border"
+                                                        >
+                                                            %
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center p-4 border"
+                                                        >
+                                                            Amount
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            %
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Amount
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -2675,6 +2885,86 @@ export default function ModalDetailPolicy({
                                                                 <tr key={m}>
                                                                     <td className="p-4 border text-center">
                                                                         {m + 1}
+                                                                    </td>
+                                                                    <td className="p-4 border">
+                                                                        <select
+                                                                            className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                            value={
+                                                                                detail.INTEREST_INSURED_ID
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {
+                                                                                inputCoverageDetail(
+                                                                                    "INTEREST_INSURED_ID",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    l,
+                                                                                    m
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    ""
+                                                                                }
+                                                                            >
+                                                                                --{" "}
+                                                                                <i>
+                                                                                    Choose
+                                                                                </i>{" "}
+                                                                                --
+                                                                            </option>
+                                                                            {interestInsured.map(
+                                                                                (
+                                                                                    interest: any,
+                                                                                    s: number
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <option
+                                                                                            key={
+                                                                                                s
+                                                                                            }
+                                                                                            value={
+                                                                                                interest.INTEREST_INSURED_ID
+                                                                                            }
+                                                                                        >
+                                                                                            {
+                                                                                                interest.INTEREST_INSURED_NAME
+                                                                                            }
+                                                                                        </option>
+                                                                                    );
+                                                                                }
+                                                                            )}
+                                                                        </select>
+                                                                    </td>
+                                                                    <td className="p-4 border">
+                                                                        <div className="block w-40 mx-auto text-left">
+                                                                            <TextInput
+                                                                                id="remarks"
+                                                                                type="text"
+                                                                                name="remarks"
+                                                                                value={
+                                                                                    detail.REMARKS
+                                                                                }
+                                                                                className=""
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    inputCoverageDetail(
+                                                                                        "REMARKS",
+                                                                                        e
+                                                                                            .target
+                                                                                            .value,
+                                                                                        l,
+                                                                                        m
+                                                                                    )
+                                                                                }
+                                                                                required
+                                                                                autoComplete="off"
+                                                                            />
+                                                                        </div>
                                                                     </td>
                                                                     <td className="p-4 border">
                                                                         <select
@@ -2840,33 +3130,6 @@ export default function ModalDetailPolicy({
                                                                     </td>
                                                                     <td className="p-4 border">
                                                                         <CurrencyInput
-                                                                            id="lost_limit_amount"
-                                                                            name="LOST_LIMIT_AMOUNT"
-                                                                            value={
-                                                                                detail.LOST_LIMIT_AMOUNT
-                                                                            }
-                                                                            decimalScale={
-                                                                                2
-                                                                            }
-                                                                            decimalsLimit={
-                                                                                2
-                                                                            }
-                                                                            onValueChange={(
-                                                                                values
-                                                                            ) => {
-                                                                                inputCoverageDetail(
-                                                                                    "LOST_LIMIT_AMOUNT",
-                                                                                    values,
-                                                                                    l,
-                                                                                    m
-                                                                                );
-                                                                            }}
-                                                                            className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                            required
-                                                                        />
-                                                                    </td>
-                                                                    <td className="p-4 border">
-                                                                        <CurrencyInput
                                                                             id="lost_limit_scale"
                                                                             name="LOST_LIMIT_SCALE"
                                                                             value={
@@ -2892,6 +3155,34 @@ export default function ModalDetailPolicy({
                                                                             required
                                                                         />
                                                                     </td>
+                                                                    <td className="p-4 border">
+                                                                        <CurrencyInput
+                                                                            id="lost_limit_amount"
+                                                                            name="LOST_LIMIT_AMOUNT"
+                                                                            value={
+                                                                                detail.LOST_LIMIT_AMOUNT
+                                                                            }
+                                                                            decimalScale={
+                                                                                2
+                                                                            }
+                                                                            decimalsLimit={
+                                                                                2
+                                                                            }
+                                                                            onValueChange={(
+                                                                                values
+                                                                            ) => {
+                                                                                inputCoverageDetail(
+                                                                                    "LOST_LIMIT_AMOUNT",
+                                                                                    values,
+                                                                                    l,
+                                                                                    m
+                                                                                );
+                                                                            }}
+                                                                            className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                            required
+                                                                        />
+                                                                    </td>
+
                                                                     <td className="p-4 border">
                                                                         <CurrencyInput
                                                                             id="insurance_disc_percentage"
@@ -2973,6 +3264,61 @@ export default function ModalDetailPolicy({
                                                                             required
                                                                         />
                                                                     </td>
+                                                                    <td className="p-4 border">
+                                                                        <CurrencyInput
+                                                                            id="deposit_premium_percentage"
+                                                                            name="DEPOSIT_PREMIUM_PERCENTAGE"
+                                                                            value={
+                                                                                detail.DEPOSIT_PREMIUM_PERCENTAGE
+                                                                            }
+                                                                            decimalScale={
+                                                                                2
+                                                                            }
+                                                                            decimalsLimit={
+                                                                                2
+                                                                            }
+                                                                            onValueChange={(
+                                                                                values
+                                                                            ) => {
+                                                                                inputCoverageDetail(
+                                                                                    "DEPOSIT_PREMIUM_PERCENTAGE",
+                                                                                    values,
+                                                                                    l,
+                                                                                    m
+                                                                                );
+                                                                            }}
+                                                                            className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                    <td className="p-4 border">
+                                                                        <CurrencyInput
+                                                                            id="deposit_premium_amount"
+                                                                            name="DEPOSIT_PREMIUM_AMOUNT"
+                                                                            value={
+                                                                                detail.DEPOSIT_PREMIUM_AMOUNT
+                                                                            }
+                                                                            decimalScale={
+                                                                                2
+                                                                            }
+                                                                            decimalsLimit={
+                                                                                2
+                                                                            }
+                                                                            onValueChange={(
+                                                                                values
+                                                                            ) => {
+                                                                                inputCoverageDetail(
+                                                                                    "DEPOSIT_PREMIUM_AMOUNT",
+                                                                                    values,
+                                                                                    l,
+                                                                                    m
+                                                                                );
+                                                                            }}
+                                                                            className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                            required
+                                                                        />
+                                                                    </td>
+
                                                                     <td>
                                                                         {m >
                                                                         0 ? (
@@ -3617,9 +3963,9 @@ export default function ModalDetailPolicy({
                             return (
                                 <>
                                     <div className="mt-6 mb-4 ml-4 mr-4">
-                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 border-b-2 w-fit">
+                                        {/* <h3 className="text-xl font-semibold leading-6 text-gray-900 border-b-2 w-fit">
                                             List Insurer
-                                        </h3>
+                                        </h3> */}
                                         <div className="shadow-md border-2 mt-3">
                                             <div className=" ml-4 mr-4 mb-4 mt-4">
                                                 <div className="grid grid-cols-4 gap-4">
@@ -3818,34 +4164,88 @@ export default function ModalDetailPolicy({
                                             </div>
                                             <div className="relative overflow-x-auto shadow-md sm:rounded-lg ml-4 mr-4 mb-4 mt-4 ">
                                                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border">
+                                                    <thead className="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border">
                                                         <tr className="bg-gray-2 dark:bg-meta-4">
-                                                            <th className="min-w-[10px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 No.
                                                             </th>
-                                                            <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
+                                                                Interest Insured
+                                                            </th>
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
+                                                                Remarks
+                                                            </th>
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 Coverage Name
                                                             </th>
-                                                            <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 Currency
                                                             </th>
-                                                            <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 Coverage Premium
                                                             </th>
-                                                            <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                colSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 Brokerage Fee
                                                             </th>
-
-                                                            <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                colSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 Engineering Fee
                                                             </th>
-                                                            <th className="min-w-[150px] py-4 px-4 text-sm text-black dark:text-white">
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
+                                                                Consultancy Fee
+                                                            </th>
+                                                            <th
+                                                                rowSpan={2}
+                                                                className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
+                                                            >
                                                                 Nett Premium
                                                             </th>
-
-                                                            <th className="min-w-[50px] py-4 px-4 text-sm text-black dark:text-white">
-                                                                Delete
+                                                        </tr>
+                                                        <tr className="text-sm font-semibold text-gray-900">
+                                                            <th className="text-center p-4 border ">
+                                                                %
                                                             </th>
+                                                            <th className="text-center p-4 border ">
+                                                                Amount
+                                                            </th>
+                                                            <th className="text-center p-4 border ">
+                                                                %
+                                                            </th>
+                                                            <th className="text-center p-4 border ">
+                                                                Amount
+                                                            </th>
+                                                            {/* <th className="text-center p-4 border ">
+                                                                %
+                                                            </th>
+                                                            <th className="text-center p-4 border ">
+                                                                Amount
+                                                            </th> */}
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -3859,6 +4259,86 @@ export default function ModalDetailPolicy({
                                                                         <td className="border-b w-10 text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             {j +
                                                                                 1}
+                                                                        </td>
+                                                                        <td className="p-4 border">
+                                                                            <select
+                                                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                                value={
+                                                                                    dIP.INTEREST_INSURED_ID
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    inputInsurerCoverage(
+                                                                                        "INTEREST_INSURED_ID",
+                                                                                        e
+                                                                                            .target
+                                                                                            .value,
+                                                                                        i,
+                                                                                        j
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                <option
+                                                                                    value={
+                                                                                        ""
+                                                                                    }
+                                                                                >
+                                                                                    --{" "}
+                                                                                    <i>
+                                                                                        Choose
+                                                                                    </i>{" "}
+                                                                                    --
+                                                                                </option>
+                                                                                {interestInsured.map(
+                                                                                    (
+                                                                                        interest: any,
+                                                                                        s: number
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <option
+                                                                                                key={
+                                                                                                    s
+                                                                                                }
+                                                                                                value={
+                                                                                                    interest.INTEREST_INSURED_ID
+                                                                                                }
+                                                                                            >
+                                                                                                {
+                                                                                                    interest.INTEREST_INSURED_NAME
+                                                                                                }
+                                                                                            </option>
+                                                                                        );
+                                                                                    }
+                                                                                )}
+                                                                            </select>
+                                                                        </td>
+                                                                        <td className="p-4 border">
+                                                                            <div className="block w-40 mx-auto text-left">
+                                                                                <TextInput
+                                                                                    id="remarks"
+                                                                                    type="text"
+                                                                                    name="remarks"
+                                                                                    value={
+                                                                                        dIP.REMARKS
+                                                                                    }
+                                                                                    className=""
+                                                                                    onChange={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        inputInsurerCoverage(
+                                                                                            "REMARKS",
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                            i,
+                                                                                            j
+                                                                                        )
+                                                                                    }
+                                                                                    required
+                                                                                    autoComplete="off"
+                                                                                />
+                                                                            </div>
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <select
@@ -3990,6 +4470,33 @@ export default function ModalDetailPolicy({
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
+                                                                                id="brokerage_fee_percentage"
+                                                                                name="BROKERAGE_FEE_PERCENTAGE"
+                                                                                value={
+                                                                                    dIP.BROKERAGE_FEE_PERCENTAGE
+                                                                                }
+                                                                                decimalScale={
+                                                                                    2
+                                                                                }
+                                                                                decimalsLimit={
+                                                                                    2
+                                                                                }
+                                                                                onValueChange={(
+                                                                                    values
+                                                                                ) => {
+                                                                                    inputInsurerCoverage(
+                                                                                        "BROKERAGE_FEE_PERCENTAGE",
+                                                                                        values,
+                                                                                        i,
+                                                                                        j
+                                                                                    );
+                                                                                }}
+                                                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                                required
+                                                                            />
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                            <CurrencyInput
                                                                                 id="brokerage_fee"
                                                                                 name="BROKERAGE_FEE"
                                                                                 value={
@@ -4006,6 +4513,33 @@ export default function ModalDetailPolicy({
                                                                                 ) => {
                                                                                     inputInsurerCoverage(
                                                                                         "BROKERAGE_FEE",
+                                                                                        values,
+                                                                                        i,
+                                                                                        j
+                                                                                    );
+                                                                                }}
+                                                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                                required
+                                                                            />
+                                                                        </td>
+                                                                        <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                            <CurrencyInput
+                                                                                id="engineering_fee_percentage"
+                                                                                name="ENGINEERING_FEE_PERCENTAGE"
+                                                                                value={
+                                                                                    dIP.ENGINEERING_FEE_PERCENTAGE
+                                                                                }
+                                                                                decimalScale={
+                                                                                    2
+                                                                                }
+                                                                                decimalsLimit={
+                                                                                    2
+                                                                                }
+                                                                                onValueChange={(
+                                                                                    values
+                                                                                ) => {
+                                                                                    inputInsurerCoverage(
+                                                                                        "ENGINEERING_FEE_PERCENTAGE",
                                                                                         values,
                                                                                         i,
                                                                                         j
@@ -4034,6 +4568,60 @@ export default function ModalDetailPolicy({
                                                                                 ) => {
                                                                                     inputInsurerCoverage(
                                                                                         "ENGINEERING_FEE",
+                                                                                        values,
+                                                                                        i,
+                                                                                        j
+                                                                                    );
+                                                                                }}
+                                                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                                required
+                                                                            />
+                                                                        </td>
+                                                                        {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                            <CurrencyInput
+                                                                                id="consultancy_fee_percentage"
+                                                                                name="CONSULTANCY_FEE_PERCENTAGE"
+                                                                                value={
+                                                                                    dIP.CONSULTANCY_FEE_PERCENTAGE
+                                                                                }
+                                                                                decimalScale={
+                                                                                    2
+                                                                                }
+                                                                                decimalsLimit={
+                                                                                    2
+                                                                                }
+                                                                                onValueChange={(
+                                                                                    values
+                                                                                ) => {
+                                                                                    inputInsurerCoverage(
+                                                                                        "CONSULTANCY_FEE_PERCENTAGE",
+                                                                                        values,
+                                                                                        i,
+                                                                                        j
+                                                                                    );
+                                                                                }}
+                                                                                className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                                required
+                                                                            />
+                                                                        </td> */}
+                                                                        <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                            <CurrencyInput
+                                                                                id="consultancy_fee_amount"
+                                                                                name="CONSULTANCY_FEE"
+                                                                                value={
+                                                                                    dIP.CONSULTANCY_FEE
+                                                                                }
+                                                                                decimalScale={
+                                                                                    2
+                                                                                }
+                                                                                decimalsLimit={
+                                                                                    2
+                                                                                }
+                                                                                onValueChange={(
+                                                                                    values
+                                                                                ) => {
+                                                                                    inputInsurerCoverage(
+                                                                                        "CONSULTANCY_FEE",
                                                                                         values,
                                                                                         i,
                                                                                         j
@@ -4072,7 +4660,7 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
 
-                                                                        <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                        {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <svg
                                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                                 viewBox="0 0 24 24"
@@ -4095,12 +4683,12 @@ export default function ModalDetailPolicy({
                                                                                     d="M6 18 18 6M6 6l12 12"
                                                                                 />
                                                                             </svg>
-                                                                        </td>
+                                                                        </td> */}
                                                                     </tr>
                                                                 );
                                                             }
                                                         )}
-                                                        <tr>
+                                                        {/* <tr>
                                                             <td
                                                                 colSpan={2}
                                                                 className=" h-10 w-40 mb-2 mt-2"
@@ -4120,7 +4708,7 @@ export default function ModalDetailPolicy({
                                                                     + Add Row
                                                                 </a>
                                                             </td>
-                                                        </tr>
+                                                        </tr> */}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -4229,9 +4817,9 @@ export default function ModalDetailPolicy({
                             return (
                                 <>
                                     <div className="mt-6 mb-4 ml-4 mr-4">
-                                        <h3 className="text-xl font-semibold leading-6 text-gray-900 border-b-2 w-fit">
+                                        {/* <h3 className="text-xl font-semibold leading-6 text-gray-900 border-b-2 w-fit">
                                             List Insurer
-                                        </h3>
+                                        </h3> */}
                                         <div className="shadow-md border-2 mt-3">
                                             <div className=" ml-4 mr-4 mb-4 mt-4">
                                                 <div className="grid grid-cols-4 gap-4">
@@ -4720,11 +5308,9 @@ export default function ModalDetailPolicy({
                         setSumByCurrency([]);
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
-                    // setInsurerNettPremi(0);
-                    // setSearchInsurerNettPremi({});
-                    setInsurerNettPremi({});
+                    setDataInsurerForInsured([]);
                 }}
-                title={"Add Insured"}
+                title={"Add Interest Insured"}
                 url={`/insertManyInsured`}
                 data={dataInsured}
                 onSuccess={handleSuccessInsured}
@@ -4742,7 +5328,7 @@ export default function ModalDetailPolicy({
                                                 <div>
                                                     <InputLabel
                                                         htmlFor="insured_name"
-                                                        value="Insured Name"
+                                                        value="Interest Name"
                                                     />
                                                 </div>
                                                 <div className=" text-red-600">
@@ -4769,33 +5355,39 @@ export default function ModalDetailPolicy({
                                                     required
                                                 />
                                             </div>
-                                            {i > 0 ? (
+                                        </div>
+                                        <div className="grid grid-cols-5 mb-4">
+                                            <div className="grid grid-cols-2">
                                                 <div>
-                                                    <div className="">
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 24 24"
-                                                            strokeWidth={1.5}
-                                                            stroke="currentColor"
-                                                            className="mx-auto h-6 text-red-500 cursor-pointer"
-                                                            onClick={() => {
-                                                                deleteRowInsured(
-                                                                    i
-                                                                );
-                                                            }}
-                                                        >
-                                                            <path
-                                                                fill="#AB7C94"
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                d="M6 18 18 6M6 6l12 12"
-                                                            />
-                                                        </svg>
-                                                    </div>
+                                                    <InputLabel
+                                                        htmlFor="admin_cost"
+                                                        value="Admin Cost"
+                                                    />
                                                 </div>
-                                            ) : (
-                                                ""
-                                            )}
+                                                <div className=" text-red-600">
+                                                    *
+                                                </div>
+                                            </div>
+                                            <div className="col-span-3">
+                                                <CurrencyInput
+                                                    id="admin_cost"
+                                                    name="POLICY_ADMIN_COST"
+                                                    value={
+                                                        insured.POLICY_ADMIN_COST
+                                                    }
+                                                    decimalScale={2}
+                                                    decimalsLimit={2}
+                                                    onValueChange={(values) => {
+                                                        inputDataInsured(
+                                                            "POLICY_ADMIN_COST",
+                                                            values,
+                                                            i
+                                                        );
+                                                    }}
+                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    required
+                                                />
+                                            </div>
                                         </div>
                                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                             <table className="table-auto w-full">
@@ -4806,6 +5398,18 @@ export default function ModalDetailPolicy({
                                                             className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
                                                         >
                                                             No
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                        >
+                                                            Interest Insured
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                        >
+                                                            Remarks
                                                         </th>
                                                         <th
                                                             rowSpan={2}
@@ -4823,32 +5427,31 @@ export default function ModalDetailPolicy({
                                                             rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
                                                         >
+                                                            Insurer Nett Premium
+                                                        </th>
+                                                        <th
+                                                            colSpan={4}
+                                                            className="text-center p-4 border border-t-0 border-gray-300"
+                                                        >
+                                                            Brokerage Fee
+                                                        </th>
+                                                        <th
+                                                            colSpan={4}
+                                                            className="text-center p-4 border border-t-0 border-gray-300"
+                                                        >
+                                                            Engineering Fee
+                                                        </th>
+                                                        <th
+                                                            colSpan={4}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                        >
                                                             Consultancy Fee
                                                         </th>
                                                         <th
                                                             rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                            className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
                                                         >
-                                                            Insurer Nett Premium
-                                                        </th>
-                                                        <th
-                                                            colSpan={2}
-                                                            className="text-center p-4 border border-t-0 border-gray-300"
-                                                        >
-                                                            Discount Brokerage
-                                                        </th>
-                                                        <th
-                                                            colSpan={2}
-                                                            className="text-center p-4 border border-t-0 border-gray-300"
-                                                        >
-                                                            Discount Admin
-                                                        </th>
-                                                        <th
-                                                            colSpan={2}
-                                                            className="text-center p-4 border border-t-0 border-gray-300"
-                                                        >
-                                                            Discount Engineering
-                                                            Fee
+                                                            Income Amount
                                                         </th>
                                                         <th
                                                             rowSpan={2}
@@ -4860,22 +5463,40 @@ export default function ModalDetailPolicy({
                                                     </tr>
                                                     <tr className="border-b border-gray-400 text-sm font-semibold text-gray-900">
                                                         <th className="text-center p-4 border ">
-                                                            %
+                                                            Full Amount
                                                         </th>
                                                         <th className="text-center p-4 border ">
-                                                            Amount
+                                                            Disc %
                                                         </th>
                                                         <th className="text-center p-4 border ">
-                                                            %
+                                                            Disc Amount
                                                         </th>
                                                         <th className="text-center p-4 border ">
-                                                            Amount
+                                                            Nett Amount
                                                         </th>
                                                         <th className="text-center p-4 border ">
-                                                            %
+                                                            Full Amount
                                                         </th>
                                                         <th className="text-center p-4 border ">
-                                                            Amount
+                                                            Disc %
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Disc Amount
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Nett Amount
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Full Amount
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Disc %
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Disc Amount
+                                                        </th>
+                                                        <th className="text-center p-4 border ">
+                                                            Nett Amount
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -4888,6 +5509,86 @@ export default function ModalDetailPolicy({
                                                             <tr key={j}>
                                                                 <td className="p-4 border">
                                                                     {j + 1}
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <select
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                        value={
+                                                                            detail.INTEREST_INSURED_ID
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "INTEREST_INSURED_ID",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
+                                                                            --{" "}
+                                                                            <i>
+                                                                                Choose
+                                                                            </i>{" "}
+                                                                            --
+                                                                        </option>
+                                                                        {interestInsured.map(
+                                                                            (
+                                                                                interest: any,
+                                                                                s: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            s
+                                                                                        }
+                                                                                        value={
+                                                                                            interest.INTEREST_INSURED_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            interest.INTEREST_INSURED_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </select>
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <div className="block w-40 mx-auto text-left">
+                                                                        <TextInput
+                                                                            id="remarks"
+                                                                            type="text"
+                                                                            name="remarks"
+                                                                            value={
+                                                                                detail.REMARKS
+                                                                            }
+                                                                            className=""
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                inputInsuredDetail(
+                                                                                    "REMARKS",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i,
+                                                                                    j
+                                                                                )
+                                                                            }
+                                                                            required
+                                                                            autoComplete="off"
+                                                                        />
+                                                                    </div>
                                                                 </td>
                                                                 <td className="p-4 border">
                                                                     <select
@@ -4999,33 +5700,6 @@ export default function ModalDetailPolicy({
                                                                 </td>
                                                                 <td className="p-4 border">
                                                                     <CurrencyInput
-                                                                        id="consultancy_fee"
-                                                                        name="CONSULTANCY_FEE"
-                                                                        value={
-                                                                            detail.CONSULTANCY_FEE
-                                                                        }
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        onValueChange={(
-                                                                            values
-                                                                        ) => {
-                                                                            inputInsuredDetail(
-                                                                                "CONSULTANCY_FEE",
-                                                                                values,
-                                                                                i,
-                                                                                j
-                                                                            );
-                                                                        }}
-                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
-                                                                    />
-                                                                </td>
-                                                                <td className="p-4 border">
-                                                                    <CurrencyInput
                                                                         id="premium_amount"
                                                                         name="PREMIUM_AMOUNT"
                                                                         value={
@@ -5042,6 +5716,33 @@ export default function ModalDetailPolicy({
                                                                         ) => {
                                                                             inputInsuredDetail(
                                                                                 "PREMIUM_AMOUNT",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="bf_full_amount"
+                                                                        name="BF_FULL_AMOUNT"
+                                                                        value={
+                                                                            detail.BF_FULL_AMOUNT
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "BF_FULL_AMOUNT",
                                                                                 values,
                                                                                 i,
                                                                                 j
@@ -5107,10 +5808,10 @@ export default function ModalDetailPolicy({
                                                                 </td>
                                                                 <td className="p-4 border">
                                                                     <CurrencyInput
-                                                                        id="disc_admin_percentage"
-                                                                        name="DISC_ADMIN_PERCENTAGE"
+                                                                        id="bf_nett_amount"
+                                                                        name="BF_NETT_AMOUNT"
                                                                         value={
-                                                                            detail.DISC_ADMIN_PERCENTAGE
+                                                                            detail.BF_NETT_AMOUNT
                                                                         }
                                                                         decimalScale={
                                                                             2
@@ -5122,7 +5823,7 @@ export default function ModalDetailPolicy({
                                                                             values
                                                                         ) => {
                                                                             inputInsuredDetail(
-                                                                                "DISC_ADMIN_PERCENTAGE",
+                                                                                "BF_NETT_AMOUNT",
                                                                                 values,
                                                                                 i,
                                                                                 j
@@ -5134,10 +5835,10 @@ export default function ModalDetailPolicy({
                                                                 </td>
                                                                 <td className="p-4 border">
                                                                     <CurrencyInput
-                                                                        id="disc_admin_amount"
-                                                                        name="DISC_ADMIN_AMOUNT"
+                                                                        id="ef_full_amount"
+                                                                        name="EF_FULL_AMOUNT"
                                                                         value={
-                                                                            detail.DISC_ADMIN_AMOUNT
+                                                                            detail.EF_FULL_AMOUNT
                                                                         }
                                                                         decimalScale={
                                                                             2
@@ -5149,7 +5850,7 @@ export default function ModalDetailPolicy({
                                                                             values
                                                                         ) => {
                                                                             inputInsuredDetail(
-                                                                                "DISC_ADMIN_AMOUNT",
+                                                                                "EF_FULL_AMOUNT",
                                                                                 values,
                                                                                 i,
                                                                                 j
@@ -5204,6 +5905,168 @@ export default function ModalDetailPolicy({
                                                                         ) => {
                                                                             inputInsuredDetail(
                                                                                 "DISC_EF_AMOUNT",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="ef_nett_amount"
+                                                                        name="EF_NETT_AMOUNT"
+                                                                        value={
+                                                                            detail.EF_NETT_AMOUNT
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "EF_NETT_AMOUNT",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="consultancy_fee"
+                                                                        name="CONSULTANCY_FEE"
+                                                                        value={
+                                                                            detail.CONSULTANCY_FEE
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "CONSULTANCY_FEE",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="disc_cf_percentage"
+                                                                        name="DISC_CF_PERCENTAGE"
+                                                                        value={
+                                                                            detail.DISC_CF_PERCENTAGE
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "DISC_CF_PERCENTAGE",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="disc_cf_amount"
+                                                                        name="DISC_CF_AMOUNT"
+                                                                        value={
+                                                                            detail.DISC_CF_AMOUNT
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "DISC_CF_AMOUNT",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="cf_nett_amount"
+                                                                        name="CF_NETT_AMOUNT"
+                                                                        value={
+                                                                            detail.CF_NETT_AMOUNT
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "CF_NETT_AMOUNT",
+                                                                                values,
+                                                                                i,
+                                                                                j
+                                                                            );
+                                                                        }}
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                        required
+                                                                    />
+                                                                </td>
+                                                                <td className="p-4 border">
+                                                                    <CurrencyInput
+                                                                        id="income_nett_amount"
+                                                                        name="INCOME_NETT_AMOUNT"
+                                                                        value={
+                                                                            detail.INCOME_NETT_AMOUNT
+                                                                        }
+                                                                        decimalScale={
+                                                                            2
+                                                                        }
+                                                                        decimalsLimit={
+                                                                            2
+                                                                        }
+                                                                        onValueChange={(
+                                                                            values
+                                                                        ) => {
+                                                                            inputInsuredDetail(
+                                                                                "INCOME_NETT_AMOUNT",
                                                                                 values,
                                                                                 i,
                                                                                 j
@@ -5270,15 +6133,15 @@ export default function ModalDetailPolicy({
                                 </div>
                             </div>
                         ))}
-                        <div className="ml-4 w-40 mb-2 mt-2">
+                        {/* <div className="ml-4 w-40 mb-2 mt-2">
                             <a
                                 href=""
                                 className="text-xs mt-1 text-primary-pelindo ms-1"
                                 onClick={(e) => addRowInsured(e)}
                             >
-                                + Add Insured
+                                + Add Interest Insured
                             </a>
-                        </div>
+                        </div> */}
                     </>
                 }
             />
@@ -6401,29 +7264,35 @@ export default function ModalDetailPolicy({
                                             colSpan={2}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
-                                            Brokerage Fee
+                                            <div>Brokerage Fee</div>
+                                            <div>
+                                                Nilai Brokerage Fee Dari
+                                                Interest
+                                            </div>
                                         </th>
                                         <th
                                             scope="col"
                                             colSpan={2}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
-                                            Engineering Fee
+                                            <div>Engineering Fee</div>
+                                            <div>
+                                                Nilai Engineering Fee Dari
+                                                Interest
+                                            </div>
                                         </th>
                                         <th
                                             scope="col"
                                             colSpan={2}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
-                                            Consultancy Fee
+                                            <div>Consultancy Fee</div>
+                                            <div>
+                                                Nilai Consultancy Fee Dari
+                                                Interest
+                                            </div>
                                         </th>
-                                        <th
-                                            rowSpan={2}
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
-                                        >
-                                            Admin Cost
-                                        </th>
+
                                         <th
                                             rowSpan={2}
                                             scope="col"
@@ -6712,7 +7581,6 @@ export default function ModalDetailPolicy({
                                                                     required
                                                                 />
                                                             </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]"></td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
                                                                 {detailIdx >
                                                                 0 ? (
@@ -6799,9 +7667,6 @@ export default function ModalDetailPolicy({
                                                             style: "decimal",
                                                         }
                                                     ).format(nett.nettCf)}
-                                                </td>
-                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]">
-                                                    Admin Cost
                                                 </td>
                                                 <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
                                             </tr>
@@ -7339,7 +8204,7 @@ export default function ModalDetailPolicy({
 
                             <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4 mt-8">
                                 <div className="border-b-2 w-fit font-semibold text-lg">
-                                    <span>Insured</span>
+                                    <span>Interest Insured</span>
                                 </div>
                                 <div className="flex gap-2 mt-4">
                                     <div>
@@ -7352,7 +8217,7 @@ export default function ModalDetailPolicy({
                                                 );
                                             }}
                                         >
-                                            Add Insured
+                                            Add Interest Insured
                                         </button>
                                     </div>
                                 </div>
@@ -7865,6 +8730,20 @@ export default function ModalDetailPolicy({
                                             Edit Business Partners
                                         </button>
                                     </div>
+                                    {/* <div>
+                                        <button
+                                            type="button"
+                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
+                                            onClick={(e) => {
+                                                handleTest(e, policy.POLICY_ID);
+                                                // setTriggerEditSumIncome(
+                                                //     triggerEditSumIncome + 1
+                                                // );
+                                            }}
+                                        >
+                                            Button Test
+                                        </button>
+                                    </div> */}
                                 </div>
                                 {listDataPartners.length > 0 ? (
                                     <div className="w-full mt-4 align-middle">
