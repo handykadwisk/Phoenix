@@ -95,6 +95,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $childBAA = Menu::create(
+            [
+                'menu_name'       => 'BAA',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation/baa',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 7,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
         $finance = Menu::create(
             [
                 'menu_name'       => 'Finance',
@@ -260,6 +271,25 @@ class DatabaseSeeder extends Seeder
             'role_id' => $admin->id,
             'menu_id' => $ACLRole->id
         ]);
+
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $group->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childRelation->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childAgent->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childBAA->id
+        ]);
+
+
 
 
         // create user
@@ -435,9 +465,9 @@ class DatabaseSeeder extends Seeder
 
         $file_path15 = resource_path('../database/LogDB/2024_07_31_r_coa.sql');
 
-        // DB::unprepared(
-        //     file_get_contents($file_path15)
-        // );
+        DB::unprepared(
+            file_get_contents($file_path15)
+        );
         // create 2024_24_07_r_address_status
         $file_path16 = resource_path('../database/LogDB/2024_24_07_r_address_status.sql');
 
@@ -482,5 +512,19 @@ class DatabaseSeeder extends Seeder
         DB::unprepared(
             file_get_contents($file_path20)
         );
+        // create 2024_16_05_r_salutation
+        $r_salutation = resource_path('../database/LogDB/2024_16_05_r_salutation.sql');
+
+        DB::unprepared(
+            file_get_contents($r_salutation)
+        );
+
+        // create 2024_08_08_r_for_bank_account
+        $r_for_bank_account = resource_path('../database/LogDB/2024_08_08_r_for_bank_account.sql');
+
+        DB::unprepared(
+            file_get_contents($r_for_bank_account)
+        );
+
     }
 }

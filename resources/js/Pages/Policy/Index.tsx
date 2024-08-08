@@ -67,7 +67,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         await axios
             .post(`/getPolicy?${pageNumber}`, {
                 policy_number: searchPolicy.POLICY_NUMBER,
-                client_id:searchPolicy.CLIENT_ID.value,
+                client_id: searchPolicy.CLIENT_ID.value,
             })
             .then((res) => {
                 setPolicies(res.data);
@@ -129,6 +129,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         search: false,
     });
 
+
     const selectInsurance = insurance?.map((query: any) => {
         return {
             value: query.RELATION_ORGANIZATION_ID,
@@ -157,7 +158,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                 nett_premi: 0,
                 fee_based_income: 0,
                 agent_commision: 0,
-                acquisition_cost: 0
+                acquisition_cost: 0,
             },
         ],
         policyInstallment: [
@@ -362,8 +363,8 @@ console.log('searchPolicy: ', searchPolicy)
         if (message) {
             setModal({
                 ...modal,
-                view: false
-            })
+                view: false,
+            });
             // setModal({
             //     add: false,
             //     delete: true,
@@ -380,7 +381,7 @@ console.log('searchPolicy: ', searchPolicy)
         changeVal[i][name] = value;
         setData("policyPremium", changeVal);
 
-        if (name == 'currency_id') {
+        if (name == "currency_id") {
             setarrCurrency([...arrCurrency, value]);
         }
 
@@ -411,7 +412,7 @@ console.log('searchPolicy: ', searchPolicy)
         const val = [...data.policyPremium];
         val.splice(i, 1);
         setData("policyPremium", val);
-        getSummaryPremi()
+        getSummaryPremi();
     };
 
     const inputPolicyInstallment = (name: string, value: any, i: number) => {
@@ -447,7 +448,6 @@ console.log('searchPolicy: ', searchPolicy)
             .get(`/getPolicy/${id}`)
             .then((res) => setDataById(res.data))
             .catch((err) => console.log(err));
-
     };
 
 
@@ -482,6 +482,7 @@ console.log('searchPolicy: ', searchPolicy)
     const addRowEditPolicyPremium = (e: FormEvent) => {
         e.preventDefault();
 
+
         setDataById({
             ...dataById,
             policy_premium: [
@@ -512,10 +513,7 @@ console.log('searchPolicy: ', searchPolicy)
     const deleteRowEditPolicyPremium = (i: number) => {
         const val = [...dataById.policy_premium];
         val.splice(i, 1);
-        if (
-            dataById.policy_premium[i].policy_initial_premium_id !==
-            null
-        ) {
+        if (dataById.policy_premium[i].policy_initial_premium_id !== null) {
             if (dataById.deletedPolicyPremium) {
                 // alert("a");
                 setDataById({
@@ -564,6 +562,7 @@ console.log('searchPolicy: ', searchPolicy)
 
     const addRowEditInstallment = (e: FormEvent) => {
         e.preventDefault();
+
 
         setDataById({
             ...dataById,
@@ -662,13 +661,12 @@ console.log('searchPolicy: ', searchPolicy)
         }
     }, [data.relation_id]);
 
-    const getCurrencyById = (currId:any) => {
-        const dataCurr = currency
+    const getCurrencyById = (currId: any) => {
+        const dataCurr = currency;
         const result = dataCurr.find((id: any) => id.CURRENCY_ID == currId);
 
         return result.CURRENCY_SYMBOL;
-    }
-
+    };
 
     const getSummaryPremi = () => {
         const dataToGroup = data.policyPremium;
@@ -685,11 +683,15 @@ console.log('searchPolicy: ', searchPolicy)
                         acc[currency_id].sum_gross_premi += val.gross_premi;
                         acc[currency_id].sum_admin_cost += val.admin_cost;
                         acc[currency_id].sum_disc_broker += val.disc_broker;
-                        acc[currency_id].sum_disc_consultation += val.disc_consultation;
+                        acc[currency_id].sum_disc_consultation +=
+                            val.disc_consultation;
                         acc[currency_id].sum_disc_admin += val.disc_admin;
-                        acc[currency_id].sum_fee_based_income += val.fee_based_income;
-                        acc[currency_id].sum_agent_commision += val.agent_commision;
-                        acc[currency_id].sum_acquisition_cost += val.acquisition_cost;
+                        acc[currency_id].sum_fee_based_income +=
+                            val.fee_based_income;
+                        acc[currency_id].sum_agent_commision +=
+                            val.agent_commision;
+                        acc[currency_id].sum_acquisition_cost +=
+                            val.acquisition_cost;
                     } else {
                         acc[currency_id] = {
                             currency_id,
@@ -710,15 +712,14 @@ console.log('searchPolicy: ', searchPolicy)
             );
         };
         setSumByCurrency(groupBy(dataToGroup, ["currency_id"]));
-
-    }
+    };
     useEffect(() => {
         if (data.policyPremium) {
             getSummaryPremi()
         }
     }, [data.policyPremium]);
 
-// console.log("sumByCurrency: ", sumByCurrency);
+    // console.log("sumByCurrency: ", sumByCurrency);
     // Start fungsi hitung initial premium
     const inputCalculate = (i: number) => {
         const changeVal: any = [...data.policyPremium];
@@ -732,7 +733,12 @@ console.log('searchPolicy: ', searchPolicy)
         const disc_broker = changeVal[i]["disc_broker"];
         const disc_consultation = changeVal[i]["disc_consultation"];
         const disc_admin = changeVal[i]["disc_admin"];
-        changeVal[i]["nett_premi"] = parseFloat(gross_premi) + parseFloat(admin_cost) - parseFloat(disc_broker) - parseFloat(disc_admin) - parseFloat(disc_consultation)
+        changeVal[i]["nett_premi"] =
+            parseFloat(gross_premi) +
+            parseFloat(admin_cost) -
+            parseFloat(disc_broker) -
+            parseFloat(disc_admin) -
+            parseFloat(disc_consultation);
 
         setData("policyPremium", changeVal);
     };
@@ -745,14 +751,15 @@ console.log('searchPolicy: ', searchPolicy)
             changeVal[i]["INITIAL_PREMIUM"] = (si * rate) / 100;
         } else [(changeVal[i]["INITIAL_PREMIUM"] = 0)];
 
+
         setDataById({ ...dataById, policy_premium: changeVal });
     };
     // End fungsi hitung initial premium
 
 
     const handleSwitch = () => {
-        setFlagSwitch(!flagSwitch)
-    }
+        setFlagSwitch(!flagSwitch);
+    };
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Policy"}>

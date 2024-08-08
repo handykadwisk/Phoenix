@@ -53,4 +53,8 @@ class Relation extends Model
     public function MRelationAgent(){
         return $this->hasOne(MRelationAgent::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
+
+    public function MRelationBaa(){
+        return $this->hasOne(MRelationBaa::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
 }

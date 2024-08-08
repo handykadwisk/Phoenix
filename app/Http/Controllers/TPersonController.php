@@ -13,7 +13,9 @@ use App\Models\RTaxStatus;
 use App\Models\RWilayahKemendagri;
 use App\Models\TAddress;
 use App\Models\Document;
+use App\Models\MForPersonBankAccount;
 use App\Models\MPersonDocument;
+use App\Models\RForAccountBank;
 use App\Models\TPerson;
 use App\Models\TPersonBankAccount;
 use App\Models\TPersonCertificate;
@@ -279,7 +281,7 @@ class TPersonController extends Controller
     }
 
     public function get_detail(Request $request){
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->with('PersonEducation')->with('PersonCertificate')->with('MPersonDocument')->find($request->id);
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->with('PersonEducation')->with('PersonCertificate')->with('MPersonDocument')->with('TPersonBank')->find($request->id);
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -388,6 +390,16 @@ class TPersonController extends Controller
         $data = RBank::get();
         return response()->json($data);
     }
+    public function getForBankAccount(){
+        $data = RForAccountBank::get();
+        return response()->json($data);
+    }
+
+    public function getTPersonBank(){
+        $data = TPersonBankAccount::get();
+        return response()->json($data);
+    }
+    
 
     public function getOffice(Request $request){
         $data = DB::select('call sp_combo_relation_office(?)', [$request->id]);
@@ -420,7 +432,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->PERSON_ID
+            $request->PERSON_ID,
+            "add"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -539,28 +552,128 @@ class TPersonController extends Controller
     public function addBankAccount(Request $request){
         // $personFor = $request->BANK_ACCOUNT[0]['BANK_ID']['value'];
         // print_r($personFor);die;
-        $bankForNew = [];
-        foreach ($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_FOR'] as $bankFor) {
-            // get Bank For
-            array_push($bankForNew, (int)$bankFor['value']);
-        }
-        $valueBankFor = json_encode($bankForNew);
+        // $bankForNew = [];
+        // foreach ($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_FOR'] as $bankFor) {
+        //     // get Bank For
+        //     array_push($bankForNew, (int)$bankFor['value']);
+        // }
+        // $valueBankFor = json_encode($bankForNew);
 
         // created bank account
-        // if (is_countable($request->BANK_ACCOUNT)) {
+        if (is_countable($request->BANK_ACCOUNT)) {
             for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
-                TPersonBankAccount::create([
+                $createPersonBank = TPersonBankAccount::create([
                     "PERSON_ID" => $request->BANK_ACCOUNT[$i]["idPerson"],
                     "PERSON_BANK_ACCOUNT_NAME" => $request->BANK_ACCOUNT[$i]["PERSON_BANK_ACCOUNT_NUMBER"],
                     "PERSON_BANK_ACCOUNT_NUMBER" => $request->BANK_ACCOUNT[$i]["PERSON_BANK_ACCOUNT_NUMBER"],
-                    "PERSON_BANK_ACCOUNT_FOR" => $valueBankFor,
+                    // "PERSON_BANK_ACCOUNT_FOR" => $valueBankFor,
                     "BANK_ID" => $request->BANK_ACCOUNT[$i]['BANK_ID']['value'],
                 ]);
+
+                if ($createPersonBank) {
+                    if (is_countable($request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_FOR'])) {
+                        for ($a=0; $a < sizeof($request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_FOR']); $a++) { 
+                            $dataBankAccount = $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_FOR'];
+
+                            MForPersonBankAccount::create([
+                                "FOR_BANK_ACCOUNT_ID"          => $dataBankAccount[$a]['value'],
+                                "PERSON_BANK_ACCOUNT_ID"         => $createPersonBank->PERSON_BANK_ACCOUNT_ID
+                            ]);
+                        }
+                    }
+                }
             }
-        // }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Add Bank Account (Person).",
+            "module"      => "Person",
+                "id"          => $request->BANK_ACCOUNT[0]["idPerson"]
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
 
         return new JsonResponse([
             $request->BANK_ACCOUNT[0]["idPerson"]
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function editBankAccount(Request $request){
+
+        // dd($request);
+        // if (!isset($request->BANK_ACCOUNT[0]["m_for_bank"][0]["FOR_BANK_ACCOUNT_ID"])) {
+        //     echo "gaada";
+        // }else{
+        //     echo "ada";
+        // }
+        // die;
+        // created bank account
+        if (is_countable($request->BANK_ACCOUNT)) {
+            for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
+
+
+                // Delete M Bank Account Existing By Id
+                $dataExisting = MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
+                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+                    MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
+                }
+
+                // Delete Data T Person Bank Account
+                $dataExisting = TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
+                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+                    TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
+                }
+
+
+                // Add New Data T Person Bank Account and M Person Bank Account
+                $createPersonBank = TPersonBankAccount::create([
+                    "PERSON_ID" => $request->BANK_ACCOUNT[$i]["PERSON_ID"],
+                    "PERSON_BANK_ACCOUNT_NAME" => $request->BANK_ACCOUNT[$i]["PERSON_BANK_ACCOUNT_NAME"],
+                    "PERSON_BANK_ACCOUNT_NUMBER" => $request->BANK_ACCOUNT[$i]["PERSON_BANK_ACCOUNT_NUMBER"],
+                    // "PERSON_BANK_ACCOUNT_FOR" => $valueBankFor,
+                    "BANK_ID" => $request->BANK_ACCOUNT[$i]['BANK_ID'],
+                ]);
+
+                if ($createPersonBank) {
+                    if (is_countable($request->BANK_ACCOUNT[$i]['m_for_bank'])) {
+                        for ($a=0; $a < sizeof($request->BANK_ACCOUNT[$i]['m_for_bank']); $a++) { 
+                            $dataBankAccount = $request->BANK_ACCOUNT[$i]['m_for_bank'];
+
+                            if (!isset($dataBankAccount[$a]["FOR_BANK_ACCOUNT_ID"])) {
+                                MForPersonBankAccount::create([
+                                    "FOR_BANK_ACCOUNT_ID"          => $dataBankAccount[$a]['value'],
+                                    "PERSON_BANK_ACCOUNT_ID"         => $createPersonBank->PERSON_BANK_ACCOUNT_ID
+                                ]);
+                            }else{
+                                MForPersonBankAccount::create([
+                                    "FOR_BANK_ACCOUNT_ID"          => $dataBankAccount[$a]['FOR_BANK_ACCOUNT_ID'],
+                                    "PERSON_BANK_ACCOUNT_ID"         => $createPersonBank->PERSON_BANK_ACCOUNT_ID
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Edit Bank Account (Person).",
+            "module"      => "Person",
+                "id"          => $request->BANK_ACCOUNT[0]["PERSON_ID"]
+            ]),
+            'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->BANK_ACCOUNT[0]["PERSON_ID"]
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -924,7 +1037,9 @@ class TPersonController extends Controller
     }
 
     public function edit_Certificate(Request $request){
+        // dd($request->person_certificate[0]['CERTIFICATE_QUALIFICATION_ID']);
         // cek existing
+        // dd($request->person_certificate);
         $dataExisting = TPersonCertificate::where('PERSON_ID', $request->person_certificate[0]['PERSON_ID'])->get();
         if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
             TPersonCertificate::where('PERSON_ID', $request->person_certificate[0]['PERSON_ID'])->delete();
@@ -936,7 +1051,7 @@ class TPersonController extends Controller
 
                 $pointNew = NULL;
                 $qualification = NULL;
-                if ($request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 1 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 2 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 3) {
+                if ($request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 1 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 2 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 3 && $request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] == 1) {
                     $pointNew = $request->person_certificate[$i]['PERSON_CERTIFICATE_POINT'];
                     // $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
                 }
@@ -997,19 +1112,15 @@ class TPersonController extends Controller
 
                 // get Data Document
                 $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
-                $documentFileName = $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                $documentFileName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
                 $documentDirName = $uploadPath;
                 $documentFileType = $uploadDocument[$i]->getMimeType();
                 $documentFileSize = $uploadDocument[$i]->getSize();
 
-                // create folder in directory laravel
-                Storage::makeDirectory($uploadPath, 0777, true, true);
-                Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
-
                 // masukan data file ke database
                 $document = Document::create([
                     'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
-                    'DOCUMENT_FILENAME'             => $documentFileName,
+                    'DOCUMENT_FILENAME'             => "",
                     'DOCUMENT_DIRNAME'              => $documentDirName,
                     'DOCUMENT_FILETYPE'             => $documentFileType,
                     'DOCUMENT_FILESIZE'             => $documentFileSize,
@@ -1017,9 +1128,22 @@ class TPersonController extends Controller
                 ])->DOCUMENT_ID;
 
                 if($document){
+                    // update file name "DOCUMENT_ID - FILENAME"
+                    Document::where('DOCUMENT_ID', $document)->update([
+                        'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                    ]);
+
+                    // create folder in directory laravel
+                    Storage::makeDirectory($uploadPath, 0777, true, true);
+                    Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $document . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+                }
+
+
+                if($document){
                     MPersonDocument::create([
                         'PERSON_ID'     => $request->PERSON_ID,
-                        'DOCUMENT_ID'   => $document
+                        'DOCUMENT_ID'   => $document,
+                        'CATEGORY_DOCUMENT' => 1
                     ]);
                 }
             }
@@ -1040,19 +1164,16 @@ class TPersonController extends Controller
 
                 // get Data Document
                 $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
-                $documentFileName = $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                $documentFileName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
                 $documentDirName = $uploadPath;
                 $documentFileType = $uploadDocument[$i]->getMimeType();
                 $documentFileSize = $uploadDocument[$i]->getSize();
 
-                // create folder in directory laravel
-                Storage::makeDirectory($uploadPath, 0777, true, true);
-                Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->PERSON_ID . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
 
                 // masukan data file ke database
                 $document = Document::create([
                     'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
-                    'DOCUMENT_FILENAME'             => $documentFileName,
+                    'DOCUMENT_FILENAME'             => "",
                     'DOCUMENT_DIRNAME'              => $documentDirName,
                     'DOCUMENT_FILETYPE'             => $documentFileType,
                     'DOCUMENT_FILESIZE'             => $documentFileSize,
@@ -1060,9 +1181,21 @@ class TPersonController extends Controller
                 ])->DOCUMENT_ID;
 
                 if($document){
+                    // update file name "DOCUMENT_ID - FILENAME"
+                    Document::where('DOCUMENT_ID', $document)->update([
+                        'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                    ]);
+
+                    // create folder in directory laravel
+                    Storage::makeDirectory($uploadPath, 0777, true, true);
+                    Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $document . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+                }
+
+                if($document){
                     MPersonDocument::create([
                         'PERSON_ID'     => $request->PERSON_ID,
-                        'DOCUMENT_ID'   => $document
+                        'DOCUMENT_ID'   => $document,
+                        'CATEGORY_DOCUMENT' => 2
                     ]);
                 }
             }

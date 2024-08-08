@@ -22,6 +22,6 @@ class TPersonEmergencyContact extends Model
     public $timestamps = false;
 
     public function personRelationship(){
-        return $this->hasOne(RPersonRelationship::class, 'PERSON_RELATIONSHIP_ID');
+        return $this->hasOne(RPersonRelationship::class, 'PERSON_RELATIONSHIP_ID','PERSON_RELATIONSHIP_ID');
     }
 }

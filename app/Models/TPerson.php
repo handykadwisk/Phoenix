@@ -75,4 +75,8 @@ class TPerson extends Model
         return $this->hasMany(MPersonDocument::class, 'PERSON_ID', 'PERSON_ID');
     }
 
+    public function TPersonBank(){
+        return $this->hasMany(TPersonBankAccount::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
 }

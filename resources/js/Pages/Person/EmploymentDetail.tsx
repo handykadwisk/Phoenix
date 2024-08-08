@@ -11,8 +11,10 @@ import {
     useState,
 } from "react";
 import { spawn } from "child_process";
+import dateFormat from "dateformat";
 import axios from "axios";
 import {
+    ArrowDownTrayIcon,
     BuildingLibraryIcon,
     BuildingOffice2Icon,
     CreditCardIcon,
@@ -36,6 +38,8 @@ import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import { Datepicker } from "flowbite-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function EmploymentDetail({
     idPerson,
@@ -63,11 +67,11 @@ export default function EmploymentDetail({
             });
     };
     const [tab, setTab] = useState<any>({
-        nameTab: "Employment",
+        nameTab: "Employee",
         currentTab: true,
     });
     const tabs = [
-        { name: "Employment", href: "#", current: true },
+        { name: "Employee", href: "#", current: true },
         { name: "Education", href: "#", current: false },
         { name: "Certificate", href: "#", current: false },
         { name: "Document", href: "#", current: false },
@@ -165,6 +169,14 @@ export default function EmploymentDetail({
         setDataEditCertificate({
             person_certificate: detailPerson.person_certificate,
         });
+        if (
+            detailPerson.person_certificate[0][
+                "CERTIFICATE_QUALIFICATION_ID"
+            ] === null
+        ) {
+            inputEditCertificate("CERTIFICATE_QUALIFICATION_ID", "", 0);
+        }
+
         getQualification();
     };
 
@@ -233,7 +245,7 @@ export default function EmploymentDetail({
         ],
     });
 
-    console.log("acaca", dataEditCertificate);
+    console.log("acaca", dataEditCertificate.person_certificate);
 
     const addRowAddEducation = (e: FormEvent) => {
         e.preventDefault();
@@ -573,6 +585,7 @@ export default function EmploymentDetail({
         <>
             {/* Edit Document */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalDocument.add}
                 onClose={() => {
                     setModalDocument({
@@ -591,6 +604,14 @@ export default function EmploymentDetail({
                     <>
                         <div>
                             <div className="bg-white rounded-md p-4">
+                                <div className="bg-red-300 rounded-md p-2 mb-2">
+                                    <div className="font-semibold text-sm">
+                                        <span>
+                                            * Document Format: Image or PDF
+                                            File.
+                                        </span>
+                                    </div>
+                                </div>
                                 <div>
                                     <span>Photo KTP</span>
                                 </div>
@@ -651,6 +672,7 @@ export default function EmploymentDetail({
 
             {/* Edit Certificate */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalCertificate.edit}
                 onClose={() => {
                     setModalCertificate({
@@ -672,6 +694,7 @@ export default function EmploymentDetail({
                                 <div className="col-span-3">
                                     <div className="text-sm">
                                         <span>Certificate Name</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
@@ -687,16 +710,19 @@ export default function EmploymentDetail({
                                 <div className="col-span-2">
                                     <div className="text-sm">
                                         <span>Point</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div className="text-sm">
                                         <span>Certificate Date</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div className="text-sm">
                                         <span>Certificate Expiry Date</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                             </div>
@@ -892,7 +918,48 @@ export default function EmploymentDetail({
                                             )}
                                             <div className="col-span-2">
                                                 <div>
-                                                    <TextInput
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            popperPlacement="top-end"
+                                                            selected={
+                                                                pC.PERSON_CERTIFICATE_START_DATE
+                                                            }
+                                                            onChange={
+                                                                (date: any) => {
+                                                                    inputEditCertificate(
+                                                                        "PERSON_CERTIFICATE_START_DATE",
+                                                                        date.toLocaleDateString(
+                                                                            "en-CA"
+                                                                        ),
+                                                                        i
+                                                                    );
+                                                                }
+                                                                // setData(
+                                                                //     "PERSON_BIRTH_DATE",
+                                                                //     date.toLocaleDateString(
+                                                                //         "en-CA"
+                                                                //     )
+                                                                // )
+                                                            }
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                    {/* <TextInput
                                                         type="date"
                                                         value={
                                                             pC.PERSON_CERTIFICATE_START_DATE
@@ -907,12 +974,52 @@ export default function EmploymentDetail({
                                                         }}
                                                         required
                                                         placeholder="From"
-                                                    />
+                                                    /> */}
                                                 </div>
                                             </div>
                                             <div className="col-span-2">
                                                 <div>
-                                                    <TextInput
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            selected={
+                                                                pC.PERSON_CERTIFICATE_EXPIRES_DATE
+                                                            }
+                                                            onChange={
+                                                                (date: any) => {
+                                                                    inputEditCertificate(
+                                                                        "PERSON_CERTIFICATE_EXPIRES_DATE",
+                                                                        date.toLocaleDateString(
+                                                                            "en-CA"
+                                                                        ),
+                                                                        i
+                                                                    );
+                                                                }
+                                                                // setData(
+                                                                //     "PERSON_BIRTH_DATE",
+                                                                //     date.toLocaleDateString(
+                                                                //         "en-CA"
+                                                                //     )
+                                                                // )
+                                                            }
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                    {/* <TextInput
                                                         type="date"
                                                         value={
                                                             pC.PERSON_CERTIFICATE_EXPIRES_DATE
@@ -927,7 +1034,7 @@ export default function EmploymentDetail({
                                                         }}
                                                         required
                                                         placeholder="From"
-                                                    />
+                                                    /> */}
                                                 </div>
                                             </div>
                                             <div>
@@ -982,6 +1089,7 @@ export default function EmploymentDetail({
 
             {/* Add Certificate */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalCertificate.add}
                 onClose={() => {
                     setModalCertificate({
@@ -1003,6 +1111,7 @@ export default function EmploymentDetail({
                                 <div className="col-span-3">
                                     <div className="text-sm">
                                         <span>Certificate Name</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
@@ -1018,16 +1127,19 @@ export default function EmploymentDetail({
                                 <div className="col-span-2">
                                     <div className="text-sm">
                                         <span>Point</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div className="text-sm">
                                         <span>Certificate Date</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div className="text-sm">
                                         <span>Certificate Expiry Date</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                             </div>
@@ -1192,7 +1304,10 @@ export default function EmploymentDetail({
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="col-span-2">
+                                                <div
+                                                    className="col-span-2"
+                                                    title="Point only for CIIB, APAI, AAPAI"
+                                                >
                                                     <div>
                                                         <TextInput
                                                             type="text"
@@ -1216,7 +1331,46 @@ export default function EmploymentDetail({
                                             )}
                                             <div className="col-span-2">
                                                 <div>
-                                                    <TextInput
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            selected={
+                                                                dC.PERSON_CERTIFICATE_START_DATE
+                                                            }
+                                                            onChange={
+                                                                (date: any) =>
+                                                                    inputAddCertificate(
+                                                                        "PERSON_CERTIFICATE_START_DATE",
+                                                                        date.toLocaleDateString(
+                                                                            "en-CA"
+                                                                        ),
+                                                                        i
+                                                                    )
+                                                                // setData(
+                                                                //     "PERSON_BIRTH_DATE",
+                                                                //     date.toLocaleDateString(
+                                                                //         "en-CA"
+                                                                //     )
+                                                                // )
+                                                            }
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                    {/* <TextInput
                                                         type="date"
                                                         value={
                                                             dC.PERSON_CERTIFICATE_START_DATE
@@ -1231,12 +1385,51 @@ export default function EmploymentDetail({
                                                         }}
                                                         required
                                                         placeholder="From"
-                                                    />
+                                                    /> */}
                                                 </div>
                                             </div>
                                             <div className="col-span-2">
                                                 <div>
-                                                    <TextInput
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            selected={
+                                                                dC.PERSON_CERTIFICATE_EXPIRES_DATE
+                                                            }
+                                                            onChange={
+                                                                (date: any) =>
+                                                                    inputAddCertificate(
+                                                                        "PERSON_CERTIFICATE_EXPIRES_DATE",
+                                                                        date.toLocaleDateString(
+                                                                            "en-CA"
+                                                                        ),
+                                                                        i
+                                                                    )
+                                                                // setData(
+                                                                //     "PERSON_BIRTH_DATE",
+                                                                //     date.toLocaleDateString(
+                                                                //         "en-CA"
+                                                                //     )
+                                                                // )
+                                                            }
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                    {/* <TextInput
                                                         type="date"
                                                         value={
                                                             dC.PERSON_CERTIFICATE_EXPIRES_DATE
@@ -1251,7 +1444,7 @@ export default function EmploymentDetail({
                                                         }}
                                                         required
                                                         placeholder="From"
-                                                    />
+                                                    /> */}
                                                 </div>
                                             </div>
                                             <div>
@@ -1306,6 +1499,7 @@ export default function EmploymentDetail({
 
             {/* Edit Education */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalEducation.edit}
                 onClose={() => {
                     setModalEducation({
@@ -1322,31 +1516,36 @@ export default function EmploymentDetail({
                 onSuccess={handleSuccessEditEducation}
                 body={
                     <>
-                        <div className="mb-2">
+                        <div className="mb-2 px-7">
                             <div className="grid grid-cols-13 gap-3">
                                 <div className="col-span-2">
                                     <div>
                                         <span>From</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div>
                                         <span>To</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div>
                                         <span>Degree</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-3">
                                     <div>
                                         <span>Major</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-3">
                                     <div>
                                         <span>School/College/University</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                             </div>
@@ -1358,7 +1557,47 @@ export default function EmploymentDetail({
                                             key={i}
                                         >
                                             <div className="col-span-2">
-                                                <TextInput
+                                                <div className="relative max-w-sm">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        popperPlacement="top-end"
+                                                        selected={
+                                                            dE.PERSON_EDUCATION_START
+                                                        }
+                                                        onChange={
+                                                            (date: any) =>
+                                                                inputEditEducation(
+                                                                    "PERSON_EDUCATION_START",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                )
+                                                            // setData(
+                                                            //     "PERSON_BIRTH_DATE",
+                                                            //     date.toLocaleDateString(
+                                                            //         "en-CA"
+                                                            //     )
+                                                            // )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
+                                                </div>
+                                                {/* <TextInput
                                                     type="date"
                                                     value={
                                                         dE.PERSON_EDUCATION_START
@@ -1373,10 +1612,50 @@ export default function EmploymentDetail({
                                                     }
                                                     required
                                                     placeholder="From"
-                                                />
+                                                /> */}
                                             </div>
                                             <div className="col-span-2">
-                                                <TextInput
+                                                <div className="relative max-w-sm">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        popperPlacement="top-start"
+                                                        selected={
+                                                            dE.PERSON_EDUCATION_END
+                                                        }
+                                                        onChange={
+                                                            (date: any) =>
+                                                                inputEditEducation(
+                                                                    "PERSON_EDUCATION_END",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                )
+                                                            // setData(
+                                                            //     "PERSON_BIRTH_DATE",
+                                                            //     date.toLocaleDateString(
+                                                            //         "en-CA"
+                                                            //     )
+                                                            // )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
+                                                </div>
+                                                {/* <TextInput
                                                     type="date"
                                                     value={
                                                         dE.PERSON_EDUCATION_END
@@ -1391,7 +1670,7 @@ export default function EmploymentDetail({
                                                     }
                                                     required
                                                     placeholder="From"
-                                                />
+                                                /> */}
                                             </div>
                                             <div className="col-span-2">
                                                 <select
@@ -1519,6 +1798,7 @@ export default function EmploymentDetail({
 
             {/* Add Education */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalEducation.add}
                 onClose={() => {
                     setModalEducation({
@@ -1535,31 +1815,36 @@ export default function EmploymentDetail({
                 onSuccess={handleSuccessAddEducation}
                 body={
                     <>
-                        <div className="mb-2">
+                        <div className="mb-2 p-6">
                             <div className="grid grid-cols-13 gap-3">
                                 <div className="col-span-2">
                                     <div>
                                         <span>From</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div>
                                         <span>To</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <div>
                                         <span>Degree</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-3">
                                     <div>
                                         <span>Major</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                                 <div className="col-span-3">
                                     <div>
                                         <span>School/College/University</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
                                 </div>
                             </div>
@@ -1571,7 +1856,46 @@ export default function EmploymentDetail({
                                             key={i}
                                         >
                                             <div className="col-span-2">
-                                                <TextInput
+                                                <div className="relative max-w-sm">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        selected={
+                                                            dE.PERSON_EDUCATION_START
+                                                        }
+                                                        onChange={
+                                                            (date: any) =>
+                                                                inputEducation(
+                                                                    "PERSON_EDUCATION_START",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                )
+                                                            // setData(
+                                                            //     "PERSON_BIRTH_DATE",
+                                                            //     date.toLocaleDateString(
+                                                            //         "en-CA"
+                                                            //     )
+                                                            // )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
+                                                </div>
+                                                {/* <TextInput
                                                     type="date"
                                                     value={
                                                         dE.PERSON_EDUCATION_START
@@ -1586,10 +1910,49 @@ export default function EmploymentDetail({
                                                     }
                                                     required
                                                     placeholder="From"
-                                                />
+                                                /> */}
                                             </div>
                                             <div className="col-span-2">
-                                                <TextInput
+                                                <div className="relative max-w-sm">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        selected={
+                                                            dE.PERSON_EDUCATION_END
+                                                        }
+                                                        onChange={
+                                                            (date: any) =>
+                                                                inputEducation(
+                                                                    "PERSON_EDUCATION_END",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                )
+                                                            // setData(
+                                                            //     "PERSON_BIRTH_DATE",
+                                                            //     date.toLocaleDateString(
+                                                            //         "en-CA"
+                                                            //     )
+                                                            // )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
+                                                </div>
+                                                {/* <TextInput
                                                     type="date"
                                                     value={
                                                         dE.PERSON_EDUCATION_END
@@ -1604,7 +1967,7 @@ export default function EmploymentDetail({
                                                     }
                                                     required
                                                     placeholder="From"
-                                                />
+                                                /> */}
                                             </div>
                                             <div className="col-span-2">
                                                 <select
@@ -1726,6 +2089,7 @@ export default function EmploymentDetail({
 
             {/* Edit Employment */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalEmployment.edit}
                 onClose={() => {
                     setModalEmployment({
@@ -1734,7 +2098,7 @@ export default function EmploymentDetail({
                     });
                     getPersonDetail(idPerson);
                 }}
-                title={"Edit Employment Information"}
+                title={"Edit Detail Employee"}
                 url={`/editPersonEmployment`}
                 data={dataById}
                 classPanel={
@@ -1762,15 +2126,18 @@ export default function EmploymentDetail({
                                                 PERSONE_ID: e.target.value,
                                             })
                                         }
-                                        required
                                         placeholder="Employee Id"
                                     />
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="PERSON_CATEGORY"
                                         value={"Category"}
                                     />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataById.PERSON_CATEGORY}
@@ -1815,7 +2182,9 @@ export default function EmploymentDetail({
                             </div>
                             <div
                                 className={
+                                    dataById.PERSON_CATEGORY === 2 ||
                                     dataById.PERSON_CATEGORY === "2" ||
+                                    dataById.PERSON_CATEGORY === 3 ||
                                     dataById.PERSON_CATEGORY === "3"
                                         ? "grid grid-cols-3 gap-4 mt-2"
                                         : "grid grid-cols-2 gap-4 mt-2"
@@ -1851,12 +2220,44 @@ export default function EmploymentDetail({
                                         })}
                                     </select>
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="PERSON_HIRE_DATE"
                                         value={"Hire Date "}
                                     />
-                                    <TextInput
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={dataById.PERSON_HIRE_DATE}
+                                            onChange={(date: any) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    PERSON_HIRE_DATE:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_HIRE_DATE"
                                         type="date"
                                         name="PERSON_HIRE_DATE"
@@ -1871,24 +2272,58 @@ export default function EmploymentDetail({
                                         }
                                         required
                                         placeholder="Hire Date"
-                                    />
+                                    /> */}
                                 </div>
                                 <div
                                     className={
+                                        dataById.PERSON_CATEGORY === 2 ||
                                         dataById.PERSON_CATEGORY === "2" ||
+                                        dataById.PERSON_CATEGORY === 3 ||
                                         dataById.PERSON_CATEGORY === "3"
                                             ? ""
                                             : "hidden"
                                     }
                                 >
-                                    {dataById.PERSON_CATEGORY === "2" ||
+                                    {dataById.PERSON_CATEGORY === 2 ||
+                                    dataById.PERSON_CATEGORY === "2" ||
+                                    dataById.PERSON_CATEGORY === 3 ||
                                     dataById.PERSON_CATEGORY === "3" ? (
                                         <>
                                             <InputLabel
                                                 htmlFor="PERSON_END_DATE"
                                                 value={"End Date "}
                                             />
-                                            <TextInput
+                                            <div className="relative max-w-sm">
+                                                <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                    <svg
+                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                        aria-hidden="true"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                    </svg>
+                                                </div>
+                                                <DatePicker
+                                                    selected={
+                                                        dataById.PERSON_END_DATE
+                                                    }
+                                                    onChange={(date: any) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            PERSON_END_DATE:
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                ),
+                                                        })
+                                                    }
+                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd - mm - yyyy"
+                                                />
+                                            </div>
+                                            {/* <TextInput
                                                 id="PERSON_END_DATE"
                                                 type="date"
                                                 name="PERSON_END_DATE"
@@ -1901,9 +2336,8 @@ export default function EmploymentDetail({
                                                             e.target.value,
                                                     })
                                                 }
-                                                required
                                                 placeholder="End Date"
-                                            />
+                                            /> */}
                                         </>
                                     ) : null}
                                 </div>
@@ -1914,7 +2348,37 @@ export default function EmploymentDetail({
                                         htmlFor="PERSON_SALARY_ADJUSTMENT1"
                                         value={"First Salary Adjustment "}
                                     />
-                                    <TextInput
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataById.PERSON_SALARY_ADJUSTMENT1
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    PERSON_SALARY_ADJUSTMENT1:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_SALARY_ADJUSTMENT1"
                                         type="date"
                                         name="PERSON_SALARY_ADJUSTMENT1"
@@ -1929,16 +2393,45 @@ export default function EmploymentDetail({
                                                     e.target.value,
                                             })
                                         }
-                                        required
                                         placeholder="First Salary Adjustment"
-                                    />
+                                    /> */}
                                 </div>
                                 <div>
                                     <InputLabel
                                         htmlFor="PERSON_SALARY_ADJUSTMENT2"
                                         value={"Secondary Salary Adjustment "}
                                     />
-                                    <TextInput
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataById.PERSON_SALARY_ADJUSTMENT2
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    PERSON_SALARY_ADJUSTMENT2:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_SALARY_ADJUSTMENT2"
                                         type="date"
                                         name="PERSON_SALARY_ADJUSTMENT2"
@@ -1953,9 +2446,8 @@ export default function EmploymentDetail({
                                                     e.target.value,
                                             })
                                         }
-                                        required
                                         placeholder="Secondary Salary Adjustment"
-                                    />
+                                    /> */}
                                 </div>
                             </div>
                             <div>
@@ -1986,6 +2478,7 @@ export default function EmploymentDetail({
 
             {/* Empolyment add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalEmployment.add}
                 onClose={() => {
                     setModalEmployment({
@@ -1993,7 +2486,7 @@ export default function EmploymentDetail({
                     });
                     getPersonDetail(idPerson);
                 }}
-                title={"Add Employment Information"}
+                title={"Add Employee Detail"}
                 url={`/personEmployment`}
                 data={data}
                 classPanel={
@@ -2021,15 +2514,18 @@ export default function EmploymentDetail({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="Employee Id"
                                     />
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="PERSON_CATEGORY"
                                         value={"Category"}
                                     />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={data.PERSON_CATEGORY}
@@ -2039,6 +2535,7 @@ export default function EmploymentDetail({
                                                 e.target.value
                                             );
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Category --
@@ -2109,12 +2606,43 @@ export default function EmploymentDetail({
                                         })}
                                     </select>
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="PERSON_HIRE_DATE"
                                         value={"Hire Date "}
                                     />
-                                    <TextInput
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={data.PERSON_HIRE_DATE}
+                                            onChange={(date: any) =>
+                                                setData(
+                                                    "PERSON_HIRE_DATE",
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    )
+                                                )
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_HIRE_DATE"
                                         type="date"
                                         name="PERSON_HIRE_DATE"
@@ -2128,7 +2656,7 @@ export default function EmploymentDetail({
                                         }
                                         required
                                         placeholder="Hire Date"
-                                    />
+                                    /> */}
                                 </div>
                                 <div
                                     className={
@@ -2145,7 +2673,36 @@ export default function EmploymentDetail({
                                                 htmlFor="PERSON_END_DATE"
                                                 value={"End Date "}
                                             />
-                                            <TextInput
+                                            <div className="relative max-w-sm">
+                                                <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                    <svg
+                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                        aria-hidden="true"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                    </svg>
+                                                </div>
+                                                <DatePicker
+                                                    selected={
+                                                        data.PERSON_END_DATE
+                                                    }
+                                                    onChange={(date: any) =>
+                                                        setData(
+                                                            "PERSON_END_DATE",
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            )
+                                                        )
+                                                    }
+                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd - mm - yyyy"
+                                                />
+                                            </div>
+                                            {/* <TextInput
                                                 id="PERSON_END_DATE"
                                                 type="date"
                                                 name="PERSON_END_DATE"
@@ -2157,20 +2714,48 @@ export default function EmploymentDetail({
                                                         e.target.value
                                                     )
                                                 }
-                                                required
                                                 placeholder="End Date"
-                                            />
+                                            /> */}
                                         </>
                                     ) : null}
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 mt-3">
+                            <div className="grid grid-cols-2 gap-1 mt-3">
                                 <div>
                                     <InputLabel
                                         htmlFor="PERSON_SALARY_ADJUSTMENT1"
                                         value={"First Salary Adjustment "}
                                     />
-                                    <TextInput
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                data.PERSON_SALARY_ADJUSTMENT1
+                                            }
+                                            onChange={(date: any) =>
+                                                setData(
+                                                    "PERSON_SALARY_ADJUSTMENT1",
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    )
+                                                )
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_SALARY_ADJUSTMENT1"
                                         type="date"
                                         name="PERSON_SALARY_ADJUSTMENT1"
@@ -2182,16 +2767,44 @@ export default function EmploymentDetail({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="First Salary Adjustment"
-                                    />
+                                    /> */}
                                 </div>
                                 <div>
                                     <InputLabel
                                         htmlFor="PERSON_SALARY_ADJUSTMENT2"
                                         value={"Secondary Salary Adjustment "}
                                     />
-                                    <TextInput
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                data.PERSON_SALARY_ADJUSTMENT2
+                                            }
+                                            onChange={(date: any) =>
+                                                setData(
+                                                    "PERSON_SALARY_ADJUSTMENT2",
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    )
+                                                )
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_SALARY_ADJUSTMENT2"
                                         type="date"
                                         name="PERSON_SALARY_ADJUSTMENT2"
@@ -2203,9 +2816,8 @@ export default function EmploymentDetail({
                                                 e.target.value
                                             )
                                         }
-                                        required
                                         placeholder="Secondary Salary Adjustment"
-                                    />
+                                    /> */}
                                 </div>
                             </div>
                             <div>
@@ -2280,23 +2892,20 @@ export default function EmploymentDetail({
                         ))}
                     </nav>
                 </div>
-                {tab.nameTab === "Employment" ? (
+                {tab.nameTab === "Employee" ? (
                     <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md h-48">
-                        {detailPerson.PERSONE_ID !== null &&
-                        detailPerson.PERSON_CATEGORY !== null &&
-                        detailPerson.PERSON_IS_DELETED !== null &&
-                        detailPerson.TAX_STATUS_ID !== null &&
-                        detailPerson.PERSON_HIRE_DATE !== null &&
-                        detailPerson.PERSON_SALARY_ADJUSTMENT1 !== null &&
-                        detailPerson.PERSON_SALARY_ADJUSTMENT2 !== null ? (
+                        {detailPerson.PERSON_CATEGORY !== null &&
+                        detailPerson.PERSON_HIRE_DATE !== null ? (
                             <>
-                                <div className="grid grid-cols-4 gap-4 divide-x px-1 py-4">
+                                <div className="grid grid-cols-3 gap-4 divide-x px-1 py-4">
                                     <div className="px-2">
                                         <div className="text-red-700">
                                             Employee Id
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSONE_ID}
+                                            {detailPerson.PERSONE_ID === null
+                                                ? "-"
+                                                : detailPerson.PERSONE_ID}
                                         </div>
                                         <div className="text-red-700 mt-2">
                                             Tax Status
@@ -2333,40 +2942,20 @@ export default function EmploymentDetail({
                                             Hire date
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSON_HIRE_DATE}
+                                            {detailPerson.PERSON_HIRE_DATE ===
+                                            null
+                                                ? "-"
+                                                : dateFormat(
+                                                      detailPerson.PERSON_HIRE_DATE,
+                                                      "dd-mm-yyyy"
+                                                  )}
+                                            {/* {detailPerson.PERSON_HIRE_DATE} */}
                                         </div>
-                                    </div>
-                                    <div className="px-2">
-                                        <div className="text-red-700">
-                                            Status
-                                        </div>
-                                        <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSON_IS_DELETED ===
-                                            0
-                                                ? "Active"
-                                                : "Inactive"}
-                                        </div>
-                                        {detailPerson.PERSON_CATEGORY === 2 ||
-                                        detailPerson.PERSON_CATEGORY === 3 ? (
-                                            <>
-                                                <div className="text-red-700 mt-2">
-                                                    End date
-                                                </div>
-                                                <div className="text-gray-600 text-sm">
-                                                    {
-                                                        detailPerson.PERSON_END_DATE
-                                                    }
-                                                </div>
-                                            </>
-                                        ) : null}
                                     </div>
                                     <div className="px-2">
                                         <div className="flex justify-between gap-1">
                                             <div className="text-red-700">
-                                                Company Facilities
-                                                <div className="text-gray-600">
-                                                    -
-                                                </div>
+                                                Status
                                             </div>
                                             <div className="text-gray-600 text-sm">
                                                 <a
@@ -2382,6 +2971,35 @@ export default function EmploymentDetail({
                                                 </a>
                                             </div>
                                         </div>
+                                        <div className="text-gray-600 text-sm">
+                                            {detailPerson.PERSON_IS_DELETED ===
+                                            0
+                                                ? "Active"
+                                                : detailPerson.PERSON_IS_DELETED !==
+                                                  null
+                                                ? "Inactive"
+                                                : "-"}
+                                        </div>
+                                        {detailPerson.PERSON_CATEGORY === 2 ||
+                                        detailPerson.PERSON_CATEGORY === 3 ? (
+                                            <>
+                                                <div className="text-red-700 mt-2">
+                                                    End date
+                                                </div>
+                                                <div className="text-gray-600 text-sm">
+                                                    {/* {
+                                                        detailPerson.PERSON_END_DATE
+                                                            } */}
+                                                    {detailPerson.PERSON_END_DATE ===
+                                                    null
+                                                        ? "-"
+                                                        : dateFormat(
+                                                              detailPerson.PERSON_END_DATE,
+                                                              "dd-mm-yyyy"
+                                                          )}
+                                                </div>
+                                            </>
+                                        ) : null}
                                     </div>
                                 </div>
                             </>
@@ -2398,7 +3016,7 @@ export default function EmploymentDetail({
                                             });
                                         }}
                                     >
-                                        <span>Add Employment</span>
+                                        <span>Add Detail Employee</span>
                                     </div>
                                 </div>
                             </>
@@ -2471,18 +3089,26 @@ export default function EmploymentDetail({
                                                 <div className="col-span-2 text-sm text-gray-500">
                                                     <div>
                                                         <span>
-                                                            {
-                                                                pE.PERSON_EDUCATION_START
-                                                            }
+                                                            {pE.PERSON_EDUCATION_START ===
+                                                            null
+                                                                ? "-"
+                                                                : dateFormat(
+                                                                      pE.PERSON_EDUCATION_START,
+                                                                      "dd-mm-yyyy"
+                                                                  )}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2 text-sm text-gray-500 px-2">
                                                     <div>
                                                         <span>
-                                                            {
-                                                                pE.PERSON_EDUCATION_END
-                                                            }
+                                                            {pE.PERSON_EDUCATION_END ===
+                                                            null
+                                                                ? "-"
+                                                                : dateFormat(
+                                                                      pE.PERSON_EDUCATION_END,
+                                                                      "dd-mm-yyyy"
+                                                                  )}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -2647,18 +3273,26 @@ export default function EmploymentDetail({
                                                 <div className="col-span-2 px-1">
                                                     <div className="text-sm text-gray-500">
                                                         <span>
-                                                            {
-                                                                pC.PERSON_CERTIFICATE_START_DATE
-                                                            }
+                                                            {pC.PERSON_CERTIFICATE_START_DATE ===
+                                                            null
+                                                                ? "-"
+                                                                : dateFormat(
+                                                                      pC.PERSON_CERTIFICATE_START_DATE,
+                                                                      "dd-mm-yyyy"
+                                                                  )}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2 px-1">
                                                     <div className="text-sm text-gray-500">
                                                         <span>
-                                                            {
-                                                                pC.PERSON_CERTIFICATE_EXPIRES_DATE
-                                                            }
+                                                            {pC.PERSON_CERTIFICATE_EXPIRES_DATE ===
+                                                            null
+                                                                ? "-"
+                                                                : dateFormat(
+                                                                      pC.PERSON_CERTIFICATE_EXPIRES_DATE,
+                                                                      "dd-mm-yyyy"
+                                                                  )}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -2682,21 +3316,19 @@ export default function EmploymentDetail({
                             </div>
                         </div>
                         <div className="mt-2 grid-cols-4 grid gap-4">
-                            <div className="text-sm font-semibold ">
+                            {/* <div className="text-sm font-semibold ">
                                 <span>Images</span>
-                            </div>
+                            </div> */}
                             <div className="text-sm font-semibold ">
-                                <span>Name Document</span>
-                            </div>
-                            <div className="text-sm font-semibold ">
-                                <span>Type / Size</span>
+                                <span>KTP</span>
                             </div>
                         </div>
-                        {detailPerson.m_person_document?.map(
-                            (mPD: any, l: number) => {
+                        {detailPerson.m_person_document
+                            ?.filter((m: any) => m.CATEGORY_DOCUMENT === 1)
+                            .map((mPD: any, l: number) => {
                                 return (
                                     <div className="grid-cols-4 grid gap-4 mb-2">
-                                        <div className="text-sm ">
+                                        {/* <div className="text-sm ">
                                             <span>
                                                 <img
                                                     className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
@@ -2732,8 +3364,22 @@ export default function EmploymentDetail({
                                                     }}
                                                 />
                                             </span>
-                                        </div>
-                                        <div className="text-sm text-gray-500 font-semibold ">
+                                        </div> */}
+                                        <div
+                                            className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                window.open(
+                                                    window.location.origin +
+                                                        "/storage/" +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_DIRNAME +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_FILENAME,
+                                                    "_blank"
+                                                );
+                                            }}
+                                        >
                                             <span>
                                                 {
                                                     mPD.document_person
@@ -2741,25 +3387,19 @@ export default function EmploymentDetail({
                                                 }
                                             </span>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <div className="text-sm font-semibold text-gray-500">
-                                                <span>
-                                                    {
-                                                        mPD.document_person
-                                                            .DOCUMENT_FILETYPE
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                <span className="text-xs">
-                                                    {
-                                                        mPD.document_person
-                                                            .DOCUMENT_FILESIZE
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div>
+                                        <div className="flex">
+                                            <span>
+                                                <ArrowDownTrayIcon
+                                                    className="w-6 text-blue-600 hover:cursor-pointer"
+                                                    title="Download Images"
+                                                    // onClick={(e) =>
+                                                    //     alertDelete(
+                                                    //         mPD.DOCUMENT_ID,
+                                                    //         mPD.PERSON_ID
+                                                    //     )
+                                                    // }
+                                                />
+                                            </span>
                                             <span>
                                                 <XMarkIcon
                                                     className="w-7 text-red-600 hover:cursor-pointer"
@@ -2775,8 +3415,108 @@ export default function EmploymentDetail({
                                         </div>
                                     </div>
                                 );
-                            }
-                        )}
+                            })}
+                        <div className="mt-2 grid-cols-4 grid gap-4">
+                            {/* <div className="text-sm font-semibold ">
+                                <span>Images</span>
+                            </div> */}
+                            <div className="text-sm font-semibold ">
+                                <span>Other Document</span>
+                            </div>
+                        </div>
+                        {detailPerson.m_person_document
+                            ?.filter((m: any) => m.CATEGORY_DOCUMENT === 2)
+                            .map((mPD: any, l: number) => {
+                                return (
+                                    <div className="grid-cols-4 grid gap-4 mb-2">
+                                        {/* <div className="text-sm ">
+                                            <span>
+                                                <img
+                                                    className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                                                    src={
+                                                        window.location.origin +
+                                                        "/storage/" +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_DIRNAME +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_FILENAME
+                                                    }
+                                                    alt="Image Person"
+                                                    // onClick={(e) => {
+                                                    //     downloadImage(
+                                                    //         mPD.document_person
+                                                    //             ?.DOCUMENT_ID
+                                                    //     );
+                                                    // }}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        window.open(
+                                                            window.location
+                                                                .origin +
+                                                                "/storage/" +
+                                                                mPD
+                                                                    .document_person
+                                                                    ?.DOCUMENT_DIRNAME +
+                                                                mPD
+                                                                    .document_person
+                                                                    ?.DOCUMENT_FILENAME,
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                />
+                                            </span>
+                                        </div> */}
+                                        <div
+                                            className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                window.open(
+                                                    window.location.origin +
+                                                        "/storage/" +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_DIRNAME +
+                                                        mPD.document_person
+                                                            ?.DOCUMENT_FILENAME,
+                                                    "_blank"
+                                                );
+                                            }}
+                                        >
+                                            <span>
+                                                {
+                                                    mPD.document_person
+                                                        .DOCUMENT_ORIGINAL_NAME
+                                                }
+                                            </span>
+                                        </div>
+                                        <div className="flex">
+                                            <span>
+                                                <ArrowDownTrayIcon
+                                                    className="w-6 text-blue-600 hover:cursor-pointer"
+                                                    title="Download Images"
+                                                    // onClick={(e) =>
+                                                    //     alertDelete(
+                                                    //         mPD.DOCUMENT_ID,
+                                                    //         mPD.PERSON_ID
+                                                    //     )
+                                                    // }
+                                                />
+                                            </span>
+                                            <span>
+                                                <XMarkIcon
+                                                    className="w-7 text-red-600 hover:cursor-pointer"
+                                                    title="Delete Images"
+                                                    onClick={(e) =>
+                                                        alertDelete(
+                                                            mPD.DOCUMENT_ID,
+                                                            mPD.PERSON_ID
+                                                        )
+                                                    }
+                                                />
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                     </div>
                 )}
             </div>

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('PERSON_DOCUMENT_ID')->unique()->primary();
             $table->unsignedBigInteger('PERSON_ID')->nullable();
             $table->unsignedBigInteger('DOCUMENT_ID')->nullable();
+            $table->unsignedBigInteger('CATEGORY_DOCUMENT')->nullable()->comment("1 = KTP, 2 = Other Document");
         });
     }
 

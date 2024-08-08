@@ -22,31 +22,32 @@ import TextArea from "@/Components/TextArea";
 import AGGrid from "@/Components/AgGrid";
 import { BeatLoader } from "react-spinners";
 
-export default function DetailAgent({
+export default function DetailBaa({
     auth,
-    isSuccess,
-    setIsSuccess,
+    // isSuccessNew,
+    // setIsSuccessNew,
     idAgent,
 }: PropsWithChildren<{
     auth: any;
-    isSuccess: any;
+    // isSuccessNew: any;
     idAgent: any;
-    setIsSuccess: any;
+    // setIsSuccessNew: any;
 }>) {
     const [detailAgentNew, setDetailAgentNew] = useState<any>([]);
-    const [relationAgent, setRelationAgent] = useState<any>([]);
+    const [relationBaa, setRelationBaa] = useState<any>([]);
     // console.log(dataAgent);
     // useEffect(() => {
-    //     getMRelationAgent(idAgent);
+    //     getMRelationBaa(idAgent);
     // }, [idAgent]);
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
     });
+    const [isSuccessNew, setIsSuccessNew] = useState<any>("");
 
     // get detail agent
-    const getMRelationAgent = async (id: string) => {
+    const getMRelationBaa = async (id: string) => {
         await axios
-            .post(`/getMRelationAgent`, { id })
+            .post(`/getMRelationBaa`, { id })
             .then((res) => {
                 setDetailAgentNew(res.data);
                 // setDataRelationById(res.data);
@@ -57,15 +58,15 @@ export default function DetailAgent({
     };
 
     // get detail agent
-    const getRelationAgent = async () => {
+    const getRelationBaa = async () => {
         setIsLoading({
             ...isLoading,
             get_detail: true,
         });
         await axios
-            .post(`/getRelationAgentSelect`)
+            .post(`/getRelationBaaSelect`)
             .then((res) => {
-                setRelationAgent(res.data);
+                setRelationBaa(res.data);
                 setIsLoading({
                     ...isLoading,
                     get_detail: false,
@@ -76,19 +77,19 @@ export default function DetailAgent({
             });
     };
 
-    const [modalAgent, setModalAgent] = useState<any>({
+    const [modalBaa, setModalBaa] = useState<any>({
         add: false,
     });
 
     // handle modal add relation agent
-    const handleClickAddRelationAgent = async (
+    const handleClickAddRelationBaa = async (
         // e: FormEvent,
         idRelationOrganization: string
     ) => {
         // e.preventDefault();
-        getRelationAgent();
-        setModalAgent({
-            add: !modalAgent.false,
+        getRelationBaa();
+        setModalBaa({
+            add: !modalBaa.false,
         });
     };
 
@@ -100,7 +101,7 @@ export default function DetailAgent({
     const [query, setQuery] = useState("");
     const [menuOpen, setMenuOpen] = useState(true);
 
-    const filteredTags = relationAgent.filter(
+    const filteredTags = relationBaa.filter(
         (item: any) =>
             item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
                 query.toLocaleLowerCase()?.trim()
@@ -132,9 +133,9 @@ export default function DetailAgent({
         }).then((result: any) => {
             // console.log(message);
             if (result.value) {
-                // getMRelationAgent(message[0]);
-                setIsSuccess({
-                    isSuccess: "success",
+                // getMRelationBaa(message[0]);
+                setIsSuccessNew({
+                    isSuccessNew: "success",
                 });
             }
         });
@@ -142,13 +143,13 @@ export default function DetailAgent({
 
     const deleteProcess = async (id: string) => {
         await axios
-            .post(`/deleteAgent`, { id })
+            .post(`/deleteBaa`, { id })
             .then((res) => {
-                setIsSuccess({
-                    isSuccess: "success",
+                setIsSuccessNew({
+                    isSuccessNew: "success",
                 });
                 // console.log(id);
-                // getMRelationAgent(idAgent);
+                // getMRelationBaa(idAgent);
             })
             .catch((err) => {
                 console.log(err);
@@ -187,7 +188,7 @@ export default function DetailAgent({
                 <XMarkIcon
                     className="w-7 text-red-500 cursor-pointer"
                     onClick={(e) =>
-                        deleteRelation(props.data.M_RELATION_AGENT_ID)
+                        deleteRelation(props.data.M_RELATION_BAA_ID)
                     }
                 />
             </span>
@@ -201,15 +202,15 @@ export default function DetailAgent({
             </div> */}
             {/* modal agent */}
             <ModalToAdd
-                show={modalAgent.add}
+                show={modalBaa.add}
                 onClose={() =>
-                    setModalAgent({
+                    setModalBaa({
                         add: false,
                     })
                 }
-                title={"Add Relation Agent"}
+                title={"Add Relation BAA"}
                 buttonAddOns={""}
-                url={`/addMRelationAgent`}
+                url={`/addMRelationBaa`}
                 data={dataRelation}
                 onSuccess={handleSuccess}
                 classPanel={
@@ -402,14 +403,14 @@ export default function DetailAgent({
             <div className="max-w-full h-[100%] mt-2">
                 <AGGrid
                     // loading={isLoading.get_policy}
-                    url={"getMRelationAgent"}
+                    url={"getMRelationBAA"}
                     addButtonLabel={"Add Relation"}
                     withParam={idAgent}
                     addButtonModalState={() =>
-                        handleClickAddRelationAgent(idAgent)
+                        handleClickAddRelationBaa(idAgent)
                     }
                     doubleClickEvent={undefined}
-                    triggeringRefreshData={isSuccess}
+                    triggeringRefreshData={isSuccessNew}
                     colDefs={[
                         {
                             headerName: "No.",
@@ -450,7 +451,7 @@ export default function DetailAgent({
                                     <div
                                         className="p-2 bg-red-600 w-fit text-white rounded-md cursor-pointer"
                                         onClick={(e) =>
-                                            handleClickAddRelationAgent(
+                                            handleClickAddRelationBaa(
                                                 e,
                                                 idAgent
                                             )

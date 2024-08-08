@@ -24,13 +24,14 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import { Datepicker } from "flowbite-react";
 import Select from "react-tailwindcss-select";
 
-export default function BankAccount({
+export default function DetailBankAccount({
     show,
     modal,
     bank,
     optionsBank,
     idPerson,
     handleSuccess,
+    detailBank,
 }: PropsWithChildren<{
     show: any;
     modal: any;
@@ -38,8 +39,15 @@ export default function BankAccount({
     optionsBank: any;
     idPerson: any;
     handleSuccess: any;
+    detailBank: any;
 }>) {
-    const [dataBankAccount, setDataBankAccount] = useState<any>({
+    useEffect(() => {
+        setDataEditBankAccount({
+            BANK_ACCOUNT: detailBank,
+        });
+    }, [detailBank]);
+
+    const [dataEditBankAccount, setDataEditBankAccount] = useState<any>({
         idPerson: "",
         BANK_ACCOUNT: [
             {
@@ -61,21 +69,22 @@ export default function BankAccount({
 
     const addRowBankAccount = (e: FormEvent) => {
         e.preventDefault();
-        setDataBankAccount({
-            ...dataBankAccount,
+        setDataEditBankAccount({
+            ...dataEditBankAccount,
             BANK_ACCOUNT: [
-                ...dataBankAccount.BANK_ACCOUNT,
+                ...dataEditBankAccount.BANK_ACCOUNT,
                 {
                     idPerson: idPerson,
                     PERSON_BANK_ACCOUNT_NAME: "",
                     PERSON_BANK_ACCOUNT_NUMBER: "",
                     PERSON_BANK_ACCOUNT_FOR: null,
-                    BANK_ID: "",
+                    BANK_ID: null,
+                    m_for_bank: null,
                 },
             ],
         });
-        // setDataBankAccount([
-        //     ...dataBankAccount.BANK_ACCOUNT,
+        // setDataEditBankAccount([
+        //     ...dataEditBankAccount.BANK_ACCOUNT,
         //     {
         //         idPerson: idPerson,
         //         PERSON_BANK_ACCOUNT_NAME: "",
@@ -86,14 +95,73 @@ export default function BankAccount({
         // ]);
     };
 
+    const getNameBank = (value: any) => {
+        if (value) {
+            const selected = bank.filter(
+                (option: any) => option.BANK_ID === parseInt(value)
+            );
+            const nameBank = selected[0];
+            if (nameBank !== undefined) {
+                return nameBank.BANK_ABBREVIATION;
+            }
+        }
+    };
+
+    const getNameForBank = (dB: any, i: number) => {
+        const bankFor = dB.m_for_bank?.map((query: any) => {
+            if (query.for_bank === undefined) {
+                return {
+                    value: query.value,
+                    label: query.label,
+                };
+            } else {
+                return {
+                    value: query.for_bank.FOR_BANK_ACCOUNT_ID,
+                    label: query.for_bank.FOR_BANK_ACCOUNT_NAME,
+                };
+            }
+        });
+        return bankFor;
+    };
+
     const inputDataBank = (
         name: string,
         value: string | undefined,
         i: number
     ) => {
-        const changeVal: any = [...dataBankAccount.BANK_ACCOUNT];
+        const changeVal: any = [...dataEditBankAccount.BANK_ACCOUNT];
         changeVal[i][name] = value;
-        setDataBankAccount({ ...dataBankAccount, BANK_ACCOUNT: changeVal });
+        setDataEditBankAccount({
+            ...dataEditBankAccount,
+            BANK_ACCOUNT: changeVal,
+        });
+    };
+
+    const inputDataBankId = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...dataEditBankAccount.BANK_ACCOUNT];
+        changeVal[i][name] = value;
+        setDataEditBankAccount({
+            ...dataEditBankAccount,
+            BANK_ACCOUNT: changeVal,
+        });
+    };
+
+    const inputDataForBank = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...dataEditBankAccount.BANK_ACCOUNT];
+        changeVal[i].m_for_bank = value;
+        // console.log(changeVal);
+        setDataEditBankAccount({
+            ...dataEditBankAccount,
+            BANK_ACCOUNT: changeVal,
+        });
     };
 
     // const optionsBank = [
@@ -119,19 +187,21 @@ export default function BankAccount({
         };
     });
 
+    console.log("hasil", dataEditBankAccount.BANK_ACCOUNT);
+
     const close = () => {
         modal();
-        setDataBankAccount({
-            BANK_ACCOUNT: [
-                {
-                    idPerson: idPerson,
-                    PERSON_BANK_ACCOUNT_NAME: "",
-                    PERSON_BANK_ACCOUNT_NUMBER: "",
-                    PERSON_BANK_ACCOUNT_FOR: null,
-                    BANK_ID: "",
-                },
-            ],
-        });
+        // setDataEditBankAccount({
+        //     BANK_ACCOUNT: [
+        //         {
+        //             idPerson: idPerson,
+        //             PERSON_BANK_ACCOUNT_NAME: "",
+        //             PERSON_BANK_ACCOUNT_NUMBER: "",
+        //             PERSON_BANK_ACCOUNT_FOR: null,
+        //             BANK_ID: "",
+        //         },
+        //     ],
+        // });
     };
 
     return (
@@ -140,16 +210,16 @@ export default function BankAccount({
                 buttonAddOns={""}
                 show={show}
                 onClose={close}
-                title={"Bank Account"}
-                url={`/addBankAccount`}
-                data={dataBankAccount}
+                title={"Detail & Edit Bank Account"}
+                url={`/editBankAccount`}
+                data={dataEditBankAccount}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-4xl"
                 }
                 onSuccess={handleSuccess}
                 body={
                     <>
-                        {dataBankAccount.BANK_ACCOUNT?.map(
+                        {dataEditBankAccount.BANK_ACCOUNT?.map(
                             (dB: any, i: number) => {
                                 return (
                                     <div
@@ -175,14 +245,19 @@ export default function BankAccount({
                                                     }: any) =>
                                                         `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
                                                             isSelected
-                                                                ? `text-white bg-primary-pelindo`
-                                                                : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                                ? `text-white bg-red-500`
+                                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
                                                         }`,
                                                 }}
                                                 options={bankSelect}
                                                 isSearchable={true}
                                                 placeholder={"Bank Name *"}
-                                                value={dB.BANK_ID}
+                                                value={{
+                                                    label: getNameBank(
+                                                        dB.BANK_ID
+                                                    ),
+                                                    value: dB.BANK_ID,
+                                                }}
                                                 // onChange={(e) =>
                                                 //     inputDataBank(
                                                 //         "BANK_ID",
@@ -191,9 +266,9 @@ export default function BankAccount({
                                                 //     )
                                                 // }
                                                 onChange={(val: any) => {
-                                                    inputDataBank(
+                                                    inputDataBankId(
                                                         "BANK_ID",
-                                                        val,
+                                                        val.value,
                                                         i
                                                     );
                                                     inputDataBank(
@@ -246,12 +321,10 @@ export default function BankAccount({
                                                     "Select For Bank Account *"
                                                 }
                                                 isClearable={true}
-                                                value={
-                                                    dB.PERSON_BANK_ACCOUNT_FOR
-                                                }
+                                                value={getNameForBank(dB, i)}
                                                 onChange={(val: any) => {
-                                                    inputDataBank(
-                                                        "PERSON_BANK_ACCOUNT_FOR",
+                                                    inputDataForBank(
+                                                        "FOR_BANK_ACCOUNT_ID",
                                                         val,
                                                         i
                                                     );
@@ -268,14 +341,14 @@ export default function BankAccount({
                                                 className=" h-6 text-red-500 cursor-pointer font-semibold mt-11"
                                                 onClick={() => {
                                                     const updatedData =
-                                                        dataBankAccount.BANK_ACCOUNT.filter(
+                                                        dataEditBankAccount.BANK_ACCOUNT.filter(
                                                             (
                                                                 data: any,
                                                                 a: number
                                                             ) => a !== i
                                                         );
-                                                    setDataBankAccount({
-                                                        ...dataBankAccount,
+                                                    setDataEditBankAccount({
+                                                        ...dataEditBankAccount,
                                                         BANK_ACCOUNT:
                                                             updatedData,
                                                     });
