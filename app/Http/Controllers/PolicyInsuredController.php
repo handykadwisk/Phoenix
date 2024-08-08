@@ -25,6 +25,7 @@ class PolicyInsuredController extends Controller
             $insured = MPolicyInsured::insertGetId([
                 'POLICY_ID'             => $value['POLICY_ID'],
                 'POLICY_INSURED_NAME'  => trim($value['POLICY_INSURED_NAME']),
+                'ADMIN_COST'             => $value['POLICY_ADMIN_COST'],
             ]);
             
             foreach ($value['policy_insured_detail'] as $details => $detail) {
@@ -37,11 +38,23 @@ class PolicyInsuredController extends Controller
                     'PREMIUM_AMOUNT' => $detail['PREMIUM_AMOUNT'],
                     'DISC_BF_PERCENTAGE' => $detail['DISC_BF_PERCENTAGE'],
                     'DISC_BF_AMOUNT' => $detail['DISC_BF_AMOUNT'],
-                    'DISC_ADMIN_PERCENTAGE' => $detail['DISC_ADMIN_PERCENTAGE'],
-                    'DISC_ADMIN_AMOUNT' => $detail['DISC_ADMIN_AMOUNT'],
+                    // 'DISC_ADMIN_PERCENTAGE' => $detail['DISC_ADMIN_PERCENTAGE'],
+                    // 'DISC_ADMIN_AMOUNT' => $detail['DISC_ADMIN_AMOUNT'],
                     'DISC_EF_PERCENTAGE' => $detail['DISC_EF_PERCENTAGE'],
                     'DISC_EF_AMOUNT' => $detail['DISC_EF_AMOUNT'],
                     'PREMIUM_TO_INSURED' => $detail['PREMIUM_TO_INSURED'],
+
+                    // TAMBAHAN FIELD
+                    'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
+                    'REMARKS' => $detail['REMARKS'],
+                    'BF_FULL_AMOUNT' => $detail['BF_FULL_AMOUNT'],
+                    'BF_NETT_AMOUNT' => $detail['BF_NETT_AMOUNT'],
+                    'EF_FULL_AMOUNT' => $detail['EF_FULL_AMOUNT'],
+                    'EF_NETT_AMOUNT' => $detail['EF_NETT_AMOUNT'],
+                    'DISC_CF_PERCENTAGE' => $detail['DISC_CF_PERCENTAGE'],
+                    'DISC_CF_AMOUNT' => $detail['DISC_CF_AMOUNT'],
+                    'CF_NETT_AMOUNT' => $detail['CF_NETT_AMOUNT'],
+                    'INCOME_NETT_AMOUNT' => $detail['INCOME_NETT_AMOUNT'],
                 ]);
             }
         }
@@ -134,19 +147,24 @@ class PolicyInsuredController extends Controller
     }
 
     public function getInsurerNettPremi(Request $request) {
-        // dd($request->input());
-
         $query = DB::table('t_insurance_panel as ip')
                     ->select(DB::raw('ip.IP_ID, ip.POLICY_ID, ipc.INTEREST_INSURED_ID, ipc.REMARKS, ipc.POLICY_COVERAGE_ID, ipc.CURRENCY_ID, SUM(ipc.NETT_PREMI) AS INSURER_NETT_PREMIUM, SUM(ipc.BROKERAGE_FEE) AS BROKERAGE_FEE, SUM(ipc.ENGINEERING_FEE) AS ENGINEERING_FEE, SUM(ipc.CONSULTANCY_FEE) AS CONSULTANCY_FEE'))
                      ->leftJoin('m_insurer_coverage AS ipc', 'ip.IP_ID', '=', 'ipc.IP_ID')
             ->where('POLICY_ID', $request->input('policy_id'))
             ->groupBy('ipc.CURRENCY_ID', 'ipc.POLICY_COVERAGE_ID')
                      ->get();
-            // ->select('SUM(NETT_PREMI) AS insurer_nett_premium')
-            // ->leftJoin('m_insurer_coverage AS ipc', 'ip.IP_ID', '=', 'ipc.IP_ID')
-            // ->where('POLICY_ID', $request->input('policy_id'))
-            // ->groupBy('ipc.CURRENCY_ID')
-            // ->sum('ip.IP_ID, ip.POLICY_ID, ipc.INTEREST_INSURED_ID, ipc.REMARKS, ipc.POLICY_COVERAGE_ID, ipc.CURRENCY_ID, ipc.NETT_PREMI, ipc.BROKERAGE_FEE, ipc.ENGINEERING_FEE, ipc.CONSULTANCY_FEE');
+
+        return response()->json($query);
+
+    }
+
+    public function getSummaryInsured(Request $request) {
+        $query = DB::table('m_policy_insured as pii')
+                    ->select(DB::raw('pii.POLICY_ID, pii.POLICY_INSURED_ID, pid.INTEREST_INSURED_ID, SUM(pid.BF_NETT_AMOUNT) AS BF_NETT_AMOUNT, SUM(pid.EF_NETT_AMOUNT) AS EF_NETT_AMOUNT, SUM(pid.CF_NETT_AMOUNT) AS CF_NETT_AMOUNT'))
+                    ->leftJoin('m_policy_insured_detail AS pid', 'pii.POLICY_INSURED_ID', '=', 'pid.POLICY_INSURED_ID')
+                    ->where('POLICY_ID', $request->input('policy_id'))
+            // ->groupBy('ipc.CURRENCY_ID', 'ipc.POLICY_COVERAGE_ID')
+                    ->get();
 
         return response()->json($query);
 

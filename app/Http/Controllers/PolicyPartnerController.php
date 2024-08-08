@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MPolicyPartners;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PolicyPartnerController extends Controller
 {
@@ -29,6 +30,7 @@ class PolicyPartnerController extends Controller
                     'INCOME_TYPE' => $detail1['INCOME_TYPE'],
                     'POLICY_ID' => $detail1['POLICY_ID'],
                     'PARTNER_NAME' => $detail1['NAME'],
+                    'RELATION_ID' => $detail1['RELATION_ID'],
                     'BROKERAGE_FEE_PERCENTAGE' => $detail1['BROKERAGE_FEE_PERCENTAGE'],
                     'BROKERAGE_FEE_AMOUNT' => $detail1['BROKERAGE_FEE_AMOUNT'],
                     'ENGINEERING_FEE_PERCENTAGE' => $detail1['ENGINEERING_FEE_PERCENTAGE'],
@@ -46,6 +48,7 @@ class PolicyPartnerController extends Controller
                     'INCOME_TYPE' => $detail2['INCOME_TYPE'],
                     'POLICY_ID' => $detail2['POLICY_ID'],
                     'PARTNER_NAME' => $detail2['NAME'],
+                    'RELATION_ID' => $detail1['RELATION_ID'],
                     'BROKERAGE_FEE_PERCENTAGE' => $detail2['BROKERAGE_FEE_PERCENTAGE'],
                     'BROKERAGE_FEE_AMOUNT' => $detail2['BROKERAGE_FEE_AMOUNT'],
                     'ENGINEERING_FEE_PERCENTAGE' => $detail2['ENGINEERING_FEE_PERCENTAGE'],
@@ -63,6 +66,7 @@ class PolicyPartnerController extends Controller
                     'INCOME_TYPE' => $detail3['INCOME_TYPE'],
                     'POLICY_ID' => $detail3['POLICY_ID'],
                     'PARTNER_NAME' => $detail3['NAME'],
+                    'RELATION_ID' => $detail1['RELATION_ID'],
                     'BROKERAGE_FEE_PERCENTAGE' => $detail3['BROKERAGE_FEE_PERCENTAGE'],
                     'BROKERAGE_FEE_AMOUNT' => $detail3['BROKERAGE_FEE_AMOUNT'],
                     'ENGINEERING_FEE_PERCENTAGE' => $detail3['ENGINEERING_FEE_PERCENTAGE'],
@@ -87,6 +91,22 @@ class PolicyPartnerController extends Controller
      public function getDataPartner($id) {       
         $query = MPolicyPartners::where('POLICY_ID', $id)->get();
         return response()->json($query);
+    }
+
+    public function getRelationByType($id) {  
+        if ($id == 3) {
+            $data = DB::table('t_relation')
+                ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
+                ->where('RELATION_TYPE_ID', '=', 3)
+                ->get();
+        } else if ($id == 4) {
+            $data = DB::table('t_relation')
+                ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
+                ->where('RELATION_TYPE_ID', '=', 4)
+                ->get();
+        }
+        // $query = MPolicyPartners::where('POLICY_ID', $id)->get();
+        return response()->json($data);
     }
 
     public function editPartners(Request $request) {
@@ -155,6 +175,7 @@ class PolicyPartnerController extends Controller
                         'INCOME_TYPE' => $detail1['INCOME_TYPE'],
                         'POLICY_ID' => $detail1['POLICY_ID'],
                         'PARTNER_NAME' => $detail1['PARTNER_NAME'],
+                        'RELATION_ID' => null,
                         'BROKERAGE_FEE_PERCENTAGE' => $detail1['BROKERAGE_FEE_PERCENTAGE'],
                         'BROKERAGE_FEE_AMOUNT' => $detail1['BROKERAGE_FEE_AMOUNT'],
                         'ENGINEERING_FEE_PERCENTAGE' => $detail1['ENGINEERING_FEE_PERCENTAGE'],
@@ -175,6 +196,7 @@ class PolicyPartnerController extends Controller
                         'INCOME_TYPE' => $detail2['INCOME_TYPE'],
                         'POLICY_ID' => $detail2['POLICY_ID'],
                         'PARTNER_NAME' => $detail2['PARTNER_NAME'],
+                        'RELATION_ID' => array_key_exists("RELATION_ID",$detail2) ? $detail2['RELATION_ID'] : null,
                         'BROKERAGE_FEE_PERCENTAGE' => $detail2['BROKERAGE_FEE_PERCENTAGE'],
                         'BROKERAGE_FEE_AMOUNT' => $detail2['BROKERAGE_FEE_AMOUNT'],
                         'ENGINEERING_FEE_PERCENTAGE' => $detail2['ENGINEERING_FEE_PERCENTAGE'],
@@ -195,6 +217,7 @@ class PolicyPartnerController extends Controller
                         'INCOME_TYPE' => $detail3['INCOME_TYPE'],
                         'POLICY_ID' => $detail3['POLICY_ID'],
                         'PARTNER_NAME' => $detail3['PARTNER_NAME'],
+                        'RELATION_ID' => array_key_exists("RELATION_ID",$detail3) ? $detail3['RELATION_ID'] : null,
                         'BROKERAGE_FEE_PERCENTAGE' => $detail3['BROKERAGE_FEE_PERCENTAGE'],
                         'BROKERAGE_FEE_AMOUNT' => $detail3['BROKERAGE_FEE_AMOUNT'],
                         'ENGINEERING_FEE_PERCENTAGE' => $detail3['ENGINEERING_FEE_PERCENTAGE'],

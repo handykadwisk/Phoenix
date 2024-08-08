@@ -239,6 +239,12 @@ export default function ModalDetailPolicy({
         return result ? result.CURRENCY_SYMBOL : null;
     };
 
+    const getInterestInsuredById = (insterestInsuredId: any) => {
+        const dataInterest = interestInsured;
+        const result = dataInterest.find((id: any) => id.INTEREST_INSURED_ID == insterestInsuredId);
+        return result ? result.INTEREST_INSURED_NAME : null;
+    };
+
     // Add Policy Coverage
     const fieldDataCoverage: any = {
         POLICY_ID: "",
@@ -1175,7 +1181,7 @@ export default function ModalDetailPolicy({
     const fieldDataInsured: any = {
         POLICY_ID: "",
         POLICY_INSURED_NAME: "",
-        POLICY_ADMIN_COST:"",
+        POLICY_ADMIN_COST:0,
         policy_insured_detail: [
             // {
             //     INTEREST_INSURED_ID: "",
@@ -1846,6 +1852,7 @@ export default function ModalDetailPolicy({
                                     INCOME_TYPE: val["INCOME_TYPE"],
                                     POLICY_ID: val["POLICY_ID"],
                                     PARTNER_NAME: val["PARTNER_NAME"],
+                                    RELATION_ID: "",
                                     BROKERAGE_FEE_PERCENTAGE:
                                         val["BROKERAGE_FEE_PERCENTAGE"],
                                     BROKERAGE_FEE_AMOUNT:
@@ -1872,6 +1879,7 @@ export default function ModalDetailPolicy({
                                     INCOME_TYPE: val["INCOME_TYPE"],
                                     POLICY_ID: val["POLICY_ID"],
                                     PARTNER_NAME: val["PARTNER_NAME"],
+                                    RELATION_ID: val["RELATION_ID"],
                                     BROKERAGE_FEE_PERCENTAGE:
                                         val["BROKERAGE_FEE_PERCENTAGE"],
                                     BROKERAGE_FEE_AMOUNT:
@@ -1898,6 +1906,7 @@ export default function ModalDetailPolicy({
                                     INCOME_TYPE: val["INCOME_TYPE"],
                                     POLICY_ID: val["POLICY_ID"],
                                     PARTNER_NAME: val["PARTNER_NAME"],
+                                    RELATION_ID: val["RELATION_ID"],
                                     BROKERAGE_FEE_PERCENTAGE:
                                         val["BROKERAGE_FEE_PERCENTAGE"],
                                     BROKERAGE_FEE_AMOUNT:
@@ -1927,6 +1936,8 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
+    console.log("listDataPartners: ", listDataPartners);
+
     // const [modalTest, setModalTest] = useState<any>({
     //     add:false
     // })
@@ -1938,9 +1949,60 @@ export default function ModalDetailPolicy({
     //     });
     // };
 
+    const [dataInitialForBP, setDataInitialForBP] = useState<any>({});
+
+    const getSummaryInsured = (policy_id: any) => {
+        return axios
+            .post(`/getSummaryInsured?`, {
+                policy_id: policy_id,
+            })
+            .then((res) => {
+                const data = res.data[0];
+                let policy_insured_detail: any = [];
+                console.log("res.data: ", data);
+                setDataInitialForBP(data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [listAgent, setListAgent] = useState<any>([]);
+    const [listBAA, setListBAA] = useState<any>([]);
+
+    const getAgent = async (relation_type: number) => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
+        await axios
+            .get(`/getRelationByType/${relation_type}`)
+            .then((res) => {
+                setListAgent(res.data)
+            })
+            .catch((err) => console.log(err));
+    };
+
+    const getBAA = async (relation_type: number) => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
+        await axios
+            .get(`/getRelationByType/${relation_type}`)
+            .then((res) => {
+                setListBAA(res.data)
+            })
+            .catch((err) => console.log(err));
+    };
+
     // Edit Partners
     const handleEditPartners = async (policy_id: any) => {
+        getAgent(3);
+        getBAA(4);
         getDataPartner(policy_id);
+        getSummaryInsured(policy_id);
+        
         setModal({
             add: false,
             delete: false,
@@ -1973,6 +2035,7 @@ export default function ModalDetailPolicy({
                 {
                     INCOME_TYPE: income_type,
                     POLICY_ID: policy.POLICY_ID,
+                    RELATION_ID:"",
                     PARTNER_NAME: "",
                     BROKERAGE_FEE_PERCENTAGE: 0,
                     BROKERAGE_FEE_AMOUNT: 0,
@@ -1998,6 +2061,27 @@ export default function ModalDetailPolicy({
         const item = { ...items[incomeNum] };
         const detail = [...item.income_detail];
         const detailItem = { ...detail[detailNum] };
+
+        const initBF = dataInitialForBP.BF_NETT_AMOUNT;
+        const initCF = dataInitialForBP.CF_NETT_AMOUNT;
+        const initEF = dataInitialForBP.EF_NETT_AMOUNT;
+// alert('a')
+        if (name == "BROKERAGE_FEE_PERCENTAGE") {
+            detailItem["BROKERAGE_FEE_AMOUNT"] =
+                (initBF * detailItem["BROKERAGE_FEE_PERCENTAGE"]) / 100;
+        }
+
+        if (name == "ENGINEERING_FEE_PERCENTAGE") {
+            detailItem["ENGINEERING_FEE_AMOUNT"] =
+                (initEF * detailItem["ENGINEERING_FEE_PERCENTAGE"]) / 100;
+        }
+
+        if (name == "CONSULTANCY_FEE_PERCENTAGE") {
+            detailItem["CONSULTANCY_FEE_AMOUNT"] =
+                (initCF * detailItem["CONSULTANCY_FEE_PERCENTAGE"]) / 100;
+        }
+
+
         detailItem[name] = value;
         detail[detailNum] = detailItem;
         item.income_detail = detail;
@@ -2020,6 +2104,7 @@ export default function ModalDetailPolicy({
         const fbi_by_pks = { ...items[0] };
         const agent_commission = { ...items[1] };
         const acquisition_cost = { ...items[2] };
+        
         // Nett Brokerage Fee
         const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
             prev: any,
@@ -2087,17 +2172,24 @@ export default function ModalDetailPolicy({
             0
         );
 
+        const initBF = dataInitialForBP.BF_NETT_AMOUNT;
+        const initEF = dataInitialForBP.EF_NETT_AMOUNT;
+        const initCF = dataInitialForBP.CF_NETT_AMOUNT;
+        
+
         const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition;
+        console.log("nettBF: ", nettBF, initEF, initCF);
+        console.log("initBF - nettBF: ", initBF);
         const nettEF = nettEF_fbi + nettEF_agent + nettEF_acquisition;
         const nettCF = nettCF_fbi + nettCF_agent + nettCF_acquisition;
         setDataEditNettIncome([
             {
-                nettBf: nettBF,
-                nettEf: nettEF,
-                nettCf: nettCF,
+                nettBf: initBF - nettBF,
+                nettEf: initEF - nettEF,
+                nettCf: initCF - nettCF,
             },
         ]);
-        setGrandTotalEditNettIncome(nettBF + nettEF + nettCF);
+        setGrandTotalEditNettIncome( (initBF - nettBF) + (initEF - nettEF) + (initCF -nettCF) );
     };
 
     const deleteRowEditIncome = (incomeNum: number, detailNum: number) => {
@@ -3376,28 +3468,28 @@ export default function ModalDetailPolicy({
                                                             );
                                                         }
                                                     )}
-                                                    <tr>
-                                                        <td
-                                                            colSpan={2}
-                                                            className=" h-10 w-40 mb-2 mt-2"
-                                                        >
-                                                            <a
-                                                                href=""
-                                                                className="pl-2 text-xs mt-1 text-primary-pelindo ms-1"
-                                                                onClick={(e) =>
-                                                                    addRowCoverageDetail(
-                                                                        e,
-                                                                        l
-                                                                    )
-                                                                }
-                                                            >
-                                                                + Add Row
-                                                            </a>
-                                                        </td>
-                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <tr>
+                                            <td
+                                                colSpan={2}
+                                                className=" h-10 w-40 mb-2 mt-2"
+                                            >
+                                                <a
+                                                    href=""
+                                                    className="pl-2 text-xs mt-1 text-primary-pelindo ms-1"
+                                                    onClick={(e) =>
+                                                        addRowCoverageDetail(
+                                                            e,
+                                                            l
+                                                        )
+                                                    }
+                                                >
+                                                    + Add Row
+                                                </a>
+                                            </td>
+                                        </tr>
                                     </div>
                                 </div>
                             </div>
@@ -6130,7 +6222,7 @@ export default function ModalDetailPolicy({
                                                             </tr>
                                                         )
                                                     )}
-                                                    <tr>
+                                                    {/* <tr>
                                                         <td
                                                             colSpan={2}
                                                             className=" h-10 w-40 mb-2 mt-2"
@@ -6148,7 +6240,7 @@ export default function ModalDetailPolicy({
                                                                 + Add Row
                                                             </a>
                                                         </td>
-                                                    </tr>
+                                                    </tr> */}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -7273,6 +7365,9 @@ export default function ModalDetailPolicy({
                             <table className="table-auto w-full">
                                 <thead className="bg-gray-50">
                                     <tr>
+                                        {/* {dataInitialForBP.map(
+                                            (init: any, i: number) => (
+                                                <> */}
                                         <th
                                             rowSpan={2}
                                             scope="col"
@@ -7290,8 +7385,11 @@ export default function ModalDetailPolicy({
                                         >
                                             <div>Brokerage Fee</div>
                                             <div>
-                                                Nilai Brokerage Fee Dari
-                                                Interest
+                                                {new Intl.NumberFormat("id", {
+                                                    style: "decimal",
+                                                }).format(
+                                                    dataInitialForBP.BF_NETT_AMOUNT
+                                                )}
                                             </div>
                                         </th>
                                         <th
@@ -7301,8 +7399,11 @@ export default function ModalDetailPolicy({
                                         >
                                             <div>Engineering Fee</div>
                                             <div>
-                                                Nilai Engineering Fee Dari
-                                                Interest
+                                                {new Intl.NumberFormat("id", {
+                                                    style: "decimal",
+                                                }).format(
+                                                    dataInitialForBP.EF_NETT_AMOUNT
+                                                )}
                                             </div>
                                         </th>
                                         <th
@@ -7312,8 +7413,11 @@ export default function ModalDetailPolicy({
                                         >
                                             <div>Consultancy Fee</div>
                                             <div>
-                                                Nilai Consultancy Fee Dari
-                                                Interest
+                                                {new Intl.NumberFormat("id", {
+                                                    style: "decimal",
+                                                }).format(
+                                                    dataInitialForBP.CF_NETT_AMOUNT
+                                                )}
                                             </div>
                                         </th>
 
@@ -7324,6 +7428,9 @@ export default function ModalDetailPolicy({
                                         >
                                             Action
                                         </th>
+                                        {/* </>
+                                            )
+                                        )} */}
                                     </tr>
                                     <tr>
                                         <th
@@ -7417,31 +7524,141 @@ export default function ModalDetailPolicy({
                                                             }
                                                         >
                                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm  text-gray-900 sm:pl-3 border-[1px]">
-                                                                <div className="block w-40 mx-auto text-left">
-                                                                    <TextInput
-                                                                        id="name"
-                                                                        type="text"
-                                                                        name="name"
+                                                                {editPartner.INCOME_CATEGORY_ID ==
+                                                                2 ? (
+                                                                    <select
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                                         value={
-                                                                            detail.PARTNER_NAME
+                                                                            detail.RELATION_ID
                                                                         }
-                                                                        className=""
                                                                         onChange={(
                                                                             e
-                                                                        ) =>
+                                                                        ) => {
                                                                             inputDataEditIncome(
-                                                                                "PARTNER_NAME",
+                                                                                "RELATION_ID",
                                                                                 e
                                                                                     .target
                                                                                     .value,
                                                                                 i,
                                                                                 detailIdx
-                                                                            )
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
+                                                                            --{" "}
+                                                                            <i>
+                                                                                Choose
+                                                                                Agent
+                                                                            </i>{" "}
+                                                                            --
+                                                                        </option>
+                                                                        {listAgent.map(
+                                                                            (
+                                                                                item: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            item.RELATION_ORGANIZATION_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            item.RELATION_ORGANIZATION_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </select>
+                                                                ) : editPartner.INCOME_CATEGORY_ID ==
+                                                                  3 ? (
+                                                                    <select
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                        value={
+                                                                            detail.RELATION_ID
                                                                         }
-                                                                        required
-                                                                        autoComplete="off"
-                                                                    />
-                                                                </div>
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            inputDataEditIncome(
+                                                                                "RELATION_ID",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i,
+                                                                                detailIdx
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
+                                                                            --{" "}
+                                                                            <i>
+                                                                                Choose
+                                                                                BAA
+                                                                            </i>{" "}
+                                                                            --
+                                                                        </option>
+                                                                        {listBAA.map(
+                                                                            (
+                                                                                item: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            item.RELATION_ORGANIZATION_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            item.RELATION_ORGANIZATION_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </select>
+                                                                ) : (
+                                                                    <div className="block w-40 mx-auto text-left">
+                                                                        <TextInput
+                                                                            id="name"
+                                                                            type="text"
+                                                                            name="name"
+                                                                            value={
+                                                                                detail.PARTNER_NAME
+                                                                            }
+                                                                            className=""
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                inputDataEditIncome(
+                                                                                    "PARTNER_NAME",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                    i,
+                                                                                    detailIdx
+                                                                                )
+                                                                            }
+                                                                            required
+                                                                            autoComplete="off"
+                                                                        />
+                                                                    </div>
+                                                                )}
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
                                                                 <CurrencyInput
@@ -7909,185 +8126,317 @@ export default function ModalDetailPolicy({
                                                         Edit Coverage
                                                     </button>
                                                 </div>
-                                                <table className="table-auto overflow-x-auto divide-y divide-gray-300">
-                                                    <thead className="bg-gray-50">
-                                                        <tr key={i}>
-                                                            <th
-                                                                scope="col"
-                                                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                                                            >
-                                                                Currency
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Sum Insured
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Rate %
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Gross Premium
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Loss Limit %
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Loss Limit
-                                                                Amount
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Loss Limit Scale
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Insurance
-                                                                Discount %
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Insurance
-                                                                Discount Amount
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Coverage Premium
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-gray-200 bg-white">
-                                                        {name.policy_coverage_detail.map(
-                                                            (
-                                                                detail: any,
-                                                                j: number
-                                                            ) => (
-                                                                <tr key={j}>
-                                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                                        {getCurrencyById(
-                                                                            detail.CURRENCY_ID
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.SUM_INSURED
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                                maximumFractionDigits: 6,
-                                                                            }
-                                                                        ).format(
-                                                                            detail.RATE
-                                                                        ) +
-                                                                            " %"}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.GROSS_PREMIUM
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.LOST_LIMIT_PERCENTAGE
-                                                                        ) +
-                                                                            " %"}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.LOST_LIMIT_AMOUNT
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.LOST_LIMIT_SCALE
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.INSURANCE_DISC_PERCENTAGE
-                                                                        ) +
-                                                                            " %"}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.INSURANCE_DISC_AMOUNT
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            detail.PREMIUM
-                                                                        )}
-                                                                    </td>
-                                                                </tr>
-                                                            )
-                                                        )}
-                                                    </tbody>
-                                                </table>
+                                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
+                                                    <table className="table-auto w-full">
+                                                        <thead className="border-b bg-gray-50">
+                                                            <tr className="text-sm font-semibold text-gray-900">
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300"
+                                                                >
+                                                                    No.
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Interest
+                                                                    Insured
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Remarks
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Currency
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Sum Insured
+                                                                </th>
+                                                                <th
+                                                                    colSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Gross
+                                                                    Premium
+                                                                </th>
+                                                                {/* <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Gross Premium
+                                                        </th> */}
+                                                                <th
+                                                                    colSpan={3}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Loss Limit
+                                                                    Premium
+                                                                </th>
+                                                                {/* <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Loss Limit Amount
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Loss Limit Scale
+                                                        </th> */}
+                                                                <th
+                                                                    colSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Insurance
+                                                                    Discount
+                                                                </th>
+                                                                {/* <th
+                                                            rowSpan={2}
+                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                        >
+                                                            Insurance Discount
+                                                            Amount
+                                                        </th> */}
+
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Coverage
+                                                                    Premium
+                                                                </th>
+                                                                <th
+                                                                    colSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Deposit
+                                                                    Premium
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
+                                                                >
+                                                                    Delete
+                                                                </th>
+                                                            </tr>
+                                                            <tr className="text-sm font-semibold text-gray-900">
+                                                                <th className="text-center p-4 border">
+                                                                    Rate %
+                                                                </th>
+                                                                <th className="text-center p-4 border">
+                                                                    Amount
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center p-4 border"
+                                                                >
+                                                                    %
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center p-4 border"
+                                                                >
+                                                                    Scale
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center p-4 border"
+                                                                >
+                                                                    Amount
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center p-4 border"
+                                                                >
+                                                                    %
+                                                                </th>
+                                                                <th
+                                                                    rowSpan={2}
+                                                                    className="text-center p-4 border"
+                                                                >
+                                                                    Amount
+                                                                </th>
+                                                                <th className="text-center p-4 border ">
+                                                                    %
+                                                                </th>
+                                                                <th className="text-center p-4 border ">
+                                                                    Amount
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-gray-200 bg-white">
+                                                            {name.policy_coverage_detail.map(
+                                                                (
+                                                                    detail: any,
+                                                                    j: number
+                                                                ) => (
+                                                                    <tr key={j}>
+                                                                        <td className="p-4 border text-center">
+                                                                            {j +
+                                                                                1}
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600">
+                                                                            <div className="block w-40 mx-auto text-left">
+                                                                                {getInterestInsuredById(
+                                                                                    detail.INTEREST_INSURED_ID
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600">
+                                                                            <div className="block w-40 mx-auto text-left">
+                                                                                {
+                                                                                    detail.REMARKS
+                                                                                }
+                                                                            </div>
+                                                                        </td>
+
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600">
+                                                                            {getCurrencyById(
+                                                                                detail.CURRENCY_ID
+                                                                            )}
+                                                                        </td>
+
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            {new Intl.NumberFormat(
+                                                                                "id",
+                                                                                {
+                                                                                    style: "decimal",
+                                                                                }
+                                                                            ).format(
+                                                                                detail.SUM_INSURED
+                                                                            )}
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-center">
+                                                                            <div className="block w-20 mx-auto">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                        maximumFractionDigits: 6,
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.RATE
+                                                                                ) +
+                                                                                    " %"}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            {new Intl.NumberFormat(
+                                                                                "id",
+                                                                                {
+                                                                                    style: "decimal",
+                                                                                }
+                                                                            ).format(
+                                                                                detail.GROSS_PREMIUM
+                                                                            )}
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-center">
+                                                                            <div className="block w-20 mx-auto">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.LOST_LIMIT_PERCENTAGE
+                                                                                ) +
+                                                                                    " %"}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            <div className="block w-20 mx-auto">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.LOST_LIMIT_SCALE
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            {new Intl.NumberFormat(
+                                                                                "id",
+                                                                                {
+                                                                                    style: "decimal",
+                                                                                }
+                                                                            ).format(
+                                                                                detail.LOST_LIMIT_AMOUNT
+                                                                            )}
+                                                                        </td>
+
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-center">
+                                                                            <div className="block w-20 mx-auto">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.INSURANCE_DISC_PERCENTAGE
+                                                                                ) +
+                                                                                    " %"}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            {new Intl.NumberFormat(
+                                                                                "id",
+                                                                                {
+                                                                                    style: "decimal",
+                                                                                }
+                                                                            ).format(
+                                                                                detail.INSURANCE_DISC_AMOUNT
+                                                                            )}
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            {new Intl.NumberFormat(
+                                                                                "id",
+                                                                                {
+                                                                                    style: "decimal",
+                                                                                }
+                                                                            ).format(
+                                                                                detail.PREMIUM
+                                                                            )}
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-center">
+                                                                            <div className="block w-20 mx-auto">
+                                                                                {new Intl.NumberFormat(
+                                                                                    "id",
+                                                                                    {
+                                                                                        style: "decimal",
+                                                                                    }
+                                                                                ).format(
+                                                                                    detail.DEPOSIT_PREMIUM_PERCENTAGE
+                                                                                ) + " %"}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="p-4 border text-sm font-medium text-gray-600 text-right">
+                                                                            {new Intl.NumberFormat(
+                                                                                "id",
+                                                                                {
+                                                                                    style: "decimal",
+                                                                                }
+                                                                            ).format(
+                                                                                detail.DEPOSIT_PREMIUM_AMOUNT
+                                                                            )}
+                                                                        </td>
+                                                                    </tr>
+                                                                )
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </Collapsible>
                                         )
                                     )}
@@ -8976,6 +9325,37 @@ export default function ModalDetailPolicy({
                                 )}
                             </div>
                             {/* End Partners */}
+
+                            {/* Partners */}
+                            <div className="bg-white shadow-md rounded-md mt-6 p-4 max-w-full ml-4">
+                                <div className="border-b-2 w-fit font-semibold text-lg">
+                                    <span>Summary</span>
+                                </div>
+                                {/* <div className="flex gap-2 mt-4"> */}
+                                <div className="">
+                                    1. Coverage = {dataCoverageName.length}{" "}
+                                </div>
+                                <div className="">
+                                    2. Insurer = {insurancePanels.length}{" "}
+                                </div>
+                                <div className="">
+                                    3. Interest Insured ={" "}
+                                    {dataInsuredView.length}
+                                </div>
+                                <div className="">
+                                    4. Business Partners ={" "}
+                                    {listDataPartners.length > 0
+                                        ? listDataPartners[0]["income_detail"]
+                                              .length +
+                                          listDataPartners[1]["income_detail"]
+                                              .length +
+                                          listDataPartners[2]["income_detail"]
+                                              .length
+                                        : ""}
+                                </div>
+                                {/* </div> */}
+                            </div>
+                            {/* End Report Summary */}
                         </div>
                         {/* end all information */}
                     </div>
