@@ -222,9 +222,13 @@ class InsurancePanelController extends Controller
             foreach ($value['premium'] as $key => $cover) {
                 $insurerCoverage = MInsurerCoverage::where('INSURER_COVERAGE_ID', $cover['INSURER_COVERAGE_ID'])
                         ->update([
+
                             // 'ACQUISITION_COST'  => $cover['ACQUISITION_COST'], 
                             // 'ADMIN_COST'  => $cover['ADMIN_COST'],
                             // 'AGENT_COMMISION'  => $cover['AGENT_COMMISION'],
+                            'INTEREST_INSURED_ID'  => $cover['INTEREST_INSURED_ID'], // Belum ada isi
+                            'REMARKS'  => $cover['REMARKS'],
+                            'BROKERAGE_FEE_PERCENTAGE'  => $cover['BROKERAGE_FEE_PERCENTAGE'],
                             'BROKERAGE_FEE'  => $cover['BROKERAGE_FEE'],
                             // 'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
                             'COVERAGE_NAME'  => $cover['COVERAGE_NAME'],
@@ -232,7 +236,9 @@ class InsurancePanelController extends Controller
                             // 'DISC_ADMIN'  => $cover['DISC_ADMIN'],
                             // 'DISC_BROKER'  => $cover['DISC_BROKER'],
                             // 'DISC_CONSULTATION'  => $cover['DISC_CONSULTATION'],
+                            'ENGINEERING_FEE_PERCENTAGE'  => $cover['ENGINEERING_FEE_PERCENTAGE'],
                             'ENGINEERING_FEE'  => $cover['ENGINEERING_FEE'],
+                            'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
                             // 'FEE_BASED_INCOME'  => $cover['FEE_BASED_INCOME'],
                             'GROSS_PREMI'  => $cover['GROSS_PREMI'],
                             'NETT_PREMI'  => $cover['NETT_PREMI'],

@@ -306,6 +306,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editPartners', [PolicyPartnerController::class, 'editPartners'])->name('policyPartner.editPartners');
     Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
     Route::get('/getRelationByType/{id}', [PolicyPartnerController::class, 'getRelationByType'])->name('policyPartner.getRelationByType');
+    Route::get('/getPersonBaa/{id}', [PolicyPartnerController::class, 'getPersonBaa'])->name('policyPartner.getPersonBaa');
 
 
 });

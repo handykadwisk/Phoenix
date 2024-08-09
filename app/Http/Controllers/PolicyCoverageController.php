@@ -87,6 +87,8 @@ class PolicyCoverageController extends Controller
                 // jika ada POLICY_COVERAGE_DETAIL_ID maka update
                 $coverageDetail = MPolicyCoverageDetail::where('POLICY_COVERAGE_DETAIL_ID', $detail['POLICY_COVERAGE_DETAIL_ID'])
                     ->update([
+                        'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
+                        'REMARKS' => $detail['REMARKS'],
                         'CURRENCY_ID' => $detail['CURRENCY_ID'],
                         'SUM_INSURED' => $detail['SUM_INSURED'],
                         'RATE' => $detail['RATE'],
@@ -94,6 +96,8 @@ class PolicyCoverageController extends Controller
                         'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
                         'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
                         'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
+                        'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
+                        'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
                         'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
                         'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
                         'PREMIUM' => $detail['PREMIUM'],
@@ -102,6 +106,8 @@ class PolicyCoverageController extends Controller
                 // jika Tidak ada POLICY_COVERAGE_DETAIL_ID maka Insert
                 $coverageDetail = MPolicyCoverageDetail::insertGetId([
                     'POLICY_COVERAGE_ID' => $detail['POLICY_COVERAGE_ID'],
+                    'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
+                    'REMARKS' => $detail['REMARKS'],
                     'CURRENCY_ID' => $detail['CURRENCY_ID'],
                     'SUM_INSURED' => $detail['SUM_INSURED'],
                     'RATE' => $detail['RATE'],
@@ -109,6 +115,8 @@ class PolicyCoverageController extends Controller
                     'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
                     'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
                     'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
+                    'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
+                    'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
                     'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
                     'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
                     'PREMIUM' => $detail['PREMIUM'],
