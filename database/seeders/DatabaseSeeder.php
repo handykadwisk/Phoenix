@@ -427,10 +427,6 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path11)
         );
 
-        RelationStatus::create([
-            'relation_status_name' => 'Individu',
-        ]);
-
         $file_path12 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_status.sql');
 
         DB::unprepared(
