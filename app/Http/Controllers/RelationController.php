@@ -30,26 +30,56 @@ class RelationController extends Controller
         return $oldRelation;
     }
 
-    public function getRelationData($dataPerPage = 5, $searchQuery = null)
+    public function getRelationData($request)
     {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        $RType = $searchQuery->RELATION_TYPE_ID;
-        $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
-        // print_r($data);
-        if ($searchQuery) {
-            if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
-                $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
-            }
-            if ($searchQuery->input('RELATION_TYPE_ID')) {
-                $data->whereHas('mRelationType', function($q) use($RType) {
-                    // Query the name field in status table
-                    $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
-             });
+        $query = Relation::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
         }
-            // dd($data->get());
 
-            return $data->paginate($dataPerPage);
+        // if ($filterModel) {
+        //     foreach ($filterModel as $colId => $filterValue) {
+        //         if ($colId === 'policy_number') {
+        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
+        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
+        //         } elseif ($colId === 'policy_inception_date') {
+        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
+        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
+        //         }
+        //     }
+        // }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
+
+        // $RType = $searchQuery->RELATION_TYPE_ID;
+        // $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
+        // // print_r($data);
+        // if ($searchQuery) {
+        //     if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
+        //         $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
+        //     }
+        //     if ($searchQuery->input('RELATION_TYPE_ID')) {
+        //         $data->whereHas('mRelationType', function($q) use($RType) {
+        //             // Query the name field in status table
+        //             $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
+        //      });
+        //     }
+        // }
+        //     // dd($data->get());
+
+        //     return $data->paginate($dataPerPage);
     }
 
     // Get All Relation Type
@@ -63,7 +93,8 @@ class RelationController extends Controller
 
     public function getRelationJson(Request $request)
     {
-        $data = $this->getRelationData(5, $request);
+        $data = $this->getRelationData($request);
+        // $data = Relation::get();
         // print_r($data);
         // die;
         return response()->json($data);
@@ -126,7 +157,6 @@ class RelationController extends Controller
     public function store(Request $request)
     {
 
-
         // cek abbreviation
         // dd($request->abbreviation);
         $flag = "0";
@@ -142,6 +172,17 @@ class RelationController extends Controller
                     'X-Inertia' => true
                 ]);
             }
+        }
+
+        $flag = "rType";
+        $message = "Please Choose Relation Type!";
+        if ($request->relation_type_id == null) {
+            return new JsonResponse([
+                $flag,
+                $message
+            ], 201, [
+                'X-Inertia' => true
+            ]);
         }
 
 

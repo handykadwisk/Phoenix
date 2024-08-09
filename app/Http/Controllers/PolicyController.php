@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\InsurancePanel;
 use App\Models\MPolicyPremium;
-// use App\Models\MPolicyPremium;
 use App\Models\Policy;
 use App\Models\PolicyInstallment;
 use App\Models\RCurrency;
@@ -27,7 +26,6 @@ class PolicyController extends Controller
     }
 
     public function getPolicyData ($dataPerPage = 10, $searchQuery = null) {
-        // dd($searchQuery);
         $data = Policy::orderBy('policy_inception_date', 'desc')
                      ->orderBy('policy_due_date', 'desc')
                    ->whereNull('POLICY_IS_DELETED');
@@ -40,10 +38,7 @@ class PolicyController extends Controller
                 $data->where('RELATION_ID', $searchQuery["client_id"]);
             }
         }
-        // print_r($data->toSql());
-
         return $data->paginate($dataPerPage);
-
     }
 
     public function detailPolicy($policy_id=null){
@@ -64,39 +59,29 @@ class PolicyController extends Controller
 
     public function index()
     {
-        // $policy = Policy::get();
         $policy = Policy::leftJoin('t_relation', 't_policy.RELATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
         ->leftJoin('r_insurance_type', 't_policy.INSURANCE_TYPE_ID', '=', 'r_insurance_type.INSURANCE_TYPE_ID')
         ->orderBy('t_policy.POLICY_ID', 'desc')
         ->get();
-        // dd($policy);
-
-        // dd(RInsuranceType::where('INSURANCE_TYPE_STATUS', '=', 1)->get());
 
         return Inertia::render('Policy/Index', [
             'policy' => $policy,
             'currency' => RCurrency::get(),
             'insuranceType' => RInsuranceType::where('INSURANCE_TYPE_STATUS', '=', 1)->get(),
-            'insurance' => DB::table('t_relation')
+            'clients' => DB::table('t_relation')
                 ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
                 ->where('RELATION_TYPE_ID', '=', 1)
+                ->get(),
+            'insurance' => DB::table('t_relation')
+                ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
+                ->where('RELATION_TYPE_ID', '=', 2)
                 ->get()
         ]);
     }
 
     public function getPolicyDataForJSON(Request $request) {
-
-        // $collection = collect(Policy::get());
-
-        // $data = $collection->sortBy([
-        //     ['policy_inception_date', 'desc'],
-        //     ['policy_due_date', 'desc']
-        // ]);
-        // return response()->json($data->values()->all());
-
         $data = $this->getPolicyData(10, $request);
         return response()->json($data);
-
     }
 
     public function store(Request $request) {
@@ -117,14 +102,6 @@ class PolicyController extends Controller
             'policy_status_id.required'          => 'Policy Status is required.',
         ]);
 
-        // $totalRateInstallment = collect($request->policyInstallment)->sum('policy_installment_percentage');
-        // if ($totalRateInstallment != 100) {
-        //     return new JsonResponse([
-        //         ['Rate Installment must equal to 100 %.']
-        //     ], 422, [
-        //         'X-Inertia' => true
-        //     ]);
-        // }
         if (trim($request->policy_number)) {
             $cekPolicy = $this->checkPolicyNumber(trim($request->policy_number));
             if (sizeof($cekPolicy) > 0) {
@@ -157,41 +134,8 @@ class PolicyController extends Controller
             'POLICY_CREATED_BY'      => Auth::user()->id
         ]);
 
-        // // Create Initial Premium
-        // $policyPremiumData = [];
-        // foreach ($request->policyPremium as $req) {
-        //     $policyPremiumData[] = [
-        //         'POLICY_ID' => $policy,
-        //         'CURRENCY_ID' => $req['currency_id'],
-        //         'COVERAGE_NAME' => $req['coverage_name'],
-        //         'GROSS_PREMI' => $req['gross_premi'],
-        //         'ADMIN_COST' => $req['admin_cost'],
-        //         'DISC_BROKER' => $req['disc_broker'],
-        //         'DISC_CONSULTATION' => $req['disc_consultation'],
-        //         'DISC_ADMIN' => $req['disc_admin'],
-        //         'NETT_PREMI' => $req['nett_premi'],
-        //         'FEE_BASED_INCOME' => $req['fee_based_income'],
-        //         'AGENT_COMMISION' => $req['agent_commision'],
-        //         'ACQUISITION_COST' => $req['acquisition_cost'],
-        //         'CREATED_BY' => Auth::user()->id
-        //     ];
-        // };
-        // MPolicyPremium::insert($policyPremiumData);
-        // // $policy->policyInitialPremium()->saveMany($initialPremiumData);
-
-        // // Create Policy Installment
-        // $policyInstallmentData = [];
-        // foreach ($request->policyInstallment as $req) {
-        //     $policyInstallmentData[] = [
-        //         'POLICY_ID' => $policy,
-        //         'POLICY_INSTALLMENT_TERM' => $req['policy_installment_term'],
-        //         'POLICY_INSTALLMENT_PERCENTAGE' => $req['policy_installment_percentage'],
-        //         'INSTALLMENT_DUE_DATE' => $req['installment_due_date']
-        //     ];
-        // };
-        // PolicyInstallment::insert($policyInstallmentData);
-
-         // Created Log
+        
+        // Created Log
         UserLog::create([
             'created_by' => Auth::user()->id,
             'action'     => json_encode([
@@ -204,7 +148,6 @@ class PolicyController extends Controller
 
 
         return new JsonResponse([
-            // 'New Policy added.'
             $policy
         ], 201, [
             'X-Inertia' => true
@@ -214,20 +157,13 @@ class PolicyController extends Controller
     public function get_id($id) {
          
         $data = Policy::find($id);
-        // dd($data);
-        // $data = $this->getPolice($id);
         return response()->json($data);
 
     }
 
     public function getRelationById($id) {
-        // dd('xxx');
-         
         $data = Relation::find($id);
-        // dd($data);
-        // $data = $this->getPolice($id);
         return response()->json($data);
-
     }
 
     function getCurrencyOnPolicyCoverage($policy_id) {
@@ -238,13 +174,10 @@ class PolicyController extends Controller
             ->where('pc.POLICY_ID', $policy_id)
             ->groupBy('pcd.CURRENCY_ID')
             ->get();
-            // dd($query);
             return response()->json($query);
     }
 
-    // public function edit(Request $request, MPolicyPremium $insurancePanel) {
-    public function edit(Request $request) {
-       
+    public function edit(Request $request) {       
         $validateData = Validator::make(
             // Data
             $request->all(), [
@@ -261,14 +194,7 @@ class PolicyController extends Controller
             'POLICY_STATUS_ID.required'          => 'Policy Status is required.',
         ]);
 
-        $totalRateInstallment = collect($request->policy_installment)->sum('POLICY_INSTALLMENT_PERCENTAGE');
-        if ($totalRateInstallment != 100) {
-            return new JsonResponse([
-                ['Rate Installment must equal to 100 %.']
-            ], 422, [
-                'X-Inertia' => true
-            ]);
-        }
+        
         if (trim($request->POLICY_NUMBER)) {
             $cekPolicy = $this->checkPolicyNumber(trim($request->POLICY_NUMBER));
             if (sizeof($cekPolicy) > 1) {
@@ -298,9 +224,6 @@ class PolicyController extends Controller
                             'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
                             'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
                             'SELF_INSURED'          => $request->SELF_INSURED,
-                            // 'POLICY_INSURANCE_PANEL' => $request->POLICY_INSURANCE_PANEL,
-                            // 'POLICY_SHARE'          => $policy_share,
-                            // 'POLICY_INSTALLMENT'          => $request->POLICY_INSTALLMENT,
                             'POLICY_UPDATED_BY'      => Auth::user()->id,
                             'POLICY_UPDATED_DATE'   => now()
                         ]);
@@ -367,7 +290,6 @@ class PolicyController extends Controller
         ]);
 
         return new JsonResponse([
-            // 'Policy updated.'
             $request->id
         ], 200, [
             'X-Inertia' => true
@@ -377,26 +299,9 @@ class PolicyController extends Controller
 
     public function deactivate (Request $request) {
 
-        // dd($request->id);
-        // $validateData = Validator::make($request->all(), [
-        //     'notes'    => 'required'
-        // ], [
-        //     'required' => ':attribute is required.'
-        // ]);
-
-        // if ($validateData->fails()) {
-        //     return new JsonResponse([
-        //         $validateData->errors()->all()
-        //     ], 422, [
-        //         'X-Inertia' => true
-        //     ]);
-        // }
-
         $updatingData = Policy::where('POLICY_ID', $request->id)
                               ->update([
-                                // 'POLICY_STATUS_ID'       => 1:current; 0:lapse
                                 'POLICY_IS_DELETED'      => 1,
-                                // 'POLICY_IS_deleted_note' => $request->notes,
                                 'POLICY_IS_DELETED_BY'   => Auth::user()->id,
                                 'POLICY_IS_DELETED_DATE' => now()
                               ]);
@@ -414,7 +319,6 @@ class PolicyController extends Controller
             ]);
             
             return new JsonResponse([
-                // 'Policy deactivated.'
                 'status' => true
             ], 201, [
                 'X-Inertia' => true

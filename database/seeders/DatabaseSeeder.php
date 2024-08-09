@@ -95,6 +95,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $childBAA = Menu::create(
+            [
+                'menu_name'       => 'BAA',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation/baa',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 7,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
         $finance = Menu::create(
             [
                 'menu_name'       => 'Finance',
@@ -261,6 +272,25 @@ class DatabaseSeeder extends Seeder
             'menu_id' => $ACLRole->id
         ]);
 
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $group->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childRelation->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childAgent->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childBAA->id
+        ]);
+
+
+
 
         // create user
         User::create(
@@ -397,6 +427,27 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path11)
         );
 
+        // create 2024_16_05_r_insurance_type
+        $file_path12 = resource_path('../database/LogDB/2024_16_05_r_insurance_type.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path12)
+        );
+
+        // create 2024_16_05_r_currency
+        $file_path13 = resource_path('../database/LogDB/2024_16_05_r_currency.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path13)
+        );
+
+        // create 2024_08_07_r_interest_insured
+        $r_interest_insured = resource_path('../database/LogDB/2024_08_07_r_interest_insured.sql');
+
+        DB::unprepared(
+            file_get_contents($r_interest_insured)
+        );
+
         RelationStatus::create([
             'relation_status_name' => 'Individu',
         ]);
@@ -419,16 +470,16 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path14)
         );
 
-        // $file_path15 = resource_path('../database/LogDB/2024_07_30_relation.sql');
-
-        // DB::unprepared(
-        //     file_get_contents($file_path15)
-        // );
-        // create 2024_24_07_r_address_status
-        $file_path15 = resource_path('../database/LogDB/2024_24_07_r_address_status.sql');
+        $file_path15 = resource_path('../database/LogDB/2024_07_31_r_coa.sql');
 
         DB::unprepared(
             file_get_contents($file_path15)
+        );
+        // create 2024_24_07_r_address_status
+        $file_path16 = resource_path('../database/LogDB/2024_24_07_r_address_status.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path16)
         );
 
         // create 2024_29_07_r_education_degree
@@ -445,5 +496,72 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_certificate_qualification)
         );
 
+        $file_path17 = resource_path('../database/LogDB/2024_07_31_r_coa_class.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path17)
+        );
+
+        $file_path18 = resource_path('../database/LogDB/2024_07_31_r_coa_group.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path18)
+        );
+
+        $file_path19 = resource_path('../database/LogDB/2024_07_31_t_relation.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path19)
+        );
+
+        $file_path20 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path20)
+        );
+        // create 2024_16_05_r_salutation
+        $r_salutation = resource_path('../database/LogDB/2024_16_05_r_salutation.sql');
+
+        DB::unprepared(
+            file_get_contents($r_salutation)
+        );
+
+        // create 2024_08_08_r_for_bank_account
+        $r_for_bank_account = resource_path('../database/LogDB/2024_08_08_r_for_bank_account.sql');
+
+        DB::unprepared(
+            file_get_contents($r_for_bank_account)
+        );
+
+
+        $file_path20 = resource_path('../database/LogDB/2024_08_01_t_relation_division.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path20)
+        );
+
+        $file_path21 = resource_path('../database/LogDB/2024_08_01_t_relation_structure.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path21)
+        );
+
+        $file_path22 = resource_path('../database/LogDB/2024_08_04_t_person.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path22)
+        );
+
+        $file_path23 = resource_path('../database/LogDB/2024_08_05_r_cash_advance_method.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path23)
+        );
+
+        $file_path24 = resource_path('../database/LogDB/2024_08_05_r_cash_advance_differents.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path24)
+        );
     }
 }

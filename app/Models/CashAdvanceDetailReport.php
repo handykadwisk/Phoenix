@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CashAdvanceDetailReport extends Model
 {
@@ -19,12 +20,30 @@ class CashAdvanceDetailReport extends Model
     protected $with = [
         'document', 
         'purpose',
-        'cost_classification'
+        'cost_classification',
+        'relation_organization',
+        'coa',
+        'm_cash_advance_report_document'
     ];
 
     public function cash_advance_report(): BelongsTo
     {
         return $this->belongsTo(CashAdvanceReport::class);
+    }
+
+    public function m_cash_advance_report_document(): HasMany
+    {
+        return $this->hasMany(MCashAdvanceReportDocument::class, 'CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_ID');
+    }
+
+    public function relation_organization(): BelongsTo
+    {
+        return $this->belongsTo(Relation::class, 'REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID');
+    }
+
+    public function coa(): BelongsTo
+    {
+        return $this->belongsTo(COA::class, 'REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION');
     }
 
     public function document(): BelongsTo
@@ -39,6 +58,6 @@ class CashAdvanceDetailReport extends Model
 
     public function cost_classification()
     {
-        return $this->belongsTo(CashAdvanceCostClassification::class, 'REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION');
+        return $this->belongsTo(CashAdvanceCostClassification::class, 'REPORT_CASH_ADVANCE_DETAIL_APPROVAL');
     }
 }

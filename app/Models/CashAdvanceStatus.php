@@ -9,9 +9,9 @@ class CashAdvanceStatus extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'ID';
+    protected $primaryKey = 'CASH_ADVANCE_STATUS_ID';
 
     protected $table = 'r_cash_advance_status';
 
-    protected $guarded = ['ID'];
+    protected $guarded = ['CASH_ADVANCE_STATUS_ID'];
 }

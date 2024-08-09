@@ -13,6 +13,7 @@ import {
 import { spawn } from "child_process";
 import axios from "axios";
 import Select from "react-tailwindcss-select";
+import dateFormat from "dateformat";
 import {
     ArrowUpIcon,
     ArrowUpTrayIcon,
@@ -48,6 +49,8 @@ import BankAccount from "./BankAccount";
 import SelectTailwind from "react-tailwindcss-select";
 import AddressPerson from "./AddressPerson";
 import DetailPersonAddress from "./DetailPersonAddress";
+import DatePicker from "react-datepicker";
+import DetailBankAccount from "./DetailBankAccount";
 
 export default function DetailPerson({
     idPerson,
@@ -65,6 +68,7 @@ export default function DetailPerson({
     const [division, setDivision] = useState<any>([]);
     const [office, setOffice] = useState<any>([]);
     const [bank, setBank] = useState<any>([]);
+    const [optionsBank, setOptionsBank] = useState<any>([]);
     const [file, setFile] = useState<any>();
     const [fileNew, setFileNew] = useState<any>();
     const [wilayah, setWilayah] = useState<any>([]);
@@ -192,6 +196,16 @@ export default function DetailPerson({
             .post(`/getRBank`)
             .then((res) => {
                 setBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const getForBankAccount = async () => {
+        await axios
+            .post(`/getForBankAccount`)
+            .then((res) => {
+                setOptionsBank(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -529,18 +543,43 @@ export default function DetailPerson({
               });
     };
 
+    // const [dataPersonBank, setDataPersonBank] = useState<any>({
+    //     idPerson: "",
+    //     BANK_ACCOUNT: [
+    //         {
+    //             idPerson: idPerson,
+    //             PERSON_BANK_ACCOUNT_NAME: "",
+    //             PERSON_BANK_ACCOUNT_NUMBER: "",
+    //             PERSON_BANK_ACCOUNT_FOR: null,
+    //             BANK_ID: "",
+    //         },
+    //     ],
+    // });
+
     const handleBankAccount = async (e: FormEvent) => {
         e.preventDefault();
 
         getRBank();
-        setModalBank({
-            add: !modalBank.add,
-            delete: false,
-            edit: false,
-            view: false,
-            document: false,
-            search: false,
-        });
+        getForBankAccount();
+        if (detailPerson.t_person_bank?.length === 0) {
+            setModalBank({
+                add: !modalBank.add,
+                delete: false,
+                edit: false,
+                view: false,
+                document: false,
+                search: false,
+            });
+        } else {
+            setModalBank({
+                add: false,
+                delete: false,
+                edit: !modalBank.edit,
+                view: false,
+                document: false,
+                search: false,
+            });
+        }
     };
 
     const handleSuccessEditPerson = (message: string) => {
@@ -669,23 +708,23 @@ export default function DetailPerson({
 
     const handleSuccess = (message: string) => {
         // setIsSuccess("");
-        if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Bank Account Added",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message);
-                }
-            });
-        }
+        // if (message !== "") {
+        Swal.fire({
+            title: "Success",
+            text: "Bank Account Added",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(result);
+            if (result.value) {
+                getPersonDetail(idPerson);
+            }
+        });
+        // }
     };
 
     const handleSuccessStructure = (message: string) => {
         // setIsSuccess("");
-        if (message !== "") {
+        if (message[1] === "add") {
             setDataStructure({
                 PERSON_ID: idPerson,
                 STRUCTURE_ID: "",
@@ -699,7 +738,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({
@@ -720,7 +759,7 @@ export default function DetailPerson({
             }).then((result: any) => {
                 // console.log(result);
                 if (result.value) {
-                    getPersonDetail(message);
+                    getPersonDetail(message[0]);
                     // getPersons();
                     // setGetDetailRelation(message);
                     // setModal({
@@ -900,8 +939,30 @@ export default function DetailPerson({
                     })
                 }
                 bank={bank}
+                optionsBank={optionsBank}
                 idPerson={idPerson}
                 handleSuccess={handleSuccess}
+            />
+            {/* End Bank Account */}
+
+            {/* Bank Account */}
+            <DetailBankAccount
+                show={modalBank.edit}
+                modal={() =>
+                    setModalBank({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                bank={bank}
+                optionsBank={optionsBank}
+                idPerson={idPerson}
+                handleSuccess={handleSuccess}
+                detailBank={detailPerson.t_person_bank}
             />
             {/* End Bank Account */}
 
@@ -1002,18 +1063,45 @@ export default function DetailPerson({
                                                     e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Place Of Birth"
                                     />
                                 </div>
-                                <div className="relative">
+                                <div className="">
                                     <InputLabel
-                                        className="absolute"
                                         htmlFor="PERSON_BIRTH_DATE"
                                         value={"Date Of Birth "}
                                     />
-                                    <div className="ml-24 text-red-600">*</div>
-                                    <TextInput
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                editPerson.PERSON_BIRTH_DATE
+                                            }
+                                            onChange={(date: any) => {
+                                                setEditPerson({
+                                                    ...editPerson,
+                                                    PERSON_BIRTH_DATE:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                });
+                                            }}
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+                                    {/* <TextInput
                                         id="PERSON_BIRTH_DATE"
                                         type="date"
                                         name="PERSON_BIRTH_DATE"
@@ -1026,9 +1114,8 @@ export default function DetailPerson({
                                                     e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Date Of Birth"
-                                    />
+                                    /> */}
                                 </div>
                             </div>
                             <div className="grid gap-4 grid-cols-3 mt-4 hidden">
@@ -1122,7 +1209,7 @@ export default function DetailPerson({
                                                 PERSON_KTP: e.target.value,
                                             });
                                         }}
-                                        required
+                                        placeholder="Person KTP"
                                     />
                                 </div>
                                 <div>
@@ -1143,7 +1230,6 @@ export default function DetailPerson({
                                                 PERSON_NPWP: e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Person NPWP"
                                     />
                                 </div>
@@ -1165,7 +1251,6 @@ export default function DetailPerson({
                                                 PERSON_KK: e.target.value,
                                             });
                                         }}
-                                        required
                                         placeholder="Person KK"
                                     />
                                 </div>
@@ -1451,7 +1536,7 @@ export default function DetailPerson({
                                                     }
                                                 >
                                                     <span className="hover:underline hover:decoration-from-font">
-                                                        Add Emergency Contact
+                                                        + Add Emergency Contact
                                                     </span>
                                                 </a>
                                             </td>
@@ -1731,7 +1816,7 @@ export default function DetailPerson({
                         search: false,
                     })
                 }
-                title={"Employment Information"}
+                title={"Detail Employee Information"}
                 url={""}
                 data={""}
                 onSuccess={""}
@@ -1766,6 +1851,7 @@ export default function DetailPerson({
                         search: false,
                     });
                 }}
+                buttonAddOns={""}
                 title={"Add Structure Division"}
                 url={`/personStructureDivision`}
                 data={dataStructure}
@@ -1777,11 +1863,13 @@ export default function DetailPerson({
                     <>
                         <div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
+                                <div className="">
                                     <InputLabel
+                                        className=""
                                         htmlFor="RELATION_ORGANIZATION_ID"
                                         value={"Entity"}
                                     />
+                                    {/* <div className="ml-10 text-red-600">*</div> */}
                                     <TextInput
                                         id="RELATION_ORGANIZATION_ID"
                                         type="text"
@@ -1802,11 +1890,15 @@ export default function DetailPerson({
                                         disabled
                                     />
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="STRUCTURE_ID"
-                                        value={"Sub Entity"}
+                                        value={"Structure"}
                                     />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.STRUCTURE_ID}
@@ -1816,6 +1908,7 @@ export default function DetailPerson({
                                                 STRUCTURE_ID: e.target.value,
                                             });
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Sub Entity --
@@ -1840,11 +1933,15 @@ export default function DetailPerson({
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="DIVISION_ID"
                                         value={"Division"}
                                     />
+                                    <div className="ml-[58px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.DIVISION_ID}
@@ -1854,6 +1951,7 @@ export default function DetailPerson({
                                                 DIVISION_ID: e.target.value,
                                             });
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Division --
@@ -1876,11 +1974,15 @@ export default function DetailPerson({
                                         )}
                                     </select>
                                 </div>
-                                <div>
+                                <div className="relative">
                                     <InputLabel
+                                        className="absolute"
                                         htmlFor="OFFICE_ID"
                                         value={"Office"}
                                     />
+                                    <div className="ml-[45px] text-red-600">
+                                        *
+                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.OFFICE_ID}
@@ -1890,6 +1992,7 @@ export default function DetailPerson({
                                                 OFFICE_ID: e.target.value,
                                             });
                                         }}
+                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Office --
@@ -2110,7 +2213,7 @@ export default function DetailPerson({
                                     onClick={(e) => handleEditPerson(e)}
                                 >
                                     <PencilSquareIcon
-                                        className="w-7"
+                                        className="w-7 text-red-600"
                                         title="Edit Profile"
                                     />
                                 </a>
@@ -2179,7 +2282,9 @@ export default function DetailPerson({
                                     Place Of Birth
                                 </div>
                                 <div className="text-sm mt-2 text-gray-500">
-                                    {detailPerson.PERSON_BIRTH_PLACE}
+                                    {detailPerson.PERSON_BIRTH_PLACE === null
+                                        ? "-"
+                                        : detailPerson.PERSON_BIRTH_PLACE}
                                 </div>
                             </div>
                             <div className="p-2">
@@ -2187,7 +2292,12 @@ export default function DetailPerson({
                                     Date Of Birth
                                 </div>
                                 <div className="text-sm mt-2 text-gray-500">
-                                    {detailPerson.PERSON_BIRTH_DATE}
+                                    {detailPerson.PERSON_BIRTH_DATE === null
+                                        ? "-"
+                                        : dateFormat(
+                                              detailPerson.PERSON_BIRTH_DATE,
+                                              "dd-mm-yyyy"
+                                          )}
                                 </div>
                             </div>
                         </div>
@@ -2239,7 +2349,9 @@ export default function DetailPerson({
                                 <div className="text-sm mt-2 text-gray-500">
                                     {detailPerson.PERSON_GENDER === "m"
                                         ? "Laki-Laki"
-                                        : "Perempuan"}
+                                        : detailPerson.PERSON_GENDER === "f"
+                                        ? "Perempuan"
+                                        : "-"}
                                 </div>
                             </div>
                             <div className="p-2">
@@ -2414,7 +2526,7 @@ export default function DetailPerson({
                                                                     {
                                                                         cm
                                                                             .person_relationship
-                                                                            .PERSON_RELATIONSHIP_NAME
+                                                                            ?.PERSON_RELATIONSHIP_NAME
                                                                     }
                                                                 </span>
                                                             </div>
@@ -2446,7 +2558,7 @@ export default function DetailPerson({
                                 onClick={(e) => handleStructure(e)}
                             >
                                 <PencilSquareIcon
-                                    className="w-6"
+                                    className="w-6 text-red-600"
                                     title="Structure & Division"
                                 />
                             </a>
@@ -2542,13 +2654,13 @@ export default function DetailPerson({
                             </div>
                         )} */}
                         <div className="grid grid-cols-3 gap-3 mt-4 xs:grid xs:grid-cols-1 lg:grid lg:grid-cols-3">
-                            {detailPerson.relation?.HR_MANAGED_BY_APP !== 1 ? (
+                            {detailPerson.relation?.HR_MANAGED_BY_APP !== 0 ? (
                                 <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
                                     <a
                                         className="m-auto"
                                         onClick={(e) => handleEmploymentNew(e)}
                                     >
-                                        Employment Information
+                                        Employee Information
                                     </a>
                                 </div>
                             ) : null}

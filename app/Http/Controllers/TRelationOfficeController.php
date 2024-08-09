@@ -63,6 +63,25 @@ class TRelationOfficeController extends Controller
     public function store(Request $request){
         // dd($request->RELATION_LOCATION_TYPE);
         // jika parent kosong = 0
+
+
+        $flag = "lType";
+        $message = "Please Choose Location Type!";
+        if ($request->RELATION_LOCATION_TYPE == null) {
+            return new JsonResponse([
+                $flag,
+                $message
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
+
+
+
+
+
+
+
         $parentId = 0;
         if ($request->RELATION_OFFICE_PARENT_ID != null || $request->RELATION_OFFICE_PARENT_ID != "") {
             $parentId = $request->RELATION_OFFICE_PARENT_ID;

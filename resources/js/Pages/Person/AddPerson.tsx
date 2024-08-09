@@ -25,7 +25,8 @@ import Checkbox from "@/Components/Checkbox";
 import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
-import { Datepicker } from "flowbite-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function AddPerson({
     show,
@@ -152,6 +153,8 @@ export default function AddPerson({
         setData({ ...data, PERSON_CONTACT: changeVal });
     };
 
+    console.log(data);
+
     return (
         <>
             <ModalToAdd
@@ -212,7 +215,6 @@ export default function AddPerson({
                                                 e.target.value
                                             );
                                         }}
-                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Gender --
@@ -246,18 +248,46 @@ export default function AddPerson({
                                         htmlFor="PERSON_BIRTH_DATE"
                                         value={"Date Of Birth "}
                                     />
-                                    <TextInput
-                                        type="date"
-                                        value={data.PERSON_BIRTH_DATE}
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setData(
-                                                "PERSON_BIRTH_DATE",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="Date Of Birth"
-                                    />
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={data.PERSON_BIRTH_DATE}
+                                            onChange={(date: any) =>
+                                                setData(
+                                                    "PERSON_BIRTH_DATE",
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    )
+                                                )
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
+                                    </div>
+
+                                    {/* <TextInput
+                                    //     type="date"
+                                    //     value={data.PERSON_BIRTH_DATE}
+                                    //     className="mt-2"
+                                    //     onChange={(e) =>
+                                             setData(
+                                                 "PERSON_BIRTH_DATE",
+                                                 e.target.value
+                                             )
+                                    //     }
+                                    //     placeholder="Date Of Birth"
+                                    // /> */}
                                 </div>
                             </div>
                             {/* <div className="grid gap-4 grid-cols-3 mt-4">
@@ -531,7 +561,8 @@ export default function AddPerson({
                                                                                 i
                                                                             )
                                                                         }
-                                                                        placeholder="Name"
+                                                                        required
+                                                                        placeholder="Name *"
                                                                     />
                                                                 </td>
                                                                 <td className="py-3 px-2">
@@ -552,7 +583,8 @@ export default function AddPerson({
                                                                                 i
                                                                             )
                                                                         }
-                                                                        placeholder="Phone Number"
+                                                                        required
+                                                                        placeholder="Phone Number *"
                                                                     />
                                                                 </td>
                                                                 <td className="py-3 px-2">
@@ -572,8 +604,13 @@ export default function AddPerson({
                                                                                 i
                                                                             )
                                                                         }
+                                                                        required
                                                                     >
-                                                                        <option>
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
                                                                             --
                                                                             Person
                                                                             Relationship
@@ -642,7 +679,7 @@ export default function AddPerson({
                                                     }
                                                 >
                                                     <span className="hover:underline hover:decoration-from-font">
-                                                        Add Emergency Contact
+                                                        + Add Emergency Contact
                                                     </span>
                                                 </a>
                                             </td>

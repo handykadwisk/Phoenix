@@ -175,41 +175,61 @@ export default function Address({
     };
 
     const handleSuccess = (message: string) => {
-        setData({
-            RELATION_OFFICE_NAME: "",
-            RELATION_OFFICE_ALIAS: "",
-            RELATION_OFFICE_DESCRIPTION: "",
-            RELATION_OFFICE_PARENT_ID: "",
-            RELATION_ORGANIZATION_ID: idRelation,
-            RELATION_OFFICE_MAPPING: "",
-            RELATION_OFFICE_ADDRESS: "",
-            RELATION_OFFICE_PHONENUMBER: "",
-            RELATION_OFFICE_PROVINCE: "",
-            RELATION_OFFICE_REGENCY: "",
-            RELATION_LOCATION_TYPE: [],
-        });
+        if (message[0] === "lType") {
+            Swal.fire({
+                title: "Warning",
+                text: message[1],
+                icon: "warning",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    setModal({
+                        add: true,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }
+            });
+        } else {
+            setData({
+                RELATION_OFFICE_NAME: "",
+                RELATION_OFFICE_ALIAS: "",
+                RELATION_OFFICE_DESCRIPTION: "",
+                RELATION_OFFICE_PARENT_ID: "",
+                RELATION_ORGANIZATION_ID: idRelation,
+                RELATION_OFFICE_MAPPING: "",
+                RELATION_OFFICE_ADDRESS: "",
+                RELATION_OFFICE_PHONENUMBER: "",
+                RELATION_OFFICE_PROVINCE: "",
+                RELATION_OFFICE_REGENCY: "",
+                RELATION_LOCATION_TYPE: [],
+            });
 
-        Swal.fire({
-            title: "Success",
-            text: "New Relation Office",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getRelationOffice();
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
+            Swal.fire({
+                title: "Success",
+                text: "New Relation Office",
+                icon: "success",
+            }).then((result: any) => {
+                if (result.value) {
+                    getRelationOffice();
+                    // setGetDetailRelation({
+                    //     RELATION_ORGANIZATION_NAME: message[1],
+                    //     RELATION_ORGANIZATION_ID: message[0],
+                    // });
+                    // setModal({
+                    //     add: false,
+                    //     delete: false,
+                    //     edit: false,
+                    //     view: true,
+                    //     document: false,
+                    //     search: false,
+                    // });
+                }
+            });
+        }
     };
 
     const clearSearchAddress = async (pageNumber = "page=1") => {
@@ -338,7 +358,6 @@ export default function Address({
                                             e.target.value
                                         );
                                     }}
-                                    required
                                     placeholder="Phone Number"
                                 />
                             </div>
@@ -361,18 +380,16 @@ export default function Address({
                                         e.target.value
                                     )
                                 }
+                                required
                             />
                         </div>
                         <div className=" relative lg:grid lg:grid-cols-2 lg:gap-4 mt-2 xs:grid xs:grid-cols-1 xs:gap-4">
                             <div>
                                 <InputLabel
-                                    className="absolute"
+                                    className=""
                                     htmlFor="RELATION_OFFICE_PROVINCE"
                                     value={"Province"}
                                 />
-                                <div className="ml-[4.1rem] text-red-600">
-                                    *
-                                </div>
                                 <SelectTailwind
                                     classNames={{
                                         menuButton: () =>
@@ -408,13 +425,10 @@ export default function Address({
                             </div>
                             <div>
                                 <InputLabel
-                                    className="absolute"
+                                    className=""
                                     htmlFor="RELATION_OFFICE_REGENCY"
                                     value={"Regency"}
                                 />
-                                <div className="ml-[4.1rem] text-red-600">
-                                    *
-                                </div>
                                 <SelectTailwind
                                     classNames={{
                                         menuButton: () =>

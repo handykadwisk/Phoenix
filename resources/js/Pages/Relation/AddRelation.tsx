@@ -241,7 +241,6 @@ export default function AddRelation({
     //         alert("gaada");
     //     }
     // };
-
     return (
         // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
         // <Head title="Detail Relation" />
@@ -682,11 +681,13 @@ export default function AddRelation({
                                 />
                             </div>
                         </div>
-                        <div className="mt-4">
+                        <div className="mt-4 relative">
                             <InputLabel
+                                className="absolute"
                                 htmlFor="relation_type_id"
                                 value="Relation Type"
                             />
+                            <div className="ml-[6.2rem] text-red-600">*</div>
                             <div>
                                 <ul
                                     role="list"
@@ -710,6 +711,9 @@ export default function AddRelation({
                                                             value={
                                                                 typeRelation.RELATION_TYPE_ID
                                                             }
+                                                            // defaultChecked={
+                                                            //     data.relation_type_id
+                                                            // }
                                                             onChange={(e) =>
                                                                 handleCheckbox(
                                                                     e

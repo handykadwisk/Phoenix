@@ -74,7 +74,7 @@ export default function ModalToAction({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-50"
+                    className="relative z-9999"
                     onClose={close}
                     initialFocus={modalRef}
                 >
@@ -126,13 +126,11 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div className="max-h-full">
-                                                <div
-                                                    className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
-                                                    ref={modalRef}
-                                                >
-                                                    {body}
-                                                </div>
+                                            <div
+                                                className="max-h-full overflow-y-auto custom-scrollbar px-2"
+                                                ref={modalRef}
+                                            >
+                                                {body}
                                             </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
