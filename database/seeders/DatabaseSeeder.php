@@ -416,8 +416,5 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_interest_insured)
         );
 
-        RelationStatus::create([
-            'relation_status_name' => 'Individu',
-        ]);
     }
 }
