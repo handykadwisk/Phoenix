@@ -16,6 +16,7 @@ export default function AGGrid({
     url,
     // loading,
     withParam,
+    searchParam,
     triggeringRefreshData,
     doubleClickEvent = () => {},
     addButtonModalState = () => {},
@@ -25,12 +26,12 @@ export default function AGGrid({
     addButtonLabel: string | null | undefined;
     // loading: boolean;
     withParam: number | string | null;
+    searchParam: any | string | null;
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
 }>) {
     const gridRef = useRef<AgGridReact>(null);
-
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
             getRows: (params) => {
@@ -72,7 +73,7 @@ export default function AGGrid({
                             endRow - startRow
                         }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
-                        )}`
+                        )}&newFilter=${JSON.stringify(searchParam)}`
                     )
                     .then((res) => {
                         params.success({
@@ -127,6 +128,7 @@ export default function AGGrid({
                             };
                         }
                     }}
+                    suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={10}
                     cacheBlockSize={10}

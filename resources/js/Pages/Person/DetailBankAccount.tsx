@@ -51,10 +51,9 @@ export default function DetailBankAccount({
         idPerson: "",
         BANK_ACCOUNT: [
             {
-                idPerson: idPerson,
+                PERSON_ID: idPerson,
                 PERSON_BANK_ACCOUNT_NAME: "",
                 PERSON_BANK_ACCOUNT_NUMBER: "",
-                PERSON_BANK_ACCOUNT_FOR: null,
                 BANK_ID: "",
             },
         ],
@@ -74,10 +73,9 @@ export default function DetailBankAccount({
             BANK_ACCOUNT: [
                 ...dataEditBankAccount.BANK_ACCOUNT,
                 {
-                    idPerson: idPerson,
+                    PERSON_ID: idPerson,
                     PERSON_BANK_ACCOUNT_NAME: "",
                     PERSON_BANK_ACCOUNT_NUMBER: "",
-                    PERSON_BANK_ACCOUNT_FOR: null,
                     BANK_ID: null,
                     m_for_bank: null,
                 },
@@ -102,7 +100,10 @@ export default function DetailBankAccount({
             );
             const nameBank = selected[0];
             if (nameBank !== undefined) {
-                return nameBank.BANK_ABBREVIATION;
+                return {
+                    label: nameBank.BANK_ABBREVIATION,
+                    value: value,
+                };
             }
         }
     };
@@ -197,7 +198,7 @@ export default function DetailBankAccount({
         //             idPerson: idPerson,
         //             PERSON_BANK_ACCOUNT_NAME: "",
         //             PERSON_BANK_ACCOUNT_NUMBER: "",
-        //             PERSON_BANK_ACCOUNT_FOR: null,
+        //
         //             BANK_ID: "",
         //         },
         //     ],
@@ -252,12 +253,7 @@ export default function DetailBankAccount({
                                                 options={bankSelect}
                                                 isSearchable={true}
                                                 placeholder={"Bank Name *"}
-                                                value={{
-                                                    label: getNameBank(
-                                                        dB.BANK_ID
-                                                    ),
-                                                    value: dB.BANK_ID,
-                                                }}
+                                                value={getNameBank(dB.BANK_ID)}
                                                 // onChange={(e) =>
                                                 //     inputDataBank(
                                                 //         "BANK_ID",
@@ -289,13 +285,18 @@ export default function DetailBankAccount({
                                                     dB.PERSON_BANK_ACCOUNT_NUMBER
                                                 }
                                                 className="mt-9"
-                                                onChange={(e) =>
+                                                onChange={(e) => {
                                                     inputDataBank(
                                                         "PERSON_BANK_ACCOUNT_NUMBER",
                                                         e.target.value,
                                                         i
-                                                    )
-                                                }
+                                                    );
+                                                    inputDataBank(
+                                                        "PERSON_BANK_ACCOUNT_FOR",
+                                                        "flag",
+                                                        i
+                                                    );
+                                                }}
                                                 placeholder="Bank Account Number *"
                                             />
                                         </div>

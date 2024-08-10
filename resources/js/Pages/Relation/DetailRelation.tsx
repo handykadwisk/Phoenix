@@ -1471,18 +1471,6 @@ export default function DetailRelation({
                                                         .RELATION_TYPE_NAME
                                                 }
                                             </span>
-                                            <div>
-                                                {/* <a href=""> */}
-                                                <div
-                                                    className="text-white cursor-pointer"
-                                                    onMouseDown={(e) =>
-                                                        e.preventDefault()
-                                                    }
-                                                >
-                                                    <XMarkIcon className="w-5" />
-                                                </div>
-                                                {/* </a> */}
-                                            </div>
                                         </div>
                                         // </>
                                     );

@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class TPersonController extends Controller
@@ -550,14 +551,23 @@ class TPersonController extends Controller
     }
 
     public function addBankAccount(Request $request){
-        // $personFor = $request->BANK_ACCOUNT[0]['BANK_ID']['value'];
-        // print_r($personFor);die;
-        // $bankForNew = [];
-        // foreach ($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_FOR'] as $bankFor) {
-        //     // get Bank For
-        //     array_push($bankForNew, (int)$bankFor['value']);
-        // }
-        // $valueBankFor = json_encode($bankForNew);
+        // dd($request->BANK_ACCOUNT);
+        // validasi bank account
+        $validateData = Validator::make($request->all() ,[
+            'BANK_ACCOUNT.*.BANK_ID'                    => 'required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_FOR'    => 'required'
+        ],[
+            'BANK_ACCOUNT.*.BANK_ID'                    => 'Bank Name is required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_FOR'    => 'For Bank Account is required'
+        ]);
+
+        if ($validateData->fails()) {
+            return new JsonResponse([
+                $validateData->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
 
         // created bank account
         if (is_countable($request->BANK_ACCOUNT)) {
@@ -606,28 +616,49 @@ class TPersonController extends Controller
     public function editBankAccount(Request $request){
 
         // dd($request);
-        // if (!isset($request->BANK_ACCOUNT[0]["m_for_bank"][0]["FOR_BANK_ACCOUNT_ID"])) {
-        //     echo "gaada";
-        // }else{
-        //     echo "ada";
+        $validateData = Validator::make($request->all() ,[
+            'BANK_ACCOUNT.*.BANK_ID'                        => 'required',
+            'BANK_ACCOUNT.*.m_for_bank'                    => 'required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_NUMBER'    => 'required'
+            
+        ],[
+            'BANK_ACCOUNT.*.BANK_ID'                       => 'Bank Name is required',
+            'BANK_ACCOUNT.*.m_for_bank'                    => 'For Bank Account is required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_NUMBER'    => 'Account Number is required'
+        ]);
+
+        if ($validateData->fails()) {
+            return new JsonResponse([
+                $validateData->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
+
+
+        // if (isset($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_ID'])) {
+            $dataTPerson = TPersonBankAccount::where('PERSON_ID', $request->BANK_ACCOUNT[0]['PERSON_ID'])->get();
+            // dd($dataTPerson);
+            // Delete M Bank Account Existing By Id
+            for ($i=0; $i < sizeof($dataTPerson); $i++) { 
+                
+                $dataExisting = MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $dataTPerson[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
+                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+                    MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $dataTPerson[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
+                }
+            }
+            // Delete Data T Person Bank Account
+            // $dataExistingTPerson = TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $dataTPerson[0]['PERSON_ID'])->get();
+            if ($dataTPerson->count()>0) { //jika ada delete data sebelumnya
+                TPersonBankAccount::where('PERSON_ID', $dataTPerson[0]['PERSON_ID'])->delete();
+            }
+            
         // }
-        // die;
+
+
         // created bank account
         if (is_countable($request->BANK_ACCOUNT)) {
             for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
-
-
-                // Delete M Bank Account Existing By Id
-                $dataExisting = MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
-                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
-                    MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
-                }
-
-                // Delete Data T Person Bank Account
-                $dataExisting = TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
-                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
-                    TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
-                }
 
 
                 // Add New Data T Person Bank Account and M Person Bank Account

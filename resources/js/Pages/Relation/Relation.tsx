@@ -41,6 +41,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied
 import AGGrid from "@/Components/AgGrid";
 
 export default function Relation({ auth }: PageProps) {
+    console.log(auth);
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });
@@ -55,10 +56,16 @@ export default function Relation({ auth }: PageProps) {
     const [relations, setRelations] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
     const [searchRelation, setSearchRelation] = useState<any>({
-        RELATION_ORGANIZATION_NAME: "",
-        RELATION_TYPE_ID: "",
+        relation_search: [
+            {
+                RELATION_ORGANIZATION_NAME: "",
+                RELATION_TYPE_ID: "",
+                flag: "flag",
+            },
+        ],
     });
 
+    // console.log(searchRelation.relation_search);
     const getRelation = async (pageNumber = "page=1") => {
         await axios
             .post(`/getRelation?${pageNumber}`, {
@@ -97,7 +104,7 @@ export default function Relation({ auth }: PageProps) {
         custom_menu,
     }: any = usePage().props;
 
-    const [isSuccess, setIsSuccess] = useState<string>("");
+    const [isSuccess, setIsSuccess] = useState<any>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [mRelation, setMRelation] = useState<any>([]);
     const [switchPage, setSwitchPage] = useState(false);
@@ -396,20 +403,14 @@ export default function Relation({ auth }: PageProps) {
         )?.length;
 
     // search
-    const clearSearchRelation = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRelation?${pageNumber}`)
-            .then((res) => {
-                setRelations([]);
-                setSearchRelation({
-                    ...searchRelation,
-                    RELATION_ORGANIZATION_NAME: "",
-                    RELATION_TYPE: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchRelation = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("RELATION_ORGANIZATION_NAME", "", 0);
+        inputDataSearch("RELATION_TYPE_ID", "", 0);
+        inputDataSearch("flag", "flag", 0);
+        setIsSuccess({
+            isSuccess: "success",
+        });
     };
 
     const selectRType = relationType?.map((query: any) => {
@@ -461,6 +462,18 @@ export default function Relation({ auth }: PageProps) {
             });
         }
     };
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchRelation.relation_search];
+        changeVal[i][name] = value;
+        setSearchRelation({ ...searchRelation, relation_search: changeVal });
+    };
+
+    console.log(searchRelation.relation_search);
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -554,7 +567,7 @@ export default function Relation({ auth }: PageProps) {
 
             {/* Page */}
             <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
-                <div className="flex flex-col">
+                <div className="flex flex-col relative">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
                             className="p-2"
@@ -573,65 +586,119 @@ export default function Relation({ auth }: PageProps) {
                             {"Add Relation"}
                         </Button>
                     </div>
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
+                    <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
                         <TextInput
                             type="text"
-                            value={searchRelation.RELATION_ORGANIZATION_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchRelation({
-                                    ...searchRelation,
-                                    RELATION_ORGANIZATION_NAME: e.target.value,
-                                })
+                            value={
+                                searchRelation.relation_search[0]
+                                    .RELATION_ORGANIZATION_NAME === ""
+                                    ? ""
+                                    : searchRelation.relation_search[0]
+                                          .RELATION_ORGANIZATION_NAME
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (
-                                        searchRelation.RELATION_ORGANIZATION_NAME !==
-                                        ""
-                                    ) {
-                                        getRelation();
-                                    }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "RELATION_ORGANIZATION_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchRelation.relation_search[0]
+                                        .RELATION_ORGANIZATION_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
+
+                                // setSearchRelation([
+                                //     ...searchRelation,
+                                //     {
+                                //         RELATION_ORGANIZATION_NAME:
+                                //             e.target.value,
+                                //     },
+                                // ])
                             }}
+                            // onKeyDown={(e) => {
+                            //     if (e.key === "Enter") {
+                            //         if (
+                            //             searchRelation.relation_search[0]
+                            //                 .RELATION_ORGANIZATION_NAME === ""
+                            //         ) {
+                            //             inputDataSearch(
+                            //                 "RELATION_ORGANIZATION_NAME",
+                            //                 "flag",
+                            //                 0
+                            //             );
+                            //         }
+
+                            //         setIsSuccess({
+                            //             isSuccess: "success",
+                            //         });
+                            //     }
+                            // }}
                             placeholder="Search Relation Name"
                         />
                         <Select
                             classNames={{
                                 menuButton: () =>
                                     `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
-                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                 listItem: ({ isSelected }: any) =>
                                     `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
                                         isSelected
-                                            ? `text-white bg-primary-pelindo`
-                                            : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                            ? `text-white bg-red-600`
+                                            : `text-gray-500 hover:bg-red-200 hover:text-black-500`
                                     }`,
                             }}
                             options={selectRType}
                             isSearchable={true}
                             placeholder={"Search Relation Type"}
-                            value={searchRelation.RELATION_TYPE_ID}
-                            onChange={(val: any) =>
-                                setSearchRelation({
-                                    ...searchRelation,
-                                    RELATION_TYPE_ID: val,
-                                })
+                            value={
+                                searchRelation.relation_search[0]
+                                    .RELATION_TYPE_ID === ""
+                                    ? ""
+                                    : searchRelation.relation_search[0]
+                                          .RELATION_TYPE_ID
                             }
+                            onChange={(val: any) => {
+                                inputDataSearch("RELATION_TYPE_ID", val, 0);
+                                if (
+                                    searchRelation.relation_search[0]
+                                        .RELATION_TYPE_ID === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                            }}
                             primaryColor={"bg-red-500"}
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
-                                    getRelation();
+                                    if (
+                                        searchRelation.relation_search[0]
+                                            .RELATION_TYPE_ID === "" &&
+                                        searchRelation.relation_search[0]
+                                            .RELATION_ORGANIZATION_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setIsSuccess({
+                                        isSuccess: "success",
+                                    });
                                 }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRelation()}
+                                onClick={(e) => clearSearchRelation(e)}
                             >
                                 Clear Search
                             </div>
@@ -640,6 +707,10 @@ export default function Relation({ auth }: PageProps) {
                 </div>
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
                     <AGGrid
+                        addButtonLabel={undefined}
+                        addButtonModalState={undefined}
+                        withParam={""}
+                        searchParam={searchRelation.relation_search}
                         // loading={isLoading.get_policy}
                         url={"getRelation"}
                         doubleClickEvent={handleDetailRelation}

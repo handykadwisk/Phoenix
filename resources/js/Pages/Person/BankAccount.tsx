@@ -134,6 +134,8 @@ export default function BankAccount({
         });
     };
 
+    console.log(dataBankAccount);
+
     return (
         <>
             <ModalToAdd
@@ -175,8 +177,8 @@ export default function BankAccount({
                                                     }: any) =>
                                                         `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
                                                             isSelected
-                                                                ? `text-white bg-primary-pelindo`
-                                                                : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                                ? `text-white bg-red-600`
+                                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
                                                         }`,
                                                 }}
                                                 options={bankSelect}
@@ -207,9 +209,7 @@ export default function BankAccount({
                                         </div>
                                         <div className="col-span-2">
                                             <TextInput
-                                                id="PERSON_BANK_ACCOUNT_NUMBER"
                                                 type="text"
-                                                name="PERSON_BANK_ACCOUNT_NUMBER"
                                                 value={
                                                     dB.PERSON_BANK_ACCOUNT_NUMBER
                                                 }
@@ -221,6 +221,7 @@ export default function BankAccount({
                                                         i
                                                     )
                                                 }
+                                                required
                                                 placeholder="Bank Account Number *"
                                             />
                                         </div>
@@ -235,8 +236,8 @@ export default function BankAccount({
                                                     }: any) =>
                                                         `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
                                                             isSelected
-                                                                ? `text-white bg-primary-pelindo`
-                                                                : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                                ? `text-white bg-red-600`
+                                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
                                                         }`,
                                                 }}
                                                 options={bankFor}
@@ -260,34 +261,37 @@ export default function BankAccount({
                                             />
                                         </div>
                                         <div className="">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth={1.5}
-                                                stroke="currentColor"
-                                                className=" h-6 text-red-500 cursor-pointer font-semibold mt-11"
-                                                onClick={() => {
-                                                    const updatedData =
-                                                        dataBankAccount.BANK_ACCOUNT.filter(
-                                                            (
-                                                                data: any,
-                                                                a: number
-                                                            ) => a !== i
-                                                        );
-                                                    setDataBankAccount({
-                                                        ...dataBankAccount,
-                                                        BANK_ACCOUNT:
-                                                            updatedData,
-                                                    });
-                                                }}
-                                            >
-                                                <path
-                                                    fill="#AB7C94"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M6 18 18 6M6 6l12 12"
-                                                />
-                                            </svg>
+                                            {dataBankAccount.BANK_ACCOUNT
+                                                ?.length !== 1 && (
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 24 24"
+                                                    strokeWidth={1.5}
+                                                    stroke="currentColor"
+                                                    className=" h-6 text-red-500 cursor-pointer font-semibold mt-11"
+                                                    onClick={() => {
+                                                        const updatedData =
+                                                            dataBankAccount.BANK_ACCOUNT.filter(
+                                                                (
+                                                                    data: any,
+                                                                    a: number
+                                                                ) => a !== i
+                                                            );
+                                                        setDataBankAccount({
+                                                            ...dataBankAccount,
+                                                            BANK_ACCOUNT:
+                                                                updatedData,
+                                                        });
+                                                    }}
+                                                >
+                                                    <path
+                                                        fill="#AB7C94"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M6 18 18 6M6 6l12 12"
+                                                    />
+                                                </svg>
+                                            )}
                                         </div>
                                     </div>
                                 );

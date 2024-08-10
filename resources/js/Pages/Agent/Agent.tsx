@@ -237,9 +237,9 @@ export default function Agent({ auth }: PageProps) {
                 title={"Agent " + detailAgent.RELATION_ORGANIZATION_NAME}
                 url={""}
                 data={""}
-                onSuccess={""}
+                onSuccess={null}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
                 }
@@ -308,6 +308,7 @@ export default function Agent({ auth }: PageProps) {
                 </div>
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100%]">
                     <AGGrid
+                        searchParam={""}
                         addButtonLabel={null}
                         addButtonModalState={undefined}
                         withParam={null}

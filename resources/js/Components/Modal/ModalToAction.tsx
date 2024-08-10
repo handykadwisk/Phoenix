@@ -29,7 +29,7 @@ export default function ModalToAction({
     url: string;
     data: any | null;
     method: string;
-    onSuccess: any;
+    onSuccess: any | null | undefined;
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
@@ -59,7 +59,13 @@ export default function ModalToAction({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data);
+                if (
+                    onSuccess !== null ||
+                    onSuccess !== "" ||
+                    onSuccess !== undefined
+                ) {
+                    onSuccess(res.data);
+                }
                 close();
             })
             .catch((err) => {

@@ -139,7 +139,7 @@ class TRelationAgentController extends Controller
         $query = MRelationAgent::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
-        $query->leftJoin('t_relation', 'm_relation_agents.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('RELATION_AGENT_ID', $request->idAgent);
+        $query->leftJoin('t_relation', 'm_relation_agents.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('RELATION_AGENT_ID', $request->id);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 

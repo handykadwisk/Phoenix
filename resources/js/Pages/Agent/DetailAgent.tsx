@@ -24,17 +24,19 @@ import { BeatLoader } from "react-spinners";
 
 export default function DetailAgent({
     auth,
-    isSuccess,
-    setIsSuccess,
+    // isSuccessNew,
+    // setIsSuccessNew,
     idAgent,
 }: PropsWithChildren<{
     auth: any;
-    isSuccess: any;
+    // isSuccessNew: any;
     idAgent: any;
-    setIsSuccess: any;
+    // setIsSuccessNew: any;
 }>) {
     const [detailAgentNew, setDetailAgentNew] = useState<any>([]);
     const [relationAgent, setRelationAgent] = useState<any>([]);
+
+    const [isSuccessNew, setIsSuccessNew] = useState<any>("");
     // console.log(dataAgent);
     // useEffect(() => {
     //     getMRelationAgent(idAgent);
@@ -119,7 +121,7 @@ export default function DetailAgent({
         )?.length;
     // console.log(dataRelation.name_relation);
 
-    const handleSuccess = (message: string) => {
+    const handleSuccess = async (message: string) => {
         // if (modal.add) {
         setDataRelation({
             idAgent: idAgent,
@@ -133,8 +135,8 @@ export default function DetailAgent({
             // console.log(message);
             if (result.value) {
                 // getMRelationAgent(message[0]);
-                setIsSuccess({
-                    isSuccess: "success",
+                setIsSuccessNew({
+                    isSuccessNew: "success",
                 });
             }
         });
@@ -144,8 +146,8 @@ export default function DetailAgent({
         await axios
             .post(`/deleteAgent`, { id })
             .then((res) => {
-                setIsSuccess({
-                    isSuccess: "success",
+                setIsSuccessNew({
+                    isSuccessNew: "success",
                 });
                 // console.log(id);
                 // getMRelationAgent(idAgent);
@@ -401,6 +403,7 @@ export default function DetailAgent({
 
             <div className="max-w-full h-[100%] mt-2">
                 <AGGrid
+                    searchParam={""}
                     // loading={isLoading.get_policy}
                     url={"getMRelationAgent"}
                     addButtonLabel={"Add Relation"}
@@ -409,7 +412,7 @@ export default function DetailAgent({
                         handleClickAddRelationAgent(idAgent)
                     }
                     doubleClickEvent={undefined}
-                    triggeringRefreshData={isSuccess}
+                    triggeringRefreshData={isSuccessNew}
                     colDefs={[
                         {
                             headerName: "No.",
