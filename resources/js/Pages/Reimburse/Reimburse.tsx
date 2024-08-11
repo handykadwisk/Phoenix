@@ -18,10 +18,15 @@ import ToastMessage from "@/Components/ToastMessage";
 import Pagination from "@/Components/Pagination";
 import {
     ArrowDownTrayIcon,
+    ArrowPathIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import dateFormat from "dateformat";
 import ModalSearch from "@/Components/Modal/ModalSearch";
+import Input from "@/Components/Input";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Select from "react-tailwindcss-select";
 
 export default function CashAdvance({ auth }: PageProps) {
     useEffect(() => {
@@ -42,6 +47,20 @@ export default function CashAdvance({ auth }: PageProps) {
         execute: false,
     });
     // Modal Add End
+
+    // Modal Add Files Start
+    const [modalFiles, setModalFiles] = useState<any>({
+        add_files: false,
+        show_files: false,
+        add_files_report: false,
+        show_files_report: false,
+        show_files_proof_of_document: false,
+        add_files_execute_report: false,
+        index: "",
+        index_show: "",
+        index_show_report: "",
+    });
+    // Modal Add Files End
 
     const { data, setData, errors, reset } = useForm({
         reimburse_number: "",
@@ -496,7 +515,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // };
 
     // Data Start
-    const { users }: any = usePage().props;
+    const { users, relations, coa, persons }: any = usePage().props;
     const purposes = [
         {
             id: 1,
@@ -571,6 +590,25 @@ export default function CashAdvance({ auth }: PageProps) {
         },
     ];
     // Data End
+
+    // Handle Add Start
+    const handleAddModal = async (e: FormEvent) => {
+        e.preventDefault();
+
+        setModal({
+            add: true,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            search_ca_report: false,
+            approve: false,
+            report: false,
+            execute: false,
+        });
+    };
+    // Handle Add End
 
     // Handle Approve Start
     const handleApproveModal = async (e: FormEvent, id: number) => {
@@ -776,16 +814,65 @@ export default function CashAdvance({ auth }: PageProps) {
     };
 
     const [checkedTransfer, setCheckedTransfer] = useState(false);
-    const handleCheckedTransfer = (e:any) => {
-        setData("reimburse_delivery_method_transfer", e.target.value)
-        setCheckedTransfer(!checkedTransfer); 
+    const handleCheckedTransfer = (e: any) => {
+        setData("reimburse_delivery_method_transfer", e.target.value);
+        setCheckedTransfer(!checkedTransfer);
     };
 
     const [checkedCash, setCheckedCash] = useState(false);
-    const handleCheckedCash = (e:any) => {
-        setData("reimburse_delivery_method_cash", e.target.value)
-        setCheckedCash(!checkedCash); 
+    const handleCheckedCash = (e: any) => {
+        setData("reimburse_delivery_method_cash", e.target.value);
+        setCheckedCash(!checkedCash);
     };
+
+    const selectPerson = persons
+        ?.filter(
+            (m: any) =>
+                m.DIVISION_ID === auth.user.person?.DIVISION_ID &&
+                m.STRUCTURE_ID === 4
+        )
+        .map((query: any) => {
+            return {
+                value: query.PERSON_ID,
+                label: query.PERSON_FIRST_NAME,
+            };
+        });
+
+    const selectApproval = persons
+        ?.filter(
+            (m: any) =>
+                m.DIVISION_ID === auth.user.person?.DIVISION_ID &&
+                (m.STRUCTURE_ID === 2 || m.STRUCTURE_ID === 3)
+        )
+        .map((query: any) => {
+            return {
+                value: query.PERSON_ID,
+                label: query.PERSON_FIRST_NAME,
+            };
+        });
+
+    const selectRelation = relations?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
+    });
+
+    const getRelationSelect = (value: any) => {
+        if (value) {
+            const selected = selectRelation.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+
+    const selectCoa = coa?.map((query: any) => {
+        return {
+            value: query.COA_ID,
+            label: query.COA_CODE + " - " + query.COA_TITLE,
+        };
+    });
 
     console.log(data);
     // console.log(DataRow);
@@ -826,115 +913,162 @@ export default function CashAdvance({ auth }: PageProps) {
                 url={`/reimburse`}
                 data={data}
                 onSuccess={handleSuccess}
-                panelWidth={"65%"}
+                buttonAddOns={null}
                 body={
                     <>
+                        <ModalToAction
+                            classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                            show={modalFiles.add_files}
+                            closeable={true}
+                            onClose={() =>
+                                setModalFiles({
+                                    add_files: false,
+                                    show_files: false,
+                                    add_files_report: false,
+                                    show_files_report: false,
+                                    show_files_proof_of_document: false,
+                                    index: "",
+                                })
+                            }
+                            title="Add Files"
+                            url=""
+                            data=""
+                            method=""
+                            onSuccess=""
+                            headers={null}
+                            submitButtonName=""
+                            // panelWidth=""
+                            body={
+                                <>
+                                    <div className="grid grid-cols-12 my-5">
+                                        <div className={`w-full col-span-11`}>
+                                            <InputLabel
+                                                htmlFor="files"
+                                                value="File"
+                                                className="mb-2"
+                                            />
+                                            {/* <p>test</p> */}
+                                            <Input
+                                                name="cash_advance_detail_document_id"
+                                                type="file"
+                                                className="w-full"
+                                                onChange={(e) =>
+                                                    handleChangeAddFiles(e, i)
+                                                }
+                                            />
+                                        </div>
+                                        <button
+                                            className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
+                                            onClick={(e) =>
+                                                handleRemoveFilesRow(e, i)
+                                            }
+                                        >
+                                            X
+                                        </button>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="text-sm cursor-pointer hover:underline"
+                                        onClick={(e) => handleAddRowFiles(e)}
+                                    >
+                                        + Add Row
+                                    </button>
+                                </>
+                            }
+                        />
                         <div className="grid md:grid-cols-2 my-10">
-                            {/* <div className="w-full p-2">
-                                <InputLabel htmlFor="tipe" className="mb-2">
-                                    Type<span className="text-red-600">*</span>
-                                </InputLabel>
-                                <select
-                                    id="tipe"
-                                    name="tipe"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setData("tipe", e.target.value)
-                                    }
-                                    required
-                                >
-                                    <option value="">-- Choose Type --</option>
-                                    {types.map((type: any) => (
-                                        <option key={type.id} value={type.id}>
-                                            {type.type}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div> */}
-                            <div className="w-full p-2">
+                            <div className="w-full p-2 mb-1">
                                 <InputLabel
                                     htmlFor="namaPengguna"
                                     value="Applicant"
-                                    className="mb-2"
+                                    className="mb-4"
                                 />
                                 <TextInput
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
                                     value={auth.user.name}
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="reimburse_division"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="reimburse_division"
-                                    type="text"
-                                    name="reimburse_division"
-                                    value="IT"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemohon"
-                                    className="mb-2"
-                                >
+                            <div className="w-full p-2 mb-1">
+                                <InputLabel htmlFor="namaPemohon" className="">
                                     Used By
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <select
-                                    id="namaPemohon"
-                                    name="namaPemohon"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setData("reimburse_used_by", e.target.value)
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={selectPerson}
+                                    isSearchable={true}
+                                    placeholder={"Choose Used By"}
+                                    value={data.cash_advance_used_by}
+                                    onChange={(val: any) =>
+                                        setData("cash_advance_used_by", val)
                                     }
-                                    required
-                                >
-                                    <option value="">
-                                        -- Choose Used By --
-                                    </option>
-                                    {users.map((user: any) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    primaryColor={"bg-red-500"}
+                                />
                             </div>
-                            <div className="w-full p-2">
+                            <div className="w-full p-2 mb-1">
+                                <InputLabel
+                                    htmlFor="cash_advance_division"
+                                    value="Division"
+                                    className="mb-4"
+                                />
+                                <TextInput
+                                    id="cash_advance_division"
+                                    type="text"
+                                    name="cash_advance_division"
+                                    value={
+                                        auth.user.person.division
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2 mb-1">
                                 <InputLabel
                                     htmlFor="namaPemberiApproval"
-                                    className="mb-2"
+                                    className=""
                                 >
                                     Request for Approval
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
-                                <select
-                                    id="namaPemberiApproval"
-                                    name="namaPemberiApproval"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={selectApproval}
+                                    isSearchable={true}
+                                    placeholder={"Choose Request To"}
+                                    value={data.cash_advance_first_approval_by}
+                                    onChange={(val: any) =>
                                         setData(
-                                            "reimburse_first_approval_by",
-                                            e.target.value
+                                            "cash_advance_first_approval_by",
+                                            val
                                         )
                                     }
-                                    required
-                                >
-                                    <option value="">
-                                        -- Choose Request To --
-                                    </option>
-                                    {users.map((user: any) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    primaryColor={"bg-red-500"}
+                                />
                             </div>
                         </div>
 
@@ -991,14 +1125,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                         )}
                                     </tr>
                                     <tr className="text-center">
-                                        <TH
-                                            label="Name"
-                                            className="border"
-                                        />
-                                        <TH
-                                            label="Person"
-                                            className="border"
-                                        />
+                                        <TH label="Name" className="border" />
+                                        <TH label="Person" className="border" />
                                         <TH
                                             label="Position"
                                             className="border"
@@ -1010,77 +1138,81 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <tr className="text-center" key={i}>
                                             <TD className="border">{i + 1}.</TD>
                                             <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_date"
-                                                    type="date"
-                                                    name="reimburse_detail_date"
-                                                    value={val.reimburse_detail_date}
-                                                    className="w-1/2"
-                                                    autoComplete="reimburse_detail_date"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
+                                                <DatePicker
+                                                    name="cash_advance_detail_start_date"
+                                                    selected={
+                                                        val.cash_advance_detail_start_date
                                                     }
+                                                    onChange={(date: any) =>
+                                                        handleChangeAddDate(
+                                                            date,
+                                                            "cash_advance_detail_start_date",
+                                                            i
+                                                        )
+                                                    }
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd-mm-yyyyy"
+                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                    autoComplete="off"
                                                     required
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                <select
+                                                <TextInput
                                                     id="reimburse_detail_purpose"
+                                                    type="text"
                                                     name="reimburse_detail_purpose"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    required
+                                                    value={
+                                                        val.reimburse_detail_purpose
+                                                    }
+                                                    className="w-1/2"
+                                                    autoComplete="reimburse_detail_purpose"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
-                                                >
-                                                    <option value="">
-                                                        -- Choose purpose --
-                                                    </option>
-                                                    {purposes.map((purpose) => (
-                                                        <option
-                                                            key={purpose.id}
-                                                            value={purpose.id}
-                                                        >
-                                                            {purpose.purpose}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                />
                                             </TD>
                                             <TD className="border">
-                                                <select
-                                                    id="reimburse_detail_relation_organization_id"
-                                                    name="reimburse_detail_relation_organization_id"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
+                                                <Select
+                                                    classNames={{
+                                                        menuButton: () =>
+                                                            `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                        listItem: ({
+                                                            isSelected,
+                                                        }: any) =>
+                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                isSelected
+                                                                    ? `text-white bg-red-600`
+                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                            }`,
+                                                    }}
+                                                    options={selectRelation}
+                                                    isSearchable={true}
+                                                    placeholder={
+                                                        "Choose Business Relation"
                                                     }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Business
-                                                        Relation --
-                                                    </option>
-                                                    {companies.map(
-                                                        (company) => (
-                                                            <option
-                                                                key={company.id}
-                                                                value={
-                                                                    company.id
-                                                                }
-                                                            >
-                                                                {
-                                                                    company.nama_perusahaan
-                                                                }
-                                                            </option>
+                                                    value={
+                                                        val.cash_advance_detail_relation_organization_id
+                                                    }
+                                                    onChange={(val: any) =>
+                                                        handleChangeAddCustom(
+                                                            val,
+                                                            "cash_advance_detail_relation_organization_id",
+                                                            i
                                                         )
-                                                    )}
-                                                </select>
+                                                    }
+                                                    primaryColor={"bg-red-500"}
+                                                />
                                             </TD>
                                             <TD className="border">
                                                 <TextInput
                                                     id="reimburse_detail_relation_name"
                                                     type="text"
                                                     name="reimburse_detail_relation_name"
-                                                    value={val.reimburse_detail_relation_name}
+                                                    value={
+                                                        val.reimburse_detail_relation_name
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_relation_name"
                                                     onChange={(e) =>
@@ -1093,7 +1225,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_relation_position"
                                                     type="text"
                                                     name="reimburse_detail_relation_position"
-                                                    value={val.reimburse_detail_relation_position}
+                                                    value={
+                                                        val.reimburse_detail_relation_position
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_relation_position"
                                                     onChange={(e) =>
@@ -1106,7 +1240,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_location"
                                                     type="text"
                                                     name="reimburse_detail_location"
-                                                    value={val.reimburse_detail_location}
+                                                    value={
+                                                        val.reimburse_detail_location
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_location"
                                                     onChange={(e) =>
@@ -1120,7 +1256,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_amount"
                                                     type="number"
                                                     name="reimburse_detail_amount"
-                                                    value={val.reimburse_detail_amount}
+                                                    value={
+                                                        val.reimburse_detail_amount
+                                                    }
                                                     className="w-1/2 text-right"
                                                     autoComplete="reimburse_detail_amount"
                                                     onChange={(e) =>
@@ -1131,16 +1269,23 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                <input
-                                                    type="file"
-                                                    id="reimburse_detail_document_id"
-                                                    name="reimburse_detail_document_id"
-                                                    className="bg-white leading-4"
-                                                    multiple
-                                                    onChange={(e) =>
-                                                        handleUploadFile(e, i)
-                                                    }
-                                                />
+                                                <button
+                                                    type="button"
+                                                    className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                    onClick={() => {
+                                                        setModalFiles({
+                                                            add_files: true,
+                                                            show_files: false,
+                                                            add_files_report:
+                                                                false,
+                                                            show_files_report:
+                                                                false,
+                                                            index: i,
+                                                        });
+                                                    }}
+                                                >
+                                                    Add Files
+                                                </button>
                                             </TD>
                                             <TD className="border">
                                                 {DataRow.length > 1 && (
@@ -1163,11 +1308,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <TD></TD>
                                         <TD>
                                             <Button
-                                                className="mt-5 px-2 py-1 bg-blue-600 hover:bg-blue-500 text-sm"
+                                                className="mt-5 px-2 py-1 text-black bg-none shadow-none hover:underline"
                                                 onClick={(e) => handleAddRow(e)}
                                                 type="button"
                                             >
-                                                +
+                                                + Add Row
                                             </Button>
                                         </TD>
                                         <TD
@@ -1313,7 +1458,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                 rows={5}
                                 value={data.reimburse_request_note}
                                 onChange={(e) =>
-                                    setData("reimburse_request_note", e.target.value)
+                                    setData(
+                                        "reimburse_request_note",
+                                        e.target.value
+                                    )
                                 }
                             />
                         </div>
@@ -1597,15 +1745,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE === "1" &&
-                                                        "Peruntukan A"
-                                                    }
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE === "2" &&
-                                                        "Peruntukan B"
-                                                    }
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE === "3" &&
-                                                        "Peruntukan C"
-                                                    }
+                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                        "1" && "Peruntukan A"}
+                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                        "2" && "Peruntukan B"}
+                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
+                                                        "3" && "Peruntukan C"}
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
@@ -1635,21 +1780,24 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.REIMBURSE_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !== null ? (
-                                                <TD className="border px-3 py-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            handleFileDownload(
-                                                                cad.REIMBURSE_DETAIL_ID
-                                                            )
-                                                        }
-                                                    >
-                                                        <ArrowDownTrayIcon className="w-6 m-auto" />
-                                                    </button>
-                                                </TD>
+                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !==
+                                                null ? (
+                                                    <TD className="border px-3 py-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleFileDownload(
+                                                                    cad.REIMBURSE_DETAIL_ID
+                                                                )
+                                                            }
+                                                        >
+                                                            <ArrowDownTrayIcon className="w-6 m-auto" />
+                                                        </button>
+                                                    </TD>
                                                 ) : (
-                                                    <TD className="border px-3 py-2">-</TD>
+                                                    <TD className="border px-3 py-2">
+                                                        -
+                                                    </TD>
                                                 )}
                                             </tr>
                                         )
@@ -1689,7 +1837,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                 rows={5}
                                 value={dataById.REIMBURSE_REQUEST_NOTE}
                                 onChange={(e) =>
-                                    setData("reimburse_request_note", e.target.value)
+                                    setData(
+                                        "reimburse_request_note",
+                                        e.target.value
+                                    )
                                 }
                                 readOnly
                             />
@@ -1977,7 +2128,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.REIMBURSE_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !== null ? (
+                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !==
+                                                null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
@@ -1991,7 +2143,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         </button>
                                                     </TD>
                                                 ) : (
-                                                    <TD className="border px-3 py-2">-</TD>
+                                                    <TD className="border px-3 py-2">
+                                                        -
+                                                    </TD>
                                                 )}
                                                 <TD className="border">
                                                     <select
@@ -2289,7 +2443,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="namaPemohon"
                                     onChange={(e) =>
-                                        setData("reimburse_used_by", e.target.value)
+                                        setData(
+                                            "reimburse_used_by",
+                                            e.target.value
+                                        )
                                     }
                                     readOnly
                                 />
@@ -2308,7 +2465,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
-                                        setData("reimburse_requested_by", e.target.value)
+                                        setData(
+                                            "reimburse_requested_by",
+                                            e.target.value
+                                        )
                                     }
                                     readOnly
                                 />
@@ -2327,7 +2487,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="reimburse_division"
                                     onChange={(e) =>
-                                        setData("reimburse_division", e.target.value)
+                                        setData(
+                                            "reimburse_division",
+                                            e.target.value
+                                        )
                                     }
                                     readOnly
                                 />
@@ -2523,14 +2686,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         <option value="">
                                                             -- Choose purpose --
                                                         </option>
-                                                        {purposes.map((purpose) => (
-                                                            <option
-                                                                key={purpose.id}
-                                                                value={purpose.id}
-                                                            >
-                                                                {purpose.purpose}
-                                                            </option>
-                                                        ))}
+                                                        {purposes.map(
+                                                            (purpose) => (
+                                                                <option
+                                                                    key={
+                                                                        purpose.id
+                                                                    }
+                                                                    value={
+                                                                        purpose.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        purpose.purpose
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
                                                     </select>
                                                 </TD>
                                                 <TD className="border">
@@ -3188,7 +3359,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.REIMBURSE_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !== null ? (
+                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !==
+                                                null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
@@ -3202,7 +3374,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         </button>
                                                     </TD>
                                                 ) : (
-                                                    <TD className="border px-3 py-2">-</TD>
+                                                    <TD className="border px-3 py-2">
+                                                        -
+                                                    </TD>
                                                 )}
                                                 <TD className="border px-3">
                                                     {cad.REIMBURSE_DETAIL_STATUS ===
@@ -3246,35 +3420,43 @@ export default function CashAdvance({ auth }: PageProps) {
 
                         <div className="mt-10">
                             <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
-                                <legend className="ml-12 bg-gray-300 px-3 font-medium">Delivery Method</legend>
+                                <legend className="ml-12 bg-gray-300 px-3 font-medium">
+                                    Delivery Method
+                                </legend>
                                 <div className="mt-4 mx-5 space-y-5">
                                     <div className="relative flex items-start">
                                         <div className="flex h-9 items-center">
                                             <input
-                                            id="transfer"
-                                            name="transfer"
-                                            type="checkbox"
-                                            aria-describedby="transfer-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
+                                                id="transfer"
+                                                name="transfer"
+                                                type="checkbox"
+                                                aria-describedby="transfer-description"
+                                                className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             />
                                         </div>
                                         <div className="flex w-full gap-4">
                                             <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="transfer" className="font-medium text-gray-900">
-                                                Transfer
+                                                <label
+                                                    htmlFor="transfer"
+                                                    className="font-medium text-gray-900"
+                                                >
+                                                    Transfer
                                                 </label>
                                             </div>
                                             <TextInput
                                                 id="REIMBURSE_TRANSFER_AMOUNT"
                                                 type="number"
                                                 name="REIMBURSE_TRANSFER_AMOUNT"
-                                                value={dataById.REIMBURSE_TRANSFER_AMOUNT}
+                                                value={
+                                                    dataById.REIMBURSE_TRANSFER_AMOUNT
+                                                }
                                                 className="w-full lg:w-1/4 text-right"
                                                 placeholder="0"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        REIMBURSE_TRANSFER_AMOUNT: e.target.value,
+                                                        REIMBURSE_TRANSFER_AMOUNT:
+                                                            e.target.value,
                                                     })
                                                 }
                                                 required
@@ -3301,14 +3483,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="mb-2"
                                             >
                                                 Transfer Date
-                                                <span className="text-red-600">*</span>
+                                                <span className="text-red-600">
+                                                    *
+                                                </span>
                                             </InputLabel>
                                             <TextInput
                                                 id="reimburse_transfer_date"
                                                 type="date"
                                                 name="reimburse_transfer_date"
-                                                value={data.reimburse_transfer_date}
-                                                className="w-full lg:w-7/12"    
+                                                value={
+                                                    data.reimburse_transfer_date
+                                                }
+                                                className="w-full lg:w-7/12"
                                                 onChange={(e) =>
                                                     setData(
                                                         "reimburse_transfer_date",
@@ -3324,49 +3510,67 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="mb-2"
                                             >
                                                 From Bank Account
-                                                <span className="text-red-600">*</span>
+                                                <span className="text-red-600">
+                                                    *
+                                                </span>
                                             </InputLabel>
-                                            <select name="reimburse_from_bank_account" id="reimburse_from_bank_account" className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                            onChange={(e) =>
-                                                setData(
-                                                    "reimburse_from_bank_account",
-                                                    e.target.value
-                                                )
-                                            }
-                                            required>
-                                                <option value="">-- Choose Bank Account --</option>
-                                                <option value="Bank 1">Bank 1</option>
-                                                <option value="Bank 2">Bank 2</option>
+                                            <select
+                                                name="reimburse_from_bank_account"
+                                                id="reimburse_from_bank_account"
+                                                className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "reimburse_from_bank_account",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    -- Choose Bank Account --
+                                                </option>
+                                                <option value="Bank 1">
+                                                    Bank 1
+                                                </option>
+                                                <option value="Bank 2">
+                                                    Bank 2
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
                                     <div className="relative flex items-start">
                                         <div className="flex h-9 items-center">
                                             <input
-                                            id="cash"
-                                            name="cash"
-                                            type="checkbox"
-                                            aria-describedby="cash-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
+                                                id="cash"
+                                                name="cash"
+                                                type="checkbox"
+                                                aria-describedby="cash-description"
+                                                className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
                                             />
                                         </div>
                                         <div className="flex w-full">
                                             <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="cash" className="font-medium text-gray-900">
-                                                Cash
+                                                <label
+                                                    htmlFor="cash"
+                                                    className="font-medium text-gray-900"
+                                                >
+                                                    Cash
                                                 </label>
                                             </div>
                                             <TextInput
                                                 id="REIMBURSE_CASH_AMOUNT"
                                                 type="number"
                                                 name="REIMBURSE_CASH_AMOUNT"
-                                                value={dataById.REIMBURSE_CASH_AMOUNT}
+                                                value={
+                                                    dataById.REIMBURSE_CASH_AMOUNT
+                                                }
                                                 className="w-full lg:w-6/12 text-right ml-9"
                                                 placeholder="0"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        REIMBURSE_CASH_AMOUNT: e.target.value,
+                                                        REIMBURSE_CASH_AMOUNT:
+                                                            e.target.value,
                                                     })
                                                 }
                                                 required
@@ -3380,13 +3584,17 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="mb-2"
                                             >
                                                 Receive Date
-                                                <span className="text-red-600">*</span>
+                                                <span className="text-red-600">
+                                                    *
+                                                </span>
                                             </InputLabel>
                                             <TextInput
                                                 id="reimburse_receive_date"
                                                 type="date"
                                                 name="reimburse_receive_date"
-                                                value={data.reimburse_receive_date}
+                                                value={
+                                                    data.reimburse_receive_date
+                                                }
                                                 className="w-full lg:w-7/12"
                                                 placeholder="Bank Account"
                                                 onChange={(e) =>
@@ -3404,13 +3612,17 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="mb-2"
                                             >
                                                 Receive Name
-                                                <span className="text-red-600">*</span>
+                                                <span className="text-red-600">
+                                                    *
+                                                </span>
                                             </InputLabel>
                                             <TextInput
                                                 id="reimburse_receive_name"
                                                 type="text"
                                                 name="reimburse_receive_name"
-                                                value={data.reimburse_receive_name}
+                                                value={
+                                                    data.reimburse_receive_name
+                                                }
                                                 className="w-full lg:w-7/12"
                                                 onChange={(e) =>
                                                     setData(
@@ -3532,7 +3744,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     }
                                     required
                                 >
-                                    <option value="">-- Choose Reimburse --</option>
+                                    <option value="">
+                                        -- Choose Reimburse --
+                                    </option>
                                     {CANumber.map((ca: any) => (
                                         <option
                                             key={ca.REIMBURSE_ID}
@@ -3684,7 +3898,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_date"
                                                     type="date"
                                                     name="reimburse_detail_date"
-                                                    value={val.reimburse_detail_date}
+                                                    value={
+                                                        val.reimburse_detail_date
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_date"
                                                     onChange={(e) =>
@@ -3700,7 +3916,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_end_date"
                                                     type="date"
                                                     name="reimburse_detail_end_date"
-                                                    value={val.reimburse_detail_end_date}
+                                                    value={
+                                                        val.reimburse_detail_end_date
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_end_date"
                                                     onChange={(e) =>
@@ -3712,7 +3930,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
-                                            <select
+                                                <select
                                                     id="reimburse_detail_purpose"
                                                     name="reimburse_detail_purpose"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -3774,7 +3992,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_relation_name"
                                                     type="text"
                                                     name="reimburse_detail_relation_name"
-                                                    value={val.reimburse_detail_relation_name}
+                                                    value={
+                                                        val.reimburse_detail_relation_name
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_relation_name"
                                                     onChange={(e) =>
@@ -3790,7 +4010,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_relation_position"
                                                     type="text"
                                                     name="reimburse_detail_relation_position"
-                                                    value={val.reimburse_detail_relation_position}
+                                                    value={
+                                                        val.reimburse_detail_relation_position
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_relation_position"
                                                     onChange={(e) =>
@@ -3806,7 +4028,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_location"
                                                     type="text"
                                                     name="reimburse_detail_location"
-                                                    value={val.reimburse_detail_location}
+                                                    value={
+                                                        val.reimburse_detail_location
+                                                    }
                                                     className="w-1/2"
                                                     autoComplete="reimburse_detail_location"
                                                     onChange={(e) =>
@@ -3822,7 +4046,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="reimburse_detail_amount"
                                                     type="number"
                                                     name="reimburse_detail_amount"
-                                                    value={val.reimburse_detail_amount}
+                                                    value={
+                                                        val.reimburse_detail_amount
+                                                    }
                                                     className="w-1/2 text-right"
                                                     autoComplete="reimburse_detail_amount"
                                                     placeholder="0"
@@ -3884,9 +4110,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD>
-                                            0
-                                        </TD>
+                                        <TD>0</TD>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -3908,7 +4132,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                 rows={5}
                                 value={data.reimburse_request_note}
                                 onChange={(e) =>
-                                    setData("reimburse_request_note", e.target.value)
+                                    setData(
+                                        "reimburse_request_note",
+                                        e.target.value
+                                    )
                                 }
                                 readOnly
                                 //
@@ -3968,271 +4195,307 @@ export default function CashAdvance({ auth }: PageProps) {
             />
             {/* Modal Report End */}
 
-            {/* Modal Search Reimburse */}
-            <ModalSearch
-                show={modal.search}
-                onClose={() =>
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        search_ca_report: false,
-                        approve: false,
-                        report: false,
-                        execute: false,
-                    })
-                }
-                title={"Search Reimburse"}
-                submitButtonName={"Search"}
-                onAction={() => {
-                    getReimburse();
-                }}
-                isLoading={isLoading}
-                body={
-                    <>
-                        <div className="mb-4">
-                            <InputLabel
-                                htmlFor="REIMBURSE_NUMBER"
-                                value="Reimburse Number"
-                            />
-                            <TextInput
-                                id="REIMBURSE_NUMBER"
-                                type="text"
-                                name="REIMBURSE_NUMBER"
-                                value={searchReimburse.REIMBURSE_NUMBER}
-                                className=""
-                                onChange={(e) =>
-                                    setSearchReimburse({
-                                        ...searchReimburse,
-                                        REIMBURSE_NUMBER: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                    </>
-                }
-            />
-            {/* End Modal Search Reimburse */}
-
-            {/* Modal Search Reimburse Report */}
-            {/* <ModalSearch
-                show={modal.search_ca_report}
-                onClose={() =>
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        search_ca_report: false,
-                        approve: false,
-                        report: false,
-                        execute: false,
-                    })
-                }
-                title={"Search Reimburse Report"}
-                submitButtonName={"Search"}
-                onAction={() => getReportCA()}
-                isLoading={isLoading}
-                body={
-                    <>
-                        <div className="mb-4">
-                            <InputLabel
-                                htmlFor="REIMBURSE_NUMBER"
-                                value="Reimburse Number"
-                            />
-                            <TextInput
-                                id="REIMBURSE_NUMBER"
-                                type="text"
-                                name="REIMBURSE_NUMBER"
-                                value={searchReimburse.REIMBURSE_NUMBER}
-                                className=""
-                                onChange={(e) =>
-                                    setSearchReimburse({
-                                        ...searchReimburse,
-                                        REIMBURSE_NUMBER: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                    </>
-                }
-            /> */}
-            {/* End Modal Search Reimburse Report */}
-
             {/* Content Start */}
-            {/* <div className="max-w-0xl mx-auto sm:px-6 lg:px-0"> */}
             <div className="p-6 text-gray-900 mb-60">
-                {/* <div className="flex hover:cursor-pointer">
-                    {tabs.map((tab, i) => (
-                        <div
-                            key={i}
-                            className={`tab-1 px-5 py-4 rounded-t-lg ${
-                                toggleState === tab.index
-                                    ? `font-bold bg-white`
-                                    : "hover:bg-white"
-                            }`}
-                            onClick={() => toggleTab(tab.index)}
-                        >
-                            {tab.name}
-                        </div>
-                    ))}
-                </div> */}
-                <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
-                    <div className="grid sm:gap-2 sm:grid-cols-2 md:grid-cols-6 md:gap-4 lg:grid-cols-8">
-                        <Button
-                            className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto bg-red-600 hover:bg-red-500"
-                            onClick={() => {
-                                setModal({
-                                    add: true,
-                                    delete: false,
-                                    edit: false,
-                                    view: false,
-                                    document: false,
-                                    search: false,
-                                    search_ca_report: false,
-                                    approve: false,
-                                    report: false,
-                                    execute: false,
-                                });
-                            }}
-                        >
-                            {"Add Reimburse"}
-                        </Button>
-                    </div>
-                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
-                    <div className="bg-white rounded-md mb-5 lg:mb-0 p-10">
-                        <div className="grid grid-cols-3 gap-2">
-                            <div className="col-span-2">
-                                <button
-                                    className="w-full inline-flex rounded-md text-left border-0 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6 lg:col-span-5 md:col-span-4"
-                                    onClick={() => {
-                                        setModal({
-                                            add: false,
-                                            delete: false,
-                                            edit: false,
-                                            view: false,
-                                            document: false,
-                                            search: !modal.search,
-                                            search_ca_report: false,
-                                            approve: false,
-                                            report: false,
-                                            execute: false,
-                                        });
-                                    }}
-                                >
-                                    <MagnifyingGlassIcon
-                                        className="mx-2 h-5 w-5 text-gray-400"
-                                        aria-hidden="true"
-                                    />
-                                    Search Reimburse
-                                </button>
-                            </div>
-                            <div className="flex justify-center items-center">
-                                <Button
-                                    className="mb-4 w-40 py-1.5 px-2"
-                                    onClick={() => clearSearchReimburse()}
-                                >
-                                    Clear Search
-                                </Button>
-                            </div>
-                            <div className="flex flex-wrap col-span-3 gap-12 justify-center mt-5">
-                                <div className="flex relative">
-                                    <Button className="bg-gray-500 px-2 py-1 hover:bg-gray-400">
-                                        Request
-                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                            0
-                                        </span>
-                                    </Button>
+                    <div className="flex flex-col">
+                        <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
+                            <Button
+                                className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                                onClick={(e) => handleAddModal(e, 1, 0)}
+                            >
+                                {"Add Reimburse"}
+                            </Button>
+                        </div>
+                        <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5 relative">
+                            <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
+                                <legend className="ml-8 px-3 text-sm">
+                                    Search
+                                </legend>
+                                <div className="mt-3 px-4">
+                                    <div className="mb-5">
+                                        <Input
+                                            id="cash_advance_requested_by"
+                                            name="cash_advance_requested_by"
+                                            type="text"
+                                            // value={
+                                            //     searchCA.cash_advance_requested_by
+                                            // }
+                                            placeholder="Applicant"
+                                            className="focus:ring-red-600"
+                                            autoComplete="off"
+                                            // onChange={(e: any) =>
+                                            //     setSearchCA({
+                                            //         ...searchCA,
+                                            //         cash_advance_requested_by:
+                                            //             e.target.value,
+                                            //     })
+                                            // }
+                                        />
+                                    </div>
+                                    <div className="mb-5">
+                                        <Input
+                                            id="cash_advance_used_by"
+                                            name="cash_advance_used_by"
+                                            type="text"
+                                            // value={
+                                            //     searchCA.cash_advance_used_by
+                                            // }
+                                            placeholder="Used By"
+                                            className="focus:ring-red-600"
+                                            autoComplete="off"
+                                            // onChange={(e: any) =>
+                                            //     setSearchCA({
+                                            //         ...searchCA,
+                                            //         cash_advance_used_by:
+                                            //             e.target.value,
+                                            //     })
+                                            // }
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 mb-5">
+                                        <DatePicker
+                                            name="cash_advance_start_date"
+                                            // selected={
+                                            //     searchCA.cash_advance_start_date
+                                            // }
+                                            // onChange={(date: any) =>
+                                            //     setSearchCA({
+                                            //         ...searchCA,
+                                            //         cash_advance_start_date:
+                                            //             date.toLocaleDateString(
+                                            //                 "en-CA"
+                                            //             ),
+                                            //     })
+                                            // }
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd-mm-yyyyy (Start Date)"
+                                            className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 mb-5">
+                                        <DatePicker
+                                            name="cash_advance_end_date"
+                                            // selected={
+                                            //     searchCA.cash_advance_end_date
+                                            // }
+                                            // onChange={(date: any) =>
+                                            //     setSearchCA({
+                                            //         ...searchCA,
+                                            //         cash_advance_end_date:
+                                            //             date.toLocaleDateString(
+                                            //                 "en-CA"
+                                            //             ),
+                                            //     })
+                                            // }
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd-mm-yyyyy (End Date)"
+                                            className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                        />
+                                    </div>
+                                    <div className="mb-5">
+                                        <Input
+                                            id="cash_advance_division"
+                                            name="cash_advance_division"
+                                            type="text"
+                                            // value={
+                                            //     searchCA.cash_advance_division
+                                            // }
+                                            placeholder="Division"
+                                            className="focus:ring-red-600"
+                                            autoComplete="off"
+                                            // onChange={(e: any) =>
+                                            //     setSearchCA({
+                                            //         ...searchCA,
+                                            //         cash_advance_division:
+                                            //             e.target.value,
+                                            //     })
+                                            // }
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-2">
+                                        <Button
+                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            onClick={() => getCA()}
+                                        >
+                                            Search
+                                        </Button>
+                                        <Button
+                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            onClick={() => clearSearchCA()}
+                                        >
+                                            Clear Search
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="flex relative">
-                                    <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
-                                        Approve 1
-                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                            0
-                                        </span>
-                                    </Button>
-                                </div>
-                                <div className="flex relative">
-                                    <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
-                                        Approve 2
-                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                            0
-                                        </span>
-                                    </Button>
-                                </div>
-                                <div className="flex relative">
-                                    <Button className="bg-green-600 px-2 py-1 hover:bg-green-500">
-                                        Approve 3
-                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                            0
-                                        </span>
-                                    </Button>
-                                </div>
-                                <div className="flex relative">
-                                    <Button className="bg-yellow-400 px-2 py-1 hover:bg-yellow-300">
-                                        Need Revision
-                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                            0
-                                        </span>
-                                    </Button>
-                                </div>
-                                <div className="flex relative">
-                                    <Button className="bg-red-600 px-2 py-1 hover:bg-red-500">
-                                        Reject
-                                        <span className="flex absolute bg-red-600 -top-3 -right-4 px-2 rounded-full">
-                                            0
-                                        </span>
-                                    </Button>
-                                </div>
+                            </fieldset>
+                            <div className="mt-10">
+                                <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
+                                    <legend className="ml-8 text-sm">
+                                        Reimburse Status
+                                    </legend>
+                                    <ArrowPathIcon
+                                        className="w-5 text-gray-600 hover:text-gray-500 cursor-pointer ml-auto mr-3 mb-8"
+                                        // onClick={() => handleRefresh()}
+                                    ></ArrowPathIcon>
+                                    <div className="flex flex-wrap content-between justify-center gap-6 mt-5 text-sm">
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-gray-500 px-2 py-1 hover:bg-gray-400"
+                                                onClick={() =>
+                                                    getCA("", "1", "Approve1")
+                                                }
+                                            >
+                                                Request
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {0}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
+                                                onClick={() =>
+                                                    getCA("", "2", "Approve1")
+                                                }
+                                            >
+                                                Approve 1
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {0}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
+                                                onClick={() =>
+                                                    getCA("", "2", "Approve2")
+                                                }
+                                            >
+                                                Approve 2
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {0}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
+                                                onClick={() =>
+                                                    getCA(
+                                                        "",
+                                                        "5",
+                                                        "Pending Report"
+                                                    )
+                                                }
+                                            >
+                                                Pending Report
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {0}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
+                                                onClick={() =>
+                                                    getCA(
+                                                        "",
+                                                        "3",
+                                                        "Need Revision"
+                                                    )
+                                                }
+                                            >
+                                                Need Revision
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {0}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-red-600 px-2 py-1 hover:bg-red-500"
+                                                onClick={() =>
+                                                    getCA("", "4", "Reject")
+                                                }
+                                            >
+                                                Reject
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {0}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
                         </div>
                     </div>
                     <div className="bg-white rounded-md col-span-2 p-10">
-                        <div className="max-w-full overflow-x-auto h-auto h-75 ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible">
-                            <table className="w-full divide-y divide-gray-300">
+                        <div
+                            className={`max-w-full overflow-x-auto ${
+                                reimburse.data ? "h-[70%]" : "h-auto"
+                            } ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible`}
+                        >
+                            <table className="min-w-full divide-y divide-gray-300">
                                 <thead className="bg-gray-100">
                                     <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                                         <TableTH
-                                            className="max-w-[0px]"
+                                            className="border whitespace-nowrap"
                                             label={"No"}
+                                            colSpan=""
+                                            rowSpan="2"
                                         />
                                         <TableTH
-                                            className="min-w-[50px]"
+                                            className="border whitespace-nowrap"
                                             label={"Reimburse Number"}
+                                            colSpan=""
+                                            rowSpan="2"
                                         />
                                         <TableTH
-                                            className="min-w-[50px]"
+                                            className="border whitespace-nowrap"
                                             label={"Request Date"}
+                                            colSpan=""
+                                            rowSpan="2"
                                         />
                                         <TableTH
-                                            className="min-w-[50px]"
+                                            className="border whitespace-nowrap"
                                             label={"Amount"}
+                                            colSpan=""
+                                            rowSpan="2"
                                         />
                                         <TableTH
-                                            className="min-w-[50px]"
-                                            label={"Status"}
+                                            className="border whitespace-nowrap"
+                                            label={"Reimburse"}
+                                            colSpan="3"
+                                            rowSpan=""
                                         />
                                         <TableTH
-                                            className="min-w-[50px]"
-                                            label={"Approve 1"}
-                                        />
-                                        <TableTH
-                                            className="min-w-[50px]"
-                                            label={"Approve 2"}
-                                        />
-                                        <TableTH
-                                            className="min-w-[50px]"
-                                            label={"Approve 3"}
-                                        />
-                                        <TableTH
-                                            className={"min-w-[50px]"}
+                                            className={
+                                                "border whitespace-nowrap"
+                                            }
                                             label={"Action"}
+                                            colSpan=""
+                                            rowSpan="2"
+                                        />
+                                    </tr>
+                                    <tr>
+                                        <TableTH
+                                            className="border whitespace-nowrap"
+                                            label={"Approve 1"}
+                                            colSpan=""
+                                            rowSpan=""
+                                        />
+                                        <TableTH
+                                            className="border whitespace-nowrap"
+                                            label={"Approve 2"}
+                                            colSpan=""
+                                            rowSpan=""
+                                        />
+                                        <TableTH
+                                            className="border whitespace-nowrap"
+                                            label={"Approve 3"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                     </tr>
                                 </thead>
@@ -4241,7 +4504,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <tr>
                                             <TD
                                                 className="leading-10 text-gray-500"
-                                                colSpan="9"
+                                                colSpan="12"
                                             >
                                                 Please Search Reimburse
                                             </TD>
@@ -4251,7 +4514,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <tr>
                                             <TD
                                                 className="leading-10 text-gray-500"
-                                                colSpan="9"
+                                                colSpan="12"
                                             >
                                                 Data not available
                                             </TD>
@@ -4273,113 +4536,45 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                     <TableTD
                                                         value={
-                                                            ca.REIMBURSE_NUMBER
+                                                            ca.CASH_ADVANCE_NUMBER
                                                         }
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={dateFormat(
-                                                            ca.REIMBURSE_REQUESTED_DATE,
-                                                            "dd mmmm yyyy"
+                                                            ca.CASH_ADVANCE_REQUESTED_DATE,
+                                                            "dd-mm-yyyy"
                                                         )}
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={formatCurrency.format(
-                                                            ca.REIMBURSE_TOTAL_AMOUNT
+                                                            ca.CASH_ADVANCE_TOTAL_AMOUNT
                                                         )}
                                                         className=""
                                                     />
-                                                    {ca.approval_status
-                                                        .CA_STATUS_ID ===
-                                                        0 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                                    {
-                                                                        ca
-                                                                            .approval_status
-                                                                            .CA_STATUS_NAME
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.approval_status
-                                                        .CA_STATUS_ID ===
-                                                        1 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700">
-                                                                    {
-                                                                        ca
-                                                                            .approval_status
-                                                                            .CA_STATUS_NAME
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.approval_status
-                                                        .CA_STATUS_ID ===
-                                                        2 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700">
-                                                                    {
-                                                                        ca
-                                                                            .approval_status
-                                                                            .CA_STATUS_NAME
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.approval_status
-                                                        .CA_STATUS_ID ===
-                                                        3 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">
-                                                                    {
-                                                                        ca
-                                                                            .approval_status
-                                                                            .CA_STATUS_NAME
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.approval_status
-                                                        .CA_STATUS_ID ===
-                                                        4 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">
-                                                                    {
-                                                                        ca
-                                                                            .approval_status
-                                                                            .CA_STATUS_NAME
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
                                                     <TableTD
-                                                        value=""
+                                                        value={
+                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
+                                                            "-"
+                                                            // </span>
+                                                        }
                                                         className=""
                                                     />
                                                     <TableTD
-                                                        value=""
+                                                        value={
+                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
+                                                            "-"
+                                                            // </span>
+                                                        }
                                                         className=""
                                                     />
                                                     <TableTD
-                                                        value=""
+                                                        value={
+                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
+                                                            "-"
+                                                            // </span>
+                                                        }
                                                         className=""
                                                     />
                                                     <TableTD
@@ -4394,23 +4589,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             onClick={(
                                                                                 e
                                                                             ) =>
-                                                                                handleApproveModal(
-                                                                                    e,
-                                                                                    ca.REIMBURSE_ID
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Approve
-                                                                        </a>
-                                                                        <a
-                                                                            href=""
-                                                                            className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                            onClick={(
-                                                                                e
-                                                                            ) =>
                                                                                 handleShowModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.CASH_ADVANCE_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4422,13 +4603,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             onClick={(
                                                                                 e
                                                                             ) =>
-                                                                                handleRevisedModal(
+                                                                                handleApproveModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.CASH_ADVANCE_ID
                                                                                 )
                                                                             }
                                                                         >
-                                                                            Revised
+                                                                            Approve
                                                                         </a>
                                                                         <a
                                                                             href=""
@@ -4438,12 +4619,125 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleExecuteModal(
                                                                                     e,
-                                                                                    ca.REIMBURSE_ID
+                                                                                    ca.CASH_ADVANCE_ID
                                                                                 )
                                                                             }
                                                                         >
                                                                             Execute
                                                                         </a>
+                                                                        <a
+                                                                            href=""
+                                                                            className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                            onClick={(
+                                                                                e
+                                                                            ) =>
+                                                                                handleRevisedModal(
+                                                                                    e,
+                                                                                    ca.CASH_ADVANCE_ID
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            Revised
+                                                                        </a>
+                                                                        {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                            5 && (
+                                                                            <a
+                                                                                href=""
+                                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    handleAddCAReportModal(
+                                                                                        e,
+                                                                                        ca.CASH_ADVANCE_ID,
+                                                                                        ca.CASH_ADVANCE_USED_BY,
+                                                                                        ca.CASH_ADVANCE_FIRST_APPROVAL_BY,
+                                                                                        ca.CASH_ADVANCE_TOTAL_AMOUNT
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                Create
+                                                                                CA
+                                                                                Report
+                                                                            </a>
+                                                                        )}
+                                                                        {ca.cash_advance_report !==
+                                                                            null && (
+                                                                            <>
+                                                                                <a
+                                                                                    href=""
+                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        handleShowReportModal(
+                                                                                            e,
+                                                                                            ca
+                                                                                                .cash_advance_report
+                                                                                                ?.REPORT_CASH_ADVANCE_ID
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Detail
+                                                                                    CA
+                                                                                    Report
+                                                                                </a>
+                                                                                <a
+                                                                                    href=""
+                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        handleApproveReportModal(
+                                                                                            e,
+                                                                                            ca
+                                                                                                .cash_advance_report
+                                                                                                ?.REPORT_CASH_ADVANCE_ID
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Approve
+                                                                                    CA
+                                                                                    Report
+                                                                                </a>
+                                                                                <a
+                                                                                    href=""
+                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        handleRevisedReportModal(
+                                                                                            e,
+                                                                                            ca
+                                                                                                .cash_advance_report
+                                                                                                ?.REPORT_CASH_ADVANCE_ID
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Revised
+                                                                                    CA
+                                                                                    Report
+                                                                                </a>
+                                                                                <a
+                                                                                    href=""
+                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) =>
+                                                                                        handleExecuteReportModal(
+                                                                                            e,
+                                                                                            ca
+                                                                                                .cash_advance_report
+                                                                                                ?.REPORT_CASH_ADVANCE_ID
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Execute
+                                                                                    CA
+                                                                                    Report
+                                                                                </a>
+                                                                            </>
+                                                                        )}
                                                                     </>
                                                                 }
                                                             />
@@ -4463,13 +4757,12 @@ export default function CashAdvance({ auth }: PageProps) {
                             toData={reimburse.to}
                             totalData={reimburse.total}
                             clickHref={(url: string) =>
-                                getReimburse(url.split("?").pop())
+                                getCA(url.split("?").pop())
                             }
                         />
                     </div>
                 </div>
             </div>
-            {/* </div> */}
             {/* Content End */}
         </AuthenticatedLayout>
     );

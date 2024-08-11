@@ -257,45 +257,6 @@ export default function CashAdvance({ auth }: PageProps) {
     };
     // Handle Success End
 
-    const [dataById, setDataById] = useState<any>({
-        CASH_ADVANCE_REQUEST_NOTE: "",
-        cash_advance_detail: [
-            {
-                CASH_ADVANCE_DETAIL_ID: "",
-                CASH_ADVANCE_DETAIL_PURPOSE: "",
-                CASH_ADVANCE_DETAIL_LOCATION: "",
-                CASH_ADVANCE_DETAIL_AMOUNT: "",
-                CASH_ADVANCE_DETAIL_NOTE: "",
-                CASH_ADVANCE_DETAIL_DOCUMENT_ID: [],
-                cash_advance_detail_document_id: "",
-            },
-        ],
-        user: [
-            {
-                id: "",
-                name: "",
-                email: "",
-                role_id: "",
-            },
-        ],
-        user_used_by: [
-            {
-                id: "",
-                name: "",
-                email: "",
-                role_id: "",
-            },
-        ],
-        user_approval: [
-            {
-                id: "",
-                name: "",
-                email: "",
-                role_id: "",
-            },
-        ],
-    });
-
     // Handle Add Row Start
     const [DataRow, setDataRow] = useState([
         {
@@ -411,6 +372,46 @@ export default function CashAdvance({ auth }: PageProps) {
         setData("CashAdvanceDetail", deleteRow);
     };
     // Handle Remove Row End
+
+    const [dataById, setDataById] = useState<any>({
+        CASH_ADVANCE_REQUEST_NOTE: "",
+        deletedRow: [],
+        cash_advance_detail: [
+            {
+                CASH_ADVANCE_DETAIL_ID: "",
+                CASH_ADVANCE_DETAIL_PURPOSE: "",
+                CASH_ADVANCE_DETAIL_LOCATION: "",
+                CASH_ADVANCE_DETAIL_AMOUNT: "",
+                CASH_ADVANCE_DETAIL_NOTE: "",
+                CASH_ADVANCE_DETAIL_DOCUMENT_ID: "",
+                cash_advance_detail_document_id: "",
+            },
+        ],
+        // user: [
+        //     {
+        //         id: "",
+        //         name: "",
+        //         email: "",
+        //         role_id: "",
+        //     },
+        // ],
+        // user_used_by: [
+        //     {
+        //         id: "",
+        //         name: "",
+        //         email: "",
+        //         role_id: "",
+        //     },
+        // ],
+        // user_approval: [
+        //     {
+        //         id: "",
+        //         name: "",
+        //         email: "",
+        //         role_id: "",
+        //     },
+        // ],
+    });
 
     // Handle Add Row Files Start
     const [DataFilesRow, setDataFilesRow] = useState<any>({
@@ -646,7 +647,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 ...dataById.cash_advance_detail,
                 {
                     CASH_ADVANCE_DETAIL_AMOUNT: "",
-                    CASH_ADVANCE_DETAIL_DOCUMENT_ID: [],
+                    CASH_ADVANCE_DETAIL_DOCUMENT_ID: "",
                     CASH_ADVANCE_DETAIL_END_DATE: "",
                     CASH_ADVANCE_DETAIL_ID: "",
                     CASH_ADVANCE_DETAIL_LOCATION: "",
@@ -709,34 +710,42 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Change Revised Custom End
 
     // Handle Remove Row Revised Start
-    const handleRemoveRowRevised = (i: number) => {
+    const handleRemoveRowRevised = (
+        i: number,
+        cash_advance_detail_id: number
+    ) => {
         const deleteRow = [...dataById.cash_advance_detail];
 
         deleteRow.splice(i, 1);
 
-        setDataById({ ...dataById, cash_advance_detail: deleteRow });
+        setDataById({
+            ...dataById,
+            cash_advance_detail: deleteRow,
+            deletedRow: [
+                ...(dataById.deletedRow || []),
+                {
+                    CASH_ADVANCE_DETAIL_ID: cash_advance_detail_id,
+                },
+            ],
+        });
     };
     // Handle Remove Row Revised End
 
     // Handle Add Row Revised Files Start
-    const handleAddRowRevisedFiles = (e: FormEvent) => {
-        e.preventDefault();
+    const handleAddRowRevisedFiles = (cash_advance_detail_id: number) => {
+        const addFiles = [...dataById.cash_advance_detail];
 
-        const cash_advance_detail: any = [...dataById.cash_advance_detail];
-
-        cash_advance_detail[
-            modalFiles.index_show
-        ].CASH_ADVANCE_DETAIL_DOCUMENT_ID = [
-            ...(cash_advance_detail[modalFiles.index_show]
-                .CASH_ADVANCE_DETAIL_DOCUMENT_ID || []),
+        addFiles[modalFiles.index_show].filesDocument = [
+            ...(addFiles[modalFiles.index_show].filesDocument || []),
             {
-                CASH_ADVANCE_DETAIL_DOCUMENT_ID: "",
+                CASH_ADVANCE_DETAIL_DOCUMENT: "",
+                CASH_ADVANCE_DETAIL_ID: cash_advance_detail_id,
             },
         ];
 
         setDataById({
             ...dataById,
-            cash_advance_detail: cash_advance_detail,
+            cash_advance_detail: addFiles,
         });
     };
     // Handle Add Row Revised Files End
@@ -747,9 +756,8 @@ export default function CashAdvance({ auth }: PageProps) {
 
         const onchangeFileData: any = [...dataById.cash_advance_detail];
 
-        onchangeFileData[modalFiles.index_show].CASH_ADVANCE_DETAIL_DOCUMENT_ID[
-            i
-        ][name] = files[0];
+        onchangeFileData[modalFiles.index_show].filesDocument[i][name] =
+            files[0];
 
         setDataById({ ...dataById, cash_advance_detail: onchangeFileData });
     };
@@ -759,22 +767,33 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleRemoveRowRevisedFiles = (e: any, i: number) => {
         const deleteRow = [...dataById.cash_advance_detail];
 
-        deleteRow[modalFiles.index_show].CASH_ADVANCE_DETAIL_DOCUMENT_ID.splice(
-            i,
-            1
-        );
+        deleteRow[modalFiles.index_show].filesDocument.splice(i, 1);
 
         setDataById({ ...dataById, cash_advance_detail: deleteRow });
     };
     // Handle Remove Row Revised Files End
 
     // Handle Remove Row Revised Show Files Start
-    const handleRemoveRowRevisedShowFiles = (e: any, i: number) => {
+    const handleRemoveRowRevisedShowFiles = (
+        i: number,
+        document_id: number,
+        cash_advance_detail_id: number
+    ) => {
         const deleteRow = [...dataById.cash_advance_detail];
 
         deleteRow[modalFiles.index_show].m_cash_advance_document.splice(i, 1);
 
-        setDataById({ ...dataById, cash_advance_detail: deleteRow });
+        setDataById({
+            ...dataById,
+            cash_advance_detail: deleteRow,
+            deletedDocument: [
+                ...(dataById.deletedDocument || []),
+                {
+                    DOCUMENT_ID: document_id,
+                    CASH_ADVANCE_DETAIL_ID: cash_advance_detail_id,
+                },
+            ],
+        });
     };
     // Handle Remove Row Revised Show Files End
 
@@ -973,10 +992,46 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Change Approve Custom Report End
 
     // Handle Change Approval Report Start
-    const handleChangeApprovalReport = (value: any, name: any, i: number) => {
+    const handleChangeApprovalReport = (e: any, i: number) => {
+        const { name, value } = e.target;
+
         const onchangeVal: any = [...dataReportById.cash_advance_detail_report];
 
+        const report_cash_advance_detail_amount_approve = [
+            ...dataReportById.cash_advance_detail_report,
+        ];
+
+        const report_cash_advance_detail_amount_approve_null = [
+            ...dataReportById.cash_advance_detail_report,
+        ];
+
         onchangeVal[i][name] = value;
+
+        report_cash_advance_detail_amount_approve[i][
+            "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
+        ] =
+            report_cash_advance_detail_amount_approve[i][
+                "REPORT_CASH_ADVANCE_DETAIL_AMOUNT"
+            ];
+
+        // report_cash_advance_detail_amount_approve_null[i][
+        //     "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
+        // ] = 0;
+
+        if (onchangeVal === 1) {
+            setDataReportById({
+                ...dataReportById,
+                cash_advance_detail_report:
+                    report_cash_advance_detail_amount_approve,
+            });
+        }
+        // else {
+        //     setDataReportById({
+        //         ...dataReportById,
+        //         cash_advance_detail_report:
+        //             report_cash_advance_detail_amount_approve_null,
+        //     });
+        // }
 
         setDataReportById({
             ...dataReportById,
@@ -1031,7 +1086,10 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Change Revised Report Date End
 
     // Handle Remove Row Revised Start
-    const handleRemoveRowRevisedReport = (i: number) => {
+    const handleRemoveRowRevisedReport = (
+        i: number,
+        report_cash_advance_detail_id: number
+    ) => {
         const deleteRow = [...dataReportById.cash_advance_detail_report];
 
         deleteRow.splice(i, 1);
@@ -1039,9 +1097,95 @@ export default function CashAdvance({ auth }: PageProps) {
         setDataReportById({
             ...dataReportById,
             cash_advance_detail_report: deleteRow,
+            deletedRow: [
+                ...(dataReportById.deletedRow || []),
+                {
+                    REPORT_CASH_ADVANCE_DETAIL_ID:
+                        report_cash_advance_detail_id,
+                },
+            ],
         });
     };
     // Handle Remove Row Revised End
+
+    // Handle Add Row Revised Files Report Start
+    const handleAddRowRevisedFilesReport = (
+        report_cash_advance_detail_id: number
+    ) => {
+        const addFiles = [...dataReportById.cash_advance_detail_report];
+
+        addFiles[modalFiles.index_show_report].filesDocument = [
+            ...(addFiles[modalFiles.index_show_report].filesDocument || []),
+            {
+                REPORT_CASH_ADVANCE_DETAIL_DOCUMENT: "",
+                REPORT_CASH_ADVANCE_DETAIL_ID: report_cash_advance_detail_id,
+            },
+        ];
+
+        setDataReportById({
+            ...dataReportById,
+            cash_advance_detail_report: addFiles,
+        });
+    };
+    // Handle Add Row Revised Files Report End
+
+    // Handle Change Revised Files Report Start
+    const handleChangeRevisedFilesReport = (e: any, i: number) => {
+        const { name, files } = e.target;
+
+        const onchangeFileData: any = [
+            ...dataReportById.cash_advance_detail_report,
+        ];
+
+        onchangeFileData[modalFiles.index_show_report].filesDocument[i][name] =
+            files[0];
+
+        setDataReportById({
+            ...dataReportById,
+            cash_advance_detail_report: onchangeFileData,
+        });
+    };
+    // Handle Change Revised Files Report End
+
+    // Handle Remove Row Revised Files Report Start
+    const handleRemoveRowRevisedFilesReport = (e: any, i: number) => {
+        const deleteRow = [...dataReportById.cash_advance_detail_report];
+
+        deleteRow[modalFiles.index_show_report].filesDocument.splice(i, 1);
+
+        setDataReportById({
+            ...dataReportById,
+            cash_advance_detail_report: deleteRow,
+        });
+    };
+    // Handle Remove Row Revised Files Report End
+
+    // Handle Remove Row Revised Show Files Report Start
+    const handleRemoveRowRevisedShowFilesReport = (
+        i: number,
+        document_id: number,
+        report_cash_advance_detail_id: number
+    ) => {
+        const deleteRow = [...dataReportById.cash_advance_detail_report];
+
+        deleteRow[
+            modalFiles.index_show_report
+        ].m_cash_advance_report_document.splice(i, 1);
+
+        setDataReportById({
+            ...dataReportById,
+            cash_advance_detail_report: deleteRow,
+            deletedDocument: [
+                ...(dataReportById.deletedDocument || []),
+                {
+                    DOCUMENT_ID: document_id,
+                    REPORT_CASH_ADVANCE_DETAIL_ID:
+                        report_cash_advance_detail_id,
+                },
+            ],
+        });
+    };
+    // Handle Remove Row Revised Show Files Report End
 
     const [cashAdvance, setCA] = useState<any>([]);
     const [CANumber, setCANumber] = useState<any>([]);
@@ -1068,7 +1212,7 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_type: "",
     });
 
-    console.log("searchCA", searchCA);
+    // console.log("searchCA", searchCA);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -1422,7 +1566,7 @@ export default function CashAdvance({ auth }: PageProps) {
             });
     };
 
-    // Handle Approve Start
+    // Handle Add Start
     const handleAddModal = async (
         e: FormEvent,
         transfer_method: number,
@@ -1453,7 +1597,7 @@ export default function CashAdvance({ auth }: PageProps) {
             execute_report: false,
         });
     };
-    // Handle Approve End
+    // Handle Add End
 
     // Handle Approve Start
     const handleApproveModal = async (e: FormEvent, id: number) => {
@@ -1463,7 +1607,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1494,7 +1638,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1525,7 +1669,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1570,7 +1714,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1601,7 +1745,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1634,7 +1778,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAReportById/${id}`)
             .then((res) => {
                 setDataReportById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1665,7 +1809,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAReportById/${id}`)
             .then((res) => {
                 setDataReportById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1696,7 +1840,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAReportById/${id}`)
             .then((res) => {
                 setDataReportById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1729,7 +1873,7 @@ export default function CashAdvance({ auth }: PageProps) {
             .get(`/getCAReportById/${id}`)
             .then((res) => {
                 setDataReportById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -1771,7 +1915,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 }
             )
             .then((res) => {
-                console.log(res);
+                // console.log(res);
             })
             .catch((err) => {
                 console.log(err);
@@ -1797,7 +1941,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 }
             )
             .then((res) => {
-                console.log(res);
+                // console.log(res);
             })
             .catch((err) => {
                 console.log(err);
@@ -1816,7 +1960,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 }
             )
             .then((res) => {
-                console.log(res);
+                // console.log(res);
                 close();
             })
             .catch((err) => {
@@ -2001,7 +2145,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 CASH_ADVANCE_TRANSFER_AMOUNT: revised_total_amount,
             });
         }
-    }, []);
+    }, [revised_total_amount]);
 
     let revised_total_amount_report = 0;
 
@@ -2071,7 +2215,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setCheckedTransferEdit(!checkedTransferEdit);
     };
 
-    console.log("checkedTransferEdit", checkedTransferEdit);
+    // console.log("checkedTransferEdit", checkedTransferEdit);
 
     const [checkedCashEdit, setCheckedCashEdit] = useState(false);
     const handleCheckedCashEdit = (e: any) => {
@@ -2084,7 +2228,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setCheckedCashEdit(!checkedCashEdit);
     };
 
-    console.log("checkedCashEdit", checkedCashEdit);
+    // console.log("checkedCashEdit", checkedCashEdit);
 
     const [checkedTransferReport, setCheckedTransferReport] = useState(false);
     const handleCheckedTransferReport = (e: any) => {
@@ -2187,6 +2331,15 @@ export default function CashAdvance({ auth }: PageProps) {
         };
     });
 
+    const getRelationSelect = (value: any) => {
+        if (value) {
+            const selected = selectRelation.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+
     const selectCoa = coa?.map((query: any) => {
         return {
             value: query.COA_ID,
@@ -2199,7 +2352,6 @@ export default function CashAdvance({ auth }: PageProps) {
     console.log("Data CA By Id", dataById);
     console.log("Data CA Report", dataCAReport);
     console.log("Data CA Report By Id", dataReportById);
-    console.log("getCashAdvanceApproval", getCashAdvanceApproval);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Cash Advance"}>
@@ -4288,10 +4440,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     </div>
                                                     <button
                                                         className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-4 py-1 rounded-lg"
-                                                        onClick={(e) =>
+                                                        type="button"
+                                                        onClick={() =>
                                                             handleRemoveRowRevisedShowFiles(
-                                                                e,
-                                                                i
+                                                                i,
+                                                                dataById
+                                                                    .cash_advance_detail[
+                                                                    modalFiles
+                                                                        .index_show
+                                                                ]
+                                                                    .m_cash_advance_document[
+                                                                    i
+                                                                ]?.document
+                                                                    .DOCUMENT_ID,
+                                                                dataById
+                                                                    .cash_advance_detail[
+                                                                    modalFiles
+                                                                        .index_show
+                                                                ]
+                                                                    .CASH_ADVANCE_DETAIL_ID
                                                             )
                                                         }
                                                     >
@@ -4303,22 +4470,19 @@ export default function CashAdvance({ auth }: PageProps) {
 
                                         {dataById.cash_advance_detail[
                                             modalFiles.index_show
-                                        ]?.CASH_ADVANCE_DETAIL_DOCUMENT_ID ? (
+                                        ]?.filesDocument ? (
                                             <>
                                                 {dataById.cash_advance_detail[
                                                     modalFiles.index_show
-                                                ]?.CASH_ADVANCE_DETAIL_DOCUMENT_ID.map(
+                                                ]?.filesDocument.map(
                                                     (e: any, i: number) => (
                                                         <>
                                                             {dataById
                                                                 .cash_advance_detail[
                                                                 modalFiles
                                                                     .index_show
-                                                            ]
-                                                                ?.CASH_ADVANCE_DETAIL_DOCUMENT_ID[
-                                                                i
-                                                            ]
-                                                                .CASH_ADVANCE_DETAIL_DOCUMENT_ID
+                                                            ].filesDocument[i]
+                                                                .CASH_ADVANCE_DETAIL_DOCUMENT
                                                                 ?.name ? (
                                                                 <div
                                                                     className={`w-full col-span-11 mb-4`}
@@ -4335,10 +4499,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                                 modalFiles
                                                                                     .index_show
                                                                             ]
-                                                                                ?.CASH_ADVANCE_DETAIL_DOCUMENT_ID[
+                                                                                .filesDocument[
                                                                                 i
                                                                             ]
-                                                                                .CASH_ADVANCE_DETAIL_DOCUMENT_ID
+                                                                                .CASH_ADVANCE_DETAIL_DOCUMENT
                                                                                 ?.name
                                                                         }
                                                                     </p>
@@ -4353,7 +4517,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                         className="mb-2"
                                                                     />
                                                                     <Input
-                                                                        name="CASH_ADVANCE_DETAIL_DOCUMENT_ID"
+                                                                        name="CASH_ADVANCE_DETAIL_DOCUMENT"
                                                                         type="file"
                                                                         className="w-full"
                                                                         onChange={(
@@ -4389,8 +4553,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <button
                                         type="button"
                                         className="text-sm cursor-pointer hover:underline"
-                                        onClick={(e) =>
-                                            handleAddRowRevisedFiles(e)
+                                        onClick={() =>
+                                            handleAddRowRevisedFiles(
+                                                dataById.cash_advance_detail[
+                                                    modalFiles.index_show
+                                                ].CASH_ADVANCE_DETAIL_ID
+                                            )
                                         }
                                     >
                                         + Add Row
@@ -4708,42 +4876,42 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     </select>
                                                 </TD>
                                                 <TD className="border">
-                                                    <select
-                                                        id="CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        name="CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        value={
-                                                            cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectRelation}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose Business Relation"
                                                         }
-                                                        onChange={(e) =>
-                                                            handleChangeRevised(
-                                                                e,
+                                                        value={{
+                                                            label: getRelationSelect(
+                                                                cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID
+                                                            ),
+                                                            value: cad.CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID,
+                                                        }}
+                                                        onChange={(val: any) =>
+                                                            handleChangeRevisedCustom(
+                                                                val.value,
+                                                                "CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID",
                                                                 i
                                                             )
                                                         }
-                                                        required
-                                                    >
-                                                        <option value="">
-                                                            -- Choose Business
-                                                            Relation --
-                                                        </option>
-                                                        {relations.map(
-                                                            (relation: any) => (
-                                                                <option
-                                                                    key={
-                                                                        relation.RELATION_ORGANIZATION_ID
-                                                                    }
-                                                                    value={
-                                                                        relation.RELATION_ORGANIZATION_ID
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        relation.RELATION_ORGANIZATION_NAME
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </select>
+                                                        primaryColor={
+                                                            "bg-red-500"
+                                                        }
+                                                    />
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
@@ -4827,40 +4995,41 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border px-3 py-2">
-                                                    {cad
-                                                        ?.m_cash_advance_document
-                                                        ?.length > 0 ? (
-                                                        <button
-                                                            type="button"
-                                                            className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
-                                                            onClick={() => {
-                                                                setModalFiles({
-                                                                    add_files:
-                                                                        false,
-                                                                    show_files:
-                                                                        true,
-                                                                    add_files_report:
-                                                                        false,
-                                                                    show_files_report:
-                                                                        false,
-                                                                    index: "",
-                                                                    index_show:
-                                                                        i,
-                                                                    index_show_report:
-                                                                        "",
-                                                                });
-                                                            }}
-                                                        >
-                                                            {
-                                                                cad
-                                                                    ?.m_cash_advance_document
-                                                                    ?.length
-                                                            }{" "}
-                                                            Files
-                                                        </button>
-                                                    ) : (
-                                                        "-"
-                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                        onClick={() => {
+                                                            setModalFiles({
+                                                                add_files:
+                                                                    false,
+                                                                show_files:
+                                                                    true,
+                                                                add_files_report:
+                                                                    false,
+                                                                show_files_report:
+                                                                    false,
+                                                                index: "",
+                                                                index_show: i,
+                                                                index_show_report:
+                                                                    "",
+                                                            });
+                                                        }}
+                                                    >
+                                                        {cad
+                                                            .m_cash_advance_document
+                                                            ?.length > 0 ? (
+                                                            <>
+                                                                {
+                                                                    cad
+                                                                        .m_cash_advance_document
+                                                                        ?.length
+                                                                }{" "}
+                                                                Files
+                                                            </>
+                                                        ) : (
+                                                            "Add Files"
+                                                        )}
+                                                    </button>
                                                 </TD>
                                                 <TD className="border text-left px-3">
                                                     {
@@ -4872,12 +5041,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <TD className="border">
                                                         <Button
                                                             className="my-1.5 px-3 py-1"
+                                                            type="button"
                                                             onClick={() =>
                                                                 handleRemoveRowRevised(
-                                                                    i
+                                                                    i,
+                                                                    cad.CASH_ADVANCE_DETAIL_ID
                                                                 )
                                                             }
-                                                            type="button"
                                                         >
                                                             X
                                                         </Button>
@@ -7590,7 +7760,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         name="REPORT_CASH_ADVANCE_DETAIL_APPROVAL"
                                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         onChange={(e) =>
-                                                            handleChangeApproveReport(
+                                                            handleChangeApprovalReport(
                                                                 e,
                                                                 i
                                                             )
@@ -7676,10 +7846,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                 i
                                                             )
                                                         }
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ===
+                                                            "3"
+                                                                ? "bg-gray-100"
+                                                                : ""
+                                                        }`}
                                                         required
                                                         placeholder="0.00"
                                                         autoComplete="off"
+                                                        autoFocus={
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE
+                                                        }
+                                                        disabled={
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ===
+                                                                "3" && true
+                                                        }
                                                     />
                                                 </TD>
                                                 <TD className="border">
@@ -7874,14 +8056,204 @@ export default function CashAdvance({ auth }: PageProps) {
                 title="Cash Advance Revised Report"
                 url={`/cashAdvanceReportRevised/${dataReportById?.CASH_ADVANCE_ID}`}
                 data={dataReportById}
-                method="patch"
+                method="post"
                 onSuccess={handleSuccess}
-                headers={null}
+                headers={{ "Content-type": "multipart/form-data" }}
                 submitButtonName={"Save"}
                 // panelWidth={"70%"}
                 body={
                     <>
                         <ModalToAction
+                            classPanel={
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                            }
+                            show={modalFiles.show_files_report}
+                            closeable={true}
+                            onClose={() =>
+                                setModalFiles({
+                                    add_files: false,
+                                    show_files: false,
+                                    add_files_report: false,
+                                    show_files_report: false,
+                                    show_files_proof_of_document: false,
+                                    index: "",
+                                    index_show: "",
+                                    index_show_report: "",
+                                })
+                            }
+                            title="Show Files Report"
+                            url={`/cashAdvanceDownload/${
+                                dataById.cash_advance_detail[modalFiles.index]
+                                    ?.CASH_ADVANCE_DETAIL_ID
+                            }`}
+                            data=""
+                            method=""
+                            onSuccess=""
+                            headers={null}
+                            submitButtonName=""
+                            // panelWidth=""
+                            body={
+                                <>
+                                    <div className="grid grid-cols-12 my-3">
+                                        {dataReportById?.cash_advance_detail_report[
+                                            modalFiles.index_show_report
+                                        ]?.m_cash_advance_report_document.map(
+                                            (file: any, i: number) => (
+                                                <>
+                                                    <div
+                                                        className={`w-full col-span-11 mb-4`}
+                                                        key={i}
+                                                    >
+                                                        <InputLabel
+                                                            htmlFor="files"
+                                                            value="File"
+                                                            className="mb-2"
+                                                        />
+                                                        <p>
+                                                            {
+                                                                dataReportById
+                                                                    ?.cash_advance_detail_report[
+                                                                    modalFiles
+                                                                        .index_show_report
+                                                                ]
+                                                                    ?.m_cash_advance_report_document[
+                                                                    i
+                                                                ]?.document
+                                                                    .DOCUMENT_ORIGINAL_NAME
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-4 py-1 rounded-lg"
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleRemoveRowRevisedShowFilesReport(
+                                                                i,
+                                                                dataReportById
+                                                                    ?.cash_advance_detail_report[
+                                                                    modalFiles
+                                                                        .index_show_report
+                                                                ]
+                                                                    ?.m_cash_advance_report_document[
+                                                                    i
+                                                                ]?.document
+                                                                    .DOCUMENT_ID,
+                                                                dataReportById
+                                                                    ?.cash_advance_detail_report[
+                                                                    modalFiles
+                                                                        .index_show_report
+                                                                ]
+                                                                    .REPORT_CASH_ADVANCE_DETAIL_ID
+                                                            )
+                                                        }
+                                                    >
+                                                        X
+                                                    </button>
+                                                </>
+                                            )
+                                        )}
+
+                                        {dataReportById
+                                            ?.cash_advance_detail_report[
+                                            modalFiles.index_show_report
+                                        ]?.filesDocument ? (
+                                            <>
+                                                {dataReportById?.cash_advance_detail_report[
+                                                    modalFiles.index_show_report
+                                                ]?.filesDocument.map(
+                                                    (e: any, i: number) => (
+                                                        <>
+                                                            {dataReportById
+                                                                ?.cash_advance_detail_report[
+                                                                modalFiles
+                                                                    .index_show_report
+                                                            ].filesDocument[i]
+                                                                .REPORT_CASH_ADVANCE_DETAIL_DOCUMENT
+                                                                ?.name ? (
+                                                                <div
+                                                                    className={`w-full col-span-11 mb-4`}
+                                                                >
+                                                                    <InputLabel
+                                                                        htmlFor="files"
+                                                                        value="File"
+                                                                        className="mb-2"
+                                                                    />
+                                                                    <p>
+                                                                        {
+                                                                            dataReportById
+                                                                                ?.cash_advance_detail_report[
+                                                                                modalFiles
+                                                                                    .index_show_report
+                                                                            ]
+                                                                                .filesDocument[
+                                                                                i
+                                                                            ]
+                                                                                .REPORT_CASH_ADVANCE_DETAIL_DOCUMENT
+                                                                                ?.name
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            ) : (
+                                                                <div
+                                                                    className={`w-full col-span-11 mb-4`}
+                                                                >
+                                                                    <InputLabel
+                                                                        htmlFor="files"
+                                                                        value="File"
+                                                                        className="mb-2"
+                                                                    />
+                                                                    <Input
+                                                                        name="REPORT_CASH_ADVANCE_DETAIL_DOCUMENT"
+                                                                        type="file"
+                                                                        className="w-full"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            handleChangeRevisedFilesReport(
+                                                                                e,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <button
+                                                                className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-7 py-1 rounded-lg"
+                                                                onClick={(e) =>
+                                                                    handleRemoveRowRevisedFilesReport(
+                                                                        e,
+                                                                        i
+                                                                    )
+                                                                }
+                                                            >
+                                                                X
+                                                            </button>
+                                                        </>
+                                                    )
+                                                )}
+                                            </>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="text-sm cursor-pointer hover:underline"
+                                        onClick={() =>
+                                            handleAddRowRevisedFilesReport(
+                                                dataReportById
+                                                    ?.cash_advance_detail_report[
+                                                    modalFiles.index_show_report
+                                                ].REPORT_CASH_ADVANCE_DETAIL_ID
+                                            )
+                                        }
+                                    >
+                                        + Add Row
+                                    </button>
+                                </>
+                            }
+                        />
+                        {/* <ModalToAction
                             classPanel={
                                 "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
                             }
@@ -7973,7 +8345,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </div>
                                 </>
                             }
-                        />
+                        /> */}
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
@@ -8252,42 +8624,42 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border whitespace-nowrap">
-                                                    <select
-                                                        id="REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        name="REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        value={
-                                                            cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectRelation}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose Business Relation"
                                                         }
-                                                        onChange={(e) =>
-                                                            handleChangeRevisedReport(
-                                                                e,
+                                                        value={{
+                                                            label: getRelationSelect(
+                                                                cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID
+                                                            ),
+                                                            value: cad.REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID,
+                                                        }}
+                                                        onChange={(val: any) =>
+                                                            handleChangeRevisedReportCustom(
+                                                                val.value,
+                                                                "REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID",
                                                                 i
                                                             )
                                                         }
-                                                        required
-                                                    >
-                                                        <option value="">
-                                                            -- Choose Business
-                                                            Relation --
-                                                        </option>
-                                                        {relations.map(
-                                                            (relation: any) => (
-                                                                <option
-                                                                    key={
-                                                                        relation.RELATION_ORGANIZATION_ID
-                                                                    }
-                                                                    value={
-                                                                        relation.RELATION_ORGANIZATION_ID
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        relation.RELATION_ORGANIZATION_NAME
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </select>
+                                                        primaryColor={
+                                                            "bg-red-500"
+                                                        }
+                                                    />
                                                 </TD>
                                                 <TD className="border whitespace-nowrap">
                                                     <TextInput
@@ -8371,7 +8743,42 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border px-3 py-2">
-                                                    {cad
+                                                    <button
+                                                        type="button"
+                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                        onClick={() => {
+                                                            setModalFiles({
+                                                                add_files:
+                                                                    false,
+                                                                show_files:
+                                                                    false,
+                                                                add_files_report:
+                                                                    false,
+                                                                show_files_report:
+                                                                    true,
+                                                                index: "",
+                                                                index_show: "",
+                                                                index_show_report:
+                                                                    i,
+                                                            });
+                                                        }}
+                                                    >
+                                                        {cad
+                                                            .m_cash_advance_report_document
+                                                            ?.length > 0 ? (
+                                                            <>
+                                                                {
+                                                                    cad
+                                                                        .m_cash_advance_report_document
+                                                                        ?.length
+                                                                }{" "}
+                                                                Files
+                                                            </>
+                                                        ) : (
+                                                            "Add Files"
+                                                        )}
+                                                    </button>
+                                                    {/* {cad
                                                         ?.m_cash_advance_report_document
                                                         ?.length > 0 ? (
                                                         <button
@@ -8404,7 +8811,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         </button>
                                                     ) : (
                                                         "-"
-                                                    )}
+                                                    )} */}
                                                 </TD>
                                                 {dataReportById
                                                     .cash_advance_detail_report
@@ -8414,7 +8821,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             className="my-1.5 px-3 py-1"
                                                             onClick={() =>
                                                                 handleRemoveRowRevisedReport(
-                                                                    i
+                                                                    i,
+                                                                    cad.REPORT_CASH_ADVANCE_DETAIL_ID
                                                                 )
                                                             }
                                                             type="button"

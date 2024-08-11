@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\COA;
 use App\Models\Reimburse;
 use App\Models\ReimburseDetail;
 use App\Models\Document;
+use App\Models\Relation;
+use App\Models\TPerson;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -62,7 +65,10 @@ class ReimburseController extends Controller
     public function index() 
     {
         $data = [
-            'users' => User::where('role_id', 2)->get()
+            'users' => User::where('role_id', 2)->get(),
+            'relations' => Relation::all(),
+            'coa' => COA::all(),
+            'persons' => TPerson::all()
         ];
 
         return Inertia::render('Reimburse/Reimburse', $data);

@@ -204,62 +204,58 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Mapping data menu
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $dashboard->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $relation->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $policy->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $finance
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $cashAdvance
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $reimburse
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $otherExpenses
-        ]);
         // RoleAccessMenu::create([
         //     'role_id' => $admin->id,
-        //     'menu_id' => $setting
+        //     'menu_id' => $dashboard->id
         // ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $approvalLimit
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $relation->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $policy->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $finance
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $cashAdvance
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $reimburse
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $otherExpenses
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $approvalLimit
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $setting->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $setting->id
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $ACLMenu->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $ACLMenu->id
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $ACLPermission->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $ACLPermission->id
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $ACLRole->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $ACLRole->id
+        // ]);
 
 
         // create user
