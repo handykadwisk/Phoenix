@@ -108,11 +108,13 @@ Route::middleware('auth')->group(function () {
 
     // BAA
     Route::get('/relation/baa', [TRelationAgentController::class, 'index_baa'])->name('relation/baa');
-    Route::get('/getRelationBAA', [TRelationAgentController::class, 'getRelationBAA'])->name('getRelationBAA.getRelationBAA');
+    Route::get('/getPersonBAA', [TRelationAgentController::class, 'getPersonBAA'])->name('getPersonBAA.getPersonBAA');
     Route::get('/getMRelationBAA', [TRelationAgentController::class, 'getMRelationBAA'])->name('getMRelationBAA.getMRelationBAA');
     Route::post('/addMRelationBaa', [TRelationAgentController::class, 'addMRelationBaa'])->name('addMRelationBaa.addMRelationBaa');
     Route::post('/getRelationBaaSelect', [TRelationAgentController::class, 'relationBaa'])->name('getRelationBaaSelect.relationBaa');
     Route::post('/deleteBaa', [TRelationAgentController::class, 'deleteBaa'])->name('deleteBaa.deleteBaa');
+    Route::post('/getRelationByIdPerson', [TRelationAgentController::class, 'getRelationByIdPerson'])->name('getRelationByIdPerson.getRelationByIdPerson');
+
     
     
     

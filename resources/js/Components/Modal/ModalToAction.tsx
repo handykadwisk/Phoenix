@@ -134,7 +134,7 @@ export default function ModalToAction({
                                             )}
                                             <div className="max-h-full">
                                                 <div
-                                                    className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
+                                                    className="max-h-[100%] overflow-y-auto custom-scrollbar px-2"
                                                     ref={modalRef}
                                                 >
                                                     {body}

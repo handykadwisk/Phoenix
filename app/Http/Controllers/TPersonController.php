@@ -93,6 +93,8 @@ class TPersonController extends Controller
                 'PERSON_KTP' => $request->PERSON_KTP,
                 'PERSON_NPWP' => $request->PERSON_NPWP,
                 'PERSON_KK' => $request->PERSON_KK,
+                'PERSON_IS_BAA' => $request->PERSON_IS_BAA,
+                'PERSON_IS_VIP' => $request->PERSON_IS_VIP,
                 'PERSON_BLOOD_TYPE' => $request->PERSON_BLOOD_TYPE,
                 'PERSON_BLOOD_RHESUS' => $request->PERSON_BLOOD_RHESUS,
                 'PERSON_MARITAL_STATUS' => $request->PERSON_MARITAL_STATUS,
@@ -209,7 +211,7 @@ class TPersonController extends Controller
 
 
     public function store(Request $request){
-        // Remove Object "CONTACT EMERGENCY" agar bisa insert dengan request all
+        // Remove Object "CONTACT EMERGENCY" dan "PERSON_CONTACT" agar bisa insert dengan request all
         $removeArray = collect($request->all());
         $filtered = $removeArray->except(['CONTACT_EMERGENCY']);
         $newFiltered = $filtered->except(['PERSON_CONTACT']);

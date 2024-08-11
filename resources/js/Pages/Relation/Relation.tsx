@@ -41,7 +41,6 @@ import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied
 import AGGrid from "@/Components/AgGrid";
 
 export default function Relation({ auth }: PageProps) {
-    console.log(auth);
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });

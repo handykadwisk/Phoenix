@@ -33,8 +33,8 @@ import DetailBaa from "./DetailBaa";
 export default function Baa({ auth }: PageProps) {
     // for judul modal
     const [detailBaa, setDetailBaa] = useState<any>({
-        RELATION_ORGANIZATION_ID: "",
-        RELATION_ORGANIZATION_NAME: "",
+        PERSON_ID: "",
+        PERSON_FIRST_NAME: "",
     });
 
     const [isSuccess, setIsSuccess] = useState<string>("");
@@ -47,11 +47,11 @@ export default function Baa({ auth }: PageProps) {
         view: false,
     });
 
-    const handleDetailAgent = async (data: any) => {
+    const handleDetailPersonBAA = async (data: any) => {
         // getDivisionCombo(idRelation);
         setDetailBaa({
-            RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
-            RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
+            PERSON_ID: data.PERSON_ID,
+            PERSON_FIRST_NAME: data.PERSON_FIRST_NAME,
         });
         setModal({
             add: false,
@@ -73,7 +73,7 @@ export default function Baa({ auth }: PageProps) {
                         view: false,
                     });
                 }}
-                title={"BAA - " + detailBaa.RELATION_ORGANIZATION_NAME}
+                title={"BAA - " + detailBaa.PERSON_FIRST_NAME}
                 url={""}
                 data={""}
                 onSuccess={""}
@@ -89,7 +89,7 @@ export default function Baa({ auth }: PageProps) {
                             // isSuccess={isSuccess}
                             // setIsSuccess={setIsSuccess}
                             auth={auth}
-                            idAgent={detailBaa.RELATION_ORGANIZATION_ID}
+                            idPerson={detailBaa.PERSON_ID}
                         />
                     </>
                 }
@@ -126,7 +126,7 @@ export default function Baa({ auth }: PageProps) {
                                         }
                                     }
                                 }}
-                                placeholder="Search BAA Name"
+                                placeholder="Search Person BAA Name"
                             />
                             <div className="mt-4 flex justify-end gap-2">
                                 <div
@@ -146,12 +146,13 @@ export default function Baa({ auth }: PageProps) {
                     </div>
                     <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100%]">
                         <AGGrid
+                            searchParam={""}
                             addButtonLabel={null}
                             addButtonModalState={undefined}
                             withParam={""}
                             // loading={isLoading.get_policy}
-                            url={"getRelationBAA"}
-                            doubleClickEvent={handleDetailAgent}
+                            url={"getPersonBAA"}
+                            doubleClickEvent={handleDetailPersonBAA}
                             triggeringRefreshData={isSuccess}
                             colDefs={[
                                 {
@@ -160,9 +161,9 @@ export default function Baa({ auth }: PageProps) {
                                     flex: 1,
                                 },
                                 {
-                                    headerName: "Relation BAA",
-                                    field: "RELATION_ORGANIZATION_ALIAS",
-                                    flex: 7,
+                                    headerName: "Person BAA Name",
+                                    field: "PERSON_FIRST_NAME",
+                                    flex: 11,
                                 },
                             ]}
                         />

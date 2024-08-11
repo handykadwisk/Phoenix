@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MRelationAgent;
 use App\Models\MRelationBaa;
 use App\Models\Relation;
+use App\Models\TPerson;
 use App\Models\TRelationAgent;
 use App\Models\UserLog;
 use Illuminate\Database\Eloquent\Builder;
@@ -225,15 +226,15 @@ class TRelationAgentController extends Controller
 
 
     // for BAA
-    public function getRelationBAA(Request $request){
+    public function getPersonBAA(Request $request){
         // $data = MRelationAgent::with('relation')->where('RELATION_AGENT_ID', $request->id)->get();
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
-        $query = Relation::query();
+        $query = TPerson::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
-        $query->where('relation_status_id', "2");
+        $query->where('PERSON_IS_BAA', "1");
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -349,5 +350,11 @@ class TRelationAgentController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function getRelationByIdPerson(Request $request){
+        $data = TPerson::leftJoin('t_relation', 't_person.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('PERSON_ID', $request->idPerson)->first();
+
+        return response()->json($data);
     }
 }
