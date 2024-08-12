@@ -591,6 +591,31 @@ export default function EmploymentDetail({
             });
     };
 
+    const handleFileDownload = async (id: number) => {
+        await axios({
+            url: `/downloadPersonDocument/${id}`,
+            method: "GET",
+            responseType: "blob",
+        })
+            .then((response) => {
+                console.log(response);
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", response.headers.filename);
+                document.body.appendChild(link);
+                link.click();
+            })
+            .catch((err) => {
+                console.log(err);
+                if (err.response.status === 404) {
+                    alert("File not Found");
+                }
+            });
+    };
+
     return (
         <>
             {/* Edit Document */}
@@ -3344,7 +3369,9 @@ export default function EmploymentDetail({
                                 <span>KTP</span>
                             </div>
                         </div>
-                        {detailPerson.m_person_document?.length === 0 ? (
+                        {detailPerson.m_person_document?.filter(
+                            (m: any) => m.CATEGORY_DOCUMENT === 1
+                        )?.length === 0 ? (
                             <div
                                 className="w-fit flex items-center group mt-2 mb-2 text-sm"
                                 onClick={(e) => {
@@ -3436,12 +3463,11 @@ export default function EmploymentDetail({
                                                         <ArrowDownTrayIcon
                                                             className="w-6 text-blue-600 hover:cursor-pointer"
                                                             title="Download Images"
-                                                            // onClick={(e) =>
-                                                            //     alertDelete(
-                                                            //         mPD.DOCUMENT_ID,
-                                                            //         mPD.PERSON_ID
-                                                            //     )
-                                                            // }
+                                                            onClick={(e) =>
+                                                                handleFileDownload(
+                                                                    mPD.DOCUMENT_ID
+                                                                )
+                                                            }
                                                         />
                                                     </span>
                                                     <span>
@@ -3491,6 +3517,21 @@ export default function EmploymentDetail({
                             </div>
                         ) : (
                             <>
+                                <div
+                                    className="w-fit flex items-center group mt-2 mb-2 text-sm"
+                                    onClick={(e) => {
+                                        handleAddDocument(e, 2);
+                                    }}
+                                >
+                                    <div className="group-hover:underline group-hover:cursor-pointer">
+                                        <span>
+                                            <PlusCircleIcon className="w-5 text-gray-500 text-sm" />
+                                        </span>
+                                    </div>
+                                    <div className="group-hover:underline group-hover:cursor-pointer text-gray-500">
+                                        <span>Add Other Document</span>
+                                    </div>
+                                </div>
                                 {detailPerson.m_person_document
                                     ?.filter(
                                         (m: any) => m.CATEGORY_DOCUMENT === 2
@@ -3565,12 +3606,11 @@ export default function EmploymentDetail({
                                                         <ArrowDownTrayIcon
                                                             className="w-6 text-blue-600 hover:cursor-pointer"
                                                             title="Download Images"
-                                                            // onClick={(e) =>
-                                                            //     alertDelete(
-                                                            //         mPD.DOCUMENT_ID,
-                                                            //         mPD.PERSON_ID
-                                                            //     )
-                                                            // }
+                                                            onClick={(e) =>
+                                                                handleFileDownload(
+                                                                    mPD.DOCUMENT_ID
+                                                                )
+                                                            }
                                                         />
                                                     </span>
                                                     <span>
