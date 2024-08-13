@@ -16,7 +16,7 @@ class ReimburseDetail extends Model
 
     protected $guarded = ['REIMBURSE_DETAIL_ID'];
 
-    protected $with = ['document'];
+    protected $with = ['document','relation_organization'];
 
     public function reimburse(): BelongsTo
     {
@@ -26,5 +26,10 @@ class ReimburseDetail extends Model
     public function document(): BelongsTo
     {
         return $this->belongsTo(Document::class, 'REIMBURSE_DETAIL_DOCUMENT_ID');
+    }
+
+    public function relation_organization(): BelongsTo
+    {
+        return $this->belongsTo(Relation::class, 'REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID');
     }
 }

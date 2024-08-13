@@ -27,10 +27,15 @@ import Input from "@/Components/Input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-tailwindcss-select";
+import CurrencyInput from "react-currency-input-field";
+import Swal from "sweetalert2";
+import BadgeCustom from "@/Components/BadgeFlat";
+import BadgeFlat from "@/Components/BadgeFlat";
 
 export default function CashAdvance({ auth }: PageProps) {
     useEffect(() => {
         getReimburseNumber();
+        getReimburseApproval();
     }, []);
 
     // Modal Add Start
@@ -52,13 +57,9 @@ export default function CashAdvance({ auth }: PageProps) {
     const [modalFiles, setModalFiles] = useState<any>({
         add_files: false,
         show_files: false,
-        add_files_report: false,
-        show_files_report: false,
         show_files_proof_of_document: false,
         add_files_execute_report: false,
         index: "",
-        index_show: "",
-        index_show_report: "",
     });
     // Modal Add Files End
 
@@ -67,6 +68,7 @@ export default function CashAdvance({ auth }: PageProps) {
         reimburse_used_by: "",
         reimburse_requested_by: "",
         reimburse_division: "",
+        reimburse_offcie: "",
         reimburse_first_approval_by: "",
         reimburse_request_note: "",
         reimburse_delivery_method_transfer: "",
@@ -83,15 +85,14 @@ export default function CashAdvance({ auth }: PageProps) {
         ReimburseDetail: [
             {
                 reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
                 reimburse_detail_purpose: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
                 reimburse_detail_location: "",
                 reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
                 reimburse_detail_note: "",
+                reimburse_detail_document: [],
             },
         ],
     });
@@ -107,6 +108,7 @@ export default function CashAdvance({ auth }: PageProps) {
             reimburse_used_by: "",
             reimburse_requested_by: "",
             reimburse_division: "",
+            reimburse_offcie: "",
             reimburse_first_approval_by: "",
             reimburse_request_note: "",
             reimburse_delivery_method_transfer: "",
@@ -123,15 +125,14 @@ export default function CashAdvance({ auth }: PageProps) {
             ReimburseDetail: [
                 {
                     reimburse_detail_date: "",
-                    reimburse_detail_end_date: "",
                     reimburse_detail_purpose: "",
                     reimburse_detail_relation_name: "",
                     reimburse_detail_relation_position: "",
                     reimburse_detail_relation_organization_id: "",
                     reimburse_detail_location: "",
                     reimburse_detail_amount: "",
-                    reimburse_detail_document_id: "",
                     reimburse_detail_note: "",
+                    reimburse_detail_document: [],
                 },
             ],
         });
@@ -139,20 +140,12 @@ export default function CashAdvance({ auth }: PageProps) {
         setIsSuccess(message);
         getReimburse();
         getReimburseNumber();
+        getReimburseApproval();
     };
     // Handle Success End
 
     const [dataById, setDataById] = useState<any>({
-        // REIMBURSE_NUMBER: "",
-        // REIMBURSE_TYPE: "",
-        // DIVISION: "",
-        // USED_BY: "",
-        // REIMBURSE_REQUESTED_BY: "",
-        // REIMBURSE_REQUESTED_DATE: "",
-        // FIRST_APPROVAL_USER: "",
-        // REIMBURSE_REQUEST_NOTE: "",
-        // REIMBURSE_TOTAL_AMOUNT: "",
-        // REIMBURSE_TRANSFER_AMOUNT: "",
+        REIMBURSE_REQUEST_NOTE: "",
         reimburse_detail: [
             {
                 REIMBURSE_DETAIL_ID: "",
@@ -161,48 +154,46 @@ export default function CashAdvance({ auth }: PageProps) {
                 REIMBURSE_DETAIL_AMOUNT: "",
                 REIMBURSE_DETAIL_NOTE: "",
                 REIMBURSE_DETAIL_DOCUMENT_ID: "",
-                reimburse_detail_document_id: "",
             },
         ],
-        user: [
-            {
-                id: "",
-                name: "",
-                email: "",
-                role_id: "",
-            },
-        ],
-        user_used_by: [
-            {
-                id: "",
-                name: "",
-                email: "",
-                role_id: "",
-            },
-        ],
-        user_approval: [
-            {
-                id: "",
-                name: "",
-                email: "",
-                role_id: "",
-            },
-        ],
+        // user: [
+        //     {
+        //         id: "",
+        //         name: "",
+        //         email: "",
+        //         role_id: "",
+        //     },
+        // ],
+        // user_used_by: [
+        //     {
+        //         id: "",
+        //         name: "",
+        //         email: "",
+        //         role_id: "",
+        //     },
+        // ],
+        // user_approval: [
+        //     {
+        //         id: "",
+        //         name: "",
+        //         email: "",
+        //         role_id: "",
+        //     },
+        // ],
     });
 
     // Handle Add Row Start
     const [DataRow, setDataRow] = useState([
         {
             reimburse_detail_date: "",
-            reimburse_detail_end_date: "",
             reimburse_detail_purpose: "",
             reimburse_detail_relation_name: "",
             reimburse_detail_relation_position: "",
             reimburse_detail_relation_organization_id: "",
             reimburse_detail_location: "",
             reimburse_detail_amount: "",
-            reimburse_detail_document_id: "",
             reimburse_detail_note: "",
+            reimburse_detail_document: [],
         },
     ]);
 
@@ -213,15 +204,14 @@ export default function CashAdvance({ auth }: PageProps) {
             ...DataRow,
             {
                 reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
                 reimburse_detail_purpose: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
                 reimburse_detail_location: "",
                 reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
                 reimburse_detail_note: "",
+                reimburse_detail_document: [],
             },
         ]);
 
@@ -229,15 +219,14 @@ export default function CashAdvance({ auth }: PageProps) {
             ...data.ReimburseDetail,
             {
                 reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
                 reimburse_detail_purpose: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
                 reimburse_detail_location: "",
                 reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
                 reimburse_detail_note: "",
+                reimburse_detail_document: [],
             },
         ]);
     };
@@ -268,6 +257,78 @@ export default function CashAdvance({ auth }: PageProps) {
         setData("ReimburseDetail", onchangeVal);
     };
     // Handle Change Add End
+
+    // Handle Change Add Date Start
+    const handleChangeAddDate = (date: any, name: any, i: number) => {
+        const onchangeVal: any = [...data.ReimburseDetail];
+
+        onchangeVal[i][name] = date.toLocaleDateString("en-CA");
+
+        setDataRow(onchangeVal);
+
+        setData("ReimburseDetail", onchangeVal);
+    };
+    // Handle Change Add Date End
+
+    // Handle Change Add Custom Start
+    const handleChangeAddCustom = (value: any, name: any, i: number) => {
+        const onchangeVal: any = [...data.ReimburseDetail];
+
+        onchangeVal[i][name] = value;
+
+        setDataRow(onchangeVal);
+
+        setData("ReimburseDetail", onchangeVal);
+    };
+    // Handle Change Add Custom End
+
+    // Handle Add Row Files Start
+    const handleAddRowFiles = (e: FormEvent) => {
+        e.preventDefault();
+
+        const ReimburseDetail: any = [...data.ReimburseDetail];
+
+        ReimburseDetail[modalFiles.index].reimburse_detail_document = [
+            ...(ReimburseDetail[modalFiles.index].reimburse_detail_document ||
+                []),
+            {
+                reimburse_detail_document: "",
+            },
+        ];
+
+        setData({
+            ...data,
+            ReimburseDetail: ReimburseDetail,
+        });
+    };
+    // Handle Add Row Files End
+
+    // Handle Add Row Files Start
+    const handleChangeAddFiles = (e: any, i: number) => {
+        const { name, files } = e.target;
+
+        const onchangeFileData: any = [...data.ReimburseDetail];
+
+        onchangeFileData[modalFiles.index][name][i] = files[0];
+
+        setData("ReimburseDetail", onchangeFileData);
+    };
+    // Handle Add Row Files End
+
+    // Handle Remove Files Row Start
+    const handleRemoveFilesRow = (e: any, i: number) => {
+        e.preventDefault();
+
+        const deleteFilesData: any = [...data.ReimburseDetail];
+
+        deleteFilesData[modalFiles.index].reimburse_detail_document.splice(
+            i,
+            1
+        );
+
+        setData({ ...data, ReimburseDetail: deleteFilesData });
+    };
+    // Handle Remove Files Row End
 
     const handleUploadFile = (e: any, i: number) => {
         const { name, files } = e.target;
@@ -329,15 +390,14 @@ export default function CashAdvance({ auth }: PageProps) {
     const [DataReportRow, setDataReportRow] = useState([
         {
             reimburse_detail_date: "",
-            reimburse_detail_end_date: "",
             reimburse_detail_purpose: "",
             reimburse_detail_relation_name: "",
             reimburse_detail_relation_position: "",
             reimburse_detail_relation_organization_id: "",
             reimburse_detail_location: "",
             reimburse_detail_amount: "",
-            reimburse_detail_document_id: "",
             reimburse_detail_note: "",
+            reimburse_detail_document: [],
         },
     ]);
 
@@ -348,15 +408,14 @@ export default function CashAdvance({ auth }: PageProps) {
             ...DataReportRow,
             {
                 reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
                 reimburse_detail_purpose: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
                 reimburse_detail_location: "",
                 reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
                 reimburse_detail_note: "",
+                reimburse_detail_document: [],
             },
         ]);
 
@@ -364,15 +423,14 @@ export default function CashAdvance({ auth }: PageProps) {
             ...data.ReimburseDetail,
             {
                 reimburse_detail_date: "",
-                reimburse_detail_end_date: "",
                 reimburse_detail_purpose: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
                 reimburse_detail_location: "",
                 reimburse_detail_amount: "",
-                reimburse_detail_document_id: "",
                 reimburse_detail_note: "",
+                reimburse_detail_document: [],
             },
         ]);
     };
@@ -425,77 +483,43 @@ export default function CashAdvance({ auth }: PageProps) {
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const getReimburse = async (pageNumber = "page=1") => {
-        setIsLoading(true);
+    const getReimburse = async (
+        pageNumber = "page=1",
+        status = "",
+        status_type = ""
+    ) => {
         await axios
             .post(`/getReimburse?${pageNumber}`, {
-                REIMBURSE_NUMBER: searchReimburse.REIMBURSE_NUMBER,
+                reimburse_requested_by: searchReimburse.reimburse_requested_by,
+                reimburse_used_by: searchReimburse.reimburse_used_by,
+                reimburse_start_date: searchReimburse.reimburse_start_date,
+                reimburse_end_date: searchReimburse.reimburse_end_date,
+                reimburse_division: searchReimburse.reimburse_division,
+                status: status,
+                status_type: status_type,
             })
             .then((res) => {
                 setReimburse(res.data);
-                setIsLoading(false);
-                if (modal.search) {
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        search_ca_report: false,
-                        approve: false,
-                        report: false,
-                        execute: false,
-                    });
-                }
             })
             .catch((err) => {
                 console.log(err);
             });
     };
-
-    const getReportCA = async (pageNumber = "page=1") => {
-        setIsLoading(true);
-        await axios
-            .post(`/getReportCA?${pageNumber}`, {
-                REIMBURSE_NUMBER: searchReimburse.REIMBURSE_NUMBER,
-            })
-            .then((res) => {
-                setReimburse(res.data);
-                setIsLoading(false);
-                if (modal.search) {
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        search_ca_report: false,
-                        approve: false,
-                        report: false,
-                        execute: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-    // Search End
 
     // Clear Search Start
     const clearSearchReimburse = async (pageNumber = "page=1") => {
         await axios
             .post(`/getReimburse?${pageNumber}`)
             .then((res) => {
-                setReimburse([]);
+                setReimburse(res.data);
                 setSearchReimburse({
-                    ...searchReimburse,
-                    REIMBURSE_NUMBER: "",
+                    reimburse_requested_by: "",
+                    reimburse_used_by: "",
+                    reimburse_start_date: "",
+                    reimburse_end_date: "",
+                    reimburse_division: "",
+                    reimburse_offcie: "",
                 });
-
-                // console.log(res);
             })
             .catch((err) => {
                 console.log(err);
@@ -503,93 +527,33 @@ export default function CashAdvance({ auth }: PageProps) {
     };
     // Clear Search End
 
-    // const getReimburse = async (pageNumber = "page=1") => {
-    //     await axios
-    //         .get(`/getReimburse?${pageNumber}`)
-    //         .then((res) => {
-    //             setReimburse(res.data);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
-
     // Data Start
-    const { users, relations, coa, persons }: any = usePage().props;
-    const purposes = [
-        {
-            id: 1,
-            purpose: "Peruntukan A",
-        },
-        {
-            id: 2,
-            purpose: "Peruntukan B",
-        },
-        {
-            id: 3,
-            purpose: "Peruntukan C",
-        },
-    ];
-
-    const companies = [
-        {
-            id: 1,
-            nama_perusahaan: "Perusahaan A",
-        },
-        {
-            id: 2,
-            nama_perusahaan: "Perusahaan B",
-        },
-        {
-            id: 3,
-            nama_perusahaan: "Perusahaan C",
-        },
-    ];
-
-    const types = [
-        {
-            id: 1,
-            type: "Reimburse",
-        },
-        {
-            id: 2,
-            type: "Reimburse",
-        },
-    ];
-
-    const payments = [
-        {
-            id: 1,
-            name: "Cash",
-        },
-        {
-            id: 2,
-            name: "Transfer",
-        },
-    ];
-
-    const approval = [
-        {
-            id: 0,
-            name: "Approve",
-        },
-        {
-            id: 1,
-            name: "Reject",
-        },
-    ];
-
-    const tabs = [
-        {
-            index: 1,
-            name: "Reimburse",
-        },
-        {
-            index: 2,
-            name: "Report Reimburse",
-        },
-    ];
+    const { relations, coa, persons, office }: any = usePage().props;
     // Data End
+
+    const [getCashAdvanceApproval, setCashAdvanceApproval] = useState<any>([]);
+    const getReimburseApproval = async () => {
+        await axios
+            .get(`/getCashAdvanceApproval`)
+            .then((res) => {
+                setCashAdvanceApproval(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [getCashAdvanceMethod, setCashAdvanceMethod] = useState<any>([]);
+    const getReimburseMethod = async () => {
+        await axios
+            .get(`/getCashAdvanceMethod`)
+            .then((res) => {
+                setCashAdvanceMethod(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     // Handle Add Start
     const handleAddModal = async (e: FormEvent) => {
@@ -807,24 +771,6 @@ export default function CashAdvance({ auth }: PageProps) {
         count_approve += Number(item.REIMBURSE_DETAIL_STATUS);
     });
 
-    const [toggleState, setToggleState] = useState(1);
-
-    const toggleTab = (i: number) => {
-        setToggleState(i);
-    };
-
-    const [checkedTransfer, setCheckedTransfer] = useState(false);
-    const handleCheckedTransfer = (e: any) => {
-        setData("reimburse_delivery_method_transfer", e.target.value);
-        setCheckedTransfer(!checkedTransfer);
-    };
-
-    const [checkedCash, setCheckedCash] = useState(false);
-    const handleCheckedCash = (e: any) => {
-        setData("reimburse_delivery_method_cash", e.target.value);
-        setCheckedCash(!checkedCash);
-    };
-
     const selectPerson = persons
         ?.filter(
             (m: any) =>
@@ -848,6 +794,19 @@ export default function CashAdvance({ auth }: PageProps) {
             return {
                 value: query.PERSON_ID,
                 label: query.PERSON_FIRST_NAME,
+            };
+        });
+
+    const selectOffice = office
+        ?.filter(
+            (m: any) =>
+                m.RELATION_ORGANIZATION_ID ===
+                auth.user.person?.RELATION_ORGANIZATION_ID
+        )
+        .map((query: any) => {
+            return {
+                value: query.RELATION_OFFICE_ID,
+                label: query.RELATION_OFFICE_ALIAS,
             };
         });
 
@@ -893,7 +852,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Add Start */}
             <ModalToAdd
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -917,7 +876,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 body={
                     <>
                         <ModalToAction
-                            classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                            classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]`}
                             show={modalFiles.add_files}
                             closeable={true}
                             onClose={() =>
@@ -941,30 +900,50 @@ export default function CashAdvance({ auth }: PageProps) {
                             body={
                                 <>
                                     <div className="grid grid-cols-12 my-5">
-                                        <div className={`w-full col-span-11`}>
-                                            <InputLabel
-                                                htmlFor="files"
-                                                value="File"
-                                                className="mb-2"
-                                            />
-                                            {/* <p>test</p> */}
-                                            <Input
-                                                name="cash_advance_detail_document_id"
-                                                type="file"
-                                                className="w-full"
-                                                onChange={(e) =>
-                                                    handleChangeAddFiles(e, i)
-                                                }
-                                            />
-                                        </div>
-                                        <button
-                                            className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
-                                            onClick={(e) =>
-                                                handleRemoveFilesRow(e, i)
-                                            }
-                                        >
-                                            X
-                                        </button>
+                                        {data.ReimburseDetail[
+                                            modalFiles.index
+                                        ]?.reimburse_detail_document.map(
+                                            (val: any, i: number) => (
+                                                <>
+                                                    <div
+                                                        key={i}
+                                                        className={`w-full col-span-11`}
+                                                    >
+                                                        <InputLabel
+                                                            htmlFor="files"
+                                                            value="File"
+                                                            className="mb-2"
+                                                        />
+                                                        {val.name ? (
+                                                            <p>{val.name}</p>
+                                                        ) : (
+                                                            <Input
+                                                                name="reimburse_detail_document"
+                                                                type="file"
+                                                                className="w-full"
+                                                                onChange={(e) =>
+                                                                    handleChangeAddFiles(
+                                                                        e,
+                                                                        i
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
+                                                        onClick={(e) =>
+                                                            handleRemoveFilesRow(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    >
+                                                        X
+                                                    </button>
+                                                </>
+                                            )
+                                        )}
                                     </div>
                                     <button
                                         type="button"
@@ -987,7 +966,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.name}
+                                    value={auth.user.person.PERSON_FIRST_NAME}
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -1012,29 +991,56 @@ export default function CashAdvance({ auth }: PageProps) {
                                     options={selectPerson}
                                     isSearchable={true}
                                     placeholder={"Choose Used By"}
-                                    value={data.cash_advance_used_by}
+                                    value={data.reimburse_used_by}
                                     onChange={(val: any) =>
-                                        setData("cash_advance_used_by", val)
+                                        setData("reimburse_used_by", val)
                                     }
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
                             <div className="w-full p-2 mb-1">
                                 <InputLabel
-                                    htmlFor="cash_advance_division"
-                                    value="Division"
+                                    htmlFor="reimburse_division"
+                                    value="Cost Center"
                                     className="mb-4"
                                 />
                                 <TextInput
-                                    id="cash_advance_division"
+                                    id="reimburse_division"
                                     type="text"
-                                    name="cash_advance_division"
+                                    name="reimburse_division"
                                     value={
                                         auth.user.person.division
                                             ?.RELATION_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2 mb-1">
+                                <InputLabel htmlFor="namaPemohon" className="">
+                                    Office
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={selectOffice}
+                                    isSearchable={true}
+                                    placeholder={"Choose Used By"}
+                                    value={data.reimburse_office}
+                                    onChange={(val: any) =>
+                                        setData("reimburse_office", val)
+                                    }
+                                    primaryColor={"bg-red-500"}
                                 />
                             </div>
                             <div className="w-full p-2 mb-1">
@@ -1060,10 +1066,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                     options={selectApproval}
                                     isSearchable={true}
                                     placeholder={"Choose Request To"}
-                                    value={data.cash_advance_first_approval_by}
+                                    value={data.reimburse_first_approval_by}
                                     onChange={(val: any) =>
                                         setData(
-                                            "cash_advance_first_approval_by",
+                                            "reimburse_first_approval_by",
                                             val
                                         )
                                     }
@@ -1139,14 +1145,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <TD className="border">{i + 1}.</TD>
                                             <TD className="border">
                                                 <DatePicker
-                                                    name="cash_advance_detail_start_date"
+                                                    name="reimburse_detail_date"
                                                     selected={
-                                                        val.cash_advance_detail_start_date
+                                                        val.reimburse_detail_date
                                                     }
                                                     onChange={(date: any) =>
                                                         handleChangeAddDate(
                                                             date,
-                                                            "cash_advance_detail_start_date",
+                                                            "reimburse_detail_date",
                                                             i
                                                         )
                                                     }
@@ -1166,10 +1172,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         val.reimburse_detail_purpose
                                                     }
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_purpose"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
+                                                    autoComplete="off"
+                                                    required
                                                 />
                                             </TD>
                                             <TD className="border">
@@ -1193,12 +1200,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         "Choose Business Relation"
                                                     }
                                                     value={
-                                                        val.cash_advance_detail_relation_organization_id
+                                                        val.reimburse_detail_relation_organization_id
                                                     }
                                                     onChange={(val: any) =>
                                                         handleChangeAddCustom(
                                                             val,
-                                                            "cash_advance_detail_relation_organization_id",
+                                                            "reimburse_detail_relation_organization_id",
                                                             i
                                                         )
                                                     }
@@ -1214,10 +1221,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         val.reimburse_detail_relation_name
                                                     }
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_name"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
+                                                    autoComplete="off"
                                                 />
                                             </TD>
                                             <TD className="border">
@@ -1229,10 +1236,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         val.reimburse_detail_relation_position
                                                     }
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_position"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
+                                                    autoComplete="off"
                                                 />
                                             </TD>
                                             <TD className="border">
@@ -1244,27 +1251,32 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         val.reimburse_detail_location
                                                     }
                                                     className="w-1/2"
-                                                    autoComplete="reimburse_detail_location"
                                                     onChange={(e) =>
                                                         handleChangeAdd(e, i)
                                                     }
+                                                    autoComplete="off"
                                                     required
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                <TextInput
+                                                <CurrencyInput
                                                     id="reimburse_detail_amount"
-                                                    type="number"
                                                     name="reimburse_detail_amount"
                                                     value={
                                                         val.reimburse_detail_amount
                                                     }
-                                                    className="w-1/2 text-right"
-                                                    autoComplete="reimburse_detail_amount"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
+                                                    decimalScale={2}
+                                                    decimalsLimit={2}
+                                                    onValueChange={(val: any) =>
+                                                        handleChangeAddCustom(
+                                                            val,
+                                                            "reimburse_detail_amount",
+                                                            i
+                                                        )
                                                     }
-                                                    placeholder="0"
+                                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
+                                                    placeholder="0.00"
+                                                    autoComplete="off"
                                                     required
                                                 />
                                             </TD>
@@ -1284,7 +1296,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         });
                                                     }}
                                                 >
-                                                    Add Files
+                                                    {val
+                                                        .reimburse_detail_document
+                                                        ?.length > 0
+                                                        ? val
+                                                              ?.reimburse_detail_document
+                                                              .length
+                                                        : "Add Files"}
                                                 </button>
                                             </TD>
                                             <TD className="border">
@@ -1317,7 +1335,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TD>
                                         <TD
                                             className="text-right pr-5 font-bold"
-                                            colSpan={6}
+                                            colSpan={5}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
@@ -1327,123 +1345,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             </table>
                         </div>
                         {/* Table form end */}
-
-                        {/* <p className="mt-5">{JSON.stringify(DataRow)}</p> */}
-
-                        {/* <div className="mt-10">
-                            <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
-                                <legend className="ml-12 bg-gray-300 px-3 font-medium">Delivery Method</legend>
-                                <div className="mt-4 mx-5 space-y-5">
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="transfer"
-                                            name="transfer"
-                                            type="checkbox"
-                                            aria-describedby="transfer-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={1}
-                                            onChange={(e) => handleCheckedTransfer(e)}
-                                            required
-                                            />
-                                        </div>
-                                        <div className="flex w-full gap-4">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="transfer" className="font-medium text-gray-900">
-                                                Transfer
-                                                </label>
-                                            </div>
-                                            {checkedTransfer === true ? (
-                                                <TextInput
-                                                    id="reimburse_transfer_amount"
-                                                    type="number"
-                                                    name="reimburse_transfer_amount"
-                                                    value={data.reimburse_transfer_amount}
-                                                    className="w-full lg:w-1/4 text-right"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        setData("reimburse_transfer_amount", e.target.value)
-                                                    }
-                                                    required
-                                                />
-                                            ) : (
-                                                <TextInput
-                                                    id="reimburse_transfer_amount"
-                                                    type="number"
-                                                    name="reimburse_transfer_amount"
-                                                    value={""}
-                                                    className="w-full lg:w-1/4 text-right"
-                                                    placeholder="0"
-                                                    // required
-                                                    readOnly
-                                                />
-                                            )}
-                                            <TextInput
-                                                id="account_number"
-                                                type="text"
-                                                name="account_number"
-                                                value=""
-                                                className="w-full lg:w-1/4"
-                                                placeholder="Bank Account"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
-                                                required
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="cash"
-                                            name="cash"
-                                            type="checkbox"
-                                            aria-describedby="cash-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={2}
-                                            onChange={(e) => handleCheckedCash(e)}
-                                            />
-                                        </div>
-                                        <div className="flex w-full">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="cash" className="font-medium text-gray-900">
-                                                Cash
-                                                </label>
-                                            </div>
-                                            {checkedCash === true ? (
-                                                <TextInput
-                                                    id="reimburse_cash_amount"
-                                                    type="number"
-                                                    name="reimburse_cash_amount"
-                                                    value={data.reimburse_cash_amount}
-                                                    className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        setData("reimburse_cash_amount", e.target.value)
-                                                    }
-                                                    required
-                                                />
-                                            ) : (
-                                                <TextInput
-                                                    id="reimburse_cash_amount"
-                                                    type="number"
-                                                    name="reimburse_cash_amount"
-                                                    value={""}
-                                                    className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                    placeholder="0"
-                                                    // onChange={(e) =>
-                                                    //     handleChangeAdd(e, i)
-                                                    // }
-                                                    required
-                                                    readOnly
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div> */}
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
@@ -1472,7 +1373,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Detail Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
                 show={modal.view}
                 closeable={true}
                 onClose={() =>
@@ -1496,73 +1397,24 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess=""
                 headers={null}
                 submitButtonName=""
-                panelWidth={"65%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
+                                    htmlFor="cashAdvanceNumber"
                                     value="Reimburse Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="cashAdvanceNumber"
                                     type="text"
-                                    name="reimburseNumber"
+                                    name="cashAdvanceNumber"
                                     value={dataById.REIMBURSE_NUMBER}
-                                    className=""
-                                    autoComplete="reimburseNumber"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            REIMBURSE_NUMBER: e.target.value,
-                                        })
-                                    }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
-                            {/* <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tipe"
-                                    value="Type"
-                                    className="mb-2"
-                                />
-                                {dataById.REIMBURSE_TYPE === 1 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                DIVISION: e.target.value,
-                                            })
-                                        }
-                                        readOnly
-                                    />
-                                )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                DIVISION: e.target.value,
-                                            })
-                                        }
-                                        readOnly
-                                    />
-                                )}
-                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
@@ -1573,15 +1425,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
-                                    className=""
-                                    autoComplete="namaPemohon"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById.user_used_by,
-                                            name: e.target.value,
-                                        })
+                                    value={
+                                        dataById.person_used_by
+                                            ?.PERSON_FIRST_NAME
                                     }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
@@ -1595,37 +1443,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={dataById.user.name}
-                                    className=""
-                                    autoComplete="namaPengguna"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            DIVISION: e.target.value,
-                                        })
-                                    }
+                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
+                                    htmlFor="office"
+                                    value="Office"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="divisi"
+                                    id="office"
                                     type="text"
-                                    name="divisi"
-                                    value={dataById.REIMBURSE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            REIMBURSE_DIVISION: e.target.value,
-                                        })
+                                    name="office"
+                                    value={
+                                        dataById.office?.RELATION_OFFICE_ALIAS
                                     }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
@@ -1640,11 +1476,28 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
-                                        "dd-mm-yyyy"
+                                        dataById.REIMBURSE_REQUETED_DATE,
+                                        "dd-mm-yyy"
                                     )}
-                                    className=""
-                                    autoComplete="tanggalPengajuan"
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value={
+                                        auth.user.person.division
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
@@ -1658,15 +1511,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
-                                    className=""
-                                    autoComplete="namaPemberiApproval"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            DIVISION: e.target.value,
-                                        })
+                                    value={
+                                        dataById.person_approval
+                                            ?.PERSON_FIRST_NAME
                                     }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
@@ -1745,20 +1594,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "1" && "Peruntukan A"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "2" && "Peruntukan B"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "3" && "Peruntukan C"}
+                                                    {
+                                                        cad.REIMBURSE_DETAIL_PURPOSE
+                                                    }
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
+                                                    {
+                                                        cad
+                                                            .relation_organization
+                                                            ?.RELATION_ORGANIZATION_ALIAS
+                                                    }
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {
@@ -1780,25 +1625,30 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.REIMBURSE_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !==
-                                                null ? (
-                                                    <TD className="border px-3 py-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                handleFileDownload(
-                                                                    cad.REIMBURSE_DETAIL_ID
-                                                                )
-                                                            }
-                                                        >
-                                                            <ArrowDownTrayIcon className="w-6 m-auto" />
-                                                        </button>
-                                                    </TD>
-                                                ) : (
-                                                    <TD className="border px-3 py-2">
-                                                        -
-                                                    </TD>
-                                                )}
+                                                <TD className="border px-3 py-2">
+                                                    <button
+                                                        type="button"
+                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                        onClick={() => {
+                                                            setModalFiles({
+                                                                add_files:
+                                                                    false,
+                                                                show_files:
+                                                                    false,
+                                                                add_files_report:
+                                                                    false,
+                                                                show_files_report:
+                                                                    true,
+                                                                index: "",
+                                                                index_show: "",
+                                                                index_show_report:
+                                                                    "",
+                                                            });
+                                                        }}
+                                                    >
+                                                        Show Files
+                                                    </button>
+                                                </TD>
                                             </tr>
                                         )
                                     )}
@@ -1822,8 +1672,6 @@ export default function CashAdvance({ auth }: PageProps) {
                         </div>
                         {/* Table form end */}
 
-                        {/* <p className="mt-5">{JSON.stringify(DataRow)}</p> */}
-
                         <div className="w-full p-2 mt-5">
                             <InputLabel
                                 htmlFor="reimburse_request_note"
@@ -1836,12 +1684,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
                                 value={dataById.REIMBURSE_REQUEST_NOTE}
-                                onChange={(e) =>
-                                    setData(
-                                        "reimburse_request_note",
-                                        e.target.value
-                                    )
-                                }
                                 readOnly
                             />
                         </div>
@@ -1852,7 +1694,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Approve Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
                 show={modal.approve}
                 closeable={true}
                 onClose={() =>
@@ -1882,49 +1724,20 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
+                                    htmlFor="cashAdvanceNumber"
                                     value="Reimburse Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="cashAdvanceNumber"
                                     type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
-                                    className=""
-                                    autoComplete="reimburseNumber"
+                                    name="cashAdvanceNumber"
+                                    value="PV/REIM/2024/8/00001"
+                                    className="bg-gray-100"
+                                    autoComplete="cashAdvanceNumber"
                                     readOnly
                                 />
                             </div>
-                            {/* <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tipe"
-                                    value="Type"
-                                    className="mb-2"
-                                />
-                                {dataById.REIMBURSE_TYPE === 1 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        readOnly
-                                    />
-                                )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        readOnly
-                                    />
-                                )}
-                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
@@ -1935,8 +1748,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
-                                    className=""
+                                    value="Fadhlan"
+                                    className="bg-gray-100"
                                     autoComplete="namaPemohon"
                                     readOnly
                                 />
@@ -1951,25 +1764,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={dataById.user.name}
-                                    className=""
+                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    className="bg-gray-100"
                                     autoComplete="namaPengguna"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataById.REIMBURSE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -1983,12 +1780,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="tanggalPengajuan"
                                     type="text"
                                     name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
-                                    className=""
+                                    value="12-08-2024"
+                                    className="bg-gray-100"
                                     autoComplete="tanggalPengajuan"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value="Information Technology"
+                                    className="bg-gray-100"
+                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -2002,8 +1812,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
-                                    className=""
+                                    value="Apep"
+                                    className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
                                     readOnly
                                 />
@@ -2052,13 +1862,23 @@ export default function CashAdvance({ auth }: PageProps) {
                                         />
                                         <TH
                                             label="Approval"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
+                                            className="border"
+                                            rowSpan="2"
                                         />
                                         <TH
-                                            label="Note"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
+                                            label="Cost Classification"
+                                            className="border"
+                                            rowSpan="2"
+                                        />
+                                        <TH
+                                            label="Amount Approve"
+                                            className="border"
+                                            rowSpan="2"
+                                        />
+                                        <TH
+                                            label="Remarks"
+                                            className="border"
+                                            rowSpan="2"
                                         />
                                     </tr>
                                     <tr className="text-center">
@@ -2077,134 +1897,161 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>{" "}
                                 <tbody id="form_table">
-                                    {dataById.reimburse_detail.map(
-                                        (cad: any, i: number) => (
-                                            <tr
-                                                className="text-center text-sm"
-                                                key={i}
+                                    {/* {dataById.reimburse_detail.map(
+                                        (cad: any, i: number) => ( */}
+                                    <tr
+                                        className="text-center text-gray-700 text-sm leading-7"
+                                        // key={i}
+                                    >
+                                        <TD className="border">1.</TD>
+                                        <TD className="border px-3 py-2">
+                                            12-08-2024
+                                        </TD>
+                                        <TD className="border px-3">
+                                            Perjalanan Dinas
+                                        </TD>
+                                        <TD className="border px-3">Pelindo</TD>
+                                        <TD className="border px-3 py-2">
+                                            Budi
+                                        </TD>
+                                        <TD className="border px-3 py-2">
+                                            Manajer
+                                        </TD>
+                                        <TD className="border px-3 py-2">
+                                            Jakarta
+                                        </TD>
+                                        <TD className="border px-3 py-2">
+                                            {formatCurrency.format(1000000)}
+                                        </TD>
+                                        <TD className="border px-3 py-2">
+                                            <button
+                                                type="button"
+                                                className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                onClick={() => {
+                                                    setModalFiles({
+                                                        add_files: false,
+                                                        show_files: false,
+                                                        add_files_report: false,
+                                                        show_files_report: true,
+                                                        index: "",
+                                                        index_show: "",
+                                                        index_show_report: "",
+                                                    });
+                                                }}
                                             >
-                                                <TD className="border">
-                                                    {i + 1 + "."}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {dateFormat(
-                                                        cad.REIMBURSE_DETAIL_DATE,
-                                                        "dd-mm-yyyy"
-                                                    )}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "1" && "Peruntukan A"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "2" && "Peruntukan B"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "3" && "Peruntukan C"}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REIMBURSE_DETAIL_RELATION_NAME
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REIMBURSE_DETAIL_RELATION_POSITION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REIMBURSE_DETAIL_LOCATION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {formatCurrency.format(
-                                                        cad.REIMBURSE_DETAIL_AMOUNT
-                                                    )}
-                                                </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !==
-                                                null ? (
-                                                    <TD className="border px-3 py-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                handleFileDownload(
-                                                                    cad.REIMBURSE_DETAIL_ID
-                                                                )
+                                                Show Files
+                                            </button>
+                                        </TD>
+                                        <TD className="border">
+                                            <select
+                                                id="REPORT_CASH_ADVANCE_DETAIL_APPROVAL"
+                                                name="REPORT_CASH_ADVANCE_DETAIL_APPROVAL"
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                // onChange={(e) =>
+                                                //     handleChangeApprovalReport(
+                                                //         e,
+                                                //         i
+                                                //     )
+                                                // }
+                                                // value={
+                                                //     cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL
+                                                // }
+                                            >
+                                                <option value="">
+                                                    -- Choose Approval --
+                                                </option>
+                                                {getCashAdvanceApproval.map(
+                                                    (
+                                                        cost_classification: any
+                                                    ) => (
+                                                        <option
+                                                            key={
+                                                                cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_ID
+                                                            }
+                                                            value={
+                                                                cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_ID
                                                             }
                                                         >
-                                                            <ArrowDownTrayIcon className="w-6 m-auto" />
-                                                        </button>
-                                                    </TD>
-                                                ) : (
-                                                    <TD className="border px-3 py-2">
-                                                        -
-                                                    </TD>
-                                                )}
-                                                <TD className="border">
-                                                    <select
-                                                        name="REIMBURSE_DETAIL_STATUS"
-                                                        id="REIMBURSE_DETAIL_STATUS"
-                                                        value={
-                                                            cad.REIMBURSE_DETAIL_STATUS
-                                                        }
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        onChange={(e) =>
-                                                            handleChangeApprove(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                        required
-                                                    >
-                                                        <option value="">
-                                                            Choose Approval
+                                                            {
+                                                                cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_NAME
+                                                            }
                                                         </option>
-                                                        {approval.map(
-                                                            (approve) => (
-                                                                <option
-                                                                    key={
-                                                                        approve.id
-                                                                    }
-                                                                    value={
-                                                                        approve.id
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        approve.name
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </select>
-                                                </TD>
-                                                <TD className="border">
-                                                    <TextInput
-                                                        id="REIMBURSE_DETAIL_NOTE"
-                                                        type="text"
-                                                        name="REIMBURSE_DETAIL_NOTE"
-                                                        value={
-                                                            cad.REIMBURSE_DETAIL_NOTE
-                                                        }
-                                                        className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_NOTE"
-                                                        onChange={(e) =>
-                                                            handleChangeApprove(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                    />
-                                                </TD>
-                                            </tr>
-                                        )
-                                    )}
+                                                    )
+                                                )}
+                                            </select>
+                                        </TD>
+                                        <TD className="border">
+                                            <Select
+                                                classNames={{
+                                                    menuButton: () =>
+                                                        `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    listItem: ({
+                                                        isSelected,
+                                                    }: any) =>
+                                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                            isSelected
+                                                                ? `text-white bg-red-600`
+                                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                        }`,
+                                                }}
+                                                options={selectCoa}
+                                                isSearchable={true}
+                                                placeholder={"Choose COA"}
+                                                // value={
+                                                //     cad.REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION
+                                                // }
+                                                // onChange={(val: any) =>
+                                                //     handleChangeApproveReportCustom(
+                                                //         val,
+                                                //         "REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION",
+                                                //         i
+                                                //     )
+                                                // }
+                                                primaryColor={"bg-red-500"}
+                                            />
+                                        </TD>
+                                        <TD className="border">
+                                            <CurrencyInput
+                                                id="REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
+                                                name="REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
+                                                // value={
+                                                //     cad.REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE
+                                                // }
+                                                decimalScale={2}
+                                                decimalsLimit={2}
+                                                // onValueChange={(val: any) =>
+                                                //     handleChangeApproveReportCustom(
+                                                //         val,
+                                                //         "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE",
+                                                //         i
+                                                //     )
+                                                // }
+                                                className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
+                                                required
+                                                placeholder="0.00"
+                                                autoComplete="off"
+                                            />
+                                        </TD>
+                                        <TD className="border">
+                                            <TextInput
+                                                id="REPORT_CASH_ADVANCE_DETAIL_REMARKS"
+                                                type="text"
+                                                name="REPORT_CASH_ADVANCE_DETAIL_REMARKS"
+                                                value=""
+                                                className="w-1/2"
+                                                autoComplete="off"
+                                                // onChange={(e) =>
+                                                //     handleChangeApproveReport(
+                                                //         e,
+                                                //         i
+                                                //     )
+                                                // }
+                                            />
+                                        </TD>
+                                    </tr>
+                                    {/* )
+                                    )} */}
                                 </tbody>
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
@@ -2215,9 +2062,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             TOTAL AMOUNT
                                         </TD>
                                         <TD className="border text-center py-2">
-                                            {formatCurrency.format(
-                                                dataById.REIMBURSE_TOTAL_AMOUNT
-                                            )}
+                                            {formatCurrency.format(1000000)}
                                         </TD>
                                     </tr>
                                 </tfoot>
@@ -2236,97 +2081,30 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="reimburse_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value=""
                                 readOnly
                             />
                         </div>
 
-                        {/* <div className="w-1/2 p-2 mt-5">
-                            <InputLabel
-                                htmlFor="DELIVERY_METHOD"
-                                value="Delivery Method"
-                                className="mb-2"
-                            />
-                            {dataById.DELIVERY_METHOD === 1 &&(
-                                <TextInput
-                                    id="DELIVERY_METHOD"
-                                    type="text"
-                                    name="DELIVERY_METHOD"
-                                    value="Cash"
-                                    readOnly
-                                />
-                            )}
-                            {dataById.DELIVERY_METHOD === 2 &&(
-                                <TextInput
-                                    id="DELIVERY_METHOD"
-                                    type="text"
-                                    name="DELIVERY_METHOD"
-                                    value="Transfer"
-                                    readOnly
-                                />
-                            )}
-                        </div> */}
-
-                        {/* <div className="p-2 my-5">
-                            <table className="w-2/6 table-auto">
-                                <thead>
-                                    <tr>
-                                        <TableTH
-                                            label="STATUS"
-                                            className="uppercase"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTH
-                                            label="Date & Time"
-                                            className=""
-                                        />
-                                        <TableTH label="Name" className="" />
-                                        <TableTH label="Status" className="" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <TableTD
-                                            value={dateFormat(
-                                                dataById.created_at,
-                                                "dd-mm-yyyy HH:MM:ss"
-                                            )}
-                                            className="w-48 border-none"
-                                        />
-                                        <TableTD
-                                            value={dataById.user_used_by.name}
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Created"
-                                            className="border-none"
-                                        />
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> */}
                         <div className="md:absolute mt-7">
-                            {count_approve > 0 && (
-                                <button
-                                    type="submit"
-                                    className="mt-3 inline-flex w-full justify-center rounded-md bg-yellow-400 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-300 sm:ml-3 sm:mt-0 sm:w-auto"
-                                    onClick={() => handleBtnStatus(3)}
-                                >
-                                    Need Revision
-                                </button>
-                            )}
+                            <button
+                                type="submit"
+                                className="mt-3 inline-flex w-full justify-center rounded-md bg-yellow-400 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-300 sm:ml-3 sm:mt-0 sm:w-auto"
+                                onClick={() => handleBtnStatus(3)}
+                            >
+                                Need Revision
+                            </button>
                             <button
                                 type="submit"
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500 sm:ml-3 sm:mt-0 sm:w-auto"
-                                onClick={() => handleBtnStatus(2)}
+                                onClick={() => handleBtnStatus(4)}
                             >
                                 Reject
                             </button>
                             <button
                                 type="submit"
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-500 sm:ml-3 sm:mt-0 sm:w-auto"
-                                onClick={() => handleBtnStatus(1)}
+                                onClick={() => handleBtnStatus(2)}
                             >
                                 Approve
                             </button>
@@ -2338,7 +2116,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Revised Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
                 show={modal.edit}
                 closeable={true}
                 onClose={() =>
@@ -2368,67 +2146,20 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="reimburseNumber"
+                                    htmlFor="cashAdvanceNumber"
                                     value="Reimburse Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="reimburseNumber"
+                                    id="cashAdvanceNumber"
                                     type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
-                                    className=""
-                                    autoComplete="reimburseNumber"
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            REIMBURSE_NUMBER: e.target.value,
-                                        })
-                                    }
+                                    name="cashAdvanceNumber"
+                                    value="PV/REIM/2024/8/00001"
+                                    className="bg-gray-100"
+                                    autoComplete="cashAdvanceNumber"
                                     readOnly
                                 />
                             </div>
-                            {/* <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tipe"
-                                    value="Type"
-                                    className="mb-2"
-                                />
-                                {dataById.REIMBURSE_TYPE === 1 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                DIVISION: e.target.value,
-                                            })
-                                        }
-                                        readOnly
-                                    />
-                                )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                DIVISION: e.target.value,
-                                            })
-                                        }
-                                        readOnly
-                                    />
-                                )}
-                            </div> */}
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="namaPemohon"
@@ -2439,15 +2170,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemohon"
                                     type="text"
                                     name="namaPemohon"
-                                    value={dataById.user_used_by.name}
-                                    className=""
+                                    value="Fadhlan"
+                                    className="bg-gray-100"
                                     autoComplete="namaPemohon"
-                                    onChange={(e) =>
-                                        setData(
-                                            "reimburse_used_by",
-                                            e.target.value
-                                        )
-                                    }
                                     readOnly
                                 />
                             </div>
@@ -2461,37 +2186,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={dataById.user.name}
-                                    className=""
+                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    className="bg-gray-100"
                                     autoComplete="namaPengguna"
-                                    onChange={(e) =>
-                                        setData(
-                                            "reimburse_requested_by",
-                                            e.target.value
-                                        )
-                                    }
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="reimburse_division"
-                                    type="text"
-                                    name="reimburse_division"
-                                    value={dataById.REIMBURSE_DIVISION}
-                                    className=""
-                                    autoComplete="reimburse_division"
-                                    onChange={(e) =>
-                                        setData(
-                                            "reimburse_division",
-                                            e.target.value
-                                        )
-                                    }
                                     readOnly
                                 />
                             </div>
@@ -2505,18 +2202,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="tanggalPengajuan"
                                     type="text"
                                     name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
-                                    className=""
+                                    value="12-08-2024"
+                                    className="bg-gray-100"
                                     autoComplete="tanggalPengajuan"
-                                    // onChange={(e) =>
-                                    //     setData(
-                                    //         "tanggal_pengajuan",
-                                    //         e.target.value
-                                    //     )
-                                    // }
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="divisi"
+                                    value="Division"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="divisi"
+                                    type="text"
+                                    name="divisi"
+                                    value="Information Technology"
+                                    className="bg-gray-100"
+                                    autoComplete="divisi"
                                     readOnly
                                 />
                             </div>
@@ -2530,15 +2234,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
-                                    className=""
+                                    value="Apep"
+                                    className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
-                                    onChange={(e) =>
-                                        setData(
-                                            "reimburse_first_approval_by",
-                                            e.target.value
-                                        )
-                                    }
                                     readOnly
                                 />
                             </div>
@@ -2586,11 +2284,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                             rowSpan={2}
                                         />
                                         <TH
-                                            label="Status"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
                                             label="Note"
                                             className="border px-3 py-2"
                                             rowSpan={2}
@@ -2630,117 +2323,80 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     {i + 1 + "."}
                                                 </TD>
                                                 <TD className="border">
-                                                    <TextInput
-                                                        id="REIMBURSE_DETAIL_DATE"
-                                                        type="date"
+                                                    <DatePicker
                                                         name="REIMBURSE_DETAIL_DATE"
-                                                        value={
-                                                            cad.REIMBURSE_DETAIL_DATE
+                                                        // selected={
+                                                        //     val.REIMBURSE_DETAIL_DATE
+                                                        // }
+                                                        // onChange={(date: any) =>
+                                                        //     handleChangeAddDate(
+                                                        //         date,
+                                                        //         "REIMBURSE_DETAIL_DATE",
+                                                        //         i
+                                                        //     )
+                                                        // }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
                                                         }
-                                                        className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_DATE"
-                                                        onChange={(e) =>
-                                                            handleChangeRevised(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
                                                         required
                                                     />
                                                 </TD>
-                                                {/* <TD className="border">
-                                                    <TextInput
-                                                        id="REIMBURSE_DETAIL_END_DATE"
-                                                        type="date"
-                                                        name="REIMBURSE_DETAIL_END_DATE"
-                                                        value={
-                                                            cad.REIMBURSE_DETAIL_END_DATE
-                                                        }
-                                                        className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_END_DATE"
-                                                        onChange={(e) =>
-                                                            handleChangeRevised(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-                                                </TD> */}
                                                 <TD className="border">
-                                                    <select
+                                                    <TextInput
                                                         id="REIMBURSE_DETAIL_PURPOSE"
+                                                        type="text"
                                                         name="REIMBURSE_DETAIL_PURPOSE"
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         value={
                                                             cad.REIMBURSE_DETAIL_PURPOSE
                                                         }
-                                                        required
+                                                        className="w-1/2"
+                                                        autoComplete="REIMBURSE_DETAIL_PURPOSE"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
                                                                 i
                                                             )
                                                         }
-                                                    >
-                                                        <option value="">
-                                                            -- Choose purpose --
-                                                        </option>
-                                                        {purposes.map(
-                                                            (purpose) => (
-                                                                <option
-                                                                    key={
-                                                                        purpose.id
-                                                                    }
-                                                                    value={
-                                                                        purpose.id
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        purpose.purpose
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </select>
+                                                        required
+                                                    />
                                                 </TD>
                                                 <TD className="border">
-                                                    <select
-                                                        id="REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        name="REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID"
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        value={
-                                                            cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectRelation}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose Business Relation"
                                                         }
-                                                        onChange={(e) =>
-                                                            handleChangeRevised(
-                                                                e,
-                                                                i
-                                                            )
+                                                        // value={
+                                                        //     val.reimburse_detail_relation_organization_id
+                                                        // }
+                                                        // onChange={(val: any) =>
+                                                        //     handleChangeAddCustom(
+                                                        //         val,
+                                                        //         "reimburse_detail_relation_organization_id",
+                                                        //         i
+                                                        //     )
+                                                        // }
+                                                        primaryColor={
+                                                            "bg-red-500"
                                                         }
-                                                        required
-                                                    >
-                                                        <option value="">
-                                                            -- Choose Business
-                                                            Relation --
-                                                        </option>
-                                                        {companies.map(
-                                                            (company) => (
-                                                                <option
-                                                                    key={
-                                                                        company.id
-                                                                    }
-                                                                    value={
-                                                                        company.id
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        company.nama_perusahaan
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </select>
+                                                    />
                                                 </TD>
                                                 <TD className="border">
                                                     <TextInput
@@ -2800,52 +2456,50 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border">
-                                                    <TextInput
-                                                        id="REIMBURSE_DETAIL_AMOUNT"
-                                                        type="number"
-                                                        name="REIMBURSE_DETAIL_AMOUNT"
-                                                        value={
-                                                            cad.REIMBURSE_DETAIL_AMOUNT
-                                                        }
-                                                        className="w-1/2 text-right"
-                                                        autoComplete="REIMBURSE_DETAIL_AMOUNT"
-                                                        onChange={(e) =>
-                                                            handleChangeRevised(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                        placeholder="0"
+                                                    <CurrencyInput
+                                                        id="REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT"
+                                                        name="REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT"
+                                                        // value={
+                                                        //     cad.REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT
+                                                        // }
+                                                        decimalScale={2}
+                                                        decimalsLimit={2}
+                                                        // onValueChange={(val: any) =>
+                                                        //     handleChangeApproveReportCustom(
+                                                        //         val,
+                                                        //         "REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT",
+                                                        //         i
+                                                        //     )
+                                                        // }
+                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
                                                         required
+                                                        placeholder="0.00"
+                                                        autoComplete="off"
                                                     />
                                                 </TD>
                                                 <TD className="border">
-                                                    <input
-                                                        type="file"
-                                                        id="reimburse_detail_document_id"
-                                                        name="reimburse_detail_document_id"
-                                                        className="bg-white leading-4"
-                                                        onChange={(e) =>
-                                                            handleUploadFileRevised(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                    />
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
-                                                        0 && (
-                                                        <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                            Approve
-                                                        </span>
-                                                    )}
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
-                                                        1 && (
-                                                        <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
-                                                            Reject
-                                                        </span>
-                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                        onClick={() => {
+                                                            setModalFiles({
+                                                                add_files:
+                                                                    false,
+                                                                show_files:
+                                                                    false,
+                                                                add_files_report:
+                                                                    false,
+                                                                show_files_report:
+                                                                    true,
+                                                                index: "",
+                                                                index_show: "",
+                                                                index_show_report:
+                                                                    "",
+                                                            });
+                                                        }}
+                                                    >
+                                                        Show Files
+                                                    </button>
                                                 </TD>
                                                 <TD className="border text-left px-3">
                                                     {cad.REIMBURSE_DETAIL_NOTE}
@@ -2889,127 +2543,6 @@ export default function CashAdvance({ auth }: PageProps) {
                         </div>
                         {/* Table form end */}
 
-                        {/* <div className="mt-10">
-                            <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
-                                <legend className="ml-12 bg-gray-300 px-3 font-medium">Delivery Method</legend>
-                                <div className="mt-4 mx-5 space-y-5">
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="transfer"
-                                            name="transfer"
-                                            type="checkbox"
-                                            aria-describedby="transfer-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={1}
-                                            onChange={(e) => handleCheckedTransfer(e)}
-                                            required
-                                            />
-                                        </div>
-                                        <div className="flex w-full gap-4">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="transfer" className="font-medium text-gray-900">
-                                                Transfer
-                                                </label>
-                                            </div>
-                                            {checkedTransfer === true ? (
-                                                <TextInput
-                                                    id="REIMBURSE_TRANSFER_AMOUNT"
-                                                    type="number"
-                                                    name="REIMBURSE_TRANSFER_AMOUNT"
-                                                    value={dataById.REIMBURSE_TRANSFER_AMOUNT}
-                                                    className="w-full lg:w-1/4 text-right"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            REIMBURSE_TRANSFER_AMOUNT: e.target.value,
-                                                        })
-                                                    }
-                                                    required
-                                                />
-                                            ) : (
-                                                <TextInput
-                                                    id="REIMBURSE_TRANSFER_AMOUNT"
-                                                    type="number"
-                                                    name="REIMBURSE_TRANSFER_AMOUNT"
-                                                    value={dataById.REIMBURSE_TRANSFER_AMOUNT}
-                                                    className="w-full lg:w-1/4 text-right"
-                                                    placeholder="0"
-                                                    // required
-                                                    readOnly
-                                                />
-                                            )}
-                                            <TextInput
-                                                id="account_number"
-                                                type="text"
-                                                name="account_number"
-                                                value=""
-                                                className="w-full lg:w-1/4"
-                                                placeholder="Bank Account"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
-                                                required
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                            id="cash"
-                                            name="cash"
-                                            type="checkbox"
-                                            aria-describedby="cash-description"
-                                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            value={2}
-                                            onChange={(e) => handleCheckedCash(e)}
-                                            />
-                                        </div>
-                                        <div className="flex w-full">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label htmlFor="cash" className="font-medium text-gray-900">
-                                                Cash
-                                                </label>
-                                            </div>
-                                            {checkedCash === true ? (
-                                                <TextInput
-                                                    id="REIMBURSE_CASH_AMOUNT"
-                                                    type="number"
-                                                    name="REIMBURSE_CASH_AMOUNT"
-                                                    value={dataById.REIMBURSE_CASH_AMOUNT}
-                                                    className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            REIMBURSE_CASH_AMOUNT: e.target.value,
-                                                        })
-                                                    }
-                                                    required
-                                                />
-                                            ) : (
-                                                <TextInput
-                                                    id="REIMBURSE_CASH_AMOUNT"
-                                                    type="number"
-                                                    name="REIMBURSE_CASH_AMOUNT"
-                                                    value={dataById.REIMBURSE_CASH_AMOUNT}
-                                                    className="w-5/12 lg:w-1/4 text-right ml-9"
-                                                    placeholder="0"
-                                                    // onChange={(e) =>
-                                                    //     handleChangeAdd(e, i)
-                                                    // }
-                                                    required
-                                                    readOnly
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div> */}
-
                         <div className="w-full p-2 mt-5">
                             <InputLabel
                                 htmlFor="reimburse_request_note"
@@ -3025,57 +2558,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
-
-                        {/* <div className="p-2 my-5">
-                            <table className="w-2/6 table-auto">
-                                <thead>
-                                    <tr>
-                                        <TableTH
-                                            label="STATUS"
-                                            className="uppercase"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTH
-                                            label="Date & Time"
-                                            className=""
-                                        />
-                                        <TableTH label="Name" className="" />
-                                        <TableTH label="Status" className="" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <TableTD
-                                            value="21/9/2023 09.00WIB"
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Pemohon"
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Created"
-                                            className="border-none"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTD
-                                            value="21/9/2023 10.00WIB"
-                                            className="w-48 border-none"
-                                        />
-                                        <TableTD
-                                            value="Pemberi Approval"
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Revised"
-                                            className="border-none"
-                                        />
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> */}
                     </>
                 }
             />
@@ -3083,7 +2565,7 @@ export default function CashAdvance({ auth }: PageProps) {
 
             {/* Modal Execute Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
                 show={modal.execute}
                 closeable={true}
                 onClose={() =>
@@ -3107,1093 +2589,258 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={"Execute"}
-                panelWidth={"70%"}
+                // panelWidth={"70%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="reimburseNumber"
-                                    value="Reimburse Number"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="reimburseNumber"
-                                    type="text"
-                                    name="reimburseNumber"
-                                    value={dataById.REIMBURSE_NUMBER}
-                                    className=""
-                                    autoComplete="reimburseNumber"
-                                    readOnly
-                                />
-                            </div>
-                            {/* <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tipe"
-                                    value="Type"
-                                    className="mb-2"
-                                />
-                                {dataById.REIMBURSE_TYPE === 1 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        readOnly
-                                    />
-                                )}
-                                {dataById.REIMBURSE_TYPE === 2 && (
-                                    <TextInput
-                                        id="tipe"
-                                        type="text"
-                                        name="tipe"
-                                        value={"Reimburse"}
-                                        className=""
-                                        autoComplete="tipe"
-                                        readOnly
-                                    />
-                                )}
-                            </div> */}
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPemohon"
-                                    type="text"
-                                    name="namaPemohon"
-                                    value={dataById.user_used_by.name}
-                                    className=""
-                                    autoComplete="namaPemohon"
-                                    readOnly
+                                <InputLabel htmlFor="type" className="mb-2">
+                                    Advanced Amount
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
+                                <CurrencyInput
+                                    // value={
+                                    //     dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST
+                                    // }
+                                    decimalScale={2}
+                                    decimalsLimit={2}
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
+                                    placeholder="0.00"
+                                    autoComplete="off"
+                                    disabled
                                 />
                             </div>
                             <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPengguna"
-                                    value="Applicant"
-                                    className="mb-2"
+                                <InputLabel htmlFor="type" className="mb-2">
+                                    Utilization
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
+                                <CurrencyInput
+                                    // value={
+                                    //     dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_APPROVE
+                                    // }
+                                    decimalScale={2}
+                                    decimalsLimit={2}
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
+                                    placeholder="0.00"
+                                    autoComplete="off"
+                                    disabled
                                 />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel htmlFor="type" className="mb-2">
+                                    Surplus / Deficit
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
+                                <CurrencyInput
+                                    // value={
+                                    //     dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT
+                                    // }
+                                    decimalScale={2}
+                                    decimalsLimit={2}
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
+                                    placeholder="0.00"
+                                    autoComplete="off"
+                                    disabled
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel htmlFor="type" className="mb-2">
+                                    Difference
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
                                 <TextInput
-                                    id="namaPengguna"
-                                    type="text"
-                                    name="namaPengguna"
-                                    value={dataById.user.name}
-                                    className=""
-                                    autoComplete="namaPengguna"
+                                    // value={
+                                    //     dataReportById?.reimburse_differents
+                                    //         .CASH_ADVANCE_DIFFERENTS_NAME
+                                    // }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
                             <div className="w-full p-2">
+                                <InputLabel htmlFor="method" className="mb-2">
+                                    Method
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <select
+                                    id="method"
+                                    name="method"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    // onChange={(e) =>
+                                    //     setDataCAReport({
+                                    //         ...dataCAReport,
+                                    //         method: e.target.value,
+                                    //     })
+                                    // }
+                                    required
+                                >
+                                    <option value="">
+                                        -- Choose Method --
+                                    </option>
+                                    {getCashAdvanceMethod.map((method: any) => (
+                                        <option
+                                            key={method.CASH_ADVANCE_METHOD_ID}
+                                            value={
+                                                method.CASH_ADVANCE_METHOD_ID
+                                            }
+                                        >
+                                            {method.CASH_ADVANCE_METHOD_NAME}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-1 p-2">
                                 <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
+                                    htmlFor="transaction_date"
                                     className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value={dataById.REIMBURSE_DIVISION}
-                                    className=""
-                                    autoComplete="divisi"
-                                    readOnly
+                                >
+                                    Transaction Date
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <DatePicker
+                                    name="transaction_date"
+                                    // selected={dataCAReport.transaction_date}
+                                    // onChange={(date: any) =>
+                                    //     setDataCAReport({
+                                    //         ...dataCAReport,
+                                    //         transaction_date:
+                                    //             date.toLocaleDateString(
+                                    //                 "en-CA"
+                                    //             ),
+                                    //     })
+                                    // }
+                                    dateFormat={"dd-MM-yyyy"}
+                                    placeholderText="dd-mm-yyyyy"
+                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                    autoComplete="off"
+                                    required
                                 />
                             </div>
                             <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tanggalPengajuan"
-                                    value="Request Date"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="tanggalPengajuan"
-                                    type="TEXT"
-                                    name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataById.REIMBURSE_REQUESTED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
-                                    className=""
-                                    autoComplete="tanggalPengajuan"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemberiApproval"
-                                    value="Request for Approval"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPemberiApproval"
-                                    type="text"
-                                    name="namaPemberiApproval"
-                                    value={dataById.user_approval.name}
-                                    className=""
-                                    autoComplete="namaPemberiApproval"
-                                    readOnly
-                                />
-                            </div>
-                        </div>
-
-                        {/* Table form start */}
-                        <div className="max-w-full overflow-x-auto overflow-visible">
-                            <table className="w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-100 leading-8">
-                                    <tr className="text-center dark:bg-meta-4">
-                                        <TH
-                                            label="No."
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Date Intended Activity"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Purpose"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Relation"
-                                            className="border px-3 py-2"
-                                            colSpan={3}
-                                        />
-                                        <TH
-                                            label="Location"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Amount"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Document"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Approval"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Note"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                    </tr>
-                                    <tr className="text-center">
-                                        <TH
-                                            label="Name"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Person"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Position"
-                                            className="border px-3 py-2"
-                                        />
-                                    </tr>
-                                </thead>{" "}
-                                <tbody id="form_table">
-                                    {dataById.reimburse_detail.map(
-                                        (cad: any, i: number) => (
-                                            <tr
-                                                className="text-center text-sm"
-                                                key={i}
-                                            >
-                                                <TD className="border">
-                                                    {i + 1 + "."}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {dateFormat(
-                                                        cad.REIMBURSE_DETAIL_DATE,
-                                                        "dd-mm-yyyy"
-                                                    )}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "1" && "Peruntukan A"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "2" && "Peruntukan B"}
-                                                    {cad.REIMBURSE_DETAIL_PURPOSE ===
-                                                        "3" && "Peruntukan C"}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        1 && "Perusahaan A"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        2 && "Perusahaan B"}
-                                                    {cad.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID ===
-                                                        3 && "Perusahaan C"}
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REIMBURSE_DETAIL_RELATION_NAME
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REIMBURSE_DETAIL_RELATION_POSITION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {
-                                                        cad.REIMBURSE_DETAIL_LOCATION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3">
-                                                    {formatCurrency.format(
-                                                        cad.REIMBURSE_DETAIL_AMOUNT
-                                                    )}
-                                                </TD>
-                                                {cad.REIMBURSE_DETAIL_DOCUMENT_ID !==
-                                                null ? (
-                                                    <TD className="border px-3 py-2">
+                                <InputLabel htmlFor="document" className="mb-2">
+                                    Proof of Document
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <div className="">
+                                    <button
+                                        type="button"
+                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                        onClick={() => {
+                                            setModalFiles({
+                                                add_files: false,
+                                                show_files: false,
+                                                add_files_report: false,
+                                                show_files_report: false,
+                                                add_files_execute_report: true,
+                                                index: "",
+                                            });
+                                        }}
+                                    >
+                                        Add Files
+                                    </button>
+                                </div>
+                                {/* <ModalToAction
+                                    classPanel={
+                                        "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                                    }
+                                    show={modalFiles.add_files_execute_report}
+                                    closeable={true}
+                                    onClose={() =>
+                                        setModalFiles({
+                                            add_files: false,
+                                            show_files: false,
+                                            add_files_report: false,
+                                            show_files_report: false,
+                                            show_files_proof_of_document: false,
+                                            add_files_execute_report: false,
+                                            index: "",
+                                        })
+                                    }
+                                    title="Proof of Document"
+                                    url=""
+                                    data=""
+                                    method=""
+                                    onSuccess=""
+                                    headers={null}
+                                    submitButtonName=""
+                                    panelWidth=""
+                                    body={
+                                        <>
+                                            {dataCAReport.proof_of_document.map(
+                                                (val: any, i: number) => (
+                                                    <div
+                                                        className="grid grid-cols-12 my-5"
+                                                        key={i}
+                                                    >
+                                                        {dataCAReport
+                                                            .proof_of_document[
+                                                            i
+                                                        ].proof_of_document
+                                                            ?.name ? (
+                                                            <div className="w-full col-span-11">
+                                                                <p>
+                                                                    {
+                                                                        dataCAReport
+                                                                            .proof_of_document[
+                                                                            i
+                                                                        ]
+                                                                            .proof_of_document
+                                                                            ?.name
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-full col-span-11">
+                                                                <Input
+                                                                    name="proof_of_document"
+                                                                    type="file"
+                                                                    className="w-full"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleChangeProofOfDocument(
+                                                                            e,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
                                                         <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                handleFileDownload(
-                                                                    cad.REIMBURSE_DETAIL_ID
+                                                            className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 py-1 rounded-lg"
+                                                            onClick={(e) =>
+                                                                handleRemoveProofOfDocument(
+                                                                    e,
+                                                                    i
                                                                 )
                                                             }
                                                         >
-                                                            <ArrowDownTrayIcon className="w-6 m-auto" />
+                                                            X
                                                         </button>
-                                                    </TD>
-                                                ) : (
-                                                    <TD className="border px-3 py-2">
-                                                        -
-                                                    </TD>
-                                                )}
-                                                <TD className="border px-3">
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
-                                                        0 && (
-                                                        <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                            Approve
-                                                        </span>
-                                                    )}
-                                                    {cad.REIMBURSE_DETAIL_STATUS ===
-                                                        1 && (
-                                                        <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
-                                                            Reject
-                                                        </span>
-                                                    )}
-                                                </TD>
-                                                <TD className="border">
-                                                    {cad.REIMBURSE_DETAIL_NOTE}
-                                                </TD>
-                                            </tr>
-                                        )
-                                    )}
-                                </tbody>
-                                <tfoot>
-                                    <tr className="text-center text-black text-sm leading-7">
-                                        <TD
-                                            className="border text-right pr-5 py-2"
-                                            colSpan={7}
-                                        >
-                                            TOTAL AMOUNT
-                                        </TD>
-                                        <TD className="border text-center py-2">
-                                            {formatCurrency.format(
-                                                dataById.REIMBURSE_TOTAL_AMOUNT
+                                                    </div>
+                                                )
                                             )}
-                                        </TD>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                            <button
+                                                type="button"
+                                                className="text-sm cursor-pointer hover:underline"
+                                                onClick={(e) =>
+                                                    handleAddRowProofOfDocument(
+                                                        e
+                                                    )
+                                                }
+                                            >
+                                                + Add Row
+                                            </button>
+                                        </>
+                                    }
+                                /> */}
+                            </div>
                         </div>
-                        {/* Table form end */}
-
-                        <div className="mt-10">
-                            <fieldset className="bg-white pb-10 pt-5 rounded-lg border-2">
-                                <legend className="ml-12 bg-gray-300 px-3 font-medium">
-                                    Delivery Method
-                                </legend>
-                                <div className="mt-4 mx-5 space-y-5">
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                                id="transfer"
-                                                name="transfer"
-                                                type="checkbox"
-                                                aria-describedby="transfer-description"
-                                                className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            />
-                                        </div>
-                                        <div className="flex w-full gap-4">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label
-                                                    htmlFor="transfer"
-                                                    className="font-medium text-gray-900"
-                                                >
-                                                    Transfer
-                                                </label>
-                                            </div>
-                                            <TextInput
-                                                id="REIMBURSE_TRANSFER_AMOUNT"
-                                                type="number"
-                                                name="REIMBURSE_TRANSFER_AMOUNT"
-                                                value={
-                                                    dataById.REIMBURSE_TRANSFER_AMOUNT
-                                                }
-                                                className="w-full lg:w-1/4 text-right"
-                                                placeholder="0"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        REIMBURSE_TRANSFER_AMOUNT:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                            <TextInput
-                                                id="account_number"
-                                                type="text"
-                                                name="account_number"
-                                                value={""}
-                                                className="w-full lg:w-1/4"
-                                                placeholder="To Bank Account"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
-                                                readOnly
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="ml-7">
-                                        <div className="mb-5">
-                                            <InputLabel
-                                                htmlFor="reimburse_transfer_date"
-                                                className="mb-2"
-                                            >
-                                                Transfer Date
-                                                <span className="text-red-600">
-                                                    *
-                                                </span>
-                                            </InputLabel>
-                                            <TextInput
-                                                id="reimburse_transfer_date"
-                                                type="date"
-                                                name="reimburse_transfer_date"
-                                                value={
-                                                    data.reimburse_transfer_date
-                                                }
-                                                className="w-full lg:w-7/12"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "reimburse_transfer_date",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-5">
-                                            <InputLabel
-                                                htmlFor="reimburse_from_bank_account"
-                                                className="mb-2"
-                                            >
-                                                From Bank Account
-                                                <span className="text-red-600">
-                                                    *
-                                                </span>
-                                            </InputLabel>
-                                            <select
-                                                name="reimburse_from_bank_account"
-                                                id="reimburse_from_bank_account"
-                                                className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "reimburse_from_bank_account",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            >
-                                                <option value="">
-                                                    -- Choose Bank Account --
-                                                </option>
-                                                <option value="Bank 1">
-                                                    Bank 1
-                                                </option>
-                                                <option value="Bank 2">
-                                                    Bank 2
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="relative flex items-start">
-                                        <div className="flex h-9 items-center">
-                                            <input
-                                                id="cash"
-                                                name="cash"
-                                                type="checkbox"
-                                                aria-describedby="cash-description"
-                                                className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                            />
-                                        </div>
-                                        <div className="flex w-full">
-                                            <div className="ml-3 text-sm leading-9">
-                                                <label
-                                                    htmlFor="cash"
-                                                    className="font-medium text-gray-900"
-                                                >
-                                                    Cash
-                                                </label>
-                                            </div>
-                                            <TextInput
-                                                id="REIMBURSE_CASH_AMOUNT"
-                                                type="number"
-                                                name="REIMBURSE_CASH_AMOUNT"
-                                                value={
-                                                    dataById.REIMBURSE_CASH_AMOUNT
-                                                }
-                                                className="w-full lg:w-6/12 text-right ml-9"
-                                                placeholder="0"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        REIMBURSE_CASH_AMOUNT:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="ml-7">
-                                        <div className="mb-5">
-                                            <InputLabel
-                                                htmlFor="reimburse_receive_date"
-                                                className="mb-2"
-                                            >
-                                                Receive Date
-                                                <span className="text-red-600">
-                                                    *
-                                                </span>
-                                            </InputLabel>
-                                            <TextInput
-                                                id="reimburse_receive_date"
-                                                type="date"
-                                                name="reimburse_receive_date"
-                                                value={
-                                                    data.reimburse_receive_date
-                                                }
-                                                className="w-full lg:w-7/12"
-                                                placeholder="Bank Account"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "reimburse_receive_date",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-2">
-                                            <InputLabel
-                                                htmlFor="receive_name"
-                                                className="mb-2"
-                                            >
-                                                Receive Name
-                                                <span className="text-red-600">
-                                                    *
-                                                </span>
-                                            </InputLabel>
-                                            <TextInput
-                                                id="reimburse_receive_name"
-                                                type="text"
-                                                name="reimburse_receive_name"
-                                                value={
-                                                    data.reimburse_receive_name
-                                                }
-                                                className="w-full lg:w-7/12"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "reimburse_receive_name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-
-                        <div className="w-full p-2 mt-5">
-                            <InputLabel
-                                htmlFor="reimburse_request_note"
-                                value="Note"
-                                className="mb-2"
-                            />
-                            <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
-                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
-                                readOnly
-                            />
-                        </div>
-
-                        {/* <div className="p-2 my-5">
-                            <table className="w-2/6 table-auto">
-                                <thead>
-                                    <tr>
-                                        <TableTH
-                                            label="STATUS"
-                                            className="uppercase"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTH
-                                            label="Date & Time"
-                                            className=""
-                                        />
-                                        <TableTH label="Name" className="" />
-                                        <TableTH label="Status" className="" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <TableTD
-                                            value={dateFormat(
-                                                dataById.created_at,
-                                                "dd-mm-yyyy HH:MM:ss"
-                                            )}
-                                            className="w-48 border-none"
-                                        />
-                                        <TableTD
-                                            value={dataById.user_used_by.name}
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Created"
-                                            className="border-none"
-                                        />
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> */}
                     </>
                 }
             />
             {/* Modal Execute End */}
-
-            {/* Modal Report Start */}
-            <ModalToAdd
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:max-w-2xl md:max-w-2xl lg:max-w-4xl xl:max-w-full`}
-                show={modal.report}
-                onClose={() =>
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        search_ca_report: false,
-                        approve: false,
-                        report: false,
-                        execute: false,
-                    })
-                }
-                title={"Report Reimburse"}
-                url={`/reimburseReport`}
-                data={data}
-                onSuccess={handleSuccess}
-                panelWidth={"65%"}
-                body={
-                    <>
-                        <div className="grid md:grid-cols-2 my-10">
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="reimburseNumber"
-                                    className="mb-2"
-                                >
-                                    Reimburse Number{" "}
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <select
-                                    id="reimburseNumber"
-                                    name="reimburseNumber"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setData(
-                                            "reimburse_number",
-                                            e.target.value
-                                        )
-                                    }
-                                    required
-                                >
-                                    <option value="">
-                                        -- Choose Reimburse --
-                                    </option>
-                                    {CANumber.map((ca: any) => (
-                                        <option
-                                            key={ca.REIMBURSE_ID}
-                                            value={ca.REIMBURSE_ID}
-                                        >
-                                            {ca.REIMBURSE_NUMBER}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPengguna"
-                                    value="Applicant"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPengguna"
-                                    type="text"
-                                    name="namaPengguna"
-                                    value={auth.user.name}
-                                    className=""
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="divisi"
-                                    value="Division"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="divisi"
-                                    type="text"
-                                    name="divisi"
-                                    value="IT"
-                                    className=""
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemberiApproval"
-                                    className="mb-2"
-                                >
-                                    Request for Approval{" "}
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <select
-                                    id="namaPemberiApproval"
-                                    name="namaPemberiApproval"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setData(
-                                            "reimburse_first_approval_by",
-                                            e.target.value
-                                        )
-                                    }
-                                >
-                                    <option value="">
-                                        -- Choose Request To --
-                                    </option>
-                                    {users.map((user: any) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Table form start */}
-                        <div className="max-w-full overflow-x-auto overflow-visible">
-                            <table className="w-full divide-y divide-gray-300">
-                                <thead className="">
-                                    <tr className="bg-gray-2 text-center dark:bg-meta-4">
-                                        <TH
-                                            label="No."
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Intended Activity"
-                                            className="border px-3 py-2"
-                                            colSpan="2"
-                                        />
-                                        <TH
-                                            label="Purpose"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Relation"
-                                            className="border px-3 py-2"
-                                            colSpan="3"
-                                        />
-                                        <TH
-                                            label="Location"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Amount"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Document"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        {DataReportRow.length > 1 && (
-                                            <TH
-                                                label="Action"
-                                                className="border px-3 py-2"
-                                                rowSpan="2"
-                                            />
-                                        )}
-                                    </tr>
-                                    <tr className="text-center">
-                                        <TH
-                                            label="Start Date"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="End Date"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Name"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Person"
-                                            className="border px-3 py-2"
-                                        />
-                                        <TH
-                                            label="Position"
-                                            className="border px-3 py-2"
-                                        />
-                                    </tr>
-                                </thead>
-                                <tbody id="form_table">
-                                    {DataReportRow.map((val, i) => (
-                                        <tr className="text-center" key={i}>
-                                            <TD className="border">{i + 1}.</TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_date"
-                                                    type="date"
-                                                    name="reimburse_detail_date"
-                                                    value={
-                                                        val.reimburse_detail_date
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="reimburse_detail_date"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_end_date"
-                                                    type="date"
-                                                    name="reimburse_detail_end_date"
-                                                    value={
-                                                        val.reimburse_detail_end_date
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="reimburse_detail_end_date"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <select
-                                                    id="reimburse_detail_purpose"
-                                                    name="reimburse_detail_purpose"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    required
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose purpose --
-                                                    </option>
-                                                    {purposes.map((purpose) => (
-                                                        <option
-                                                            key={purpose.id}
-                                                            value={purpose.id}
-                                                        >
-                                                            {purpose.purpose}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </TD>
-                                            <TD className="border">
-                                                <select
-                                                    id="reimburse_detail_relation_organization_id"
-                                                    name="reimburse_detail_relation_organization_id"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Business
-                                                        Relation --
-                                                    </option>
-                                                    {companies.map(
-                                                        (company) => (
-                                                            <option
-                                                                key={company.id}
-                                                                value={
-                                                                    company.id
-                                                                }
-                                                            >
-                                                                {
-                                                                    company.nama_perusahaan
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </select>
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_relation_name"
-                                                    type="text"
-                                                    name="reimburse_detail_relation_name"
-                                                    value={
-                                                        val.reimburse_detail_relation_name
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_name"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_relation_position"
-                                                    type="text"
-                                                    name="reimburse_detail_relation_position"
-                                                    value={
-                                                        val.reimburse_detail_relation_position
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="reimburse_detail_relation_position"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_location"
-                                                    type="text"
-                                                    name="reimburse_detail_location"
-                                                    value={
-                                                        val.reimburse_detail_location
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="reimburse_detail_location"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_amount"
-                                                    type="number"
-                                                    name="reimburse_detail_amount"
-                                                    value={
-                                                        val.reimburse_detail_amount
-                                                    }
-                                                    className="w-1/2 text-right"
-                                                    autoComplete="reimburse_detail_amount"
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <input
-                                                    type="file"
-                                                    id="reimburse_detail_document_id"
-                                                    name="reimburse_detail_document_id"
-                                                    className="bg-white leading-4"
-                                                    multiple
-                                                    onChange={(e) =>
-                                                        handleUploadFile(e, i)
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                {DataReportRow.length > 1 && (
-                                                    <Button
-                                                        className="my-1.5 px-3 py-1 ml-2"
-                                                        onClick={() =>
-                                                            handleRemoveReportRow(
-                                                                i
-                                                            )
-                                                        }
-                                                        type="button"
-                                                    >
-                                                        X
-                                                    </Button>
-                                                )}
-                                            </TD>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                                <tfoot>
-                                    <tr className="text-center">
-                                        <TD></TD>
-                                        <TD>
-                                            <Button
-                                                className="mt-5 px-2 py-1 ml-2 bg-blue-600 hover:bg-blue-500 text-sm"
-                                                onClick={(e) =>
-                                                    handleAddReportRow(e)
-                                                }
-                                                type="button"
-                                            >
-                                                +
-                                            </Button>
-                                        </TD>
-                                        <TD
-                                            className="text-right pr-5 font-bold"
-                                            colSpan={6}
-                                        >
-                                            TOTAL AMOUNT
-                                        </TD>
-                                        <TD>0</TD>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        {/* Table form end */}
-
-                        {/* <p className="mt-5">{JSON.stringify(DataRow)}</p> */}
-
-                        <div className="w-full p-2 mt-5">
-                            <InputLabel
-                                htmlFor="reimburse_request_note"
-                                value="Note"
-                                className="mb-2"
-                            />
-                            <Textarea
-                                id="reimburse_request_note"
-                                name="reimburse_request_note"
-                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                rows={5}
-                                value={data.reimburse_request_note}
-                                onChange={(e) =>
-                                    setData(
-                                        "reimburse_request_note",
-                                        e.target.value
-                                    )
-                                }
-                                readOnly
-                                //
-                            />
-                        </div>
-                        <div className="grid md:grid-cols-2 my-10">
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="refundType"
-                                    className="mb-2"
-                                >
-                                    Refund Type
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <select
-                                    id="refundType"
-                                    name="refundType"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    onChange={(e) =>
-                                        setData("refund_type", e.target.value)
-                                    }
-                                >
-                                    <option value="">
-                                        -- Pilih Refund Type --
-                                    </option>
-                                    {payments.map((refund: any) => (
-                                        <option
-                                            key={refund.id}
-                                            value={refund.id}
-                                        >
-                                            {refund.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="refundProof"
-                                    className="mb-2"
-                                >
-                                    Refund Proof
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <input
-                                    type="file"
-                                    id="refundProof"
-                                    name="refundProof"
-                                    className="w-full bg-white leading-4"
-                                    onChange={(e: any) =>
-                                        setData("refund_proof", e.target.files)
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </>
-                }
-            />
-            {/* Modal Report End */}
 
             {/* Content Start */}
             <div className="p-6 text-gray-900 mb-60">
@@ -4202,72 +2849,70 @@ export default function CashAdvance({ auth }: PageProps) {
                         <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
                             <Button
                                 className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
-                                onClick={(e) => handleAddModal(e, 1, 0)}
+                                onClick={(e) => handleAddModal(e)}
                             >
                                 {"Add Reimburse"}
                             </Button>
                         </div>
                         <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5 relative">
                             <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                <legend className="ml-8 px-3 text-sm">
-                                    Search
-                                </legend>
+                                <legend className="ml-8 text-sm">Search</legend>
                                 <div className="mt-3 px-4">
                                     <div className="mb-5">
                                         <Input
-                                            id="cash_advance_requested_by"
-                                            name="cash_advance_requested_by"
+                                            id="reimburse_requested_by"
+                                            name="reimburse_requested_by"
                                             type="text"
-                                            // value={
-                                            //     searchCA.cash_advance_requested_by
-                                            // }
+                                            value={
+                                                searchReimburse.reimburse_requested_by
+                                            }
                                             placeholder="Applicant"
                                             className="focus:ring-red-600"
                                             autoComplete="off"
-                                            // onChange={(e: any) =>
-                                            //     setSearchCA({
-                                            //         ...searchCA,
-                                            //         cash_advance_requested_by:
-                                            //             e.target.value,
-                                            //     })
-                                            // }
+                                            onChange={(e: any) =>
+                                                setSearchReimburse({
+                                                    ...searchReimburse,
+                                                    reimburse_requested_by:
+                                                        e.target.value,
+                                                })
+                                            }
                                         />
                                     </div>
                                     <div className="mb-5">
                                         <Input
-                                            id="cash_advance_used_by"
-                                            name="cash_advance_used_by"
+                                            id="reimburse_used_by"
+                                            name="reimburse_used_by"
                                             type="text"
-                                            // value={
-                                            //     searchCA.cash_advance_used_by
-                                            // }
+                                            value={
+                                                searchReimburse.reimburse_used_by
+                                            }
                                             placeholder="Used By"
                                             className="focus:ring-red-600"
                                             autoComplete="off"
-                                            // onChange={(e: any) =>
-                                            //     setSearchCA({
-                                            //         ...searchCA,
-                                            //         cash_advance_used_by:
-                                            //             e.target.value,
-                                            //     })
-                                            // }
+                                            onChange={(e: any) =>
+                                                setSearchReimburse({
+                                                    ...searchReimburse,
+                                                    reimburse_used_by:
+                                                        e.target.value,
+                                                })
+                                            }
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 mb-5">
                                         <DatePicker
-                                            name="cash_advance_start_date"
-                                            // selected={
-                                            //     searchCA.cash_advance_start_date
-                                            // }
-                                            // onChange={(date: any) =>
-                                            //     setSearchCA({
-                                            //         ...searchCA,
-                                            //         cash_advance_start_date:
-                                            //             date.toLocaleDateString(
-                                            //                 "en-CA"
-                                            //             ),
-                                            //     })
-                                            // }
+                                            name="reimburse_start_date"
+                                            selected={
+                                                searchReimburse.reimburse_start_date
+                                            }
+                                            onChange={(date: any) =>
+                                                setSearchReimburse({
+                                                    ...searchReimburse,
+                                                    reimburse_start_date:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (Start Date)"
                                             className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
@@ -4275,19 +2920,19 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </div>
                                     <div className="grid grid-cols-1 mb-5">
                                         <DatePicker
-                                            name="cash_advance_end_date"
-                                            // selected={
-                                            //     searchCA.cash_advance_end_date
-                                            // }
-                                            // onChange={(date: any) =>
-                                            //     setSearchCA({
-                                            //         ...searchCA,
-                                            //         cash_advance_end_date:
-                                            //             date.toLocaleDateString(
-                                            //                 "en-CA"
-                                            //             ),
-                                            //     })
-                                            // }
+                                            name="reimburse_end_date"
+                                            selected={
+                                                searchReimburse.reimburse_end_date
+                                            }
+                                            onChange={(date: any) =>
+                                                setSearchReimburse({
+                                                    ...searchReimburse,
+                                                    reimburse_end_date:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (End Date)"
                                             className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
@@ -4295,34 +2940,36 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </div>
                                     <div className="mb-5">
                                         <Input
-                                            id="cash_advance_division"
-                                            name="cash_advance_division"
+                                            id="reimburse_division"
+                                            name="reimburse_division"
                                             type="text"
-                                            // value={
-                                            //     searchCA.cash_advance_division
-                                            // }
+                                            value={
+                                                searchReimburse.reimburse_division
+                                            }
                                             placeholder="Division"
                                             className="focus:ring-red-600"
                                             autoComplete="off"
-                                            // onChange={(e: any) =>
-                                            //     setSearchCA({
-                                            //         ...searchCA,
-                                            //         cash_advance_division:
-                                            //             e.target.value,
-                                            //     })
-                                            // }
+                                            onChange={(e: any) =>
+                                                setSearchReimburse({
+                                                    ...searchReimburse,
+                                                    reimburse_division:
+                                                        e.target.value,
+                                                })
+                                            }
                                         />
                                     </div>
                                     <div className="flex justify-end gap-2">
                                         <Button
                                             className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                            onClick={() => getCA()}
+                                            onClick={() => getReimburse()}
                                         >
                                             Search
                                         </Button>
                                         <Button
                                             className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                            onClick={() => clearSearchCA()}
+                                            onClick={() =>
+                                                clearSearchReimburse()
+                                            }
                                         >
                                             Clear Search
                                         </Button>
@@ -4343,7 +2990,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <Button
                                                 className="w-36 bg-gray-500 px-2 py-1 hover:bg-gray-400"
                                                 onClick={() =>
-                                                    getCA("", "1", "Approve1")
+                                                    getReimburse(
+                                                        "",
+                                                        "1",
+                                                        "Approve1"
+                                                    )
                                                 }
                                             >
                                                 Request
@@ -4356,7 +3007,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <Button
                                                 className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
                                                 onClick={() =>
-                                                    getCA("", "2", "Approve1")
+                                                    getReimburse(
+                                                        "",
+                                                        "2",
+                                                        "Approve1"
+                                                    )
                                                 }
                                             >
                                                 Approve 1
@@ -4369,7 +3024,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <Button
                                                 className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
                                                 onClick={() =>
-                                                    getCA("", "2", "Approve2")
+                                                    getReimburse(
+                                                        "",
+                                                        "2",
+                                                        "Approve2"
+                                                    )
                                                 }
                                             >
                                                 Approve 2
@@ -4382,7 +3041,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <Button
                                                 className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
                                                 onClick={() =>
-                                                    getCA(
+                                                    getReimburse(
                                                         "",
                                                         "5",
                                                         "Pending Report"
@@ -4399,7 +3058,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <Button
                                                 className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
                                                 onClick={() =>
-                                                    getCA(
+                                                    getReimburse(
                                                         "",
                                                         "3",
                                                         "Need Revision"
@@ -4416,7 +3075,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <Button
                                                 className="w-36 bg-red-600 px-2 py-1 hover:bg-red-500"
                                                 onClick={() =>
-                                                    getCA("", "4", "Reject")
+                                                    getReimburse(
+                                                        "",
+                                                        "4",
+                                                        "Reject"
+                                                    )
                                                 }
                                             >
                                                 Reject
@@ -4465,7 +3128,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         />
                                         <TableTH
                                             className="border whitespace-nowrap"
-                                            label={"Reimburse"}
+                                            label={"Approve"}
                                             colSpan="3"
                                             rowSpan=""
                                         />
@@ -4521,7 +3184,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </tr>
                                     ) : (
                                         reimburse.data?.map(
-                                            (ca: any, i: number) => (
+                                            (dataReimburse: any, i: number) => (
                                                 <tr
                                                     key={i}
                                                     className={
@@ -4531,49 +3194,192 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     }
                                                 >
                                                     <TableTD
-                                                        value={i + 1 + "."}
+                                                        value={i + 1}
                                                         className="w-px"
                                                     />
                                                     <TableTD
                                                         value={
-                                                            ca.CASH_ADVANCE_NUMBER
+                                                            dataReimburse.REIMBURSE_NUMBER
                                                         }
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={dateFormat(
-                                                            ca.CASH_ADVANCE_REQUESTED_DATE,
+                                                            dataReimburse.REIMBURSE_REQUETED_DATE,
                                                             "dd-mm-yyyy"
                                                         )}
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={formatCurrency.format(
-                                                            ca.CASH_ADVANCE_TOTAL_AMOUNT
+                                                            dataReimburse.REIMBURSE_TOTAL_AMOUNT
                                                         )}
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={
-                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                            "-"
-                                                            // </span>
+                                                            <>
+                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
                                                         }
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={
-                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                            "-"
-                                                            // </span>
+                                                            <>
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    "" ||
+                                                                    (dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                        null && (
+                                                                        <span>
+                                                                            -
+                                                                        </span>
+                                                                    ))}
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    5 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Execute"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
                                                         }
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={
-                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                            "-"
-                                                            // </span>
+                                                            <>
+                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
+                                                                    "" ||
+                                                                    (dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
+                                                                        null && (
+                                                                        <span>
+                                                                            -
+                                                                        </span>
+                                                                    ))}
+                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
                                                         }
                                                         className=""
                                                     />
@@ -4581,6 +3387,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         value={
                                                             <Dropdown
                                                                 title="Actions"
+                                                                className="text-center"
                                                                 children={
                                                                     <>
                                                                         <a
@@ -4591,7 +3398,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleShowModal(
                                                                                     e,
-                                                                                    ca.CASH_ADVANCE_ID
+                                                                                    dataReimburse.REIMBURSE_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4605,7 +3412,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             ) =>
                                                                                 handleApproveModal(
                                                                                     e,
-                                                                                    ca.CASH_ADVANCE_ID
+                                                                                    dataReimburse.REIMBURSE_ID
                                                                                 )
                                                                             }
                                                                         >
@@ -4617,13 +3424,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             onClick={(
                                                                                 e
                                                                             ) =>
-                                                                                handleExecuteModal(
+                                                                                handleRevisedModal(
                                                                                     e,
-                                                                                    ca.CASH_ADVANCE_ID
+                                                                                    dataReimburse.REIMBURSE_ID
                                                                                 )
                                                                             }
                                                                         >
-                                                                            Execute
+                                                                            Revised
                                                                         </a>
                                                                         <a
                                                                             href=""
@@ -4631,118 +3438,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                             onClick={(
                                                                                 e
                                                                             ) =>
-                                                                                handleRevisedModal(
+                                                                                handleExecuteModal(
                                                                                     e,
-                                                                                    ca.CASH_ADVANCE_ID
+                                                                                    dataReimburse.REIMBURSE_ID
                                                                                 )
                                                                             }
                                                                         >
-                                                                            Revised
+                                                                            Execute
                                                                         </a>
-                                                                        {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                                            5 && (
-                                                                            <a
-                                                                                href=""
-                                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    handleAddCAReportModal(
-                                                                                        e,
-                                                                                        ca.CASH_ADVANCE_ID,
-                                                                                        ca.CASH_ADVANCE_USED_BY,
-                                                                                        ca.CASH_ADVANCE_FIRST_APPROVAL_BY,
-                                                                                        ca.CASH_ADVANCE_TOTAL_AMOUNT
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                Create
-                                                                                CA
-                                                                                Report
-                                                                            </a>
-                                                                        )}
-                                                                        {ca.cash_advance_report !==
-                                                                            null && (
-                                                                            <>
-                                                                                <a
-                                                                                    href=""
-                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleShowReportModal(
-                                                                                            e,
-                                                                                            ca
-                                                                                                .cash_advance_report
-                                                                                                ?.REPORT_CASH_ADVANCE_ID
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    Detail
-                                                                                    CA
-                                                                                    Report
-                                                                                </a>
-                                                                                <a
-                                                                                    href=""
-                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleApproveReportModal(
-                                                                                            e,
-                                                                                            ca
-                                                                                                .cash_advance_report
-                                                                                                ?.REPORT_CASH_ADVANCE_ID
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    Approve
-                                                                                    CA
-                                                                                    Report
-                                                                                </a>
-                                                                                <a
-                                                                                    href=""
-                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleRevisedReportModal(
-                                                                                            e,
-                                                                                            ca
-                                                                                                .cash_advance_report
-                                                                                                ?.REPORT_CASH_ADVANCE_ID
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    Revised
-                                                                                    CA
-                                                                                    Report
-                                                                                </a>
-                                                                                <a
-                                                                                    href=""
-                                                                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) =>
-                                                                                        handleExecuteReportModal(
-                                                                                            e,
-                                                                                            ca
-                                                                                                .cash_advance_report
-                                                                                                ?.REPORT_CASH_ADVANCE_ID
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    Execute
-                                                                                    CA
-                                                                                    Report
-                                                                                </a>
-                                                                            </>
-                                                                        )}
                                                                     </>
                                                                 }
                                                             />
                                                         }
-                                                        className="text-center"
                                                     />
                                                 </tr>
                                             )
@@ -4757,7 +3464,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             toData={reimburse.to}
                             totalData={reimburse.total}
                             clickHref={(url: string) =>
-                                getCA(url.split("?").pop())
+                                getReimburse(url.split("?").pop())
                             }
                         />
                     </div>

@@ -279,16 +279,6 @@ class CashAdvanceController extends Controller
 
     public function getCashAdvanceNumber()
     {
-        // if ($cash_advance_type == 1) {
-        //     $code = 'CA/';
-        //     $start_char = 10;
-        //     $start_char_2 = 3;
-        // } else {
-        //     $code = 'RMBS/';
-        //     $start_char = 12;
-        //     $start_char_2 = 5;
-        // }
-
         $code = 'PV/CA/';
         $start_char = 13;
         $start_char_2 = 6;

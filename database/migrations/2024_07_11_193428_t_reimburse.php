@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments('REIMBURSE_ID')->primary();
             $table->string('REIMBURSE_NUMBER')->nullable();
             $table->string('REIMBURSE_DIVISION')->nullable();
+            $table->string('REIMBURSE_OFFICE')->nullable();
             $table->smallInteger('REIMBURSE_USED_BY')->nullable();
             $table->smallInteger('REIMBURSE_REQUESTED_BY')->nullable();
             $table->dateTime('REIMBURSE_REQUESTED_DATE')->nullable();

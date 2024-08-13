@@ -1001,10 +1001,6 @@ export default function CashAdvance({ auth }: PageProps) {
             ...dataReportById.cash_advance_detail_report,
         ];
 
-        const report_cash_advance_detail_amount_approve_null = [
-            ...dataReportById.cash_advance_detail_report,
-        ];
-
         onchangeVal[i][name] = value;
 
         report_cash_advance_detail_amount_approve[i][
@@ -1014,24 +1010,25 @@ export default function CashAdvance({ auth }: PageProps) {
                 "REPORT_CASH_ADVANCE_DETAIL_AMOUNT"
             ];
 
-        // report_cash_advance_detail_amount_approve_null[i][
-        //     "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
-        // ] = 0;
-
-        if (onchangeVal === 1) {
+        if (onchangeVal[i][name] === 1) {
             setDataReportById({
                 ...dataReportById,
                 cash_advance_detail_report:
                     report_cash_advance_detail_amount_approve,
             });
         }
-        // else {
-        //     setDataReportById({
-        //         ...dataReportById,
-        //         cash_advance_detail_report:
-        //             report_cash_advance_detail_amount_approve_null,
-        //     });
-        // }
+
+        if (onchangeVal[i][name] === 2) {
+            setDataReportById({
+                ...dataReportById,
+                cash_advance_detail_report: [
+                    ...dataReportById.cash_advance_detail_report[i][
+                        "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
+                    ],
+                    0,
+                ],
+            });
+        }
 
         setDataReportById({
             ...dataReportById,
@@ -1274,6 +1271,7 @@ export default function CashAdvance({ auth }: PageProps) {
                     cash_advance_start_date: "",
                     cash_advance_end_date: "",
                     cash_advance_division: "",
+                    cash_advance_type: "",
                 });
                 // console.log(res);
             })
@@ -2145,7 +2143,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 CASH_ADVANCE_TRANSFER_AMOUNT: revised_total_amount,
             });
         }
-    }, [revised_total_amount]);
+    }, []);
 
     let revised_total_amount_report = 0;
 
@@ -2202,30 +2200,30 @@ export default function CashAdvance({ auth }: PageProps) {
         setCheckedCash(!checkedCash);
     };
 
-    // console.log("checkedCash", checkedCash)
-
     const [checkedTransferEdit, setCheckedTransferEdit] = useState(false);
     const handleCheckedTransferEdit = (e: any) => {
-        if (checkedTransferEdit === false) {
+        if (e.target.checked) {
+            setCheckedTransferEdit(e.target.checked);
+        } else {
+            setCheckedTransferEdit(e.target.checked);
             setDataById({
                 ...dataById,
                 CASH_ADVANCE_TRANSFER_AMOUNT: 0,
             });
         }
-        setCheckedTransferEdit(!checkedTransferEdit);
     };
-
-    // console.log("checkedTransferEdit", checkedTransferEdit);
 
     const [checkedCashEdit, setCheckedCashEdit] = useState(false);
     const handleCheckedCashEdit = (e: any) => {
-        if (checkedCashEdit === false) {
+        if (e.target.checked) {
+            setCheckedCashEdit(e.target.checked);
+        } else {
+            setCheckedCashEdit(e.target.checked);
             setDataById({
                 ...dataById,
                 CASH_ADVANCE_CASH_AMOUNT: 0,
             });
         }
-        setCheckedCashEdit(!checkedCashEdit);
     };
 
     // console.log("checkedCashEdit", checkedCashEdit);
@@ -4151,7 +4149,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     handleCheckedTransferEdit(e)
                                                 }
-                                                required
                                             />
                                         </div>
                                         <div className="flex w-full gap-4">
@@ -4183,9 +4180,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 autoComplete="off"
                                                 disabled={
                                                     dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                    0
-                                                        ? checkedTransferEdit
-                                                        : !checkedTransferEdit
+                                                        0 ===
+                                                        false &&
+                                                    !checkedTransferEdit
                                                 }
                                             />
                                             <TextInput
@@ -4252,10 +4249,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById?.CASH_ADVANCE_CASH_AMOUNT >
-                                                    0
-                                                        ? checkedCashEdit
-                                                        : !checkedCashEdit
+                                                    dataById.CASH_ADVANCE_CASH_AMOUNT >
+                                                        0 ===
+                                                        false &&
+                                                    !checkedCashEdit
                                                 }
                                             />
                                         </div>
@@ -5112,7 +5109,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 onChange={(e) =>
                                                     handleCheckedTransferEdit(e)
                                                 }
-                                                required
                                             />
                                         </div>
                                         <div className="flex w-full gap-4">
@@ -5144,9 +5140,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 autoComplete="off"
                                                 disabled={
                                                     dataById?.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                    0
-                                                        ? checkedTransferEdit
-                                                        : !checkedTransferEdit
+                                                        0 ===
+                                                        false &&
+                                                    !checkedTransferEdit
                                                 }
                                             />
                                             <TextInput
@@ -5212,7 +5208,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 placeholder="0.00"
                                                 autoComplete="off"
-                                                disabled={!checkedCashEdit}
+                                                disabled={
+                                                    dataById?.CASH_ADVANCE_CASH_AMOUNT >
+                                                        0 ===
+                                                        false &&
+                                                    !checkedCashEdit
+                                                }
                                             />
                                         </div>
                                     </div>
@@ -5768,9 +5769,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 autoComplete="off"
                                                 disabled={
                                                     dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                    0
-                                                        ? checkedTransferEdit
-                                                        : !checkedTransferEdit
+                                                        0 ===
+                                                        false &&
+                                                    !checkedTransferEdit
                                                 }
                                             />
                                             <TextInput
@@ -5788,70 +5789,76 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </div>
                                     </div>
                                     {dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                        0 && (
-                                        <div className="ml-7">
-                                            <div className="mb-5">
-                                                <InputLabel
-                                                    htmlFor="cash_advance_transfer_date"
-                                                    className="mb-2"
-                                                >
-                                                    Transfer Date
-                                                    {/* <span className="text-red-600">*</span> */}
-                                                </InputLabel>
-                                                <DatePicker
-                                                    name="CASH_ADVANCE_TRANSFER_DATE"
-                                                    selected={
-                                                        dataById.CASH_ADVANCE_TRANSFER_DATE
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            CASH_ADVANCE_TRANSFER_DATE:
-                                                                date.toLocaleDateString(
-                                                                    "en-CA"
-                                                                ),
-                                                        })
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                />
+                                        0 ===
+                                        false ||
+                                        (!checkedTransferEdit && (
+                                            <div className="ml-7">
+                                                <div className="mb-5">
+                                                    <InputLabel
+                                                        htmlFor="cash_advance_transfer_date"
+                                                        className="mb-2"
+                                                    >
+                                                        Transfer Date
+                                                        {/* <span className="text-red-600">*</span> */}
+                                                    </InputLabel>
+                                                    <DatePicker
+                                                        name="CASH_ADVANCE_TRANSFER_DATE"
+                                                        selected={
+                                                            dataById.CASH_ADVANCE_TRANSFER_DATE
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            setDataById({
+                                                                ...dataById,
+                                                                CASH_ADVANCE_TRANSFER_DATE:
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                            })
+                                                        }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                    />
+                                                </div>
+                                                <div className="mb-5">
+                                                    <InputLabel
+                                                        htmlFor="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                        className="mb-2"
+                                                    >
+                                                        From Bank Account
+                                                        {/* <span className="text-red-600">*</span> */}
+                                                    </InputLabel>
+                                                    <select
+                                                        name="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                        id="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                        className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                        onChange={(e) =>
+                                                            setDataById({
+                                                                ...dataById,
+                                                                CASH_ADVANCE_FROM_BANK_ACCOUNT:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                    >
+                                                        <option value="">
+                                                            -- Choose Bank
+                                                            Account --
+                                                        </option>
+                                                        <option value="Bank 1">
+                                                            Bank 1
+                                                        </option>
+                                                        <option value="Bank 2">
+                                                            Bank 2
+                                                        </option>
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <div className="mb-5">
-                                                <InputLabel
-                                                    htmlFor="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                    className="mb-2"
-                                                >
-                                                    From Bank Account
-                                                    {/* <span className="text-red-600">*</span> */}
-                                                </InputLabel>
-                                                <select
-                                                    name="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                    id="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                    className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    onChange={(e) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            CASH_ADVANCE_FROM_BANK_ACCOUNT:
-                                                                e.target.value,
-                                                        })
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Bank Account
-                                                        --
-                                                    </option>
-                                                    <option value="Bank 1">
-                                                        Bank 1
-                                                    </option>
-                                                    <option value="Bank 2">
-                                                        Bank 2
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    )}
+                                        ))}
+
                                     <div className="relative flex items-start">
                                         <div className="flex h-9 items-center">
                                             <input
@@ -5899,68 +5906,78 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 placeholder="0.00"
                                                 autoComplete="off"
-                                                disabled={!checkedCashEdit}
+                                                disabled={
+                                                    dataById.CASH_ADVANCE_CASH_AMOUNT >
+                                                        0 ===
+                                                        false &&
+                                                    !checkedCashEdit
+                                                }
                                             />
                                         </div>
                                     </div>
-                                    {checkedCashEdit && (
-                                        <div className="ml-7">
-                                            <div className="mb-5">
-                                                <InputLabel
-                                                    htmlFor="CASH_ADVANCE_RECEIVE_DATE"
-                                                    className="mb-2"
-                                                >
-                                                    Receive Date
-                                                    {/* <span className="text-red-600">*</span> */}
-                                                </InputLabel>
-                                                <DatePicker
-                                                    name="CASH_ADVANCE_RECEIVE_DATE"
-                                                    selected={
-                                                        dataById.CASH_ADVANCE_RECEIVE_DATE
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            CASH_ADVANCE_RECEIVE_DATE:
-                                                                date.toLocaleDateString(
-                                                                    "en-CA"
-                                                                ),
-                                                        })
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                />
+                                    {dataById?.CASH_ADVANCE_CASH_AMOUNT > 0 ===
+                                        false ||
+                                        (!checkedCashEdit && (
+                                            <div className="ml-7">
+                                                <div className="mb-5">
+                                                    <InputLabel
+                                                        htmlFor="CASH_ADVANCE_RECEIVE_DATE"
+                                                        className="mb-2"
+                                                    >
+                                                        Receive Date
+                                                        {/* <span className="text-red-600">*</span> */}
+                                                    </InputLabel>
+                                                    <DatePicker
+                                                        name="CASH_ADVANCE_RECEIVE_DATE"
+                                                        selected={
+                                                            dataById.CASH_ADVANCE_RECEIVE_DATE
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            setDataById({
+                                                                ...dataById,
+                                                                CASH_ADVANCE_RECEIVE_DATE:
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                            })
+                                                        }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                    />
+                                                </div>
+                                                <div className="mb-2">
+                                                    <InputLabel
+                                                        htmlFor="receive_name"
+                                                        className="mb-2"
+                                                    >
+                                                        Receive Name
+                                                        {/* <span className="text-red-600">*</span> */}
+                                                    </InputLabel>
+                                                    <TextInput
+                                                        id="CASH_ADVANCE_RECEIVE_NAME"
+                                                        type="text"
+                                                        name="CASH_ADVANCE_RECEIVE_NAME"
+                                                        value={
+                                                            dataById.CASH_ADVANCE_RECEIVE_NAME
+                                                        }
+                                                        className="w-full lg:w-7/12"
+                                                        onChange={(e) =>
+                                                            setDataById({
+                                                                ...dataById,
+                                                                CASH_ADVANCE_RECEIVE_NAME:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                        autoComplete="off"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="mb-2">
-                                                <InputLabel
-                                                    htmlFor="receive_name"
-                                                    className="mb-2"
-                                                >
-                                                    Receive Name
-                                                    {/* <span className="text-red-600">*</span> */}
-                                                </InputLabel>
-                                                <TextInput
-                                                    id="CASH_ADVANCE_RECEIVE_NAME"
-                                                    type="text"
-                                                    name="CASH_ADVANCE_RECEIVE_NAME"
-                                                    value={
-                                                        dataById.CASH_ADVANCE_RECEIVE_NAME
-                                                    }
-                                                    className="w-full lg:w-7/12"
-                                                    onChange={(e) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            CASH_ADVANCE_RECEIVE_NAME:
-                                                                e.target.value,
-                                                        })
-                                                    }
-                                                    autoComplete="off"
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
+                                        ))}
                                 </div>
                             </fieldset>
                         </div>
@@ -7620,21 +7637,24 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="border px-3 py-2"
                                             rowSpan={2}
                                         />
-                                        <TH
-                                            label="Approval"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Cost Classification"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Amount Approve"
-                                            className="border"
-                                            rowSpan="2"
-                                        />
+                                        <TH className="border" rowSpan="2">
+                                            Approval
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border" rowSpan="2">
+                                            Cost Classification
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border" rowSpan="2">
+                                            Amount Approve
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
                                         <TH
                                             label="Remarks"
                                             className="border"
@@ -7758,7 +7778,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <select
                                                         id="REPORT_CASH_ADVANCE_DETAIL_APPROVAL"
                                                         name="REPORT_CASH_ADVANCE_DETAIL_APPROVAL"
-                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                        className="block w-56 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                         onChange={(e) =>
                                                             handleChangeApprovalReport(
                                                                 e,
@@ -7797,8 +7817,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <Select
                                                         classNames={{
                                                             menuButton: () =>
-                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                `flex w-96 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute text-left z-20 w-96 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                             listItem: ({
                                                                 isSelected,
                                                             }: any) =>

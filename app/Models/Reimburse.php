@@ -21,9 +21,10 @@ class Reimburse extends Model
 
     protected $with = [
         'reimburse_detail',
-        'user',
-        'user_used_by',
-        'user_approval',
+        'office',
+        'person',
+        'person_used_by',
+        'person_approval',
         'approval_status'
     ];
 
@@ -31,24 +32,44 @@ class Reimburse extends Model
     {
         return $this->hasMany(ReimburseDetail::class, 'REIMBURSE_ID');
     }
+
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(TRelationOffice::class, 'REIMBURSE_OFFICE');
+    }
+
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REIMBURSE_REQUESTED_BY');
+    }
+
+    public function person_used_by(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REIMBURSE_USED_BY');
+    }
+
+    public function person_approval(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REIMBURSE_FIRST_APPROVAL_BY');
+    }
     
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'REIMBURSE_REQUESTED_BY');
-    }
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class, 'REIMBURSE_REQUESTED_BY');
+    // }
 
-    public function user_used_by(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'REIMBURSE_USED_BY');
-    }
+    // public function user_used_by(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class, 'REIMBURSE_USED_BY');
+    // }
 
-    public function user_approval(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'REIMBURSE_FIRST_APPROVAL_BY');
-    }
+    // public function user_approval(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class, 'REIMBURSE_FIRST_APPROVAL_BY');
+    // }
 
     public function approval_status(): BelongsTo
     {
-        return $this->belongsTo(CashAdvanceStatus::class, 'REIMBURSE_FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
+        return $this->belongsTo(CashAdvanceStatus::class, 'REIMBURSE_FIRST_APPROVAL_STATUS', 'CASH_ADVANCE_STATUS_ID');
     }
 }
