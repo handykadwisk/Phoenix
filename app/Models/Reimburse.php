@@ -35,7 +35,7 @@ class Reimburse extends Model
 
     public function office(): BelongsTo
     {
-        return $this->belongsTo(TRelationOffice::class, 'REIMBURSE_OFFICE');
+        return $this->belongsTo(TRelationOffice::class, 'REIMBURSE_BRANCH');
     }
 
     public function person(): BelongsTo

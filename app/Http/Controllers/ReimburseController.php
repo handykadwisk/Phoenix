@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashAdvanceCostClassification;
 use App\Models\COA;
 use App\Models\Reimburse;
 use App\Models\ReimburseDetail;
 use App\Models\Document;
 use App\Models\MReimburseDocument;
+use App\Models\RCashAdvanceApproval;
 use App\Models\Relation;
 use App\Models\TDocument;
 use App\Models\TPerson;
@@ -108,6 +110,61 @@ class ReimburseController extends Controller
         return response()->json($data);
     }
 
+    public function getCountReimburseRequestStatus()
+    {
+        $data = Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 1)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountReimburseApprove1Status()
+    {
+        $data = Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountReimburseApprove2Status()
+    {
+        $data = Reimburse::where('REIMBURSE_SECOND_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountReimburseApprove3Status()
+    {
+        $data = Reimburse::where('REIMBURSE_THIRD_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountReimburseNeedRevisionStatus()
+    {
+        $data = Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 3)
+                            ->orWhere('REIMBURSE_SECOND_APPROVAL_STATUS', 3)
+                            ->orWhere('REIMBURSE_THIRD_APPROVAL_STATUS', 3)
+                            ->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountReimburseRejectStatus()
+    {
+        $data = Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 4)
+                            ->orWhere('REIMBURSE_SECOND_APPROVAL_STATUS', 4)
+                            ->orWhere('REIMBURSE_THIRD_APPROVAL_STATUS', 4)
+                            ->count();
+
+        return response()->json($data);
+    }
+
+    public function getReimburseApproval()
+    {
+        $data = RCashAdvanceApproval::all();
+
+        return response()->json($data);
+    }
+
     public function index() 
     {
         $data = [
@@ -194,19 +251,21 @@ class ReimburseController extends Controller
         return $reimburse_number;
     }
 
-    public function download($reimburse_detail_id)
+    public function download($reimburse_detail_id, $document_id)
     {
-        $ReimburseDetail = ReimburseDetail::find($reimburse_detail_id);
-        
-        // $filePath = public_path('/storage/documents/CA/0/11/11-List-Asuransi--2-Unit-Dumptruck.pdf');
-        $filePath = public_path('/storage/documents/CA/0/' . $reimburse_detail_id . '/'. $ReimburseDetail->document->DOCUMENT_FILENAME);
-        
+        $document = TDocument::find($document_id);
+
+        $document_filename = $reimburse_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = public_path('/storage' . '/'. $document_dirname . '/' . $document_filename);
+
         $headers = [
-            'filename' => $ReimburseDetail->document->DOCUMENT_FILENAME
+            'filename' => $document_filename
         ];
 
         if (file_exists($filePath)) {
-            return response()->download($filePath, $ReimburseDetail->document->DOCUMENT_FILENAME, $headers);
+            return response()->download($filePath, $document_filename, $headers);
         } else {
             abort(404, 'File not found');
         }
@@ -214,6 +273,7 @@ class ReimburseController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->file('ReimburseDetail'));
         $user_id = Auth::user()->id;
         $person = TPerson::find($request->reimburse_first_approval_by['value']);
 
@@ -227,7 +287,7 @@ class ReimburseController extends Controller
         $reimburse_used_by = $request->reimburse_used_by['value'];
         $reimburse_requested_by = $user_id;
         $reimburse_division = 'IT';
-        $reimburse_office = $request->reimburse_office['value'];
+        $reimburse_branch = $request->reimburse_branch['value'];
         $reimburse_requested_date = now();
         $reimburse_first_approval_by = $request->reimburse_first_approval_by['value'];
         $reimburse_first_approval_user = $person->PERSON_FIRST_NAME;
@@ -247,7 +307,7 @@ class ReimburseController extends Controller
             'REIMBURSE_USED_BY' => $reimburse_used_by,
             'REIMBURSE_REQUESTED_BY' => $reimburse_requested_by,
             'REIMBURSE_DIVISION' => $reimburse_division,
-            'REIMBURSE_OFFICE' => $reimburse_office,
+            'REIMBURSE_BRANCH' => $reimburse_branch,
             'REIMBURSE_REQUESTED_DATE' => $reimburse_requested_date,
             'REIMBURSE_FIRST_APPROVAL_BY' => $reimburse_first_approval_by,
             'REIMBURSE_FIRST_APPROVAL_USER' => $reimburse_first_approval_user,
@@ -300,46 +360,49 @@ class ReimburseController extends Controller
             // Start process file upload
             $files = $request->file('ReimburseDetail');
             if (is_array($files) && !empty($files)) {
-                foreach ($rd['reimburse_detail_document'] as $file) {
-                    $parentDir = ((floor(($reimburse_detail_id) / 1000)) * 1000) . '/';
-                    $CAId = $reimburse_detail_id . '/';
-                    $typeDir = '';
-                    $uploadPath = 'documents/' . 'Reimburse/'. $parentDir . $CAId . $typeDir;
-
-                    $userId = Auth::user()->id;
-
-                    $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
-                    $documentFileName =  $reimburse_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
-                    $documentDirName =  $uploadPath;
-                    $documentFileType = $file->getMimeType();
-                    $documentFileSize = $file->getSize();
-
-                    Storage::makeDirectory($uploadPath, 0777, true, true);
-                    Storage::disk('public')->putFileAs($uploadPath, $file, $reimburse_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
-
-                    $document = TDocument::create([
-                        'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
-                        'DOCUMENT_FILENAME'               => $documentFileName,
-                        'DOCUMENT_DIRNAME'                => $documentDirName,
-                        'DOCUMENT_FILETYPE'               => $documentFileType,
-                        'DOCUMENT_FILESIZE'               => $documentFileSize,
-                        'DOCUMENT_CREATED_BY'             => $userId
-                    ])->DOCUMENT_ID;
-
-                    if($document){
-                        Document::where('DOCUMENT_ID', $document)->update([
-                            'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
-                        ]);
+                if (isset($rd['reimburse_detail_document'])) {
+                    foreach ($rd['reimburse_detail_document'] as $file) {
+                        $parentDir = ((floor(($reimburse_detail_id) / 1000)) * 1000) . '/';
+                        $CAId = $reimburse_detail_id . '/';
+                        $typeDir = '';
+                        $uploadPath = 'documents/' . 'Reimburse/'. $parentDir . $CAId . $typeDir;
+    
+                        $userId = Auth::user()->id;
+    
+                        $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
+                        $documentFileName =  $reimburse_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
+                        $documentDirName =  $uploadPath;
+                        $documentFileType = $file->getMimeType();
+                        $documentFileSize = $file->getSize();
+    
+                        Storage::makeDirectory($uploadPath, 0777, true, true);
+                        Storage::disk('public')->putFileAs($uploadPath, $file, $reimburse_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
+    
+                        $document = TDocument::create([
+                            'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
+                            'DOCUMENT_FILENAME'               => $documentFileName,
+                            'DOCUMENT_DIRNAME'                => $documentDirName,
+                            'DOCUMENT_FILETYPE'               => $documentFileType,
+                            'DOCUMENT_FILESIZE'               => $documentFileSize,
+                            'DOCUMENT_CREATED_BY'             => $userId
+                        ])->DOCUMENT_ID;
+    
+                        if($document){
+                            Document::where('DOCUMENT_ID', $document)->update([
+                                'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                            ]);
+                        }
+    
+                        if ($document) {
+                            MReimburseDocument::create([
+                                'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_ID' => $reimburse_detail_id,
+                                'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_DOCUMENT_ID' => $document,
+                                'REIMBURSE_DOCUMENT_CREATED_AT' => now(),
+                                'REIMBURSE_DOCUMENT_CREATED_BY' => $userId,
+                            ]);
+                        }
                     }
-
-                    if ($document) {
-                        MReimburseDocument::create([
-                            'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_ID' => $reimburse_detail_id,
-                            'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_DOCUMENT_ID' => $document,
-                            'REIMBURSE_DOCUMENT_CREATED_AT' => now(),
-                            'REIMBURSE_DOCUMENT_CREATED_BY' => $userId,
-                        ]);
-                    }
+                    
                 }
             }
             // End process file upload
@@ -365,13 +428,42 @@ class ReimburseController extends Controller
 
     public function approve(Request $request)
     {
+        $reimburse_detail = $request->reimburse_detail;
+
+        $total_amount_approve = 0;
+
+        if (is_array($reimburse_detail) && !empty($reimburse_detail)) {
+            foreach ($request->reimburse_detail as $value) {
+                $total_amount_approve += $value['REIMBURSE_DETAIL_AMOUNT_APPROVE'];
+            }
+        }
+
+        $reimburse_total_amount_different = $request->REIMBURSE_TOTAL_AMOUNT - $total_amount_approve;
+
+        if ($reimburse_total_amount_different > 0) {
+            $type = 1;
+        } else if ($reimburse_total_amount_different < 0) {
+            $type = 2;
+        } else {
+            $type = 3;
+        }
+
         $reimburse_id = $request->REIMBURSE_ID;
         $reimburse_first_approval_change_status_date = date('Y-m-d H:i:s');
         $reimburse_first_approval_status = $request->REIMBURSE_FIRST_APPROVAL_STATUS;
+        $reimburse_type = $type;
+        // $reimburse_amount = $request->REIMBURSE_AMOUNT;
+        $reimburse_total_amount = $request->REIMBURSE_TOTAL_AMOUNT;
+        $reimburse_total_amount_approve = $total_amount_approve;
 
         Reimburse::where('REIMBURSE_ID', $reimburse_id)->update([
             'REIMBURSE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $reimburse_first_approval_change_status_date,
-            'REIMBURSE_FIRST_APPROVAL_STATUS' => $reimburse_first_approval_status
+            'REIMBURSE_FIRST_APPROVAL_STATUS' => $reimburse_first_approval_status,
+            'REIMBURSE_TYPE' => $reimburse_type,
+            // 'REIMBURSE_AMOUNT' => $reimburse_amount,
+            'REIMBURSE_TOTAL_AMOUNT' => $reimburse_total_amount,
+            'REIMBURSE_TOTAL_AMOUNT_APPROVE' => $reimburse_total_amount_approve,
+            'REIMBURSE_TOTAL_AMOUNT_DIFFERENT' => $reimburse_total_amount_different,
         ]);
 
         // Created Log CA
@@ -385,26 +477,32 @@ class ReimburseController extends Controller
             'action_by'  => Auth::user()->email
         ]);
 
-        foreach ($request->reimburse_detail as $cad) {
-            $reimburse_detail_id = $cad['REIMBURSE_DETAIL_ID'];
-            $reimburse_detail_status = $cad['REIMBURSE_DETAIL_STATUS'];
-            $reimburse_detail_note = $cad['REIMBURSE_DETAIL_NOTE'];
+        if (is_array($reimburse_detail) && !empty($reimburse_detail)) {
+            foreach ($reimburse_detail as $cad) {
+                $reimburse_detail_id = $cad['REIMBURSE_DETAIL_ID'];
+                $reimburse_detail_approval = $cad['REIMBURSE_DETAIL_APPROVAL'];
+                $reimburse_detail_cost_classification = $cad['REIMBURSE_DETAIL_COST_CLASSIFICATION']['value'];
+                $reimburse_detail_amount_approve = $cad['REIMBURSE_DETAIL_AMOUNT_APPROVE'];
+                $reimburse_detail_remarks = $cad['REIMBURSE_DETAIL_REMARKS'];
 
-            ReimburseDetail::where('REIMBURSE_DETAIL_ID', $reimburse_detail_id)->update([
-                'REIMBURSE_DETAIL_STATUS' => $reimburse_detail_status,
-                'REIMBURSE_DETAIL_NOTE' => $reimburse_detail_note
-            ]);
+                ReimburseDetail::where('REIMBURSE_DETAIL_ID', $reimburse_detail_id)->update([
+                    'REIMBURSE_DETAIL_APPROVAL' => $reimburse_detail_approval,
+                    'REIMBURSE_DETAIL_COST_CLASSIFICATION' => $reimburse_detail_cost_classification,
+                    'REIMBURSE_DETAIL_AMOUNT_APPROVE' => $reimburse_detail_amount_approve,
+                    'REIMBURSE_DETAIL_REMARKS' => $reimburse_detail_remarks
+                ]);
 
-            // Created Log CA Detail
-            UserLog::create([
-                'created_by' => Auth::user()->id,
-                'action'     => json_encode([
-                    "description" => "Approve (Reimburse Detail).",
-                    "module"      => "Reimburse",
-                    "id"          => $reimburse_detail_id
-                ]),
-                'action_by'  => Auth::user()->email
-            ]);
+                // Created Log CA Detail
+                UserLog::create([
+                    'created_by' => Auth::user()->id,
+                    'action'     => json_encode([
+                        "description" => "Approve (Reimburse).",
+                        "module"      => "Reimburse",
+                        "id"          => $reimburse_detail_id
+                    ]),
+                    'action_by'  => Auth::user()->email
+                ]);
+            }
         }
 
         return new JsonResponse([

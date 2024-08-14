@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReimburseDetail extends Model
 {
@@ -16,16 +17,16 @@ class ReimburseDetail extends Model
 
     protected $guarded = ['REIMBURSE_DETAIL_ID'];
 
-    protected $with = ['document','relation_organization'];
+    protected $with = ['m_reimburse_document','relation_organization'];
 
     public function reimburse(): BelongsTo
     {
         return $this->belongsTo(Reimburse::class);
     }
 
-    public function document(): BelongsTo
+    public function m_reimburse_document(): HasMany
     {
-        return $this->belongsTo(Document::class, 'REIMBURSE_DETAIL_DOCUMENT_ID');
+        return $this->hasMany(MReimburseDocument::class, 'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_ID');
     }
 
     public function relation_organization(): BelongsTo

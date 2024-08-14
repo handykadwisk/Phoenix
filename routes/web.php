@@ -203,15 +203,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/cashAdvanceReportDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_download'])->name('cashAdvanceReport.download');
     Route::get('/cashAdvanceReportProofOfDocumentDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_download'])->name('cashAdvanceReportProofOfDocument.download');
 
+    // Get Count Reimburse Status
+    Route::get('/getCountReimburseRequestStatus', [ReimburseController::class, 'getCountReimburseRequestStatus'])->name('getCountReimburseRequestStatus');
+    Route::get('/getCountReimburseApprove1Status', [ReimburseController::class, 'getCountReimburseApprove1Status'])->name('getCountReimburseApprove1Status');
+    Route::get('/getCountReimburseApprove2Status', [ReimburseController::class, 'getCountReimburseApprove2Status'])->name('getCountReimburseApprove2Status');
+    Route::get('/getCountReimburseApprove3Status', [ReimburseController::class, 'getCountReimburseApprove3Status'])->name('getCountReimburseApprove3Status');
+    Route::get('/getCountReimburseNeedRevisionStatus', [ReimburseController::class, 'getCountReimburseNeedRevisionStatus'])->name('getCountReimburseNeedRevisionStatus');
+    Route::get('/getCountReimburseRejectStatus', [ReimburseController::class, 'getCountReimburseRejectStatus'])->name('getCountReimburseRejectStatus');
+    Route::get('/getCountReimburseComplitedStatus', [ReimburseController::class, 'getCountReimburseComplitedStatus'])->name('getCountReimburseComplitedStatus');
+
     // Reimburse
     Route::post('/getReimburse', [ReimburseController::class, 'getReimburse'])->name('cashAdvance.getReimburse');
     Route::get('/getReimburseNumber', [ReimburseController::class, 'getReimburseNumber'])->name('getReimburseNumber');
     Route::get('/getReimburseById/{id}', [ReimburseController::class, 'getReimburseById'])->name('getReimburseById');
+    Route::get('/getReimburseApproval', [ReimburseController::class, 'getReimburseApproval'])->name('getReimburseApproval');
     Route::get('/reimburse', [ReimburseController::class, 'index'])->name('reimburse');
     Route::post('/reimburse', [ReimburseController::class, 'store'])->name('reimburse.store');
     Route::patch('/reimburseApprove/{id}', [ReimburseController::class, 'approve'])->name('reimburse.approve');
     Route::patch('/reimburseRevised/{id}', [ReimburseController::class, 'revised'])->name('reimburse.revised');
-    Route::get('/reimburseDownload/{id}', [ReimburseController::class, 'download'])->name('reimburse.download');
+    Route::get('/reimburseDownload/{id}/{key}', [ReimburseController::class, 'download'])->name('reimburse.download');
 
     // Other Expenses
     Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');

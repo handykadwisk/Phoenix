@@ -405,7 +405,7 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path13)
         );
 
-        $file_path14 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_cost_classification.sql');
+        $file_path14 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_approval.sql');
 
         DB::unprepared(
             file_get_contents($file_path14)
