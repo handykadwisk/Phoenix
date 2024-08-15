@@ -51,6 +51,7 @@ import AddressPerson from "./AddressPerson";
 import DetailPersonAddress from "./DetailPersonAddress";
 import DatePicker from "react-datepicker";
 import DetailBankAccount from "./DetailBankAccount";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function DetailPerson({
     idPerson,
@@ -72,6 +73,10 @@ export default function DetailPerson({
     const [file, setFile] = useState<any>();
     const [fileNew, setFileNew] = useState<any>();
     const [wilayah, setWilayah] = useState<any>([]);
+    // for switch baa
+    const [switchPageBAA, setSwitchPageBAA] = useState(false);
+    // for switch vip
+    const [switchPageVIP, setSwitchPageVIP] = useState(false);
     useEffect(() => {
         getPersonDetail(idPerson);
     }, [idPerson]);
@@ -238,6 +243,8 @@ export default function DetailPerson({
         PERSON_KTP: "",
         PERSON_NPWP: "",
         PERSON_KK: "",
+        PERSON_IS_BAA: "",
+        PERSON_IS_VIP: "",
         PERSON_BLOOD_TYPE: "",
         PERSON_BLOOD_RHESUS: "",
         PERSON_MARITAL_STATUS: "",
@@ -393,27 +400,12 @@ export default function DetailPerson({
                 }
             )
             .then((res) => {
-                Swal.fire({
-                    title: "Success",
-                    text: "Images Change",
-                    icon: "success",
-                }).then((result: any) => {
-                    // console.log(result);
-                    if (result.value) {
-                        setFile();
-                        getPersonDetail(res.data[0]);
-                        // getPersons();
-                        // setGetDetailRelation(message);
-                        // setModal({
-                        //     add: false,
-                        //     delete: false,
-                        //     edit: false,
-                        //     view: true,
-                        //     document: false,
-                        //     search: false,
-                        // });
-                    }
-                });
+                setIsSuccess(res.data[1]);
+                setFile(null);
+                getPersonDetail(res.data[0]);
+                setTimeout(() => {
+                    setIsSuccess("");
+                }, 5000);
             })
             .catch((err) => {
                 console.log(err);
@@ -432,6 +424,16 @@ export default function DetailPerson({
 
     const handleEditPerson = async (e: FormEvent) => {
         setEditPerson(detailPerson);
+        if (detailPerson.PERSON_IS_BAA == "1") {
+            setSwitchPageBAA(true);
+        } else {
+            setSwitchPageBAA(false);
+        }
+        if (detailPerson.PERSON_IS_VIP == "1") {
+            setSwitchPageVIP(true);
+        } else {
+            setSwitchPageVIP(false);
+        }
         setModal({
             add: false,
             delete: false,
@@ -440,6 +442,26 @@ export default function DetailPerson({
             document: false,
             search: false,
         });
+    };
+
+    const handleCheckboxEditBAA = (e: any) => {
+        if (e == true) {
+            setSwitchPageBAA(true);
+            setEditPerson({ ...editPerson, PERSON_IS_BAA: "1" });
+        } else {
+            setSwitchPageBAA(false);
+            setEditPerson({ ...editPerson, PERSON_IS_BAA: "0" });
+        }
+    };
+
+    const handleCheckboxEditVIP = (e: any) => {
+        if (e == true) {
+            setSwitchPageVIP(true);
+            setEditPerson({ ...editPerson, PERSON_IS_VIP: "1" });
+        } else {
+            setSwitchPageVIP(false);
+            setEditPerson({ ...editPerson, PERSON_IS_VIP: "0" });
+        }
     };
 
     const handleEmployment = async (e: FormEvent) => {
@@ -585,26 +607,11 @@ export default function DetailPerson({
     const handleSuccessEditPerson = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Edited",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message[0]);
-                    // getPersons();
-                    // setGetDetailRelation(message);
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            setIsSuccess(message[1]);
+            getPersonDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -723,55 +730,25 @@ export default function DetailPerson({
     };
 
     const handleSuccessStructure = (message: string) => {
-        // setIsSuccess("");
+        setIsSuccess("");
         if (message[1] === "add") {
+            setIsSuccess(message[2]);
             setDataStructure({
                 PERSON_ID: idPerson,
                 STRUCTURE_ID: "",
                 DIVISION_ID: "",
                 OFFICE_ID: "",
             });
-            Swal.fire({
-                title: "Success",
-                text: "Structure & Division Added",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message[0]);
-                    // getPersons();
-                    // setGetDetailRelation(message);
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            getPersonDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         } else {
-            Swal.fire({
-                title: "Success",
-                text: "Structure & Division Edited",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message[0]);
-                    // getPersons();
-                    // setGetDetailRelation(message);
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            setIsSuccess("Person Structure Edited");
+            getPersonDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -832,10 +809,16 @@ export default function DetailPerson({
         });
     };
 
-    // console.log("bbb", editPerson);
-
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* <ModalToAction
                 show={modal.view}
                 onClose={() =>
@@ -1255,6 +1238,57 @@ export default function DetailPerson({
                                     />
                                 </div>
                             </div>
+                            <div
+                                className="grid grid-cols-2 gap-2"
+                                title="BAA (Business Acquisition Assistant)"
+                            >
+                                <div className="mt-4 ">
+                                    <ul role="list" className="">
+                                        <li className="col-span-1 flex rounded-md shadow-sm">
+                                            <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
+                                                <span className="mt-1 ml-2">
+                                                    <Switch
+                                                        enabled={switchPageBAA}
+                                                        onChangeButton={(
+                                                            e: any
+                                                        ) =>
+                                                            handleCheckboxEditBAA(
+                                                                e
+                                                            )
+                                                        }
+                                                    />
+                                                </span>
+                                                <span className="ml-2 text-sm">
+                                                    PERSON IS BAA
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="mt-4 ">
+                                    <ul role="list" className="">
+                                        <li className="col-span-1 flex rounded-md shadow-sm">
+                                            <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
+                                                <span className="mt-1 ml-2">
+                                                    <Switch
+                                                        enabled={switchPageVIP}
+                                                        onChangeButton={(
+                                                            e: any
+                                                        ) =>
+                                                            handleCheckboxEditVIP(
+                                                                e
+                                                            )
+                                                        }
+                                                    />
+                                                </span>
+                                                <span className="ml-2 text-sm">
+                                                    PERSON IS VIP
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                             <div className="mt-6">
                                 <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
                                     <thead className="border-slate-300 bg-slate-300">
@@ -1551,6 +1585,7 @@ export default function DetailPerson({
             {/* End Edit Person */}
             {/* Empolyment add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() => {
                     setModal({
@@ -2022,6 +2057,7 @@ export default function DetailPerson({
 
             {/* Edit Structure and Division */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalStructure.edit}
                 onClose={() => {
                     setModalStructure({
@@ -2194,7 +2230,21 @@ export default function DetailPerson({
                 {/* Profile and information */}
                 <div className="xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-3 lg:gap-4">
                     <div className="bg-white p-4 shadow-md rounded-md">
-                        <div className="flex justify-end">
+                        <div
+                            className={
+                                detailPerson.PERSON_IS_VIP === 1
+                                    ? "flex justify-between items-center"
+                                    : "flex justify-end"
+                            }
+                        >
+                            {/* label vip */}
+                            {detailPerson.PERSON_IS_VIP === 1 ? (
+                                <>
+                                    <div className="bg-amber-600 w-fit font-semibold text-sm text-white px-2 rounded-md">
+                                        <span>VIP</span>
+                                    </div>
+                                </>
+                            ) : null}
                             {/* button save gambar */}
                             {file ? (
                                 <div

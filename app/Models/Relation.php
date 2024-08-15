@@ -57,4 +57,12 @@ class Relation extends Model
     public function MRelationBaa(){
         return $this->hasOne(MRelationBaa::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
+
+    public function MRelationFbi(){
+        return $this->hasOne(MRelationFBIPKS::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function TPerson(){
+        return $this->hasMany(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
 }

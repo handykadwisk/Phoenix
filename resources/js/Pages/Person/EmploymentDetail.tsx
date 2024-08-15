@@ -24,6 +24,7 @@ import {
     PencilIcon,
     PencilSquareIcon,
     PhoneIcon,
+    PlusCircleIcon,
     UserGroupIcon,
     UserIcon,
     UsersIcon,
@@ -40,6 +41,8 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import { Datepicker } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function EmploymentDetail({
     idPerson,
@@ -60,7 +63,6 @@ export default function EmploymentDetail({
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
-                console.log("zz", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -170,7 +172,7 @@ export default function EmploymentDetail({
             person_certificate: detailPerson.person_certificate,
         });
         if (
-            detailPerson.person_certificate[0][
+            dataEditCertificate.person_certificate[0][
                 "CERTIFICATE_QUALIFICATION_ID"
             ] === null
         ) {
@@ -180,11 +182,19 @@ export default function EmploymentDetail({
         getQualification();
     };
 
-    const handleAddDocument = async (e: FormEvent) => {
+    const [flagDocument, setFlagDocument] = useState<string>("");
+
+    const handleAddDocument = async (e: FormEvent, number: number) => {
+        e.preventDefault();
+
         setModalDocument({
             add: !modalDocument.add,
         });
-        getQualification();
+        if (number === 1) {
+            setFlagDocument("KTP");
+        } else {
+            setFlagDocument("Document");
+        }
     };
 
     // data add education
@@ -399,58 +409,38 @@ export default function EmploymentDetail({
     const handleSuccessAddEducation = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Education Add",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
     const handleSuccessEditEducation = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Education Edit",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
     const handleSuccessAddCertificate = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Certificate Add",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
     const handleSuccessEditCertificate = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Certificate Edit",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -581,8 +571,40 @@ export default function EmploymentDetail({
             });
     };
 
+    const handleFileDownload = async (id: number) => {
+        await axios({
+            url: `/downloadPersonDocument/${id}`,
+            method: "GET",
+            responseType: "blob",
+        })
+            .then((response) => {
+                console.log(response);
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", response.headers.filename);
+                document.body.appendChild(link);
+                link.click();
+            })
+            .catch((err) => {
+                console.log(err);
+                if (err.response.status === 404) {
+                    alert("File not Found");
+                }
+            });
+    };
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* Edit Document */}
             <ModalToAdd
                 buttonAddOns={""}
@@ -612,11 +634,13 @@ export default function EmploymentDetail({
                                         </span>
                                     </div>
                                 </div>
-                                <div>
-                                    <span>Photo KTP</span>
-                                </div>
-                                <div>
-                                    {/* <TextInput
+                                {flagDocument === "KTP" ? (
+                                    <>
+                                        <div>
+                                            <span>Photo KTP</span>
+                                        </div>
+                                        <div>
+                                            {/* <TextInput
                                         type="file"
                                         // value={pC.PERSON_CERTIFICATE_NAME}
                                         className="mt-1"
@@ -630,18 +654,23 @@ export default function EmploymentDetail({
                                         placeholder="Certificate Name"
                                         required
                                     /> */}
-                                    <input
-                                        className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
-                                        id="file_input"
-                                        type="file"
-                                        onChange={(e) => handleChange(e)}
-                                    ></input>
-                                </div>
-                                <div className="mt-3">
-                                    <span>Other Document</span>
-                                </div>
-                                <div>
-                                    {/* <TextInput
+                                            <input
+                                                className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
+                                                id="file_input"
+                                                type="file"
+                                                onChange={(e) =>
+                                                    handleChange(e)
+                                                }
+                                            ></input>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="mt-3">
+                                            <span>Other Document</span>
+                                        </div>
+                                        <div>
+                                            {/* <TextInput
                                         type="file"
                                         // value={pC.PERSON_CERTIFICATE_NAME}
                                         className="mt-1"
@@ -655,14 +684,18 @@ export default function EmploymentDetail({
                                         placeholder="Certificate Name"
                                         required
                                     /> */}
-                                    <input
-                                        className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
-                                        id="file_input"
-                                        type="file"
-                                        multiple
-                                        onChange={(e) => handleChangeOther(e)}
-                                    ></input>
-                                </div>
+                                            <input
+                                                className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
+                                                id="file_input"
+                                                type="file"
+                                                multiple
+                                                onChange={(e) =>
+                                                    handleChangeOther(e)
+                                                }
+                                            ></input>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </>
@@ -3305,7 +3338,7 @@ export default function EmploymentDetail({
                     </div>
                 ) : (
                     <div className="bg-white shadow-md p-4 rounded-bl-md rounded-br-md rounded-tr-md h-full">
-                        <div>
+                        {/* <div>
                             <div
                                 className="bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
                                 onClick={(e) => {
@@ -3314,8 +3347,8 @@ export default function EmploymentDetail({
                             >
                                 <span>Add Document</span>
                             </div>
-                        </div>
-                        <div className="mt-2 grid-cols-4 grid gap-4">
+                        </div> */}
+                        <div className="grid-cols-4 grid gap-4">
                             {/* <div className="text-sm font-semibold ">
                                 <span>Images</span>
                             </div> */}
@@ -3323,30 +3356,72 @@ export default function EmploymentDetail({
                                 <span>KTP</span>
                             </div>
                         </div>
-                        {detailPerson.m_person_document
-                            ?.filter((m: any) => m.CATEGORY_DOCUMENT === 1)
-                            .map((mPD: any, l: number) => {
-                                return (
-                                    <div className="grid-cols-4 grid gap-4 mb-2">
-                                        {/* <div className="text-sm ">
-                                            <span>
-                                                <img
-                                                    className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                                                    src={
-                                                        window.location.origin +
-                                                        "/storage/" +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_DIRNAME +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_FILENAME
-                                                    }
-                                                    alt="Image Person"
-                                                    // onClick={(e) => {
-                                                    //     downloadImage(
-                                                    //         mPD.document_person
-                                                    //             ?.DOCUMENT_ID
-                                                    //     );
-                                                    // }}
+                        {detailPerson.m_person_document?.filter(
+                            (m: any) => m.CATEGORY_DOCUMENT === 1
+                        )?.length === 0 ? (
+                            <div
+                                className="w-fit flex items-center group mt-2 mb-2 text-sm"
+                                onClick={(e) => {
+                                    handleAddDocument(e, 1);
+                                }}
+                            >
+                                <div className="group-hover:underline group-hover:cursor-pointer">
+                                    <span>
+                                        <PlusCircleIcon className="w-5 text-gray-500 text-sm" />
+                                    </span>
+                                </div>
+                                <div className="group-hover:underline group-hover:cursor-pointer text-gray-500">
+                                    <span>Add KTP</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {detailPerson.m_person_document
+                                    ?.filter(
+                                        (m: any) => m.CATEGORY_DOCUMENT === 1
+                                    )
+                                    .map((mPD: any, l: number) => {
+                                        return (
+                                            <div className="grid-cols-4 grid gap-4 mb-2">
+                                                {/* <div className="text-sm ">
+                                                <span>
+                                                    <img
+                                                        className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                                                        src={
+                                                            window.location.origin +
+                                                            "/storage/" +
+                                                            mPD.document_person
+                                                                ?.DOCUMENT_DIRNAME +
+                                                            mPD.document_person
+                                                                ?.DOCUMENT_FILENAME
+                                                        }
+                                                        alt="Image Person"
+                                                        // onClick={(e) => {
+                                                        //     downloadImage(
+                                                        //         mPD.document_person
+                                                        //             ?.DOCUMENT_ID
+                                                        //     );
+                                                        // }}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.open(
+                                                                window.location
+                                                                    .origin +
+                                                                    "/storage/" +
+                                                                    mPD
+                                                                        .document_person
+                                                                        ?.DOCUMENT_DIRNAME +
+                                                                    mPD
+                                                                        .document_person
+                                                                        ?.DOCUMENT_FILENAME,
+                                                                "_blank"
+                                                            );
+                                                        }}
+                                                    />
+                                                </span>
+                                            </div> */}
+                                                <div
+                                                    className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         window.open(
@@ -3362,60 +3437,45 @@ export default function EmploymentDetail({
                                                             "_blank"
                                                         );
                                                     }}
-                                                />
-                                            </span>
-                                        </div> */}
-                                        <div
-                                            className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                window.open(
-                                                    window.location.origin +
-                                                        "/storage/" +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_DIRNAME +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_FILENAME,
-                                                    "_blank"
-                                                );
-                                            }}
-                                        >
-                                            <span>
-                                                {
-                                                    mPD.document_person
-                                                        .DOCUMENT_ORIGINAL_NAME
-                                                }
-                                            </span>
-                                        </div>
-                                        <div className="flex">
-                                            <span>
-                                                <ArrowDownTrayIcon
-                                                    className="w-6 text-blue-600 hover:cursor-pointer"
-                                                    title="Download Images"
-                                                    // onClick={(e) =>
-                                                    //     alertDelete(
-                                                    //         mPD.DOCUMENT_ID,
-                                                    //         mPD.PERSON_ID
-                                                    //     )
-                                                    // }
-                                                />
-                                            </span>
-                                            <span>
-                                                <XMarkIcon
-                                                    className="w-7 text-red-600 hover:cursor-pointer"
-                                                    title="Delete Images"
-                                                    onClick={(e) =>
-                                                        alertDelete(
-                                                            mPD.DOCUMENT_ID,
-                                                            mPD.PERSON_ID
-                                                        )
-                                                    }
-                                                />
-                                            </span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                                >
+                                                    <span>
+                                                        {
+                                                            mPD.document_person
+                                                                .DOCUMENT_ORIGINAL_NAME
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div className="flex">
+                                                    <span>
+                                                        <ArrowDownTrayIcon
+                                                            className="w-6 text-blue-600 hover:cursor-pointer"
+                                                            title="Download Images"
+                                                            onClick={(e) =>
+                                                                handleFileDownload(
+                                                                    mPD.DOCUMENT_ID
+                                                                )
+                                                            }
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <XMarkIcon
+                                                            className="w-7 text-red-600 hover:cursor-pointer"
+                                                            title="Delete Images"
+                                                            onClick={(e) =>
+                                                                alertDelete(
+                                                                    mPD.DOCUMENT_ID,
+                                                                    mPD.PERSON_ID
+                                                                )
+                                                            }
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                            </>
+                        )}
+
                         <div className="mt-2 grid-cols-4 grid gap-4">
                             {/* <div className="text-sm font-semibold ">
                                 <span>Images</span>
@@ -3424,30 +3484,87 @@ export default function EmploymentDetail({
                                 <span>Other Document</span>
                             </div>
                         </div>
-                        {detailPerson.m_person_document
-                            ?.filter((m: any) => m.CATEGORY_DOCUMENT === 2)
-                            .map((mPD: any, l: number) => {
-                                return (
-                                    <div className="grid-cols-4 grid gap-4 mb-2">
-                                        {/* <div className="text-sm ">
-                                            <span>
-                                                <img
-                                                    className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                                                    src={
-                                                        window.location.origin +
-                                                        "/storage/" +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_DIRNAME +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_FILENAME
-                                                    }
-                                                    alt="Image Person"
-                                                    // onClick={(e) => {
-                                                    //     downloadImage(
-                                                    //         mPD.document_person
-                                                    //             ?.DOCUMENT_ID
-                                                    //     );
-                                                    // }}
+                        {detailPerson.m_person_document?.filter(
+                            (m: any) => m.CATEGORY_DOCUMENT === 2
+                        )?.length === 0 ? (
+                            <div
+                                className="w-fit flex items-center group mt-2 mb-2 text-sm"
+                                onClick={(e) => {
+                                    handleAddDocument(e, 2);
+                                }}
+                            >
+                                <div className="group-hover:underline group-hover:cursor-pointer">
+                                    <span>
+                                        <PlusCircleIcon className="w-5 text-gray-500 text-sm" />
+                                    </span>
+                                </div>
+                                <div className="group-hover:underline group-hover:cursor-pointer text-gray-500">
+                                    <span>Add Other Document</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div
+                                    className="w-fit flex items-center group mt-2 mb-2 text-sm"
+                                    onClick={(e) => {
+                                        handleAddDocument(e, 2);
+                                    }}
+                                >
+                                    <div className="group-hover:underline group-hover:cursor-pointer">
+                                        <span>
+                                            <PlusCircleIcon className="w-5 text-gray-500 text-sm" />
+                                        </span>
+                                    </div>
+                                    <div className="group-hover:underline group-hover:cursor-pointer text-gray-500">
+                                        <span>Add Other Document</span>
+                                    </div>
+                                </div>
+                                {detailPerson.m_person_document
+                                    ?.filter(
+                                        (m: any) => m.CATEGORY_DOCUMENT === 2
+                                    )
+                                    .map((mPD: any, l: number) => {
+                                        return (
+                                            <div className="grid-cols-4 grid gap-4 mb-2">
+                                                {/* <div className="text-sm ">
+                                                <span>
+                                                    <img
+                                                        className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                                                        src={
+                                                            window.location.origin +
+                                                            "/storage/" +
+                                                            mPD.document_person
+                                                                ?.DOCUMENT_DIRNAME +
+                                                            mPD.document_person
+                                                                ?.DOCUMENT_FILENAME
+                                                        }
+                                                        alt="Image Person"
+                                                        // onClick={(e) => {
+                                                        //     downloadImage(
+                                                        //         mPD.document_person
+                                                        //             ?.DOCUMENT_ID
+                                                        //     );
+                                                        // }}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.open(
+                                                                window.location
+                                                                    .origin +
+                                                                    "/storage/" +
+                                                                    mPD
+                                                                        .document_person
+                                                                        ?.DOCUMENT_DIRNAME +
+                                                                    mPD
+                                                                        .document_person
+                                                                        ?.DOCUMENT_FILENAME,
+                                                                "_blank"
+                                                            );
+                                                        }}
+                                                    />
+                                                </span>
+                                            </div> */}
+                                                <div
+                                                    className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         window.open(
@@ -3463,60 +3580,44 @@ export default function EmploymentDetail({
                                                             "_blank"
                                                         );
                                                     }}
-                                                />
-                                            </span>
-                                        </div> */}
-                                        <div
-                                            className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                window.open(
-                                                    window.location.origin +
-                                                        "/storage/" +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_DIRNAME +
-                                                        mPD.document_person
-                                                            ?.DOCUMENT_FILENAME,
-                                                    "_blank"
-                                                );
-                                            }}
-                                        >
-                                            <span>
-                                                {
-                                                    mPD.document_person
-                                                        .DOCUMENT_ORIGINAL_NAME
-                                                }
-                                            </span>
-                                        </div>
-                                        <div className="flex">
-                                            <span>
-                                                <ArrowDownTrayIcon
-                                                    className="w-6 text-blue-600 hover:cursor-pointer"
-                                                    title="Download Images"
-                                                    // onClick={(e) =>
-                                                    //     alertDelete(
-                                                    //         mPD.DOCUMENT_ID,
-                                                    //         mPD.PERSON_ID
-                                                    //     )
-                                                    // }
-                                                />
-                                            </span>
-                                            <span>
-                                                <XMarkIcon
-                                                    className="w-7 text-red-600 hover:cursor-pointer"
-                                                    title="Delete Images"
-                                                    onClick={(e) =>
-                                                        alertDelete(
-                                                            mPD.DOCUMENT_ID,
-                                                            mPD.PERSON_ID
-                                                        )
-                                                    }
-                                                />
-                                            </span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                                >
+                                                    <span>
+                                                        {
+                                                            mPD.document_person
+                                                                .DOCUMENT_ORIGINAL_NAME
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div className="flex">
+                                                    <span>
+                                                        <ArrowDownTrayIcon
+                                                            className="w-6 text-blue-600 hover:cursor-pointer"
+                                                            title="Download Images"
+                                                            onClick={(e) =>
+                                                                handleFileDownload(
+                                                                    mPD.DOCUMENT_ID
+                                                                )
+                                                            }
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <XMarkIcon
+                                                            className="w-7 text-red-600 hover:cursor-pointer"
+                                                            title="Delete Images"
+                                                            onClick={(e) =>
+                                                                alertDelete(
+                                                                    mPD.DOCUMENT_ID,
+                                                                    mPD.PERSON_ID
+                                                                )
+                                                            }
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                            </>
+                        )}
                     </div>
                 )}
             </div>

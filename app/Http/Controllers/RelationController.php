@@ -13,6 +13,7 @@ use App\Models\RelationStatus;
 use App\Models\RelationType;
 use App\Models\Salutation;
 use App\Models\Tag;
+use App\Models\TPerson;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,12 +33,17 @@ class RelationController extends Controller
 
     public function getRelationData($request)
     {
+        // dd(json_decode($request->newFilter, true));
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
         $query = Relation::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
+
+        // dd($newSearch[0]);
+        
         
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -45,6 +51,70 @@ class RelationController extends Controller
                 list($colId, $sortDirection) = explode(',', $sortItem);
                 $query->orderBy($colId, $sortDirection); 
             }
+        }
+        // dd($newSearch[0]['RELATION_TYPE_ID']['value']);
+
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    // dd($keyId);
+                    if ($keyId === 'RELATION_ORGANIZATION_NAME') {
+                        $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }elseif ($keyId === 'RELATION_TYPE_ID'){
+                        if (!isset($searchValue['value'])) {
+                            $valueTypeId = $searchValue;
+                        }else{
+                            $valueTypeId = $searchValue['value'];
+                        }
+                        // dd($searchValue);
+                        $query->whereHas('mRelationType', function($q) use($valueTypeId) {
+                            // Query the name field in status table
+                            $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
+                        });
+                    }
+                    // elseif ($keyId === 'policy_inception_date') {
+                    //     $query->where('policy_due_date', '>=', date('Y-m-d', strtotime($searchValue)));
+                    // }
+                }
+            }
+            // for ($i=0; $i < sizeof($newSearch); $i++) { 
+            //     // get id Relation Type
+
+            //     // Filter By Search
+            //     if ($newSearch[$i]['flag'] === "flag") {
+            //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['flag'] . '%');
+            //         // dd("masuk sini");
+            //     }
+                
+            //     if ($newSearch[$i]['RELATION_ORGANIZATION_NAME'] !== ""){
+            //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['RELATION_ORGANIZATION_NAME'] . '%');
+            //     }
+                
+            //     if($newSearch[$i]['RELATION_TYPE_ID']['value'] !== "" ||$newSearch[$i]['RELATION_TYPE_ID'] !== "" ){
+            //         // dd("masuk sin");
+            //         $valueTypeId = $newSearch[$i]['RELATION_TYPE_ID']['value'];
+            //         // dd($valueTypeId);
+            //         $query->whereHas('mRelationType', function($q) use($valueTypeId) {
+            //             // Query the name field in status table
+            //             $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
+            //         });
+            //     }
+            //     // if ($newSearch[$i]['RELATION_ORGANIZATION_NAME'] == "flag" && $newSearch[$i]['RELATION_TYPE_ID'] == "flag") {
+            //     //     $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['RELATION_ORGANIZATION_NAME'] . '%');
+            //     // }else if($newSearch[$i]['RELATION_ORGANIZATION_NAME'] == $newSearch[$i]['RELATION_ORGANIZATION_NAME']){
+            //     //     $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['RELATION_ORGANIZATION_NAME'] . '%');
+            //     // }else if($newSearch[$i]['RELATION_TYPE_ID']['value'] == $newSearch[$i]['RELATION_TYPE_ID']['value']){
+            //     //     $valueTypeId = $newSearch[$i]['RELATION_TYPE_ID']['value'];
+            //     //     // dd($valueTypeId);
+            //     //     $query->whereHas('mRelationType', function($q) use($valueTypeId) {
+            //     //         // Query the name field in status table
+            //     //         $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
+            //     //     });
+            //     // }
+            // }
         }
 
         // if ($filterModel) {
@@ -58,7 +128,7 @@ class RelationController extends Controller
         //         }
         //     }
         // }
-
+        // dd($query->toSql());
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
@@ -116,7 +186,7 @@ class RelationController extends Controller
     public function index(Request $request)
     {
         // call data relation
-        $relation = Relation::where('RELATION_ORGANIZATION_PARENT_ID', "0")->paginate(3);
+        $relation = Relation::get();
 
         // call data relation group
         $relationGroup = RelationGroup::get();
@@ -144,7 +214,8 @@ class RelationController extends Controller
             'relationStatus' => $relationStatus,
             'relationGroup' => $relationGroup,
             'mRelationType' => $mRelationType,
-            'profession'   => $profession
+            'profession'   => $profession,
+            'relation' => $relation
         ]);
     }
 
@@ -157,8 +228,7 @@ class RelationController extends Controller
     public function store(Request $request)
     {
 
-        // cek abbreviation
-        // dd($request->abbreviation);
+        // Cek Abbreviation Exist;
         $flag = "0";
         $message = "Abbreviation already exists";
         $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->abbreviation)))->get();
@@ -174,6 +244,8 @@ class RelationController extends Controller
             }
         }
 
+
+        // Cek Relation Type Required;
         $flag = "rType";
         $message = "Please Choose Relation Type!";
         if ($request->relation_type_id == null) {
@@ -186,19 +258,6 @@ class RelationController extends Controller
         }
 
 
-
-
-        // dd($request);
-        // print_r(!is_countable($request->relation_aka));die;
-        // if (is_countable($request->relation_aka)) {
-        //     echo "ada";
-        // }
-        // die;
-        // Cek Relation Perent Id
-        // $parentID = $request->parent_id;
-        // if ($request->parent_id == '' || $request->parent_id == NULL) {
-        //     $parentID = "0";
-        // }
 
         // ubah ke to lower dan huruf besar di awal
         $nameRelation = strtolower($request->name_relation);
@@ -249,9 +308,22 @@ class RelationController extends Controller
             'relation_status_id' => $request->relation_status_id
 
         ]);
+        
+        if ($request->relation_status_id == "2") {
+            // jika dia corporate pic dan milih corporate pic maka akan melakukan mapping ke t person
+            if (is_countable($request->corporate_pic_for)) {
+                for ($i=0; $i < sizeof($request->corporate_pic_for); $i++) { 
+                    $idRelation = $request->corporate_pic_for[$i]['value'];
 
-        // Mapping Parent Id and Update
-        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
+                    // simpan mapping ke t person
+                    TPerson::create([
+                        "PERSON_FIRST_NAME"         => $addTBK,
+                        "RELATION_ORGANIZATION_ID"  => $idRelation,
+                        "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID
+                    ]);
+                }
+            }
+        }
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
@@ -579,14 +651,15 @@ class RelationController extends Controller
             $request->RELATION_ORGANIZATION_ID,
             $addTBK,
             $preSalutation,
-            $postSalutation
+            $postSalutation,
+            "Relation Edit Success"
         ], 201, [
             'X-Inertia' => true
         ]);
     }
 
     public function get_detail(Request $request){
-        $detailRelation = Relation::find($request->id);
+        $detailRelation = Relation::with('TPerson')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }

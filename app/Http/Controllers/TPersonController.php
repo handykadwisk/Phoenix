@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class TPersonController extends Controller
@@ -92,6 +93,8 @@ class TPersonController extends Controller
                 'PERSON_KTP' => $request->PERSON_KTP,
                 'PERSON_NPWP' => $request->PERSON_NPWP,
                 'PERSON_KK' => $request->PERSON_KK,
+                'PERSON_IS_BAA' => $request->PERSON_IS_BAA,
+                'PERSON_IS_VIP' => $request->PERSON_IS_VIP,
                 'PERSON_BLOOD_TYPE' => $request->PERSON_BLOOD_TYPE,
                 'PERSON_BLOOD_RHESUS' => $request->PERSON_BLOOD_RHESUS,
                 'PERSON_MARITAL_STATUS' => $request->PERSON_MARITAL_STATUS,
@@ -162,7 +165,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->PERSON_ID
+            $request->PERSON_ID,
+            "Relation Person Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -208,7 +212,7 @@ class TPersonController extends Controller
 
 
     public function store(Request $request){
-        // Remove Object "CONTACT EMERGENCY" agar bisa insert dengan request all
+        // Remove Object "CONTACT EMERGENCY" dan "PERSON_CONTACT" agar bisa insert dengan request all
         $removeArray = collect($request->all());
         $filtered = $removeArray->except(['CONTACT_EMERGENCY']);
         $newFiltered = $filtered->except(['PERSON_CONTACT']);
@@ -433,7 +437,8 @@ class TPersonController extends Controller
 
         return new JsonResponse([
             $request->PERSON_ID,
-            "add"
+            "add",
+            "Person Structure Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -541,7 +546,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->id
+            $request->id,
+            "Profile Person Has Change"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -550,14 +556,23 @@ class TPersonController extends Controller
     }
 
     public function addBankAccount(Request $request){
-        // $personFor = $request->BANK_ACCOUNT[0]['BANK_ID']['value'];
-        // print_r($personFor);die;
-        // $bankForNew = [];
-        // foreach ($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_FOR'] as $bankFor) {
-        //     // get Bank For
-        //     array_push($bankForNew, (int)$bankFor['value']);
-        // }
-        // $valueBankFor = json_encode($bankForNew);
+        // dd($request->BANK_ACCOUNT);
+        // validasi bank account
+        $validateData = Validator::make($request->all() ,[
+            'BANK_ACCOUNT.*.BANK_ID'                    => 'required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_FOR'    => 'required'
+        ],[
+            'BANK_ACCOUNT.*.BANK_ID'                    => 'Bank Name is required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_FOR'    => 'For Bank Account is required'
+        ]);
+
+        if ($validateData->fails()) {
+            return new JsonResponse([
+                $validateData->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
 
         // created bank account
         if (is_countable($request->BANK_ACCOUNT)) {
@@ -606,28 +621,49 @@ class TPersonController extends Controller
     public function editBankAccount(Request $request){
 
         // dd($request);
-        // if (!isset($request->BANK_ACCOUNT[0]["m_for_bank"][0]["FOR_BANK_ACCOUNT_ID"])) {
-        //     echo "gaada";
-        // }else{
-        //     echo "ada";
+        $validateData = Validator::make($request->all() ,[
+            'BANK_ACCOUNT.*.BANK_ID'                        => 'required',
+            'BANK_ACCOUNT.*.m_for_bank'                    => 'required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_NUMBER'    => 'required'
+            
+        ],[
+            'BANK_ACCOUNT.*.BANK_ID'                       => 'Bank Name is required',
+            'BANK_ACCOUNT.*.m_for_bank'                    => 'For Bank Account is required',
+            'BANK_ACCOUNT.*.PERSON_BANK_ACCOUNT_NUMBER'    => 'Account Number is required'
+        ]);
+
+        if ($validateData->fails()) {
+            return new JsonResponse([
+                $validateData->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
+
+
+        // if (isset($request->BANK_ACCOUNT[0]['PERSON_BANK_ACCOUNT_ID'])) {
+            $dataTPerson = TPersonBankAccount::where('PERSON_ID', $request->BANK_ACCOUNT[0]['PERSON_ID'])->get();
+            // dd($dataTPerson);
+            // Delete M Bank Account Existing By Id
+            for ($i=0; $i < sizeof($dataTPerson); $i++) { 
+                
+                $dataExisting = MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $dataTPerson[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
+                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+                    MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $dataTPerson[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
+                }
+            }
+            // Delete Data T Person Bank Account
+            // $dataExistingTPerson = TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $dataTPerson[0]['PERSON_ID'])->get();
+            if ($dataTPerson->count()>0) { //jika ada delete data sebelumnya
+                TPersonBankAccount::where('PERSON_ID', $dataTPerson[0]['PERSON_ID'])->delete();
+            }
+            
         // }
-        // die;
+
+
         // created bank account
         if (is_countable($request->BANK_ACCOUNT)) {
             for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
-
-
-                // Delete M Bank Account Existing By Id
-                $dataExisting = MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
-                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
-                    MForPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
-                }
-
-                // Delete Data T Person Bank Account
-                $dataExisting = TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->get();
-                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
-                    TPersonBankAccount::where('PERSON_BANK_ACCOUNT_ID', $request->BANK_ACCOUNT[$i]['PERSON_BANK_ACCOUNT_ID'])->delete();
-                }
 
 
                 // Add New Data T Person Bank Account and M Person Bank Account
@@ -945,7 +981,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->dataEducations[0]['PERSON_ID']
+            $request->dataEducations[0]['PERSON_ID'],
+            "Person Education Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -988,7 +1025,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->person_education[0]['PERSON_ID']
+            $request->person_education[0]['PERSON_ID'],
+            "Person Education Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1004,11 +1042,18 @@ class TPersonController extends Controller
         $certificate = is_countable($request->dataCertificates);
         if ($certificate) {
             for ($i=0; $i < sizeof($request->dataCertificates); $i++) { 
+                $qualification = 0;
+                $isQualification = 0;
+                if ($request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'] != null && $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] != null) {
+                    $qualification = $request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'];
+                    $isQualification = $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'];
+                }
+                
                 $createCertificate = TPersonCertificate::create([
                     "PERSON_ID"                                 => $request->dataCertificates[$i]['PERSON_ID'],
                     "PERSON_CERTIFICATE_NAME"                   => $request->dataCertificates[$i]['PERSON_CERTIFICATE_NAME'], 
-                    "PERSON_CERTIFICATE_IS_QUALIFICATION"       => $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'],
-                    "CERTIFICATE_QUALIFICATION_ID"              => $request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'],
+                    "PERSON_CERTIFICATE_IS_QUALIFICATION"       => $isQualification,
+                    "CERTIFICATE_QUALIFICATION_ID"              => $qualification,
                     "PERSON_CERTIFICATE_POINT"                  => $request->dataCertificates[$i]['PERSON_CERTIFICATE_POINT'],
                     "PERSON_CERTIFICATE_START_DATE"             => $request->dataCertificates[$i]['PERSON_CERTIFICATE_START_DATE'],
                     "PERSON_CERTIFICATE_EXPIRES_DATE"           => $request->dataCertificates[$i]['PERSON_CERTIFICATE_EXPIRES_DATE'],
@@ -1030,7 +1075,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->dataCertificates[0]['PERSON_ID']
+            $request->dataCertificates[0]['PERSON_ID'],
+            "Person Certificate Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1050,7 +1096,7 @@ class TPersonController extends Controller
             for ($i=0; $i < sizeof($request->person_certificate); $i++) { 
 
                 $pointNew = NULL;
-                $qualification = NULL;
+                $qualification = 0;
                 if ($request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 1 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 2 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 3 && $request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] == 1) {
                     $pointNew = $request->person_certificate[$i]['PERSON_CERTIFICATE_POINT'];
                     // $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
@@ -1059,6 +1105,7 @@ class TPersonController extends Controller
                 if ($request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] == 1) {
                     $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
                 }
+
 
 
                 $createCertificate = TPersonCertificate::create([
@@ -1087,7 +1134,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->person_certificate[0]['PERSON_ID']
+            $request->person_certificate[0]['PERSON_ID'],
+            "Person Certificate Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1262,6 +1310,22 @@ class TPersonController extends Controller
         return response()->download($downloadFile);
 
     }
-    
+
+    public function person_document_download($idDocument)
+    {
+        $detailDocument = Document::find($idDocument);
+        // $filePath = public_path('/storage/documents/CA/0/11/11-List-Asuransi--2-Unit-Dumptruck.pdf');
+        $filePath = public_path('/storage/' . $detailDocument->DOCUMENT_DIRNAME . $detailDocument->DOCUMENT_FILENAME);
+        
+        $headers = [
+            'filename' => $detailDocument->DOCUMENT_FILENAME
+        ];
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $detailDocument->DOCUMENT_FILENAME, $headers);
+        } else {
+            abort(404, 'File not found');
+        }
+    }
 }   
 

@@ -23,39 +23,52 @@ import AGGrid from "@/Components/AgGrid";
 import { BeatLoader } from "react-spinners";
 import DetailRelation from "./DetailRelation";
 
-export default function DetailBaa({
+export default function DetailFBI({
     auth,
-    // isSuccessBAA,
-    // setIsSuccessBAA,
-    idBaa,
+    // isSuccessNew,
+    // setIsSuccessNew,
+    idFBI,
 }: PropsWithChildren<{
     auth: any;
-    // isSuccessBAA: any;
-    idBaa: any;
-    // setIsSuccessBAA: any;
+    // isSuccessNew: any;
+    idFBI: any;
+    // setIsSuccessNew: any;
 }>) {
-    console.log(idBaa);
+    const [detailAgentNew, setDetailAgentNew] = useState<any>([]);
+    const [relationFBI, setRelationFBI] = useState<any>([]);
+
+    const [isSuccessNew, setIsSuccessNew] = useState<any>("");
+    // console.log(dataAgent);
+    // useEffect(() => {
+    //     getMRelationFBI(idFBI);
+    // }, [idFBI]);
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
     });
 
-    const [relationAgent, setRelationBAA] = useState<any>([]);
-    const [isSuccessBAA, setIsSuccessBAA] = useState<any>("");
-    const [dataRelation, setDataRelation] = useState<any>({
-        idBaa: idBaa,
-        name_relation: [],
-    });
+    // get detail agent
+    const getMRelationFBI = async (id: string) => {
+        await axios
+            .post(`/getMRelationFBI`, { id })
+            .then((res) => {
+                setDetailAgentNew(res.data);
+                // setDataRelationById(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     // get detail agent
-    const getRelationBAA = async () => {
+    const getRelationFBI = async () => {
         setIsLoading({
             ...isLoading,
             get_detail: true,
         });
         await axios
-            .post(`/getRelationBaaSelect`)
+            .post(`/getRelationFBISelect`)
             .then((res) => {
-                setRelationBAA(res.data);
+                setRelationFBI(res.data);
                 setIsLoading({
                     ...isLoading,
                     get_detail: false,
@@ -66,50 +79,80 @@ export default function DetailBaa({
             });
     };
 
-    const [modalBAA, setModalBAA] = useState<any>({
+    const [modalAgent, setModalAgent] = useState<any>({
         add: false,
         relation: false,
     });
 
     // handle modal add relation agent
-    const handleClickAddRelationBAA = async (
+    const handleClickAddRelationFBI = async (
         // e: FormEvent,
         idRelationOrganization: string
     ) => {
         // e.preventDefault();
-        getRelationBAA();
-        setModalBAA({
-            add: !modalBAA.false,
+        getRelationFBI();
+        setModalAgent({
+            add: !modalAgent.false,
         });
     };
 
-    const [detailRelation, setDetailRelation] = useState<any>({
-        RELATION_ORGANIZATION_ID: "",
-        RELATION_ORGANIZATION_NAME: "",
+    const [dataRelation, setDataRelation] = useState<any>({
+        idFBI: idFBI,
+        name_relation: [],
     });
+    const inputRefTag = useRef<HTMLInputElement>(null);
+    const [query, setQuery] = useState("");
+    const [menuOpen, setMenuOpen] = useState(true);
 
-    // handle detail relation
-    const handleDetailRelation = async (data: any) => {
-        // getDivisionCombo(idRelation);
-        setDetailRelation({
-            RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
-            RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
+    const filteredTags = relationFBI.filter(
+        (item: any) =>
+            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+                query.toLocaleLowerCase()?.trim()
+            ) &&
+            !dataRelation.name_relation?.includes(
+                item.RELATION_ORGANIZATION_NAME
+            )
+    );
+
+    const isDisableTag =
+        !query?.trim() ||
+        dataRelation.name_relation.filter(
+            (item: any) =>
+                item.name_relation?.toLocaleLowerCase()?.trim() ===
+                query?.toLocaleLowerCase()?.trim()
+        )?.length;
+    // console.log(dataRelation.name_relation);
+
+    const handleSuccess = async (message: string) => {
+        // if (modal.add) {
+        setDataRelation({
+            idFBI: idFBI,
+            name_relation: [],
         });
-        setModalBAA({
-            add: false,
-            relation: true,
+        Swal.fire({
+            title: "Success",
+            text: "Relation Add",
+            icon: "success",
+        }).then((result: any) => {
+            // console.log(message);
+            if (result.value) {
+                // getMRelationFBI(message[0]);
+                setIsSuccessNew({
+                    isSuccessNew: "success",
+                });
+            }
         });
     };
 
     const deleteProcess = async (id: string) => {
         await axios
-            .post(`/deleteBaa`, { id })
+            .post(`/deleteFBI`, { id })
             .then((res) => {
-                setIsSuccessBAA({
-                    isSuccessBAA: "success",
+                setIsSuccessNew({
+                    isSuccessNew: "success",
                 });
                 // console.log(id);
-                // getMRelationAgent(idAgent);
+                // getMRelationFBI(idFBI);
             })
             .catch((err) => {
                 console.log(err);
@@ -142,67 +185,48 @@ export default function DetailBaa({
         //     }
         // });
     };
-
     const CustomButtonComponent = (props: any) => {
         return (
             <span>
                 <XMarkIcon
                     className="w-7 text-red-500 cursor-pointer"
                     onClick={(e) =>
-                        deleteRelation(props.data.M_RELATION_BAA_ID)
+                        deleteRelation(props.data.M_RELATION_FBI_ID)
                     }
                 />
             </span>
         );
     };
 
-    const handleSuccess = async (message: string) => {
-        // if (modal.add) {
-        setDataRelation({
-            idBaa: idBaa,
-            name_relation: [],
+    const [detailRelation, setDetailRelation] = useState<any>({
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
+    });
+    // handle detail relation
+    const handleDetailRelation = async (data: any) => {
+        // getDivisionCombo(idRelation);
+        setDetailRelation({
+            RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
+            RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
         });
-        Swal.fire({
-            title: "Success",
-            text: "Relation Add",
-            icon: "success",
-        }).then((result: any) => {
-            // console.log(message);
-            if (result.value) {
-                // getMRelationAgent(message[0]);
-                setIsSuccessBAA({
-                    isSuccessBAA: "success",
-                });
-            }
+        setModalAgent({
+            add: false,
+            relation: true,
         });
     };
-
-    const inputRefTag = useRef<HTMLInputElement>(null);
-    const [query, setQuery] = useState("");
-    const [menuOpen, setMenuOpen] = useState(true);
-    const filteredTags = relationAgent.filter(
-        (item: any) =>
-            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
-                query.toLocaleLowerCase()?.trim()
-            ) &&
-            !dataRelation.name_relation?.includes(
-                item.RELATION_ORGANIZATION_NAME
-            )
-    );
-
     return (
         <>
             {/* modal agent */}
             <ModalToAdd
-                show={modalBAA.add}
+                show={modalAgent.add}
                 onClose={() =>
-                    setModalBAA({
+                    setModalAgent({
                         add: false,
                     })
                 }
-                title={"Add Relation BAA"}
+                title={"Add Relation Agent"}
                 buttonAddOns={""}
-                url={`/addMRelationBaa`}
+                url={`/addMRelationFBI`}
                 data={dataRelation}
                 onSuccess={handleSuccess}
                 classPanel={
@@ -394,9 +418,9 @@ export default function DetailBaa({
 
             {/* modal relation */}
             <ModalToAction
-                show={modalBAA.relation}
+                show={modalAgent.relation}
                 onClose={() =>
-                    setModalBAA({
+                    setModalAgent({
                         add: false,
                         relation: false,
                     })
@@ -426,12 +450,12 @@ export default function DetailBaa({
                 <AGGrid
                     searchParam={""}
                     // loading={isLoading.get_policy}
-                    url={"getMRelationBAA"}
+                    url={"getMRelationFBI"}
                     addButtonLabel={"Add Relation"}
-                    withParam={idBaa}
-                    addButtonModalState={() => handleClickAddRelationBAA(idBaa)}
+                    withParam={idFBI}
+                    addButtonModalState={() => handleClickAddRelationFBI(idFBI)}
                     doubleClickEvent={handleDetailRelation}
-                    triggeringRefreshData={isSuccessBAA}
+                    triggeringRefreshData={isSuccessNew}
                     colDefs={[
                         {
                             headerName: "No.",

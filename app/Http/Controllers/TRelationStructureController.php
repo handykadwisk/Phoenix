@@ -85,7 +85,8 @@ class TRelationStructureController extends Controller
 
         return new JsonResponse([
             $structure->RELATION_STRUCTURE_ID,
-            $structure->RELATION_STRUCTURE_ALIAS
+            $structure->RELATION_STRUCTURE_ALIAS,
+            "Relation Structure Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -133,7 +134,8 @@ class TRelationStructureController extends Controller
 
         return new JsonResponse([
             $request->RELATION_STRUCTURE_ID,
-            $request->RELATION_STRUCTURE_ALIAS
+            $request->RELATION_STRUCTURE_ALIAS,
+            "Relation Structure Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

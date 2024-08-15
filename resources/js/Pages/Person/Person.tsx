@@ -97,6 +97,8 @@ export default function Person({
         PERSON_HIRE_DATE: "",
         PERSON_END_DATE: "",
         PERSON_KTP: "",
+        PERSON_IS_BAA: "",
+        PERSON_IS_VIP: "",
         PERSON_NPWP: "",
         PERSON_BANK_ACCOUNT_ID: "",
         PERSON_IMAGE_ID: "",
@@ -190,6 +192,8 @@ export default function Person({
                 PERSON_HIRE_DATE: "",
                 PERSON_END_DATE: "",
                 PERSON_KTP: "",
+                PERSON_IS_BAA: "",
+                PERSON_IS_VIP: "",
                 PERSON_NPWP: "",
                 PERSON_BANK_ACCOUNT_ID: "",
                 PERSON_IMAGE_ID: "",
@@ -281,7 +285,7 @@ export default function Person({
                 data={""}
                 onSuccess={""}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
                 }
@@ -356,12 +360,16 @@ export default function Person({
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={2}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }
@@ -406,6 +414,23 @@ export default function Person({
                                                         </>
                                                     }
                                                     className={""}
+                                                />
+                                                <TableTD
+                                                    value={
+                                                        dPerson.PERSON_IS_VIP ===
+                                                        1 ? (
+                                                            <>
+                                                                <div className="bg-amber-600 w-fit font-semibold text-sm text-white px-2 rounded-md">
+                                                                    <span>
+                                                                        VIP
+                                                                    </span>
+                                                                </div>
+                                                            </>
+                                                        ) : null
+                                                    }
+                                                    className={
+                                                        "flex justify-center"
+                                                    }
                                                 />
                                             </tr>
                                         );

@@ -6,6 +6,7 @@ use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\InsurancePanelController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MRelationFBIPKSController;
 use App\Http\Controllers\OtherExpensesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
@@ -108,11 +109,24 @@ Route::middleware('auth')->group(function () {
 
     // BAA
     Route::get('/relation/baa', [TRelationAgentController::class, 'index_baa'])->name('relation/baa');
-    Route::get('/getRelationBAA', [TRelationAgentController::class, 'getRelationBAA'])->name('getRelationBAA.getRelationBAA');
+    Route::get('/getBAA', [TRelationAgentController::class, 'getBAA'])->name('getBAA.getBAA');
     Route::get('/getMRelationBAA', [TRelationAgentController::class, 'getMRelationBAA'])->name('getMRelationBAA.getMRelationBAA');
     Route::post('/addMRelationBaa', [TRelationAgentController::class, 'addMRelationBaa'])->name('addMRelationBaa.addMRelationBaa');
     Route::post('/getRelationBaaSelect', [TRelationAgentController::class, 'relationBaa'])->name('getRelationBaaSelect.relationBaa');
     Route::post('/deleteBaa', [TRelationAgentController::class, 'deleteBaa'])->name('deleteBaa.deleteBaa');
+    Route::post('/getRelationByIdPerson', [TRelationAgentController::class, 'getRelationByIdPerson'])->name('getRelationByIdPerson.getRelationByIdPerson');
+    Route::get('/getPolicyByRelationId', [TRelationAgentController::class, 'getPolicyByRelationId'])->name('getPolicyByRelationId.getPolicyByRelationId');
+
+    // FBI by PKS
+
+    Route::get('/relation/fbipks', [MRelationFBIPKSController::class, 'index'])->name('relation/fbipks');
+    Route::get('/getRelationFBI', [MRelationFBIPKSController::class, 'getRelationFBI'])->name('getRelationFBI.getRelationFBI');
+    Route::get('/getMRelationFBI', [MRelationFBIPKSController::class, 'getMRelationFBI'])->name('getMRelationFBI.getMRelationFBI');
+    Route::post('/getRelationFBISelect', [MRelationFBIPKSController::class, 'relationFbi'])->name('getRelationFBISelect.relationFbi');
+    Route::post('/addMRelationFBI', [MRelationFBIPKSController::class, 'addMRelationFBI'])->name('addMRelationFBI.addMRelationFBI');
+    Route::post('/deleteFBI', [MRelationFBIPKSController::class, 'deleteFBI'])->name('deleteFBI.deleteFBI');
+
+
 
 
 
@@ -154,6 +168,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/getForBankAccount', [TPersonController::class, 'getForBankAccount'])->name('getForBankAccount.getForBankAccount');
     Route::post('/getTPersonBank', [TPersonController::class, 'getTPersonBank'])->name('getTPersonBank.getTPersonBank');
     Route::post('/editBankAccount', [TPersonController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+
+
+
+
+
+
+
+
+
 
     // Structure
     Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');
@@ -273,9 +296,6 @@ Route::middleware('auth')->group(function () {
     // Approval Limit
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
 
-    // Group
-    Route::get('/group', [GroupRelationController::class, 'index'])->name('group');
-
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
     Route::get('/detailPolicy/{id}', [PolicyController::class, 'detailPolicy'])->name('detailPolicy');
@@ -373,6 +393,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertPartners', [PolicyPartnerController::class, 'store'])->name('policyPartner.store');
     Route::post('/editPartners', [PolicyPartnerController::class, 'editPartners'])->name('policyPartner.editPartners');
     Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
+
+    // HR
+    Route::get('hr/settingCompany', [RelationController::class, 'index'])->name('hr/settingCompany');
+
 
 
 });

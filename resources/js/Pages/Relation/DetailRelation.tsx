@@ -30,6 +30,7 @@ import Division from "../Division/Division";
 import AddressPopup from "../Address/Address";
 import JobDesk from "../Job/JobDesk";
 import SelectTailwind from "react-tailwindcss-select";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function DetailRelation({
     detailRelation,
@@ -72,6 +73,16 @@ export default function DetailRelation({
 
     // Structure Modal
     const [structureModal, setStructureModal] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    // Structure Edit Corporate PIC
+    const [corporatePIC, setCorporatePIC] = useState({
         add: false,
         delete: false,
         edit: false,
@@ -305,21 +316,35 @@ export default function DetailRelation({
     };
 
     const handleSuccessEdit = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Relation Edit",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setGetDetailRelation({
-                    RELATION_ORGANIZATION_NAME: message[1],
-                    RELATION_ORGANIZATION_ID: message[0],
-                    RELATION_SALUTATION_PRE: message[2],
-                    RELATION_SALUTATION_POST: message[3],
-                });
-                getDetailRelation(message[0]);
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[4]);
+            setGetDetailRelation({
+                RELATION_ORGANIZATION_NAME: message[1],
+                RELATION_ORGANIZATION_ID: message[0],
+                RELATION_SALUTATION_PRE: message[2],
+                RELATION_SALUTATION_POST: message[3],
+            });
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        // Swal.fire({
+        //     title: "Success",
+        //     text: "Relation Edit",
+        //     icon: "success",
+        // }).then((result: any) => {
+        //     if (result.value) {
+        //         setGetDetailRelation({
+        //             RELATION_ORGANIZATION_NAME: message[1],
+        //             RELATION_ORGANIZATION_ID: message[0],
+        //             RELATION_SALUTATION_PRE: message[2],
+        //             RELATION_SALUTATION_POST: message[3],
+        //         });
+        //         getDetailRelation(message[0]);
+        //     }
+        // });
     };
 
     // Onclick Structure
@@ -455,6 +480,24 @@ export default function DetailRelation({
             });
     };
 
+    console.log("dataRelation", dataRelationNew);
+
+    const handleClickEditCorporate = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setCorporatePIC({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !corporatePIC.view,
+            document: false,
+            search: false,
+        });
+    };
+
     let valueEmail;
     if (dataById.RELATION_ORGANIZATION_EMAIL === null) {
         valueEmail = "";
@@ -470,6 +513,13 @@ export default function DetailRelation({
     }
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             <ModalToAction
                 show={modal.edit}
                 onClose={() =>
@@ -1354,7 +1404,7 @@ export default function DetailRelation({
 
             {/* Detail Relation*/}
             {/* Top */}
-            <div className="bg-white p-4 rounded-md shadow-md">
+            <div className="bg-white p-4 rounded-md shadow-md mb-3">
                 {/* Official Information */}
                 <div className="flex justify-between">
                     <div className="text-md font-semibold w-fit">
@@ -1471,18 +1521,6 @@ export default function DetailRelation({
                                                         .RELATION_TYPE_NAME
                                                 }
                                             </span>
-                                            <div>
-                                                {/* <a href=""> */}
-                                                <div
-                                                    className="text-white cursor-pointer"
-                                                    onMouseDown={(e) =>
-                                                        e.preventDefault()
-                                                    }
-                                                >
-                                                    <XMarkIcon className="w-5" />
-                                                </div>
-                                                {/* </a> */}
-                                            </div>
                                         </div>
                                         // </>
                                     );
@@ -1493,78 +1531,138 @@ export default function DetailRelation({
                     <div></div>
                 </div>
                 {/* END Relation Type And */}
+
+                {dataRelationNew.relation_status_id !== 2 ? null : (
+                    <>
+                        {/* Corporate Pic For */}
+                        <div className="mt-4 flex gap-2">
+                            <div className="text-md font-semibold border-b-2 w-fit border-red-600">
+                                <span>Corporate PIC For</span>
+                            </div>
+                            <div
+                                className="gap-2 text-sm bg-red-600 text-white px-2 flex items-center rounded-md cursor-pointer hover:bg-red-500"
+                                title="Edit Corporate PIC"
+                                onClick={(e) =>
+                                    handleClickEditCorporate(
+                                        e,
+                                        dataRelationNew.RELATION_ORGANIZATION_ID
+                                    )
+                                }
+                            >
+                                <span>
+                                    <PencilSquareIcon className="w-4" />
+                                </span>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                            <div className="grid grid-cols-1 gap-4 mt-2">
+                                <div className="mb-2 relative flex flex-wrap gap-3">
+                                    {dataRelationNew.t_person
+                                        ?.filter(
+                                            (m: any) =>
+                                                m.PERSON_IS_DELETED === 0
+                                        )
+                                        .map((dCorporate: any, i: number) => {
+                                            return (
+                                                // <>
+                                                <div
+                                                    key={i}
+                                                    className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm"
+                                                >
+                                                    <span className="text-white">
+                                                        {
+                                                            dCorporate
+                                                                .corporate_p_i_c
+                                                                .RELATION_ORGANIZATION_NAME
+                                                        }
+                                                    </span>
+                                                </div>
+                                                // </>
+                                            );
+                                        })}
+                                </div>
+                            </div>
+                            <div></div>
+                        </div>
+                        {/* End Corporate PIC For */}
+                    </>
+                )}
             </div>
             {/* End Top */}
 
-            {/* Button */}
-            <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickStructure(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Structure</span>
+            {dataRelationNew.relation_status_id !== 2 ? (
+                <>
+                    {/* Button */}
+                    <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickStructure(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Structure</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickDivision(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Division</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickAddressLocation(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Address & Location</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickJobDesk(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Job Desc</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickPerson(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Person & User</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickDivision(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Division</span>
-                    </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickAddressLocation(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Address & Location</span>
-                    </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickJobDesk(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Job Desc</span>
-                    </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickPerson(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Person & User</span>
-                    </div>
-                </div>
-            </div>
-            {/* End Button */}
+                    {/* End Button */}
+                </>
+            ) : null}
         </>
     );
 }

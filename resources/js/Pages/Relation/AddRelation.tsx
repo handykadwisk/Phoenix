@@ -33,6 +33,7 @@ export default function AddRelation({
     show,
     modal,
     handleSuccess,
+    relation,
     data,
     setData,
     switchPage,
@@ -46,6 +47,7 @@ export default function AddRelation({
     relationType: any;
     profession: any;
     relationLOB: any;
+    relation: any;
     show: any;
     modal: any;
     handleSuccess: any;
@@ -209,6 +211,13 @@ export default function AddRelation({
         };
     });
 
+    const relationSelect = relation?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
+    });
+
     const [existingAbb, setExistingAbb] = useState<any>([]);
 
     const cekAbbreviationRelation = async (name: any) => {
@@ -232,6 +241,15 @@ export default function AddRelation({
                 console.log(err);
             });
     };
+    // const [flagBAA, setFlagBAA] = useState<string>("noFlag");
+
+    // const checkBAA = (id: string) => {
+    //     if (data.relation_type_id.find((f: any) => f.id === id)) {
+    //         setFlagBAA("noFlag");
+    //     } else {
+    //         setFlagBAA("flag");
+    //     }
+    // };
 
     // const cekAbbreviation = (result: any) => {
     //     console.log(result.length);
@@ -248,6 +266,7 @@ export default function AddRelation({
         // })}
         <>
             <ModalToAdd
+                buttonAddOns={""}
                 show={show}
                 onClose={modal}
                 title={"Add Relation"}
@@ -714,11 +733,15 @@ export default function AddRelation({
                                                             // defaultChecked={
                                                             //     data.relation_type_id
                                                             // }
-                                                            onChange={(e) =>
+                                                            onChange={(e) => {
                                                                 handleCheckbox(
                                                                     e
-                                                                )
-                                                            }
+                                                                );
+                                                                // checkBAA(
+                                                                //     e.target
+                                                                //         .value
+                                                                // );
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
@@ -737,6 +760,38 @@ export default function AddRelation({
                                 </ul>
                             </div>
                         </div>
+                        {data.relation_status_id === "2" ? (
+                            <div className="mt-4">
+                                <InputLabel
+                                    htmlFor="corporate_pic_for"
+                                    value="Corporate PIC For"
+                                />
+                                <SelectTailwind
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={relationSelect}
+                                    isSearchable={true}
+                                    isMultiple={true}
+                                    isClearable={true}
+                                    placeholder={"--Select Relation--"}
+                                    value={data.corporate_pic_for}
+                                    onChange={(val: any) => {
+                                        setData("corporate_pic_for", val);
+                                    }}
+                                    primaryColor={"bg-red-500"}
+                                />
+                            </div>
+                        ) : null}
+
                         <div className="mt-4" id="relationJobs">
                             <InputLabel
                                 htmlFor="profession_id"

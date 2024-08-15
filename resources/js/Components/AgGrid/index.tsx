@@ -16,6 +16,7 @@ export default function AGGrid({
     url,
     // loading,
     withParam,
+    searchParam,
     triggeringRefreshData,
     doubleClickEvent = () => {},
     addButtonModalState = () => {},
@@ -24,13 +25,14 @@ export default function AGGrid({
     url: string;
     addButtonLabel: string | null | undefined;
     // loading: boolean;
-    withParam: number | string | null;
+    withParam: string | null;
+    searchParam: any | string | null;
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
 }>) {
+    console.log("bbb", withParam);
     const gridRef = useRef<AgGridReact>(null);
-
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
             getRows: (params) => {
@@ -72,7 +74,7 @@ export default function AGGrid({
                             endRow - startRow
                         }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
-                        )}`
+                        )}&newFilter=${JSON.stringify(searchParam)}`
                     )
                     .then((res) => {
                         params.success({
@@ -115,7 +117,7 @@ export default function AGGrid({
             )}
             <div
                 className="ag-theme-quartz"
-                style={{ height: 400, width: "100%" }}
+                style={{ height: 350, width: "100%" }}
             >
                 <AgGridReact
                     ref={gridRef}
@@ -127,6 +129,7 @@ export default function AGGrid({
                             };
                         }
                     }}
+                    suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={10}
                     cacheBlockSize={10}

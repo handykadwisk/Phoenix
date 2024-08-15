@@ -27,6 +27,7 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import SelectTailwind from "react-tailwindcss-select";
 import DetailSubGroup from "./DetailSubGroup";
+import SummaryGroup from "./SummaryGroup";
 
 export default function DetailGroup({
     idGroup,
@@ -50,6 +51,10 @@ export default function DetailGroup({
     const [relationId, setRelationId] = useState<any>({
         idRelation: "",
         nameRelation: "",
+    });
+    const [groupName, setGroupName] = useState<any>({
+        RELATION_GROUP_NAME: "",
+        RELATION_GROUP_ID: "",
     });
 
     // variable for modal
@@ -233,6 +238,11 @@ export default function DetailGroup({
     });
 
     const [modalDetailGroup, setModalDetailGroup] = useState({
+        view: false,
+        edit: false,
+    });
+
+    const [modalSummaryGroup, setModalSummaryGroup] = useState({
         view: false,
         edit: false,
     });
@@ -605,6 +615,30 @@ export default function DetailGroup({
     };
     // end Add Detail Group
 
+    // Onclick summary group
+    const handleClickSummary = async (
+        e: FormEvent,
+        idGroup: string,
+        name_group: string
+    ) => {
+        e.preventDefault();
+        // getRelationNoGroup();
+        // getDetailSubGroupParent(idGroup);
+        // setDataRelation({
+        //     ...dataRelation,
+        //     RELATION_ORGANIZATION_GROUP: idGroup,
+        // });
+        setGroupName({
+            RELATION_GROUP_NAME: name_group,
+            RELATION_GROUP_ID: idGroup,
+        });
+        setModalSummaryGroup({
+            view: !modalSummaryGroup.view,
+            edit: false,
+        });
+    };
+    // end Add summary Group
+
     const inputRefTag = useRef<HTMLInputElement>(null);
     const [query, setQuery] = useState("");
     const [menuOpen, setMenuOpen] = useState(true);
@@ -791,6 +825,34 @@ export default function DetailGroup({
     };
     return (
         <>
+            {/* modal detail  */}
+            <ModalToAction
+                show={modalSummaryGroup.view}
+                onClose={() => {
+                    setModalSummaryGroup({
+                        view: false,
+                        edit: false,
+                    });
+                    getDetailGroup(idGroup);
+                    getGroupName(idGroup);
+                }}
+                title={groupName.RELATION_GROUP_NAME}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <SummaryGroup idGroup={idGroup} />
+                    </>
+                }
+            />
+
             {/* modal detail group */}
             <DetailSubGroup
                 show={modalDetailGroup.edit}
@@ -1292,7 +1354,7 @@ export default function DetailGroup({
                 }
             />
 
-            <div className="grid grid-cols-1">
+            <div className="grid grid-cols-1 mb-96">
                 <div className="col-span-2 bg-white rounded-lg shadow-md pb-10 mb-5">
                     {/* <div className="flex justify-between items-center mt-4 mb-4"> */}
                     {/* <div className="w-fit px-4 text-md font-semibold">
@@ -1419,6 +1481,22 @@ export default function DetailGroup({
                                                                 >
                                                                     <span>
                                                                         Edit
+                                                                    </span>
+                                                                </div>
+                                                                <div
+                                                                    className="text-sm bg-amber-400 p-2 rounded-md text-white cursor-pointer hover:bg-amber-200"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleClickSummary(
+                                                                            e,
+                                                                            item.RELATION_GROUP_ID,
+                                                                            item.RELATION_GROUP_NAME
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <span>
+                                                                        Summary
                                                                     </span>
                                                                 </div>
                                                             </div>

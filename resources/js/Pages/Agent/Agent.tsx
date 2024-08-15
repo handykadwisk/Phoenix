@@ -237,9 +237,9 @@ export default function Agent({ auth }: PageProps) {
                 title={"Agent " + detailAgent.RELATION_ORGANIZATION_NAME}
                 url={""}
                 data={""}
-                onSuccess={""}
+                onSuccess={null}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
                 }
@@ -247,8 +247,6 @@ export default function Agent({ auth }: PageProps) {
                 body={
                     <>
                         <DetailAgentPopup
-                            isSuccess={isSuccess}
-                            setIsSuccess={setIsSuccess}
                             auth={auth}
                             idAgent={detailAgent.RELATION_ORGANIZATION_ID}
                         />
@@ -308,6 +306,7 @@ export default function Agent({ auth }: PageProps) {
                 </div>
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100%]">
                     <AGGrid
+                        searchParam={""}
                         addButtonLabel={null}
                         addButtonModalState={undefined}
                         withParam={null}
@@ -328,87 +327,6 @@ export default function Agent({ auth }: PageProps) {
                             },
                         ]}
                     />
-                    {/* <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                        <table className="w-full table-auto divide-y divide-gray-300">
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg "
-                                        }
-                                        label={"No"}
-                                    />
-                                    <TableTH
-                                        className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg "
-                                        }
-                                        label={"Name Relation Agent"}
-                                    />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dataAgent.data?.map(
-                                    (dAgent: any, i: number) => {
-                                        return (
-                                            <tr
-                                                onDoubleClick={() => {
-                                                    // getDivisionCombo(
-                                                    //     idRelation
-                                                    // );
-                                                    setDetailAgent({
-                                                        RELATION_ORGANIZATION_ID:
-                                                            dAgent.RELATION_ORGANIZATION_ID,
-                                                        RELATION_ORGANIZATION_NAME:
-                                                            dAgent.RELATION_ORGANIZATION_NAME,
-                                                    });
-                                                    setModal({
-                                                        add: false,
-                                                        delete: false,
-                                                        edit: false,
-                                                        view: true,
-                                                    });
-                                                }}
-                                                key={i}
-                                                className={
-                                                    i % 2 === 0
-                                                        ? "cursor-pointer"
-                                                        : "bg-gray-100 cursor-pointer"
-                                                }
-                                            >
-                                                <TableTD
-                                                    value={
-                                                        dataAgent.from + i + "."
-                                                    }
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dAgent.RELATION_ORGANIZATION_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </tbody>
-                        </table>
-                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                            <Pagination
-                                links={dataAgent.links}
-                                fromData={dataAgent.from}
-                                toData={dataAgent.to}
-                                totalData={dataAgent.total}
-                                clickHref={(url: string) =>
-                                    getAgent(url.split("?").pop())
-                                }
-                            />
-                        </div>
-                    </div> */}
                 </div>
             </div>
         </AuthenticatedLayout>

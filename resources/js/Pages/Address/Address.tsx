@@ -15,6 +15,7 @@ import TextArea from "@/Components/TextArea";
 import Checkbox from "@/Components/Checkbox";
 import SelectTailwind from "react-tailwindcss-select";
 import DetailAddressPopup from "./DetailAddress";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function Address({
     auth,
@@ -120,7 +121,7 @@ export default function Address({
 
     const regencySelect = regency?.map((query: any) => {
         return {
-            value: query.kode,
+            value: query.kode_mapping,
             label: query.nama,
         };
     });
@@ -194,6 +195,7 @@ export default function Address({
                 }
             });
         } else {
+            setIsSuccess(message[2]);
             setData({
                 RELATION_OFFICE_NAME: "",
                 RELATION_OFFICE_ALIAS: "",
@@ -207,28 +209,10 @@ export default function Address({
                 RELATION_OFFICE_REGENCY: "",
                 RELATION_LOCATION_TYPE: [],
             });
-
-            Swal.fire({
-                title: "Success",
-                text: "New Relation Office",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getRelationOffice();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            getRelationOffice();
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -245,10 +229,19 @@ export default function Address({
             });
     };
 
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -638,12 +631,16 @@ export default function Address({
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }

@@ -78,7 +78,8 @@ class TRelationDivisionController extends Controller
 
         return new JsonResponse([
             $division->RELATION_DIVISION_ID,
-            $division->RELATION_DIVISION_NAME
+            $division->RELATION_DIVISION_NAME,
+            "Relation Division Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -125,7 +126,8 @@ class TRelationDivisionController extends Controller
 
         return new JsonResponse([
             $request->RELATION_DIVISION_ID,
-            $request->RELATION_DIVISION_ALIAS
+            $request->RELATION_DIVISION_ALIAS,
+            "Relation Division Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

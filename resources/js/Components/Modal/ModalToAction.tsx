@@ -29,7 +29,7 @@ export default function ModalToAction({
     url: string;
     data: any | null;
     method: string;
-    onSuccess: any;
+    onSuccess: any | null | undefined;
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
@@ -59,7 +59,13 @@ export default function ModalToAction({
             .then((res) => {
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data);
+                if (
+                    onSuccess !== null ||
+                    onSuccess !== "" ||
+                    onSuccess !== undefined
+                ) {
+                    onSuccess(res.data);
+                }
                 close();
             })
             .catch((err) => {
@@ -74,7 +80,7 @@ export default function ModalToAction({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-9999"
+                    className="relative z-50"
                     onClose={close}
                     initialFocus={modalRef}
                 >
@@ -126,11 +132,13 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div
-                                                className="max-h-full overflow-y-auto custom-scrollbar px-2"
-                                                ref={modalRef}
-                                            >
-                                                {body}
+                                            <div className="max-h-full">
+                                                <div
+                                                    className="max-h-[100%] overflow-y-auto custom-scrollbar px-2"
+                                                    ref={modalRef}
+                                                >
+                                                    {body}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
