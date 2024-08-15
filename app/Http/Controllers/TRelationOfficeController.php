@@ -129,7 +129,8 @@ class TRelationOfficeController extends Controller
 
         return new JsonResponse([
             $office->RELATION_OFFICE_ID,
-            $office->RELATION_OFFICE_ALIAS
+            $office->RELATION_OFFICE_ALIAS,
+            "Relation Structure Office Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -201,7 +202,8 @@ class TRelationOfficeController extends Controller
 
         return new JsonResponse([
             $request->RELATION_OFFICE_ID,
-            $request->RELATION_OFFICE_ALIAS
+            $request->RELATION_OFFICE_ALIAS,
+            "Relation Office Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

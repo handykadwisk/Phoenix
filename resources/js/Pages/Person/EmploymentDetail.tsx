@@ -42,6 +42,7 @@ import { Datepicker } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function EmploymentDetail({
     idPerson,
@@ -62,7 +63,6 @@ export default function EmploymentDetail({
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
-                console.log("zz", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -172,7 +172,7 @@ export default function EmploymentDetail({
             person_certificate: detailPerson.person_certificate,
         });
         if (
-            detailPerson.person_certificate[0][
+            dataEditCertificate.person_certificate[0][
                 "CERTIFICATE_QUALIFICATION_ID"
             ] === null
         ) {
@@ -409,58 +409,38 @@ export default function EmploymentDetail({
     const handleSuccessAddEducation = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Education Add",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
     const handleSuccessEditEducation = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Education Edit",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
     const handleSuccessAddCertificate = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Certificate Add",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
     const handleSuccessEditCertificate = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Certificate Edit",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                }
-            });
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -615,9 +595,16 @@ export default function EmploymentDetail({
                 }
             });
     };
-
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* Edit Document */}
             <ModalToAdd
                 buttonAddOns={""}

@@ -165,7 +165,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->PERSON_ID
+            $request->PERSON_ID,
+            "Relation Person Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -436,7 +437,8 @@ class TPersonController extends Controller
 
         return new JsonResponse([
             $request->PERSON_ID,
-            "add"
+            "add",
+            "Person Structure Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -544,7 +546,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->id
+            $request->id,
+            "Profile Person Has Change"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -978,7 +981,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->dataEducations[0]['PERSON_ID']
+            $request->dataEducations[0]['PERSON_ID'],
+            "Person Education Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1021,7 +1025,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->person_education[0]['PERSON_ID']
+            $request->person_education[0]['PERSON_ID'],
+            "Person Education Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1037,11 +1042,18 @@ class TPersonController extends Controller
         $certificate = is_countable($request->dataCertificates);
         if ($certificate) {
             for ($i=0; $i < sizeof($request->dataCertificates); $i++) { 
+                $qualification = 0;
+                $isQualification = 0;
+                if ($request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'] != null && $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] != null) {
+                    $qualification = $request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'];
+                    $isQualification = $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'];
+                }
+                
                 $createCertificate = TPersonCertificate::create([
                     "PERSON_ID"                                 => $request->dataCertificates[$i]['PERSON_ID'],
                     "PERSON_CERTIFICATE_NAME"                   => $request->dataCertificates[$i]['PERSON_CERTIFICATE_NAME'], 
-                    "PERSON_CERTIFICATE_IS_QUALIFICATION"       => $request->dataCertificates[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'],
-                    "CERTIFICATE_QUALIFICATION_ID"              => $request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'],
+                    "PERSON_CERTIFICATE_IS_QUALIFICATION"       => $isQualification,
+                    "CERTIFICATE_QUALIFICATION_ID"              => $qualification,
                     "PERSON_CERTIFICATE_POINT"                  => $request->dataCertificates[$i]['PERSON_CERTIFICATE_POINT'],
                     "PERSON_CERTIFICATE_START_DATE"             => $request->dataCertificates[$i]['PERSON_CERTIFICATE_START_DATE'],
                     "PERSON_CERTIFICATE_EXPIRES_DATE"           => $request->dataCertificates[$i]['PERSON_CERTIFICATE_EXPIRES_DATE'],
@@ -1063,7 +1075,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->dataCertificates[0]['PERSON_ID']
+            $request->dataCertificates[0]['PERSON_ID'],
+            "Person Certificate Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1083,7 +1096,7 @@ class TPersonController extends Controller
             for ($i=0; $i < sizeof($request->person_certificate); $i++) { 
 
                 $pointNew = NULL;
-                $qualification = NULL;
+                $qualification = 0;
                 if ($request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 1 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 2 && $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'] != 3 && $request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] == 1) {
                     $pointNew = $request->person_certificate[$i]['PERSON_CERTIFICATE_POINT'];
                     // $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
@@ -1092,6 +1105,7 @@ class TPersonController extends Controller
                 if ($request->person_certificate[$i]['PERSON_CERTIFICATE_IS_QUALIFICATION'] == 1) {
                     $qualification = $request->person_certificate[$i]['CERTIFICATE_QUALIFICATION_ID'];
                 }
+
 
 
                 $createCertificate = TPersonCertificate::create([
@@ -1120,7 +1134,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->person_certificate[0]['PERSON_ID']
+            $request->person_certificate[0]['PERSON_ID'],
+            "Person Certificate Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1295,6 +1310,22 @@ class TPersonController extends Controller
         return response()->download($downloadFile);
 
     }
-    
+
+    public function person_document_download($idDocument)
+    {
+        $detailDocument = Document::find($idDocument);
+        // $filePath = public_path('/storage/documents/CA/0/11/11-List-Asuransi--2-Unit-Dumptruck.pdf');
+        $filePath = public_path('/storage/' . $detailDocument->DOCUMENT_DIRNAME . $detailDocument->DOCUMENT_FILENAME);
+        
+        $headers = [
+            'filename' => $detailDocument->DOCUMENT_FILENAME
+        ];
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $detailDocument->DOCUMENT_FILENAME, $headers);
+        } else {
+            abort(404, 'File not found');
+        }
+    }
 }   
 

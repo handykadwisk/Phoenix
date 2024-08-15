@@ -51,6 +51,7 @@ import AddressPerson from "./AddressPerson";
 import DetailPersonAddress from "./DetailPersonAddress";
 import DatePicker from "react-datepicker";
 import DetailBankAccount from "./DetailBankAccount";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function DetailPerson({
     idPerson,
@@ -399,27 +400,12 @@ export default function DetailPerson({
                 }
             )
             .then((res) => {
-                Swal.fire({
-                    title: "Success",
-                    text: "Images Change",
-                    icon: "success",
-                }).then((result: any) => {
-                    // console.log(result);
-                    if (result.value) {
-                        setFile();
-                        getPersonDetail(res.data[0]);
-                        // getPersons();
-                        // setGetDetailRelation(message);
-                        // setModal({
-                        //     add: false,
-                        //     delete: false,
-                        //     edit: false,
-                        //     view: true,
-                        //     document: false,
-                        //     search: false,
-                        // });
-                    }
-                });
+                setIsSuccess(res.data[1]);
+                setFile(null);
+                getPersonDetail(res.data[0]);
+                setTimeout(() => {
+                    setIsSuccess("");
+                }, 5000);
             })
             .catch((err) => {
                 console.log(err);
@@ -621,26 +607,11 @@ export default function DetailPerson({
     const handleSuccessEditPerson = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Edited",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message[0]);
-                    // getPersons();
-                    // setGetDetailRelation(message);
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            setIsSuccess(message[1]);
+            getPersonDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -759,55 +730,25 @@ export default function DetailPerson({
     };
 
     const handleSuccessStructure = (message: string) => {
-        // setIsSuccess("");
+        setIsSuccess("");
         if (message[1] === "add") {
+            setIsSuccess(message[2]);
             setDataStructure({
                 PERSON_ID: idPerson,
                 STRUCTURE_ID: "",
                 DIVISION_ID: "",
                 OFFICE_ID: "",
             });
-            Swal.fire({
-                title: "Success",
-                text: "Structure & Division Added",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message[0]);
-                    // getPersons();
-                    // setGetDetailRelation(message);
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            getPersonDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         } else {
-            Swal.fire({
-                title: "Success",
-                text: "Structure & Division Edited",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    getPersonDetail(message[0]);
-                    // getPersons();
-                    // setGetDetailRelation(message);
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
-                }
-            });
+            setIsSuccess("Person Structure Edited");
+            getPersonDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
@@ -868,10 +809,16 @@ export default function DetailPerson({
         });
     };
 
-    // console.log("bbb", editPerson);
-
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* <ModalToAction
                 show={modal.view}
                 onClose={() =>
@@ -1638,6 +1585,7 @@ export default function DetailPerson({
             {/* End Edit Person */}
             {/* Empolyment add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() => {
                     setModal({
@@ -2109,6 +2057,7 @@ export default function DetailPerson({
 
             {/* Edit Structure and Division */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modalStructure.edit}
                 onClose={() => {
                     setModalStructure({

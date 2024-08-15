@@ -23,6 +23,7 @@ import TextInput from "@/Components/TextInput";
 import SelectTailwind from "react-tailwindcss-select";
 import Checkbox from "@/Components/Checkbox";
 import BeatLoader from "react-spinners/BeatLoader";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function DetailAddress({
     idAddress,
@@ -141,7 +142,7 @@ export default function DetailAddress({
 
     const regencySelect = regency?.map((query: any) => {
         return {
-            value: query.kode,
+            value: query.kode_mapping,
             label: query.nama,
         };
     });
@@ -182,61 +183,67 @@ export default function DetailAddress({
     const getProvinceLabel = (value: any) => {
         if (value) {
             const selected = wilayahSelect.filter(
-                (option: any) => option.value === value
+                (option: any) => option.value === parseInt(value)
             );
             return selected[0].label;
         }
     };
     const getRegencyLabel = (value: any) => {
+        console.log(value);
         if (value) {
             const selectedRegency = regencySelect.filter(
-                (optionRegency: any) => optionRegency.value === value
+                (option: any) => option.value === value
             );
-            if (selectedRegency?.length === 0) {
-                dataById.RELATION_OFFICE_REGENCY;
-            } else {
-                return {
-                    label: selectedRegency[0].label,
-                    value: dataById.RELATION_OFFICE_REGENCY,
-                };
-            }
-            // return selectedRegency[0].label;
+            // console.log(selectedRegency);
+            return selectedRegency[0].label;
+        }
+    };
+    // const getRegencyLabel = (value: any) => {
+    //     if (value) {
+    //         const selectedRegency = regencySelect.filter(
+    //             (optionRegency: any) => optionRegency.value === value
+    //         );
+    //         if (selectedRegency?.length === 0) {
+    //             dataById.RELATION_OFFICE_REGENCY;
+    //         } else {
+    //             return {
+    //                 label: selectedRegency[0].label,
+    //                 value: dataById.RELATION_OFFICE_REGENCY,
+    //             };
+    //         }
+    //         // return selectedRegency[0].label;
+    //     }
+    // };
+
+    const handleSuccess = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[2]);
+            setDetailAddress({
+                RELATION_OFFICE_ID: message[0],
+                RELATION_OFFICE_ALIAS: message[1],
+            });
+            getOfficeDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
         }
     };
 
-    const handleSuccess = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Edit Relation Address",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setDetailAddress({
-                    RELATION_OFFICE_ID: message[0],
-                    RELATION_OFFICE_ALIAS: message[1],
-                });
-                getOfficeDetail(message[0]);
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
-    };
-    console.log(isLoading.get_detail);
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* <span>Detail Division</span> */}
             {/* modal edit*/}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.edit}
                 onClose={() =>
                     setModal({
@@ -456,9 +463,15 @@ export default function DetailAddress({
                                     options={regencySelect}
                                     isSearchable={true}
                                     placeholder={"--Select Regency--"}
-                                    value={getRegencyLabel(
-                                        dataById.RELATION_OFFICE_REGENCY
-                                    )}
+                                    value={{
+                                        label: getRegencyLabel(
+                                            dataById.RELATION_OFFICE_REGENCY
+                                        ),
+                                        value: dataById.RELATION_OFFICE_REGENCY,
+                                    }}
+                                    // value={getRegencyLabel(
+                                    //     dataById.RELATION_OFFICE_REGENCY
+                                    // )}
                                     // value={dataById.RELATION_OFFICE_REGENCY}
                                     // onChange={(e) =>
                                     //     inputDataBank(

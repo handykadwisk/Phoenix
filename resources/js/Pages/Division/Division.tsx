@@ -14,6 +14,7 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
 import DetailDivision from "./DetailDivision";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function Division({
     auth,
@@ -100,40 +101,26 @@ export default function Division({
     });
 
     const handleSuccess = (message: string) => {
-        setData({
-            RELATION_DIVISION_NAME: "",
-            RELATION_DIVISION_ALIAS: "",
-            RELATION_DIVISION_INITIAL: "",
-            RELATION_DIVISION_DESCRIPTION: "",
-            RELATION_DIVISION_PARENT_ID: "",
-            RELATION_ORGANIZATION_NAME: nameRelation,
-            RELATION_ORGANIZATION_ID: idRelation,
-            RELATION_DIVISION_MAPPING: "",
-            RELATION_DIVISION_CREATED_BY: "",
-            RELATION_DIVISION_CREATED_DATE: "",
-        });
-
-        Swal.fire({
-            title: "Success",
-            text: "New Relation Division",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getDivision();
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[2]);
+            setData({
+                RELATION_DIVISION_NAME: "",
+                RELATION_DIVISION_ALIAS: "",
+                RELATION_DIVISION_INITIAL: "",
+                RELATION_DIVISION_DESCRIPTION: "",
+                RELATION_DIVISION_PARENT_ID: "",
+                RELATION_ORGANIZATION_NAME: nameRelation,
+                RELATION_ORGANIZATION_ID: idRelation,
+                RELATION_DIVISION_MAPPING: "",
+                RELATION_DIVISION_CREATED_BY: "",
+                RELATION_DIVISION_CREATED_DATE: "",
+            });
+            getDivision();
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
 
     const clearSearchDivision = async (pageNumber = "page=1") => {
@@ -149,10 +136,20 @@ export default function Division({
             });
     };
 
+    const [isSuccess, setIsSuccess] = useState<string>("");
+
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -390,12 +387,16 @@ export default function Division({
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }

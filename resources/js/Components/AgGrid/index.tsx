@@ -25,12 +25,13 @@ export default function AGGrid({
     url: string;
     addButtonLabel: string | null | undefined;
     // loading: boolean;
-    withParam: number | string | null;
+    withParam: string | null;
     searchParam: any | string | null;
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
 }>) {
+    console.log("bbb", withParam);
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
@@ -116,7 +117,7 @@ export default function AGGrid({
             )}
             <div
                 className="ag-theme-quartz"
-                style={{ height: 400, width: "100%" }}
+                style={{ height: 350, width: "100%" }}
             >
                 <AgGridReact
                     ref={gridRef}

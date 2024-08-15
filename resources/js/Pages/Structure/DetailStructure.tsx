@@ -19,6 +19,7 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
 import TextInput from "@/Components/TextInput";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function DetailStructure({
     idStructure,
@@ -30,6 +31,7 @@ export default function DetailStructure({
     structureCombo: any;
 }>) {
     const [dataStructureNew, setDataStructureNew] = useState<any>([]);
+    const [isSuccess, setIsSuccess] = useState<string>("");
 
     useEffect(() => {
         getStructureDetail(idStructure);
@@ -80,32 +82,27 @@ export default function DetailStructure({
     };
 
     const handleSuccess = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Edit Relation Structure",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getStructureDetail(message[0]);
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[2]);
+            getStructureDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal edit*/}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.edit}
                 onClose={() =>
                     setModal({

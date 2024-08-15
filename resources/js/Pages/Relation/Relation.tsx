@@ -163,6 +163,7 @@ export default function Relation({ auth }: PageProps) {
         mark_tbk_relation: "",
         profession_id: "",
         relation_type_id: [],
+        corporate_pic_for: null,
     });
 
     const [dataById, setDataById] = useState<any>({
@@ -505,6 +506,7 @@ export default function Relation({ auth }: PageProps) {
                 relationType={relationType}
                 profession={profession}
                 relationLOB={relationLOB}
+                relation={relation}
                 data={data}
                 setData={setData}
                 switchPage={switchPage}

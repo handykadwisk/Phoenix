@@ -17,6 +17,8 @@ class TPerson extends Model
         'PERSON_ID',
     ];
 
+    public $with = ['corporatePIC'];
+
     public $timestamps = false;
 
     public function users(){
@@ -73,6 +75,10 @@ class TPerson extends Model
 
     public function TPersonBank(){
         return $this->hasMany(TPersonBankAccount::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function corporatePIC(){
+        return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
 }

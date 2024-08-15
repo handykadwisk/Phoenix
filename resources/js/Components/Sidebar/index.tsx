@@ -33,6 +33,7 @@ const Sidebar = ({
             ? false
             : storedSidebarExpanded === "true"
     );
+    const [filter, setFilter] = useState<string>("client");
 
     // close on click outside
     useEffect(() => {

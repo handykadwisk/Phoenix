@@ -13,6 +13,7 @@ use App\Models\RelationStatus;
 use App\Models\RelationType;
 use App\Models\Salutation;
 use App\Models\Tag;
+use App\Models\TPerson;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -185,7 +186,7 @@ class RelationController extends Controller
     public function index(Request $request)
     {
         // call data relation
-        $relation = Relation::where('RELATION_ORGANIZATION_PARENT_ID', "0")->paginate(3);
+        $relation = Relation::get();
 
         // call data relation group
         $relationGroup = RelationGroup::get();
@@ -213,7 +214,8 @@ class RelationController extends Controller
             'relationStatus' => $relationStatus,
             'relationGroup' => $relationGroup,
             'mRelationType' => $mRelationType,
-            'profession'   => $profession
+            'profession'   => $profession,
+            'relation' => $relation
         ]);
     }
 
@@ -226,8 +228,7 @@ class RelationController extends Controller
     public function store(Request $request)
     {
 
-        // cek abbreviation
-        // dd($request->abbreviation);
+        // Cek Abbreviation Exist;
         $flag = "0";
         $message = "Abbreviation already exists";
         $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->abbreviation)))->get();
@@ -243,6 +244,8 @@ class RelationController extends Controller
             }
         }
 
+
+        // Cek Relation Type Required;
         $flag = "rType";
         $message = "Please Choose Relation Type!";
         if ($request->relation_type_id == null) {
@@ -255,19 +258,6 @@ class RelationController extends Controller
         }
 
 
-
-
-        // dd($request);
-        // print_r(!is_countable($request->relation_aka));die;
-        // if (is_countable($request->relation_aka)) {
-        //     echo "ada";
-        // }
-        // die;
-        // Cek Relation Perent Id
-        // $parentID = $request->parent_id;
-        // if ($request->parent_id == '' || $request->parent_id == NULL) {
-        //     $parentID = "0";
-        // }
 
         // ubah ke to lower dan huruf besar di awal
         $nameRelation = strtolower($request->name_relation);
@@ -318,9 +308,22 @@ class RelationController extends Controller
             'relation_status_id' => $request->relation_status_id
 
         ]);
+        
+        if ($request->relation_status_id == "2") {
+            // jika dia corporate pic dan milih corporate pic maka akan melakukan mapping ke t person
+            if (is_countable($request->corporate_pic_for)) {
+                for ($i=0; $i < sizeof($request->corporate_pic_for); $i++) { 
+                    $idRelation = $request->corporate_pic_for[$i]['value'];
 
-        // Mapping Parent Id and Update
-        // DB::select('call sp_set_mapping_relation_organization(?)', [$request->group_id]);
+                    // simpan mapping ke t person
+                    TPerson::create([
+                        "PERSON_FIRST_NAME"         => $addTBK,
+                        "RELATION_ORGANIZATION_ID"  => $idRelation,
+                        "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID
+                    ]);
+                }
+            }
+        }
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
@@ -648,14 +651,15 @@ class RelationController extends Controller
             $request->RELATION_ORGANIZATION_ID,
             $addTBK,
             $preSalutation,
-            $postSalutation
+            $postSalutation,
+            "Relation Edit Success"
         ], 201, [
             'X-Inertia' => true
         ]);
     }
 
     public function get_detail(Request $request){
-        $detailRelation = Relation::find($request->id);
+        $detailRelation = Relation::with('TPerson')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }

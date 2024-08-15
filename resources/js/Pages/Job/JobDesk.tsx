@@ -15,6 +15,7 @@ import TextArea from "@/Components/TextArea";
 import Checkbox from "@/Components/Checkbox";
 import SelectTailwind from "react-tailwindcss-select";
 import DetailJobDescPopup from "./DetailJobDesc";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function JobDesk({
     auth,
@@ -99,35 +100,21 @@ export default function JobDesk({
     });
 
     const handleSuccess = (message: string) => {
-        setData({
-            RELATION_JOBDESC_ALIAS: "",
-            RELATION_JOBDESC_DESCRIPTION: "",
-            RELATION_JOBDESC_PARENT_ID: "",
-            RELATION_ORGANIZATION_ID: idRelation,
-            RELATION_ORGANIZATION_ALIAS: nameRelation,
-        });
-
-        Swal.fire({
-            title: "Success",
-            text: "New Relation Job Desc",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getJobDesc();
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[2]);
+            setData({
+                RELATION_JOBDESC_ALIAS: "",
+                RELATION_JOBDESC_DESCRIPTION: "",
+                RELATION_JOBDESC_PARENT_ID: "",
+                RELATION_ORGANIZATION_ID: idRelation,
+                RELATION_ORGANIZATION_ALIAS: nameRelation,
+            });
+            getJobDesc();
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
 
     const clearSearchJobDesc = async (pageNumber = "page=1") => {
@@ -142,11 +129,19 @@ export default function JobDesk({
                 console.log(err);
             });
     };
-
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -361,12 +356,16 @@ export default function JobDesk({
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }
