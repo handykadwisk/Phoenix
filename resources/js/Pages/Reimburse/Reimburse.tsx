@@ -42,6 +42,8 @@ export default function Reimburse({ auth }: PageProps) {
         getReimburseNeedRevisionStatus();
         getReimburseRejectStatus();
         getReimburseApproval();
+        getReimburseNotes();
+        getReimburseMethod();
     }, []);
 
     const handleRefresh = () => {
@@ -53,6 +55,8 @@ export default function Reimburse({ auth }: PageProps) {
         getReimburseNeedRevisionStatus();
         getReimburseRejectStatus();
         getReimburseApproval();
+        getReimburseNotes();
+        getReimburseMethod();
     };
 
     // Modal Add Start
@@ -73,31 +77,39 @@ export default function Reimburse({ auth }: PageProps) {
     // Modal Add Files Start
     const [modalFiles, setModalFiles] = useState<any>({
         add_files: false,
+        add_files_execute: false,
         show_files: false,
+        show_files_revised: false,
         index: "",
         index_show: "",
+        index_show_revised: "",
     });
     // Modal Add Files End
+
+    const handleOnClose = () => {
+        setModalFiles({
+            add_files: false,
+            add_files_execute: false,
+            show_files: false,
+            show_files_revised: false,
+            index: "",
+            index_show: "",
+            index_show_revised: "",
+        });
+    };
 
     const { data, setData, errors, reset } = useForm({
         reimburse_number: "",
         reimburse_used_by: "",
         reimburse_requested_by: "",
         reimburse_division: "",
+        reimburse_cost_center: "",
         reimburse_branch: "",
         reimburse_first_approval_by: "",
         reimburse_request_note: "",
-        reimburse_delivery_method_transfer: "",
-        reimburse_transfer_amount: "",
-        reimburse_delivery_method_cash: "",
-        reimburse_cash_amount: "",
-        reimburse_total_amount: "",
-        reimburse_transfer_date: "",
-        reimburse_from_bank_account: "",
-        reimburse_receive_date: "",
-        reimburse_receive_name: "",
-        refund_type: "",
-        refund_proof: "",
+        reimburse_method: "",
+        reimburse_settlement_date: "",
+        proof_of_document: [],
         ReimburseDetail: [
             {
                 reimburse_detail_date: "",
@@ -124,20 +136,13 @@ export default function Reimburse({ auth }: PageProps) {
             reimburse_used_by: "",
             reimburse_requested_by: "",
             reimburse_division: "",
+            reimburse_cost_center: "",
             reimburse_branch: "",
             reimburse_first_approval_by: "",
             reimburse_request_note: "",
-            reimburse_delivery_method_transfer: "",
-            reimburse_transfer_amount: "",
-            reimburse_delivery_method_cash: "",
-            reimburse_cash_amount: "",
-            reimburse_total_amount: "",
-            reimburse_transfer_date: "",
-            reimburse_from_bank_account: "",
-            reimburse_receive_date: "",
-            reimburse_receive_name: "",
-            refund_type: "",
-            refund_proof: "",
+            reimburse_method: "",
+            reimburse_settlement_date: "",
+            proof_of_document: [],
             ReimburseDetail: [
                 {
                     reimburse_detail_date: "",
@@ -163,6 +168,8 @@ export default function Reimburse({ auth }: PageProps) {
         getReimburseNeedRevisionStatus();
         getReimburseRejectStatus();
         getReimburseApproval();
+        getReimburseNotes();
+        getReimburseMethod();
     };
     // Handle Success End
 
@@ -352,16 +359,6 @@ export default function Reimburse({ auth }: PageProps) {
     };
     // Handle Remove Files Row End
 
-    const handleUploadFile = (e: any, i: number) => {
-        const { name, files } = e.target;
-
-        const onchangeFile: any = [...data.ReimburseDetail];
-
-        onchangeFile[i][name] = files[0];
-
-        setData("ReimburseDetail", onchangeFile);
-    };
-
     // Handle Change Approve Start
     const handleChangeApprove = (e: any, i: number) => {
         const { name, value } = e.target;
@@ -424,6 +421,32 @@ export default function Reimburse({ auth }: PageProps) {
     };
     // Handle Change Approval Report End
 
+    // Handle Add Row Revised Start
+    const handleAddRowRevised = (e: any) => {
+        setDataById({
+            ...dataById,
+            reimburse_detail: [
+                ...dataById.reimburse_detail,
+                {
+                    REIMBURSE_DETAIL_AMOUNT: "",
+                    REIMBURSE_DETAIL_AMOUNT_APPROVE: "",
+                    REIMBURSE_DETAIL_APPROVAL: "",
+                    REIMBURSE_DETAIL_COST_CLASSIFICATION: "",
+                    REIMBURSE_DETAIL_DATE: "",
+                    REIMBURSE_DETAIL_ID: "",
+                    REIMBURSE_DETAIL_LOCATION: "",
+                    REIMBURSE_DETAIL_PURPOSE: "",
+                    REIMBURSE_DETAIL_RELATION_NAME: "",
+                    REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID: "",
+                    REIMBURSE_DETAIL_RELATION_POSITION: "",
+                    REIMBURSE_DETAIL_REMARKS: "",
+                    REIMBURSE_ID: "",
+                },
+            ],
+        });
+    };
+    // Handle Add Row Revised End
+
     // Handle Change Revised Start
     const handleChangeRevised = (e: any, i: number) => {
         const { name, value } = e.target;
@@ -436,27 +459,159 @@ export default function Reimburse({ auth }: PageProps) {
     };
     // Handle Change Revised End
 
-    const handleUploadFileRevised = (e: any, i: number) => {
-        const { name, files } = e.target;
+    // Handle Change Revised Custom Start
+    const handleChangeRevisedCustom = (value: any, name: any, i: number) => {
+        const onchangeVal: any = [...dataById.reimburse_detail];
 
-        const onchangeFile: any = [...dataById.reimburse_detail];
+        onchangeVal[i][name] = value;
 
-        onchangeFile[i][name] = files[0];
-
-        // setData("ReimburseDetail", onchangeFile);
-
-        setDataById({ ...dataById, reimburse_detail: onchangeFile });
+        setDataById({ ...dataById, reimburse_detail: onchangeVal });
     };
+    // Handle Change Revised Custom End
+
+    // Handle Change Revised Date Start
+    const handleChangeRevisedDate = (value: any, name: any, i: number) => {
+        const onchangeVal: any = [...dataById.reimburse_detail];
+
+        onchangeVal[i][name] = value.toLocaleDateString("en-CA");
+
+        setDataById({ ...dataById, reimburse_detail: onchangeVal });
+    };
+    // Handle Change Revised Date End
 
     // Handle Remove Row Revised Start
-    const handleRemoveRowRevised = (i: number) => {
+    const handleRemoveRowRevised = (i: number, reimburse_detail_id: number) => {
         const deleteRow = [...dataById.reimburse_detail];
 
         deleteRow.splice(i, 1);
 
-        setDataById({ ...dataById, reimburse_detail: deleteRow });
+        setDataById({
+            ...dataById,
+            reimburse_detail: deleteRow,
+            deletedRow: [
+                ...(dataById.deletedRow || []),
+                {
+                    REIMBURSE_DETAIL_ID: reimburse_detail_id,
+                },
+            ],
+        });
     };
     // Handle Remove Row Revised End
+
+    // Handle Add Row Revised Files Start
+    const handleAddRowRevisedFiles = (reimburse_detail_id: number) => {
+        const addFiles = [...dataById.reimburse_detail];
+
+        addFiles[modalFiles.index_show_revised].filesDocument = [
+            ...(addFiles[modalFiles.index_show_revised].filesDocument || []),
+            {
+                REIMBURSE_DETAIL_DOCUMENT: "",
+                REIMBURSE_DETAIL_ID: reimburse_detail_id,
+            },
+        ];
+
+        setDataById({
+            ...dataById,
+            reimburse_detail: addFiles,
+        });
+    };
+    // Handle Add Row Revised Files End
+
+    // Handle Change Revised Files Start
+    const handleChangeRevisedFiles = (e: any, i: number) => {
+        const { name, files } = e.target;
+
+        const onchangeFileData: any = [...dataById.reimburse_detail];
+
+        onchangeFileData[modalFiles.index_show_revised].filesDocument[i][name] =
+            files[0];
+
+        setDataById({ ...dataById, reimburse_detail: onchangeFileData });
+    };
+    // Handle Change Revised Files End
+
+    // Handle Remove Row Revised Files Start
+    const handleRemoveRowRevisedFiles = (e: any, i: number) => {
+        const deleteRow = [...dataById.reimburse_detail];
+
+        deleteRow[modalFiles.index_show_revised].filesDocument.splice(i, 1);
+
+        setDataById({ ...dataById, reimburse_detail: deleteRow });
+    };
+    // Handle Remove Row Revised Files End
+
+    // Handle Remove Row Revised Show Files Start
+    const handleRemoveRowRevisedShowFiles = (
+        i: number,
+        document_id: number,
+        reimburse_detail_id: number
+    ) => {
+        const deleteRow = [...dataById.reimburse_detail];
+
+        deleteRow[modalFiles.index_show_revised].m_reimburse_document.splice(
+            i,
+            1
+        );
+
+        setDataById({
+            ...dataById,
+            reimburse_detail: deleteRow,
+            deletedDocument: [
+                ...(dataById.deletedDocument || []),
+                {
+                    DOCUMENT_ID: document_id,
+                    REIMBURSE_DETAIL_ID: reimburse_detail_id,
+                },
+            ],
+        });
+    };
+    // Handle Remove Row Revised Show Files End
+
+    // Handle Add Row Proof of Document Start
+    const handleAddRowProofOfDocument = (e: any) => {
+        e.preventDefault();
+
+        setData({
+            ...data,
+            proof_of_document: [
+                ...data.proof_of_document,
+                {
+                    proof_of_document: "",
+                },
+            ],
+        });
+    };
+    // Handle Add Row Proof of Document End
+
+    // Handle Change Row Proof of Document Start
+    const handleChangeProofOfDocument = (e: any, i: number) => {
+        const { name, files } = e.target;
+
+        const onchangeFileData: any = [...data.proof_of_document];
+
+        onchangeFileData[i][name] = files[0];
+
+        setData({
+            ...data,
+            proof_of_document: onchangeFileData,
+        });
+    };
+    // Handle Change Row Proof of Document End
+
+    // Handle Remove Row Proof of Document Row Start
+    const handleRemoveProofOfDocument = (e: any, i: number) => {
+        e.preventDefault();
+
+        const deleteFilesData: any = [...data.proof_of_document];
+
+        deleteFilesData.splice(i, 1);
+
+        setData({
+            ...data,
+            proof_of_document: deleteFilesData,
+        });
+    };
+    // Handle Remove Row Proof of Document Row End
 
     // Handle Add Row Report Reimburse Start
     const [DataReportRow, setDataReportRow] = useState([
@@ -590,6 +745,7 @@ export default function Reimburse({ auth }: PageProps) {
                     reimburse_start_date: "",
                     reimburse_end_date: "",
                     reimburse_division: "",
+                    reimburse_cost_center: "",
                     reimburse_branch: "",
                 });
             })
@@ -600,7 +756,7 @@ export default function Reimburse({ auth }: PageProps) {
     // Clear Search End
 
     // Data Start
-    const { relations, coa, persons, office }: any = usePage().props;
+    const { relations, coa, persons, office, division }: any = usePage().props;
     // Data End
 
     const [ReimburseApproval, setReimburseApproval] = useState<any>([]);
@@ -615,12 +771,24 @@ export default function Reimburse({ auth }: PageProps) {
             });
     };
 
-    const [getCashAdvanceMethod, setCashAdvanceMethod] = useState<any>([]);
+    const [ReimburseNotes, setReimburseNotes] = useState<any>([]);
+    const getReimburseNotes = async () => {
+        await axios
+            .get(`/getReimburseNotes`)
+            .then((res) => {
+                setReimburseNotes(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [ReimburseMethod, setReimburseMethod] = useState<any>([]);
     const getReimburseMethod = async () => {
         await axios
-            .get(`/getCashAdvanceMethod`)
+            .get(`/getReimburseMethod`)
             .then((res) => {
-                setCashAdvanceMethod(res.data);
+                setReimburseMethod(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -1027,10 +1195,34 @@ export default function Reimburse({ auth }: PageProps) {
         }
     });
 
+    useEffect(() => {
+        const difference =
+            reimburse_total_amount_approve - dataById.REIMBURSE_TOTAL_AMOUNT;
+
+        if (difference < 0) {
+            setDataById({ ...dataById, REIMBURSE_TYPE: 1 });
+        } else {
+            setDataById({ ...dataById, REIMBURSE_TYPE: 2 });
+        }
+    }, [reimburse_total_amount_approve, dataById.REIMBURSE_TOTAL_AMOUNT]);
+
+    const selectDivision = division
+        ?.filter(
+            (m: any) =>
+                m.RELATION_ORGANIZATION_ID ===
+                auth.user.person.RELATION_ORGANIZATION_ID
+        )
+        .map((query: any) => {
+            return {
+                value: query.RELATION_DIVISION_ID,
+                label: query.RELATION_DIVISION_ALIAS,
+            };
+        });
+
     const selectPerson = persons
         ?.filter(
             (m: any) =>
-                m.DIVISION_ID === auth.user.person?.DIVISION_ID &&
+                m.DIVISION_ID === data.reimburse_cost_center.value &&
                 m.STRUCTURE_ID === 4
         )
         .map((query: any) => {
@@ -1135,14 +1327,7 @@ export default function Reimburse({ auth }: PageProps) {
                             classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]`}
                             show={modalFiles.add_files}
                             closeable={true}
-                            onClose={() =>
-                                setModalFiles({
-                                    add_files: false,
-                                    show_files: false,
-                                    index: "",
-                                    index_show: "",
-                                })
-                            }
+                            onClose={() => handleOnClose()}
                             title="Add Files"
                             url=""
                             data=""
@@ -1226,6 +1411,51 @@ export default function Reimburse({ auth }: PageProps) {
                                 />
                             </div>
                             <div className="w-full p-2 mb-1">
+                                <InputLabel
+                                    htmlFor="reimburse_division"
+                                    value="Division"
+                                    className="mb-4"
+                                />
+                                <TextInput
+                                    id="reimburse_division"
+                                    type="text"
+                                    name="reimburse_division"
+                                    value={
+                                        auth.user.person.division
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2 mb-1">
+                                <InputLabel htmlFor="namaPemohon" className="">
+                                    Cost Center
+                                    <span className="text-red-600">*</span>
+                                </InputLabel>
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={selectDivision}
+                                    isSearchable={true}
+                                    placeholder={"Choose Cost Center"}
+                                    value={data.reimburse_cost_center}
+                                    onChange={(val: any) =>
+                                        setData("reimburse_cost_center", val)
+                                    }
+                                    primaryColor={"bg-red-500"}
+                                />
+                            </div>
+                            <div className="w-full p-2 mb-1">
                                 <InputLabel htmlFor="namaPemohon" className="">
                                     Used By
                                     <span className="text-red-600">*</span>
@@ -1250,24 +1480,6 @@ export default function Reimburse({ auth }: PageProps) {
                                         setData("reimburse_used_by", val)
                                     }
                                     primaryColor={"bg-red-500"}
-                                />
-                            </div>
-                            <div className="w-full p-2 mb-1">
-                                <InputLabel
-                                    htmlFor="reimburse_division"
-                                    value="Cost Center"
-                                    className="mb-4"
-                                />
-                                <TextInput
-                                    id="reimburse_division"
-                                    type="text"
-                                    name="reimburse_division"
-                                    value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
                                 />
                             </div>
                             <div className="w-full p-2 mb-1">
@@ -1542,8 +1754,12 @@ export default function Reimburse({ auth }: PageProps) {
                                                         setModalFiles({
                                                             add_files: true,
                                                             show_files: false,
+                                                            show_files_revised:
+                                                                false,
                                                             index: i,
                                                             index_show: "",
+                                                            index_show_revised:
+                                                                "",
                                                         });
                                                     }}
                                                 >
@@ -1641,7 +1857,7 @@ export default function Reimburse({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Detail Reimburse"
+                title="Reimburse Detail"
                 url=""
                 data=""
                 method=""
@@ -1656,14 +1872,7 @@ export default function Reimburse({ auth }: PageProps) {
                             }
                             show={modalFiles.show_files}
                             closeable={true}
-                            onClose={() =>
-                                setModalFiles({
-                                    add_files: false,
-                                    show_files: false,
-                                    index: "",
-                                    index_show: "",
-                                })
-                            }
+                            onClose={() => handleOnClose()}
                             title="Show Files"
                             url=""
                             data=""
@@ -1739,18 +1948,18 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
+                                    htmlFor="tanggalPengajuan"
+                                    value="Request Date"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="namaPemohon"
+                                    id="tanggalPengajuan"
                                     type="text"
-                                    name="namaPemohon"
-                                    value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
-                                    }
+                                    name="tanggalPengajuan"
+                                    value={dateFormat(
+                                        dataById.REIMBURSE_REQUETED_DATE,
+                                        "dd-mm-yyyy"
+                                    )}
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -1772,25 +1981,8 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="branch"
-                                    value="Branch"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="branch"
-                                    type="text"
-                                    name="branch"
-                                    value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
                                     htmlFor="divisi"
-                                    value="Cost Center"
+                                    value="Division"
                                     className="mb-2"
                                 />
                                 <TextInput
@@ -1807,18 +1999,53 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="tanggalPengajuan"
-                                    value="Request Date"
+                                    htmlFor="cost_center"
+                                    value="Cost Center"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="tanggalPengajuan"
+                                    id="cost_center"
                                     type="text"
-                                    name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataById.REIMBURSE_REQUETED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
+                                    name="cost_center"
+                                    value={
+                                        dataById.cost_center
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="namaPemohon"
+                                    value="Used By"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="namaPemohon"
+                                    type="text"
+                                    name="namaPemohon"
+                                    value={
+                                        dataById.person_used_by
+                                            ?.PERSON_FIRST_NAME
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="branch"
+                                    value="Branch"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="branch"
+                                    type="text"
+                                    name="branch"
+                                    value={
+                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -1958,9 +2185,13 @@ export default function Reimburse({ auth }: PageProps) {
                                                                         false,
                                                                     show_files:
                                                                         true,
+                                                                    show_files_revised:
+                                                                        "",
                                                                     index: "",
                                                                     index_show:
                                                                         i,
+                                                                    index_show_revised:
+                                                                        "",
                                                                 });
                                                             }}
                                                         >
@@ -2035,7 +2266,7 @@ export default function Reimburse({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Approve Reimburse"
+                title="Reimburse Approve"
                 url={`/reimburseApprove/${dataById.reimburse_detail.REIMBURSE_DETAIL_ID}`}
                 data={dataById}
                 method="patch"
@@ -2050,14 +2281,7 @@ export default function Reimburse({ auth }: PageProps) {
                             }
                             show={modalFiles.show_files}
                             closeable={true}
-                            onClose={() =>
-                                setModalFiles({
-                                    add_files: false,
-                                    show_files: false,
-                                    index: "",
-                                    index_show: "",
-                                })
-                            }
+                            onClose={() => handleOnClose()}
                             title="Show Files"
                             url=""
                             data=""
@@ -2133,18 +2357,18 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
+                                    htmlFor="tanggalPengajuan"
+                                    value="Request Date"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="namaPemohon"
+                                    id="tanggalPengajuan"
                                     type="text"
-                                    name="namaPemohon"
-                                    value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
-                                    }
+                                    name="tanggalPengajuan"
+                                    value={dateFormat(
+                                        dataById.REIMBURSE_REQUETED_DATE,
+                                        "dd-mm-yyyy"
+                                    )}
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -2166,25 +2390,8 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="branch"
-                                    value="Branch"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="branch"
-                                    type="text"
-                                    name="branch"
-                                    value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
                                     htmlFor="divisi"
-                                    value="Cost Center"
+                                    value="Division"
                                     className="mb-2"
                                 />
                                 <TextInput
@@ -2201,18 +2408,53 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="tanggalPengajuan"
-                                    value="Request Date"
+                                    htmlFor="cost_center"
+                                    value="Cost Center"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="tanggalPengajuan"
+                                    id="cost_center"
                                     type="text"
-                                    name="tanggalPengajuan"
-                                    value={dateFormat(
-                                        dataById.REIMBURSE_REQUETED_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
+                                    name="cost_center"
+                                    value={
+                                        dataById.cost_center
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="namaPemohon"
+                                    value="Used By"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="namaPemohon"
+                                    type="text"
+                                    name="namaPemohon"
+                                    value={
+                                        dataById.person_used_by
+                                            ?.PERSON_FIRST_NAME
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="branch"
+                                    value="Branch"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="branch"
+                                    type="text"
+                                    name="branch"
+                                    value={
+                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -2372,9 +2614,13 @@ export default function Reimburse({ auth }: PageProps) {
                                                                         false,
                                                                     show_files:
                                                                         true,
+                                                                    show_files_revised:
+                                                                        false,
                                                                     index: "",
                                                                     index_show:
                                                                         i,
+                                                                    index_show_revised:
+                                                                        "",
                                                                 });
                                                             }}
                                                         >
@@ -2541,7 +2787,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             )}
                                         </TD>
                                     </tr>
-                                    {/* <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm leading-7">
                                         <TD
                                             className="border text-right pr-5 py-2"
                                             colSpan={11}
@@ -2554,11 +2800,45 @@ export default function Reimburse({ auth }: PageProps) {
                                                     reimburse_total_amount_approve
                                             )}
                                         </TD>
-                                    </tr> */}
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>
                         {/* Table form end */}
+
+                        <div className="grid md:grid-cols-2 my-10">
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="REPORT_CASH_ADVANCE_TYPE"
+                                    className="mb-2"
+                                >
+                                    Notes
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
+                                <select
+                                    id="REIMBURSE_TYPE"
+                                    name="REIMBURSE_TYPE"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    onChange={(e) =>
+                                        setDataById({
+                                            ...dataById,
+                                            REIMBURSE_TYPE: e.target.value,
+                                        })
+                                    }
+                                    value={dataById?.REIMBURSE_TYPE}
+                                >
+                                    <option value="">-- Choose Notes --</option>
+                                    {ReimburseNotes.map((notes: any) => (
+                                        <option
+                                            key={notes.REIMBURSE_NOTES_ID}
+                                            value={notes.REIMBURSE_NOTES_ID}
+                                        >
+                                            {notes.REIMBURSE_NOTES_NAME}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
@@ -2623,15 +2903,174 @@ export default function Reimburse({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Revised Reimburse"
-                url={`/reimburseRevised/${dataById.REIMBURSE_ID}`}
+                title="Reimburse Revised"
+                url={`/reimburseRevised`}
                 data={dataById}
-                method="patch"
+                method="post"
                 onSuccess={handleSuccess}
-                headers={null}
+                headers={{ "Content-type": "multipart/form-data" }}
                 submitButtonName={"Save"}
                 body={
                     <>
+                        <ModalToAction
+                            classPanel={
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                            }
+                            show={modalFiles.show_files_revised}
+                            closeable={true}
+                            onClose={() => handleOnClose()}
+                            title="Show Files"
+                            url=""
+                            data=""
+                            method=""
+                            onSuccess=""
+                            headers={null}
+                            submitButtonName=""
+                            body={
+                                <>
+                                    <div className="grid grid-cols-12 my-3">
+                                        {dataById.reimburse_detail[
+                                            modalFiles.index_show_revised
+                                        ]?.m_reimburse_document && (
+                                            <>
+                                                {dataById.reimburse_detail[
+                                                    modalFiles
+                                                        .index_show_revised
+                                                ]?.m_reimburse_document.map(
+                                                    (file: any, i: number) => (
+                                                        <>
+                                                            <div
+                                                                className={`w-full col-span-11 mb-4`}
+                                                                key={i}
+                                                            >
+                                                                <InputLabel
+                                                                    htmlFor="files"
+                                                                    value="File"
+                                                                    className="mb-2"
+                                                                />
+                                                                <p>
+                                                                    {
+                                                                        file
+                                                                            ?.document
+                                                                            .DOCUMENT_ORIGINAL_NAME
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                            <button
+                                                                className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-4 py-1 rounded-lg"
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    handleRemoveRowRevisedShowFiles(
+                                                                        i,
+                                                                        file
+                                                                            ?.document
+                                                                            .DOCUMENT_ID,
+                                                                        dataById
+                                                                            .reimburse_detail[
+                                                                            modalFiles
+                                                                                .index_show_revised
+                                                                        ]
+                                                                            .REIMBURSE_DETAIL_ID
+                                                                    )
+                                                                }
+                                                            >
+                                                                X
+                                                            </button>
+                                                        </>
+                                                    )
+                                                )}
+                                            </>
+                                        )}
+
+                                        {dataById.reimburse_detail[
+                                            modalFiles.index_show_revised
+                                        ]?.filesDocument ? (
+                                            <>
+                                                {dataById.reimburse_detail[
+                                                    modalFiles
+                                                        .index_show_revised
+                                                ]?.filesDocument.map(
+                                                    (file: any, i: number) => (
+                                                        <>
+                                                            {file
+                                                                .REIMBURSE_DETAIL_DOCUMENT
+                                                                ?.name ? (
+                                                                <div
+                                                                    className={`w-full col-span-11 mb-4`}
+                                                                >
+                                                                    <InputLabel
+                                                                        htmlFor="files"
+                                                                        value="File"
+                                                                        className="mb-2"
+                                                                    />
+                                                                    <p>
+                                                                        {
+                                                                            file
+                                                                                ?.REIMBURSE_DETAIL_DOCUMENT
+                                                                                .name
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            ) : (
+                                                                <div
+                                                                    className={`w-full col-span-11 mb-4`}
+                                                                >
+                                                                    <InputLabel
+                                                                        htmlFor="files"
+                                                                        value="File"
+                                                                        className="mb-2"
+                                                                    />
+                                                                    <Input
+                                                                        name="REIMBURSE_DETAIL_DOCUMENT"
+                                                                        type="file"
+                                                                        className="w-full"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            handleChangeRevisedFiles(
+                                                                                e,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <button
+                                                                className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-7 py-1 rounded-lg"
+                                                                onClick={(e) =>
+                                                                    handleRemoveRowRevisedFiles(
+                                                                        e,
+                                                                        i
+                                                                    )
+                                                                }
+                                                            >
+                                                                X
+                                                            </button>
+                                                        </>
+                                                    )
+                                                )}
+                                            </>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="text-sm cursor-pointer hover:underline"
+                                        onClick={() =>
+                                            handleAddRowRevisedFiles(
+                                                dataById.reimburse_detail[
+                                                    modalFiles
+                                                        .index_show_revised
+                                                ].REIMBURSE_DETAIL_ID
+                                            )
+                                        }
+                                    >
+                                        + Add Row
+                                    </button>
+                                </>
+                            }
+                        />
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
@@ -2643,25 +3082,26 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="cashAdvanceNumber"
                                     type="text"
                                     name="cashAdvanceNumber"
-                                    value="PV/REIM/2024/8/00001"
+                                    value={dataById.REIMBURSE_NUMBER}
                                     className="bg-gray-100"
-                                    autoComplete="cashAdvanceNumber"
                                     readOnly
                                 />
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
+                                    htmlFor="tanggalPengajuan"
+                                    value="Request Date"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="namaPemohon"
+                                    id="tanggalPengajuan"
                                     type="text"
-                                    name="namaPemohon"
-                                    value="Fadhlan"
+                                    name="tanggalPengajuan"
+                                    value={dateFormat(
+                                        dataById.REIMBURSE_REQUETED_DATE,
+                                        "dd-mm-yyyy"
+                                    )}
                                     className="bg-gray-100"
-                                    autoComplete="namaPemohon"
                                     readOnly
                                 />
                             </div>
@@ -2677,39 +3117,77 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="namaPengguna"
                                     value={auth.user.person.PERSON_FIRST_NAME}
                                     className="bg-gray-100"
-                                    autoComplete="namaPengguna"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="tanggalPengajuan"
-                                    value="Request Date"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="tanggalPengajuan"
-                                    type="text"
-                                    name="tanggalPengajuan"
-                                    value="12-08-2024"
-                                    className="bg-gray-100"
-                                    autoComplete="tanggalPengajuan"
                                     readOnly
                                 />
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="divisi"
-                                    value="Cost Center"
+                                    value="Division"
                                     className="mb-2"
                                 />
                                 <TextInput
                                     id="divisi"
                                     type="text"
                                     name="divisi"
-                                    value="Information Technology"
+                                    value={
+                                        auth.user.person.division
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
                                     className="bg-gray-100"
-                                    autoComplete="divisi"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="cost_center"
+                                    value="Cost Center"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="cost_center"
+                                    type="text"
+                                    name="cost_center"
+                                    value={
+                                        dataById.cost_center
+                                            ?.RELATION_DIVISION_ALIAS
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="namaPemohon"
+                                    value="Used By"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="namaPemohon"
+                                    type="text"
+                                    name="namaPemohon"
+                                    value={
+                                        dataById.person_used_by
+                                            ?.PERSON_FIRST_NAME
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="branch"
+                                    value="Branch"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="branch"
+                                    type="text"
+                                    name="branch"
+                                    value={
+                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                    }
+                                    className="bg-gray-100"
                                     readOnly
                                 />
                             </div>
@@ -2723,9 +3201,11 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPemberiApproval"
                                     type="text"
                                     name="namaPemberiApproval"
-                                    value="Apep"
+                                    value={
+                                        dataById.person_approval
+                                            ?.PERSON_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
-                                    autoComplete="namaPemberiApproval"
                                     readOnly
                                 />
                             </div>
@@ -2742,31 +3222,34 @@ export default function Reimburse({ auth }: PageProps) {
                                             rowSpan={2}
                                         />
                                         <TH className="border" rowSpan="2">
-                                            Date Intended <br /> Activity{" "}
+                                            Date Intended Activity{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border" rowSpan="2">
+                                            Purpose
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
                                         <TH
-                                            label="Purpose"
-                                            className="border py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
                                             label="Relation"
                                             className="border py-2"
                                             colSpan={3}
                                         />
-                                        <TH
-                                            label="Location"
-                                            className="border py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Amount"
-                                            className="border py-2"
-                                            rowSpan={2}
-                                        />
+                                        <TH className="border" rowSpan="2">
+                                            Location{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border" rowSpan="2">
+                                            Amount
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
                                         <TH
                                             label="Document"
                                             className="border py-2"
@@ -2803,7 +3286,7 @@ export default function Reimburse({ auth }: PageProps) {
                                 </thead>
                                 <tbody>
                                     {dataById.reimburse_detail.map(
-                                        (cad: any, i: number) => (
+                                        (rd: any, i: number) => (
                                             <tr
                                                 className="text-center text-sm"
                                                 key={i}
@@ -2814,16 +3297,16 @@ export default function Reimburse({ auth }: PageProps) {
                                                 <TD className="border">
                                                     <DatePicker
                                                         name="REIMBURSE_DETAIL_DATE"
-                                                        // selected={
-                                                        //     val.REIMBURSE_DETAIL_DATE
-                                                        // }
-                                                        // onChange={(date: any) =>
-                                                        //     handleChangeAddDate(
-                                                        //         date,
-                                                        //         "REIMBURSE_DETAIL_DATE",
-                                                        //         i
-                                                        //     )
-                                                        // }
+                                                        selected={
+                                                            rd.REIMBURSE_DETAIL_DATE
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            handleChangeRevisedDate(
+                                                                date,
+                                                                "REIMBURSE_DETAIL_DATE",
+                                                                i
+                                                            )
+                                                        }
                                                         dateFormat={
                                                             "dd-MM-yyyy"
                                                         }
@@ -2839,10 +3322,10 @@ export default function Reimburse({ auth }: PageProps) {
                                                         type="text"
                                                         name="REIMBURSE_DETAIL_PURPOSE"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_PURPOSE
+                                                            rd.REIMBURSE_DETAIL_PURPOSE
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_PURPOSE"
+                                                        autoComplete="off"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2872,16 +3355,19 @@ export default function Reimburse({ auth }: PageProps) {
                                                         placeholder={
                                                             "Choose Business Relation"
                                                         }
-                                                        // value={
-                                                        //     val.reimburse_detail_relation_organization_id
-                                                        // }
-                                                        // onChange={(val: any) =>
-                                                        //     handleChangeAddCustom(
-                                                        //         val,
-                                                        //         "reimburse_detail_relation_organization_id",
-                                                        //         i
-                                                        //     )
-                                                        // }
+                                                        value={{
+                                                            label: getRelationSelect(
+                                                                rd.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID
+                                                            ),
+                                                            value: rd.REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID,
+                                                        }}
+                                                        onChange={(val: any) =>
+                                                            handleChangeRevisedCustom(
+                                                                val.value,
+                                                                "REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID",
+                                                                i
+                                                            )
+                                                        }
                                                         primaryColor={
                                                             "bg-red-500"
                                                         }
@@ -2893,17 +3379,16 @@ export default function Reimburse({ auth }: PageProps) {
                                                         type="text"
                                                         name="REIMBURSE_DETAIL_RELATION_NAME"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_RELATION_NAME
+                                                            rd.REIMBURSE_DETAIL_RELATION_NAME
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_RELATION_NAME"
+                                                        autoComplete="off"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
                                                                 i
                                                             )
                                                         }
-                                                        required
                                                     />
                                                 </TD>
                                                 <TD className="border">
@@ -2912,17 +3397,16 @@ export default function Reimburse({ auth }: PageProps) {
                                                         type="text"
                                                         name="REIMBURSE_DETAIL_RELATION_POSITION"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_RELATION_POSITION
+                                                            rd.REIMBURSE_DETAIL_RELATION_POSITION
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_RELATION_POSITION"
+                                                        autoComplete="off"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
                                                                 i
                                                             )
                                                         }
-                                                        required
                                                     />
                                                 </TD>
                                                 <TD className="border">
@@ -2931,10 +3415,10 @@ export default function Reimburse({ auth }: PageProps) {
                                                         type="text"
                                                         name="REIMBURSE_DETAIL_LOCATION"
                                                         value={
-                                                            cad.REIMBURSE_DETAIL_LOCATION
+                                                            rd.REIMBURSE_DETAIL_LOCATION
                                                         }
                                                         className="w-1/2"
-                                                        autoComplete="REIMBURSE_DETAIL_LOCATION"
+                                                        autoComplete="off"
                                                         onChange={(e) =>
                                                             handleChangeRevised(
                                                                 e,
@@ -2946,20 +3430,22 @@ export default function Reimburse({ auth }: PageProps) {
                                                 </TD>
                                                 <TD className="border">
                                                     <CurrencyInput
-                                                        id="REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT"
-                                                        name="REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT"
-                                                        // value={
-                                                        //     cad.REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT
-                                                        // }
+                                                        id="REIMBURSE_DETAIL_AMOUNT"
+                                                        name="REIMBURSE_DETAIL_AMOUNT"
+                                                        value={
+                                                            rd.REIMBURSE_DETAIL_AMOUNT
+                                                        }
                                                         decimalScale={2}
                                                         decimalsLimit={2}
-                                                        // onValueChange={(val: any) =>
-                                                        //     handleChangeApproveReportCustom(
-                                                        //         val,
-                                                        //         "REIMBURSE_CASH_ADVANCE_DETAIL_AMOUNT",
-                                                        //         i
-                                                        //     )
-                                                        // }
+                                                        onValueChange={(
+                                                            val: any
+                                                        ) =>
+                                                            handleChangeRevisedCustom(
+                                                                val,
+                                                                "REIMBURSE_DETAIL_AMOUNT",
+                                                                i
+                                                            )
+                                                        }
                                                         className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
                                                         required
                                                         placeholder="0.00"
@@ -2969,29 +3455,33 @@ export default function Reimburse({ auth }: PageProps) {
                                                 <TD className="border">
                                                     <button
                                                         type="button"
-                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                        className="bg-black w-full hover:bg-slate-800 text-sm text-white py-2 px-3"
                                                         onClick={() => {
                                                             setModalFiles({
                                                                 add_files:
                                                                     false,
                                                                 show_files:
                                                                     false,
-                                                                add_files_report:
-                                                                    false,
-                                                                show_files_report:
+                                                                show_files_revised:
                                                                     true,
                                                                 index: "",
                                                                 index_show: "",
-                                                                index_show_report:
-                                                                    "",
+                                                                index_show_revised:
+                                                                    i,
                                                             });
                                                         }}
                                                     >
-                                                        Show Files
+                                                        {rd.m_reimburse_document
+                                                            ?.length > 0
+                                                            ? rd
+                                                                  .m_reimburse_document
+                                                                  ?.length +
+                                                              " Files"
+                                                            : "Add Files"}
                                                     </button>
                                                 </TD>
                                                 <TD className="border text-left px-3">
-                                                    {cad.REIMBURSE_DETAIL_NOTE}
+                                                    {rd.REIMBURSE_DETAIL_NOTE}
                                                 </TD>
                                                 {dataById.reimburse_detail
                                                     .length > 1 && (
@@ -3000,7 +3490,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                             className="my-1.5 px-3 py-1"
                                                             onClick={() =>
                                                                 handleRemoveRowRevised(
-                                                                    i
+                                                                    i,
+                                                                    rd.REIMBURSE_DETAIL_ID
                                                                 )
                                                             }
                                                             type="button"
@@ -3015,13 +3506,25 @@ export default function Reimburse({ auth }: PageProps) {
                                 </tbody>
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
+                                        <TD></TD>
+                                        <TD>
+                                            <Button
+                                                className="mt-5 px-2 py-1 text-black bg-none shadow-none hover:underline"
+                                                onClick={(e) =>
+                                                    handleAddRowRevised(e)
+                                                }
+                                                type="button"
+                                            >
+                                                + Add Row
+                                            </Button>
+                                        </TD>
                                         <TD
-                                            className="border text-right pr-5 py-2"
-                                            colSpan={7}
+                                            className="text-right pr-5 py-2"
+                                            colSpan={5}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border py-2">
+                                        <TD className="py-2">
                                             {formatCurrency.format(
                                                 revised_total_amount
                                             )}
@@ -3071,26 +3574,22 @@ export default function Reimburse({ auth }: PageProps) {
                         execute: false,
                     })
                 }
-                title="Execute Reimburse"
-                url={`/reimburseApprove/${dataById.REIMBURSE_ID}`}
+                title="Reimburse Execute"
+                url={`/reimburseExecute`}
                 data={dataById}
-                method="patch"
+                method="post"
                 onSuccess={handleSuccess}
-                headers={null}
+                headers={{ "Content-type": "multipart/form-data" }}
                 submitButtonName={"Execute"}
-                // panelWidth={"70%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
-                                    Advanced Amount
-                                    {/* <span className="text-red-600">*</span> */}
+                                    Propose Amount
                                 </InputLabel>
                                 <CurrencyInput
-                                    // value={
-                                    //     dataReportById?.REIMBURSE_TOTAL_AMOUNT_REQUEST
-                                    // }
+                                    value={dataById?.REIMBURSE_TOTAL_AMOUNT}
                                     decimalScale={2}
                                     decimalsLimit={2}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
@@ -3101,13 +3600,12 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
-                                    Utilization
-                                    {/* <span className="text-red-600">*</span> */}
+                                    Approve Amount
                                 </InputLabel>
                                 <CurrencyInput
-                                    // value={
-                                    //     dataReportById?.REIMBURSE_TOTAL_AMOUNT_APPROVE
-                                    // }
+                                    value={
+                                        dataById?.REIMBURSE_TOTAL_AMOUNT_APPROVE
+                                    }
                                     decimalScale={2}
                                     decimalsLimit={2}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
@@ -3119,12 +3617,11 @@ export default function Reimburse({ auth }: PageProps) {
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
                                     Surplus / Deficit
-                                    {/* <span className="text-red-600">*</span> */}
                                 </InputLabel>
                                 <CurrencyInput
-                                    // value={
-                                    //     dataReportById?.REIMBURSE_TOTAL_AMOUNT_DIFFERENT
-                                    // }
+                                    value={
+                                        dataById?.REIMBURSE_TOTAL_AMOUNT_DIFFERENT
+                                    }
                                     decimalScale={2}
                                     decimalsLimit={2}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
@@ -3135,14 +3632,10 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
-                                    Difference
-                                    {/* <span className="text-red-600">*</span> */}
+                                    Notes
                                 </InputLabel>
                                 <TextInput
-                                    // value={
-                                    //     dataReportById?.reimburse_differents
-                                    //         .CASH_ADVANCE_DIFFERENTS_NAME
-                                    // }
+                                    value={dataById.notes?.REIMBURSE_NOTES_NAME}
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -3156,18 +3649,18 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="method"
                                     name="method"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    // onChange={(e) =>
-                                    //     setDataCAReport({
-                                    //         ...dataCAReport,
-                                    //         method: e.target.value,
-                                    //     })
-                                    // }
+                                    onChange={(e) =>
+                                        setData({
+                                            ...data,
+                                            reimburse_method: e.target.value,
+                                        })
+                                    }
                                     required
                                 >
                                     <option value="">
                                         -- Choose Method --
                                     </option>
-                                    {getCashAdvanceMethod.map((method: any) => (
+                                    {ReimburseMethod.map((method: any) => (
                                         <option
                                             key={method.CASH_ADVANCE_METHOD_ID}
                                             value={
@@ -3181,24 +3674,24 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="grid grid-cols-1 p-2">
                                 <InputLabel
-                                    htmlFor="transaction_date"
+                                    htmlFor="reimburse_settlement_date"
                                     className="mb-2"
                                 >
-                                    Transaction Date
+                                    Settlement Date
                                     <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <DatePicker
-                                    name="transaction_date"
-                                    // selected={dataCAReport.transaction_date}
-                                    // onChange={(date: any) =>
-                                    //     setDataCAReport({
-                                    //         ...dataCAReport,
-                                    //         transaction_date:
-                                    //             date.toLocaleDateString(
-                                    //                 "en-CA"
-                                    //             ),
-                                    //     })
-                                    // }
+                                    name="reimburse_settlement_date"
+                                    selected={data.reimburse_settlement_date}
+                                    onChange={(date: any) =>
+                                        setData({
+                                            ...data,
+                                            reimburse_settlement_date:
+                                                date.toLocaleDateString(
+                                                    "en-CA"
+                                                ),
+                                        })
+                                    }
                                     dateFormat={"dd-MM-yyyy"}
                                     placeholderText="dd-mm-yyyyy"
                                     className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
@@ -3209,7 +3702,7 @@ export default function Reimburse({ auth }: PageProps) {
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="document" className="mb-2">
                                     Proof of Document
-                                    <span className="text-red-600">*</span>
+                                    {/* <span className="text-red-600">*</span> */}
                                 </InputLabel>
                                 <div className="">
                                     <button
@@ -3218,34 +3711,25 @@ export default function Reimburse({ auth }: PageProps) {
                                         onClick={() => {
                                             setModalFiles({
                                                 add_files: false,
+                                                add_files_execute: true,
                                                 show_files: false,
-                                                add_files_report: false,
-                                                show_files_report: false,
-                                                add_files_execute_report: true,
+                                                show_files_revised: false,
                                                 index: "",
+                                                index_show: false,
+                                                index_show_revised: true,
                                             });
                                         }}
                                     >
                                         Add Files
                                     </button>
                                 </div>
-                                {/* <ModalToAction
+                                <ModalToAction
                                     classPanel={
                                         "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
                                     }
-                                    show={modalFiles.add_files_execute_report}
+                                    show={modalFiles.add_files_execute}
                                     closeable={true}
-                                    onClose={() =>
-                                        setModalFiles({
-                                            add_files: false,
-                                            show_files: false,
-                                            add_files_report: false,
-                                            show_files_report: false,
-                                            show_files_proof_of_document: false,
-                                            add_files_execute_report: false,
-                                            index: "",
-                                        })
-                                    }
+                                    onClose={() => handleOnClose()}
                                     title="Proof of Document"
                                     url=""
                                     data=""
@@ -3253,27 +3737,20 @@ export default function Reimburse({ auth }: PageProps) {
                                     onSuccess=""
                                     headers={null}
                                     submitButtonName=""
-                                    panelWidth=""
                                     body={
                                         <>
-                                            {dataCAReport.proof_of_document.map(
-                                                (val: any, i: number) => (
+                                            {data.proof_of_document.map(
+                                                (file: any, i: number) => (
                                                     <div
                                                         className="grid grid-cols-12 my-5"
                                                         key={i}
                                                     >
-                                                        {dataCAReport
-                                                            .proof_of_document[
-                                                            i
-                                                        ].proof_of_document
+                                                        {file.proof_of_document
                                                             ?.name ? (
                                                             <div className="w-full col-span-11">
                                                                 <p>
                                                                     {
-                                                                        dataCAReport
-                                                                            .proof_of_document[
-                                                                            i
-                                                                        ]
+                                                                        file
                                                                             .proof_of_document
                                                                             ?.name
                                                                     }
@@ -3323,7 +3800,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             </button>
                                         </>
                                     }
-                                /> */}
+                                />
                             </div>
                         </div>
                     </>
@@ -3435,7 +3912,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             value={
                                                 searchReimburse.reimburse_division
                                             }
-                                            placeholder="Cost Center"
+                                            placeholder="Division"
                                             className="focus:ring-red-600"
                                             autoComplete="off"
                                             onChange={(e: any) =>

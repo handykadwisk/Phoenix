@@ -217,10 +217,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/getReimburseNumber', [ReimburseController::class, 'getReimburseNumber'])->name('getReimburseNumber');
     Route::get('/getReimburseById/{id}', [ReimburseController::class, 'getReimburseById'])->name('getReimburseById');
     Route::get('/getReimburseApproval', [ReimburseController::class, 'getReimburseApproval'])->name('getReimburseApproval');
+    Route::get('/getReimburseNotes', [ReimburseController::class, 'getReimburseNotes'])->name('getReimburseNotes');
+    Route::get('/getReimburseMethod', [ReimburseController::class, 'getReimburseMethod'])->name('getReimburseMethod');
     Route::get('/reimburse', [ReimburseController::class, 'index'])->name('reimburse');
     Route::post('/reimburse', [ReimburseController::class, 'store'])->name('reimburse.store');
     Route::patch('/reimburseApprove/{id}', [ReimburseController::class, 'approve'])->name('reimburse.approve');
-    Route::patch('/reimburseRevised/{id}', [ReimburseController::class, 'revised'])->name('reimburse.revised');
+    Route::post('/reimburseRevised', [ReimburseController::class, 'revised'])->name('reimburse.revised');
+    Route::post('/reimburseExecute', [ReimburseController::class, 'execute'])->name('reimburse.execute');
     Route::get('/reimburseDownload/{id}/{key}', [ReimburseController::class, 'download'])->name('reimburse.download');
 
     // Other Expenses

@@ -10,6 +10,7 @@ use App\Models\Document;
 use App\Models\MCashAdvanceDocument;
 use App\Models\MCashAdvanceProofOfDocument;
 use App\Models\MCashAdvanceReportDocument;
+use App\Models\RCashAdvanceApproval;
 use App\Models\RCashAdvanceDifferent;
 use App\Models\RCashAdvanceMethod;
 use App\Models\TDocument;
@@ -107,7 +108,7 @@ class CashAdvanceReportController extends Controller
 
     public function getCashAdvanceApproval()
     {
-        $data = CashAdvanceCostClassification::all();
+        $data = RCashAdvanceApproval::all();
 
         return response()->json($data);
     }

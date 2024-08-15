@@ -995,38 +995,26 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleChangeApprovalReport = (e: any, i: number) => {
         const { name, value } = e.target;
 
-        const onchangeVal: any = [...dataReportById.cash_advance_detail_report];
-
-        const report_cash_advance_detail_amount_approve = [
-            ...dataReportById.cash_advance_detail_report,
-        ];
+        const onchangeVal = [...dataReportById.cash_advance_detail_report];
 
         onchangeVal[i][name] = value;
 
-        report_cash_advance_detail_amount_approve[i][
+        const ReimburseDetailAmountApprove = [...onchangeVal];
+
+        ReimburseDetailAmountApprove[i][
             "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
-        ] =
-            report_cash_advance_detail_amount_approve[i][
-                "REPORT_CASH_ADVANCE_DETAIL_AMOUNT"
-            ];
+        ] = onchangeVal[i]["REPORT_CASH_ADVANCE_DETAIL_AMOUNT"];
 
-        if (onchangeVal[i][name] === 1) {
+        if (parseInt(value, 10) === 1) {
             setDataReportById({
                 ...dataReportById,
-                cash_advance_detail_report:
-                    report_cash_advance_detail_amount_approve,
+                cash_advance_detail_report: ReimburseDetailAmountApprove,
             });
-        }
-
-        if (onchangeVal[i][name] === 2) {
+        } else {
+            onchangeVal[i]["REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"] = 0;
             setDataReportById({
                 ...dataReportById,
-                cash_advance_detail_report: [
-                    ...dataReportById.cash_advance_detail_report[i][
-                        "REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE"
-                    ],
-                    0,
-                ],
+                cash_advance_detail_report: onchangeVal,
             });
         }
 
@@ -7794,19 +7782,17 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             --
                                                         </option>
                                                         {getCashAdvanceApproval.map(
-                                                            (
-                                                                cost_classification: any
-                                                            ) => (
+                                                            (approval: any) => (
                                                                 <option
                                                                     key={
-                                                                        cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_ID
+                                                                        approval.CASH_ADVANCE_APPROVAL_ID
                                                                     }
                                                                     value={
-                                                                        cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_ID
+                                                                        approval.CASH_ADVANCE_APPROVAL_ID
                                                                     }
                                                                 >
                                                                     {
-                                                                        cost_classification.CASH_ADVANCE_COST_CLASSIFICATION_NAME
+                                                                        approval.CASH_ADVANCE_APPROVAL_NAME
                                                                     }
                                                                 </option>
                                                             )

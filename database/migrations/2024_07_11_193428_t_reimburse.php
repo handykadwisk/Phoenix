@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('t_reimburse', function (Blueprint $table) {
             $table->increments('REIMBURSE_ID')->primary();
             $table->string('REIMBURSE_NUMBER')->nullable();
-            $table->string('REIMBURSE_DIVISION')->nullable();
+            $table->string('REIMBURSE_COST_CENTER')->nullable();
             $table->string('REIMBURSE_BRANCH')->nullable();
             $table->smallInteger('REIMBURSE_USED_BY')->nullable();
             $table->smallInteger('REIMBURSE_REQUESTED_BY')->nullable();
@@ -36,6 +36,8 @@ return new class extends Migration
             $table->text('REIMBURSE_THIRD_APPROVAL_NOTE')->nullable();
             $table->text('REIMBURSE_REQUEST_NOTE')->nullable();
             $table->smallInteger('REIMBURSE_TYPE')->nullable();
+            $table->smallInteger('REIMBURSE_METHOD')->nullable();
+            $table->date('REIMBURSE_SETTLEMENT_DATE')->nullable();
             $table->decimal('REIMBURSE_AMOUNT', 16, 2)->nullable();
             $table->decimal('REIMBURSE_TOTAL_AMOUNT', 16, 2)->nullable();
             $table->decimal('REIMBURSE_TOTAL_AMOUNT_APPROVE', 16, 2)->nullable();

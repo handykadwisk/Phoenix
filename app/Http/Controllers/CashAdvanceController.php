@@ -414,45 +414,47 @@ class CashAdvanceController extends Controller
             // Start process file upload
             $files = $request->file('CashAdvanceDetail');
             if (is_array($files) && !empty($files)) {
-                foreach ($cad['cash_advance_detail_document_id'] as $file) {
-                    $parentDir = ((floor(($cash_advance_detail_id) / 1000)) * 1000) . '/';
-                    $CAId = $cash_advance_detail_id . '/';
-                    $typeDir = '';
-                    $uploadPath = 'documents/' . 'CashAdvance/'. $parentDir . $CAId . $typeDir;
-
-                    $userId = Auth::user()->id;
-
-                    $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
-                    $documentFileName =  $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
-                    $documentDirName =  $uploadPath;
-                    $documentFileType = $file->getMimeType();
-                    $documentFileSize = $file->getSize();
-
-                    Storage::makeDirectory($uploadPath, 0777, true, true);
-                    Storage::disk('public')->putFileAs($uploadPath, $file, $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
-
-                    $document = TDocument::create([
-                        'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
-                        'DOCUMENT_FILENAME'               => $documentFileName,
-                        'DOCUMENT_DIRNAME'                => $documentDirName,
-                        'DOCUMENT_FILETYPE'               => $documentFileType,
-                        'DOCUMENT_FILESIZE'               => $documentFileSize,
-                        'DOCUMENT_CREATED_BY'             => $userId
-                    ])->DOCUMENT_ID;
-
-                    if($document){
-                        Document::where('DOCUMENT_ID', $document)->update([
-                            'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
-                        ]);
-                    }
-
-                    if ($document) {
-                        MCashAdvanceDocument::create([
-                            'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID' => $cash_advance_detail_id,
-                            'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
-                            'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
-                            'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
-                        ]);
+                if (isset($cad['cash_advance_detail_document_id'])) {
+                    foreach ($cad['cash_advance_detail_document_id'] as $file) {
+                        $parentDir = ((floor(($cash_advance_detail_id) / 1000)) * 1000) . '/';
+                        $CAId = $cash_advance_detail_id . '/';
+                        $typeDir = '';
+                        $uploadPath = 'documents/' . 'CashAdvance/'. $parentDir . $CAId . $typeDir;
+    
+                        $userId = Auth::user()->id;
+    
+                        $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
+                        $documentFileName =  $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
+                        $documentDirName =  $uploadPath;
+                        $documentFileType = $file->getMimeType();
+                        $documentFileSize = $file->getSize();
+    
+                        Storage::makeDirectory($uploadPath, 0777, true, true);
+                        Storage::disk('public')->putFileAs($uploadPath, $file, $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
+    
+                        $document = TDocument::create([
+                            'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
+                            'DOCUMENT_FILENAME'               => $documentFileName,
+                            'DOCUMENT_DIRNAME'                => $documentDirName,
+                            'DOCUMENT_FILETYPE'               => $documentFileType,
+                            'DOCUMENT_FILESIZE'               => $documentFileSize,
+                            'DOCUMENT_CREATED_BY'             => $userId
+                        ])->DOCUMENT_ID;
+    
+                        if($document){
+                            Document::where('DOCUMENT_ID', $document)->update([
+                                'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                            ]);
+                        }
+    
+                        if ($document) {
+                            MCashAdvanceDocument::create([
+                                'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID' => $cash_advance_detail_id,
+                                'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
+                                'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
+                                'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
+                            ]);
+                        }
                     }
                 }
             }

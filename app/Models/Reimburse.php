@@ -21,7 +21,9 @@ class Reimburse extends Model
 
     protected $with = [
         'reimburse_detail',
+        'cost_center',
         'office',
+        'notes',
         'person',
         'person_used_by',
         'person_approval',
@@ -33,9 +35,19 @@ class Reimburse extends Model
         return $this->hasMany(ReimburseDetail::class, 'REIMBURSE_ID');
     }
 
+    public function cost_center(): BelongsTo
+    {
+        return $this->belongsTo(TRelationDivision::class, 'REIMBURSE_COST_CENTER');
+    }
+
     public function office(): BelongsTo
     {
         return $this->belongsTo(TRelationOffice::class, 'REIMBURSE_BRANCH');
+    }
+
+    public function notes(): BelongsTo
+    {
+        return $this->belongsTo(RReimburseNotes::class, 'REIMBURSE_TYPE');
     }
 
     public function person(): BelongsTo

@@ -476,5 +476,11 @@ class DatabaseSeeder extends Seeder
         DB::unprepared(
             file_get_contents($file_path25)
         );
+
+        $file_path26 = resource_path('../database/LogDB/2024_08_15_r_reimburse_notes.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path26)
+        );
     }
 }
