@@ -304,11 +304,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/debitNote', [DebitNoteController::class, 'index'])->name('debitNote');
     // Route::get('/getPolicyInstallment/{id}', [DebitNoteController::class, 'policyInstallment'])->name('debitNote.policyInstallment');
 
-
-
-    // Group
-    Route::get('/group', [GroupRelationController::class, 'index'])->name('group');
-
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
     Route::get('/detailPolicy/{id}', [PolicyController::class, 'detailPolicy'])->name('detailPolicy');
