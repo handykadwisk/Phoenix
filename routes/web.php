@@ -67,6 +67,11 @@ Route::middleware('auth')->group(function () {
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');
     Route::post('/getRelationDetail', [RelationController::class, 'get_detail'])->name('getRelationDetail.get_detail');
     Route::post('/getCekAbbreviation', [RelationController::class, 'getCekAbbreviation'])->name('getCekAbbreviation.getCekAbbreviation');
+    Route::post('/getRelationAll', [RelationController::class, 'getRelationAll'])->name('getRelationAll.getRelationAll');
+    Route::post('/getCorporatePIC', [RelationController::class, 'get_corporate'])->name('getCorporatePIC.get_corporate');
+    Route::post('/editCorporatePIC', [RelationController::class, 'edit_corporate'])->name('editCorporatePIC.edit_corporate');
+    
+    
     
 
 

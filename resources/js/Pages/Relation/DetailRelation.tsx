@@ -31,6 +31,8 @@ import AddressPopup from "../Address/Address";
 import JobDesk from "../Job/JobDesk";
 import SelectTailwind from "react-tailwindcss-select";
 import ToastMessage from "@/Components/ToastMessage";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import { BeatLoader } from "react-spinners";
 
 export default function DetailRelation({
     detailRelation,
@@ -82,7 +84,7 @@ export default function DetailRelation({
     });
 
     // Structure Edit Corporate PIC
-    const [corporatePIC, setCorporatePIC] = useState({
+    const [modalCorporatePIC, setModalCorporatePIC] = useState({
         add: false,
         delete: false,
         edit: false,
@@ -136,6 +138,19 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getCorporatePIC = async (id: string) => {
+        await axios
+            .post(`/getCorporatePIC`, { id })
+            .then((res) => {
+                setDetailCorporatePIC({
+                    detail_corporate: res.data,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -242,9 +257,58 @@ export default function DetailRelation({
 
     const inputRef = useRef<HTMLInputElement>(null);
     const inputRefTag = useRef<HTMLInputElement>(null);
+    const inputRefCorporate = useRef<HTMLInputElement>(null);
 
     const [query, setQuery] = useState("");
     const [queryTag, setQueryTag] = useState("");
+    const [queryCorporate, setQueryCorporate] = useState("");
+    const [menuOpen, setMenuOpen] = useState(true);
+    const [isLoading, setIsLoading] = useState<any>({
+        get_detail: false,
+    });
+
+    const [relationAll, setRelationAll] = useState<any>([]);
+    const getRelationAll = async () => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
+        await axios
+            .post(`/getRelationAll`)
+            .then((res) => {
+                setRelationAll(res.data);
+                setIsLoading({
+                    ...isLoading,
+                    get_detail: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const [detailCorporatePIC, setDetailCorporatePIC] = useState<any>({
+        INDIVIDU_RELATION_ID: detailRelation,
+        detail_corporate: [
+            {
+                RELATION_ORGANIZATION_NAME: "",
+            },
+        ],
+    });
+    const filteredAllRelation = relationAll.filter(
+        (item: any) =>
+            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+                queryCorporate.toLocaleLowerCase()?.trim()
+            ) &&
+            !detailCorporatePIC.detail_corporate?.find(
+                (f: any) =>
+                    f.RELATION_ORGANIZATION_NAME ===
+                    item.RELATION_ORGANIZATION_NAME
+            )
+    );
+
+    console.log("select", filteredAllRelation);
+    console.log("data", detailCorporatePIC.detail_corporate);
+
     const isDisableEdit =
         !query?.trim() ||
         dataById.m_relation_aka.filter(
@@ -330,21 +394,22 @@ export default function DetailRelation({
                 setIsSuccess("");
             }, 5000);
         }
-        // Swal.fire({
-        //     title: "Success",
-        //     text: "Relation Edit",
-        //     icon: "success",
-        // }).then((result: any) => {
-        //     if (result.value) {
-        //         setGetDetailRelation({
-        //             RELATION_ORGANIZATION_NAME: message[1],
-        //             RELATION_ORGANIZATION_ID: message[0],
-        //             RELATION_SALUTATION_PRE: message[2],
-        //             RELATION_SALUTATION_POST: message[3],
-        //         });
-        //         getDetailRelation(message[0]);
-        //     }
-        // });
+    };
+    const handleSuccessEditCorporate = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[1]);
+            // setGetDetailRelation({
+            //     RELATION_ORGANIZATION_NAME: message[1],
+            //     RELATION_ORGANIZATION_ID: message[0],
+            //     RELATION_SALUTATION_PRE: message[2],
+            //     RELATION_SALUTATION_POST: message[3],
+            // });
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
 
     // Onclick Structure
@@ -480,19 +545,20 @@ export default function DetailRelation({
             });
     };
 
-    console.log("dataRelation", dataRelationNew);
-
     const handleClickEditCorporate = async (
         e: FormEvent,
         idRelationOrganization: string
     ) => {
         e.preventDefault();
 
-        setCorporatePIC({
+        getCorporatePIC(idRelationOrganization);
+        getRelationAll();
+        // setDetailCorporatePIC(dataRelationNew.t_person);
+        setModalCorporatePIC({
             add: false,
             delete: false,
-            edit: false,
-            view: !corporatePIC.view,
+            edit: !modalCorporatePIC.edit,
+            view: false,
             document: false,
             search: false,
         });
@@ -511,6 +577,8 @@ export default function DetailRelation({
     } else {
         valueWebsite = dataById.RELATION_ORGANIZATION_WEBSITE;
     }
+
+    console.log(dataRelationNew.t_person);
     return (
         <>
             {isSuccess && (
@@ -520,6 +588,194 @@ export default function DetailRelation({
                     type={"success"}
                 />
             )}
+
+            {/* edit corporate PIC */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modalCorporatePIC.edit}
+                onClose={() =>
+                    setModalCorporatePIC({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Edit Corporate PIC"}
+                url={`/editCorporatePIC`}
+                data={detailCorporatePIC}
+                onSuccess={handleSuccessEditCorporate}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                }
+                body={
+                    <>
+                        <div className="mt-4">
+                            {detailCorporatePIC.detail_corporate?.length ? (
+                                <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
+                                    {detailCorporatePIC.detail_corporate?.map(
+                                        (tag: any, i: number) => {
+                                            return (
+                                                // <>
+                                                <div
+                                                    key={i}
+                                                    className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
+                                                >
+                                                    {
+                                                        tag?.RELATION_ORGANIZATION_NAME
+                                                    }
+                                                    <div className="cursor-pointer">
+                                                        {/* <a href=""> */}
+                                                        <div
+                                                            className="text-red-600"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                const updatedData =
+                                                                    detailCorporatePIC.detail_corporate.filter(
+                                                                        (
+                                                                            data: any
+                                                                        ) =>
+                                                                            data.RELATION_ORGANIZATION_NAME !==
+                                                                            tag.RELATION_ORGANIZATION_NAME
+                                                                    );
+                                                                setDetailCorporatePIC(
+                                                                    {
+                                                                        ...detailCorporatePIC,
+                                                                        detail_corporate:
+                                                                            updatedData,
+                                                                    }
+                                                                );
+                                                            }}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={
+                                                                    1.5
+                                                                }
+                                                                stroke="currentColor"
+                                                                className="w-6 h-6"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                        {/* </a> */}
+                                                    </div>
+                                                </div>
+                                                // </>
+                                            );
+                                        }
+                                    )}
+                                    <div className="w-full text-right">
+                                        <span
+                                            className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
+                                            onClick={() => {
+                                                setDetailCorporatePIC({
+                                                    ...detailCorporatePIC,
+                                                    INDIVIDU_RELATION_ID:
+                                                        detailRelation,
+                                                    detail_corporate: [],
+                                                });
+                                                inputRefCorporate.current?.focus();
+                                            }}
+                                        >
+                                            Clear all
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : null}
+                            <TextInput
+                                ref={inputRefCorporate}
+                                type="text"
+                                value={queryCorporate}
+                                onChange={(e) =>
+                                    setQueryCorporate(
+                                        e.target.value.trimStart()
+                                    )
+                                }
+                                placeholder="Search Relations"
+                                className=""
+                                onFocus={() => setMenuOpen(true)}
+                            />
+                            {menuOpen ? (
+                                <div className="bg-white rounded-md shadow-md w-full max-h-72 mt-2 p-1 flex overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-200">
+                                    {isLoading.get_detail ? (
+                                        <div className="m-auto py-20 sweet-loading h-[199px]">
+                                            <BeatLoader
+                                                // cssOverride={override}
+                                                size={10}
+                                                color={"#ff4242"}
+                                                loading={true}
+                                                speedMultiplier={1.5}
+                                                aria-label="Loading Spinner"
+                                                data-testid="loader"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <ul className="w-full">
+                                            {filteredAllRelation?.length ? (
+                                                filteredAllRelation?.map(
+                                                    (tag: any, i: number) => (
+                                                        <li
+                                                            key={i}
+                                                            className="p-2 cursor-pointer hover:bg-rose-50 hover:text-rose-500 rounded-md w-full"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                setMenuOpen(
+                                                                    true
+                                                                );
+                                                                setDetailCorporatePIC(
+                                                                    {
+                                                                        ...detailCorporatePIC,
+                                                                        detail_corporate:
+                                                                            [
+                                                                                ...detailCorporatePIC.detail_corporate,
+                                                                                {
+                                                                                    INDIVIDU_RELATION_ID:
+                                                                                        detailRelation,
+                                                                                    RELATION_ORGANIZATION_NAME:
+                                                                                        tag.RELATION_ORGANIZATION_NAME,
+                                                                                },
+                                                                            ],
+                                                                    }
+                                                                );
+                                                                setQueryCorporate(
+                                                                    ""
+                                                                );
+                                                            }}
+                                                        >
+                                                            {
+                                                                tag.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </li>
+                                                    )
+                                                )
+                                            ) : (
+                                                <li className="p-2 text-gray-500">
+                                                    No options available
+                                                </li>
+                                            )}
+                                        </ul>
+                                    )}
+                                </div>
+                            ) : null}
+                        </div>
+                    </>
+                }
+            />
+            {/* End Edit Corporate PIC */}
+
             <ModalToAction
                 show={modal.edit}
                 onClose={() =>
@@ -1567,13 +1823,13 @@ export default function DetailRelation({
                                                 // <>
                                                 <div
                                                     key={i}
-                                                    className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm"
+                                                    className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm text-white"
                                                 >
-                                                    <span className="text-white">
+                                                    <span>
                                                         {
                                                             dCorporate
                                                                 .corporate_p_i_c
-                                                                .RELATION_ORGANIZATION_NAME
+                                                                .RELATION_ORGANIZATION_ALIAS
                                                         }
                                                     </span>
                                                 </div>

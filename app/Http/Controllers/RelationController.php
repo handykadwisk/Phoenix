@@ -664,6 +664,12 @@ class RelationController extends Controller
         return response()->json($detailRelation);
     }
 
+    public function get_corporate(Request $request){
+        $detailPerson = TPerson::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_person.RELATION_ORGANIZATION_ID')->where('INDIVIDU_RELATION_ID', $request->id)->get();
+
+        return response()->json($detailPerson);
+    }
+
     public function detail($id)
     {
         // get detail relation
@@ -720,5 +726,40 @@ class RelationController extends Controller
         }
 
 
+    }
+
+    public function getRelationAll(){
+        $clientId = 1;
+        $data = Relation::whereHas('mRelationType', function($q) use($clientId) {
+            // Query the name field in status table
+            $q->where('RELATION_TYPE_ID', 'like', '%'.$clientId.'%');
+        })->get();
+
+        return response()->json($data);
+    }
+
+    public function edit_corporate(Request $request){
+        // dd($request);
+        
+
+            
+
+            // // Created Log
+            // UserLog::create([
+            //     'created_by' => Auth::user()->id,
+            //     'action'     => json_encode([
+            //         "description" => "Edit Person (TPerson).",
+            //         "module"      => "Relation",
+            //         "id"          => $arrayRelation['INDIVIDU_RELATION_ID']
+            //     ]),
+            //     'action_by'  => Auth::user()->email
+            // ]);
+
+        return new JsonResponse([
+            // $arrayRelation['INDIVIDU_RELATION_ID'],
+            "Corporate For PIC Edited"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }
