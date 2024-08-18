@@ -33,6 +33,7 @@ import SelectTailwind from "react-tailwindcss-select";
 import ToastMessage from "@/Components/ToastMessage";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import { BeatLoader } from "react-spinners";
+import PIC from "../Person/Pic";
 
 export default function DetailRelation({
     detailRelation,
@@ -305,8 +306,6 @@ export default function DetailRelation({
                     item.RELATION_ORGANIZATION_NAME
             )
     );
-
-    console.log("select", filteredAllRelation);
     console.log("data", detailCorporatePIC.detail_corporate);
 
     const isDisableEdit =
@@ -492,6 +491,26 @@ export default function DetailRelation({
         });
     };
 
+    const [modalPIC, setModalPIC] = useState<any>({
+        view: false,
+    });
+
+    const handleClickPIC = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setModalPIC({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !modalPIC.view,
+            document: false,
+            search: false,
+        });
+    };
+
     const professionSelect = profession?.map((query: any) => {
         return {
             value: query.RELATION_PROFESSION_ID,
@@ -578,7 +597,6 @@ export default function DetailRelation({
         valueWebsite = dataById.RELATION_ORGANIZATION_WEBSITE;
     }
 
-    console.log(dataRelationNew.t_person);
     return (
         <>
             {isSuccess && (
@@ -615,8 +633,12 @@ export default function DetailRelation({
                         <div className="mt-4">
                             {detailCorporatePIC.detail_corporate?.length ? (
                                 <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
-                                    {detailCorporatePIC.detail_corporate?.map(
-                                        (tag: any, i: number) => {
+                                    {detailCorporatePIC.detail_corporate
+                                        ?.filter(
+                                            (m: any) =>
+                                                m.PERSON_IS_DELETED === 0
+                                        )
+                                        .map((tag: any, i: number) => {
                                             return (
                                                 // <>
                                                 <div
@@ -673,8 +695,7 @@ export default function DetailRelation({
                                                 </div>
                                                 // </>
                                             );
-                                        }
-                                    )}
+                                        })}
                                     <div className="w-full text-right">
                                         <span
                                             className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
@@ -744,6 +765,7 @@ export default function DetailRelation({
                                                                                 {
                                                                                     INDIVIDU_RELATION_ID:
                                                                                         detailRelation,
+                                                                                    PERSON_IS_DELETED: 0,
                                                                                     RELATION_ORGANIZATION_NAME:
                                                                                         tag.RELATION_ORGANIZATION_NAME,
                                                                                 },
@@ -1658,6 +1680,37 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
 
+            {/* modal for person */}
+            <ModalToAction
+                show={modalPIC.view}
+                onClose={() =>
+                    setModalPIC({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"PIC"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <PIC auth={""} idRelation={detailRelation} />
+                    </>
+                }
+            />
+            {/* end modal for person */}
+
             {/* Detail Relation*/}
             {/* Top */}
             <div className="bg-white p-4 rounded-md shadow-md mb-3">
@@ -1903,7 +1956,7 @@ export default function DetailRelation({
                             </div>
                         </div>
                         <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500 hidden"
                             onClick={(e) =>
                                 handleClickPerson(
                                     e,
@@ -1913,6 +1966,19 @@ export default function DetailRelation({
                         >
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <span>Person & User</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickPIC(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>PIC</span>
                             </div>
                         </div>
                     </div>

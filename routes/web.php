@@ -30,6 +30,9 @@ use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\TCompanyController;
+use App\Http\Controllers\TCompanyStructureController;
+use App\Http\Controllers\TEmployeeController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -174,6 +177,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/getTPersonBank', [TPersonController::class, 'getTPersonBank'])->name('getTPersonBank.getTPersonBank');
     Route::post('/editBankAccount', [TPersonController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
     Route::get('/downloadPersonDocument/{id}', [TPersonController::class, 'person_document_download'])->name('downloadPersonDocument.person_document_download');
+    Route::post('/getIndividuRelation', [TPersonController::class, 'get_individu_relation'])->name('getIndividuRelation.get_individu_relation');
+    Route::post('/addPic', [TPersonController::class, 'add_pic'])->name('addPic.add_pic');
+    Route::post('/deletePerson', [TPersonController::class, 'delete_person'])->name('deletePerson.delete_person');
+    
+    
+    
     
     
     
@@ -373,8 +382,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
 
     // HR
-    Route::get('hr/settingCompany', [RelationController::class, 'index'])->name('hr/settingCompany');
+    Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
+    Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
+    Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
+    Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
+    Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
+    
+    // Employee
+    Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
+    Route::post('/addEmployee', [TEmployeeController::class, 'store'])->name('addEmployee.store');
+    Route::post('/getDetailEmployee', [TEmployeeController::class, 'get_employeeById'])->name('getDetailEmployee.get_employeeById');
+    Route::post('/editEmployee', [TEmployeeController::class, 'edit_Employee'])->name('editEmployee.edit_Employee');
 
+    // Company Structure
+    Route::post('/getCompanyStructureCombo', [TCompanyStructureController::class, 'get_StructureCombo'])->name('getCompanyStructureCombo.get_StructureCombo');
+    Route::post('/addCompanyStructure', [TCompanyStructureController::class, 'store'])->name('addCompanyStructure.store');
+    Route::get('/getCompanyStructure', [TCompanyStructureController::class, 'getCompanyStructureJson'])->name('getCompanyStructure.getCompanyStructureJson');
+    Route::post('/getCompanyStructureDetail', [TCompanyStructureController::class, 'get_CompanyStructureDetail'])->name('getCompanyStructureDetail.get_CompanyStructureDetail');
+    Route::post('/editStructureCompany', [TCompanyStructureController::class, 'edit'])->name('editStructureCompany.edit');
+    
+    
+    
+    
+    
 
 
 });

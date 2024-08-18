@@ -51,7 +51,6 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
-                console.log(res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -124,9 +123,9 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div className="max-h-full">
+                                            <div className="max-h-[100%]">
                                                 <div
-                                                    className="h-[25rem] overflow-y-auto custom-scrollbar px-1"
+                                                    className="h-[100%] overflow-y-auto custom-scrollbar px-1"
                                                     ref={modalRef}
                                                 >
                                                     {body}

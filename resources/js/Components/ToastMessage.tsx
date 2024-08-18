@@ -28,7 +28,7 @@ export default function ToastMessage({
     return (
         <div
             aria-live="assertive"
-            className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6 z-9999"
+            className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6 z-999999"
         >
             <div className="flex w-full flex-col items-center">
                 {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}

@@ -319,7 +319,8 @@ class RelationController extends Controller
                     TPerson::create([
                         "PERSON_FIRST_NAME"         => $addTBK,
                         "RELATION_ORGANIZATION_ID"  => $idRelation,
-                        "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID
+                        "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID,
+                        "PERSON_IS_DELETED"         => "0"
                     ]);
                 }
             }
@@ -665,7 +666,7 @@ class RelationController extends Controller
     }
 
     public function get_corporate(Request $request){
-        $detailPerson = TPerson::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_person.RELATION_ORGANIZATION_ID')->where('INDIVIDU_RELATION_ID', $request->id)->get();
+        $detailPerson = TPerson::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_person.RELATION_ORGANIZATION_ID')->where('INDIVIDU_RELATION_ID', $request->id)->where('PERSON_IS_DELETED', 0)->get();
 
         return response()->json($detailPerson);
     }
@@ -739,24 +740,52 @@ class RelationController extends Controller
     }
 
     public function edit_corporate(Request $request){
-        // dd($request);
-        
 
+        // $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $request->detail_corporate[0]['INDIVIDU_RELATION_ID'])->get();
+        // for ($i=0; $i < sizeof($arrayPerson); $i++) { 
+        //     for ($a=0; $a < sizeof($request->detail_corporate); $a++) { 
+        //         $personName = $request->detail_corporate[$a]['RELATION_ORGANIZATION_NAME'];
+        //         $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
+        //         if ($arrayPerson[$i]['RELATION_ORGANIZATION_ID'] == $dataRelation->RELATION_ORGANIZATION_ID) {
+        //             TPerson::where('RELATION_ORGANIZATION_ID', $dataRelation->RELATION_ORGANIZATION_ID)->update([
+        //                 "PERSON_IS_DELETED"      =>  "0"
+        //             ]);
+        //         }
+        //     }
+        // }
+        // die;
+
+        for ($i=0; $i < sizeof($request->detail_corporate); $i++) {
+            $personName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
+            $individuId = $request->detail_corporate[$i]['INDIVIDU_RELATION_ID'];
+
+            $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
+            $getName = Relation::select('RELATION_ORGANIZATION_NAME')->where('RELATION_ORGANIZATION_ID', $individuId)->first();
             
+            $dataPerson = TPerson::where('RELATION_ORGANIZATION_ID', $dataRelation->RELATION_ORGANIZATION_ID)->first();
+            if ($dataPerson != null) {
+                
+            }else{
+                $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->get();
+                for ($a=0; $a < sizeof($arrayPerson); $a++) { 
+                    $idPerson = $arrayPerson[$a]['PERSON_ID'];
+                    TPerson::where('PERSON_ID', $idPerson)->update([
+                        "PERSON_IS_DELETED"         => "1"
+                    ]);
+                }
 
-            // // Created Log
-            // UserLog::create([
-            //     'created_by' => Auth::user()->id,
-            //     'action'     => json_encode([
-            //         "description" => "Edit Person (TPerson).",
-            //         "module"      => "Relation",
-            //         "id"          => $arrayRelation['INDIVIDU_RELATION_ID']
-            //     ]),
-            //     'action_by'  => Auth::user()->email
-            // ]);
+                TPerson::create([
+                    "PERSON_FIRST_NAME"         => $getName,
+                    "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
+                    "INDIVIDU_RELATION_ID"      => $individuId,
+                    "PERSON_IS_DELETED"         => "0"
+                ]);
+            }
+        }
+
 
         return new JsonResponse([
-            // $arrayRelation['INDIVIDU_RELATION_ID'],
+            $request->detail_corporate[0]['INDIVIDU_RELATION_ID'],
             "Corporate For PIC Edited"
         ], 201, [
             'X-Inertia' => true

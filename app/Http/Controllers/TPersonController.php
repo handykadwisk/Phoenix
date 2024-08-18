@@ -15,6 +15,7 @@ use App\Models\TAddress;
 use App\Models\Document;
 use App\Models\MForPersonBankAccount;
 use App\Models\MPersonDocument;
+use App\Models\Relation;
 use App\Models\RForAccountBank;
 use App\Models\TPerson;
 use App\Models\TPersonBankAccount;
@@ -38,7 +39,7 @@ class TPersonController extends Controller
     {
 
         // dd($searchQuery);
-        $data = TPerson::with('users')->where('RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
+        $data = TPerson::with('users')->where('RELATION_ORGANIZATION_ID', $searchQuery->idRelation)->where('PERSON_IS_DELETED', 0)
         ->orderBy('PERSON_FIRST_NAME', 'asc');
         if ($searchQuery) {
             if ($searchQuery->input('PERSON_FIRST_NAME')) {
@@ -1326,6 +1327,66 @@ class TPersonController extends Controller
         } else {
             abort(404, 'File not found');
         }
+    }
+
+    public function get_individu_relation(Request $request){
+        $data = Relation::where('relation_status_id', 2)->get();
+
+        return response()->json($data);
+    }
+
+    public function add_pic(Request $request){
+        $idLog="";
+        for ($i=0; $i < sizeof($request->individu_relation); $i++) {
+            $personName = $request->individu_relation[$i]['label'];
+            $individuId = $request->individu_relation[$i]['value'];
+
+            // cek person
+            $dataPerson = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->first();
+            if ($dataPerson != null) { //jika ada delete data sebelumnya
+                $idPerson = $dataPerson->PERSON_ID;
+                TPerson::where('PERSON_ID', $idPerson)->update([
+                    "PERSON_IS_DELETED"         => "0"
+                ]);
+
+                $idLog = $idPerson;
+            }else{
+                // simpan mapping ke t person
+                $person = TPerson::create([
+                    "PERSON_FIRST_NAME"         => $personName,
+                    "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
+                    "INDIVIDU_RELATION_ID"      => $individuId,
+                    "PERSON_IS_DELETED"         => "0"
+                ]);
+                $idLog = $person;
+            }
+            // Created Log
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Created PIC (PIC).",
+                    "module"      => "Person PIC",
+                    "id"          => $idLog
+                ]),
+                'action_by'  => Auth::user()->email
+            ]);
+        }
+        return new JsonResponse([
+            $idLog,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function delete_person(Request $request){
+        TPerson::where('PERSON_ID', $request->idPerson)->update([
+            "PERSON_IS_DELETED"         => "1"
+        ]);
+        return new JsonResponse([
+            $request->idPerson,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }   
 
