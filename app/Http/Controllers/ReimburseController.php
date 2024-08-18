@@ -197,16 +197,6 @@ class ReimburseController extends Controller
         return Inertia::render('Reimburse/Reimburse', $data);
     }
 
-    // public function getReimburseNumber()
-    // {
-    //     $data = 
-    //         Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 1)
-    //                     ->orderBy('REIMBURSE_ID', 'desc')
-    //                     ->get();
-
-    //     return response()->json($data);
-    // }
-
     public function RemoveSpecialChar($str) 
     {
         $replace = Str::of($str)->replace(
@@ -276,6 +266,26 @@ class ReimburseController extends Controller
         $document = TDocument::find($document_id);
 
         $document_filename = $reimburse_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = public_path('/storage' . '/'. $document_dirname . '/' . $document_filename);
+
+        $headers = [
+            'filename' => $document_filename
+        ];
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $document_filename, $headers);
+        } else {
+            abort(404, 'File not found');
+        }
+    }
+
+    public function reimburse_proof_of_document_download($reimburse_id, $document_id)
+    {
+        $document = TDocument::find($document_id);
+
+        $document_filename = $reimburse_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
 
         $filePath = public_path('/storage' . '/'. $document_dirname . '/' . $document_filename);
@@ -579,6 +589,7 @@ class ReimburseController extends Controller
             $reimburseDetailId = $ReimburseDetail->REIMBURSE_DETAIL_ID;
 
             $files = $request->file('reimburse_detail');
+            
             if (is_array($files) && !empty($files)) {
                 if(isset($rd['filesDocument'])) {
                     foreach ($rd['filesDocument'] as $file) {
@@ -694,8 +705,7 @@ class ReimburseController extends Controller
 
     public function execute(Request $request)
     {
-        // dd($request->file('proof_of_document'));
-        $reimburse_id = $request->cash_advance_id;
+        $reimburse_id = $request->reimburse_id;
         $reimburse_second_approval_status = 6;
         $reimburse_method = $request->reimburse_method;
         $reimburse_settlement_date = $request->reimburse_settlement_date;

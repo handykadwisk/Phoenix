@@ -225,6 +225,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/reimburseRevised', [ReimburseController::class, 'revised'])->name('reimburse.revised');
     Route::post('/reimburseExecute', [ReimburseController::class, 'execute'])->name('reimburse.execute');
     Route::get('/reimburseDownload/{id}/{key}', [ReimburseController::class, 'download'])->name('reimburse.download');
+    Route::get('/reimburseProofOfDocumentDownload/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_download'])->name('reimburseProofOfDocument.download');
 
     // Other Expenses
     Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');

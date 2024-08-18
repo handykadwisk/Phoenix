@@ -80,18 +80,20 @@ export default function Reimburse({ auth }: PageProps) {
         add_files_execute: false,
         show_files: false,
         show_files_revised: false,
+        show_files_proof_of_document: false,
         index: "",
         index_show: "",
         index_show_revised: "",
     });
     // Modal Add Files End
 
-    const handleOnClose = () => {
+    const handleOnCloseModalFiles = () => {
         setModalFiles({
             add_files: false,
             add_files_execute: false,
             show_files: false,
             show_files_revised: false,
+            show_files_proof_of_document: false,
             index: "",
             index_show: "",
             index_show_revised: "",
@@ -99,7 +101,7 @@ export default function Reimburse({ auth }: PageProps) {
     };
 
     const { data, setData, errors, reset } = useForm({
-        reimburse_number: "",
+        reimburse_id: "",
         reimburse_used_by: "",
         reimburse_requested_by: "",
         reimburse_division: "",
@@ -132,7 +134,7 @@ export default function Reimburse({ auth }: PageProps) {
         setIsSuccess("");
         reset();
         setData({
-            reimburse_number: "",
+            reimburse_id: "",
             reimburse_used_by: "",
             reimburse_requested_by: "",
             reimburse_division: "",
@@ -185,30 +187,6 @@ export default function Reimburse({ auth }: PageProps) {
                 REIMBURSE_DETAIL_DOCUMENT_ID: "",
             },
         ],
-        // user: [
-        //     {
-        //         id: "",
-        //         name: "",
-        //         email: "",
-        //         role_id: "",
-        //     },
-        // ],
-        // user_used_by: [
-        //     {
-        //         id: "",
-        //         name: "",
-        //         email: "",
-        //         role_id: "",
-        //     },
-        // ],
-        // user_approval: [
-        //     {
-        //         id: "",
-        //         name: "",
-        //         email: "",
-        //         role_id: "",
-        //     },
-        // ],
     });
 
     // Handle Add Row Start
@@ -880,6 +858,8 @@ export default function Reimburse({ auth }: PageProps) {
             })
             .catch((err) => console.log(err));
 
+        setData("reimburse_id", id);
+
         setModal({
             add: false,
             delete: false,
@@ -967,6 +947,40 @@ export default function Reimburse({ auth }: PageProps) {
     ) => {
         await axios({
             url: `/reimburseDownload/${reimburse_detail_id}/${document_id}`,
+            method: "GET",
+            responseType: "blob",
+        })
+            .then((response) => {
+                console.log(response);
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", response.headers.filename);
+                document.body.appendChild(link);
+                link.click();
+            })
+            .catch((err) => {
+                console.log(err);
+                if (err.response.status === 404) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "File not found!",
+                        timer: 1500,
+                        timerProgressBar: true,
+                    });
+                }
+            });
+    };
+
+    const handleFileProofOfDocumentDownload = async (
+        reimburse_id: number,
+        document_id: number
+    ) => {
+        await axios({
+            url: `/reimburseProofOfDocumentDownload/${reimburse_id}/${document_id}`,
             method: "GET",
             responseType: "blob",
         })
@@ -1327,7 +1341,7 @@ export default function Reimburse({ auth }: PageProps) {
                             classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]`}
                             show={modalFiles.add_files}
                             closeable={true}
-                            onClose={() => handleOnClose()}
+                            onClose={() => handleOnCloseModalFiles()}
                             title="Add Files"
                             url=""
                             data=""
@@ -1753,8 +1767,12 @@ export default function Reimburse({ auth }: PageProps) {
                                                     onClick={() => {
                                                         setModalFiles({
                                                             add_files: true,
+                                                            add_files_execute:
+                                                                false,
                                                             show_files: false,
                                                             show_files_revised:
+                                                                false,
+                                                            show_files_proof_of_document:
                                                                 false,
                                                             index: i,
                                                             index_show: "",
@@ -1872,7 +1890,7 @@ export default function Reimburse({ auth }: PageProps) {
                             }
                             show={modalFiles.show_files}
                             closeable={true}
-                            onClose={() => handleOnClose()}
+                            onClose={() => handleOnCloseModalFiles()}
                             title="Show Files"
                             url=""
                             data=""
@@ -1922,6 +1940,74 @@ export default function Reimburse({ auth }: PageProps) {
                                                         }
                                                     >
                                                         <ArrowDownTrayIcon className="w-5 mt-7 m-auto cursor-pointer hover:text-slate-700" />
+                                                    </button>
+                                                </>
+                                            )
+                                        )}
+                                    </div>
+                                </>
+                            }
+                        />
+                        <ModalToAction
+                            classPanel={
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                            }
+                            show={modalFiles.show_files_proof_of_document}
+                            closeable={true}
+                            onClose={() =>
+                                setModalFiles({
+                                    add_files: false,
+                                    show_files: false,
+                                    add_files_report: false,
+                                    show_files_report: false,
+                                    show_files_proof_of_document: false,
+                                    index: "",
+                                    index_show: "",
+                                    index_show_report: "",
+                                })
+                            }
+                            title="Show Files Proof Of Document"
+                            url=""
+                            data=""
+                            method=""
+                            onSuccess=""
+                            headers={null}
+                            submitButtonName=""
+                            // panelWidth=""
+                            body={
+                                <>
+                                    <div className="grid grid-cols-12 my-3">
+                                        {dataById.m_reimburse_proof_of_document?.map(
+                                            (file: any, i: number) => (
+                                                <>
+                                                    <div
+                                                        className={`w-full col-span-11 mb-4`}
+                                                        key={i}
+                                                    >
+                                                        <InputLabel
+                                                            htmlFor="files"
+                                                            value="File"
+                                                            className="mb-2"
+                                                        />
+                                                        <p>
+                                                            {
+                                                                file.document
+                                                                    ?.DOCUMENT_ORIGINAL_NAME
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        title="Download File"
+                                                        onClick={() =>
+                                                            handleFileProofOfDocumentDownload(
+                                                                dataById.REIMBURSE_ID,
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            )
+                                                        }
+                                                    >
+                                                        <ArrowDownTrayIcon className="w-5 mt-4 m-auto cursor-pointer hover:text-slate-700" />
                                                     </button>
                                                 </>
                                             )
@@ -2183,10 +2269,14 @@ export default function Reimburse({ auth }: PageProps) {
                                                                 setModalFiles({
                                                                     add_files:
                                                                         false,
+                                                                    add_file_execute:
+                                                                        false,
                                                                     show_files:
                                                                         true,
                                                                     show_files_revised:
                                                                         "",
+                                                                    show_files_proof_of_document:
+                                                                        false,
                                                                     index: "",
                                                                     index_show:
                                                                         i,
@@ -2226,6 +2316,51 @@ export default function Reimburse({ auth }: PageProps) {
                             </table>
                         </div>
                         {/* Table form end */}
+
+                        <div className="grid md:grid-cols-2 my-10">
+                            <div className="w-full p-2">
+                                <InputLabel htmlFor="type" className="mb-2">
+                                    Difference
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
+                                <TextInput
+                                    value={dataById.notes?.REIMBURSE_NOTES_NAME}
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+
+                            <div className="w-full p-2">
+                                <InputLabel htmlFor="type" className="mb-2">
+                                    Proof of Document
+                                    {/* <span className="text-red-600">*</span> */}
+                                </InputLabel>
+                                {dataById.m_reimburse_proof_of_document
+                                    ?.length > 0 ? (
+                                    <button
+                                        type="button"
+                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                        onClick={() => {
+                                            setModalFiles({
+                                                add_files: false,
+                                                add_files_execute: false,
+                                                show_files: false,
+                                                show_files_revised: false,
+                                                show_files_proof_of_document:
+                                                    true,
+                                                index: "",
+                                                index_show: "",
+                                                index_show_revised: "",
+                                            });
+                                        }}
+                                    >
+                                        Show Files
+                                    </button>
+                                ) : (
+                                    "-"
+                                )}
+                            </div>
+                        </div>
 
                         <div className="w-full p-2 mt-5">
                             <InputLabel
@@ -2281,7 +2416,7 @@ export default function Reimburse({ auth }: PageProps) {
                             }
                             show={modalFiles.show_files}
                             closeable={true}
-                            onClose={() => handleOnClose()}
+                            onClose={() => handleOnCloseModalFiles()}
                             title="Show Files"
                             url=""
                             data=""
@@ -2612,9 +2747,13 @@ export default function Reimburse({ auth }: PageProps) {
                                                                 setModalFiles({
                                                                     add_files:
                                                                         false,
+                                                                    add_files_execute:
+                                                                        false,
                                                                     show_files:
                                                                         true,
                                                                     show_files_revised:
+                                                                        false,
+                                                                    show_files_proof_of_document:
                                                                         false,
                                                                     index: "",
                                                                     index_show:
@@ -2809,7 +2948,7 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="REPORT_CASH_ADVANCE_TYPE"
+                                    htmlFor="REIMBURSE_TYPE"
                                     className="mb-2"
                                 >
                                     Notes
@@ -2918,7 +3057,7 @@ export default function Reimburse({ auth }: PageProps) {
                             }
                             show={modalFiles.show_files_revised}
                             closeable={true}
-                            onClose={() => handleOnClose()}
+                            onClose={() => handleOnCloseModalFiles()}
                             title="Show Files"
                             url=""
                             data=""
@@ -2984,7 +3123,7 @@ export default function Reimburse({ auth }: PageProps) {
 
                                         {dataById.reimburse_detail[
                                             modalFiles.index_show_revised
-                                        ]?.filesDocument ? (
+                                        ]?.filesDocument && (
                                             <>
                                                 {dataById.reimburse_detail[
                                                     modalFiles
@@ -3050,8 +3189,6 @@ export default function Reimburse({ auth }: PageProps) {
                                                     )
                                                 )}
                                             </>
-                                        ) : (
-                                            ""
                                         )}
                                     </div>
                                     <button
@@ -3460,10 +3597,14 @@ export default function Reimburse({ auth }: PageProps) {
                                                             setModalFiles({
                                                                 add_files:
                                                                     false,
+                                                                add_files_execute:
+                                                                    false,
                                                                 show_files:
                                                                     false,
                                                                 show_files_revised:
                                                                     true,
+                                                                show_files_proof_of_document:
+                                                                    false,
                                                                 index: "",
                                                                 index_show: "",
                                                                 index_show_revised:
@@ -3472,10 +3613,16 @@ export default function Reimburse({ auth }: PageProps) {
                                                         }}
                                                     >
                                                         {rd.m_reimburse_document
+                                                            ?.length > 0 ||
+                                                        rd.filesDocument
                                                             ?.length > 0
-                                                            ? rd
+                                                            ? (rd
                                                                   .m_reimburse_document
-                                                                  ?.length +
+                                                                  ?.length ||
+                                                                  0) +
+                                                              (rd.filesDocument
+                                                                  ?.length ||
+                                                                  0) +
                                                               " Files"
                                                             : "Add Files"}
                                                     </button>
@@ -3576,7 +3723,7 @@ export default function Reimburse({ auth }: PageProps) {
                 }
                 title="Reimburse Execute"
                 url={`/reimburseExecute`}
-                data={dataById}
+                data={data}
                 method="post"
                 onSuccess={handleSuccess}
                 headers={{ "Content-type": "multipart/form-data" }}
@@ -3714,6 +3861,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                 add_files_execute: true,
                                                 show_files: false,
                                                 show_files_revised: false,
+                                                show_files_proof_of_document:
+                                                    false,
                                                 index: "",
                                                 index_show: false,
                                                 index_show_revised: true,
@@ -3729,7 +3878,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     }
                                     show={modalFiles.add_files_execute}
                                     closeable={true}
-                                    onClose={() => handleOnClose()}
+                                    onClose={() => handleOnCloseModalFiles()}
                                     title="Proof of Document"
                                     url=""
                                     data=""
@@ -4023,7 +4172,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 Approve 3
                                                 <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                     {
-                                                        getCountReimburseApprove1Status
+                                                        getCountReimburseApprove3Status
                                                     }
                                                 </span>
                                             </Button>
@@ -4311,6 +4460,16 @@ export default function Reimburse({ auth }: PageProps) {
                                                                     <BadgeFlat
                                                                         className=" bg-green-100 text-green-700"
                                                                         title="Execute"
+                                                                        body={
+                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                                    6 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Complited"
                                                                         body={
                                                                             dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
                                                                         }

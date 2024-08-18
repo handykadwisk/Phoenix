@@ -21,6 +21,7 @@ class Reimburse extends Model
 
     protected $with = [
         'reimburse_detail',
+        'm_reimburse_proof_of_document',
         'cost_center',
         'office',
         'notes',
@@ -33,6 +34,11 @@ class Reimburse extends Model
     public function reimburse_detail(): HasMany
     {
         return $this->hasMany(ReimburseDetail::class, 'REIMBURSE_ID');
+    }
+
+    public function m_reimburse_proof_of_document(): HasMany
+    {
+        return $this->hasMany(MReimburseProofOfDocument::class, 'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_ID');
     }
 
     public function cost_center(): BelongsTo
@@ -64,21 +70,6 @@ class Reimburse extends Model
     {
         return $this->belongsTo(TPerson::class, 'REIMBURSE_FIRST_APPROVAL_BY');
     }
-    
-    // public function user(): BelongsTo
-    // {
-    //     return $this->belongsTo(User::class, 'REIMBURSE_REQUESTED_BY');
-    // }
-
-    // public function user_used_by(): BelongsTo
-    // {
-    //     return $this->belongsTo(User::class, 'REIMBURSE_USED_BY');
-    // }
-
-    // public function user_approval(): BelongsTo
-    // {
-    //     return $this->belongsTo(User::class, 'REIMBURSE_FIRST_APPROVAL_BY');
-    // }
 
     public function approval_status(): BelongsTo
     {

@@ -21,8 +21,9 @@ class CashAdvance extends Model
     public $timestamps = false;
 
     protected $with = [
-        // 'cash_advance_report',
         'cash_advance_detail',
+        'cost_center',
+        'office',
         'user',
         'person',
         'person_used_by',
@@ -40,6 +41,16 @@ class CashAdvance extends Model
     public function cash_advance_detail(): HasMany
     {
         return $this->hasMany(CashAdvanceDetail::class, 'CASH_ADVANCE_ID');
+    }
+
+    public function cost_center(): BelongsTo
+    {
+        return $this->belongsTo(TRelationDivision::class, 'CASH_ADVANCE_COST_CENTER');
+    }
+
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(TRelationOffice::class, 'CASH_ADVANCE_BRANCH');
     }
 
     public function person(): BelongsTo

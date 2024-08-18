@@ -38,7 +38,6 @@ return new class extends Migration
             $table->smallInteger('REIMBURSE_TYPE')->nullable();
             $table->smallInteger('REIMBURSE_METHOD')->nullable();
             $table->date('REIMBURSE_SETTLEMENT_DATE')->nullable();
-            $table->decimal('REIMBURSE_AMOUNT', 16, 2)->nullable();
             $table->decimal('REIMBURSE_TOTAL_AMOUNT', 16, 2)->nullable();
             $table->decimal('REIMBURSE_TOTAL_AMOUNT_APPROVE', 16, 2)->nullable();
             $table->decimal('REIMBURSE_TOTAL_AMOUNT_DIFFERENT', 16, 2)->nullable();
