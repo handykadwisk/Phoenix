@@ -130,6 +130,7 @@ class PolicyController extends Controller
             'POLICY_INCEPTION_DATE' => $request->policy_inception_date,
             'POLICY_DUE_DATE'       => $request->policy_due_date,
             'POLICY_STATUS_ID'      => $request->policy_status_id,
+            'POLICY_TYPE'           => $request->policy_type,
             'SELF_INSURED'          => $request->self_insured,
             'POLICY_CREATED_BY'      => Auth::user()->id
         ]);
@@ -223,8 +224,9 @@ class PolicyController extends Controller
                             'POLICY_INCEPTION_DATE' => $request->POLICY_INCEPTION_DATE,
                             'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
                             'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
+                            'POLICY_TYPE'           => $request->POLICY_TYPE,
                             'SELF_INSURED'          => $request->SELF_INSURED,
-                            'POLICY_UPDATED_BY'      => Auth::user()->id,
+                            'POLICY_UPDATED_BY'     => Auth::user()->id,
                             'POLICY_UPDATED_DATE'   => now()
                         ]);
                         

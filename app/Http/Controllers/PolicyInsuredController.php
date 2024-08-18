@@ -23,9 +23,12 @@ class PolicyInsuredController extends Controller
         // dd($request);
         foreach ($request->input() as $key => $value) {
             $insured = MPolicyInsured::insertGetId([
-                'POLICY_ID'             => $value['POLICY_ID'],
-                'POLICY_INSURED_NAME'  => trim($value['POLICY_INSURED_NAME']),
-                'ADMIN_COST'             => $value['POLICY_ADMIN_COST'],
+                'POLICY_ID'                     => $value['POLICY_ID'],
+                'POLICY_INSURED_NAME'           => trim($value['POLICY_INSURED_NAME']),
+                'ADMIN_COST'                    => $value['ADMIN_COST'],
+                'DISC_ADMIN_COST_PERCENTAGE'    => $value['DISC_ADMIN_COST_PERCENTAGE'],
+                'DISC_ADMIN_COST_AMOUNT'        => $value['DISC_ADMIN_COST_AMOUNT'],
+                'ADMIN_COST_NETT_AMOUNT'        => $value['ADMIN_COST_NETT_AMOUNT'],
             ]);
             
             foreach ($value['policy_insured_detail'] as $details => $detail) {
@@ -93,8 +96,11 @@ class PolicyInsuredController extends Controller
 
         $insured = MPolicyInsured::where('POLICY_INSURED_ID', $request['POLICY_INSURED_ID'])
             ->update([
-                'POLICY_INSURED_NAME'  => trim($request['POLICY_INSURED_NAME']),
-                'ADMIN_COST'             => $request['POLICY_ADMIN_COST']
+                'POLICY_INSURED_NAME'           => trim($request['POLICY_INSURED_NAME']),
+                'ADMIN_COST'                    => $request['ADMIN_COST'],
+                'DISC_ADMIN_COST_PERCENTAGE'    => $request['DISC_ADMIN_COST_PERCENTAGE'],
+                'DISC_ADMIN_COST_AMOUNT'        => $request['DISC_ADMIN_COST_AMOUNT'],
+                'ADMIN_COST_NETT_AMOUNT'        => $request['ADMIN_COST_NETT_AMOUNT'],
             ]);
 
         foreach ($request['policy_insured_detail'] as $key => $detail) {
@@ -185,10 +191,10 @@ class PolicyInsuredController extends Controller
 
     public function getSummaryInsured(Request $request) {
         $query = DB::table('m_policy_insured as pii')
-                    ->select(DB::raw('pii.POLICY_ID, pii.POLICY_INSURED_ID, pid.INTEREST_INSURED_ID, SUM(pid.BF_NETT_AMOUNT) AS BF_NETT_AMOUNT, SUM(pid.EF_NETT_AMOUNT) AS EF_NETT_AMOUNT, SUM(pid.CF_NETT_AMOUNT) AS CF_NETT_AMOUNT'))
+                    ->select(DB::raw('pii.POLICY_ID, pii.POLICY_INSURED_ID, pid.CURRENCY_ID, pid.INTEREST_INSURED_ID, SUM(pid.BF_NETT_AMOUNT) AS BF_NETT_AMOUNT, SUM(pid.EF_NETT_AMOUNT) AS EF_NETT_AMOUNT, SUM(pid.CF_NETT_AMOUNT) AS CF_NETT_AMOUNT'))
                     ->leftJoin('m_policy_insured_detail AS pid', 'pii.POLICY_INSURED_ID', '=', 'pid.POLICY_INSURED_ID')
                     ->where('POLICY_ID', $request->input('policy_id'))
-            // ->groupBy('ipc.CURRENCY_ID', 'ipc.POLICY_COVERAGE_ID')
+                    ->groupBy('pid.CURRENCY_ID')
                     ->get();
 
         return response()->json($query);

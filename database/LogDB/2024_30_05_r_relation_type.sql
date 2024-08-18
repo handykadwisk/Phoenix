@@ -2,7 +2,8 @@
 SQLyog Ultimate v11.33 (64 bit)
 MySQL - 5.7.12 : Database - phoenix_app_dev
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -14,7 +15,7 @@ MySQL - 5.7.12 : Database - phoenix_app_dev
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 /*Data for the table `r_relation_type` */
 
-insert  into `r_relation_type`(`RELATION_TYPE_ID`,`RELATION_TYPE_NAME`,`RELATION_TYPE_DESCRIPTION`) values (1,'Client',NULL),(2,'Insurance',NULL),(3,'Agent',NULL),(4,'Financial Institution',NULL),(5,'Loss Adjuster',NULL),(6,'Hospital',NULL),(7,'Autoworkshop',NULL),(8,'Supplier',NULL),(9,'Broker',NULL),(10,'Third Party Administrator',NULL),(11,'Reinsurance',NULL);
+insert  into `r_relation_type`(`RELATION_TYPE_ID`,`RELATION_TYPE_NAME`,`RELATION_TYPE_DESCRIPTION`,`RELATION_CREATED_BY`,`RELATION_UPDATE_BY`,`RELATION_CREATED_DATE`,`RELATION_UPDATED_DATE`) values (1,'Client',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(2,'Insurance',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(3,'Agent',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(4,'Financial Institution',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(5,'Loss Adjuster',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(6,'Hospital',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(7,'Autoworkshop',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(8,'Supplier',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(9,'Broker',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(10,'Third Party Administrator',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(11,'Reinsurance',NULL,NULL,NULL,'2024-07-31 16:33:08',NULL),(12,'BAA (Business Acquisition Assistant)',NULL,NULL,NULL,'2024-08-12 15:16:32',NULL),(13,'FBI By PKS',NULL,NULL,NULL,'2024-08-14 08:45:37',NULL);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -106,6 +106,11 @@ export default function PolicyIndex({ auth }: PageProps) {
             });
     };
 
+     const policyType = [
+         { ID: "1", NAME: "Full Policy" },
+         { ID: "2", NAME: "Master Policy/Certificate" }
+     ];
+
     const client = [
         { id: "1", stat: "CHUBB" },
         { id: "2", stat: "BRINS" },
@@ -144,6 +149,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         policy_inception_date: "",
         policy_due_date: "",
         policy_status_id: 1,
+        policy_type:"",
         self_insured: "",
         policyPremium: [
             {
@@ -179,6 +185,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         POLICY_INCEPTION_DATE: "",
         POLICY_DUE_DATE: "",
         POLICY_STATUS_ID: "",
+        POLICY_TYPE: "",
         SELF_INSURED: "",
         policy_premium: [
             {
@@ -236,6 +243,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             policy_inception_date: "",
             policy_due_date: "",
             policy_status_id: 1,
+            policy_type: "",
             self_insured: "",
             policyPremium: [
                 {
@@ -281,6 +289,7 @@ console.log('searchPolicy: ', searchPolicy)
             policy_inception_date: "",
             policy_due_date: "",
             policy_status_id: 1,
+            policy_type: "",
             self_insured: "",
             policyPremium: [
                 {
@@ -869,6 +878,30 @@ console.log('searchPolicy: ', searchPolicy)
                                     )}
                                 </select>
                             </div>
+                            <div>
+                                <InputLabel
+                                    htmlFor="policy_type"
+                                    value="Policy Type"
+                                />
+                                <select
+                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={data.policy_type}
+                                    onChange={(e) =>
+                                        setData("policy_type", e.target.value)
+                                    }
+                                >
+                                    <option value={""}>
+                                        -- <i>Choose Policy Type</i> --
+                                    </option>
+                                    {policyType.map((type: any, i: number) => {
+                                        return (
+                                            <option key={i} value={type.ID}>
+                                                {type.NAME}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
                         </div>
                         <div className="mb-4 ml-4 mr-4">
                             <InputLabel
@@ -1126,7 +1159,7 @@ console.log('searchPolicy: ', searchPolicy)
                         search: false,
                     })
                 }
-                title={"Detail Policy"}
+                title={"Detail Policy - " + dataById.POLICY_NUMBER}
                 url={""}
                 data={""}
                 onSuccess={""}
