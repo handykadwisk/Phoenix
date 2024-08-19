@@ -26,22 +26,22 @@ use Illuminate\Support\Str;
 
 class CashAdvanceReportController extends Controller
 {
-    public function getReportCAData($dataPerPage = 2, $searchQuery = null)
-    {
-        $data = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
-        if ($searchQuery) {
-            if ($searchQuery->input('REPORT_CASH_ADVANCE_NUMBER')) {
-                $data->where('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID', 'like', '%'.$searchQuery->REPORT_CASH_ADVANCE_NUMBER.'%');
-            }
-        }
-        return $data->paginate($dataPerPage);
-    }
+    // public function getReportCAData($dataPerPage = 2, $searchQuery = null)
+    // {
+    //     $data = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
+    //     if ($searchQuery) {
+    //         if ($searchQuery->input('REPORT_CASH_ADVANCE_NUMBER')) {
+    //             $data->where('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID', 'like', '%'.$searchQuery->REPORT_CASH_ADVANCE_NUMBER.'%');
+    //         }
+    //     }
+    //     return $data->paginate($dataPerPage);
+    // }
 
-    public function getCAReport(Request $request)
-    {
-        $data = $this->getReportCAData(10, $request);
-        return response()->json($data);
-    }
+    // public function getCAReport(Request $request)
+    // {
+    //     $data = $this->getReportCAData(10, $request);
+    //     return response()->json($data);
+    // }
 
     public function getCAReportById(string $id) 
     {
@@ -68,6 +68,13 @@ class CashAdvanceReportController extends Controller
     public function getCountCAReportApprove2Status()
     {
         $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAReportApprove3Status()
+    {
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)->count();
 
         return response()->json($data);
     }

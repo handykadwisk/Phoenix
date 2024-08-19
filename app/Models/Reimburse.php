@@ -22,6 +22,7 @@ class Reimburse extends Model
     protected $with = [
         'reimburse_detail',
         'm_reimburse_proof_of_document',
+        'division',
         'cost_center',
         'office',
         'notes',
@@ -39,6 +40,11 @@ class Reimburse extends Model
     public function m_reimburse_proof_of_document(): HasMany
     {
         return $this->hasMany(MReimburseProofOfDocument::class, 'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_ID');
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(TRelationDivision::class, 'REIMBURSE_DIVISION');
     }
 
     public function cost_center(): BelongsTo

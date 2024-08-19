@@ -8,6 +8,7 @@ export interface User {
         RELATION_ORGANIZATION_ID: string;
         DIVISION_ID: string;
         division: {
+            RELATION_DIVISION_ID: string;
             RELATION_DIVISION_ALIAS: string;
         };
     };

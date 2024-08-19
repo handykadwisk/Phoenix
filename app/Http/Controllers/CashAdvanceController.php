@@ -36,6 +36,8 @@ class CashAdvanceController extends Controller
         $cash_advance_used_by = $searchQuery->cash_advance_used_by;
         $cash_advance_start_date = $searchQuery->cash_advance_start_date;
         $cash_advance_end_date = $searchQuery->cash_advance_end_date;
+        $cash_advance_division = $searchQuery->cash_advance_division;
+        $cash_advance_cost_center = $searchQuery->cash_advance_cost_center;
         $cash_advance_type = $searchQuery->cash_advance_type;
         $status = $searchQuery->status;
         $status_type = $searchQuery->status_type;
@@ -70,7 +72,21 @@ class CashAdvanceController extends Controller
                 }
 
                 if ($searchQuery->input('cash_advance_division')) {
-                    $data->where('CASH_ADVANCE_DIVISION', 'like', '%'. $searchQuery->cash_advance_division .'%');
+                    $data->whereHas('division',
+                    function($query) use($cash_advance_division)
+                    {
+                        $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $cash_advance_division .'%')
+                                ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $cash_advance_division .'%');
+                    });
+                }
+    
+                if ($searchQuery->input('cash_advance_cost_center')) {
+                    $data->whereHas('cost_center',
+                    function($query) use($cash_advance_cost_center)
+                    {
+                        $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $cash_advance_cost_center .'%')
+                                ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $cash_advance_cost_center .'%');
+                    });
                 }
 
                 if ($status == 1 && $status_type == "Approve1") {
@@ -79,6 +95,8 @@ class CashAdvanceController extends Controller
                     $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
                 } else if ($status == 2 && $status_type == "Approve2") {
                     $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
+                } else if ($status == 2 && $status_type == "Approve3") {
+                    $data->where('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2);
                 } else if ($status == 5 && $status_type == "Pending Report") {
                     $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
                 } else if ($status == 3 && $status_type == "Need Revision") {
@@ -128,8 +146,8 @@ class CashAdvanceController extends Controller
                     $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
                 } else if ($status == 2 && $status_type == "Report Approve2") {
                     $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
-                } else if ($status == 5 && $status_type == "Report Execute") {
-                    $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
+                } else if ($status == 2 && $status_type == "Report Approve3") {
+                    $data->where('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2);
                 } else if ($status == 3 && $status_type == "Report Need Revision") {
                     $data->where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
                         ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
@@ -182,6 +200,13 @@ class CashAdvanceController extends Controller
     public function getCountCAApprove2Status()
     {
         $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)->count();
+
+        return response()->json($data);
+    }
+
+    public function getCountCAApprove3Status()
+    {
+        $data = CashAdvance::where('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)->count();
 
         return response()->json($data);
     }
@@ -344,6 +369,7 @@ class CashAdvanceController extends Controller
         $cash_advance_number = $this->getCashAdvanceNumber();
         $cash_advance_used_by = $request->cash_advance_used_by['value'];
         $cash_advance_requested_by = $user_id;
+        $cash_advance_division = $request->cash_advance_division;
         $cash_advance_cost_center = $request->cash_advance_cost_center['value'];
         $cash_advance_branch = $request->cash_advance_branch['value'];
         $cash_advance_requested_date = now();
@@ -364,6 +390,7 @@ class CashAdvanceController extends Controller
             'CASH_ADVANCE_NUMBER' => $cash_advance_number,
             'CASH_ADVANCE_USED_BY' => $cash_advance_used_by,
             'CASH_ADVANCE_REQUESTED_BY' => $cash_advance_requested_by,
+            'CASH_ADVANCE_DIVISION' => $cash_advance_division,
             'CASH_ADVANCE_COST_CENTER' => $cash_advance_cost_center,
             'CASH_ADVANCE_BRANCH' => $cash_advance_branch,
             'CASH_ADVANCE_REQUESTED_DATE' => $cash_advance_requested_date,

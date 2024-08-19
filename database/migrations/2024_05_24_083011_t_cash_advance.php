@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('t_cash_advance', function (Blueprint $table) {
             $table->increments('CASH_ADVANCE_ID')->primary();
             $table->string('CASH_ADVANCE_NUMBER')->nullable();
+            $table->string('CASH_ADVANCE_DIVISION')->nullable();
             $table->string('CASH_ADVANCE_COST_CENTER')->nullable();
             $table->string('CASH_ADVANCE_BRANCH')->nullable();
             $table->smallInteger('CASH_ADVANCE_USED_BY')->nullable();

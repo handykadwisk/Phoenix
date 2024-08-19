@@ -30,13 +30,15 @@ export default function CashAdvance({ auth }: PageProps) {
         getCARequestStatus();
         getCAApprove1Status();
         getCAApprove2Status();
+        getCAApprove3Status();
         getCAPendingReportStatus();
         getCANeedRevisionStatus();
+        getCARejectStatus();
         getCAReportRejectStatus();
         getCAReportRequestStatus();
         getCAReportApprove1Status();
         getCAReportApprove2Status();
-        getCAReportExecuteStatus();
+        getCAReportApprove3Status();
         getCAReportNeedRevisionStatus();
         getCAReportRejectStatus();
         getCADifferents();
@@ -49,13 +51,15 @@ export default function CashAdvance({ auth }: PageProps) {
         getCARequestStatus();
         getCAApprove1Status();
         getCAApprove2Status();
+        getCAApprove3Status();
         getCAPendingReportStatus();
         getCANeedRevisionStatus();
+        getCARejectStatus();
         getCAReportRejectStatus();
         getCAReportRequestStatus();
         getCAReportApprove1Status();
         getCAReportApprove2Status();
-        getCAReportExecuteStatus();
+        getCAReportApprove3Status();
         getCAReportNeedRevisionStatus();
         getCAReportRejectStatus();
         getCADifferents();
@@ -261,13 +265,15 @@ export default function CashAdvance({ auth }: PageProps) {
         getCARequestStatus();
         getCAApprove1Status();
         getCAApprove2Status();
+        getCAApprove3Status();
         getCAPendingReportStatus();
         getCANeedRevisionStatus();
+        getCARejectStatus();
         getCAReportRejectStatus();
         getCAReportRequestStatus();
         getCAReportApprove1Status();
         getCAReportApprove2Status();
-        getCAReportExecuteStatus();
+        getCAReportApprove3Status();
         getCAReportNeedRevisionStatus();
         getCAReportRejectStatus();
         getCADifferents();
@@ -1194,7 +1200,6 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_end_date: "",
         cash_advance_division: "",
         cash_advance_cost_center: "",
-        cash_advance_branch: "",
         cash_advance_type: "",
     });
 
@@ -1217,31 +1222,13 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_start_date: searchCA.cash_advance_start_date,
                 cash_advance_end_date: searchCA.cash_advance_end_date,
                 cash_advance_division: searchCA.cash_advance_division,
+                cash_advance_cost_center: searchCA.cash_advance_cost_center,
                 cash_advance_type: searchCA.cash_advance_type,
                 status: status,
                 status_type: status_type,
             })
             .then((res) => {
                 setCA(res.data);
-                // setIsLoading(false);
-                // if (modal.search) {
-                //     setModal({
-                //         add: false,
-                //         delete: false,
-                //         edit: false,
-                //         view: false,
-                //         document: false,
-                //         search: false,
-                //         search_ca_report: false,
-                //         approve: false,
-                //         report: false,
-                //         execute: false,
-                //         view_report: false,
-                //         approve_report: false,
-                //         revised_report: false,
-                //         execute_report: false,
-                //     });
-                // }
             })
             .catch((err) => {
                 console.log(err);
@@ -1261,7 +1248,6 @@ export default function CashAdvance({ auth }: PageProps) {
                     cash_advance_end_date: "",
                     cash_advance_division: "",
                     cash_advance_cost_center: "",
-                    cash_advance_branch: "",
                     cash_advance_type: "",
                 });
                 // console.log(res);
@@ -1367,6 +1353,20 @@ export default function CashAdvance({ auth }: PageProps) {
             });
     };
 
+    const [getCountCAApprove3Status, setCountCAApprove3Status] = useState<any>(
+        []
+    );
+    const getCAApprove3Status = async () => {
+        await axios
+            .get(`/getCountCAApprove3Status`)
+            .then((res) => {
+                setCountCAApprove3Status(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     const [getCountCAPendingReportStatus, setCountCAPendingReportStatus] =
         useState<any>([]);
     const getCAPendingReportStatus = async () => {
@@ -1444,13 +1444,13 @@ export default function CashAdvance({ auth }: PageProps) {
             });
     };
 
-    const [getCountCAReportExecuteStatus, setCountCAReportExecuteStatus] =
+    const [getCountCAReportApprove3Status, setCountCAReportApprove3Status] =
         useState<any>([]);
-    const getCAReportExecuteStatus = async () => {
+    const getCAReportApprove3Status = async () => {
         await axios
-            .get(`/getCountCAReportExecuteStatus`)
+            .get(`/getCountCAReportApprove3Status`)
             .then((res) => {
-                setCountCAReportExecuteStatus(res.data);
+                setCountCAReportApprove3Status(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -1533,6 +1533,8 @@ export default function CashAdvance({ auth }: PageProps) {
 
         setData({
             ...data,
+            cash_advance_division:
+                auth.user.person.division?.RELATION_DIVISION_ID,
             cash_advance_delivery_method_transfer: transfer_method,
             cash_advance_delivery_method_cash: cash_method,
         });
@@ -2292,11 +2294,11 @@ export default function CashAdvance({ auth }: PageProps) {
         };
     });
 
-    // console.log("Data Cash Advance", data);
+    console.log("Data Cash Advance", data);
     // console.log("Cash Advance", cashAdvance.data);
     // console.log("Data CA By Id", dataById);
     // console.log("Data CA Report", dataCAReport);
-    console.log("Data CA Report By Id", dataReportById);
+    // console.log("Data CA Report By Id", dataReportById);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Cash Advance"}>
@@ -7970,7 +7972,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         }
                                                         className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
                                                             cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ===
-                                                            "3"
+                                                                "3" ||
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ===
+                                                                "1"
                                                                 ? "bg-gray-100"
                                                                 : ""
                                                         }`}
@@ -7982,7 +7986,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         }
                                                         disabled={
                                                             cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ===
-                                                                "3" && true
+                                                                "3" ||
+                                                            (cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ===
+                                                                "1" &&
+                                                                true)
                                                         }
                                                     />
                                                 </TD>
@@ -8824,40 +8831,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                               " Files"
                                                             : "Add Files"}
                                                     </button>
-                                                    {/* {cad
-                                                        ?.m_cash_advance_report_document
-                                                        ?.length > 0 ? (
-                                                        <button
-                                                            type="button"
-                                                            className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
-                                                            onClick={() => {
-                                                                setModalFiles({
-                                                                    add_files:
-                                                                        false,
-                                                                    show_files:
-                                                                        false,
-                                                                    add_files_report:
-                                                                        false,
-                                                                    show_files_report:
-                                                                        true,
-                                                                    index: "",
-                                                                    index_show:
-                                                                        "",
-                                                                    index_show_report:
-                                                                        i,
-                                                                });
-                                                            }}
-                                                        >
-                                                            {
-                                                                cad
-                                                                    ?.m_cash_advance_report_document
-                                                                    ?.length
-                                                            }{" "}
-                                                            Files
-                                                        </button>
-                                                    ) : (
-                                                        "-"
-                                                    )} */}
                                                 </TD>
                                                 {dataReportById
                                                     .cash_advance_detail_report
@@ -9450,6 +9423,26 @@ export default function CashAdvance({ auth }: PageProps) {
                                         />
                                     </div>
                                     <div className="mb-5">
+                                        <Input
+                                            id="cash_advance_cost_center"
+                                            name="cash_advance_cost_center"
+                                            type="text"
+                                            value={
+                                                searchCA.cash_advance_cost_center
+                                            }
+                                            placeholder="Cost Center"
+                                            className="focus:ring-red-600"
+                                            autoComplete="off"
+                                            onChange={(e: any) =>
+                                                setSearchCA({
+                                                    ...searchCA,
+                                                    cash_advance_cost_center:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-5">
                                         <select
                                             name="cash_advance_type"
                                             id="cash_advance_type"
@@ -9537,20 +9530,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </div>
                                         <div className="flex relative">
                                             <Button
-                                                className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
+                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
                                                 onClick={() =>
-                                                    getCA(
-                                                        "",
-                                                        "5",
-                                                        "Pending Report"
-                                                    )
+                                                    getCA("", "2", "Approve3")
                                                 }
                                             >
-                                                Pending Report
+                                                Approve 3
                                                 <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountCAPendingReportStatus
-                                                    }
+                                                    {getCountCAApprove3Status}
                                                 </span>
                                             </Button>
                                         </div>
@@ -9583,6 +9570,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 Reject
                                                 <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                     {getCountCARejectStatus}
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-green-500 px-2 py-1 hover:bg-green-600"
+                                                onClick={() =>
+                                                    getCA(
+                                                        "",
+                                                        "5",
+                                                        "Pending Report"
+                                                    )
+                                                }
+                                            >
+                                                Pending Report
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {
+                                                        getCountCAPendingReportStatus
+                                                    }
                                                 </span>
                                             </Button>
                                         </div>
@@ -9653,6 +9659,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
                                                     {
                                                         getCountCAReportApprove2Status
+                                                    }
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <div className="flex relative">
+                                            <Button
+                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
+                                                onClick={() =>
+                                                    getCA(
+                                                        "",
+                                                        "2",
+                                                        "Report Approve3"
+                                                    )
+                                                }
+                                            >
+                                                Approve 3
+                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                    {
+                                                        getCountCAReportApprove3Status
                                                     }
                                                 </span>
                                             </Button>

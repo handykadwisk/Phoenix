@@ -22,6 +22,7 @@ class CashAdvance extends Model
 
     protected $with = [
         'cash_advance_detail',
+        'division',
         'cost_center',
         'office',
         'user',
@@ -41,6 +42,11 @@ class CashAdvance extends Model
     public function cash_advance_detail(): HasMany
     {
         return $this->hasMany(CashAdvanceDetail::class, 'CASH_ADVANCE_ID');
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(TRelationDivision::class, 'CASH_ADVANCE_DIVISION');
     }
 
     public function cost_center(): BelongsTo

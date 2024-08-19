@@ -684,7 +684,12 @@ export default function Reimburse({ auth }: PageProps) {
 
     // Search Start
     const [searchReimburse, setSearchReimburse] = useState<any>({
-        REIMBURSE_NUMBER: "",
+        reimburse_requested_by: "",
+        reimburse_used_by: "",
+        reimburse_start_date: "",
+        reimburse_end_date: "",
+        reimburse_division: "",
+        reimburse_cost_center: "",
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -700,6 +705,7 @@ export default function Reimburse({ auth }: PageProps) {
                 reimburse_start_date: searchReimburse.reimburse_start_date,
                 reimburse_end_date: searchReimburse.reimburse_end_date,
                 reimburse_division: searchReimburse.reimburse_division,
+                reimburse_cost_center: searchReimburse.reimburse_cost_center,
                 status: status,
                 status_type: status_type,
             })
@@ -724,7 +730,8 @@ export default function Reimburse({ auth }: PageProps) {
                     reimburse_end_date: "",
                     reimburse_division: "",
                     reimburse_cost_center: "",
-                    reimburse_branch: "",
+                    status: "",
+                    status_type: "",
                 });
             })
             .catch((err) => {
@@ -776,6 +783,11 @@ export default function Reimburse({ auth }: PageProps) {
     // Handle Add Start
     const handleAddModal = async (e: FormEvent) => {
         e.preventDefault();
+
+        setData(
+            "reimburse_division",
+            auth.user.person.division?.RELATION_DIVISION_ID
+        );
 
         setModal({
             add: true,
@@ -1297,8 +1309,8 @@ export default function Reimburse({ auth }: PageProps) {
 
     console.log(data);
     // console.log(DataRow);
-    console.log("Reimburse", reimburse.data);
-    console.log("Data By Id", dataById);
+    // console.log("Reimburse", reimburse.data);
+    // console.log("Data By Id", dataById);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Reimburse"}>
@@ -2864,13 +2876,18 @@ export default function Reimburse({ auth }: PageProps) {
                                                         }
                                                         className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
                                                             rd.REIMBURSE_DETAIL_APPROVAL ===
-                                                            "3"
+                                                                "3" ||
+                                                            rd.REIMBURSE_DETAIL_APPROVAL ===
+                                                                "1"
                                                                 ? "bg-gray-100"
                                                                 : ""
                                                         }`}
                                                         disabled={
                                                             rd.REIMBURSE_DETAIL_APPROVAL ===
-                                                                "3" && true
+                                                                "3" ||
+                                                            (rd.REIMBURSE_DETAIL_APPROVAL ===
+                                                                "1" &&
+                                                                true)
                                                         }
                                                         required
                                                         placeholder="0.00"
@@ -3869,7 +3886,10 @@ export default function Reimburse({ auth }: PageProps) {
                                             });
                                         }}
                                     >
-                                        Add Files
+                                        {data.proof_of_document?.length > 0
+                                            ? data.proof_of_document?.length +
+                                              " Files"
+                                            : "Add Files"}
                                     </button>
                                 </div>
                                 <ModalToAction
@@ -4068,6 +4088,26 @@ export default function Reimburse({ auth }: PageProps) {
                                                 setSearchReimburse({
                                                     ...searchReimburse,
                                                     reimburse_division:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-5">
+                                        <Input
+                                            id="reimburse_cost_center"
+                                            name="reimburse_cost_center"
+                                            type="text"
+                                            value={
+                                                searchReimburse.reimburse_cost_center
+                                            }
+                                            placeholder="Cost Center"
+                                            className="focus:ring-red-600"
+                                            autoComplete="off"
+                                            onChange={(e: any) =>
+                                                setSearchReimburse({
+                                                    ...searchReimburse,
+                                                    reimburse_cost_center:
                                                         e.target.value,
                                                 })
                                             }

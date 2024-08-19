@@ -36,6 +36,8 @@ class ReimburseController extends Controller
         $reimburse_used_by = $searchQuery->reimburse_used_by;
         $reimburse_start_date = $searchQuery->reimburse_start_date;
         $reimburse_end_date = $searchQuery->reimburse_end_date;
+        $reimburse_division = $searchQuery->reimburse_division;
+        $reimburse_cost_center = $searchQuery->reimburse_cost_center;
         $status = $searchQuery->status;
         $status_type = $searchQuery->status_type;
 
@@ -66,7 +68,21 @@ class ReimburseController extends Controller
             }
 
             if ($searchQuery->input('reimburse_division')) {
-                $data->where('REIMBURSE_DIVISION', 'like', '%'. $searchQuery->reimburse_division .'%');
+                $data->whereHas('division',
+                function($query) use($reimburse_division)
+                {
+                    $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $reimburse_division .'%')
+                            ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $reimburse_division .'%');
+                });
+            }
+
+            if ($searchQuery->input('reimburse_cost_center')) {
+                $data->whereHas('cost_center',
+                function($query) use($reimburse_cost_center)
+                {
+                    $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $reimburse_cost_center .'%')
+                            ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $reimburse_cost_center .'%');
+                });
             }
 
             if ($status == 1 && $status_type == "Approve1") {
@@ -75,8 +91,8 @@ class ReimburseController extends Controller
                 $data->where('REIMBURSE_FIRST_APPROVAL_STATUS', 2);
             } else if ($status == 2 && $status_type == "Approve2") {
                 $data->where('REIMBURSE_SECOND_APPROVAL_STATUS', 2);
-            } else if ($status == 5 && $status_type == "Pending Report") {
-                $data->where('REIMBURSE_SECOND_APPROVAL_STATUS', 5);
+            } else if ($status == 2 && $status_type == "Approve3") {
+                $data->where('REIMBURSE_THIRD_APPROVAL_STATUS', 2);
             } else if ($status == 3 && $status_type == "Need Revision") {
                 $data->where('REIMBURSE_FIRST_APPROVAL_STATUS', 3)
                     ->orWhere('REIMBURSE_SECOND_APPROVAL_STATUS', 3)
@@ -85,6 +101,8 @@ class ReimburseController extends Controller
                 $data->where('REIMBURSE_FIRST_APPROVAL_STATUS', 4)
                 ->orWhere('REIMBURSE_SECOND_APPROVAL_STATUS', 4)
                 ->orWhere('REIMBURSE_THIRD_APPROVAL_STATUS', 4);
+            } else if ($status == 6 && $status_type == "Complited") {
+                $data->where('REIMBURSE_SECOND_APPROVAL_STATUS', 6);
             }
         }
 
@@ -316,6 +334,7 @@ class ReimburseController extends Controller
         $reimburse_number = $this->getReimburseNumber();
         $reimburse_used_by = $request->reimburse_used_by['value'];
         $reimburse_requested_by = $user_id;
+        $reimburse_division = $request->reimburse_division;
         $reimburse_cost_center = $request->reimburse_cost_center['value'];
         $reimburse_branch = $request->reimburse_branch['value'];
         $reimburse_requested_date = now();
@@ -332,6 +351,7 @@ class ReimburseController extends Controller
             'REIMBURSE_NUMBER' => $reimburse_number,
             'REIMBURSE_USED_BY' => $reimburse_used_by,
             'REIMBURSE_REQUESTED_BY' => $reimburse_requested_by,
+            'REIMBURSE_DIVISION' => $reimburse_division,
             'REIMBURSE_COST_CENTER' => $reimburse_cost_center,
             'REIMBURSE_BRANCH' => $reimburse_branch,
             'REIMBURSE_REQUESTED_DATE' => $reimburse_requested_date,
