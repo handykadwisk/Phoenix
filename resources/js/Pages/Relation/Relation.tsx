@@ -106,8 +106,8 @@ export default function Relation({ auth }: PageProps) {
     const [isSuccess, setIsSuccess] = useState<any>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [mRelation, setMRelation] = useState<any>([]);
-    const [switchPage, setSwitchPage] = useState(false);
-    const [switchPageTBK, setSwitchPageTBK] = useState(false);
+    const [switchPage, setSwitchPage] = useState(true);
+    const [switchPagePKS, setSwitchPagePKS] = useState({});
 
     const getMappingParent = async (name: string, column: string) => {
         // setIsLoading(true)
@@ -164,6 +164,11 @@ export default function Relation({ auth }: PageProps) {
         profession_id: "",
         relation_type_id: [],
         corporate_pic_for: null,
+        NPWP_RELATION: "",
+        date_of_birth: "",
+        DEFAULT_PAYABLE: 0,
+        no_pks: [],
+        bank_account: [],
     });
 
     const [dataById, setDataById] = useState<any>({
@@ -236,6 +241,12 @@ export default function Relation({ auth }: PageProps) {
                 mark_tbk_relation: "",
                 profession_id: "",
                 relation_type_id: [],
+                corporate_pic_for: null,
+                NPWP_RELATION: "",
+                date_of_birth: "",
+                DEFAULT_PAYABLE: 0,
+                no_pks: [],
+                bank_account: [],
             });
             Swal.fire({
                 title: "Success",
@@ -260,7 +271,7 @@ export default function Relation({ auth }: PageProps) {
                 }
             });
             setSwitchPage(false);
-            setSwitchPageTBK(false);
+            setSwitchPagePKS(false);
             setIsSuccess(message);
         }
     };
@@ -324,10 +335,10 @@ export default function Relation({ auth }: PageProps) {
 
     const handleCheckboxTBKEdit = (e: any) => {
         if (e == true) {
-            setSwitchPageTBK(true);
+            setSwitchPagePKS(true);
             setDataById({ ...dataById, MARK_TBK_RELATION: "1" });
         } else {
-            setSwitchPageTBK(false);
+            setSwitchPagePKS(false);
             setDataById({ ...dataById, MARK_TBK_RELATION: "0" });
         }
     };
@@ -473,7 +484,17 @@ export default function Relation({ auth }: PageProps) {
         setSearchRelation({ ...searchRelation, relation_search: changeVal });
     };
 
-    console.log(searchRelation.relation_search);
+    const [bank, setBank] = useState<any>([]);
+    const getRBank = async () => {
+        await axios
+            .post(`/getRBank`)
+            .then((res) => {
+                setBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -499,6 +520,7 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     })
                 }
+                bank={bank}
                 idGroupRelation={""}
                 handleSuccess={handleSuccess}
                 relationStatus={relationStatus}
@@ -511,8 +533,8 @@ export default function Relation({ auth }: PageProps) {
                 setData={setData}
                 switchPage={switchPage}
                 setSwitchPage={setSwitchPage}
-                switchPageTBK={switchPageTBK}
-                setSwitchPageTBK={setSwitchPageTBK}
+                switchPagePKS={switchPagePKS}
+                setSwitchPagePKS={setSwitchPagePKS}
             />
             {/* end modal add relation */}
 
@@ -544,7 +566,7 @@ export default function Relation({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
                 submitButtonName={""}
                 body={
@@ -573,6 +595,7 @@ export default function Relation({ auth }: PageProps) {
                         <Button
                             className="p-2"
                             onClick={() => {
+                                getRBank();
                                 setSwitchPage(false);
                                 setModal({
                                     add: true,

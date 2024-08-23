@@ -100,7 +100,7 @@ export default function Company({ auth }: PageProps) {
                 }
                 body={
                     <>
-                        <div className="h-[100%] mb-2">
+                        <div className="mb-2">
                             <div className="">
                                 <div className="relative">
                                     <InputLabel

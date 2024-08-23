@@ -809,6 +809,8 @@ export default function DetailPerson({
         });
     };
 
+    console.log("data", detailPerson.t_person_bank);
+
     const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>

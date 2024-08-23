@@ -104,7 +104,7 @@ export default function AGGrid({
     }, [triggeringRefreshData, gridRef]);
 
     return (
-        <div className="rounded-md border border-stroke bg-white px-5 py-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        <div className="ag-grid-layout rounded-md border border-stroke bg-white px-5 py-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
             {addButtonLabel && (
                 <div className="w-96">
                     <Button

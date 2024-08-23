@@ -74,16 +74,6 @@ export default function BankAccount({
                 },
             ],
         });
-        // setDataBankAccount([
-        //     ...dataBankAccount.BANK_ACCOUNT,
-        //     {
-        //         idPerson: idPerson,
-        //         PERSON_BANK_ACCOUNT_NAME: "",
-        //         PERSON_BANK_ACCOUNT_NUMBER: "",
-        //         PERSON_BANK_ACCOUNT_FOR: "",
-        //         BANK_ID: "",
-        //     },
-        // ]);
     };
 
     const inputDataBank = (

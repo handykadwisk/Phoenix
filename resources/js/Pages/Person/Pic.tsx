@@ -168,6 +168,20 @@ export default function PIC({
             .post(`/getIndividuRelation`)
             .then((res) => {
                 setIndividuRelation(res.data);
+                console.log("pic", res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const [akaIndividu, setAkaIndividu] = useState<any>([]);
+
+    const getAKAIndividu = async (idIndividu: number) => {
+        await axios
+            .post(`/getIndividuAKA`, { idIndividu })
+            .then((res) => {
+                setAkaIndividu(res.data);
+                console.log("pic", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -175,11 +189,25 @@ export default function PIC({
     };
 
     const individuSelect = individuRelation?.map((query: any) => {
-        return {
-            value: query.RELATION_ORGANIZATION_ID,
-            label: query.RELATION_ORGANIZATION_NAME,
-        };
+        // getAKAIndividu(query.RELATION_ORGANIZATION_ID);
+
+        if (query.m_relation_aka[0]?.RELATION_AKA_NAME === undefined) {
+            return {
+                value: query.RELATION_ORGANIZATION_ID,
+                label: query.RELATION_ORGANIZATION_NAME,
+            };
+        } else {
+            return {
+                value: query.RELATION_ORGANIZATION_ID,
+                label:
+                    query.RELATION_ORGANIZATION_NAME +
+                    " (" +
+                    query.m_relation_aka[0]?.RELATION_AKA_NAME +
+                    ")",
+            };
+        }
     });
+
     const deletePersonAlert = (e: FormEvent, idPerson: any) => {
         e.preventDefault();
         Swal.fire({
@@ -256,11 +284,11 @@ export default function PIC({
                 onSuccess={handleSuccess}
                 body={
                     <>
-                        <div className="">
+                        <div className="h-96">
                             <div className="">
                                 <InputLabel
                                     htmlFor="corporate_pic_for"
-                                    value="Corporate PIC For"
+                                    value="Select PIC Below"
                                 />
                                 <SelectTailwind
                                     classNames={{
@@ -278,7 +306,7 @@ export default function PIC({
                                     isSearchable={true}
                                     isMultiple={true}
                                     isClearable={true}
-                                    placeholder={"--Select Relation--"}
+                                    placeholder={"--Select PIC--"}
                                     value={dataIndividu.individu_relation}
                                     onChange={(val: any) => {
                                         setDataIndividu({

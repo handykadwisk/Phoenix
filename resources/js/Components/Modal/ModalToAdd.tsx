@@ -123,14 +123,14 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div className="max-h-[100%]">
-                                                <div
-                                                    className="h-[100%] overflow-y-auto custom-scrollbar px-1"
-                                                    ref={modalRef}
-                                                >
-                                                    {body}
-                                                </div>
+                                            {/* <div className="max-h-[100%]"> */}
+                                            <div
+                                                className="max-h-[418px] overflow-y-auto custom-scrollbar px-2"
+                                                ref={modalRef}
+                                            >
+                                                {body}
                                             </div>
+                                            {/* </div> */}
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             <PrimaryButton

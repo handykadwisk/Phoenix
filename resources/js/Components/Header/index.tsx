@@ -138,9 +138,16 @@ const Header = (props: {
                     {/* <!-- User Area --> */}
                 </div>
             </div>
-            <main className="py-5">
-                <div className="px-4 sm:px-6 lg:px-8">{props.children}</div>
+            <main>
+                <div className="px-4 sm:px-6 lg:px-8 py-5">
+                    {props.children}
+                </div>
             </main>
+            <div className="relative bottom-0 z-40 h-10 flex shrink-0 items-center justify-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                <p className="text-xs">
+                    Copyright &copy; PT. Killian Teknologi Indonesia
+                </p>
+            </div>
         </div>
     );
 };

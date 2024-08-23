@@ -28,7 +28,7 @@ export default function SwitchPage({
             <span
                 aria-hidden="true"
                 className={classNames(
-                    enabled ? "bg-red-600" : "bg-gray-200",
+                    enabled ? "bg-red-600" : "bg-blue-600",
                     "pointer-events-none absolute mx-auto h-4 w-9 rounded-full transition-colors duration-200 ease-in-out"
                 )}
             />

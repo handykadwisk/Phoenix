@@ -73,6 +73,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRelationAll', [RelationController::class, 'getRelationAll'])->name('getRelationAll.getRelationAll');
     Route::post('/getCorporatePIC', [RelationController::class, 'get_corporate'])->name('getCorporatePIC.get_corporate');
     Route::post('/editCorporatePIC', [RelationController::class, 'edit_corporate'])->name('editCorporatePIC.edit_corporate');
+    Route::post('/getIndividuAKA', [RelationController::class, 'get_individu_aka'])->name('getIndividuAKA.get_individu_aka');
+    Route::post('/editBankRelation', [RelationController::class, 'edit_bank'])->name('editBankRelation.edit_bank');
+    Route::get('/getDocumentPKSAgent', [RelationController::class, 'getPKSAgentJson'])->name('getDocumentPKSAgent.getPKSAgentJson');
+    Route::get('/getDocumentPKSFbi', [RelationController::class, 'getPKSFbiJson'])->name('getDocumentPKSFbi.getPKSFbiJson');
+    
+    
+    
+    
     
     
     

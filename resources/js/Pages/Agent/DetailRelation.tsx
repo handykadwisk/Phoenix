@@ -42,10 +42,10 @@ export default function DetailRelation({
                 <div>
                     <span>Policy Number</span>
                 </div>
-                <div className="bg-red-600 w-3 h-3 p-1 rounded-sm mt-1"></div>
-                <div>: Inactive</div>
                 <div className="bg-green-600 w-3 h-3 p-1 rounded-sm mt-1"></div>
                 <div>: Active</div>
+                <div className="bg-red-600 w-3 h-3 p-1 rounded-sm mt-1"></div>
+                <div>: Inactive</div>
             </div>
         );
     };
@@ -57,9 +57,9 @@ export default function DetailRelation({
                 <div>
                     <span>Fee Amount (IDR)</span>
                 </div>
-                <div className="bg-red-600 w-3 h-3 p-1 rounded-sm mt-1"></div>
-                <div>: Settlement</div>
                 <div className="bg-green-600 w-3 h-3 p-1 rounded-sm mt-1"></div>
+                <div>: Settlement</div>
+                <div className="bg-red-600 w-3 h-3 p-1 rounded-sm mt-1"></div>
                 <div>: Pending</div>
             </div>
         );
@@ -100,7 +100,7 @@ export default function DetailRelation({
                             {
                                 // headerName: "Fee Amount (IDR)",
                                 headerComponent: customHeaderAmount,
-                                field: "POLICY_NUMBER",
+                                field: "POLICY_SHARE",
                                 flex: 12,
                             },
                         ]}
