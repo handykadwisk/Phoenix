@@ -91,7 +91,10 @@ export default function ModalDetailPolicy({
         getSummaryPremi();
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
         getDataPartner(policy.POLICY_ID);
+        getPolicyExchangeRate(policy.POLICY_ID);
         getInterestInsured();
+        getDataForSummary();
+        getSummaryFinancial(policy.POLICY_ID);
         
     }, [policy.POLICY_ID]);
 
@@ -489,7 +492,7 @@ export default function ModalDetailPolicy({
         setDataPolicyCoverage(items);
     };
 
-    console.log("DataPolicyCoverage: ", dataPolicyCoverage);
+    // console.log("DataPolicyCoverage: ", dataPolicyCoverage);
 
     const inputDataCoverage = (
         name: string,
@@ -734,6 +737,7 @@ export default function ModalDetailPolicy({
         POLICY_ID: policy.POLICY_ID,
         IP_POLICY_SHARE: "",
         IP_POLICY_LEADER: 0,
+        IP_CURRENCY_ID: 1,
         POLICY_COST: 0,
         premium: [],
     };
@@ -756,19 +760,19 @@ export default function ModalDetailPolicy({
                     GROSS_PREMI: coverageName[j]["PREMIUM"],
                     BROKERAGE_FEE_PERCENTAGE: 0,
                     BROKERAGE_FEE: 0,
-                    BROKERAGE_FEE_VAT: 0,
+                    BROKERAGE_FEE_VAT: "",
                     BROKERAGE_FEE_PPN: 0,
                     BROKERAGE_FEE_PPH: 0,
                     BROKERAGE_FEE_NETT_AMOUNT: 0,
                     ENGINEERING_FEE_PERCENTAGE: 0,
                     ENGINEERING_FEE: 0,
-                    ENGINEERING_FEE_VAT: 0,
+                    ENGINEERING_FEE_VAT: "",
                     ENGINEERING_FEE_PPN: 0,
                     ENGINEERING_FEE_PPH: 0,
                     ENGINEERING_FEE_NETT_AMOUNT: 0,
                     CONSULTANCY_FEE_PERCENTAGE: 0,
                     CONSULTANCY_FEE: 0,
-                    CONSULTANCY_FEE_VAT: 0,
+                    CONSULTANCY_FEE_VAT: "",
                     CONSULTANCY_FEE_PPN: 0,
                     CONSULTANCY_FEE_PPH:0,
                     CONSULTANCY_FEE_NETT_AMOUNT:0,
@@ -783,6 +787,8 @@ export default function ModalDetailPolicy({
 
         setDataInsurer(arr);
     };
+
+    console.log('dataInsurer: ', dataInsurer)
 
     const addRowInsurerCoverage = (e: FormEvent, i: number) => {
         e.preventDefault();
@@ -820,11 +826,18 @@ export default function ModalDetailPolicy({
 
     const inputDataInsurer = (
         name: string,
-        value: string | undefined,
+        value: any,
         i: number
     ) => {
         const items = [...dataInsurer];
         const item = { ...items[i] };
+        if ((name == "IP_POLICY_LEADER")) {
+            if (value == 0) {
+                item["IP_CURRENCY_ID"] = 1;
+                item["POLICY_COST"] = 0;  
+            }
+        }
+        // console.log(value)
         item[name] = value;
         items[i] = item;
         setDataInsurer(items);
@@ -843,46 +856,103 @@ export default function ModalDetailPolicy({
 
         let coverage_premium = premium["GROSS_PREMI"];
 
-        let paramBF = false;
-        let paramEF = false;
-        let paramCF = false;
-
         if (name == "BROKERAGE_FEE_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             premium["BROKERAGE_FEE"] =
                 (coverage_premium * premium["BROKERAGE_FEE_PERCENTAGE"]) / 100;
-            paramBF = true
         }
         if (name == "BROKERAGE_FEE") {
-            paramBF = true
-        }
-
-        if (name == "ENGINEERING_FEE_PERCENTAGE") {
-            premium["ENGINEERING_FEE"] =
-                (coverage_premium * premium["ENGINEERING_FEE_PERCENTAGE"]) /
-                100;
-            paramEF = true;
-        }
-        if (name == "ENGINEERING_FEE") {
-            paramEF = true;
-        }
-
-        if (name == "CONSULTANCY_FEE") {
-            paramCF = true;
-        }
-
-        // VAT
-        if (name == "BROKERAGE_FEE_VAT" || paramBF == true) {
+            if (value == undefined) {
+                value = 0;
+            }
+            // paramBF = true
             let bf_after_ppn = 0;
             let bf_ppn = 0;
             let bf_pph = 0;
             // Include VAT
             // PPn BF = 2,2 % (1,022)
             // PPh BF = 2 %
-            if (value == 1 || premium["BROKERAGE_FEE_VAT"] == 1) {
+            if (premium["BROKERAGE_FEE_VAT"] == 1) {
+                bf_after_ppn = parseFloat(value) / 1.022;
+                bf_ppn = value - bf_after_ppn;
+                bf_pph = ((value - bf_ppn) * 2) / 100;
+            } else {
+                bf_ppn = 0;
+                bf_pph = (value * 2) / 100;
+            }
+            premium["BROKERAGE_FEE_PPN"] = -bf_ppn;
+            premium["BROKERAGE_FEE_PPH"] = -bf_pph;
+            premium["BROKERAGE_FEE_NETT_AMOUNT"] = value - bf_ppn - bf_pph; 
+        }
+
+        if (name == "ENGINEERING_FEE_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            premium["ENGINEERING_FEE"] =
+                (coverage_premium * premium["ENGINEERING_FEE_PERCENTAGE"]) /
+                100;
+        }
+        if (name == "ENGINEERING_FEE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            let ef_after_ppn = 0;
+            let ef_ppn = 0;
+            let ef_pph = 0;
+            // Include VAT
+            if (premium["ENGINEERING_FEE_VAT"] == 1) {
+                ef_after_ppn = parseFloat(value) / 1.022;
+                ef_ppn = value - ef_after_ppn;
+                ef_pph = ((value - ef_ppn) * 2) / 100;
+            } else {
+                ef_pph = (value * 2) / 100;
+            }
+            premium["ENGINEERING_FEE_PPN"] = -ef_ppn;
+            premium["ENGINEERING_FEE_PPH"] = -ef_pph;
+            premium["ENGINEERING_FEE_NETT_AMOUNT"] = value - ef_ppn - ef_pph;
+        }
+
+        if (name == "CONSULTANCY_FEE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            let cf_after_ppn = 0;
+            let cf_ppn = 0;
+            let cf_pph = 0;
+            // Include VAT
+            // PPn CF = 11 %
+            // PPh CF = 2 %
+            if (premium["CONSULTANCY_FEE_VAT"] == 1 ) {
+                cf_ppn = (parseFloat(value) * 11) / 100;
+                cf_after_ppn = value - cf_ppn;                
+                cf_pph = ((value - cf_after_ppn) * 2) / 100;
+            } else {
+                cf_pph = (value * 2) / 100;
+            }
+            premium["CONSULTANCY_FEE_PPN"] = -cf_ppn;
+            premium["CONSULTANCY_FEE_PPH"] = -cf_pph;
+            premium["CONSULTANCY_FEE_NETT_AMOUNT"] =
+                value - cf_ppn - cf_pph;
+        }
+
+        // VAT
+        if (name == "BROKERAGE_FEE_VAT") {
+            let bf_after_ppn = 0;
+            let bf_ppn = 0;
+            let bf_pph = 0;
+            // Include VAT
+            // PPn BF = 2,2 % (1,022)
+            // PPh BF = 2 %
+            // if (value == 1 || premium["BROKERAGE_FEE_VAT"] == 1) {
+            if (value == 1 ) {
                 bf_after_ppn = parseFloat(premium["BROKERAGE_FEE"]) / 1.022;
                 bf_ppn = premium["BROKERAGE_FEE"] - bf_after_ppn;
                 bf_pph = (premium["BROKERAGE_FEE"] - bf_ppn) * 2 / 100;
             } else {
+                bf_ppn = 0;
                 bf_pph = (premium["BROKERAGE_FEE"] * 2) / 100;
             }
             premium["BROKERAGE_FEE_PPN"] = -bf_ppn
@@ -890,12 +960,13 @@ export default function ModalDetailPolicy({
             premium["BROKERAGE_FEE_NETT_AMOUNT"] = premium["BROKERAGE_FEE"] -bf_ppn -bf_pph;            
         }
 
-        if (name == "ENGINEERING_FEE_VAT" || paramEF == true) {
+        if (name == "ENGINEERING_FEE_VAT" ) {
             let ef_after_ppn = 0;
             let ef_ppn = 0;
             let ef_pph = 0;
             // Include VAT
-            if (value == 1 || premium["ENGINEERING_FEE_VAT"] == 1) {
+            // if (value == 1 || premium["ENGINEERING_FEE_VAT"] == 1) {
+            if (value == 1) {
                 ef_after_ppn = parseFloat(premium["ENGINEERING_FEE"]) / 1.022;
                 ef_ppn = premium["ENGINEERING_FEE"] - ef_after_ppn;
                 ef_pph = ((premium["ENGINEERING_FEE"] - ef_ppn) * 2) / 100;
@@ -907,17 +978,18 @@ export default function ModalDetailPolicy({
             premium["ENGINEERING_FEE_NETT_AMOUNT"] =
                 premium["ENGINEERING_FEE"] - ef_ppn - ef_pph;
         }
-        if (name == "CONSULTANCY_FEE_VAT" || paramCF == true) {
+        if (name == "CONSULTANCY_FEE_VAT") {
             let cf_after_ppn = 0;
             let cf_ppn = 0;
             let cf_pph = 0;
             // Include VAT
             // PPn CF = 11 %
             // PPh CF = 2 %
-            if (value == 1 || premium["CONSULTANCY_FEE_VAT"] == 1) {
-                cf_after_ppn = parseFloat(premium["CONSULTANCY_FEE"]) * 11 /100;
-                cf_ppn = premium["CONSULTANCY_FEE"] - cf_after_ppn;
-                cf_pph = ((premium["CONSULTANCY_FEE"] - cf_ppn) * 2) / 100;
+            // if (value == 1 || premium["CONSULTANCY_FEE_VAT"] == 1) {
+            if (value == 1 ) {
+                cf_ppn = (parseFloat(premium["CONSULTANCY_FEE"]) * 11) / 100;
+                cf_after_ppn = premium["CONSULTANCY_FEE"] - cf_ppn;                
+                cf_pph = ((premium["CONSULTANCY_FEE"] - cf_after_ppn) * 2) / 100;
             } else {
                 cf_pph = (premium["CONSULTANCY_FEE"] * 2) / 100;
             }
@@ -933,7 +1005,7 @@ export default function ModalDetailPolicy({
         premium["NETT_PREMI"] =
             coverage_premium -
             premium["BROKERAGE_FEE_NETT_AMOUNT"] -
-            premium["ENGINEERING_FEE_NETT_AMOUNT"] -
+            // premium["ENGINEERING_FEE_NETT_AMOUNT"] -
             premium["CONSULTANCY_FEE_NETT_AMOUNT"];
 
         
@@ -943,7 +1015,7 @@ export default function ModalDetailPolicy({
         items[insurerNum] = item;
         setDataInsurer(items);
     };
-    console.log('dataInsurer: ', dataInsurer);
+    // console.log('dataInsurer: ', dataInsurer);
 
     // End Add Insurer
 
@@ -1120,14 +1192,14 @@ export default function ModalDetailPolicy({
                     // ],
                 });
             }
-            console.log("ada POLICY_COVERAGE_ID");
+            // console.log("ada POLICY_COVERAGE_ID");
         } else {
             alert("c");
             // setDataEditInsurer({
             //     ...dataEditInsurer,
             //     premium: premium,
             // });
-            console.log("Tidak ada POLICY_COVERAGE_ID");
+            // console.log("Tidak ada POLICY_COVERAGE_ID");
         }
 
         // arr[k]["premium"];
@@ -1178,11 +1250,17 @@ export default function ModalDetailPolicy({
 
     const editDataInsurer = (
         name: string,
-        value: string | undefined,
+        value: any,
         i: number
     ) => {
         const items = [...dataEditInsurer];
         const item = { ...items[i] };
+        if (name == "IP_POLICY_LEADER") {
+            if (value == 0) {
+                item["IP_CURRENCY_ID"] = 1;
+                item["POLICY_COST"] = 0;
+            }
+        }
         item[name] = value;
         items[i] = item;
         setDataEditInsurer(items);
@@ -1201,42 +1279,130 @@ export default function ModalDetailPolicy({
 
         let coverage_premium = premium["GROSS_PREMI"];
 
-        let paramBF = false;
-        let paramEF = false;
-        let paramCF = false;
-
         if (name == "BROKERAGE_FEE_PERCENTAGE") {
-            premium["BROKERAGE_FEE"] =
-                (coverage_premium * premium["BROKERAGE_FEE_PERCENTAGE"]) / 100;
-            paramBF = true;
-        }
-        if (name == "BROKERAGE_FEE") {
-            paramBF = true;
-        }
-
-        if (name == "ENGINEERING_FEE_PERCENTAGE") {
-            premium["ENGINEERING_FEE"] =
-                (coverage_premium * premium["ENGINEERING_FEE_PERCENTAGE"]) /
-                100;
-            paramEF = true;
-        }
-        if (name == "ENGINEERING_FEE") {
-            paramEF = true;
-        }
-        
-        if (name == "CONSULTANCY_FEE") {
-            paramCF = true;
-        }
-
-        // VAT
-        if (name == "BROKERAGE_FEE_VAT" || paramBF == true) {
+            if (value == undefined) {
+                value = 0;
+            }
+            premium["BROKERAGE_FEE"] = (coverage_premium * premium["BROKERAGE_FEE_PERCENTAGE"]) / 100;
             let bf_after_ppn = 0;
             let bf_ppn = 0;
             let bf_pph = 0;
             // Include VAT
             // PPn BF = 2,2 % (1.022)
             // PPh BF = 2 %
-            if (value == 1 || premium["BROKERAGE_FEE_VAT"] == 1) {
+            if (premium["BROKERAGE_FEE_VAT"] == 1) {
+                bf_after_ppn = parseFloat(premium["BROKERAGE_FEE"]) / 1.022;
+                bf_ppn = premium["BROKERAGE_FEE"] - bf_after_ppn;
+                bf_pph = ((premium["BROKERAGE_FEE"] - bf_ppn) * 2) / 100;
+            } else {
+                bf_pph = (premium["BROKERAGE_FEE"] * 2) / 100;
+            }
+            premium["BROKERAGE_FEE_PPN"] = -bf_ppn;
+            premium["BROKERAGE_FEE_PPH"] = -bf_pph;
+            premium["BROKERAGE_FEE_NETT_AMOUNT"] = premium["BROKERAGE_FEE"] - bf_ppn - bf_pph;
+        }
+        if (name == "BROKERAGE_FEE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            let bf_after_ppn = 0;
+            let bf_ppn = 0;
+            let bf_pph = 0;
+            // Include VAT
+            // PPn BF = 2,2 % (1.022)
+            // PPh BF = 2 %
+            if (premium["BROKERAGE_FEE_VAT"] == 1) {
+                bf_after_ppn = parseFloat(value) / 1.022;
+                bf_ppn = value - bf_after_ppn;
+                bf_pph = ((value - bf_ppn) * 2) / 100;
+            } else {
+                bf_pph = (value * 2) / 100;
+            }
+            premium["BROKERAGE_FEE_PPN"] = -bf_ppn;
+            premium["BROKERAGE_FEE_PPH"] = -bf_pph;
+            premium["BROKERAGE_FEE_NETT_AMOUNT"] =
+                value - bf_ppn - bf_pph;
+        }
+
+        if (name == "ENGINEERING_FEE_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            premium["ENGINEERING_FEE"] =
+                (coverage_premium * premium["ENGINEERING_FEE_PERCENTAGE"]) /
+                100;
+            let ef_after_ppn = 0;
+            let ef_ppn = 0;
+            let ef_pph = 0;
+            // Include VAT
+            // PPh EF = 2 %
+            if (premium["ENGINEERING_FEE_VAT"] == 1) {
+                ef_after_ppn = parseFloat(premium["ENGINEERING_FEE"]) / 1.022;
+                ef_ppn = premium["ENGINEERING_FEE"] - ef_after_ppn;
+                ef_pph = ((premium["ENGINEERING_FEE"] - ef_ppn) * 2) / 100;
+            } else {
+                ef_pph = (premium["ENGINEERING_FEE"] * 2) / 100;
+            }
+            premium["ENGINEERING_FEE_PPN"] = -ef_ppn;
+            premium["ENGINEERING_FEE_PPH"] = -ef_pph;
+            premium["ENGINEERING_FEE_NETT_AMOUNT"] = premium["ENGINEERING_FEE"] - ef_ppn - ef_pph;
+        }
+        if (name == "ENGINEERING_FEE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            let ef_after_ppn = 0;
+            let ef_ppn = 0;
+            let ef_pph = 0;
+            // Include VAT
+            // PPh EF = 2 %
+            if (premium["ENGINEERING_FEE_VAT"] == 1 ) {
+                ef_after_ppn = parseFloat(value) / 1.022;
+                ef_ppn = value - ef_after_ppn;
+                ef_pph = ((value - ef_ppn) * 2) / 100;
+            } else {
+                ef_pph = (value * 2) / 100;
+            }
+            premium["ENGINEERING_FEE_PPN"] = -ef_ppn;
+            premium["ENGINEERING_FEE_PPH"] = -ef_pph;
+            premium["ENGINEERING_FEE_NETT_AMOUNT"] =
+                value - ef_ppn - ef_pph;
+        }
+        
+        if (name == "CONSULTANCY_FEE") {
+            if (value == undefined) {
+                value = 0;
+            }
+            let cf_after_ppn = 0;
+            let cf_ppn = 0;
+            let cf_pph = 0;
+            // Include VAT
+            // PPn CF = 11%
+            // PPh CF = 2 %
+            if (premium["CONSULTANCY_FEE_VAT"] == 1) {
+                // cf_after_ppn = parseFloat(premium["CONSULTANCY_FEE"]) / 1.022;
+                cf_ppn = (parseFloat(value) * 11) / 100;
+                cf_after_ppn = value - cf_ppn;
+                cf_pph = ((value - cf_after_ppn) * 2) / 100;
+            } else {
+                cf_pph = (value * 2) / 100;
+            }
+            premium["CONSULTANCY_FEE_PPN"] = -cf_ppn;
+            premium["CONSULTANCY_FEE_PPH"] = -cf_pph;
+            premium["CONSULTANCY_FEE_NETT_AMOUNT"] =
+                value - cf_ppn - cf_pph;
+        }
+
+        // VAT
+        if (name == "BROKERAGE_FEE_VAT") {
+            let bf_after_ppn = 0;
+            let bf_ppn = 0;
+            let bf_pph = 0;
+            // Include VAT
+            // PPn BF = 2,2 % (1.022)
+            // PPh BF = 2 %
+            // if (value == 1 || premium["BROKERAGE_FEE_VAT"] == 1) {
+            if (value == 1 ) {
                 bf_after_ppn = parseFloat(premium["BROKERAGE_FEE"]) / 1.022;
                 bf_ppn = premium["BROKERAGE_FEE"] - bf_after_ppn;
                 bf_pph = ((premium["BROKERAGE_FEE"] - bf_ppn) * 2) / 100;
@@ -1249,13 +1415,14 @@ export default function ModalDetailPolicy({
                 premium["BROKERAGE_FEE"] - bf_ppn - bf_pph;
         }
 
-        if (name == "ENGINEERING_FEE_VAT" || paramEF == true) {
+        if (name == "ENGINEERING_FEE_VAT") {
             let ef_after_ppn = 0;
             let ef_ppn = 0;
             let ef_pph = 0;
             // Include VAT
             // PPh EF = 2 %
-            if (value == 1 || premium["ENGINEERING_FEE_VAT"] == 1) {
+            // if (value == 1 || premium["ENGINEERING_FEE_VAT"] == 1) {
+            if (value == 1 ) {
                 ef_after_ppn = parseFloat(premium["ENGINEERING_FEE"]) / 1.022;
                 ef_ppn = premium["ENGINEERING_FEE"] - ef_after_ppn;
                 ef_pph = ((premium["ENGINEERING_FEE"] - ef_ppn) * 2) / 100;
@@ -1267,18 +1434,20 @@ export default function ModalDetailPolicy({
             premium["ENGINEERING_FEE_NETT_AMOUNT"] =
                 premium["ENGINEERING_FEE"] - ef_ppn - ef_pph;
         }
-        if (name == "CONSULTANCY_FEE_VAT" || paramCF == true) {
+        if (name == "CONSULTANCY_FEE_VAT") {
             let cf_after_ppn = 0;
             let cf_ppn = 0;
             let cf_pph = 0;
             // Include VAT
             // PPn CF = 11%
             // PPh CF = 2 %
-            if (value == 1 || premium["CONSULTANCY_FEE_VAT"] == 1) {
+            // if (value == 1 || premium["CONSULTANCY_FEE_VAT"] == 1) {
+            if (value == 1) {
                 // cf_after_ppn = parseFloat(premium["CONSULTANCY_FEE"]) / 1.022;
-                cf_after_ppn = parseFloat(premium["CONSULTANCY_FEE"]) * 11 /100;
-                cf_ppn = premium["CONSULTANCY_FEE"] - cf_after_ppn;
-                cf_pph = ((premium["CONSULTANCY_FEE"] - cf_ppn) * 2) / 100;
+                cf_ppn = (parseFloat(premium["CONSULTANCY_FEE"]) * 11) / 100;
+                cf_after_ppn = premium["CONSULTANCY_FEE"] - cf_ppn;
+                cf_pph =
+                    ((premium["CONSULTANCY_FEE"] - cf_after_ppn) * 2) / 100;
             } else {
                 cf_pph = (premium["CONSULTANCY_FEE"] * 2) / 100;
             }
@@ -1293,7 +1462,7 @@ export default function ModalDetailPolicy({
         premium["NETT_PREMI"] =
             coverage_premium -
             premium["BROKERAGE_FEE_NETT_AMOUNT"] -
-            premium["ENGINEERING_FEE_NETT_AMOUNT"] -
+            // premium["ENGINEERING_FEE_NETT_AMOUNT"] -
             premium["CONSULTANCY_FEE_NETT_AMOUNT"];
 
         premium[name] = value;
@@ -1579,7 +1748,7 @@ export default function ModalDetailPolicy({
                 setDataInsured([
                     { ...fieldDataInsured, POLICY_ID: policy.POLICY_ID },
                 ]);
-                console.log("fieldDataInsured: ", fieldDataInsured);
+                // console.log("fieldDataInsured: ", fieldDataInsured);
 
                 // setDataInsurerForInsured(res.data);
             })
@@ -1588,7 +1757,7 @@ export default function ModalDetailPolicy({
             });
     };
 
-    console.log("dataInsured: ", dataInsured);
+    // console.log("dataInsured: ", dataInsured);
 
 
     const handleAddInsured = async (policy_id: any) => {
@@ -1799,7 +1968,7 @@ export default function ModalDetailPolicy({
     const editDataInsured = (name: string, value: any) => {
         const item = { ...dataEditInsured }
 
-        console.log('item: ', item)
+        // console.log('item: ', item)
 
         let disc_admin_cost_amount = 0;
         let admin_cost_nett_amount = 0;
@@ -2373,7 +2542,7 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    console.log("listDataPartners: ", listDataPartners);
+    // console.log("listDataPartners: ", listDataPartners);
 
     // const [modalTest, setModalTest] = useState<any>({
     //     add:false
@@ -2388,39 +2557,78 @@ export default function ModalDetailPolicy({
 
     
     const [dataSummaryInsured, setDataSummaryInsured] = useState<any>([]);
+    const [tmpDataSummaryInsured, setTmpDataSummaryInsured] = useState<any>([]);
     const [policyExchangeRate, setPolicyExchangeRate] = useState<any>([]);
+    const [tmpPolicyExchangeRate, setTmpPolicyExchangeRate] = useState<any>([]);
 
-    const getSummaryInsured = (policy_id: any) => {
-        return axios
+    const getSummaryInsured = async (policy_id: any) => {
+        await axios
             .post(`/getSummaryInsured?`, {
                 policy_id: policy_id,
             })
             .then((res) => {
-                setDataSummaryInsured(res.data);
+                setTmpDataSummaryInsured(res.data);
             })
             .catch((err) => {
                 console.log(err);
             });
     };
-    const getPolicyExchangeRate = (policy_id: any) => {
-        return axios
-            .get(`/getPolicyExchangeRate/${policy_id}`)
-            .then((res) => {
-                setPolicyExchangeRate(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+
+    useEffect(() => {
+        if (tmpDataSummaryInsured.length > 0) {
+            setDataSummaryInsured(tmpDataSummaryInsured);
+        }
+    }, [tmpDataSummaryInsured]);
+    console.log("dataSummaryInsured: ", dataSummaryInsured);
+
+    useEffect(() => {
+        if (dataSummaryInsured.length > 0) {
+            getExchangeRate();
+        }
+    }, [dataSummaryInsured]);
+
+    const getPolicyExchangeRate = async (id: number) => {
+        await axios
+            .get(`/getPolicyExchangeRate/${id}`)
+            .then((res) => setPolicyExchangeRate(res.data))
+            .catch((err) => console.log(err));
     };
+
+    // useEffect(() => {
+    //     if (tmpPolicyExchangeRate.length > 0) {
+    //         setPolicyExchangeRate(tmpPolicyExchangeRate);
+    //     }
+    // }, [tmpPolicyExchangeRate]);
+
+    // console.log("setPolicyExchangeRate: ", policyExchangeRate);
+    
     const getExchangeRateByCurrId = (currId: any) => {
         const dataCurr = policyExchangeRate;
         const result = dataCurr.find((id: any) => id.CURRENCY_ID == currId);
         return result ? result : null;
     };
 
+    const [summaryFinancial, setSummaryFinancial] = useState<any>([]);
+
+    const getSummaryFinancial = async (policy_id: number) => {
+        // setIsLoading({
+        //     ...isLoading,
+        //     get_detail: true,
+        // });
+        await axios
+            .get(`/getSummary/${policy_id}`)
+            .then((res) => {
+                setSummaryFinancial(res.data);
+            })
+            .catch((err) => console.log(err));
+    };
+
+    console.log("summaryFinancial :", summaryFinancial);
+
     const [listAgent, setListAgent] = useState<any>([]);
     const [listBAA, setListBAA] = useState<any>([]);
     const [listFbiPks, setListFbiPks] = useState<any>([]);
+    
 
     const getAgent = async (relation_type: number) => {
         setIsLoading({
@@ -2447,7 +2655,7 @@ export default function ModalDetailPolicy({
             })
             .catch((err) => console.log(err));
     };
-    console.log("listBaa: ", listBAA);
+    // console.log("listBaa: ", listBAA);
 
     const getFbiPks = async (relation_type: number) => {
         setIsLoading({
@@ -2466,15 +2674,16 @@ export default function ModalDetailPolicy({
     const [exchangeRate, setExchangeRate] = useState<any>([]);
 
     const getExchangeRate = async () => {
-        console.log("policyExchangeRate: ", policyExchangeRate);
+        console.log("dataSummaryInsured.length: ", dataSummaryInsured.length);
+        console.log("setPolicyExchangeRate: ", policyExchangeRate);
         if (dataSummaryInsured.length > 0) {
             let exRate: any = [];
             for (let j = 0; j < dataSummaryInsured.length; j++) {
-                console.log("exchange rate: ", dataSummaryInsured[j]);
+                // console.log("exchange rate: ", dataSummaryInsured[j]);
                 const rate = getExchangeRateByCurrId(
                     dataSummaryInsured[j]["CURRENCY_ID"]
                 );
-                console.log(" rate: ", rate);
+                // console.log(" rate: ", rate);
                 exRate.push({
                     POLICY_EXCHANGE_RATE_ID: rate
                         ? rate["POLICY_EXCHANGE_RATE_ID"]
@@ -2490,10 +2699,11 @@ export default function ModalDetailPolicy({
                     CF_NETT_AMOUNT: dataSummaryInsured[j]["CF_NETT_AMOUNT"],
                 });
             }
+            console.log("sdafsd: ", exRate)
             setExchangeRate(exRate);
         }
     };
-    console.log("exchangeRate: ", exchangeRate);
+    // console.log("exchangeRate: ", exchangeRate);
     
     const [dataInitialForBP, setDataInitialForBP] = useState<any>({
         BF_NETT_AMOUNT: 0,
@@ -2568,8 +2778,8 @@ export default function ModalDetailPolicy({
         }
     }, [exchangeRate]);
     
-    console.log("dataExchangeRate: ", exchangeRate);
-    console.log("dataInitialForBP: ", dataInitialForBP);
+    // console.log("dataExchangeRate: ", exchangeRate);
+    // console.log("dataInitialForBP: ", dataInitialForBP);
 
 
     // Edit Partners
@@ -2578,9 +2788,13 @@ export default function ModalDetailPolicy({
         // getAgent(3);
         // getBAA(12);
         getSummaryInsured(policy_id);
-        getPolicyExchangeRate(policy_id);
+        // console.log("DataSummaryInsured: ", dataSummaryInsured);
+        // getPolicyExchangeRate(policy_id);
+        // console.log("PolicyExchangeRate: ", policyExchangeRate);
         getDataPartner(policy_id);
+        console.log("ListDataPartners: ", listDataPartners);
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
+        console.log("CurrencyFromCoverage: ", currencyFromCoverage);
         setTimeout(function () {
             setTriggerEditSumIncome(triggerEditSumIncome + 1);
         }, 1000);
@@ -2637,10 +2851,13 @@ export default function ModalDetailPolicy({
 
     const inputDataEditIncome = (
         name: string,
-        value: string | undefined,
+        value: any,
         incomeNum: number,
         detailNum: number
     ) => {
+        // let xx:any = 0
+        
+        // console.log("xxxx: ", xx);
         const items = [...listDataPartners];
         const item = { ...items[incomeNum] };
         const detail = [...item.income_detail];
@@ -2653,16 +2870,43 @@ export default function ModalDetailPolicy({
         if (name == "BROKERAGE_FEE_PERCENTAGE") {
             detailItem["BROKERAGE_FEE_AMOUNT"] =
                 (initBF * detailItem["BROKERAGE_FEE_PERCENTAGE"]) / 100;
+            if (value == undefined) {
+                value = 0;
+            }
         }
 
         if (name == "ENGINEERING_FEE_PERCENTAGE") {
             detailItem["ENGINEERING_FEE_AMOUNT"] =
                 (initEF * detailItem["ENGINEERING_FEE_PERCENTAGE"]) / 100;
+            if (value == undefined) {
+                value = 0;
+            }
         }
 
         if (name == "CONSULTANCY_FEE_PERCENTAGE") {
             detailItem["CONSULTANCY_FEE_AMOUNT"] =
                 (initCF * detailItem["CONSULTANCY_FEE_PERCENTAGE"]) / 100;
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+
+        if (name == "BROKERAGE_FEE_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+
+        if (name == "ENGINEERING_FEE_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+
+        if (name == "CONSULTANCY_FEE_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
         }
 
 
@@ -2764,8 +3008,8 @@ export default function ModalDetailPolicy({
         
 
         const nettBF = parseFloat(nettBF_fbi) + parseFloat(nettBF_agent) + parseFloat(nettBF_acquisition);
-        console.log("nettBF: ", nettBF, initEF, initCF);
-        console.log("initBF - nettBF: ", initBF, initEF, initCF);
+        // console.log("nettBF: ", nettBF, initEF, initCF);
+        // console.log("initBF - nettBF: ", initBF, initEF, initCF);
         const nettEF = parseFloat(nettEF_fbi) + parseFloat(nettEF_agent) + parseFloat(nettEF_acquisition);
         const nettCF = parseFloat(nettCF_fbi) + parseFloat(nettCF_agent) + parseFloat(nettCF_acquisition);
         setDataEditNettIncome([
@@ -3022,6 +3266,31 @@ export default function ModalDetailPolicy({
             });
         }
     }, [flagSwitch]);
+
+
+    const [dataSummary, setDataSummary] = useState<any>({
+        GROSS_AR: 0,
+        DISC_AR: 0,
+        NETT_AR: 0,
+        GROSS_PREMIUM: 0,
+        GROSS_BF: 0,
+        PPH23: 0,
+        NETT_BF: 0,
+        NETT_AP: 0,
+        COMMISSION: 0,
+        TAX_COMMISSION: 0,
+        NETT_COMMISSION: 0,
+        MARGIN: 0,
+    });
+console.log("dataCoverageName :", dataCoverageName);
+    const getDataForSummary = () => {
+        // alert('aa')
+        // setFlagSwitch(!flagSwitch);
+        let gross_premium = dataCoverageName?.map((coverage: any) => {
+                               return coverage
+        });
+        console.log("dfasdf: ",gross_premium)
+    };
 
     return (
         <>
@@ -4900,7 +5169,7 @@ export default function ModalDetailPolicy({
                                         </h3> */}
                                         <div className="shadow-md border-2 mt-3">
                                             <div className=" ml-4 mr-4 mb-4 mt-4">
-                                                <div className="grid grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-5 gap-4">
                                                     <div>
                                                         <InputLabel
                                                             htmlFor="edit_relation"
@@ -5060,35 +5329,92 @@ export default function ModalDetailPolicy({
                                                     </div>
                                                     {dataIns.IP_POLICY_LEADER ==
                                                     1 ? (
-                                                        <div>
-                                                            <InputLabel
-                                                                htmlFor="policy_cost"
-                                                                value="Policy Cost"
-                                                            />
-                                                            <CurrencyInput
-                                                                id="policy_cost"
-                                                                name="policy_cost"
-                                                                value={
-                                                                    dataIns.POLICY_COST
-                                                                }
-                                                                decimalScale={2}
-                                                                decimalsLimit={
-                                                                    2
-                                                                }
-                                                                onValueChange={(
-                                                                    values
-                                                                ) => {
-                                                                    inputDataInsurer(
-                                                                        "POLICY_COST",
-                                                                        values,
-                                                                        i
-                                                                    );
-                                                                }}
-                                                                autoComplete="off"
-                                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                                required
-                                                            />
-                                                        </div>
+                                                        <>
+                                                            <div>
+                                                                <InputLabel
+                                                                    htmlFor="currency_id"
+                                                                    value="Currency"
+                                                                />
+                                                                <select
+                                                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                    value={
+                                                                        dataIns.IP_CURRENCY_ID
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        inputDataInsurer(
+                                                                            "IP_CURRENCY_ID",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <option>
+                                                                        --{" "}
+                                                                        <i>
+                                                                            Choose
+                                                                            Currency
+                                                                        </i>{" "}
+                                                                        --
+                                                                    </option>
+                                                                    {currencyFromCoverage.map(
+                                                                        (
+                                                                            currencies: any,
+                                                                            k: number
+                                                                        ) => {
+                                                                            return (
+                                                                                <option
+                                                                                    key={
+                                                                                        k
+                                                                                    }
+                                                                                    value={
+                                                                                        currencies.CURRENCY_ID
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        currencies.CURRENCY_SYMBOL
+                                                                                    }
+                                                                                </option>
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <InputLabel
+                                                                    htmlFor="policy_cost"
+                                                                    value="Policy Cost"
+                                                                />
+                                                                <CurrencyInput
+                                                                    id="policy_cost"
+                                                                    name="policy_cost"
+                                                                    value={
+                                                                        dataIns.POLICY_COST
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputDataInsurer(
+                                                                            "POLICY_COST",
+                                                                            values,
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                    autoComplete="off"
+                                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                    required
+                                                                />
+                                                            </div>
+                                                        </>
                                                     ) : (
                                                         ""
                                                     )}
@@ -5494,7 +5820,91 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <Checkbox
+                                                                            <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "radio-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "brokerage_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            1
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            inputInsurerCoverage(
+                                                                                                "BROKERAGE_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.BROKERAGE_FEE_VAT ===
+                                                                                            1
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio1"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Include
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "radio-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "brokerage_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            0
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            inputInsurerCoverage(
+                                                                                                "BROKERAGE_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.BROKERAGE_FEE_VAT ===
+                                                                                            0
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio2"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Exclude
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            {/* <Checkbox
                                                                                 name={
                                                                                     "brokerage_fee_vat-" +
                                                                                     i
@@ -5520,7 +5930,7 @@ export default function ModalDetailPolicy({
                                                                                         j
                                                                                     )
                                                                                 }
-                                                                            />
+                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -5659,7 +6069,91 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <Checkbox
+                                                                            <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            1
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            inputInsurerCoverage(
+                                                                                                "ENGINEERING_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.ENGINEERING_FEE_VAT ===
+                                                                                            1
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio1"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Include
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            0
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            inputInsurerCoverage(
+                                                                                                "ENGINEERING_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.ENGINEERING_FEE_VAT ===
+                                                                                            0
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio2"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Exclude
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            {/* <Checkbox
                                                                                 name={
                                                                                     "engineering_fee_vat-" +
                                                                                     i
@@ -5685,7 +6179,7 @@ export default function ModalDetailPolicy({
                                                                                         j
                                                                                     )
                                                                                 }
-                                                                            />
+                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -5796,7 +6290,91 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <Checkbox
+                                                                            <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            1
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            inputInsurerCoverage(
+                                                                                                "CONSULTANCY_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.CONSULTANCY_FEE_VAT ===
+                                                                                            1
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio1"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Include
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            0
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            inputInsurerCoverage(
+                                                                                                "CONSULTANCY_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.CONSULTANCY_FEE_VAT ===
+                                                                                            0
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio2"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Exclude
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            {/* <Checkbox
                                                                                 name={
                                                                                     "consultancy_fee_vat-" +
                                                                                     i
@@ -5822,7 +6400,7 @@ export default function ModalDetailPolicy({
                                                                                         j
                                                                                     )
                                                                                 }
-                                                                            />
+                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -6096,7 +6674,7 @@ export default function ModalDetailPolicy({
                                         </h3> */}
                                         <div className="shadow-md border-2 mt-3">
                                             <div className=" ml-4 mr-4 mb-4 mt-4">
-                                                <div className="grid grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-5 gap-4">
                                                     <div>
                                                         <InputLabel
                                                             htmlFor="edit_relation"
@@ -6255,34 +6833,91 @@ export default function ModalDetailPolicy({
                                                     </div>
                                                     {dataIns.IP_POLICY_LEADER ==
                                                     1 ? (
-                                                        <div>
-                                                            <InputLabel
-                                                                htmlFor="policy_cost"
-                                                                value="Policy Cost"
-                                                            />
-                                                            <CurrencyInput
-                                                                id="policy_cost"
-                                                                name="policy_cost"
-                                                                value={
-                                                                    dataIns.POLICY_COST
-                                                                }
-                                                                decimalScale={2}
-                                                                decimalsLimit={
-                                                                    2
-                                                                }
-                                                                onValueChange={(
-                                                                    values
-                                                                ) => {
-                                                                    editDataInsurer(
-                                                                        "POLICY_COST",
-                                                                        values,
-                                                                        i
-                                                                    );
-                                                                }}
-                                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                                required
-                                                            />
-                                                        </div>
+                                                        <>
+                                                            <div>
+                                                                <InputLabel
+                                                                    htmlFor="currency_id"
+                                                                    value="Currency"
+                                                                />
+                                                                <select
+                                                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                    value={
+                                                                        dataIns.IP_CURRENCY_ID
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        editDataInsurer(
+                                                                            "IP_CURRENCY_ID",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <option>
+                                                                        --{" "}
+                                                                        <i>
+                                                                            Choose
+                                                                            Currency
+                                                                        </i>{" "}
+                                                                        --
+                                                                    </option>
+                                                                    {currencyFromCoverage.map(
+                                                                        (
+                                                                            currencies: any,
+                                                                            k: number
+                                                                        ) => {
+                                                                            return (
+                                                                                <option
+                                                                                    key={
+                                                                                        k
+                                                                                    }
+                                                                                    value={
+                                                                                        currencies.CURRENCY_ID
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        currencies.CURRENCY_SYMBOL
+                                                                                    }
+                                                                                </option>
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <InputLabel
+                                                                    htmlFor="policy_cost"
+                                                                    value="Policy Cost"
+                                                                />
+                                                                <CurrencyInput
+                                                                    id="policy_cost"
+                                                                    name="policy_cost"
+                                                                    value={
+                                                                        dataIns.POLICY_COST
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        editDataInsurer(
+                                                                            "POLICY_COST",
+                                                                            values,
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                    required
+                                                                />
+                                                            </div>
+                                                        </>
                                                     ) : (
                                                         ""
                                                     )}
@@ -6682,7 +7317,91 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <Checkbox
+                                                                            <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "radio-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "brokerage_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            1
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            editInsurerCoverage(
+                                                                                                "BROKERAGE_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.BROKERAGE_FEE_VAT ==
+                                                                                            1
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio1"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Include
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "radio-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "brokerage_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            0
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            editInsurerCoverage(
+                                                                                                "BROKERAGE_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.BROKERAGE_FEE_VAT ==
+                                                                                            0
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio2"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Exclude
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            {/* <Checkbox
                                                                                 name={
                                                                                     "brokerage_fee_vat-" +
                                                                                     i
@@ -6714,7 +7433,7 @@ export default function ModalDetailPolicy({
                                                                                         ? false
                                                                                         : true
                                                                                 }
-                                                                            />
+                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -6854,7 +7573,91 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <Checkbox
+                                                                            <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            1
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            editInsurerCoverage(
+                                                                                                "ENGINEERING_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.ENGINEERING_FEE_VAT ==
+                                                                                            1
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio1"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Include
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "engineering_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            0
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            editInsurerCoverage(
+                                                                                                "ENGINEERING_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.ENGINEERING_FEE_VAT ==
+                                                                                            0
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio2"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Exclude
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            {/* <Checkbox
                                                                                 name={
                                                                                     "engineering_fee_vat-" +
                                                                                     i
@@ -6886,7 +7689,7 @@ export default function ModalDetailPolicy({
                                                                                         ? false
                                                                                         : true
                                                                                 }
-                                                                            />
+                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -6998,7 +7801,91 @@ export default function ModalDetailPolicy({
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <Checkbox
+                                                                            <div className=" mt-2 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            1
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            editInsurerCoverage(
+                                                                                                "CONSULTANCY_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.CONSULTANCY_FEE_VAT ==
+                                                                                            1
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio1"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Include
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex items-center">
+                                                                                    <input
+                                                                                        id={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        name={
+                                                                                            "consultancy_fee_vat-" +
+                                                                                            j
+                                                                                        }
+                                                                                        type="radio"
+                                                                                        value={
+                                                                                            0
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            editInsurerCoverage(
+                                                                                                "CONSULTANCY_FEE_VAT",
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                                i,
+                                                                                                j
+                                                                                            )
+                                                                                        }
+                                                                                        checked={
+                                                                                            dIP.CONSULTANCY_FEE_VAT ==
+                                                                                            0
+                                                                                                ? true
+                                                                                                : false
+                                                                                        }
+                                                                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor="radio2"
+                                                                                        className="ml-2 block text-sm font-medium leading-6 text-gray-900"
+                                                                                    >
+                                                                                        Exclude
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            {/* <Checkbox
                                                                                 name={
                                                                                     "consultancy_fee_vat-" +
                                                                                     i
@@ -7030,7 +7917,7 @@ export default function ModalDetailPolicy({
                                                                                         ? false
                                                                                         : true
                                                                                 }
-                                                                            />
+                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -7185,7 +8072,7 @@ export default function ModalDetailPolicy({
                     setDataPolicyCoverage([]);
                     // setDataInsurerForInsured([]);
                 }}
-                title={"Add Interest Insured"}
+                title={"Add Insured Nett Premium & Broker Nett Income"}
                 url={`/insertManyInsured`}
                 data={dataInsured}
                 onSuccess={handleSuccessInsured}
@@ -7452,7 +8339,8 @@ export default function ModalDetailPolicy({
                                                             rowSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
                                                         >
-                                                            Income Amount
+                                                            Fresnel Nett Income
+                                                            Amount
                                                         </th>
                                                         <th
                                                             rowSpan={2}
@@ -8171,7 +9059,7 @@ export default function ModalDetailPolicy({
                         setSumByCurrency([]);
                     setDataInsurer([]);
                 }}
-                title={"Edit Interest Insured"}
+                title={"Edit Insured Nett Premium & Broker Nett Income"}
                 url={`/editInsured`}
                 data={dataEditInsured}
                 onSuccess={handleSuccessInsured}
@@ -8453,7 +9341,8 @@ export default function ModalDetailPolicy({
                                                         rowSpan={2}
                                                         className="text-center md:p-4 p-0 md:w-32 w-10 border-r border-gray-300"
                                                     >
-                                                        Income Amount
+                                                        Fresnel Nett Income
+                                                        Amount
                                                     </th>
                                                     <th
                                                         rowSpan={2}
@@ -10472,18 +11361,20 @@ export default function ModalDetailPolicy({
                                         (nett: any, x: number) => (
                                             <tr
                                                 key={x}
-                                                className={"border-gray-200"}
+                                                className={
+                                                    "border-gray-200 bg-teal-500 text-white"
+                                                }
                                             >
                                                 <th
                                                     scope="colgroup"
-                                                    className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                                    className=" py-2 pl-4 pr-3 text-left text-sm font-semibold sm:pl-3"
                                                 >
                                                     Nett Margin
                                                 </th>
 
                                                 <td
                                                     colSpan={2}
-                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                    className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
                                                 >
                                                     {new Intl.NumberFormat(
                                                         "id",
@@ -10495,7 +11386,7 @@ export default function ModalDetailPolicy({
 
                                                 <td
                                                     colSpan={2}
-                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                    className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
                                                 >
                                                     {new Intl.NumberFormat(
                                                         "id",
@@ -10507,7 +11398,7 @@ export default function ModalDetailPolicy({
 
                                                 <td
                                                     colSpan={2}
-                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                    className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
                                                 >
                                                     {new Intl.NumberFormat(
                                                         "id",
@@ -10516,7 +11407,7 @@ export default function ModalDetailPolicy({
                                                         }
                                                     ).format(nett.nettCf)}
                                                 </td>
-                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
+                                                <td className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
                                             </tr>
                                         )
                                     )}
@@ -10525,17 +11416,19 @@ export default function ModalDetailPolicy({
                                     {grandTotalEditNettIncome != 0 ? (
                                         <tr
                                             key={1}
-                                            className={"border-gray-200"}
+                                            className={
+                                                "border-gray-200 bg-teal-500"
+                                            }
                                         >
                                             <th
                                                 scope="colgroup"
-                                                className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
+                                                className=" border-[1px] py-2 pl-4 pr-3 text-left text-sm text-white font-semibold  sm:pl-3"
                                             >
                                                 Grand Total Nett Margin
                                             </th>
                                             <td
-                                                colSpan={2}
-                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
+                                                colSpan={9}
+                                                className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-white text-sm font-medium sm:pr-3"
                                             >
                                                 {new Intl.NumberFormat("id", {
                                                     style: "decimal",
@@ -10544,10 +11437,10 @@ export default function ModalDetailPolicy({
                                                 )}
                                             </td>
 
-                                            <td
+                                            {/* <td
                                                 colSpan={7}
-                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                            ></td>
+                                                className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3"
+                                            ></td> */}
                                         </tr>
                                     ) : (
                                         ""
@@ -11201,7 +12094,10 @@ export default function ModalDetailPolicy({
 
                             <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4 mt-8">
                                 <div className="border-b-2 w-fit font-semibold text-lg">
-                                    <span>Interest Insured</span>
+                                    <span>
+                                        Insured Nett Premium & Broker Nett
+                                        Income
+                                    </span>
                                 </div>
                                 <div className="flex gap-2 mt-4">
                                     <div>
@@ -12197,8 +13093,119 @@ export default function ModalDetailPolicy({
                                 <div className="border-b-2 w-fit font-semibold text-lg">
                                     <span>Summary</span>
                                 </div>
+                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
+                                    <table className="table-auto w-full">
+                                        <thead className="border-b bg-gray-50">
+                                            <tr className="text-sm font-semibold text-gray-900">
+                                                <th
+                                                    // rowSpan={2}
+                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                >
+                                                    Title
+                                                </th>
+                                                <th
+                                                    // rowSpan={2}
+                                                    className="text-center md:p-4 p-0 md:w-20  border-r border-gray-300 "
+                                                >
+                                                    Currency
+                                                </th>
+                                                <th
+                                                    // rowSpan={2}
+                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                >
+                                                    Original Value
+                                                </th>
+                                                <th
+                                                    // rowSpan={2}
+                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                >
+                                                    IDR Conversion
+                                                </th>
+                                                <th
+                                                    // rowSpan={2}
+                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
+                                                >
+                                                    Total
+                                                </th>
+                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
+                                                    COA
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {summaryFinancial?.map(
+                                                (sum: any, m: number) => {
+                                                    let aa = 7777
+                                                    return sum.AMOUNT != 0 ? (
+                                                        <tr>
+                                                            <td className="p-4 border">
+                                                                <div className="block w-full mx-auto text-left">
+                                                                    {sum.TITLE}
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-4 border">
+                                                                <div className="block w-20 mx-auto text-left">
+                                                                    {getCurrencyById(
+                                                                        sum.CURRENCY_ID
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-4 border">
+                                                                <div className="block w-40 mx-auto text-right">
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
+                                                                        }
+                                                                    ).format(
+                                                                        sum.AMOUNT
+                                                                    )}
+                                                                    {/* {sum.AMOUNT} */}
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-4 border">
+                                                                <div className="block w-52 mx-auto text-right">
+                                                                    {new Intl.NumberFormat(
+                                                                        "id",
+                                                                        {
+                                                                            style: "decimal",
+                                                                        }
+                                                                    ).format(
+                                                                        sum.AMOUNT *
+                                                                            sum.EXCHANGE_RATE
+                                                                    )}
+                                                                </div>
+                                                                {sum.EXCHANGE_RATE ==
+                                                                1 ? (
+                                                                    ""
+                                                                ) : (
+                                                                    <div className="block w-52 mx-auto text-xs text-right">
+                                                                        Kurs:{" "}
+                                                                        {new Intl.NumberFormat(
+                                                                            "id",
+                                                                            {
+                                                                                style: "decimal",
+                                                                            }
+                                                                        ).format(
+                                                                            sum.EXCHANGE_RATE
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </td>
+                                                            <td className="p-4 border">
+                                                                <div className="block w-40 mx-auto text-right"></div>
+                                                            </td>
+                                                        </tr>
+                                                    ) : (
+                                                        ""
+                                                    );
+                                                }
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                                 {/* <div className="flex gap-2 mt-4"> */}
-                                <div className="">
+                                {/* <div className="">
                                     1. Coverage = {dataCoverageName.length}{" "}
                                 </div>
                                 <div className="">
@@ -12218,7 +13225,7 @@ export default function ModalDetailPolicy({
                                           listDataPartners[2]["income_detail"]
                                               .length
                                         : ""}
-                                </div>
+                                </div> */}
                                 {/* </div> */}
                             </div>
                             {/* End Report Summary */}

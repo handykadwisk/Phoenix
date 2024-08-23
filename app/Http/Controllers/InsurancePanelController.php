@@ -162,6 +162,7 @@ class InsurancePanelController extends Controller
                 'IP_POLICY_SHARE'   => $value['IP_POLICY_SHARE'],
                 'IP_POLICY_LEADER'  => $value['IP_POLICY_LEADER'],
                 'POLICY_COST'       => $value['POLICY_COST'],
+                'IP_CURRENCY_ID'    => $value['IP_CURRENCY_ID'],
                 'IP_CREATED_BY'     => Auth::user()->id
             ]);
 
@@ -228,6 +229,7 @@ class InsurancePanelController extends Controller
                             'IP_POLICY_SHARE'   => $value['IP_POLICY_SHARE'],
                             'IP_POLICY_LEADER'  => $value['IP_POLICY_LEADER'],
                             'POLICY_COST'       => $value['POLICY_COST'],
+                            'IP_CURRENCY_ID'    => $value['IP_CURRENCY_ID'],
                             'IP_UPDATED_BY'     => Auth::user()->id,
                             'IP_UPDATED_DATE'   => now()
                         ]);
