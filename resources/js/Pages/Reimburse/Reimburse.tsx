@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm, usePage } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
@@ -16,20 +16,14 @@ import TH from "@/Components/TH";
 import TD from "@/Components/TD";
 import ToastMessage from "@/Components/ToastMessage";
 import Pagination from "@/Components/Pagination";
-import {
-    ArrowDownTrayIcon,
-    ArrowPathIcon,
-    MagnifyingGlassIcon,
-} from "@heroicons/react/20/solid";
+import { ArrowDownTrayIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
 import dateFormat from "dateformat";
-import ModalSearch from "@/Components/Modal/ModalSearch";
 import Input from "@/Components/Input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-tailwindcss-select";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
-import BadgeCustom from "@/Components/BadgeFlat";
 import BadgeFlat from "@/Components/BadgeFlat";
 
 export default function Reimburse({ auth }: PageProps) {
@@ -116,10 +110,12 @@ export default function Reimburse({ auth }: PageProps) {
             {
                 reimburse_detail_date: "",
                 reimburse_detail_purpose: "",
+                reimburse_detail_location: "",
+                reimburse_detail_address: "",
+                reimburse_detail_type: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
                 reimburse_detail_amount: "",
                 reimburse_detail_note: "",
                 reimburse_detail_document: [],
@@ -149,10 +145,12 @@ export default function Reimburse({ auth }: PageProps) {
                 {
                     reimburse_detail_date: "",
                     reimburse_detail_purpose: "",
+                    reimburse_detail_location: "",
+                    reimburse_detail_address: "",
+                    reimburse_detail_type: "",
                     reimburse_detail_relation_name: "",
                     reimburse_detail_relation_position: "",
                     reimburse_detail_relation_organization_id: "",
-                    reimburse_detail_location: "",
                     reimburse_detail_amount: "",
                     reimburse_detail_note: "",
                     reimburse_detail_document: [],
@@ -194,10 +192,12 @@ export default function Reimburse({ auth }: PageProps) {
         {
             reimburse_detail_date: "",
             reimburse_detail_purpose: "",
+            reimburse_detail_location: "",
+            reimburse_detail_address: "",
+            reimburse_detail_type: "",
             reimburse_detail_relation_name: "",
             reimburse_detail_relation_position: "",
             reimburse_detail_relation_organization_id: "",
-            reimburse_detail_location: "",
             reimburse_detail_amount: "",
             reimburse_detail_note: "",
             reimburse_detail_document: [],
@@ -212,10 +212,12 @@ export default function Reimburse({ auth }: PageProps) {
             {
                 reimburse_detail_date: "",
                 reimburse_detail_purpose: "",
+                reimburse_detail_location: "",
+                reimburse_detail_address: "",
+                reimburse_detail_type: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
                 reimburse_detail_amount: "",
                 reimburse_detail_note: "",
                 reimburse_detail_document: [],
@@ -227,10 +229,12 @@ export default function Reimburse({ auth }: PageProps) {
             {
                 reimburse_detail_date: "",
                 reimburse_detail_purpose: "",
+                reimburse_detail_location: "",
+                reimburse_detail_address: "",
+                reimburse_detail_type: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
                 reimburse_detail_amount: "",
                 reimburse_detail_note: "",
                 reimburse_detail_document: [],
@@ -596,10 +600,12 @@ export default function Reimburse({ auth }: PageProps) {
         {
             reimburse_detail_date: "",
             reimburse_detail_purpose: "",
+            reimburse_detail_location: "",
+            reimburse_detail_address: "",
+            reimburse_detail_type: "",
             reimburse_detail_relation_name: "",
             reimburse_detail_relation_position: "",
             reimburse_detail_relation_organization_id: "",
-            reimburse_detail_location: "",
             reimburse_detail_amount: "",
             reimburse_detail_note: "",
             reimburse_detail_document: [],
@@ -614,10 +620,12 @@ export default function Reimburse({ auth }: PageProps) {
             {
                 reimburse_detail_date: "",
                 reimburse_detail_purpose: "",
+                reimburse_detail_location: "",
+                reimburse_detail_address: "",
+                reimburse_detail_type: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
                 reimburse_detail_amount: "",
                 reimburse_detail_note: "",
                 reimburse_detail_document: [],
@@ -629,10 +637,12 @@ export default function Reimburse({ auth }: PageProps) {
             {
                 reimburse_detail_date: "",
                 reimburse_detail_purpose: "",
+                reimburse_detail_location: "",
+                reimburse_detail_address: "",
+                reimburse_detail_type: "",
                 reimburse_detail_relation_name: "",
                 reimburse_detail_relation_position: "",
                 reimburse_detail_relation_organization_id: "",
-                reimburse_detail_location: "",
                 reimburse_detail_amount: "",
                 reimburse_detail_note: "",
                 reimburse_detail_document: [],
@@ -741,7 +751,8 @@ export default function Reimburse({ auth }: PageProps) {
     // Clear Search End
 
     // Data Start
-    const { relations, coa, persons, office, division }: any = usePage().props;
+    const { purposes, relations, coa, persons, office, division }: any =
+        usePage().props;
     // Data End
 
     const [ReimburseApproval, setReimburseApproval] = useState<any>([]);
@@ -920,26 +931,35 @@ export default function Reimburse({ auth }: PageProps) {
             REIMBURSE_FIRST_APPROVAL_STATUS: status,
         });
 
-        // console.log(dataById);
-
-        await axios
-            .patch(`/reimburseApprove/${dataById.REIMBURSE_ID}`, dataById, {
-                headers: {
-                    "Content-type": "multipart/form-data",
-                },
-            })
-            .then((res) => {
-                console.log(res);
-                close();
-            })
-            .catch((err) => {
-                console.log(err);
+        if (
+            auth.user.person.division?.RELATION_DIVISION_ALIAS ===
+                "FINANCE ACCOUNTING" &&
+            auth.user.person.division?.RELATION_DIVISION_INITIAL === "FA"
+        ) {
+            setDataById({
+                ...dataById,
+                REIMBURSE_SECOND_APPROVAL_BY: auth.user.person.PERSON_ID,
+                REIMBURSE_SECOND_APPROVAL_USER:
+                    auth.user.person.PERSON_FIRST_NAME,
+                REIMBURSE_SECOND_APPROVAL_STATUS: status,
             });
-    };
+        }
 
-    const handleBtnRevised = async () => {
+        if (
+            auth.user.person.division?.RELATION_DIVISION_ALIAS === "DIREKSI" &&
+            auth.user.person.division?.RELATION_DIVISION_INITIAL === "DIREKSI"
+        ) {
+            setDataById({
+                ...dataById,
+                REIMBURSE_THIRD_APPROVAL_BY: auth.user.person.PERSON_ID,
+                REIMBURSE_THIRD_APPROVAL_USER:
+                    auth.user.person.PERSON_FIRST_NAME,
+                REIMBURSE_THIRD_APPROVAL_STATUS: status,
+            });
+        }
+
         await axios
-            .patch(`/reimburseRevised/${dataById.REIMBURSE_ID}`, dataById, {
+            .patch(`/reimburseApprove`, dataById, {
                 headers: {
                     "Content-type": "multipart/form-data",
                 },
@@ -1101,96 +1121,6 @@ export default function Reimburse({ auth }: PageProps) {
             });
     };
 
-    const [
-        getCountReimburseReportRequestStatus,
-        setCountReimburseReportRequestStatus,
-    ] = useState<any>([]);
-    const getReimburseReportRequestStatus = async () => {
-        await axios
-            .get(`/getCountReimburseReportRequestStatus`)
-            .then((res) => {
-                setCountReimburseReportRequestStatus(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [
-        getCountReimburseReportApprove1Status,
-        setCountReimburseReportApprove1Status,
-    ] = useState<any>([]);
-    const getReimburseReportApprove1Status = async () => {
-        await axios
-            .get(`/getCountReimburseReportApprove1Status`)
-            .then((res) => {
-                setCountReimburseReportApprove1Status(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [
-        getCountReimburseReportApprove2Status,
-        setCountReimburseReportApprove2Status,
-    ] = useState<any>([]);
-    const getReimburseReportApprove2Status = async () => {
-        await axios
-            .get(`/getCountReimburseReportApprove2Status`)
-            .then((res) => {
-                setCountReimburseReportApprove2Status(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [
-        getCountReimburseReportExecuteStatus,
-        setCountReimburseReportExecuteStatus,
-    ] = useState<any>([]);
-    const getReimburseReportExecuteStatus = async () => {
-        await axios
-            .get(`/getCountReimburseReportExecuteStatus`)
-            .then((res) => {
-                setCountReimburseReportExecuteStatus(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [
-        getCountReimburseReportNeedRevisionStatus,
-        setCountReimburseReportNeedRevisionStatus,
-    ] = useState<any>([]);
-    const getReimburseReportNeedRevisionStatus = async () => {
-        await axios
-            .get(`/getCountReimburseReportNeedRevisionStatus`)
-            .then((res) => {
-                setCountReimburseReportNeedRevisionStatus(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [
-        getCountReimburseReportRejectStatus,
-        setCountReimburseReportRejectStatus,
-    ] = useState<any>([]);
-    const getReimburseReportRejectStatus = async () => {
-        await axios
-            .get(`/getCountReimburseReportRejectStatus`)
-            .then((res) => {
-                setCountReimburseReportRejectStatus(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     // Function Format Currency
     const formatCurrency = new Intl.NumberFormat("default", {
         style: "currency",
@@ -1310,7 +1240,7 @@ export default function Reimburse({ auth }: PageProps) {
     console.log(data);
     // console.log(DataRow);
     // console.log("Reimburse", reimburse.data);
-    // console.log("Data By Id", dataById);
+    console.log("Data By Id", dataById);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Reimburse"}>
@@ -1361,10 +1291,9 @@ export default function Reimburse({ auth }: PageProps) {
                             onSuccess=""
                             headers={null}
                             submitButtonName=""
-                            // panelWidth=""
                             body={
                                 <>
-                                    <div className="grid grid-cols-12 my-5">
+                                    <div className="grid grid-cols-12">
                                         {data.ReimburseDetail[
                                             modalFiles.index
                                         ]?.reimburse_detail_document.map(
@@ -1372,7 +1301,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 <>
                                                     <div
                                                         key={i}
-                                                        className={`w-full col-span-11`}
+                                                        className={`w-full col-span-11 mb-5`}
                                                     >
                                                         <InputLabel
                                                             htmlFor="files"
@@ -1573,36 +1502,21 @@ export default function Reimburse({ auth }: PageProps) {
                         {/* Table form start */}
                         <div className="max-w-full overflow-x-auto overflow-visible">
                             <table className="w-full divide-y divide-gray-300">
-                                <thead className="">
-                                    <tr className="bg-gray-2 text-center dark:bg-meta-4">
+                                <thead>
+                                    <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border"
+                                            className="border px-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border px-5" rowSpan="2">
-                                            Date Intended Activity{" "}
-                                            <span className="text-red-600">
-                                                *
-                                            </span>
-                                        </TH>
-                                        <TH className="border" rowSpan="2">
-                                            Purpose{" "}
-                                            <span className="text-red-600">
-                                                *
-                                            </span>
+                                        <TH className="border" colSpan="5">
+                                            Intended Activity
                                         </TH>
                                         <TH
                                             label="Relation"
-                                            className="border"
+                                            className="border py-2"
                                             colSpan="3"
                                         />
-                                        <TH className="border" rowSpan="2">
-                                            Location{" "}
-                                            <span className="text-red-600">
-                                                *
-                                            </span>
-                                        </TH>
                                         <TH className="border" rowSpan="2">
                                             Amount{" "}
                                             <span className="text-red-600">
@@ -1611,7 +1525,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Document"
-                                            className="border"
+                                            className="border px-2"
                                             rowSpan="2"
                                         />
                                         {DataRow.length > 1 && (
@@ -1623,7 +1537,40 @@ export default function Reimburse({ auth }: PageProps) {
                                         )}
                                     </tr>
                                     <tr className="text-center">
-                                        <TH label="Name" className="border" />
+                                        <TH className="border py-2">
+                                            Date{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Purpose{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Location{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Address{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Type{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH
+                                            label="Name"
+                                            className="border py-2"
+                                        />
                                         <TH label="Person" className="border" />
                                         <TH
                                             label="Position"
@@ -1631,7 +1578,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         />
                                     </tr>
                                 </thead>
-                                <tbody id="form_table">
+                                <tbody>
                                     {DataRow.map((val, i) => (
                                         <tr className="text-center" key={i}>
                                             <TD className="border">{i + 1}.</TD>
@@ -1672,11 +1619,74 @@ export default function Reimburse({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
+                                                <TextInput
+                                                    id="reimburse_detail_location"
+                                                    type="text"
+                                                    name="reimburse_detail_location"
+                                                    value={
+                                                        val.reimburse_detail_location
+                                                    }
+                                                    className="w-1/2"
+                                                    onChange={(e) =>
+                                                        handleChangeAdd(e, i)
+                                                    }
+                                                    autoComplete="off"
+                                                    required
+                                                />
+                                            </TD>
+                                            <TD className="border">
+                                                <TextInput
+                                                    id="reimburse_detail_address"
+                                                    type="text"
+                                                    name="reimburse_detail_address"
+                                                    value={
+                                                        val.reimburse_detail_address
+                                                    }
+                                                    className="w-1/2"
+                                                    onChange={(e) =>
+                                                        handleChangeAdd(e, i)
+                                                    }
+                                                    autoComplete="off"
+                                                    required
+                                                />
+                                            </TD>
+                                            <TD className="border">
+                                                <select
+                                                    id="reimburse_detail_type"
+                                                    name="reimburse_detail_type"
+                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    required
+                                                    onChange={(e) =>
+                                                        handleChangeAdd(e, i)
+                                                    }
+                                                >
+                                                    <option value="">
+                                                        -- Choose Type --
+                                                    </option>
+                                                    {purposes.map(
+                                                        (purpose: any) => (
+                                                            <option
+                                                                key={
+                                                                    purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                }
+                                                                value={
+                                                                    purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                }
+                                                            >
+                                                                {
+                                                                    purpose.CASH_ADVANCE_PURPOSE
+                                                                }
+                                                            </option>
+                                                        )
+                                                    )}
+                                                </select>
+                                            </TD>
+                                            <TD className="border">
                                                 <Select
                                                     classNames={{
                                                         menuButton: () =>
-                                                            `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            `flex w-full text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                        menu: "absolute w-full text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                         listItem: ({
                                                             isSelected,
                                                         }: any) =>
@@ -1701,7 +1711,6 @@ export default function Reimburse({ auth }: PageProps) {
                                                             i
                                                         )
                                                     }
-                                                    primaryColor={"bg-red-500"}
                                                 />
                                             </TD>
                                             <TD className="border">
@@ -1735,22 +1744,6 @@ export default function Reimburse({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_location"
-                                                    type="text"
-                                                    name="reimburse_detail_location"
-                                                    value={
-                                                        val.reimburse_detail_location
-                                                    }
-                                                    className="w-1/2"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
                                                 <CurrencyInput
                                                     id="reimburse_detail_amount"
                                                     name="reimburse_detail_amount"
@@ -1775,7 +1768,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             <TD className="border">
                                                 <button
                                                     type="button"
-                                                    className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                    className="w-full bg-black hover:bg-slate-800 text-sm py-2 px-3 text-white"
                                                     onClick={() => {
                                                         setModalFiles({
                                                             add_files: true,
@@ -1802,8 +1795,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                         : "Add Files"}
                                                 </button>
                                             </TD>
-                                            <TD className="border">
-                                                {DataRow.length > 1 && (
+                                            {DataRow.length > 1 && (
+                                                <TD className="border">
                                                     <Button
                                                         className="my-1.5 px-3 py-1"
                                                         onClick={() =>
@@ -1813,8 +1806,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                     >
                                                         X
                                                     </Button>
-                                                )}
-                                            </TD>
+                                                </TD>
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>
@@ -1832,7 +1825,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         </TD>
                                         <TD
                                             className="text-right pr-5 font-bold"
-                                            colSpan={5}
+                                            colSpan={7}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
@@ -1843,7 +1836,7 @@ export default function Reimburse({ auth }: PageProps) {
                         </div>
                         {/* Table form end */}
 
-                        <div className="w-full p-2 mt-5">
+                        <div className="w-full p-2 mt-10">
                             <InputLabel
                                 htmlFor="reimburse_request_note"
                                 value="Note"
@@ -1928,12 +1921,25 @@ export default function Reimburse({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
+                                                        <a
+                                                            href={`/reimburseDocReader/${
+                                                                dataById
+                                                                    .reimburse_detail[
+                                                                    modalFiles
+                                                                        .index_show
+                                                                ]
+                                                                    .REIMBURSE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
                                                             {
                                                                 file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -2172,106 +2178,127 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="max-w-full overflow-x-auto overflow-visible">
                             <table className="w-full divide-y divide-gray-300">
                                 <thead className="bg-gray-100">
-                                    <tr className="text-center text-gray-700 dark:bg-meta-4 leading-7">
+                                    <tr className="text-center text-gray-700">
                                         <TH
                                             label="No."
-                                            className="border px-3 py-2"
+                                            className="border px-2 w-10"
                                             rowSpan="2"
                                         />
                                         <TH
-                                            label="Date Intended Activity"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        <TH
-                                            label="Purpose"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
+                                            label="Intended Activity"
+                                            className="border"
+                                            colSpan="5"
                                         />
                                         <TH
                                             label="Relation"
-                                            className="border px-3 py-2"
+                                            className="border py-2"
                                             colSpan="3"
                                         />
                                         <TH
-                                            label="Location"
-                                            className="border px-3 py-2"
-                                            rowSpan="2"
-                                        />
-                                        <TH
                                             label="Amount"
-                                            className="border px-3 py-2"
+                                            className="border"
                                             rowSpan="2"
                                         />
                                         <TH
                                             label="Document"
-                                            className="border px-3 py-2"
+                                            className="border"
                                             rowSpan="2"
                                         />
                                     </tr>
-                                    <tr className="text-center text-gray-700 leading-7">
+                                    <tr className="text-center text-gray-700">
+                                        <TH
+                                            label="Date"
+                                            className="border py-2"
+                                        />
+                                        <TH
+                                            label="Purpose"
+                                            className="border py-2"
+                                        />
+                                        <TH
+                                            label="Location"
+                                            className="border py-2"
+                                        />
+                                        <TH
+                                            label="Address"
+                                            className="border py-2"
+                                        />
+                                        <TH
+                                            label="Type"
+                                            className="border py-2"
+                                        />
                                         <TH
                                             label="Name"
-                                            className="border px-3 py-2"
+                                            className="border py-2"
                                         />
                                         <TH
                                             label="Person"
-                                            className="border px-3 py-2"
+                                            className="border py-2"
                                         />
                                         <TH
                                             label="Position"
-                                            className="border px-3 py-2"
+                                            className="border py-2"
                                         />
                                     </tr>
                                 </thead>
-                                <tbody id="form_table">
+                                <tbody>
                                     {dataById.reimburse_detail.map(
                                         (rd: any, i: number) => (
                                             <tr
-                                                className="text-center text-gray-700 text-sm leading-7"
+                                                className="text-center text-gray-700 text-sm"
                                                 key={i}
                                             >
-                                                <TD className="border w-10">
+                                                <TD className="border py-2">
                                                     {i + 1}.
                                                 </TD>
-                                                <TD className="border px-3 py-2">
+                                                <TD className="border py-2">
                                                     {dateFormat(
                                                         rd.REIMBURSE_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
-                                                <TD className="border px-3">
+                                                <TD className="border py-2">
                                                     {
                                                         rd.REIMBURSE_DETAIL_PURPOSE
                                                     }
                                                 </TD>
-                                                <TD className="border px-3">
+                                                <TD className="border py-2">
+                                                    {
+                                                        rd.REIMBURSE_DETAIL_LOCATION
+                                                    }
+                                                </TD>
+                                                <TD className="border py-2">
+                                                    {
+                                                        rd.REIMBURSE_DETAIL_ADDRESS
+                                                    }
+                                                </TD>
+                                                <TD className="border py-2">
+                                                    {
+                                                        rd.type
+                                                            ?.CASH_ADVANCE_PURPOSE
+                                                    }
+                                                </TD>
+                                                <TD className="border py-2">
                                                     {
                                                         rd.relation_organization
                                                             ?.RELATION_ORGANIZATION_ALIAS
                                                     }
                                                 </TD>
-                                                <TD className="border px-3 py-2">
+                                                <TD className="border py-2">
                                                     {
                                                         rd.REIMBURSE_DETAIL_RELATION_NAME
                                                     }
                                                 </TD>
-                                                <TD className="border px-3 py-2">
+                                                <TD className="border py-2">
                                                     {
                                                         rd.REIMBURSE_DETAIL_RELATION_POSITION
                                                     }
                                                 </TD>
-                                                <TD className="border px-3 py-2">
-                                                    {
-                                                        rd.REIMBURSE_DETAIL_LOCATION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3 py-2">
+                                                <TD className="border py-2">
                                                     {formatCurrency.format(
                                                         rd.REIMBURSE_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                <TD className="border px-3 py-2">
+                                                <TD className="border py-2">
                                                     {rd?.m_reimburse_document
                                                         ?.length > 0 ? (
                                                         <button
@@ -2311,10 +2338,10 @@ export default function Reimburse({ auth }: PageProps) {
                                     )}
                                 </tbody>
                                 <tfoot>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD
                                             className="border text-right pr-5 py-2"
-                                            colSpan={7}
+                                            colSpan={9}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
@@ -2332,14 +2359,20 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
-                                    Difference
+                                    Information
                                     {/* <span className="text-red-600">*</span> */}
                                 </InputLabel>
-                                <TextInput
-                                    value={dataById.notes?.REIMBURSE_NOTES_NAME}
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
+                                {dataById.notes?.REIMBURSE_NOTES_NAME ? (
+                                    <TextInput
+                                        value={
+                                            dataById.notes?.REIMBURSE_NOTES_NAME
+                                        }
+                                        className="bg-gray-100"
+                                        readOnly
+                                    />
+                                ) : (
+                                    "-"
+                                )}
                             </div>
 
                             <div className="w-full p-2">
@@ -2385,7 +2418,7 @@ export default function Reimburse({ auth }: PageProps) {
                                 name="reimburse_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.REIMBURSE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>
@@ -2414,7 +2447,7 @@ export default function Reimburse({ auth }: PageProps) {
                     })
                 }
                 title="Reimburse Approve"
-                url={`/reimburseApprove/${dataById.reimburse_detail.REIMBURSE_DETAIL_ID}`}
+                url={`/reimburseApprove`}
                 data={dataById}
                 method="patch"
                 onSuccess={handleSuccess}
@@ -2436,7 +2469,6 @@ export default function Reimburse({ auth }: PageProps) {
                             onSuccess=""
                             headers={null}
                             submitButtonName=""
-                            // panelWidth=""
                             body={
                                 <>
                                     <div className="grid grid-cols-12 my-3">
@@ -2454,12 +2486,25 @@ export default function Reimburse({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
+                                                        <a
+                                                            href={`/reimburseDocReader/${
+                                                                dataById
+                                                                    .reimburse_detail[
+                                                                    modalFiles
+                                                                        .index_show
+                                                                ]
+                                                                    .REIMBURSE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
                                                             {
                                                                 file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -2629,32 +2674,22 @@ export default function Reimburse({ auth }: PageProps) {
                         {/* Table form start */}
                         <div className="max-w-full overflow-x-auto overflow-visible">
                             <table className="w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-100 leading-8">
-                                    <tr className="text-center dark:bg-meta-4">
+                                <thead className="bg-gray-100">
+                                    <tr className="text-center">
                                         <TH
                                             label="No."
                                             className="border px-3 py-2"
                                             rowSpan={2}
                                         />
                                         <TH
-                                            label="Date Intended Activity"
+                                            label="Intended Activity"
                                             className="border px-3 py-2"
-                                            rowSpan={2}
-                                        />
-                                        <TH
-                                            label="Purpose"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
+                                            colSpan={5}
                                         />
                                         <TH
                                             label="Relation"
                                             className="border px-3 py-2"
                                             colSpan={3}
-                                        />
-                                        <TH
-                                            label="Location"
-                                            className="border px-3 py-2"
-                                            rowSpan={2}
                                         />
                                         <TH
                                             label="Amount"
@@ -2667,27 +2702,59 @@ export default function Reimburse({ auth }: PageProps) {
                                             rowSpan={2}
                                         />
                                         <TH
-                                            label="Approval"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
-                                        />
+                                        >
+                                            Approval
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
                                         <TH
-                                            label="Cost Classification"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
-                                        />
+                                        >
+                                            Cost Classification
+                                            {/* <span className="text-red-600">
+                                                *
+                                            </span> */}
+                                        </TH>
                                         <TH
-                                            label="Amount Approve"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
-                                        />
+                                        >
+                                            Amount Approve
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
                                         <TH
                                             label="Remarks"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
                                         />
                                     </tr>
-                                    <tr className="text-center">
+                                    <tr className="text-center text-gray-700">
+                                        <TH
+                                            label="Date"
+                                            className="border px-3 py-2"
+                                        />
+                                        <TH
+                                            label="Purpose"
+                                            className="border px-3 py-2"
+                                        />
+                                        <TH
+                                            label="Location"
+                                            className="border px-3 py-2"
+                                        />
+                                        <TH
+                                            label="Address"
+                                            className="border px-3 py-2"
+                                        />
+                                        <TH
+                                            label="Type"
+                                            className="border px-3 py-2"
+                                        />
                                         <TH
                                             label="Name"
                                             className="border px-3 py-2"
@@ -2702,7 +2769,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         />
                                     </tr>
                                 </thead>{" "}
-                                <tbody id="form_table">
+                                <tbody>
                                     {dataById.reimburse_detail.map(
                                         (rd: any, i: number) => (
                                             <tr
@@ -2718,12 +2785,28 @@ export default function Reimburse({ auth }: PageProps) {
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
-                                                <TD className="border px-3">
+                                                <TD className="border px-3 py-2">
                                                     {
                                                         rd.REIMBURSE_DETAIL_PURPOSE
                                                     }
                                                 </TD>
-                                                <TD className="border px-3">
+                                                <TD className="border px-3 py-2">
+                                                    {
+                                                        rd.REIMBURSE_DETAIL_LOCATION
+                                                    }
+                                                </TD>
+                                                <TD className="border px-3 py-2">
+                                                    {
+                                                        rd.REIMBURSE_DETAIL_ADDRESS
+                                                    }
+                                                </TD>
+                                                <TD className="border px-3 py-2">
+                                                    {
+                                                        rd.type
+                                                            ?.CASH_ADVANCE_PURPOSE
+                                                    }
+                                                </TD>
+                                                <TD className="border px-3 py-2">
                                                     {
                                                         rd.relation_organization
                                                             ?.RELATION_ORGANIZATION_ALIAS
@@ -2737,11 +2820,6 @@ export default function Reimburse({ auth }: PageProps) {
                                                 <TD className="border px-3 py-2">
                                                     {
                                                         rd.REIMBURSE_DETAIL_RELATION_POSITION
-                                                    }
-                                                </TD>
-                                                <TD className="border px-3 py-2">
-                                                    {
-                                                        rd.REIMBURSE_DETAIL_LOCATION
                                                     }
                                                 </TD>
                                                 <TD className="border px-3 py-2">
@@ -2798,6 +2876,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                         value={
                                                             rd.REIMBURSE_DETAIL_APPROVAL
                                                         }
+                                                        required
                                                     >
                                                         <option value="">
                                                             -- Choose Approval
@@ -2826,7 +2905,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                         classNames={{
                                                             menuButton: () =>
                                                                 `flex w-96 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50",
                                                             listItem: ({
                                                                 isSelected,
                                                             }: any) =>
@@ -2895,45 +2974,34 @@ export default function Reimburse({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border">
-                                                    <TextInput
-                                                        id="REIMBURSE_DETAIL_REMARKS"
-                                                        type="text"
-                                                        name="REIMBURSE_DETAIL_REMARKS"
-                                                        value={
-                                                            rd.REIMBURSE_DETAIL_REMARKS
-                                                        }
-                                                        className="w-1/2"
-                                                        autoComplete="off"
-                                                        onChange={(e) =>
-                                                            handleChangeApprove(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                    />
+                                                    <div className="w-96">
+                                                        <TextInput
+                                                            id="REIMBURSE_DETAIL_REMARKS"
+                                                            type="text"
+                                                            name="REIMBURSE_DETAIL_REMARKS"
+                                                            value={
+                                                                rd.REIMBURSE_DETAIL_REMARKS
+                                                            }
+                                                            className=""
+                                                            autoComplete="off"
+                                                            onChange={(e) =>
+                                                                handleChangeApprove(
+                                                                    e,
+                                                                    i
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
                                                 </TD>
                                             </tr>
                                         )
                                     )}
                                 </tbody>
                                 <tfoot>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD
                                             className="border text-right pr-5 py-2"
-                                            colSpan={11}
-                                        >
-                                            APPROVE AMOUNT
-                                        </TD>
-                                        <TD className="border text-center py-2">
-                                            {formatCurrency.format(
-                                                reimburse_total_amount_approve
-                                            )}
-                                        </TD>
-                                    </tr>
-                                    <tr className="text-center text-black text-sm leading-7">
-                                        <TD
-                                            className="border text-right pr-5 py-2"
-                                            colSpan={11}
+                                            colSpan={13}
                                         >
                                             PROPOSE AMOUNT
                                         </TD>
@@ -2943,10 +3011,23 @@ export default function Reimburse({ auth }: PageProps) {
                                             )}
                                         </TD>
                                     </tr>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD
                                             className="border text-right pr-5 py-2"
-                                            colSpan={11}
+                                            colSpan={13}
+                                        >
+                                            APPROVE AMOUNT
+                                        </TD>
+                                        <TD className="border text-center py-2">
+                                            {formatCurrency.format(
+                                                reimburse_total_amount_approve
+                                            )}
+                                        </TD>
+                                    </tr>
+                                    {/* <tr className="text-center text-black text-sm">
+                                        <TD
+                                            className="border text-right pr-5 py-2"
+                                            colSpan={13}
                                         >
                                             SURPLUS / DEFICIT
                                         </TD>
@@ -2956,7 +3037,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                     reimburse_total_amount_approve
                                             )}
                                         </TD>
-                                    </tr>
+                                    </tr> */}
                                 </tfoot>
                             </table>
                         </div>
@@ -2968,7 +3049,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     htmlFor="REIMBURSE_TYPE"
                                     className="mb-2"
                                 >
-                                    Notes
+                                    Information
                                     {/* <span className="text-red-600">*</span> */}
                                 </InputLabel>
                                 <select
@@ -2983,7 +3064,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     }
                                     value={dataById?.REIMBURSE_TYPE}
                                 >
-                                    <option value="">-- Choose Notes --</option>
+                                    <option value="">
+                                        -- Choose Information --
+                                    </option>
                                     {ReimburseNotes.map((notes: any) => (
                                         <option
                                             key={notes.REIMBURSE_NOTES_ID}
@@ -3369,35 +3452,23 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="max-w-full overflow-x-auto overflow-visible">
                             <table className="w-full divide-y divide-gray-300">
                                 <thead className="bg-gray-100">
-                                    <tr className="text-center dark:bg-meta-4 leading-7">
+                                    <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border px-3 py-2"
+                                            className="border px-2"
                                             rowSpan={2}
                                         />
-                                        <TH className="border" rowSpan="2">
-                                            Date Intended Activity{" "}
-                                            <span className="text-red-600">
+                                        <TH className="border" colSpan="5">
+                                            Intended Activity{" "}
+                                            {/* <span className="text-red-600">
                                                 *
-                                            </span>
-                                        </TH>
-                                        <TH className="border" rowSpan="2">
-                                            Purpose
-                                            <span className="text-red-600">
-                                                *
-                                            </span>
+                                            </span> */}
                                         </TH>
                                         <TH
                                             label="Relation"
                                             className="border py-2"
                                             colSpan={3}
                                         />
-                                        <TH className="border" rowSpan="2">
-                                            Location{" "}
-                                            <span className="text-red-600">
-                                                *
-                                            </span>
-                                        </TH>
                                         <TH className="border" rowSpan="2">
                                             Amount
                                             <span className="text-red-600">
@@ -3406,7 +3477,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Document"
-                                            className="border py-2"
+                                            className="border px-3 py-2"
                                             rowSpan={2}
                                         />
                                         <TH
@@ -3424,17 +3495,44 @@ export default function Reimburse({ auth }: PageProps) {
                                         )}
                                     </tr>
                                     <tr className="text-center">
+                                        <TH className="border py-2">
+                                            Date{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Purpose{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Location{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Address{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border py-2">
+                                            Type{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
                                         <TH
                                             label="Name"
                                             className="border py-2"
                                         />
-                                        <TH
-                                            label="Person"
-                                            className="border py-2"
-                                        />
+                                        <TH label="Person" className="border" />
                                         <TH
                                             label="Position"
-                                            className="border py-2"
+                                            className="border"
                                         />
                                     </tr>
                                 </thead>
@@ -3490,11 +3588,86 @@ export default function Reimburse({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border">
+                                                    <TextInput
+                                                        id="REIMBURSE_DETAIL_LOCATION"
+                                                        type="text"
+                                                        name="REIMBURSE_DETAIL_LOCATION"
+                                                        value={
+                                                            rd.REIMBURSE_DETAIL_LOCATION
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeRevised(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="REIMBURSE_DETAIL_ADDRESS"
+                                                        type="text"
+                                                        name="REIMBURSE_DETAIL_ADDRESS"
+                                                        value={
+                                                            rd.REIMBURSE_DETAIL_ADDRESS
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeRevised(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <select
+                                                        id="REIMBURSE_DETAIL_TYPE"
+                                                        name="REIMBURSE_DETAIL_TYPE"
+                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                        value={
+                                                            rd.REIMBURSE_DETAIL_TYPE
+                                                        }
+                                                        required
+                                                        onChange={(e) =>
+                                                            handleChangeRevised(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    >
+                                                        <option value="">
+                                                            -- Choose Type --
+                                                        </option>
+                                                        {purposes.map(
+                                                            (purpose: any) => (
+                                                                <option
+                                                                    key={
+                                                                        purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                    }
+                                                                    value={
+                                                                        purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        purpose.CASH_ADVANCE_PURPOSE
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </select>
+                                                </TD>
+                                                <TD className="border">
                                                     <Select
                                                         classNames={{
                                                             menuButton: () =>
-                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                             listItem: ({
                                                                 isSelected,
                                                             }: any) =>
@@ -3561,25 +3734,6 @@ export default function Reimburse({ auth }: PageProps) {
                                                                 i
                                                             )
                                                         }
-                                                    />
-                                                </TD>
-                                                <TD className="border">
-                                                    <TextInput
-                                                        id="REIMBURSE_DETAIL_LOCATION"
-                                                        type="text"
-                                                        name="REIMBURSE_DETAIL_LOCATION"
-                                                        value={
-                                                            rd.REIMBURSE_DETAIL_LOCATION
-                                                        }
-                                                        className="w-1/2"
-                                                        autoComplete="off"
-                                                        onChange={(e) =>
-                                                            handleChangeRevised(
-                                                                e,
-                                                                i
-                                                            )
-                                                        }
-                                                        required
                                                     />
                                                 </TD>
                                                 <TD className="border">
@@ -3669,7 +3823,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     )}
                                 </tbody>
                                 <tfoot>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD></TD>
                                         <TD>
                                             <Button
@@ -3684,7 +3838,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         </TD>
                                         <TD
                                             className="text-right pr-5 py-2"
-                                            colSpan={5}
+                                            colSpan={7}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
@@ -3780,23 +3934,7 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
-                                    Surplus / Deficit
-                                </InputLabel>
-                                <CurrencyInput
-                                    value={
-                                        dataById?.REIMBURSE_TOTAL_AMOUNT_DIFFERENT
-                                    }
-                                    decimalScale={2}
-                                    decimalsLimit={2}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right bg-gray-100"
-                                    placeholder="0.00"
-                                    autoComplete="off"
-                                    disabled
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel htmlFor="type" className="mb-2">
-                                    Notes
+                                    Information
                                 </InputLabel>
                                 <TextInput
                                     value={dataById.notes?.REIMBURSE_NOTES_NAME}
@@ -3989,7 +4127,7 @@ export default function Reimburse({ auth }: PageProps) {
                                 {"Add Reimburse"}
                             </Button>
                         </div>
-                        <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5 relative">
+                        <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5">
                             <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
                                 <legend className="ml-8 text-sm">Search</legend>
                                 <div className="mt-3 px-4">
@@ -4002,7 +4140,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 searchReimburse.reimburse_requested_by
                                             }
                                             placeholder="Applicant"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchReimburse({
@@ -4022,7 +4160,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 searchReimburse.reimburse_used_by
                                             }
                                             placeholder="Used By"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchReimburse({
@@ -4050,7 +4188,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (Start Date)"
-                                            className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 mb-5">
@@ -4070,7 +4208,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (End Date)"
-                                            className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                         />
                                     </div>
                                     <div className="mb-5">
@@ -4082,7 +4220,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 searchReimburse.reimburse_division
                                             }
                                             placeholder="Division"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchReimburse({
@@ -4102,7 +4240,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 searchReimburse.reimburse_cost_center
                                             }
                                             placeholder="Cost Center"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchReimburse({
@@ -4113,15 +4251,15 @@ export default function Reimburse({ auth }: PageProps) {
                                             }
                                         />
                                     </div>
-                                    <div className="flex justify-end gap-2">
+                                    <div className="flex flex-col md:flex-row justify-end gap-2">
                                         <Button
-                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            className="mb-4 w-full md:w-[35%] text-white text-sm md:text-base py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                             onClick={() => getReimburse()}
                                         >
                                             Search
                                         </Button>
                                         <Button
-                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            className="mb-4 w-full md:w-[35%] text-white text-sm md:text-base py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                             onClick={() =>
                                                 clearSearchReimburse()
                                             }
@@ -4575,10 +4713,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                         className=""
                                                     />
                                                     <TableTD
+                                                        className="text-center"
                                                         value={
                                                             <Dropdown
                                                                 title="Actions"
-                                                                className="text-center"
+                                                                className=""
                                                                 children={
                                                                     <>
                                                                         <a

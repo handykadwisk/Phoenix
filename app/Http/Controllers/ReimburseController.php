@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashAdvanceCostClassification;
+use App\Models\CashAdvancePurpose;
 use App\Models\COA;
 use App\Models\Reimburse;
 use App\Models\ReimburseDetail;
@@ -205,6 +206,7 @@ class ReimburseController extends Controller
     public function index() 
     {
         $data = [
+            'purposes' => CashAdvancePurpose::all(),
             'relations' => Relation::all(),
             'coa' => COA::all(),
             'persons' => TPerson::all(),
@@ -279,6 +281,22 @@ class ReimburseController extends Controller
         return $reimburse_number;
     }
 
+    public function reimburse_doc_reader($reimburse_detail_id, $document_id)
+    {
+        $document = TDocument::find($document_id);
+
+        $document_filename = $reimburse_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = "/storage" . "/". $document_dirname . "/" . $document_filename;
+
+        $data = [
+            'uri' => $filePath
+        ];
+
+        return Inertia::render('Reimburse/ReimburseDocReader', $data);
+    }
+
     public function download($reimburse_detail_id, $document_id)
     {
         $document = TDocument::find($document_id);
@@ -321,7 +339,15 @@ class ReimburseController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->file('ReimburseDetail'));
+        $rules = [
+            'reimburse_cost_center' => 'required',
+            'reimburse_used_by' => 'required',
+            'reimburse_branch' => 'required',
+            'reimburse_first_approval_by' => 'required'
+        ];
+
+        $validate = $request->validate($rules);
+
         $user_id = Auth::user()->id;
         $person = TPerson::find($request->reimburse_first_approval_by['value']);
 
@@ -379,6 +405,8 @@ class ReimburseController extends Controller
             $reimburse_detail_date = $rd['reimburse_detail_date'];
             $reimburse_detail_purpose = $rd['reimburse_detail_purpose'];
             $reimburse_detail_location = $rd['reimburse_detail_location'];
+            $reimburse_detail_address = $rd['reimburse_detail_address'];
+            $reimburse_detail_type = $rd['reimburse_detail_type'];
             $reimburse_detail_relation_organization_id = $rd['reimburse_detail_relation_organization_id']['value'];
             $reimburse_detail_relation_name = $rd['reimburse_detail_relation_name'];
             $reimburse_detail_relation_position = $rd['reimburse_detail_relation_position'];
@@ -390,6 +418,8 @@ class ReimburseController extends Controller
                 'REIMBURSE_DETAIL_DATE' => $reimburse_detail_date,
                 'REIMBURSE_DETAIL_PURPOSE' => $reimburse_detail_purpose,
                 'REIMBURSE_DETAIL_LOCATION' => $reimburse_detail_location,
+                'REIMBURSE_DETAIL_ADDRESS' => $reimburse_detail_address,
+                'REIMBURSE_DETAIL_TYPE' => $reimburse_detail_type,
                 'REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID' => $reimburse_detail_relation_organization_id,
                 'REIMBURSE_DETAIL_RELATION_NAME' => $reimburse_detail_relation_name,
                 'REIMBURSE_DETAIL_RELATION_POSITION' => $reimburse_detail_relation_position,
@@ -470,7 +500,11 @@ class ReimburseController extends Controller
 
     public function approve(Request $request)
     {
+        // dd($request);
         $reimburse_detail = $request->reimburse_detail;
+        
+        $division_alias = $request->division['RELATION_DIVISION_ALIAS'];
+        $division_initial = $request->division['RELATION_DIVISION_INITIAL'];
 
         $total_amount_approve = 0;
 
@@ -485,6 +519,10 @@ class ReimburseController extends Controller
         $reimburse_id = $request->REIMBURSE_ID;
         $reimburse_first_approval_change_status_date = date('Y-m-d H:i:s');
         $reimburse_first_approval_status = $request->REIMBURSE_FIRST_APPROVAL_STATUS;
+        $reimburse_second_approval_change_status_date = date('Y-m-d H:i:s');
+        $reimburse_second_approval_status = $request->REIMBURSE_SECOND_APPROVAL_STATUS;
+        $reimburse_third_approval_change_status_date = date('Y-m-d H:i:s');
+        $reimburse_third_approval_status = $request->REIMBURSE_THIRD_APPROVAL_STATUS;
         $reimburse_type = $request->REIMBURSE_TYPE;
         $reimburse_total_amount = $request->REIMBURSE_TOTAL_AMOUNT;
         $reimburse_total_amount_approve = $total_amount_approve;
@@ -497,6 +535,28 @@ class ReimburseController extends Controller
             'REIMBURSE_TOTAL_AMOUNT_APPROVE' => $reimburse_total_amount_approve,
             'REIMBURSE_TOTAL_AMOUNT_DIFFERENT' => $reimburse_total_amount_different,
         ]);
+
+        if ($division_alias == "FINANCE ACCOUNTING" && $division_initial == "FA") {
+            Reimburse::where('REIMBURSE_ID', $reimburse_id)->update([
+                'REIMBURSE_SECOND_APPROVAL_CHANGE_STATUS_DATE' => $reimburse_second_approval_change_status_date,
+                'REIMBURSE_SECOND_APPROVAL_STATUS' => $reimburse_second_approval_status,
+                'REIMBURSE_TYPE' => $reimburse_type,
+                'REIMBURSE_TOTAL_AMOUNT' => $reimburse_total_amount,
+                'REIMBURSE_TOTAL_AMOUNT_APPROVE' => $reimburse_total_amount_approve,
+                'REIMBURSE_TOTAL_AMOUNT_DIFFERENT' => $reimburse_total_amount_different,
+            ]);
+        }
+
+        if ($division_alias == "DIREKSI" && $division_initial == "DIREKSI") {
+            Reimburse::where('REIMBURSE_ID', $reimburse_id)->update([
+                'REIMBURSE_THIRD_APPROVAL_CHANGE_STATUS_DATE' => $reimburse_second_approval_change_status_date,
+                'REIMBURSE_THIRD_APPROVAL_STATUS' => $reimburse_second_approval_status,
+                'REIMBURSE_TYPE' => $reimburse_type,
+                'REIMBURSE_TOTAL_AMOUNT' => $reimburse_total_amount,
+                'REIMBURSE_TOTAL_AMOUNT_APPROVE' => $reimburse_total_amount_approve,
+                'REIMBURSE_TOTAL_AMOUNT_DIFFERENT' => $reimburse_total_amount_different,
+            ]);
+        }
 
         // Created Log CA
         UserLog::create([
@@ -511,12 +571,18 @@ class ReimburseController extends Controller
 
         if (is_array($reimburse_detail) && !empty($reimburse_detail)) {
             foreach ($reimburse_detail as $rd) {
+                $cost_classification = $rd['REIMBURSE_DETAIL_COST_CLASSIFICATION'];
+
                 $reimburse_detail_id = $rd['REIMBURSE_DETAIL_ID'];
                 $reimburse_detail_approval = $rd['REIMBURSE_DETAIL_APPROVAL'];
-                $reimburse_detail_cost_classification = $rd['REIMBURSE_DETAIL_COST_CLASSIFICATION']['value'];
                 $reimburse_detail_amount_approve = $rd['REIMBURSE_DETAIL_AMOUNT_APPROVE'];
                 $reimburse_detail_remarks = $rd['REIMBURSE_DETAIL_REMARKS'];
-
+                $reimburse_detail_cost_classification = $rd['REIMBURSE_DETAIL_COST_CLASSIFICATION'];
+                
+                if ($cost_classification != null || $cost_classification != "") {
+                    $reimburse_detail_cost_classification = $cost_classification['value'];
+                }
+                
                 ReimburseDetail::where('REIMBURSE_DETAIL_ID', $reimburse_detail_id)->update([
                     'REIMBURSE_DETAIL_APPROVAL' => $reimburse_detail_approval,
                     'REIMBURSE_DETAIL_COST_CLASSIFICATION' => $reimburse_detail_cost_classification,
@@ -586,6 +652,8 @@ class ReimburseController extends Controller
             $reimburse_detail_date = $rd['REIMBURSE_DETAIL_DATE'];
             $reimburse_detail_purpose = $rd['REIMBURSE_DETAIL_PURPOSE'];
             $reimburse_detail_location = $rd['REIMBURSE_DETAIL_LOCATION'];
+            $reimburse_detail_address = $rd['REIMBURSE_DETAIL_ADDRESS'];
+            $reimburse_detail_type = $rd['REIMBURSE_DETAIL_TYPE'];
             $reimburse_detail_relation_organization_id = $rd['REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID'];
             $reimburse_detail_relation_name = $rd['REIMBURSE_DETAIL_RELATION_NAME'];
             $reimburse_detail_relation_position = $rd['REIMBURSE_DETAIL_RELATION_POSITION'];
@@ -599,10 +667,12 @@ class ReimburseController extends Controller
                 'REIMBURSE_ID' => $reimburse_id,
                 'REIMBURSE_DETAIL_DATE' => $reimburse_detail_date,
                 'REIMBURSE_DETAIL_PURPOSE' => $reimburse_detail_purpose,
+                'REIMBURSE_DETAIL_LOCATION' => $reimburse_detail_location,
+                'REIMBURSE_DETAIL_ADDRESS' => $reimburse_detail_address,
+                'REIMBURSE_DETAIL_TYPE' => $reimburse_detail_type,
                 'REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID' => $reimburse_detail_relation_organization_id,
                 'REIMBURSE_DETAIL_RELATION_NAME' => $reimburse_detail_relation_name,
                 'REIMBURSE_DETAIL_RELATION_POSITION' => $reimburse_detail_relation_position,
-                'REIMBURSE_DETAIL_LOCATION' => $reimburse_detail_location,
                 'REIMBURSE_DETAIL_AMOUNT' => $reimburse_detail_amount
             ]);
 

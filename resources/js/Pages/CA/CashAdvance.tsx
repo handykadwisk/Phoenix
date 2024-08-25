@@ -24,6 +24,7 @@ import CurrencyInput from "react-currency-input-field";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
+import BadgeFlat from "@/Components/BadgeFlat";
 
 export default function CashAdvance({ auth }: PageProps) {
     useEffect(() => {
@@ -2197,6 +2198,7 @@ export default function CashAdvance({ auth }: PageProps) {
     const handleCheckedTransferEdit = (e: any) => {
         if (e.target.checked) {
             setCheckedTransferEdit(e.target.checked);
+            console.log(checkedTransferEdit);
         } else {
             setCheckedTransferEdit(e.target.checked);
             setDataById({
@@ -2733,8 +2735,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <Select
                                                     classNames={{
                                                         menuButton: () =>
-                                                            `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                        menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                         listItem: ({
                                                             isSelected,
                                                         }: any) =>
@@ -3143,19 +3145,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
-                                                            {
+                                                        <a
+                                                            href={`/cashAdvanceDocReader/${
                                                                 dataById
                                                                     .cash_advance_detail[
                                                                     modalFiles
                                                                         .index_show
                                                                 ]
-                                                                    .m_cash_advance_document[
-                                                                    i
-                                                                ]?.document
+                                                                    .CASH_ADVANCE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
+                                                            {
+                                                                file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -3168,14 +3176,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                         .index_show
                                                                 ]
                                                                     .CASH_ADVANCE_DETAIL_ID,
-                                                                dataById
-                                                                    .cash_advance_detail[
-                                                                    modalFiles
-                                                                        .index_show
-                                                                ]
-                                                                    .m_cash_advance_document[
-                                                                    i
-                                                                ]?.document
+                                                                file?.document
                                                                     .DOCUMENT_ID
                                                             )
                                                         }
@@ -3771,19 +3772,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
-                                                            {
+                                                        <a
+                                                            href={`/cashAdvanceDocReader/${
                                                                 dataById
                                                                     .cash_advance_detail[
                                                                     modalFiles
                                                                         .index_show
                                                                 ]
-                                                                    .m_cash_advance_document[
-                                                                    i
-                                                                ]?.document
+                                                                    .CASH_ADVANCE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
+                                                            {
+                                                                file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -3796,14 +3803,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                         .index_show
                                                                 ]
                                                                     .CASH_ADVANCE_DETAIL_ID,
-                                                                dataById
-                                                                    .cash_advance_detail[
-                                                                    modalFiles
-                                                                        .index_show
-                                                                ]
-                                                                    .m_cash_advance_document[
-                                                                    i
-                                                                ]?.document
+                                                                file?.document
                                                                     .DOCUMENT_ID
                                                             )
                                                         }
@@ -4943,8 +4943,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <Select
                                                         classNames={{
                                                             menuButton: () =>
-                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                             listItem: ({
                                                                 isSelected,
                                                             }: any) =>
@@ -5370,7 +5370,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             onSuccess=""
                             headers={null}
                             submitButtonName=""
-                            // panelWidth=""
                             body={
                                 <>
                                     <div className="grid grid-cols-12 my-3">
@@ -5388,19 +5387,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
-                                                            {
+                                                        <a
+                                                            href={`/cashAdvanceDocReader/${
                                                                 dataById
                                                                     .cash_advance_detail[
                                                                     modalFiles
                                                                         .index_show
                                                                 ]
-                                                                    .m_cash_advance_document[
-                                                                    i
-                                                                ]?.document
+                                                                    .CASH_ADVANCE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
+                                                            {
+                                                                file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -5413,14 +5418,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                         .index_show
                                                                 ]
                                                                     .CASH_ADVANCE_DETAIL_ID,
-                                                                dataById
-                                                                    .cash_advance_detail[
-                                                                    modalFiles
-                                                                        .index_show
-                                                                ]
-                                                                    .m_cash_advance_document[
-                                                                    i
-                                                                ]?.document
+                                                                file?.document
                                                                     .DOCUMENT_ID
                                                             )
                                                         }
@@ -5807,76 +5805,75 @@ export default function CashAdvance({ auth }: PageProps) {
                                             />
                                         </div>
                                     </div>
-                                    {dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                        0 ===
-                                        false ||
-                                        (!checkedTransferEdit && (
-                                            <div className="ml-7">
-                                                <div className="mb-5">
-                                                    <InputLabel
-                                                        htmlFor="cash_advance_transfer_date"
-                                                        className="mb-2"
-                                                    >
-                                                        Transfer Date
-                                                        {/* <span className="text-red-600">*</span> */}
-                                                    </InputLabel>
-                                                    <DatePicker
-                                                        name="CASH_ADVANCE_TRANSFER_DATE"
-                                                        selected={
-                                                            dataById.CASH_ADVANCE_TRANSFER_DATE
-                                                        }
-                                                        onChange={(date: any) =>
-                                                            setDataById({
-                                                                ...dataById,
-                                                                CASH_ADVANCE_TRANSFER_DATE:
-                                                                    date.toLocaleDateString(
-                                                                        "en-CA"
-                                                                    ),
-                                                            })
-                                                        }
-                                                        dateFormat={
-                                                            "dd-MM-yyyy"
-                                                        }
-                                                        placeholderText="dd-mm-yyyyy"
-                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                        autoComplete="off"
-                                                    />
-                                                </div>
-                                                <div className="mb-5">
-                                                    <InputLabel
-                                                        htmlFor="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                        className="mb-2"
-                                                    >
-                                                        From Bank Account
-                                                        {/* <span className="text-red-600">*</span> */}
-                                                    </InputLabel>
-                                                    <select
-                                                        name="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                        id="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                        className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                        onChange={(e) =>
-                                                            setDataById({
-                                                                ...dataById,
-                                                                CASH_ADVANCE_FROM_BANK_ACCOUNT:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                    >
-                                                        <option value="">
-                                                            -- Choose Bank
-                                                            Account --
-                                                        </option>
-                                                        <option value="Bank 1">
-                                                            Bank 1
-                                                        </option>
-                                                        <option value="Bank 2">
-                                                            Bank 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        ))}
+
+                                    <div
+                                        className="ml-7"
+                                        hidden={
+                                            dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
+                                                0 ===
+                                                false && !checkedTransferEdit
+                                        }
+                                    >
+                                        <div className="mb-5">
+                                            <InputLabel
+                                                htmlFor="cash_advance_transfer_date"
+                                                className="mb-2"
+                                            >
+                                                Transfer Date
+                                                {/* <span className="text-red-600">*</span> */}
+                                            </InputLabel>
+                                            <DatePicker
+                                                name="CASH_ADVANCE_TRANSFER_DATE"
+                                                selected={
+                                                    dataById.CASH_ADVANCE_TRANSFER_DATE
+                                                }
+                                                onChange={(date: any) =>
+                                                    setDataById({
+                                                        ...dataById,
+                                                        CASH_ADVANCE_TRANSFER_DATE:
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            ),
+                                                    })
+                                                }
+                                                dateFormat={"dd-MM-yyyy"}
+                                                placeholderText="dd-mm-yyyyy"
+                                                className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                autoComplete="off"
+                                            />
+                                        </div>
+                                        <div className="mb-5">
+                                            <InputLabel
+                                                htmlFor="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                className="mb-2"
+                                            >
+                                                From Bank Account
+                                                {/* <span className="text-red-600">*</span> */}
+                                            </InputLabel>
+                                            <select
+                                                name="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                id="CASH_ADVANCE_FROM_BANK_ACCOUNT"
+                                                className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                onChange={(e) =>
+                                                    setDataById({
+                                                        ...dataById,
+                                                        CASH_ADVANCE_FROM_BANK_ACCOUNT:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                            >
+                                                <option value="">
+                                                    -- Choose Bank Account --
+                                                </option>
+                                                <option value="Bank 1">
+                                                    Bank 1
+                                                </option>
+                                                <option value="Bank 2">
+                                                    Bank 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
 
                                     <div className="relative flex items-start">
                                         <div className="flex h-9 items-center">
@@ -5934,69 +5931,70 @@ export default function CashAdvance({ auth }: PageProps) {
                                             />
                                         </div>
                                     </div>
-                                    {dataById?.CASH_ADVANCE_CASH_AMOUNT > 0 ===
-                                        false ||
-                                        (!checkedCashEdit && (
-                                            <div className="ml-7">
-                                                <div className="mb-5">
-                                                    <InputLabel
-                                                        htmlFor="CASH_ADVANCE_RECEIVE_DATE"
-                                                        className="mb-2"
-                                                    >
-                                                        Receive Date
-                                                        {/* <span className="text-red-600">*</span> */}
-                                                    </InputLabel>
-                                                    <DatePicker
-                                                        name="CASH_ADVANCE_RECEIVE_DATE"
-                                                        selected={
-                                                            dataById.CASH_ADVANCE_RECEIVE_DATE
-                                                        }
-                                                        onChange={(date: any) =>
-                                                            setDataById({
-                                                                ...dataById,
-                                                                CASH_ADVANCE_RECEIVE_DATE:
-                                                                    date.toLocaleDateString(
-                                                                        "en-CA"
-                                                                    ),
-                                                            })
-                                                        }
-                                                        dateFormat={
-                                                            "dd-MM-yyyy"
-                                                        }
-                                                        placeholderText="dd-mm-yyyyy"
-                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                        autoComplete="off"
-                                                    />
-                                                </div>
-                                                <div className="mb-2">
-                                                    <InputLabel
-                                                        htmlFor="receive_name"
-                                                        className="mb-2"
-                                                    >
-                                                        Receive Name
-                                                        {/* <span className="text-red-600">*</span> */}
-                                                    </InputLabel>
-                                                    <TextInput
-                                                        id="CASH_ADVANCE_RECEIVE_NAME"
-                                                        type="text"
-                                                        name="CASH_ADVANCE_RECEIVE_NAME"
-                                                        value={
-                                                            dataById.CASH_ADVANCE_RECEIVE_NAME
-                                                        }
-                                                        className="w-full lg:w-7/12"
-                                                        onChange={(e) =>
-                                                            setDataById({
-                                                                ...dataById,
-                                                                CASH_ADVANCE_RECEIVE_NAME:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        autoComplete="off"
-                                                    />
-                                                </div>
-                                            </div>
-                                        ))}
+
+                                    <div
+                                        className="ml-7"
+                                        hidden={
+                                            dataById?.CASH_ADVANCE_CASH_AMOUNT >
+                                                0 ===
+                                                false && !checkedCashEdit
+                                        }
+                                    >
+                                        <div className="mb-5">
+                                            <InputLabel
+                                                htmlFor="CASH_ADVANCE_RECEIVE_DATE"
+                                                className="mb-2"
+                                            >
+                                                Receive Date
+                                                {/* <span className="text-red-600">*</span> */}
+                                            </InputLabel>
+                                            <DatePicker
+                                                name="CASH_ADVANCE_RECEIVE_DATE"
+                                                selected={
+                                                    dataById.CASH_ADVANCE_RECEIVE_DATE
+                                                }
+                                                onChange={(date: any) =>
+                                                    setDataById({
+                                                        ...dataById,
+                                                        CASH_ADVANCE_RECEIVE_DATE:
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            ),
+                                                    })
+                                                }
+                                                dateFormat={"dd-MM-yyyy"}
+                                                placeholderText="dd-mm-yyyyy"
+                                                className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                autoComplete="off"
+                                            />
+                                        </div>
+                                        <div className="mb-2">
+                                            <InputLabel
+                                                htmlFor="receive_name"
+                                                className="mb-2"
+                                            >
+                                                Receive Name
+                                                {/* <span className="text-red-600">*</span> */}
+                                            </InputLabel>
+                                            <TextInput
+                                                id="CASH_ADVANCE_RECEIVE_NAME"
+                                                type="text"
+                                                name="CASH_ADVANCE_RECEIVE_NAME"
+                                                value={
+                                                    dataById.CASH_ADVANCE_RECEIVE_NAME
+                                                }
+                                                className="w-full lg:w-7/12"
+                                                onChange={(e) =>
+                                                    setDataById({
+                                                        ...dataById,
+                                                        CASH_ADVANCE_RECEIVE_NAME:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                autoComplete="off"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </fieldset>
                         </div>
@@ -6399,8 +6397,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <Select
                                                     classNames={{
                                                         menuButton: () =>
-                                                            `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                        menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                         listItem: ({
                                                             isSelected,
                                                         }: any) =>
@@ -6862,19 +6860,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
-                                                            {
+                                                        <a
+                                                            href={`/cashAdvanceReportDocReader/${
                                                                 dataReportById
                                                                     ?.cash_advance_detail_report[
                                                                     modalFiles
                                                                         .index_show_report
                                                                 ]
-                                                                    .m_cash_advance_report_document[
-                                                                    i
-                                                                ]?.document
+                                                                    ?.REPORT_CASH_ADVANCE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
+                                                            {
+                                                                file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -6887,14 +6891,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                         .index_show_report
                                                                 ]
                                                                     ?.REPORT_CASH_ADVANCE_DETAIL_ID,
-                                                                dataReportById
-                                                                    ?.cash_advance_detail_report[
-                                                                    modalFiles
-                                                                        .index_show_report
-                                                                ]
-                                                                    .m_cash_advance_report_document[
-                                                                    i
-                                                                ]?.document
+                                                                file?.document
                                                                     .DOCUMENT_ID
                                                             )
                                                         }
@@ -7490,19 +7487,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
-                                                            {
+                                                        <a
+                                                            href={`/cashAdvanceReportDocReader/${
                                                                 dataReportById
                                                                     ?.cash_advance_detail_report[
                                                                     modalFiles
                                                                         .index_show_report
                                                                 ]
-                                                                    .m_cash_advance_report_document[
-                                                                    i
-                                                                ]?.document
+                                                                    ?.REPORT_CASH_ADVANCE_DETAIL_ID
+                                                            }/${
+                                                                file?.document
+                                                                    .DOCUMENT_ID
+                                                            }`}
+                                                            target="_blank"
+                                                        >
+                                                            {
+                                                                file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -7515,14 +7518,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                         .index_show_report
                                                                 ]
                                                                     ?.REPORT_CASH_ADVANCE_DETAIL_ID,
-                                                                dataReportById
-                                                                    ?.cash_advance_detail_report[
-                                                                    modalFiles
-                                                                        .index_show_report
-                                                                ]
-                                                                    .m_cash_advance_report_document[
-                                                                    i
-                                                                ]?.document
+                                                                file?.document
                                                                     .DOCUMENT_ID
                                                             )
                                                         }
@@ -7751,9 +7747,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TH>
                                         <TH className="border" rowSpan="2">
                                             Cost Classification
-                                            <span className="text-red-600">
+                                            {/* <span className="text-red-600">
                                                 *
-                                            </span>
+                                            </span> */}
                                         </TH>
                                         <TH className="border" rowSpan="2">
                                             Amount Approve
@@ -8021,11 +8017,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="border text-right pr-5 py-2"
                                             colSpan={12}
                                         >
-                                            UTILIZATION
+                                            ADVANCED AMOUNT
                                         </TD>
                                         <TD className="border text-center py-2">
                                             {formatCurrency.format(
-                                                total_amount_approve
+                                                dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST
                                             )}
                                         </TD>
                                     </tr>
@@ -8034,11 +8030,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="border text-right pr-5 py-2"
                                             colSpan={12}
                                         >
-                                            ADVANCED AMOUNT
+                                            UTILIZATION
                                         </TD>
                                         <TD className="border text-center py-2">
                                             {formatCurrency.format(
-                                                dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST
+                                                total_amount_approve
                                             )}
                                         </TD>
                                     </tr>
@@ -8668,8 +8664,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <Select
                                                         classNames={{
                                                             menuButton: () =>
-                                                                `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                             listItem: ({
                                                                 isSelected,
                                                             }: any) =>
@@ -9316,7 +9312,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 {"Add Cash Advance"}
                             </Button>
                         </div>
-                        <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5 relative">
+                        <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5">
                             <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
                                 <legend className="ml-8 px-3 text-sm">
                                     Search
@@ -9331,7 +9327,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 searchCA.cash_advance_requested_by
                                             }
                                             placeholder="Applicant"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchCA({
@@ -9351,7 +9347,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 searchCA.cash_advance_used_by
                                             }
                                             placeholder="Used By"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchCA({
@@ -9379,7 +9375,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (Start Date)"
-                                            className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 mb-5">
@@ -9399,7 +9395,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (End Date)"
-                                            className="!block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                         />
                                     </div>
                                     <div className="mb-5">
@@ -9411,7 +9407,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 searchCA.cash_advance_division
                                             }
                                             placeholder="Division"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchCA({
@@ -9431,7 +9427,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 searchCA.cash_advance_cost_center
                                             }
                                             placeholder="Cost Center"
-                                            className="focus:ring-red-600"
+                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
                                             autoComplete="off"
                                             onChange={(e: any) =>
                                                 setSearchCA({
@@ -9446,7 +9442,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <select
                                             name="cash_advance_type"
                                             id="cash_advance_type"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs md:text-sm leading-6 sm:leading-1 file:-my-1.5 focus:ring-red-600"
                                             onChange={(e: any) =>
                                                 setSearchCA({
                                                     ...searchCA,
@@ -9463,15 +9459,15 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </option>
                                         </select>
                                     </div>
-                                    <div className="flex justify-end gap-2">
+                                    <div className="flex flex-col md:flex-row justify-end gap-2">
                                         <Button
-                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            className="mb-4 w-full md:w-[35%] text-white text-sm md:text-base py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                             onClick={() => getCA()}
                                         >
                                             Search
                                         </Button>
                                         <Button
-                                            className="mb-4 w-40 py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            className="mb-4 w-full md:w-[35%] text-white text-sm md:text-base py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                             onClick={() => clearSearchCA()}
                                         >
                                             Clear Search
@@ -9905,198 +9901,183 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         )}
                                                         className=""
                                                     />
-                                                    {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
-                                                        1 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:cursor-pointer"
-                                                                    title="Request"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_FIRST_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
-                                                        2 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700 hover:cursor-pointer"
-                                                                    title="Approve"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_FIRST_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
-                                                        4 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700 hover:cursor-pointer"
-                                                                    title="Reject"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_FIRST_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
-                                                        3 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white hover:cursor-pointer"
-                                                                    title="Need Revision"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_FIRST_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                        "" ||
-                                                        (ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                            null && (
-                                                            <TableTD
-                                                                value="-"
-                                                                className=""
-                                                            />
-                                                        ))}
-                                                    {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                        2 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700 hover:cursor-pointer"
-                                                                    title="Approve"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_SECOND_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                        4 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700 hover:cursor-pointer"
-                                                                    title="Reject"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_SECOND_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                        3 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white hover:cursor-pointer"
-                                                                    title="Need Revision"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_SECOND_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
-                                                        5 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700 hover:cursor-pointer"
-                                                                    title="Execute"
-                                                                >
-                                                                    {"-"}
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                        "" ||
-                                                        (ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                            null && (
-                                                            <TableTD
-                                                                value="-"
-                                                                className=""
-                                                            />
-                                                        ))}
-                                                    {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                        2 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700 hover:cursor-pointer"
-                                                                    title="Approve"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_THIRD_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                        4 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700 hover:cursor-pointer"
-                                                                    title="Reject"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_THIRD_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
-                                                    {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
-                                                        3 && (
-                                                        <TableTD
-                                                            value={
-                                                                <span
-                                                                    className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white hover:cursor-pointer"
-                                                                    title="Need Revision"
-                                                                >
-                                                                    {
-                                                                        ca.CASH_ADVANCE_THIRD_APPROVAL_USER
-                                                                    }
-                                                                </span>
-                                                            }
-                                                            className=""
-                                                        />
-                                                    )}
+                                                    <TableTD
+                                                        value={
+                                                            <>
+                                                                {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
+                                                        }
+                                                        className=""
+                                                    />
+                                                    <TableTD
+                                                        value={
+                                                            <>
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    "" ||
+                                                                    (ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                        null && (
+                                                                        <span>
+                                                                            -
+                                                                        </span>
+                                                                    ))}
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    5 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Execute"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    6 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Complited"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
+                                                        }
+                                                        className=""
+                                                    />
+                                                    <TableTD
+                                                        value={
+                                                            <>
+                                                                {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    "" ||
+                                                                    (ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                        null && (
+                                                                        <span>
+                                                                            -
+                                                                        </span>
+                                                                    ))}
+                                                                {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca.CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            ca.CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
+                                                        }
+                                                        className=""
+                                                    />
                                                     <TableTD
                                                         value={
                                                             // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
@@ -10122,9 +10103,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         className=""
                                                     />
                                                     <TableTD
+                                                        className="text-center"
                                                         value={
                                                             <Dropdown
                                                                 title="Actions"
+                                                                className=""
                                                                 children={
                                                                     <>
                                                                         <a
@@ -10286,7 +10269,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                 }
                                                             />
                                                         }
-                                                        className="text-center"
                                                     />
                                                 </tr>
                                             )

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->date('REIMBURSE_DETAIL_DATE')->nullable();
             $table->text('REIMBURSE_DETAIL_PURPOSE')->nullable();
             $table->text('REIMBURSE_DETAIL_LOCATION')->nullable();
+            $table->text('REIMBURSE_DETAIL_ADDRESS')->nullable();
+            $table->smallInteger('REIMBURSE_DETAIL_TYPE')->nullable();
             $table->smallInteger('REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID')->nullable();
             $table->string('REIMBURSE_DETAIL_RELATION_NAME')->nullable();
             $table->string('REIMBURSE_DETAIL_RELATION_POSITION')->nullable();

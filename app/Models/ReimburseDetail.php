@@ -17,11 +17,16 @@ class ReimburseDetail extends Model
 
     protected $guarded = ['REIMBURSE_DETAIL_ID'];
 
-    protected $with = ['m_reimburse_document','relation_organization'];
+    protected $with = ['type','m_reimburse_document','relation_organization'];
 
     public function reimburse(): BelongsTo
     {
         return $this->belongsTo(Reimburse::class);
+    }
+
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(CashAdvancePurpose::class, 'REIMBURSE_DETAIL_TYPE');
     }
 
     public function m_reimburse_document(): HasMany

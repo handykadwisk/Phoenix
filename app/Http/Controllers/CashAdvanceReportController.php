@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class CashAdvanceReportController extends Controller
 {
@@ -199,6 +200,22 @@ class CashAdvanceReportController extends Controller
         $cash_advance_report_number = $code . $year_month . $counting;
 
         return $cash_advance_report_number;
+    }
+
+    public function cash_advance_report_doc_reader($cash_advance_report_detail_id, $document_id)
+    {
+        $document = TDocument::find($document_id);
+
+        $document_filename = $cash_advance_report_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = "/storage" . "/". $document_dirname . "/" . $document_filename;
+
+        $data = [
+            'uri' => $filePath
+        ];
+
+        return Inertia::render('CA/CashAdvanceDocReader', $data);
     }
 
     public function cash_advance_report_download($cash_advance_detail_report_id, $document_id)
@@ -456,11 +473,15 @@ class CashAdvanceReportController extends Controller
 
         if (is_array($cash_advance_detail_report) && !empty($cash_advance_detail_report)) {
             foreach ($cash_advance_detail_report as $cad) {
+                $cost_classification = $cad['REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION'];
+                
                 $report_cash_advance_detail_id = $cad['REPORT_CASH_ADVANCE_DETAIL_ID'];
                 $report_cash_advance_detail_approval = $cad['REPORT_CASH_ADVANCE_DETAIL_APPROVAL'];
-                $report_cash_advance_detail_cost_classification = $cad['REPORT_CASH_ADVANCE_DETAIL_COST_CLASSIFICATION']['value'];
                 $report_cash_advance_detail_amount_approve = $cad['REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE'];
                 $report_cash_advance_detail_remarks = $cad['REPORT_CASH_ADVANCE_DETAIL_REMARKS'];
+                if ($cost_classification != null || $cost_classification != "") {
+                    $report_cash_advance_detail_cost_classification = $cost_classification['value'];
+                }
 
                 CashAdvanceDetailReport::where('REPORT_CASH_ADVANCE_DETAIL_ID', $report_cash_advance_detail_id)->update([
                     'REPORT_CASH_ADVANCE_DETAIL_APPROVAL' => $report_cash_advance_detail_approval,

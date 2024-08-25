@@ -14,7 +14,7 @@ MySQL - 8.0.31 : Database - phoenix
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 /*Data for the table `r_reimburse_notes` */
 
-insert  into `r_reimburse_notes`(`REIMBURSE_NOTES_ID`,`REIMBURSE_NOTES_NAME`,`REIMBURSE_NOTES_CREATED_AT`,`REIMBURSE_NOTES_UPDATED_AT`) values (1,'Amount To Be Paid By Fresnel',NULL,NULL),(2,'No Refund',NULL,NULL);
+insert  into `r_reimburse_notes`(`REIMBURSE_NOTES_ID`,`REIMBURSE_NOTES_NAME`,`REIMBURSE_NOTES_CREATED_AT`,`REIMBURSE_NOTES_UPDATED_AT`) values (1,'Paid By Fresnel',NULL,NULL),(2,'Balance',NULL,NULL);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

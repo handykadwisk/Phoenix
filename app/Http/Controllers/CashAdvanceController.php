@@ -335,6 +335,22 @@ class CashAdvanceController extends Controller
         return $cash_advance_number;
     }
 
+    public function cash_advance_doc_reader($cash_advance_detail_id, $document_id)
+    {
+        $document = TDocument::find($document_id);
+
+        $document_filename = $cash_advance_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = "/storage" . "/". $document_dirname . "/" . $document_filename;
+
+        $data = [
+            'uri' => $filePath
+        ];
+
+        return Inertia::render('CA/CashAdvanceDocReader', $data);
+    }
+
     public function cash_advance_download($cash_advance_detail_id, $document_id)
     {
         $document = TDocument::find($document_id);
