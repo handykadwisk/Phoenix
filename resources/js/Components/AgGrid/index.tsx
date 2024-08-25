@@ -31,7 +31,6 @@ export default function AGGrid({
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
 }>) {
-    console.log("bbb", withParam);
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
@@ -104,7 +103,8 @@ export default function AGGrid({
     }, [triggeringRefreshData, gridRef]);
 
     return (
-        <div className="ag-grid-layout rounded-md border border-stroke bg-white px-5 py-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        // <div className="rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        <div className="flex flex-row items-center h-[100%]">
             {addButtonLabel && (
                 <div className="w-96">
                     <Button
@@ -115,10 +115,7 @@ export default function AGGrid({
                     </Button>
                 </div>
             )}
-            <div
-                className="ag-theme-quartz"
-                style={{ height: 350, width: "100%" }}
-            >
+            <div className="w-full h-[100%] overflow-x-auto ag-grid-table custom-scrollbar overflow-visible ag-theme-quartz">
                 <AgGridReact
                     ref={gridRef}
                     columnDefs={colDefs}
@@ -132,6 +129,7 @@ export default function AGGrid({
                     suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={10}
+                    paginationAutoPageSize={true}
                     cacheBlockSize={10}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}
@@ -140,5 +138,6 @@ export default function AGGrid({
                 />
             </div>
         </div>
+        // </div>
     );
 }

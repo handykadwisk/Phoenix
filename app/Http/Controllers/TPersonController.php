@@ -1163,7 +1163,7 @@ class TPersonController extends Controller
                 $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
                 $documentFileName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
                 $documentDirName = $uploadPath;
-                $documentFileType = $uploadDocument[$i]->getMimeType();
+                $documentFileType = $uploadDocument[$i]->getClientMimeType();
                 $documentFileSize = $uploadDocument[$i]->getSize();
 
                 // masukan data file ke database

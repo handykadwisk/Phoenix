@@ -78,7 +78,7 @@ const Header = (props: {
                     aria-hidden="true"
                 />
 
-                <div className="flex flex-1 gap-x-4 self-center lg:gap-x-6">
+                <div className="flex flex-1 gap-x-4 self-center xs:text-sm lg:text-md lg:gap-x-6">
                     <Breadcrumb pageName={props.header} />
                 </div>
 

@@ -29,6 +29,22 @@
         min-height: calc(100vh - 6.5rem);
     }
 
+    .ag-grid-layouts {
+        height: calc(100vh - 4rem - 40px - 16px - 5.1rem);
+    }
+
+    .ag-grid-layout {
+        height: calc(60vh - 4rem - 40px - 16px - 5.1rem);
+    }
+
+    .ag-grid-employee {
+        height: calc(85vh - 4rem - 40px - 16px - 5.1rem);
+    }
+
+    .modal-action {
+        height: calc(100vh - 4rem - 40px - 16px - 8.1rem);
+    }
+
     .switch {
         position: relative;
         display: inline-block;

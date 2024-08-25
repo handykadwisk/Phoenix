@@ -1,134 +1,188 @@
-import AGGrid from "@/Components/AgGrid";
-import InputLabel from "@/Components/InputLabel";
-import ModalToAdd from "@/Components/Modal/ModalToAdd";
-import TextInput from "@/Components/TextInput";
-import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import axios from "axios";
+import { Head, useForm, usePage } from "@inertiajs/react";
+import { PageProps } from "@/types";
 import { FormEvent, PropsWithChildren, useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import SelectTailwind from "react-tailwindcss-select";
-import { useForm } from "@inertiajs/react";
+import Button from "@/Components/Button/Button";
+import TableTD from "@/Components/Table/TableTD";
+import TableTH from "@/Components/Table/TableTH";
+import axios from "axios";
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import Pagination from "@/Components/Pagination";
+import Swal from "sweetalert2";
 import ModalToAction from "@/Components/Modal/ModalToAction";
+import TextInput from "@/Components/TextInput";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
-import DetailStructure from "./DetailStructure";
+// import DetailDivision from "./DetailDivision";
+import ToastMessage from "@/Components/ToastMessage";
+import AGGrid from "@/Components/AgGrid";
+import DetailDivisionCompany from "./DetailDivisionCompany";
 
-export default function Structure({
+export default function DivisionCompany({
     idCompany,
-    setIsSuccess,
-    isSuccess,
+    // setIsSuccess,
+    // isSuccess,
     nameCompany,
 }: PropsWithChildren<{
     idCompany: any;
-    setIsSuccess: any | string | null;
-    isSuccess: any | string | null;
+    // setIsSuccess: any | string | null;
+    // isSuccess: any | string | null;
     nameCompany: string;
 }>) {
-    // modal Structure
-    const [modalStructure, setModalStructure] = useState<any>({
-        add: false,
-        view: false,
+    useEffect(() => {
+        getDivision();
+    }, []);
+
+    const [dataDivision, setDataDivision] = useState<any>([]);
+    const [searchDivision, setSearchDivision] = useState<any>({
+        COMPANY_DIVISION_ALIAS: "",
     });
 
-    const handleAddStructure = async (e: FormEvent) => {
+    const [detailDivision, setDetailDivision] = useState<any>({
+        COMPANY_DIVISION_ID: "",
+        COMPANY_DIVISION_NAME: "",
+    });
+    const [comboDivision, setComboDivision] = useState<any>([]);
+
+    const getDivision = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getDivision?${pageNumber}`, {
+                idCompany,
+                COMPANY_DIVISION_ALIAS: searchDivision.COMPANY_DIVISION_ALIAS,
+            })
+            .then((res) => {
+                setDataDivision(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getDivisionCombo = async (id: string) => {
+        await axios
+            .post(`/getDivisionComboCompany`, { id })
+            .then((res) => {
+                setComboDivision(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [modal, setModal] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    const addDivisionPopup = async (e: FormEvent) => {
         e.preventDefault();
-        getGrade();
-        getStructureCombo(idCompany);
-        setModalStructure({
-            add: !modalStructure.add,
+
+        getDivisionCombo(idCompany);
+        setModal({
+            add: !modal.add,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
         });
     };
 
-    // state grade
-    const [grade, setGrade] = useState<any>([]);
-    // state combo structure
-    const [structureCombo, setSetStructureCombo] = useState<any>([]);
-
-    const getStructureCombo = async (id: string) => {
-        await axios
-            .post(`/getCompanyStructureCombo`, { id })
-            .then((res) => {
-                setSetStructureCombo(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const getGrade = async () => {
-        await axios
-            .post(`/getGrade`)
-            .then((res) => {
-                setGrade(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const { data, setData, errors, reset } = useForm<any>({
-        COMPANY_STRUCTURE_NAME: "",
-        COMPANY_STRUCTURE_ALIAS: "",
-        COMPANY_STRUCTURE_DESCRIPTION: "",
-        COMPANY_STRUCTURE_PARENT_ID: "",
+    const { data, setData } = useForm<any>({
+        COMPANY_DIVISION_ALIAS: "",
+        COMPANY_DIVISION_INITIAL: "",
+        COMPANY_DIVISION_DESCRIPTION: "",
+        COMPANY_DIVISION_PARENT_ID: "",
         COMPANY_ID: idCompany,
-        COMPANY_STRUCTURE_MAPPING: "",
-        COMPANY_GRADE_ID: "",
+        COMPANY_DIVISION_MAPPING: "",
+        COMPANY_DIVISION_CREATED_BY: "",
+        COMPANY_DIVISION_CREATED_DATE: "",
     });
 
-    const handleSuccessAddCompanyStructure = (message: string) => {
+    const handleSuccess = (message: string) => {
         setIsSuccess("");
         if (message != "") {
-            // getDetailCompany(message[0]);
-            setData({
-                COMPANY_STRUCTURE_NAME: "",
-                COMPANY_STRUCTURE_ALIAS: "",
-                COMPANY_STRUCTURE_DESCRIPTION: "",
-                COMPANY_STRUCTURE_PARENT_ID: "",
-                COMPANY_ID: idCompany,
-                COMPANY_STRUCTURE_MAPPING: "",
-                COMPANY_GRADE_ID: "",
-            });
             setIsSuccess(message[2]);
+            setData({
+                COMPANY_DIVISION_NAME: "",
+                COMPANY_DIVISION_ALIAS: "",
+                COMPANY_DIVISION_INITIAL: "",
+                COMPANY_DIVISION_DESCRIPTION: "",
+                COMPANY_DIVISION_PARENT_ID: "",
+                COMPANY_ID: idCompany,
+                COMPANY_DIVISION_MAPPING: "",
+                COMPANY_DIVISION_CREATED_BY: "",
+                COMPANY_DIVISION_CREATED_DATE: "",
+            });
+            getDivision();
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
         }
     };
 
-    const [detailStructure, setDetailStructure] = useState<any>({
-        COMPANY_STRUCTURE_NAME: "",
-        COMPANY_STRUCTURE_ID: "",
-    });
+    const clearSearchDivision = async (pageNumber = "page=1") => {
+        await axios
+            .post(`/getDivision?${pageNumber}`, {
+                idCompany,
+            })
+            .then((res) => {
+                setDataDivision(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
-    const handleClickDetailCompanyStructure = async (data: any) => {
-        getGrade();
-        getStructureCombo(idCompany);
-        setDetailStructure({
-            COMPANY_STRUCTURE_NAME: data.COMPANY_STRUCTURE_ALIAS,
-            COMPANY_STRUCTURE_ID: data.COMPANY_STRUCTURE_ID,
+    const [isSuccess, setIsSuccess] = useState<string>("");
+
+    const handleClickDetailCompanyDivision = async (data: any) => {
+        getDivisionCombo(idCompany);
+        setDetailDivision({
+            COMPANY_DIVISION_ID: data.COMPANY_DIVISION_ID,
+            COMPANY_DIVISION_NAME: data.COMPANY_DIVISION_ALIAS,
         });
-        setModalStructure({
+        setModal({
             add: false,
-            view: !modalStructure.view,
+            delete: false,
+            edit: false,
+            view: !modal.view,
+            document: false,
+            search: false,
         });
     };
 
     return (
         <>
-            {/* modal add structure */}
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
+            {/* modal add */}
             <ModalToAdd
                 buttonAddOns={""}
-                show={modalStructure.add}
+                show={modal.add}
                 onClose={() =>
-                    setModalStructure({
+                    setModal({
                         add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
                     })
                 }
-                title={"Add Structure"}
-                url={`/addCompanyStructure`}
+                title={"Add Division"}
+                url={`/addDivisionCompany`}
                 data={data}
-                onSuccess={handleSuccessAddCompanyStructure}
+                onSuccess={handleSuccess}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
                 }
@@ -137,97 +191,92 @@ export default function Structure({
                         <div>
                             <InputLabel
                                 className=""
-                                htmlFor="COMPANY_ORGANIZATION_NAME"
+                                htmlFor="COMPANY_NAME"
                                 value={"Relation"}
                             />
                             <div className="bg-gray-400 rounded-md py-1 px-2 shadow-md mt-2">
                                 {nameCompany}
                             </div>
                         </div>
-                        <div className="xs:grid xs:grid-cols-1 xs:gap-4 mt-2 lg:grid lg:grid-cols-2 lg:gap-4">
-                            <div className="relative">
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                            <div>
                                 <InputLabel
                                     className="absolute"
-                                    htmlFor="COMPANY_STRUCTURE_NAME"
-                                    value={"Structure Name"}
+                                    htmlFor="COMPANY_DIVISION_ALIAS"
+                                    value={"Division Name"}
                                 />
-                                <div className="ml-[7.2rem] text-red-600">
+                                <div className="ml-[6.5rem] text-red-600">
                                     *
                                 </div>
                                 <TextInput
+                                    id="COMPANY_DIVISION_ALIAS"
                                     type="text"
-                                    value={data.COMPANY_STRUCTURE_ALIAS}
+                                    name="COMPANY_DIVISION_ALIAS"
+                                    value={data.COMPANY_DIVISION_ALIAS}
                                     className="mt-2"
                                     onChange={(e) => {
                                         setData(
-                                            "COMPANY_STRUCTURE_ALIAS",
+                                            "COMPANY_DIVISION_ALIAS",
                                             e.target.value
                                         );
                                     }}
                                     required
-                                    placeholder="Structure Name"
+                                    placeholder="Division Name"
                                 />
                             </div>
-                            <div className="relative">
+                            <div>
                                 <InputLabel
                                     className="absolute"
-                                    htmlFor="COMPANY_GRADE_ID"
-                                    value={"Grade"}
+                                    htmlFor="COMPANY_DIVISION_INITIAL"
+                                    value={"Initial"}
                                 />
-                                <div className="ml-[3rem] text-red-600">*</div>
-                                <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.COMPANY_GRADE_ID}
+                                <div className="ml-[2.6rem] text-red-600">
+                                    *
+                                </div>
+                                <TextInput
+                                    id="COMPANY_DIVISION_INITIAL"
+                                    type="text"
+                                    name="COMPANY_DIVISION_INITIAL"
+                                    value={data.COMPANY_DIVISION_INITIAL}
+                                    className="mt-2"
                                     onChange={(e) => {
                                         setData(
-                                            "COMPANY_GRADE_ID",
+                                            "COMPANY_DIVISION_INITIAL",
                                             e.target.value
                                         );
                                     }}
-                                >
-                                    <option value={""}>
-                                        -- Choose Grade --
-                                    </option>
-                                    {grade?.map((dGrade: any, i: number) => {
-                                        return (
-                                            <option
-                                                value={dGrade.GRADE_ID}
-                                                key={i}
-                                            >
-                                                {dGrade.GRADE_AKA}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
+                                    required
+                                    placeholder="Initial"
+                                />
                             </div>
                         </div>
                         <div className="mt-2">
                             <InputLabel
                                 className=""
-                                htmlFor="COMPANY_STRUCTURE_PARENT_ID"
-                                value={"Parent Structure"}
+                                htmlFor="COMPANY_DIVISION_PARENT_ID"
+                                value={"Parent Division"}
                             />
                             <select
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.COMPANY_STRUCTURE_PARENT_ID}
+                                value={data.COMPANY_DIVISION_PARENT_ID}
                                 onChange={(e) => {
                                     setData(
-                                        "COMPANY_STRUCTURE_PARENT_ID",
+                                        "COMPANY_DIVISION_PARENT_ID",
                                         e.target.value
                                     );
                                 }}
                             >
                                 <option value={""}>-- Choose Parent --</option>
-                                {structureCombo?.map(
-                                    (comboStructure: any, i: number) => {
+                                {comboDivision?.map(
+                                    (comboDivision: any, i: number) => {
                                         return (
                                             <option
                                                 value={
-                                                    comboStructure.COMPANY_STRUCTURE_ID
+                                                    comboDivision.COMPANY_DIVISION_ID
                                                 }
                                                 key={i}
                                             >
-                                                {comboStructure.text_combo}
+                                                {comboDivision.text_combo}
                                             </option>
                                         );
                                     }
@@ -236,17 +285,17 @@ export default function Structure({
                         </div>
                         <div className="mt-4 mb-2">
                             <InputLabel
-                                htmlFor="COMPANY_STRUCTURE_DESCRIPTION"
+                                htmlFor="COMPANY_DIVISION_DESCRIPTION"
                                 value="Description"
                             />
                             <TextArea
                                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                defaultValue={
-                                    data.COMPANY_STRUCTURE_DESCRIPTION
-                                }
+                                id="COMPANY_DIVISION_DESCRIPTION"
+                                name="COMPANY_DIVISION_DESCRIPTION"
+                                defaultValue={data.COMPANY_DIVISION_DESCRIPTION}
                                 onChange={(e: any) =>
                                     setData(
-                                        "COMPANY_STRUCTURE_DESCRIPTION",
+                                        "COMPANY_DIVISION_DESCRIPTION",
                                         e.target.value
                                     )
                                 }
@@ -255,17 +304,23 @@ export default function Structure({
                     </>
                 }
             />
-            {/* end modal structure */}
+            {/* end modal add */}
 
+            {/* modal detail */}
             <ModalToAction
-                show={modalStructure.view}
+                show={modal.view}
                 onClose={() => {
-                    setModalStructure({
+                    getDivision();
+                    setModal({
                         add: false,
+                        delete: false,
+                        edit: false,
                         view: false,
+                        document: false,
+                        search: false,
                     });
                 }}
-                title={detailStructure.COMPANY_STRUCTURE_NAME}
+                title={detailDivision.COMPANY_DIVISION_NAME}
                 url={""}
                 data={""}
                 onSuccess={""}
@@ -277,25 +332,26 @@ export default function Structure({
                 submitButtonName={""}
                 body={
                     <>
-                        <DetailStructure
+                        <DetailDivisionCompany
                             setIsSuccess={setIsSuccess}
-                            setDetailStructure={setDetailStructure}
-                            idStructure={detailStructure.COMPANY_STRUCTURE_ID}
-                            grade={grade}
-                            structureCombo={structureCombo}
+                            isSuccess={isSuccess}
+                            idDivision={detailDivision.COMPANY_DIVISION_ID}
+                            divisionCombo={comboDivision}
+                            setDetailDivision={setDetailDivision}
                         />
                     </>
                 }
             />
+            {/* end modal detail */}
 
             <div className="grid grid-cols-4 gap-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <div
                             className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
-                            onClick={(e) => handleAddStructure(e)}
+                            onClick={(e) => addDivisionPopup(e)}
                         >
-                            <span>Add Structure</span>
+                            <span>Add Division</span>
                         </div>
                     </div>
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[100%]">
@@ -322,7 +378,7 @@ export default function Structure({
                                     }
                                 }
                             }}
-                            placeholder="Search Employee Name"
+                            placeholder="Search Division Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
@@ -348,23 +404,18 @@ export default function Structure({
                             withParam={idCompany}
                             searchParam={null}
                             // loading={isLoading.get_policy}
-                            url={"getCompanyStructure"}
-                            doubleClickEvent={handleClickDetailCompanyStructure}
+                            url={"getDivisionCompany"}
+                            doubleClickEvent={handleClickDetailCompanyDivision}
                             triggeringRefreshData={isSuccess}
                             colDefs={[
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
-                                    flex: 3,
+                                    flex: 1,
                                 },
                                 {
-                                    headerName: "Company Structure Name",
-                                    field: "COMPANY_STRUCTURE_ALIAS",
-                                    flex: 7,
-                                },
-                                {
-                                    headerName: "Grade",
-                                    field: "GRADE_AKA",
+                                    headerName: "Company Division Name",
+                                    field: "COMPANY_DIVISION_ALIAS",
                                     flex: 7,
                                 },
                             ]}

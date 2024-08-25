@@ -27,10 +27,17 @@ import Checkbox from "@/Components/Checkbox";
 export default function DetailDocumentRelation({
     idRelation,
     dataRelationNew,
+    handleSuccessEditDocument,
+    setIsSuccess,
+    isSuccess,
 }: PropsWithChildren<{
     idRelation: any;
     dataRelationNew: any;
+    handleSuccessEditDocument: any;
+    setIsSuccess: any;
+    isSuccess: any;
 }>) {
+    console.log(dataRelationNew);
     const [modalEditDocument, setModalEditDocument] = useState<any>({
         edit: false,
     });
@@ -48,20 +55,7 @@ export default function DetailDocumentRelation({
 
         setDataDocumentPks({
             ...dataDocumentPks,
-            no_pks: [
-                ...dataDocumentPks.no_pks,
-                {
-                    FOR_PKS: "",
-                    NO_PKS: "",
-                    STAR_DATE_PKS: "",
-                    END_DATE_PKS: "",
-                    DOCUMENT_PKS_ID: "",
-                    STATUS_PKS: 0,
-                    REMARKS_PKS: "",
-                    ENDING_BY_CANCEL: 0,
-                    RELATION_ORGANIZATION_ID: idRelation,
-                },
-            ],
+            no_pks: [],
         });
     };
 
@@ -159,6 +153,14 @@ export default function DetailDocumentRelation({
     console.log(dataDocumentPks);
     return (
         <>
+            {" "}
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal add document fbi dan agent */}
             <ModalToAdd
                 buttonAddOns={""}
@@ -169,12 +171,12 @@ export default function DetailDocumentRelation({
                     });
                 }}
                 title={"Add Certificate"}
-                url={`/addCertificate`}
-                data={""}
+                url={`/editDocumentPks`}
+                data={dataDocumentPks}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
-                onSuccess={""}
+                onSuccess={handleSuccessEditDocument}
                 body={
                     <>
                         <div>
@@ -503,25 +505,13 @@ export default function DetailDocumentRelation({
                 }
             />
             {/* end modal add document fbi dan agent */}
-
             <div className="h-[100vh]">
                 {dataRelationNew.m_relation_type.find(
-                    (f: any) => f.RELATION_TYPE_ID !== 3
+                    (f: any) => f.RELATION_TYPE_ID === 3
                 ) &&
                 dataRelationNew.m_relation_type.find(
-                    (f: any) => f.RELATION_TYPE_ID !== 13
+                    (f: any) => f.RELATION_TYPE_ID === 13
                 ) ? (
-                    <div className="bg-white rounded-md shadow-md mb-2 p-2">
-                        <div className="font-semibold">
-                            <span>Document PKS Is Not Available</span>
-                        </div>
-                    </div>
-                ) : dataRelationNew.m_relation_type.find(
-                      (f: any) => f.RELATION_TYPE_ID === 3
-                  ) &&
-                  dataRelationNew.m_relation_type.find(
-                      (f: any) => f.RELATION_TYPE_ID === 13
-                  ) ? (
                     <div className="bg-white rounded-md shadow-md mb-2 p-2">
                         {/* for Document PKS */}
                         <div className="flex justify-between items-center">
@@ -540,7 +530,7 @@ export default function DetailDocumentRelation({
                             </div>
                         </div>
                         {/* ag grid Document PKS Agent */}
-                        <div className="mt-2">
+                        <div className="mt-2 ag-grid-layout">
                             <AGGrid
                                 addButtonLabel={undefined}
                                 addButtonModalState={undefined}
@@ -549,7 +539,7 @@ export default function DetailDocumentRelation({
                                 // loading={isLoading.get_policy}
                                 url={"getDocumentPKSAgent"}
                                 doubleClickEvent={undefined}
-                                triggeringRefreshData={""}
+                                triggeringRefreshData={isSuccess}
                                 colDefs={[
                                     {
                                         headerName: "No.",
@@ -574,14 +564,19 @@ export default function DetailDocumentRelation({
                             <div className="border-b-2 border-red-600 font-semibold">
                                 <span>Document PKS FBI By PKS</span>
                             </div>
-                            <div className="bg-red-600 p-2 rounded-md shadow-md text-white cursor-pointer hover:bg-red-400">
+                            <div
+                                className="bg-red-600 p-2 rounded-md shadow-md text-white cursor-pointer hover:bg-red-400"
+                                onClick={(e: FormEvent) => {
+                                    handleEditDocument(e);
+                                }}
+                            >
                                 <span>
                                     <PencilSquareIcon className="w-5" />
                                 </span>
                             </div>
                         </div>
                         {/* ag grid Document PKS FBI */}
-                        <div className="mt-2">
+                        <div className="mt-2 ag-grid-layout">
                             <AGGrid
                                 addButtonLabel={undefined}
                                 addButtonModalState={undefined}
@@ -590,7 +585,7 @@ export default function DetailDocumentRelation({
                                 // loading={isLoading.get_policy}
                                 url={"getDocumentPKSFbi"}
                                 doubleClickEvent={undefined}
-                                triggeringRefreshData={""}
+                                triggeringRefreshData={isSuccess}
                                 colDefs={[
                                     {
                                         headerName: "No.",
@@ -632,7 +627,7 @@ export default function DetailDocumentRelation({
                             </div>
                         </div>
                         {/* ag grid Document PKS Agent */}
-                        <div className="mt-2">
+                        <div className="mt-2 ag-grid-layout">
                             <AGGrid
                                 addButtonLabel={undefined}
                                 addButtonModalState={undefined}
@@ -641,7 +636,7 @@ export default function DetailDocumentRelation({
                                 // loading={isLoading.get_policy}
                                 url={"getDocumentPKSAgent"}
                                 doubleClickEvent={undefined}
-                                triggeringRefreshData={""}
+                                triggeringRefreshData={isSuccess}
                                 colDefs={[
                                     {
                                         headerName: "No.",
@@ -671,14 +666,19 @@ export default function DetailDocumentRelation({
                                 <div className="border-b-2 border-red-600 font-semibold">
                                     <span>Document PKS FBI By PKS</span>
                                 </div>
-                                <div className="bg-red-600 p-2 rounded-md shadow-md text-white cursor-pointer hover:bg-red-400">
+                                <div
+                                    className="bg-red-600 p-2 rounded-md shadow-md text-white cursor-pointer hover:bg-red-400"
+                                    onClick={(e: FormEvent) => {
+                                        handleEditDocument(e);
+                                    }}
+                                >
                                     <span>
                                         <PencilSquareIcon className="w-5" />
                                     </span>
                                 </div>
                             </div>
                             {/* ag grid Document PKS FBI */}
-                            <div className="mt-2">
+                            <div className="mt-2 ag-grid-layout">
                                 <AGGrid
                                     addButtonLabel={undefined}
                                     addButtonModalState={undefined}
@@ -687,7 +687,7 @@ export default function DetailDocumentRelation({
                                     // loading={isLoading.get_policy}
                                     url={"getDocumentPKSFbi"}
                                     doubleClickEvent={undefined}
-                                    triggeringRefreshData={""}
+                                    triggeringRefreshData={isSuccess}
                                     colDefs={[
                                         {
                                             headerName: "No.",

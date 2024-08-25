@@ -444,7 +444,7 @@ class RelationController extends Controller
                 ]);
                 
                 // create Document PKS
-                for ($a=0; $a < sizeof($request->file('no_pks')) ; $a++) { 
+                for ($a=0; $a < sizeof($request->file('no_pks')); $a++) { 
                     $file = $request->file('no_pks');
                     $varDocument = $file[$a]['DOCUMENT_PKS_ID'];
 
@@ -459,7 +459,7 @@ class RelationController extends Controller
                     $documentOriginalName = $this->RemoveSpecialChar($varDocument->getClientOriginalName());
                     $documentFileName = $this->RemoveSpecialChar($varDocument->getClientOriginalName());
                     $documentDirName = $uploadPath;
-                    $documentFileType = $varDocument->getMimeType();
+                    $documentFileType = $varDocument->getClientMimeType();
                     $documentFileSize = $varDocument->getSize();
 
                     // masukan data file ke database
@@ -804,7 +804,18 @@ class RelationController extends Controller
 
     public function edit_corporate(Request $request){
 
-
+        $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $request->detail_corporate[0]['INDIVIDU_RELATION_ID'])->get();
+        for ($i=0; $i < sizeof($arrayPerson); $i++) { 
+            for ($a=0; $a < sizeof($request->detail_corporate); $a++) { 
+                $personName = $request->detail_corporate[$a]['RELATION_ORGANIZATION_NAME'];
+                $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
+                if ($arrayPerson[$i]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
+                    TPerson::where('PERSON_ID', $arrayPerson[$i]['PERSON_ID'])->update([
+                        "PERSON_IS_DELETED"         => "1"
+                    ]);
+                }
+            }
+        }
         for ($i=0; $i < sizeof($request->detail_corporate); $i++) {
             $personName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
             $individuId = $request->detail_corporate[$i]['INDIVIDU_RELATION_ID'];
@@ -814,18 +825,25 @@ class RelationController extends Controller
             
             $dataPerson = TPerson::where('RELATION_ORGANIZATION_ID', $dataRelation->RELATION_ORGANIZATION_ID)->first();
             if ($dataPerson != null) {
+                $id = $dataPerson->PERSON_ID;
+                TPerson::where('PERSON_ID', $id)->update([
+                    "PERSON_IS_DELETED"         => "0"
+                ]);
                 
             }else{
                 $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->get();
                 for ($a=0; $a < sizeof($arrayPerson); $a++) { 
-                    $idPerson = $arrayPerson[$a]['PERSON_ID'];
-                    TPerson::where('PERSON_ID', $idPerson)->update([
-                        "PERSON_IS_DELETED"         => "1"
-                    ]);
+                    if ($arrayPerson[$a]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
+                        $idPerson = $arrayPerson[$a]['PERSON_ID'];
+                        TPerson::where('PERSON_ID', $idPerson)->update([
+                            "PERSON_IS_DELETED"         => "0"
+                        ]);
+                    }
+                    
                 }
 
                 TPerson::create([
-                    "PERSON_FIRST_NAME"         => $getName,
+                    "PERSON_FIRST_NAME"         => $getName->RELATION_ORGANIZATION_NAME,
                     "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
                     "INDIVIDU_RELATION_ID"      => $individuId,
                     "PERSON_IS_DELETED"         => "0"
@@ -952,5 +970,82 @@ class RelationController extends Controller
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json($data);
+    }
+
+    public function edit_document_pks(Request $request){
+        // No PKS
+        $pksDocument = is_countable($request->no_pks);
+        if ($pksDocument) {
+            for ($i=0; $i < sizeof($request->no_pks); $i++) { 
+                $varPKS = $request->no_pks[$i];
+                // $noPKS = $varPKS['NO_PKS'];
+
+                $createMPksRelation = MPksRelation::create([
+                    "RELATION_ORGANIZATION_ID"          => $varPKS['RELATION_ORGANIZATION_ID'],
+                    "NO_PKS"                            => $varPKS['NO_PKS'],
+                    "STAR_DATE_PKS"                     => $varPKS['STAR_DATE_PKS'],
+                    "END_DATE_PKS"                      => $varPKS['END_DATE_PKS'],
+                    "FOR_PKS"                           => $varPKS['FOR_PKS']['value'],
+                    "REMARKS_PKS"                       => $varPKS['REMARKS_PKS'],
+                    "STATUS_PKS"                        => $varPKS['STATUS_PKS'],
+                    "ENDING_BY_CANCEL"                  => $varPKS['ENDING_BY_CANCEL'],
+                ]);
+                
+                // create Document PKS
+                for ($a=0; $a < sizeof($request->file('no_pks')); $a++) { 
+                    $file = $request->file('no_pks');
+                    $varDocument = $file[$a]['DOCUMENT_PKS_ID'];
+
+                    // Create Folder For Person Document
+                    $parentDir = ((floor(($varPKS['RELATION_ORGANIZATION_ID'])/1000))*1000).'/';
+                    $personID = $varPKS['RELATION_ORGANIZATION_ID'] . '/';
+                    $typeDir = "";
+                    $uploadPath = 'documents/' . 'PKS/'. $parentDir . $personID . $typeDir;
+
+
+                    // get Data Document
+                    $documentOriginalName = $this->RemoveSpecialChar($varDocument->getClientOriginalName());
+                    $documentFileName = $this->RemoveSpecialChar($varDocument->getClientOriginalName());
+                    $documentDirName = $uploadPath;
+                    $documentFileType = $varDocument->getClientMimeType();
+                    $documentFileSize = $varDocument->getSize();
+
+                    // masukan data file ke database
+                    $document = Document::create([
+                        'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                        'DOCUMENT_FILENAME'             => "",
+                        'DOCUMENT_DIRNAME'              => $documentDirName,
+                        'DOCUMENT_FILETYPE'             => $documentFileType,
+                        'DOCUMENT_FILESIZE'             => $documentFileSize,
+                        'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                    ])->DOCUMENT_ID;
+
+                    if($document){
+                        // update file name "DOCUMENT_ID - FILENAME"
+                        Document::where('DOCUMENT_ID', $document)->update([
+                            'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                        ]);
+
+                        // create folder in directory laravel
+                        Storage::makeDirectory($uploadPath, 0777, true, true);
+                        Storage::disk('public')->putFileAs($uploadPath, $varDocument, $document . "-" . $this->RemoveSpecialChar($varDocument->getClientOriginalName()));
+                    }
+
+
+                    if($document){
+                        MPksRelation::where('M_PKS_RELATION_ID', $createMPksRelation->M_PKS_RELATION_ID)->update([
+                            'DOCUMENT_PKS_ID'     => $document,
+                        ]);
+                    }
+                }
+            }
+        }  
+
+        return new JsonResponse([
+            $request->no_pks[0]['RELATION_ORGANIZATION_ID'],
+            "Document PKS Relation Edited"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

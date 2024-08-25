@@ -30,4 +30,28 @@ class TEmployee extends Model
     public function TEmploymentEmergency(){
         return $this->hasMany(TEmployeeEmergencyContact::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
     }
+
+    public function taxStatus(){
+        return $this->hasOne(RTaxStatus::class, 'TAX_STATUS_ID', 'TAX_STATUS_ID');
+    }
+
+    public function employeeEducation(){
+        return $this->hasMany(TEmployeeEducation::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
+    }
+
+    public function employeeCertificate(){
+        return $this->hasMany(TEmployeeCertificate::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
+    }
+
+    public function MEmployeeDocument(){
+        return $this->hasMany(MEmployeeDocument::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
+    }
+
+    public function mAddressEmployee(){
+        return $this->hasMany(MAddressEmployee::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
+    }
+
+    public function TEmployeeBank(){
+        return $this->hasMany(TEmployeeBankAccount::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
+    }
 }

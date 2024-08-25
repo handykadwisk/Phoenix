@@ -206,6 +206,26 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $HR = Menu::create(
+            [
+                'menu_name'       => 'HR',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 77,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
+        $hrCompany = Menu::create(
+            [
+                'menu_name'       => 'Company Setting',
+                'menu_parent_id'  => $HR->id,
+                'menu_url'        => 'hr/settingCompany',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 1,
+                'menu_created_by' => 'admin'
+            ]
+        );
+
         // create role
         $admin = Role::create([
             'role_name' => 'Admin'
@@ -287,6 +307,14 @@ class DatabaseSeeder extends Seeder
         RoleAccessMenu::create([
             'role_id' => $admin->id,
             'menu_id' => $childBAA->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $HR->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $hrCompany->id
         ]);
 
         

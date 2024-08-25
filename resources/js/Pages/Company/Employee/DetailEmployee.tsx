@@ -25,6 +25,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import SelectTailwind from "react-tailwindcss-select";
 import defaultImage from "../../../Images/user/default.jpg";
 import dateFormat from "dateformat";
+import EmploymentDetail from "@/Pages/Person/EmploymentDetail";
+import ModalAddEmployee from "./ModalAddEmployee";
+import DetailEmployeeAddress from "./DetailEmployeeAddress";
+import AddBankAccountEmployee from "./AddBankAccountEmployee";
+import DetailBankAccountEmployee from "./DetailBankAccountEmployee";
 
 export default function DetailEmployee({
     idEmployee,
@@ -40,7 +45,7 @@ export default function DetailEmployee({
         getDetailEmployee(idEmployee);
     }, [idEmployee]);
 
-    const [dataDetailEmployee, setDateDetailEmployee] = useState<any>([]);
+    const [dataDetailEmployee, setDataDetailEmployee] = useState<any>([]);
 
     // FILE
     const [file, setFile] = useState<any>();
@@ -54,7 +59,8 @@ export default function DetailEmployee({
         await axios
             .post(`/getDetailEmployee`, { idEmployee })
             .then((res) => {
-                setDateDetailEmployee(res.data);
+                setDataDetailEmployee(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -210,8 +216,318 @@ export default function DetailEmployee({
         }
     };
 
+    const [modalEmployee, setModalEmployee] = useState<any>({
+        view: false,
+    });
+
+    const handleEmploymentNew = async (e: FormEvent) => {
+        e.preventDefault();
+        getTax();
+        setModalEmployee({
+            view: !modalEmployee.view,
+        });
+    };
+
+    const [taxStatus, setTaxStatus] = useState<any>([]);
+    const getTax = async () => {
+        await axios
+            .get(`/getTaxStatus`)
+            .then((res) => {
+                setTaxStatus(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [modalAddressPerson, setModalAddressPerson] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    const [addressStatus, setAddressStatus] = useState<any>([]);
+    const getAddressStatus = async () => {
+        await axios
+            .post(`/getAddressStatus`)
+            .then((res) => {
+                setAddressStatus(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const handleAddressPerson = async (e: FormEvent) => {
+        e.preventDefault();
+        getWilayah();
+        dataDetailEmployee.m_address_employee?.length === 0
+            ? setModalAddressPerson({
+                  add: !modalAddressPerson.add,
+                  delete: false,
+                  edit: false,
+                  view: false,
+                  document: false,
+                  search: false,
+              })
+            : setModalAddressPerson({
+                  add: false,
+                  delete: false,
+                  edit: false,
+                  view: !modalAddressPerson.view,
+                  document: false,
+                  search: false,
+              });
+        getAddressStatus();
+    };
+
+    const [dataAddress, setDataAddress] = useState<any>({
+        address_ktp: [
+            {
+                idEmployee: idEmployee,
+                ADDRESS_CATEGORY: "",
+                ADDRESS_LOCATION_TYPE: "",
+                ADDRESS_DETAIL: "",
+                ADDRESS_RT_NUMBER: "",
+                ADDRESS_RW_NUMBER: "",
+                ADDRESS_VILLAGE: "",
+                ADDRESS_DISTRICT: "",
+                ADDRESS_PROVINCE: "",
+                ADDRESS_REGENCY: "",
+                ADDRESS_STATUS: "",
+            },
+        ],
+        address_domicile: [],
+        other_address: [],
+    });
+
+    const [wilayah, setWilayah] = useState<any>([]);
+    const getWilayah = async () => {
+        await axios
+            .post(`/getWilayah`)
+            .then((res) => {
+                setWilayah(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const wilayahSelect = wilayah?.map((query: any) => {
+        return {
+            value: query.kode,
+            label: query.nama,
+        };
+    });
+    const [checkDomAddress, setCheckDomAddress] = useState({
+        domAddress: "",
+    });
+
+    const handleSuccessAddAddress = (message: string) => {
+        // setIsSuccess("");
+        setIsSuccess("");
+        if (message != "") {
+            getDetailEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setDataAddress({
+                address_ktp: [
+                    {
+                        idEmployee: idEmployee,
+                        ADDRESS_CATEGORY: "",
+                        ADDRESS_LOCATION_TYPE: "",
+                        ADDRESS_DETAIL: "",
+                        ADDRESS_RT_NUMBER: "",
+                        ADDRESS_RW_NUMBER: "",
+                        ADDRESS_VILLAGE: "",
+                        ADDRESS_DISTRICT: "",
+                        ADDRESS_PROVINCE: "",
+                        ADDRESS_REGENCY: "",
+                        ADDRESS_STATUS: "",
+                    },
+                ],
+                address_domicile: [],
+                other_address: [],
+            });
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
+    const [bank, setBank] = useState<any>([]);
+    const getRBank = async () => {
+        await axios
+            .post(`/getRBank`)
+            .then((res) => {
+                setBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [optionsBank, setOptionsBank] = useState<any>([]);
+    const getForBankAccount = async () => {
+        await axios
+            .post(`/getForBankAccount`)
+            .then((res) => {
+                setOptionsBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [modalBank, setModalBank] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+    const handleBankAccount = async (e: FormEvent) => {
+        e.preventDefault();
+
+        getRBank();
+        getForBankAccount();
+        if (dataDetailEmployee.t_employee_bank?.length === 0) {
+            setModalBank({
+                add: !modalBank.add,
+                delete: false,
+                edit: false,
+                view: false,
+                document: false,
+                search: false,
+            });
+        } else {
+            setModalBank({
+                add: false,
+                delete: false,
+                edit: !modalBank.edit,
+                view: false,
+                document: false,
+                search: false,
+            });
+        }
+    };
+
+    const handleSuccess = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            getDetailEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
     return (
         <>
+            {/* Bank Account */}
+            <AddBankAccountEmployee
+                show={modalBank.add}
+                modal={() =>
+                    setModalBank({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                bank={bank}
+                optionsBank={optionsBank}
+                idEmployee={idEmployee}
+                handleSuccess={handleSuccess}
+            />
+            {/* End Bank Account */}
+
+            {/* Bank Account */}
+            <DetailBankAccountEmployee
+                show={modalBank.edit}
+                modal={() =>
+                    setModalBank({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                bank={bank}
+                optionsBank={optionsBank}
+                idEmployee={idEmployee}
+                handleSuccess={handleSuccess}
+                detailBank={dataDetailEmployee.t_employee_bank}
+            />
+            {/* End Bank Account */}
+
+            {/* modal detail address person */}
+            <ModalToAction
+                show={modalAddressPerson.view}
+                onClose={() =>
+                    setModalAddressPerson({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Address Person"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[85%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DetailEmployeeAddress
+                            idEmployee={idEmployee}
+                            wilayah={wilayah}
+                            wilayahSelect={wilayahSelect}
+                            setIsSuccess={setIsSuccess}
+                        />
+                    </>
+                }
+            />
+            {/* end modal detail address person */}
+
+            {/* address Person */}
+            <ModalAddEmployee
+                show={modalAddressPerson.add}
+                modal={() => {
+                    setModalAddressPerson({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    });
+                }}
+                dataAddress={dataAddress}
+                setDataAddress={setDataAddress}
+                wilayahSelect={wilayahSelect}
+                checkDomAddress={checkDomAddress}
+                setCheckDomAddress={setCheckDomAddress}
+                addressStatus={addressStatus}
+                idEmployee={idEmployee}
+                handleSuccessAddAddress={handleSuccessAddAddress}
+            />
+
+            {/* end address person */}
+
             {/* Edit Employment */}
             <ModalToAdd
                 buttonAddOns={""}
@@ -902,6 +1218,37 @@ export default function DetailEmployee({
                 }
             />
             {/* End Edit Employment */}
+
+            {/* detail employee */}
+            <ModalToAction
+                show={modalEmployee.view}
+                onClose={() =>
+                    setModalEmployee({
+                        view: false,
+                    })
+                }
+                title={"Detail Employee Information"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <EmploymentDetail
+                            idEmployee={idEmployee}
+                            taxStatus={taxStatus}
+                            setIsSuccess={setIsSuccess}
+                            // handleSuccessEmployment={handleSuccessEmployment}
+                        />
+                    </>
+                }
+            />
+            {/* End Detail Employee */}
             <div className="grid grid-cols-3 gap-3 mb-2">
                 <div className="bg-white p-2 rounded-md shadow-md">
                     <div className="flex justify-end">
@@ -1294,7 +1641,7 @@ export default function DetailEmployee({
                                 </div>
                                 <div className="col-span-2 text-sm font-semibold flex items-center">
                                     <div className="absolute">
-                                        <span>Addres & Location</span>
+                                        <span>Address & Location</span>
                                     </div>
                                     <div className="mt-8 text-[13px] text-gray-500">
                                         <span className="">
@@ -1309,6 +1656,32 @@ export default function DetailEmployee({
                         </div>
                     </div>
                     <hr className="mt-5" />
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                        <div
+                            className="bg-red-600 text-white p-2 rounded-md shadow-md cursor-pointer hover:bg-red-500"
+                            onClick={(e) => handleEmploymentNew(e)}
+                        >
+                            <div className="flex justify-center items-center">
+                                <span>Employee</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-red-600 text-white p-2 rounded-md shadow-md cursor-pointer hover:bg-red-500"
+                            onClick={(e) => handleAddressPerson(e)}
+                        >
+                            <div className="flex justify-center items-center">
+                                <span>Address Employee</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-red-600 text-white p-2 rounded-md shadow-md cursor-pointer hover:bg-red-500"
+                            onClick={(e) => handleBankAccount(e)}
+                        >
+                            <div className="flex justify-center items-center">
+                                <span>Bank Account</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

@@ -387,6 +387,17 @@ export default function DetailRelation({
         }
     };
 
+    const handleSuccessEditDocument = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[1]);
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
     // Onclick Structure
     const handleClickStructure = async (
         e: FormEvent,
@@ -718,7 +729,7 @@ export default function DetailRelation({
                     })
                 }
                 title={"Document"}
-                url={`/editRelation/${detailRelation}`}
+                url={""}
                 data={""}
                 onSuccess={""}
                 method={""}
@@ -732,6 +743,11 @@ export default function DetailRelation({
                         <DetailDocumentRelation
                             idRelation={detailRelation}
                             dataRelationNew={dataRelationNew}
+                            handleSuccessEditDocument={
+                                handleSuccessEditDocument
+                            }
+                            setIsSuccess={setIsSuccess}
+                            isSuccess={isSuccess}
                         />
                     </>
                 }

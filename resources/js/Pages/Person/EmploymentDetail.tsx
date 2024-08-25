@@ -45,24 +45,25 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import ToastMessage from "@/Components/ToastMessage";
 
 export default function EmploymentDetail({
-    idPerson,
+    idEmployee,
     taxStatus,
-    handleSuccessEmployment,
-}: PropsWithChildren<{
-    idPerson: any;
+    setIsSuccess,
+}: // handleSuccessEmployment,
+PropsWithChildren<{
+    idEmployee: any;
     taxStatus: any;
-    handleSuccessEmployment: any;
+    setIsSuccess: any;
 }>) {
-    // console.log(dataById);
     useEffect(() => {
-        getPersonDetail(idPerson);
-    }, [idPerson]);
-    const [detailPerson, setDetailPerson] = useState<any>([]);
-    const getPersonDetail = async (id: string) => {
+        getEmployee(idEmployee);
+    }, [idEmployee]);
+    const [dataDetailEmployee, setDataDetailEmployee] = useState<any>([]);
+    const getEmployee = async (id: string) => {
         await axios
-            .post(`/getPersonDetail`, { id })
+            .post(`/getEmployeeDetail`, { id })
             .then((res) => {
-                setDetailPerson(res.data);
+                setDataDetailEmployee(res.data);
+                console.log("asdasda", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -89,37 +90,60 @@ export default function EmploymentDetail({
     });
 
     const { data, setData, errors, reset } = useForm<any>({
-        PERSON_ID: idPerson,
-        PERSONE_ID: "",
-        PERSON_CATEGORY: "",
-        PERSON_IS_DELETED: "",
+        EMPLOYEE_ID: idEmployee,
+        EMPLOYEE_NUMBER_ID: "",
+        EMPLOYEE_CATEGORY: "",
+        EMPLOYEE_IS_DELETED: "",
         TAX_STATUS_ID: "",
-        PERSON_HIRE_DATE: "",
-        PERSON_END_DATE: "",
-        PERSON_SALARY_ADJUSTMENT1: "",
-        PERSON_SALARY_ADJUSTMENT2: "",
-        PERSON_RECRUITMENT_LOCATION: "",
+        EMPLOYEE_HIRE_DATE: "",
+        EMPLOYEE_END_DATE: "",
+        EMPLOYEE_SALARY_ADJUSTMENT1: "",
+        EMPLOYEE_SALARY_ADJUSTMENT2: "",
+        EMPLOYEE_RECRUITMENT_LOCATION: "",
     });
+
+    const handleSuccessEditEmployee = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            getEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setData({
+                EMPLOYEE_ID: idEmployee,
+                EMPLOYEE_NUMBER_ID: "",
+                EMPLOYEE_CATEGORY: "",
+                EMPLOYEE_IS_DELETED: "",
+                TAX_STATUS_ID: "",
+                EMPLOYEE_HIRE_DATE: "",
+                EMPLOYEE_END_DATE: "",
+                EMPLOYEE_SALARY_ADJUSTMENT1: "",
+                EMPLOYEE_SALARY_ADJUSTMENT2: "",
+                EMPLOYEE_RECRUITMENT_LOCATION: "",
+            });
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
 
     const handleEditEmployment = async (e: FormEvent) => {
         setModalEmployment({
             add: false,
             edit: !modalEmployment.edit,
         });
-        setDataById(detailPerson);
+        setDataById(dataDetailEmployee);
     };
 
     const [dataById, setDataById] = useState<any>({
-        PERSON_ID: idPerson,
-        PERSONE_ID: "",
-        PERSON_CATEGORY: "",
-        PERSON_IS_DELETED: "",
+        EMPLOYEE_ID: idEmployee,
+        EMPLOYEE_NUMBER_ID: "",
+        EMPLOYEE_CATEGORY: "",
+        EMPLOYEE_IS_DELETED: "",
         TAX_STATUS_ID: "",
-        PERSON_HIRE_DATE: "",
-        PERSON_END_DATE: "",
-        PERSON_SALARY_ADJUSTMENT1: "",
-        PERSON_SALARY_ADJUSTMENT2: "",
-        PERSON_RECRUITMENT_LOCATION: "",
+        EMPLOYEE_HIRE_DATE: "",
+        EMPLOYEE_END_DATE: "",
+        EMPLOYEE_SALARY_ADJUSTMENT1: "",
+        EMPLOYEE_SALARY_ADJUSTMENT2: "",
+        EMPLOYEE_RECRUITMENT_LOCATION: "",
     });
 
     // modal add education
@@ -127,208 +151,6 @@ export default function EmploymentDetail({
         add: false,
         edit: false,
     });
-
-    // modal add certificate
-    const [modalCertificate, setModalCertificate] = useState<any>({
-        add: false,
-        edit: false,
-    });
-
-    // modal add document
-    const [modalDocument, setModalDocument] = useState<any>({
-        add: false,
-        edit: false,
-    });
-
-    const handleAddEducation = async (e: FormEvent) => {
-        setModalEducation({
-            add: !modalEducation.add,
-        });
-        getEducationDegree();
-    };
-
-    const handleEditEducation = async (e: FormEvent) => {
-        setModalEducation({
-            edit: !modalEducation.edit,
-        });
-        setDataEditEducation({
-            person_education: detailPerson.person_education,
-        });
-        getEducationDegree();
-    };
-
-    const handleAddCertificate = async (e: FormEvent) => {
-        setModalCertificate({
-            add: !modalCertificate.add,
-        });
-        getQualification();
-    };
-
-    const handleEditCertificate = async (e: FormEvent) => {
-        setModalCertificate({
-            edit: !modalCertificate.edit,
-        });
-        setDataEditCertificate({
-            person_certificate: detailPerson.person_certificate,
-        });
-        if (
-            dataEditCertificate.person_certificate[0][
-                "CERTIFICATE_QUALIFICATION_ID"
-            ] === null
-        ) {
-            inputEditCertificate("CERTIFICATE_QUALIFICATION_ID", "", 0);
-        }
-
-        getQualification();
-    };
-
-    const [flagDocument, setFlagDocument] = useState<string>("");
-
-    const handleAddDocument = async (e: FormEvent, number: number) => {
-        e.preventDefault();
-
-        setModalDocument({
-            add: !modalDocument.add,
-        });
-        if (number === 1) {
-            setFlagDocument("KTP");
-        } else {
-            setFlagDocument("Document");
-        }
-    };
-
-    // data add education
-    const [dataEducation, setDataEducation] = useState<any>({
-        dataEducations: [
-            {
-                PERSON_ID: idPerson,
-                PERSON_EDUCATION_START: "",
-                PERSON_EDUCATION_END: "",
-                EDUCATION_DEGREE_ID: "",
-                PERSON_EDUCATION_MAJOR: "",
-                PERSON_EDUCATION_SCHOOL: "",
-            },
-        ],
-    });
-
-    // data Edit education
-    const [dataEditEducation, setDataEditEducation] = useState<any>({
-        person_education: [
-            {
-                PERSON_ID: idPerson,
-                PERSON_EDUCATION_START: "",
-                PERSON_EDUCATION_END: "",
-                EDUCATION_DEGREE_ID: "",
-                PERSON_EDUCATION_MAJOR: "",
-                PERSON_EDUCATION_SCHOOL: "",
-            },
-        ],
-    });
-
-    // data add certificate
-    const [dataCertificate, setDataCertificate] = useState<any>({
-        dataCertificates: [
-            {
-                PERSON_ID: idPerson,
-                PERSON_CERTIFICATE_NAME: "",
-                PERSON_CERTIFICATE_IS_QUALIFICATION: "",
-                CERTIFICATE_QUALIFICATION_ID: "",
-                PERSON_CERTIFICATE_POINT: "",
-                PERSON_CERTIFICATE_START_DATE: "",
-                PERSON_CERTIFICATE_EXPIRES_DATE: "",
-            },
-        ],
-    });
-
-    // data edit certificate
-    const [dataEditCertificate, setDataEditCertificate] = useState<any>({
-        person_certificate: [
-            {
-                PERSON_ID: idPerson,
-                PERSON_CERTIFICATE_NAME: "",
-                PERSON_CERTIFICATE_IS_QUALIFICATION: "",
-                CERTIFICATE_QUALIFICATION_ID: "",
-                PERSON_CERTIFICATE_POINT: "",
-                PERSON_CERTIFICATE_START_DATE: "",
-                PERSON_CERTIFICATE_EXPIRES_DATE: "",
-            },
-        ],
-    });
-
-    console.log("acaca", dataEditCertificate.person_certificate);
-
-    const addRowAddEducation = (e: FormEvent) => {
-        e.preventDefault();
-        setDataEducation({
-            ...dataEducation,
-            dataEducations: [
-                ...dataEducation.dataEducations,
-                {
-                    PERSON_ID: idPerson,
-                    PERSON_EDUCATION_START: "",
-                    PERSON_EDUCATION_END: "",
-                    EDUCATION_DEGREE_ID: "",
-                    PERSON_EDUCATION_MAJOR: "",
-                    PERSON_EDUCATION_SCHOOL: "",
-                },
-            ],
-        });
-    };
-
-    const addRowEditEducation = (e: FormEvent) => {
-        e.preventDefault();
-        setDataEditEducation({
-            ...dataEditEducation,
-            person_education: [
-                ...dataEditEducation.person_education,
-                {
-                    PERSON_ID: idPerson,
-                    PERSON_EDUCATION_START: "",
-                    PERSON_EDUCATION_END: "",
-                    EDUCATION_DEGREE_ID: "",
-                    PERSON_EDUCATION_MAJOR: "",
-                    PERSON_EDUCATION_SCHOOL: "",
-                },
-            ],
-        });
-    };
-
-    const addRowAddCertificate = (e: FormEvent) => {
-        e.preventDefault();
-        setDataCertificate({
-            ...dataCertificate,
-            dataCertificates: [
-                ...dataCertificate.dataCertificates,
-                {
-                    PERSON_ID: idPerson,
-                    PERSON_CERTIFICATE_NAME: "",
-                    PERSON_CERTIFICATE_IS_QUALIFICATION: "",
-                    CERTIFICATE_QUALIFICATION_ID: "",
-                    PERSON_CERTIFICATE_POINT: "",
-                    PERSON_CERTIFICATE_START_DATE: "",
-                    PERSON_CERTIFICATE_EXPIRES_DATE: "",
-                },
-            ],
-        });
-    };
-    const addRowEditCertificate = (e: FormEvent) => {
-        e.preventDefault();
-        setDataEditCertificate({
-            ...dataEditCertificate,
-            person_certificate: [
-                ...dataEditCertificate.person_certificate,
-                {
-                    PERSON_ID: idPerson,
-                    PERSON_CERTIFICATE_NAME: "",
-                    PERSON_CERTIFICATE_IS_QUALIFICATION: "",
-                    CERTIFICATE_QUALIFICATION_ID: "",
-                    PERSON_CERTIFICATE_POINT: "",
-                    PERSON_CERTIFICATE_START_DATE: "",
-                    PERSON_CERTIFICATE_EXPIRES_DATE: "",
-                },
-            ],
-        });
-    };
 
     const [dataEducationDegree, setDataEducationDegree] = useState<any>([]);
     const getEducationDegree = async () => {
@@ -342,16 +164,36 @@ export default function EmploymentDetail({
             });
     };
 
-    const [dataQualification, setDataQualification] = useState<any>([]);
-    const getQualification = async () => {
-        await axios
-            .post(`/getQualification`)
-            .then((res) => {
-                setDataQualification(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const handleAddEducation = async (e: FormEvent) => {
+        setModalEducation({
+            add: !modalEducation.add,
+        });
+        getEducationDegree();
+    };
+
+    // data add education
+    const [dataEducation, setDataEducation] = useState<any>({
+        dataEducations: [
+            {
+                EMPLOYEE_ID: idEmployee,
+                EMPLOYEE_EDUCATION_START: "",
+                EMPLOYEE_EDUCATION_END: "",
+                EDUCATION_DEGREE_ID: "",
+                EMPLOYEE_EDUCATION_MAJOR: "",
+                EMPLOYEE_EDUCATION_SCHOOL: "",
+            },
+        ],
+    });
+
+    const handleSuccessAddEducation = (message: string) => {
+        setIsSuccess("");
+        if (message !== "") {
+            getEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
 
     const inputEducation = (
@@ -367,17 +209,139 @@ export default function EmploymentDetail({
         });
     };
 
+    const addRowAddEducation = (e: FormEvent) => {
+        e.preventDefault();
+        setDataEducation({
+            ...dataEducation,
+            dataEducations: [
+                ...dataEducation.dataEducations,
+                {
+                    EMPLOYEE_ID: idEmployee,
+                    EMPLOYEE_EDUCATION_START: "",
+                    EMPLOYEE_EDUCATION_END: "",
+                    EDUCATION_DEGREE_ID: "",
+                    EMPLOYEE_EDUCATION_MAJOR: "",
+                    EMPLOYEE_EDUCATION_SCHOOL: "",
+                },
+            ],
+        });
+    };
+
+    // data Edit education
+    const [dataEditEducation, setDataEditEducation] = useState<any>({
+        employee_education: [
+            {
+                EMPLOYEE_ID: idEmployee,
+                EMPLOYEE_EDUCATION_START: "",
+                EMPLOYEE_EDUCATION_END: "",
+                EDUCATION_DEGREE_ID: "",
+                EMPLOYEE_EDUCATION_MAJOR: "",
+                EMPLOYEE_EDUCATION_SCHOOL: "",
+            },
+        ],
+    });
+
+    const handleEditEducation = async (e: FormEvent) => {
+        setModalEducation({
+            edit: !modalEducation.edit,
+        });
+        setDataEditEducation({
+            employee_education: dataDetailEmployee.employee_education,
+        });
+        getEducationDegree();
+    };
+
+    const handleSuccessEditEducation = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            getEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
     const inputEditEducation = (
         name: string,
         value: string | undefined,
         i: number
     ) => {
-        const changeVal: any = [...dataEditEducation.person_education];
+        const changeVal: any = [...dataEditEducation.employee_education];
         changeVal[i][name] = value;
         setDataEditEducation({
             ...dataEditEducation,
-            person_education: changeVal,
+            employee_education: changeVal,
         });
+    };
+
+    const addRowEditEducation = (e: FormEvent) => {
+        e.preventDefault();
+        setDataEditEducation({
+            ...dataEditEducation,
+            employee_education: [
+                ...dataEditEducation.employee_education,
+                {
+                    EMPLOYEE_ID: idEmployee,
+                    EMPLOYEE_EDUCATION_START: "",
+                    EMPLOYEE_EDUCATION_END: "",
+                    EDUCATION_DEGREE_ID: "",
+                    EMPLOYEE_EDUCATION_MAJOR: "",
+                    EMPLOYEE_EDUCATION_SCHOOL: "",
+                },
+            ],
+        });
+    };
+
+    const [dataQualification, setDataQualification] = useState<any>([]);
+    const getQualification = async () => {
+        await axios
+            .post(`/getQualification`)
+            .then((res) => {
+                setDataQualification(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // modal add certificate
+    const [modalCertificate, setModalCertificate] = useState<any>({
+        add: false,
+        edit: false,
+    });
+
+    const handleAddCertificate = async (e: FormEvent) => {
+        setModalCertificate({
+            add: !modalCertificate.add,
+        });
+        getQualification();
+    };
+
+    // data add certificate
+    const [dataCertificate, setDataCertificate] = useState<any>({
+        dataCertificates: [
+            {
+                EMPLOYEE_ID: idEmployee,
+                EMPLOYEE_CERTIFICATE_NAME: "",
+                EMPLOYEE_CERTIFICATE_IS_QUALIFICATION: "",
+                CERTIFICATE_QUALIFICATION_ID: "",
+                EMPLOYEE_CERTIFICATE_POINT: "",
+                EMPLOYEE_CERTIFICATE_START_DATE: "",
+                EMPLOYEE_CERTIFICATE_EXPIRES_DATE: "",
+            },
+        ],
+    });
+
+    const handleSuccessAddCertificate = (message: string) => {
+        // setIsSuccess("");
+        if (message !== "") {
+            getEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
 
     const inputAddCertificate = (
@@ -393,50 +357,75 @@ export default function EmploymentDetail({
         });
     };
 
+    const addRowAddCertificate = (e: FormEvent) => {
+        e.preventDefault();
+        setDataCertificate({
+            ...dataCertificate,
+            dataCertificates: [
+                ...dataCertificate.dataCertificates,
+                {
+                    EMPLOYEE_ID: idEmployee,
+                    EMPLOYEE_CERTIFICATE_NAME: "",
+                    EMPLOYEE_CERTIFICATE_IS_QUALIFICATION: "",
+                    CERTIFICATE_QUALIFICATION_ID: "",
+                    EMPLOYEE_CERTIFICATE_POINT: "",
+                    EMPLOYEE_CERTIFICATE_START_DATE: "",
+                    EMPLOYEE_CERTIFICATE_EXPIRES_DATE: "",
+                },
+            ],
+        });
+    };
+
+    // data edit certificate
+    const [dataEditCertificate, setDataEditCertificate] = useState<any>({
+        employee_certificate: [
+            {
+                EMPLOYEE_ID: idEmployee,
+                EMPLOYEE_CERTIFICATE_NAME: "",
+                EMPLOYEE_CERTIFICATE_IS_QUALIFICATION: "",
+                CERTIFICATE_QUALIFICATION_ID: "",
+                EMPLOYEE_CERTIFICATE_POINT: "",
+                EMPLOYEE_CERTIFICATE_START_DATE: "",
+                EMPLOYEE_CERTIFICATE_EXPIRES_DATE: "",
+            },
+        ],
+    });
+
+    const handleEditCertificate = async (e: FormEvent) => {
+        setModalCertificate({
+            edit: !modalCertificate.edit,
+        });
+        setDataEditCertificate({
+            employee_certificate: dataDetailEmployee.employee_certificate,
+        });
+        if (
+            dataEditCertificate.employee_certificate[0][
+                "CERTIFICATE_QUALIFICATION_ID"
+            ] === null
+        ) {
+            inputEditCertificate("CERTIFICATE_QUALIFICATION_ID", "", 0);
+        }
+
+        getQualification();
+    };
+
     const inputEditCertificate = (
         name: string,
         value: string | undefined | number,
         i: number
     ) => {
-        const changeVal: any = [...dataEditCertificate.person_certificate];
+        const changeVal: any = [...dataEditCertificate.employee_certificate];
         changeVal[i][name] = value;
         setDataEditCertificate({
             ...dataEditCertificate,
-            person_certificate: changeVal,
+            employee_certificate: changeVal,
         });
     };
 
-    const handleSuccessAddEducation = (message: string) => {
-        // setIsSuccess("");
-        if (message !== "") {
-            setIsSuccess(message[1]);
-            setTimeout(() => {
-                setIsSuccess("");
-            }, 5000);
-        }
-    };
-    const handleSuccessEditEducation = (message: string) => {
-        // setIsSuccess("");
-        if (message !== "") {
-            setIsSuccess(message[1]);
-            setTimeout(() => {
-                setIsSuccess("");
-            }, 5000);
-        }
-    };
-
-    const handleSuccessAddCertificate = (message: string) => {
-        // setIsSuccess("");
-        if (message !== "") {
-            setIsSuccess(message[1]);
-            setTimeout(() => {
-                setIsSuccess("");
-            }, 5000);
-        }
-    };
     const handleSuccessEditCertificate = (message: string) => {
         // setIsSuccess("");
         if (message !== "") {
+            getEmployee(message[0]);
             setIsSuccess(message[1]);
             setTimeout(() => {
                 setIsSuccess("");
@@ -444,34 +433,68 @@ export default function EmploymentDetail({
         }
     };
 
-    const handleSuccessAddDocument = (message: string) => {
-        // setIsSuccess("");
-        if (message !== "") {
-            Swal.fire({
-                title: "Success",
-                text: "Person Document Add",
-                icon: "success",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    setDataDocument({
-                        PERSON_ID: idPerson,
-                        ktp_document: "",
-                        other_document: "",
-                    });
-                }
-            });
+    const addRowEditCertificate = (e: FormEvent) => {
+        e.preventDefault();
+        setDataEditCertificate({
+            ...dataEditCertificate,
+            employee_certificate: [
+                ...dataEditCertificate.employee_certificate,
+                {
+                    EMPLOYEE_ID: idEmployee,
+                    EMPLOYEE_CERTIFICATE_NAME: "",
+                    EMPLOYEE_CERTIFICATE_IS_QUALIFICATION: "",
+                    CERTIFICATE_QUALIFICATION_ID: "",
+                    EMPLOYEE_CERTIFICATE_POINT: "",
+                    EMPLOYEE_CERTIFICATE_START_DATE: "",
+                    EMPLOYEE_CERTIFICATE_EXPIRES_DATE: "",
+                },
+            ],
+        });
+    };
+
+    // modal add document
+    const [modalDocument, setModalDocument] = useState<any>({
+        add: false,
+        edit: false,
+    });
+
+    const [flagDocument, setFlagDocument] = useState<string>("");
+    const handleAddDocument = async (e: FormEvent, number: number) => {
+        e.preventDefault();
+
+        setModalDocument({
+            add: !modalDocument.add,
+        });
+        if (number === 1) {
+            setFlagDocument("KTP");
+        } else {
+            setFlagDocument("Document");
         }
     };
 
     const [dataDocument, setDataDocument] = useState<any>({
-        PERSON_ID: idPerson,
+        EMPLOYEE_ID: idEmployee,
         ktp_document: "",
         other_document: "",
     });
 
+    const handleSuccessAddDocument = (message: string) => {
+        // setIsSuccess("");\
+        if (message !== "") {
+            getEmployee(message[0]);
+            setIsSuccess(message[1]);
+            setDataDocument({
+                EMPLOYEE_ID: idEmployee,
+                ktp_document: "",
+                other_document: "",
+            });
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
     const handleChange = (e: any) => {
-        // setFile(URL.createObjectURL(e.target.files[0]));
         setDataDocument({
             ...dataDocument,
             ktp_document: e.target.files,
@@ -479,96 +502,10 @@ export default function EmploymentDetail({
     };
 
     const handleChangeOther = (e: any) => {
-        // setFile(URL.createObjectURL(e.target.files[0]));
         setDataDocument({
             ...dataDocument,
             other_document: e.target.files,
         });
-    };
-
-    console.log(dataDocument);
-
-    const alertDelete = async (idDocument: string, idPerson: string) => {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't delete document!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete!",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Swal.fire({
-                //     title: "Deleted!",
-                //     text: "Your file has been deleted.",
-                //     icon: "success",
-                // });
-                deleteDocument(idDocument, idPerson);
-            }
-        });
-    };
-
-    const deleteDocument = async (idDocument: string, idPerson: string) => {
-        // console.log(data);
-        await axios
-            .post(`/deleteDocument`, { idDocument, idPerson })
-            .then((res) => {
-                Swal.fire({
-                    title: "Success",
-                    text: "Images Delete",
-                    icon: "success",
-                }).then((result: any) => {
-                    // console.log(result);
-                    if (result.value) {
-                        getPersonDetail(idPerson);
-                        // getPersons();
-                        // setGetDetailRelation(message);
-                        // setModal({
-                        //     add: false,
-                        //     delete: false,
-                        //     edit: false,
-                        //     view: true,
-                        //     document: false,
-                        //     search: false,
-                        // });
-                    }
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const downloadImage = async (id: string) => {
-        // console.log(data);
-        await axios
-            .get(`/downloadImage/${id}`)
-            .then((res) => {
-                // Swal.fire({
-                //     title: "Success",
-                //     text: "Images Delete",
-                //     icon: "success",
-                // }).then((result: any) => {
-                //     // console.log(result);
-                //     if (result.value) {
-                //         getPersonDetail(idPerson);
-                //         // getPersons();
-                //         // setGetDetailRelation(message);
-                //         // setModal({
-                //         //     add: false,
-                //         //     delete: false,
-                //         //     edit: false,
-                //         //     view: true,
-                //         //     document: false,
-                //         //     search: false,
-                //         // });
-                //     }
-                // });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
     };
 
     const handleFileDownload = async (id: number) => {
@@ -595,16 +532,50 @@ export default function EmploymentDetail({
                 }
             });
     };
-    const [isSuccess, setIsSuccess] = useState<string>("");
+
+    const alertDelete = async (idDocument: string, idEmployee: string) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't delete document!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Swal.fire({
+                //     title: "Deleted!",
+                //     text: "Your file has been deleted.",
+                //     icon: "success",
+                // });
+                deleteDocument(idDocument, idEmployee);
+            }
+        });
+    };
+
+    const deleteDocument = async (idDocument: string, idEmployee: string) => {
+        // console.log(data);
+        await axios
+            .post(`/deleteDocument`, { idDocument, idEmployee })
+            .then((res) => {
+                Swal.fire({
+                    title: "Success",
+                    text: "Images Delete",
+                    icon: "success",
+                }).then((result: any) => {
+                    // console.log(result);
+                    if (result.value) {
+                        getEmployee(idEmployee);
+                    }
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         <>
-            {isSuccess && (
-                <ToastMessage
-                    message={isSuccess}
-                    isShow={true}
-                    type={"success"}
-                />
-            )}
             {/* Edit Document */}
             <ModalToAdd
                 buttonAddOns={""}
@@ -613,7 +584,6 @@ export default function EmploymentDetail({
                     setModalDocument({
                         add: false,
                     });
-                    getPersonDetail(idPerson);
                 }}
                 title={"Add Document"}
                 url={`/addDocumentPerson`}
@@ -640,20 +610,6 @@ export default function EmploymentDetail({
                                             <span>Photo KTP</span>
                                         </div>
                                         <div>
-                                            {/* <TextInput
-                                        type="file"
-                                        // value={pC.PERSON_CERTIFICATE_NAME}
-                                        className="mt-1"
-                                        onChange={(e) => {
-                                            inputEditCertificate(
-                                                "PERSON_CERTIFICATE_NAME",
-                                                e.target.value,
-                                                i
-                                            );
-                                        }}
-                                        placeholder="Certificate Name"
-                                        required
-                                    /> */}
                                             <input
                                                 className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
                                                 id="file_input"
@@ -670,20 +626,6 @@ export default function EmploymentDetail({
                                             <span>Other Document</span>
                                         </div>
                                         <div>
-                                            {/* <TextInput
-                                        type="file"
-                                        // value={pC.PERSON_CERTIFICATE_NAME}
-                                        className="mt-1"
-                                        onChange={(e) => {
-                                            inputEditCertificate(
-                                                "PERSON_CERTIFICATE_NAME",
-                                                e.target.value,
-                                                i
-                                            );
-                                        }}
-                                        placeholder="Certificate Name"
-                                        required
-                                    /> */}
                                             <input
                                                 className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400"
                                                 id="file_input"
@@ -703,1131 +645,668 @@ export default function EmploymentDetail({
             />
             {/* End Certificate */}
 
-            {/* Edit Certificate */}
+            {/* Empolyment add */}
             <ModalToAdd
                 buttonAddOns={""}
-                show={modalCertificate.edit}
+                show={modalEmployment.add}
                 onClose={() => {
-                    setModalCertificate({
-                        edit: false,
-                    });
-                    getPersonDetail(idPerson);
-                }}
-                title={"Edit Certificate"}
-                url={`/EditCertificate`}
-                data={dataEditCertificate}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
-                }
-                onSuccess={handleSuccessEditCertificate}
-                body={
-                    <>
-                        <div className="mb-2">
-                            <div className="grid grid-cols-14 gap-3">
-                                <div className="col-span-3">
-                                    <div className="text-sm">
-                                        <span>Certificate Name</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Is Qualification</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Qualification</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Point</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Certificate Date</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Certificate Expiry Date</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {dataEditCertificate.person_certificate?.map(
-                                (pC: any, i: number) => {
-                                    return (
-                                        <div className="grid grid-cols-14 gap-3">
-                                            <div className="col-span-3">
-                                                <div>
-                                                    <TextInput
-                                                        type="text"
-                                                        value={
-                                                            pC.PERSON_CERTIFICATE_NAME
-                                                        }
-                                                        className="mt-1"
-                                                        onChange={(e) => {
-                                                            inputEditCertificate(
-                                                                "PERSON_CERTIFICATE_NAME",
-                                                                e.target.value,
-                                                                i
-                                                            );
-                                                        }}
-                                                        placeholder="Certificate Name"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-span-2">
-                                                <div className="mt-2">
-                                                    <Checkbox
-                                                        value={
-                                                            pC.PERSON_CERTIFICATE_IS_QUALIFICATION
-                                                        }
-                                                        defaultChecked={
-                                                            pC.PERSON_CERTIFICATE_IS_QUALIFICATION
-                                                        }
-                                                        onChange={(e) => {
-                                                            if (
-                                                                e.target.checked
-                                                            ) {
-                                                                inputEditCertificate(
-                                                                    "PERSON_CERTIFICATE_IS_QUALIFICATION",
-                                                                    1,
-                                                                    i
-                                                                );
-                                                            } else {
-                                                                inputEditCertificate(
-                                                                    "PERSON_CERTIFICATE_IS_QUALIFICATION",
-                                                                    0,
-                                                                    i
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-                                                    <span className="text-sm">
-                                                        {"   "}
-                                                        Yes
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            {pC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
-                                            1 ? (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <select
-                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                            value={
-                                                                pC.CERTIFICATE_QUALIFICATION_ID
-                                                            }
-                                                            onChange={(e) => {
-                                                                inputEditCertificate(
-                                                                    "CERTIFICATE_QUALIFICATION_ID",
-                                                                    parseInt(
-                                                                        e.target
-                                                                            .value
-                                                                    ),
-                                                                    i
-                                                                );
-                                                            }}
-                                                            required
-                                                        >
-                                                            <option
-                                                                value={""}
-                                                                className="text-white"
-                                                            >
-                                                                -- Choose
-                                                                Qualification --
-                                                            </option>
-                                                            {dataQualification?.map(
-                                                                (
-                                                                    dataQua: any,
-                                                                    a: number
-                                                                ) => {
-                                                                    return (
-                                                                        <option
-                                                                            key={
-                                                                                a
-                                                                            }
-                                                                            value={
-                                                                                dataQua.CERTIFICATE_QUALIFICATION_ID
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                dataQua.CERTIFICATE_QUALIFICATION_NAME
-                                                                            }
-                                                                        </option>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <select
-                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 bg-gray-300"
-                                                            value={
-                                                                pC.CERTIFICATE_QUALIFICATION_ID
-                                                            }
-                                                            // onChange={(e) =>
-                                                            //     inputEditEducation(
-                                                            //         "EDUCATION_DEGREE_ID",
-                                                            //         e.target.value,
-                                                            //         i
-                                                            //     )
-                                                            // }
-                                                            required
-                                                            disabled
-                                                        >
-                                                            <option
-                                                                value={""}
-                                                                className="text-white"
-                                                            >
-                                                                -- Choose
-                                                                Qualification --
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {pC.CERTIFICATE_QUALIFICATION_ID !==
-                                                1 &&
-                                            pC.CERTIFICATE_QUALIFICATION_ID !==
-                                                2 &&
-                                            pC.CERTIFICATE_QUALIFICATION_ID !==
-                                                3 &&
-                                            pC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
-                                                1 ? (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <TextInput
-                                                            type="text"
-                                                            value={
-                                                                pC.PERSON_CERTIFICATE_POINT
-                                                            }
-                                                            className="mt-1"
-                                                            onChange={(e) => {
-                                                                inputEditCertificate(
-                                                                    "PERSON_CERTIFICATE_POINT",
-                                                                    e.target
-                                                                        .value,
-                                                                    i
-                                                                );
-                                                            }}
-                                                            placeholder="Point"
-                                                            required
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <TextInput
-                                                            type="text"
-                                                            value={""}
-                                                            className="mt-1 bg-gray-500"
-                                                            onChange={(e) => {
-                                                                inputEditCertificate(
-                                                                    "PERSON_CERTIFICATE_POINT",
-                                                                    e.target
-                                                                        .value,
-                                                                    i
-                                                                );
-                                                            }}
-                                                            placeholder="Point"
-                                                            required
-                                                            readOnly
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )}
-                                            <div className="col-span-2">
-                                                <div>
-                                                    <div className="relative max-w-sm">
-                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
-                                                            <svg
-                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                                aria-hidden="true"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="currentColor"
-                                                                viewBox="0 0 20 20"
-                                                            >
-                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                            </svg>
-                                                        </div>
-                                                        <DatePicker
-                                                            popperPlacement="top-end"
-                                                            selected={
-                                                                pC.PERSON_CERTIFICATE_START_DATE
-                                                            }
-                                                            onChange={
-                                                                (date: any) => {
-                                                                    inputEditCertificate(
-                                                                        "PERSON_CERTIFICATE_START_DATE",
-                                                                        date.toLocaleDateString(
-                                                                            "en-CA"
-                                                                        ),
-                                                                        i
-                                                                    );
-                                                                }
-                                                                // setData(
-                                                                //     "PERSON_BIRTH_DATE",
-                                                                //     date.toLocaleDateString(
-                                                                //         "en-CA"
-                                                                //     )
-                                                                // )
-                                                            }
-                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                            dateFormat={
-                                                                "dd-MM-yyyy"
-                                                            }
-                                                            placeholderText="dd - mm - yyyy"
-                                                        />
-                                                    </div>
-                                                    {/* <TextInput
-                                                        type="date"
-                                                        value={
-                                                            pC.PERSON_CERTIFICATE_START_DATE
-                                                        }
-                                                        className="mt-1"
-                                                        onChange={(e) => {
-                                                            inputEditCertificate(
-                                                                "PERSON_CERTIFICATE_START_DATE",
-                                                                e.target.value,
-                                                                i
-                                                            );
-                                                        }}
-                                                        required
-                                                        placeholder="From"
-                                                    /> */}
-                                                </div>
-                                            </div>
-                                            <div className="col-span-2">
-                                                <div>
-                                                    <div className="relative max-w-sm">
-                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
-                                                            <svg
-                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                                aria-hidden="true"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="currentColor"
-                                                                viewBox="0 0 20 20"
-                                                            >
-                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                            </svg>
-                                                        </div>
-                                                        <DatePicker
-                                                            selected={
-                                                                pC.PERSON_CERTIFICATE_EXPIRES_DATE
-                                                            }
-                                                            onChange={
-                                                                (date: any) => {
-                                                                    inputEditCertificate(
-                                                                        "PERSON_CERTIFICATE_EXPIRES_DATE",
-                                                                        date.toLocaleDateString(
-                                                                            "en-CA"
-                                                                        ),
-                                                                        i
-                                                                    );
-                                                                }
-                                                                // setData(
-                                                                //     "PERSON_BIRTH_DATE",
-                                                                //     date.toLocaleDateString(
-                                                                //         "en-CA"
-                                                                //     )
-                                                                // )
-                                                            }
-                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                            dateFormat={
-                                                                "dd-MM-yyyy"
-                                                            }
-                                                            placeholderText="dd - mm - yyyy"
-                                                        />
-                                                    </div>
-                                                    {/* <TextInput
-                                                        type="date"
-                                                        value={
-                                                            pC.PERSON_CERTIFICATE_EXPIRES_DATE
-                                                        }
-                                                        className="mt-1"
-                                                        onChange={(e) => {
-                                                            inputEditCertificate(
-                                                                "PERSON_CERTIFICATE_EXPIRES_DATE",
-                                                                e.target.value,
-                                                                i
-                                                            );
-                                                        }}
-                                                        required
-                                                        placeholder="From"
-                                                    /> */}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <span>
-                                                        <XMarkIcon
-                                                            className="w-6 mt-3 text-red-600 cursor-pointer"
-                                                            onClick={() => {
-                                                                const updatedData =
-                                                                    dataEditCertificate.person_certificate.filter(
-                                                                        (
-                                                                            data: any,
-                                                                            a: number
-                                                                        ) =>
-                                                                            a !==
-                                                                            i
-                                                                    );
-                                                                // console.log(
-                                                                //     "aaavv",
-                                                                //     updatedData
-                                                                // );
-                                                                setDataEditCertificate(
-                                                                    {
-                                                                        ...dataEditCertificate,
-                                                                        person_certificate:
-                                                                            updatedData,
-                                                                    }
-                                                                );
-                                                            }}
-                                                        />
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                            )}
-
-                            <div className="mt-2 w-fit">
-                                <div
-                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
-                                    onClick={(e) => addRowEditCertificate(e)}
-                                >
-                                    <span>+ Add Certificate</span>
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                }
-            />
-            {/* End Certificate */}
-
-            {/* Add Certificate */}
-            <ModalToAdd
-                buttonAddOns={""}
-                show={modalCertificate.add}
-                onClose={() => {
-                    setModalCertificate({
+                    setModalEmployment({
                         add: false,
                     });
-                    getPersonDetail(idPerson);
+                    // getEmployee(idEmployee);
                 }}
-                title={"Add Certificate"}
-                url={`/addCertificate`}
-                data={dataCertificate}
+                title={"Add Employee Detail"}
+                url={`/employmentEdit`}
+                data={data}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[50%]"
                 }
-                onSuccess={handleSuccessAddCertificate}
+                onSuccess={handleSuccessEditEmployee}
                 body={
                     <>
-                        <div className="mb-2">
-                            <div className="grid grid-cols-14 gap-3">
-                                <div className="col-span-3">
-                                    <div className="text-sm">
-                                        <span>Certificate Name</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
+                        <div className="mt-4">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_NUMBER_ID"
+                                        value={"Employee Number Id"}
+                                    />
+                                    <TextInput
+                                        id="EMPLOYEE_NUMBER_ID"
+                                        type="text"
+                                        name="EMPLOYEE_NUMBER_ID"
+                                        value={data.EMPLOYEE_NUMBER_ID}
+                                        className="mt-1"
+                                        onChange={(e) =>
+                                            setData(
+                                                "EMPLOYEE_NUMBER_ID",
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Employee Number Id"
+                                    />
                                 </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Is Qualification</span>
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="EMPLOYEE_CATEGORY"
+                                        value={"Category"}
+                                    />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
                                     </div>
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={data.EMPLOYEE_CATEGORY}
+                                        onChange={(e) => {
+                                            setData(
+                                                "EMPLOYEE_CATEGORY",
+                                                e.target.value
+                                            );
+                                        }}
+                                        required
+                                    >
+                                        <option value={""}>
+                                            -- Choose Category --
+                                        </option>
+                                        <option value={"1"}>Full-time</option>
+                                        <option value={"2"}>Contract</option>
+                                        <option value={"3"}>Intern</option>
+                                    </select>
                                 </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Qualification</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Point</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Certificate Date</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm">
-                                        <span>Certificate Expiry Date</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_IS_DELETED"
+                                        value={"Status"}
+                                    />
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={data.EMPLOYEE_IS_DELETED}
+                                        onChange={(e) => {
+                                            setData(
+                                                "EMPLOYEE_IS_DELETED",
+                                                e.target.value
+                                            );
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Status --
+                                        </option>
+                                        <option value={"0"}>Active</option>
+                                        <option value={"1"}>Inactive</option>
+                                    </select>
                                 </div>
                             </div>
-                            {dataCertificate.dataCertificates?.map(
-                                (dC: any, i: number) => {
-                                    return (
-                                        <div className="grid grid-cols-14 gap-3">
-                                            <div className="col-span-3">
-                                                <div>
-                                                    <TextInput
-                                                        type="text"
-                                                        value={
-                                                            dC.PERSON_CERTIFICATE_NAME
-                                                        }
-                                                        className="mt-1"
-                                                        onChange={(e) => {
-                                                            inputAddCertificate(
-                                                                "PERSON_CERTIFICATE_NAME",
-                                                                e.target.value,
-                                                                i
-                                                            );
-                                                        }}
-                                                        placeholder="Certificate Name"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-span-2">
-                                                <div className="mt-2">
-                                                    <Checkbox
-                                                        value={"0"}
-                                                        onChange={(e) => {
-                                                            if (
-                                                                e.target.checked
-                                                            ) {
-                                                                inputAddCertificate(
-                                                                    "PERSON_CERTIFICATE_IS_QUALIFICATION",
-                                                                    "1",
-                                                                    i
-                                                                );
-                                                            } else {
-                                                                inputAddCertificate(
-                                                                    "PERSON_CERTIFICATE_IS_QUALIFICATION",
-                                                                    "0",
-                                                                    i
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-                                                    <span className="text-sm">
-                                                        {"   "}
-                                                        Yes
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            {dC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
-                                            "1" ? (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <select
-                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                            value={
-                                                                dC.CERTIFICATE_QUALIFICATION_ID
-                                                            }
-                                                            onChange={(e) => {
-                                                                inputAddCertificate(
-                                                                    "CERTIFICATE_QUALIFICATION_ID",
-                                                                    e.target
-                                                                        .value,
-                                                                    i
-                                                                );
-                                                            }}
-                                                            required
-                                                        >
-                                                            <option
-                                                                value={""}
-                                                                className="text-white"
-                                                            >
-                                                                -- Choose
-                                                                Qualification --
-                                                            </option>
-                                                            {dataQualification?.map(
-                                                                (
-                                                                    dataQua: any,
-                                                                    a: number
-                                                                ) => {
-                                                                    return (
-                                                                        <option
-                                                                            key={
-                                                                                a
-                                                                            }
-                                                                            value={
-                                                                                dataQua.CERTIFICATE_QUALIFICATION_ID
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                dataQua.CERTIFICATE_QUALIFICATION_NAME
-                                                                            }
-                                                                        </option>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <select
-                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 bg-gray-300"
-                                                            value={
-                                                                dC.CERTIFICATE_QUALIFICATION_ID
-                                                            }
-                                                            // onChange={(e) =>
-                                                            //     inputEditEducation(
-                                                            //         "EDUCATION_DEGREE_ID",
-                                                            //         e.target.value,
-                                                            //         i
-                                                            //     )
-                                                            // }
-                                                            required
-                                                            disabled
-                                                        >
-                                                            <option
-                                                                value={""}
-                                                                className="text-white"
-                                                            >
-                                                                -- Choose
-                                                                Qualification --
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {dC.CERTIFICATE_QUALIFICATION_ID !==
-                                                "1" &&
-                                            dC.CERTIFICATE_QUALIFICATION_ID !==
-                                                "2" &&
-                                            dC.CERTIFICATE_QUALIFICATION_ID !==
-                                                "3" &&
-                                            dC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
-                                                "1" ? (
-                                                <div className="col-span-2">
-                                                    <div>
-                                                        <TextInput
-                                                            type="text"
-                                                            value={
-                                                                dC.PERSON_CERTIFICATE_POINT
-                                                            }
-                                                            className="mt-1"
-                                                            onChange={(e) => {
-                                                                inputAddCertificate(
-                                                                    "PERSON_CERTIFICATE_POINT",
-                                                                    e.target
-                                                                        .value,
-                                                                    i
-                                                                );
-                                                            }}
-                                                            placeholder="Point"
-                                                            required
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    className="col-span-2"
-                                                    title="Point only for CIIB, APAI, AAPAI"
+                            <div
+                                className={
+                                    data.EMPLOYEE_CATEGORY === "2" ||
+                                    data.EMPLOYEE_CATEGORY === "3"
+                                        ? "grid grid-cols-3 gap-4 mt-2"
+                                        : "grid grid-cols-3 gap-4 mt-2"
+                                }
+                            >
+                                <div>
+                                    <InputLabel
+                                        htmlFor="TAX_STATUS_ID"
+                                        value={"Tax Status"}
+                                    />
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={data.TAX_STATUS_ID}
+                                        onChange={(e) => {
+                                            setData(
+                                                "TAX_STATUS_ID",
+                                                e.target.value
+                                            );
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Tax Status --
+                                        </option>
+                                        {taxStatus.map((tS: any, i: number) => {
+                                            return (
+                                                <option
+                                                    key={i}
+                                                    value={tS.TAX_STATUS_ID}
                                                 >
-                                                    <div>
-                                                        <TextInput
-                                                            type="text"
-                                                            value={""}
-                                                            className="mt-1 bg-gray-500"
-                                                            onChange={(e) => {
-                                                                inputAddCertificate(
-                                                                    "PERSON_CERTIFICATE_POINT",
-                                                                    e.target
-                                                                        .value,
-                                                                    i
-                                                                );
-                                                            }}
-                                                            placeholder="Point"
-                                                            required
-                                                            readOnly
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )}
-                                            <div className="col-span-2">
-                                                <div>
-                                                    <div className="relative max-w-sm">
-                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
-                                                            <svg
-                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                                aria-hidden="true"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="currentColor"
-                                                                viewBox="0 0 20 20"
-                                                            >
-                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                            </svg>
-                                                        </div>
-                                                        <DatePicker
-                                                            selected={
-                                                                dC.PERSON_CERTIFICATE_START_DATE
-                                                            }
-                                                            onChange={
-                                                                (date: any) =>
-                                                                    inputAddCertificate(
-                                                                        "PERSON_CERTIFICATE_START_DATE",
-                                                                        date.toLocaleDateString(
-                                                                            "en-CA"
-                                                                        ),
-                                                                        i
-                                                                    )
-                                                                // setData(
-                                                                //     "PERSON_BIRTH_DATE",
-                                                                //     date.toLocaleDateString(
-                                                                //         "en-CA"
-                                                                //     )
-                                                                // )
-                                                            }
-                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                            dateFormat={
-                                                                "dd-MM-yyyy"
-                                                            }
-                                                            placeholderText="dd - mm - yyyy"
-                                                        />
-                                                    </div>
-                                                    {/* <TextInput
-                                                        type="date"
-                                                        value={
-                                                            dC.PERSON_CERTIFICATE_START_DATE
-                                                        }
-                                                        className="mt-1"
-                                                        onChange={(e) => {
-                                                            inputAddCertificate(
-                                                                "PERSON_CERTIFICATE_START_DATE",
-                                                                e.target.value,
-                                                                i
-                                                            );
-                                                        }}
-                                                        required
-                                                        placeholder="From"
-                                                    /> */}
-                                                </div>
+                                                    {tS.TAX_STATUS_NAME}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        required={true}
+                                        htmlFor="EMPLOYEE_HIRE_DATE"
+                                        value={"Hire Date "}
+                                    />
+                                    <div className="">
+                                        <div className="relative max-w-sm ">
+                                            <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                <svg
+                                                    className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                </svg>
                                             </div>
-                                            <div className="col-span-2">
-                                                <div>
-                                                    <div className="relative max-w-sm">
-                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
-                                                            <svg
-                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                                aria-hidden="true"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="currentColor"
-                                                                viewBox="0 0 20 20"
-                                                            >
-                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                            </svg>
-                                                        </div>
-                                                        <DatePicker
-                                                            selected={
-                                                                dC.PERSON_CERTIFICATE_EXPIRES_DATE
-                                                            }
-                                                            onChange={
-                                                                (date: any) =>
-                                                                    inputAddCertificate(
-                                                                        "PERSON_CERTIFICATE_EXPIRES_DATE",
-                                                                        date.toLocaleDateString(
-                                                                            "en-CA"
-                                                                        ),
-                                                                        i
-                                                                    )
-                                                                // setData(
-                                                                //     "PERSON_BIRTH_DATE",
-                                                                //     date.toLocaleDateString(
-                                                                //         "en-CA"
-                                                                //     )
-                                                                // )
-                                                            }
-                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                            dateFormat={
-                                                                "dd-MM-yyyy"
-                                                            }
-                                                            placeholderText="dd - mm - yyyy"
-                                                        />
-                                                    </div>
-                                                    {/* <TextInput
-                                                        type="date"
-                                                        value={
-                                                            dC.PERSON_CERTIFICATE_EXPIRES_DATE
-                                                        }
-                                                        className="mt-1"
-                                                        onChange={(e) => {
-                                                            inputAddCertificate(
-                                                                "PERSON_CERTIFICATE_EXPIRES_DATE",
-                                                                e.target.value,
-                                                                i
-                                                            );
-                                                        }}
-                                                        required
-                                                        placeholder="From"
-                                                    /> */}
-                                                </div>
+                                            <div className="grid grid-cols-1">
+                                                <DatePicker
+                                                    selected={
+                                                        data.EMPLOYEE_HIRE_DATE
+                                                    }
+                                                    onChange={(date: any) =>
+                                                        setData(
+                                                            "EMPLOYEE_HIRE_DATE",
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            )
+                                                        )
+                                                    }
+                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd - mm - yyyy"
+                                                />
                                             </div>
-                                            <div>
-                                                <div>
-                                                    <span>
-                                                        <XMarkIcon
-                                                            className="w-6 mt-3 text-red-600 cursor-pointer"
-                                                            onClick={() => {
-                                                                const updatedData =
-                                                                    dataCertificate.dataCertificates.filter(
-                                                                        (
-                                                                            data: any,
-                                                                            a: number
-                                                                        ) =>
-                                                                            a !==
-                                                                            i
-                                                                    );
-                                                                // console.log(
-                                                                //     "aaavv",
-                                                                //     updatedData
-                                                                // );
-                                                                setDataCertificate(
-                                                                    {
-                                                                        ...dataCertificate,
-                                                                        dataCertificates:
-                                                                            updatedData,
-                                                                    }
-                                                                );
-                                                            }}
-                                                        />
-                                                    </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {data.EMPLOYEE_CATEGORY === "2" ||
+                                data.EMPLOYEE_CATEGORY === "3" ? (
+                                    <>
+                                        <div>
+                                            <InputLabel
+                                                htmlFor="EMPLOYEE_END_DATE"
+                                                value={"End Date "}
+                                            />
+                                            <div className="">
+                                                <div className="relative max-w-sm grid grid-cols-1">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        selected={
+                                                            data.EMPLOYEE_HIRE_DATE
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            setData(
+                                                                "EMPLOYEE_HIRE_DATE",
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                )
+                                                            )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                                }
-                            )}
-
-                            <div className="mt-2 w-fit">
-                                <div
-                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
-                                    onClick={(e) => addRowAddCertificate(e)}
-                                >
-                                    <span>+ Add Certificate</span>
+                                    </>
+                                ) : null}
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 mt-3">
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_SALARY_ADJUSTMENT1"
+                                        value={"First Salary Adjustment "}
+                                    />
+                                    <div className="grid grid-cols-1">
+                                        <div className="relative max-w-sm ">
+                                            <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                <svg
+                                                    className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                </svg>
+                                            </div>
+                                            <div className="grid grid-cols-1">
+                                                <DatePicker
+                                                    selected={
+                                                        data.EMPLOYEE_SALARY_ADJUSTMENT1
+                                                    }
+                                                    onChange={(date: any) =>
+                                                        setData(
+                                                            "EMPLOYEE_SALARY_ADJUSTMENT1",
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            )
+                                                        )
+                                                    }
+                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd - mm - yyyy"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_SALARY_ADJUSTMENT2"
+                                        value={"Secondary Salary Adjustment "}
+                                    />
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <div className="grid grid-cols-1">
+                                            <DatePicker
+                                                selected={
+                                                    data.EMPLOYEE_SALARY_ADJUSTMENT2
+                                                }
+                                                onChange={(date: any) =>
+                                                    setData(
+                                                        "EMPLOYEE_SALARY_ADJUSTMENT2",
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        )
+                                                    )
+                                                }
+                                                className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                dateFormat={"dd-MM-yyyy"}
+                                                placeholderText="dd - mm - yyyy"
+                                            />
+                                        </div>
+                                    </div>
+                                    {/* <TextInput
+                                        id="EMPLOYEE_SALARY_ADJUSTMENT2"
+                                        type="date"
+                                        name="EMPLOYEE_SALARY_ADJUSTMENT2"
+                                        value={data.EMPLOYEE_SALARY_ADJUSTMENT2}
+                                        className="mt-2"
+                                        onChange={(e) =>
+                                            setData(
+                                                "EMPLOYEE_SALARY_ADJUSTMENT2",
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Secondary Salary Adjustment"
+                                    /> */}
+                                </div>
+                            </div>
+                            <div>
+                                <InputLabel
+                                    htmlFor="EMPLOYEE_RECRUITMENT_LOCATION"
+                                    value="Recruitment Location"
+                                />
+                                <TextArea
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    id="EMPLOYEE_RECRUITMENT_LOCATION"
+                                    name="EMPLOYEE_RECRUITMENT_LOCATION"
+                                    defaultValue={
+                                        data.EMPLOYEE_RECRUITMENT_LOCATION
+                                    }
+                                    onChange={(e: any) =>
+                                        setData(
+                                            "EMPLOYEE_RECRUITMENT_LOCATION",
+                                            e.target.value
+                                        )
+                                    }
+                                />
                             </div>
                         </div>
                     </>
                 }
             />
-            {/* End Certificate */}
+            {/* End Employment add */}
 
-            {/* Edit Education */}
+            {/* Edit Employment */}
             <ModalToAdd
                 buttonAddOns={""}
-                show={modalEducation.edit}
+                show={modalEmployment.edit}
                 onClose={() => {
-                    setModalEducation({
+                    setModalEmployment({
+                        add: false,
                         edit: false,
                     });
-                    getPersonDetail(idPerson);
+                    // getPersonDetail(idEmployee);
                 }}
-                title={"Edit Education"}
-                url={`/editEducationPerson`}
-                data={dataEditEducation}
+                title={"Edit Detail Employee"}
+                url={`/editEmployeeDetail`}
+                data={dataById}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[53%]"
                 }
-                onSuccess={handleSuccessEditEducation}
+                onSuccess={handleSuccessEditEmployee}
                 body={
                     <>
-                        <div className="mb-2 px-7">
-                            <div className="grid grid-cols-13 gap-3">
-                                <div className="col-span-2">
-                                    <div>
-                                        <span>From</span>
-                                        <span className="text-red-600">*</span>
+                        <div className="mt-4">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_NUMBER_ID"
+                                        value={"Employee Number Id"}
+                                    />
+                                    <TextInput
+                                        id="EMPLOYEE_NUMBER_ID"
+                                        type="text"
+                                        name="EMPLOYEE_NUMBER_ID"
+                                        value={dataById.EMPLOYEE_NUMBER_ID}
+                                        className="mt-1"
+                                        onChange={(e) =>
+                                            setDataById({
+                                                ...dataById,
+                                                EMPLOYEE_NUMBER_ID:
+                                                    e.target.value,
+                                            })
+                                        }
+                                        placeholder="Employee Number Id"
+                                    />
+                                </div>
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="EMPLOYEE_CATEGORY"
+                                        value={"Category"}
+                                    />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
+                                    <select
+                                        className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataById.EMPLOYEE_CATEGORY}
+                                        onChange={(e) => {
+                                            setDataById({
+                                                ...dataById,
+                                                EMPLOYEE_CATEGORY:
+                                                    e.target.value,
+                                            });
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Category --
+                                        </option>
+                                        <option value={1}>Full-time</option>
+                                        <option value={2}>Contract</option>
+                                        <option value={3}>Intern</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_IS_DELETED"
+                                        value={"Status"}
+                                    />
+                                    <select
+                                        className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataById.EMPLOYEE_IS_DELETED}
+                                        onChange={(e) => {
+                                            setDataById({
+                                                ...dataById,
+                                                EMPLOYEE_IS_DELETED:
+                                                    e.target.value,
+                                            });
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Status --
+                                        </option>
+                                        <option value={"0"}>Active</option>
+                                        <option value={"1"}>Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div
+                                className={
+                                    dataById.EMPLOYEE_CATEGORY === 2 ||
+                                    dataById.EMPLOYEE_CATEGORY === "2" ||
+                                    dataById.EMPLOYEE_CATEGORY === 3 ||
+                                    dataById.EMPLOYEE_CATEGORY === "3"
+                                        ? "grid grid-cols-3 gap-4 mt-2"
+                                        : "grid grid-cols-2 gap-4 mt-2"
+                                }
+                            >
+                                <div>
+                                    <InputLabel
+                                        htmlFor="TAX_STATUS_ID"
+                                        value={"Tax Status"}
+                                    />
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataById.TAX_STATUS_ID}
+                                        onChange={(e) => {
+                                            setDataById({
+                                                ...dataById,
+                                                TAX_STATUS_ID: e.target.value,
+                                            });
+                                        }}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Tax Status --
+                                        </option>
+                                        {taxStatus.map((tS: any, i: number) => {
+                                            return (
+                                                <option
+                                                    key={i}
+                                                    value={tS.TAX_STATUS_ID}
+                                                >
+                                                    {tS.TAX_STATUS_NAME}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                </div>
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="EMPLOYEE_HIRE_DATE"
+                                        value={"Hire Date "}
+                                    />
+                                    <div className="ml-[67px] text-red-600">
+                                        *
+                                    </div>
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataById.EMPLOYEE_HIRE_DATE
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    EMPLOYEE_HIRE_DATE:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
                                     </div>
                                 </div>
-                                <div className="col-span-2">
-                                    <div>
-                                        <span>To</span>
-                                        <span className="text-red-600">*</span>
+                                <div
+                                    className={
+                                        dataById.EMPLOYEE_CATEGORY === 2 ||
+                                        dataById.EMPLOYEE_CATEGORY === "2" ||
+                                        dataById.EMPLOYEE_CATEGORY === 3 ||
+                                        dataById.EMPLOYEE_CATEGORY === "3"
+                                            ? ""
+                                            : "hidden"
+                                    }
+                                >
+                                    {dataById.EMPLOYEE_CATEGORY === 2 ||
+                                    dataById.EMPLOYEE_CATEGORY === "2" ||
+                                    dataById.EMPLOYEE_CATEGORY === 3 ||
+                                    dataById.EMPLOYEE_CATEGORY === "3" ? (
+                                        <>
+                                            <InputLabel
+                                                htmlFor="EMPLOYEE_END_DATE"
+                                                value={"End Date "}
+                                            />
+                                            <div className="relative max-w-sm">
+                                                <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                    <svg
+                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                        aria-hidden="true"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                    </svg>
+                                                </div>
+                                                <DatePicker
+                                                    selected={
+                                                        dataById.EMPLOYEE_END_DATE
+                                                    }
+                                                    onChange={(date: any) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            EMPLOYEE_END_DATE:
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                ),
+                                                        })
+                                                    }
+                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd - mm - yyyy"
+                                                />
+                                            </div>
+                                        </>
+                                    ) : null}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mt-3">
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_SALARY_ADJUSTMENT1"
+                                        value={"First Salary Adjustment "}
+                                    />
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataById.EMPLOYEE_SALARY_ADJUSTMENT1
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    EMPLOYEE_SALARY_ADJUSTMENT1:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
                                     </div>
                                 </div>
-                                <div className="col-span-2">
-                                    <div>
-                                        <span>Degree</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-3">
-                                    <div>
-                                        <span>Major</span>
-                                        <span className="text-red-600">*</span>
-                                    </div>
-                                </div>
-                                <div className="col-span-3">
-                                    <div>
-                                        <span>School/College/University</span>
-                                        <span className="text-red-600">*</span>
+                                <div>
+                                    <InputLabel
+                                        htmlFor="EMPLOYEE_SALARY_ADJUSTMENT2"
+                                        value={"Secondary Salary Adjustment "}
+                                    />
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataById.EMPLOYEE_SALARY_ADJUSTMENT2
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    EMPLOYEE_SALARY_ADJUSTMENT2:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd - mm - yyyy"
+                                        />
                                     </div>
                                 </div>
                             </div>
-                            {dataEditEducation.person_education?.map(
-                                (dE: any, i: number) => {
-                                    return (
-                                        <div
-                                            className="grid grid-cols-13 gap-3"
-                                            key={i}
-                                        >
-                                            <div className="col-span-2">
-                                                <div className="relative max-w-sm">
-                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                                        <svg
-                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                            aria-hidden="true"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 20 20"
-                                                        >
-                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                        </svg>
-                                                    </div>
-                                                    <DatePicker
-                                                        popperPlacement="top-end"
-                                                        selected={
-                                                            dE.PERSON_EDUCATION_START
-                                                        }
-                                                        onChange={
-                                                            (date: any) =>
-                                                                inputEditEducation(
-                                                                    "PERSON_EDUCATION_START",
-                                                                    date.toLocaleDateString(
-                                                                        "en-CA"
-                                                                    ),
-                                                                    i
-                                                                )
-                                                            // setData(
-                                                            //     "PERSON_BIRTH_DATE",
-                                                            //     date.toLocaleDateString(
-                                                            //         "en-CA"
-                                                            //     )
-                                                            // )
-                                                        }
-                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                        dateFormat={
-                                                            "dd-MM-yyyy"
-                                                        }
-                                                        placeholderText="dd - mm - yyyy"
-                                                    />
-                                                </div>
-                                                {/* <TextInput
-                                                    type="date"
-                                                    value={
-                                                        dE.PERSON_EDUCATION_START
-                                                    }
-                                                    className="mt-1"
-                                                    onChange={(e) =>
-                                                        inputEditEducation(
-                                                            "PERSON_EDUCATION_START",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    required
-                                                    placeholder="From"
-                                                /> */}
-                                            </div>
-                                            <div className="col-span-2">
-                                                <div className="relative max-w-sm">
-                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                                        <svg
-                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                            aria-hidden="true"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 20 20"
-                                                        >
-                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                        </svg>
-                                                    </div>
-                                                    <DatePicker
-                                                        popperPlacement="top-start"
-                                                        selected={
-                                                            dE.PERSON_EDUCATION_END
-                                                        }
-                                                        onChange={
-                                                            (date: any) =>
-                                                                inputEditEducation(
-                                                                    "PERSON_EDUCATION_END",
-                                                                    date.toLocaleDateString(
-                                                                        "en-CA"
-                                                                    ),
-                                                                    i
-                                                                )
-                                                            // setData(
-                                                            //     "PERSON_BIRTH_DATE",
-                                                            //     date.toLocaleDateString(
-                                                            //         "en-CA"
-                                                            //     )
-                                                            // )
-                                                        }
-                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                        dateFormat={
-                                                            "dd-MM-yyyy"
-                                                        }
-                                                        placeholderText="dd - mm - yyyy"
-                                                    />
-                                                </div>
-                                                {/* <TextInput
-                                                    type="date"
-                                                    value={
-                                                        dE.PERSON_EDUCATION_END
-                                                    }
-                                                    className="mt-1"
-                                                    onChange={(e) =>
-                                                        inputEditEducation(
-                                                            "PERSON_EDUCATION_END",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    required
-                                                    placeholder="From"
-                                                /> */}
-                                            </div>
-                                            <div className="col-span-2">
-                                                <select
-                                                    className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    value={
-                                                        dE.EDUCATION_DEGREE_ID
-                                                    }
-                                                    onChange={(e) =>
-                                                        inputEditEducation(
-                                                            "EDUCATION_DEGREE_ID",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    required
-                                                >
-                                                    <option
-                                                        value={""}
-                                                        className="text-white"
-                                                    >
-                                                        -- Choose Degree --
-                                                    </option>
-                                                    {dataEducationDegree?.map(
-                                                        (
-                                                            EducationDegree: any,
-                                                            a: number
-                                                        ) => {
-                                                            return (
-                                                                <option
-                                                                    key={a}
-                                                                    value={
-                                                                        EducationDegree.EDUCATION_DEGREE_ID
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        EducationDegree.EDUCATION_DEGREE_NAME
-                                                                    }
-                                                                </option>
-                                                            );
-                                                        }
-                                                    )}
-                                                </select>
-                                            </div>
-                                            <div className="col-span-3">
-                                                <TextInput
-                                                    type="text"
-                                                    value={
-                                                        dE.PERSON_EDUCATION_MAJOR
-                                                    }
-                                                    className="mt-1"
-                                                    onChange={(e) =>
-                                                        inputEditEducation(
-                                                            "PERSON_EDUCATION_MAJOR",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    placeholder="Major"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="col-span-3">
-                                                <TextInput
-                                                    type="text"
-                                                    value={
-                                                        dE.PERSON_EDUCATION_SCHOOL
-                                                    }
-                                                    className="mt-1"
-                                                    onChange={(e) =>
-                                                        inputEditEducation(
-                                                            "PERSON_EDUCATION_SCHOOL",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    placeholder="School/College/University"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <span>
-                                                    <XMarkIcon
-                                                        className="w-7 mt-2 text-red-600 cursor-pointer"
-                                                        onClick={() => {
-                                                            const updatedData =
-                                                                dataEditEducation.person_education.filter(
-                                                                    (
-                                                                        data: any,
-                                                                        a: number
-                                                                    ) => a !== i
-                                                                );
-                                                            // console.log(
-                                                            //     "aaavv",
-                                                            //     updatedData
-                                                            // );
-                                                            setDataEditEducation(
-                                                                {
-                                                                    ...dataEditEducation,
-                                                                    person_education:
-                                                                        updatedData,
-                                                                }
-                                                            );
-                                                        }}
-                                                    />
-                                                </span>
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                            )}
-
                             <div className="mt-2">
-                                <div
-                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
-                                    onClick={(e) => addRowEditEducation(e)}
-                                >
-                                    <span>+ Add Education</span>
-                                </div>
+                                <InputLabel
+                                    htmlFor="EMPLOYEE_RECRUITMENT_LOCATION"
+                                    value="Recruitment Location"
+                                />
+                                <TextArea
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    id="EMPLOYEE_RECRUITMENT_LOCATION"
+                                    name="EMPLOYEE_RECRUITMENT_LOCATION"
+                                    defaultValue={
+                                        dataById.EMPLOYEE_RECRUITMENT_LOCATION
+                                    }
+                                    onChange={(e: any) =>
+                                        setDataById({
+                                            ...dataById,
+                                            EMPLOYEE_RECRUITMENT_LOCATION:
+                                                e.target.value,
+                                        })
+                                    }
+                                />
                             </div>
                         </div>
                     </>
                 }
             />
-            {/* End Education */}
+            {/* Edit Employement */}
 
             {/* Add Education */}
             <ModalToAdd
@@ -1837,7 +1316,6 @@ export default function EmploymentDetail({
                     setModalEducation({
                         add: false,
                     });
-                    getPersonDetail(idPerson);
                 }}
                 title={"Add Education"}
                 url={`/addEducationPerson`}
@@ -1903,47 +1381,24 @@ export default function EmploymentDetail({
                                                     </div>
                                                     <DatePicker
                                                         selected={
-                                                            dE.PERSON_EDUCATION_START
+                                                            dE.EMPLOYEE_EDUCATION_START
                                                         }
-                                                        onChange={
-                                                            (date: any) =>
-                                                                inputEducation(
-                                                                    "PERSON_EDUCATION_START",
-                                                                    date.toLocaleDateString(
-                                                                        "en-CA"
-                                                                    ),
-                                                                    i
-                                                                )
-                                                            // setData(
-                                                            //     "PERSON_BIRTH_DATE",
-                                                            //     date.toLocaleDateString(
-                                                            //         "en-CA"
-                                                            //     )
-                                                            // )
+                                                        onChange={(date: any) =>
+                                                            inputEducation(
+                                                                "EMPLOYEE_EDUCATION_START",
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                ),
+                                                                i
+                                                            )
                                                         }
-                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
                                                         dateFormat={
                                                             "dd-MM-yyyy"
                                                         }
                                                         placeholderText="dd - mm - yyyy"
                                                     />
                                                 </div>
-                                                {/* <TextInput
-                                                    type="date"
-                                                    value={
-                                                        dE.PERSON_EDUCATION_START
-                                                    }
-                                                    className="mt-1"
-                                                    onChange={(e) =>
-                                                        inputEducation(
-                                                            "PERSON_EDUCATION_START",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    required
-                                                    placeholder="From"
-                                                /> */}
                                             </div>
                                             <div className="col-span-2">
                                                 <div className="relative max-w-sm">
@@ -1960,47 +1415,24 @@ export default function EmploymentDetail({
                                                     </div>
                                                     <DatePicker
                                                         selected={
-                                                            dE.PERSON_EDUCATION_END
+                                                            dE.EMPLOYEE_EDUCATION_END
                                                         }
-                                                        onChange={
-                                                            (date: any) =>
-                                                                inputEducation(
-                                                                    "PERSON_EDUCATION_END",
-                                                                    date.toLocaleDateString(
-                                                                        "en-CA"
-                                                                    ),
-                                                                    i
-                                                                )
-                                                            // setData(
-                                                            //     "PERSON_BIRTH_DATE",
-                                                            //     date.toLocaleDateString(
-                                                            //         "en-CA"
-                                                            //     )
-                                                            // )
+                                                        onChange={(date: any) =>
+                                                            inputEducation(
+                                                                "EMPLOYEE_EDUCATION_END",
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                ),
+                                                                i
+                                                            )
                                                         }
-                                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
                                                         dateFormat={
                                                             "dd-MM-yyyy"
                                                         }
                                                         placeholderText="dd - mm - yyyy"
                                                     />
                                                 </div>
-                                                {/* <TextInput
-                                                    type="date"
-                                                    value={
-                                                        dE.PERSON_EDUCATION_END
-                                                    }
-                                                    className="mt-1"
-                                                    onChange={(e) =>
-                                                        inputEducation(
-                                                            "PERSON_EDUCATION_END",
-                                                            e.target.value,
-                                                            i
-                                                        )
-                                                    }
-                                                    required
-                                                    placeholder="From"
-                                                /> */}
                                             </div>
                                             <div className="col-span-2">
                                                 <select
@@ -2048,12 +1480,12 @@ export default function EmploymentDetail({
                                                 <TextInput
                                                     type="text"
                                                     value={
-                                                        dE.PERSON_EDUCATION_MAJOR
+                                                        dE.EMPLOYEE_EDUCATION_MAJOR
                                                     }
                                                     className="mt-1"
                                                     onChange={(e) =>
                                                         inputEducation(
-                                                            "PERSON_EDUCATION_MAJOR",
+                                                            "EMPLOYEE_EDUCATION_MAJOR",
                                                             e.target.value,
                                                             i
                                                         )
@@ -2066,12 +1498,12 @@ export default function EmploymentDetail({
                                                 <TextInput
                                                     type="text"
                                                     value={
-                                                        dE.PERSON_EDUCATION_SCHOOL
+                                                        dE.EMPLOYEE_EDUCATION_SCHOOL
                                                     }
                                                     className="mt-1"
                                                     onChange={(e) =>
                                                         inputEducation(
-                                                            "PERSON_EDUCATION_SCHOOL",
+                                                            "EMPLOYEE_EDUCATION_SCHOOL",
                                                             e.target.value,
                                                             i
                                                         )
@@ -2120,765 +1552,971 @@ export default function EmploymentDetail({
             />
             {/* End Education */}
 
-            {/* Edit Employment */}
+            {/* Edit Education */}
             <ModalToAdd
                 buttonAddOns={""}
-                show={modalEmployment.edit}
+                show={modalEducation.edit}
                 onClose={() => {
-                    setModalEmployment({
-                        add: false,
+                    setModalEducation({
                         edit: false,
                     });
-                    getPersonDetail(idPerson);
                 }}
-                title={"Edit Detail Employee"}
-                url={`/editPersonEmployment`}
-                data={dataById}
+                title={"Edit Education"}
+                url={`/editEducationPerson`}
+                data={dataEditEducation}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
-                onSuccess={handleSuccessEmployment}
+                onSuccess={handleSuccessEditEducation}
                 body={
                     <>
-                        <div className="mt-4">
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSONE_ID"
-                                        value={"Employee Id"}
-                                    />
-                                    <TextInput
-                                        id="PERSONE_ID"
-                                        type="text"
-                                        name="PERSONE_ID"
-                                        value={dataById.PERSONE_ID}
-                                        className="mt-1"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                PERSONE_ID: e.target.value,
-                                            })
-                                        }
-                                        placeholder="Employee Id"
-                                    />
-                                </div>
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="PERSON_CATEGORY"
-                                        value={"Category"}
-                                    />
-                                    <div className="ml-[67px] text-red-600">
-                                        *
+                        <div className="mb-2 px-7">
+                            <div className="grid grid-cols-13 gap-3">
+                                <div className="col-span-2">
+                                    <div>
+                                        <span>From</span>
+                                        <span className="text-red-600">*</span>
                                     </div>
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataById.PERSON_CATEGORY}
-                                        onChange={(e) => {
-                                            setDataById({
-                                                ...dataById,
-                                                PERSON_CATEGORY: e.target.value,
-                                            });
-                                        }}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Category --
-                                        </option>
-                                        <option value={1}>Full-time</option>
-                                        <option value={2}>Contract</option>
-                                        <option value={3}>Intern</option>
-                                    </select>
                                 </div>
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSON_IS_DELETED"
-                                        value={"Status"}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataById.PERSON_IS_DELETED}
-                                        onChange={(e) => {
-                                            setDataById({
-                                                ...dataById,
-                                                PERSON_IS_DELETED:
-                                                    e.target.value,
-                                            });
-                                        }}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Status --
-                                        </option>
-                                        <option value={"0"}>Active</option>
-                                        <option value={"1"}>Inactive</option>
-                                    </select>
+                                <div className="col-span-2">
+                                    <div>
+                                        <span>To</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div>
+                                        <span>Degree</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-3">
+                                    <div>
+                                        <span>Major</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-3">
+                                    <div>
+                                        <span>School/College/University</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div
-                                className={
-                                    dataById.PERSON_CATEGORY === 2 ||
-                                    dataById.PERSON_CATEGORY === "2" ||
-                                    dataById.PERSON_CATEGORY === 3 ||
-                                    dataById.PERSON_CATEGORY === "3"
-                                        ? "grid grid-cols-3 gap-4 mt-2"
-                                        : "grid grid-cols-2 gap-4 mt-2"
-                                }
-                            >
-                                <div>
-                                    <InputLabel
-                                        htmlFor="TAX_STATUS_ID"
-                                        value={"Tax Status"}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataById.TAX_STATUS_ID}
-                                        onChange={(e) => {
-                                            setDataById({
-                                                ...dataById,
-                                                TAX_STATUS_ID: e.target.value,
-                                            });
-                                        }}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Tax Status --
-                                        </option>
-                                        {taxStatus.map((tS: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={tS.TAX_STATUS_ID}
-                                                >
-                                                    {tS.TAX_STATUS_NAME}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
-                                </div>
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="PERSON_HIRE_DATE"
-                                        value={"Hire Date "}
-                                    />
-                                    <div className="ml-[67px] text-red-600">
-                                        *
-                                    </div>
-                                    <div className="relative max-w-sm">
-                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                            <svg
-                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                            </svg>
-                                        </div>
-                                        <DatePicker
-                                            selected={dataById.PERSON_HIRE_DATE}
-                                            onChange={(date: any) =>
-                                                setDataById({
-                                                    ...dataById,
-                                                    PERSON_HIRE_DATE:
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        ),
-                                                })
-                                            }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd - mm - yyyy"
-                                        />
-                                    </div>
-                                    {/* <TextInput
-                                        id="PERSON_HIRE_DATE"
-                                        type="date"
-                                        name="PERSON_HIRE_DATE"
-                                        value={dataById.PERSON_HIRE_DATE}
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                PERSON_HIRE_DATE:
-                                                    e.target.value,
-                                            })
-                                        }
-                                        required
-                                        placeholder="Hire Date"
-                                    /> */}
-                                </div>
-                                <div
-                                    className={
-                                        dataById.PERSON_CATEGORY === 2 ||
-                                        dataById.PERSON_CATEGORY === "2" ||
-                                        dataById.PERSON_CATEGORY === 3 ||
-                                        dataById.PERSON_CATEGORY === "3"
-                                            ? ""
-                                            : "hidden"
-                                    }
-                                >
-                                    {dataById.PERSON_CATEGORY === 2 ||
-                                    dataById.PERSON_CATEGORY === "2" ||
-                                    dataById.PERSON_CATEGORY === 3 ||
-                                    dataById.PERSON_CATEGORY === "3" ? (
-                                        <>
-                                            <InputLabel
-                                                htmlFor="PERSON_END_DATE"
-                                                value={"End Date "}
-                                            />
-                                            <div className="relative max-w-sm">
-                                                <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                                    <svg
-                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                        aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                    </svg>
-                                                </div>
-                                                <DatePicker
-                                                    selected={
-                                                        dataById.PERSON_END_DATE
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        setDataById({
-                                                            ...dataById,
-                                                            PERSON_END_DATE:
+                            {dataEditEducation.employee_education?.map(
+                                (dE: any, i: number) => {
+                                    return (
+                                        <div
+                                            className="grid grid-cols-13 gap-3"
+                                            key={i}
+                                        >
+                                            <div className="col-span-2">
+                                                <div className="relative max-w-sm">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        popperPlacement="top-end"
+                                                        selected={
+                                                            dE.EMPLOYEE_EDUCATION_START
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            inputEditEducation(
+                                                                "EMPLOYEE_EDUCATION_START",
                                                                 date.toLocaleDateString(
                                                                     "en-CA"
                                                                 ),
-                                                        })
-                                                    }
-                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd - mm - yyyy"
-                                                />
-                                            </div>
-                                            {/* <TextInput
-                                                id="PERSON_END_DATE"
-                                                type="date"
-                                                name="PERSON_END_DATE"
-                                                value={dataById.PERSON_END_DATE}
-                                                className="mt-2"
-                                                onChange={(e) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        PERSON_END_DATE:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                placeholder="End Date"
-                                            /> */}
-                                        </>
-                                    ) : null}
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 mt-3">
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSON_SALARY_ADJUSTMENT1"
-                                        value={"First Salary Adjustment "}
-                                    />
-                                    <div className="relative max-w-sm">
-                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                            <svg
-                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                            </svg>
-                                        </div>
-                                        <DatePicker
-                                            selected={
-                                                dataById.PERSON_SALARY_ADJUSTMENT1
-                                            }
-                                            onChange={(date: any) =>
-                                                setDataById({
-                                                    ...dataById,
-                                                    PERSON_SALARY_ADJUSTMENT1:
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        ),
-                                                })
-                                            }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd - mm - yyyy"
-                                        />
-                                    </div>
-                                    {/* <TextInput
-                                        id="PERSON_SALARY_ADJUSTMENT1"
-                                        type="date"
-                                        name="PERSON_SALARY_ADJUSTMENT1"
-                                        value={
-                                            dataById.PERSON_SALARY_ADJUSTMENT1
-                                        }
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                PERSON_SALARY_ADJUSTMENT1:
-                                                    e.target.value,
-                                            })
-                                        }
-                                        placeholder="First Salary Adjustment"
-                                    /> */}
-                                </div>
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSON_SALARY_ADJUSTMENT2"
-                                        value={"Secondary Salary Adjustment "}
-                                    />
-                                    <div className="relative max-w-sm">
-                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                            <svg
-                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                            </svg>
-                                        </div>
-                                        <DatePicker
-                                            selected={
-                                                dataById.PERSON_SALARY_ADJUSTMENT2
-                                            }
-                                            onChange={(date: any) =>
-                                                setDataById({
-                                                    ...dataById,
-                                                    PERSON_SALARY_ADJUSTMENT2:
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        ),
-                                                })
-                                            }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd - mm - yyyy"
-                                        />
-                                    </div>
-                                    {/* <TextInput
-                                        id="PERSON_SALARY_ADJUSTMENT2"
-                                        type="date"
-                                        name="PERSON_SALARY_ADJUSTMENT2"
-                                        value={
-                                            dataById.PERSON_SALARY_ADJUSTMENT2
-                                        }
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setDataById({
-                                                ...dataById,
-                                                PERSON_SALARY_ADJUSTMENT2:
-                                                    e.target.value,
-                                            })
-                                        }
-                                        placeholder="Secondary Salary Adjustment"
-                                    /> */}
-                                </div>
-                            </div>
-                            <div>
-                                <InputLabel
-                                    htmlFor="PERSON_RECRUITMENT_LOCATION"
-                                    value="Recruitment Location"
-                                />
-                                <TextArea
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    id="PERSON_RECRUITMENT_LOCATION"
-                                    name="PERSON_RECRUITMENT_LOCATION"
-                                    defaultValue={
-                                        dataById.PERSON_RECRUITMENT_LOCATION
-                                    }
-                                    onChange={(e: any) =>
-                                        setDataById({
-                                            ...dataById,
-                                            PERSON_RECRUITMENT_LOCATION:
-                                                e.target.value,
-                                        })
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </>
-                }
-            />
-
-            {/* Empolyment add */}
-            <ModalToAdd
-                buttonAddOns={""}
-                show={modalEmployment.add}
-                onClose={() => {
-                    setModalEmployment({
-                        add: false,
-                    });
-                    getPersonDetail(idPerson);
-                }}
-                title={"Add Employee Detail"}
-                url={`/personEmployment`}
-                data={data}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
-                }
-                onSuccess={handleSuccessEmployment}
-                body={
-                    <>
-                        <div className="mt-4">
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSONE_ID"
-                                        value={"Employee Id"}
-                                    />
-                                    <TextInput
-                                        id="PERSONE_ID"
-                                        type="text"
-                                        name="PERSONE_ID"
-                                        value={data.PERSONE_ID}
-                                        className="mt-1"
-                                        onChange={(e) =>
-                                            setData(
-                                                "PERSONE_ID",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="Employee Id"
-                                    />
-                                </div>
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="PERSON_CATEGORY"
-                                        value={"Category"}
-                                    />
-                                    <div className="ml-[67px] text-red-600">
-                                        *
-                                    </div>
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={data.PERSON_CATEGORY}
-                                        onChange={(e) => {
-                                            setData(
-                                                "PERSON_CATEGORY",
-                                                e.target.value
-                                            );
-                                        }}
-                                        required
-                                    >
-                                        <option value={""}>
-                                            -- Choose Category --
-                                        </option>
-                                        <option value={"1"}>Full-time</option>
-                                        <option value={"2"}>Contract</option>
-                                        <option value={"3"}>Intern</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSON_IS_DELETED"
-                                        value={"Status"}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={data.PERSON_IS_DELETED}
-                                        onChange={(e) => {
-                                            setData(
-                                                "PERSON_IS_DELETED",
-                                                e.target.value
-                                            );
-                                        }}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Status --
-                                        </option>
-                                        <option value={"0"}>Active</option>
-                                        <option value={"1"}>Inactive</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div
-                                className={
-                                    data.PERSON_CATEGORY === "2" ||
-                                    data.PERSON_CATEGORY === "3"
-                                        ? "grid grid-cols-3 gap-4 mt-2"
-                                        : "grid grid-cols-2 gap-4 mt-2"
-                                }
-                            >
-                                <div>
-                                    <InputLabel
-                                        htmlFor="TAX_STATUS_ID"
-                                        value={"Tax Status"}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={data.TAX_STATUS_ID}
-                                        onChange={(e) => {
-                                            setData(
-                                                "TAX_STATUS_ID",
-                                                e.target.value
-                                            );
-                                        }}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Tax Status --
-                                        </option>
-                                        {taxStatus.map((tS: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={tS.TAX_STATUS_ID}
-                                                >
-                                                    {tS.TAX_STATUS_NAME}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
-                                </div>
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="PERSON_HIRE_DATE"
-                                        value={"Hire Date "}
-                                    />
-                                    <div className="ml-[67px] text-red-600">
-                                        *
-                                    </div>
-                                    <div className="relative max-w-sm">
-                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                            <svg
-                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                            </svg>
-                                        </div>
-                                        <DatePicker
-                                            selected={data.PERSON_HIRE_DATE}
-                                            onChange={(date: any) =>
-                                                setData(
-                                                    "PERSON_HIRE_DATE",
-                                                    date.toLocaleDateString(
-                                                        "en-CA"
-                                                    )
-                                                )
-                                            }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd - mm - yyyy"
-                                        />
-                                    </div>
-                                    {/* <TextInput
-                                        id="PERSON_HIRE_DATE"
-                                        type="date"
-                                        name="PERSON_HIRE_DATE"
-                                        value={data.PERSON_HIRE_DATE}
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setData(
-                                                "PERSON_HIRE_DATE",
-                                                e.target.value
-                                            )
-                                        }
-                                        required
-                                        placeholder="Hire Date"
-                                    /> */}
-                                </div>
-                                <div
-                                    className={
-                                        data.PERSON_CATEGORY === "2" ||
-                                        data.PERSON_CATEGORY === "3"
-                                            ? ""
-                                            : "hidden"
-                                    }
-                                >
-                                    {data.PERSON_CATEGORY === "2" ||
-                                    data.PERSON_CATEGORY === "3" ? (
-                                        <>
-                                            <InputLabel
-                                                htmlFor="PERSON_END_DATE"
-                                                value={"End Date "}
-                                            />
-                                            <div className="relative max-w-sm">
-                                                <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                                    <svg
-                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                        aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                                    </svg>
-                                                </div>
-                                                <DatePicker
-                                                    selected={
-                                                        data.PERSON_END_DATE
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        setData(
-                                                            "PERSON_END_DATE",
-                                                            date.toLocaleDateString(
-                                                                "en-CA"
+                                                                i
                                                             )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div className="relative max-w-sm">
+                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                                        <svg
+                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                            aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <DatePicker
+                                                        popperPlacement="top-start"
+                                                        selected={
+                                                            dE.EMPLOYEE_EDUCATION_END
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            inputEditEducation(
+                                                                "EMPLOYEE_EDUCATION_END",
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                ),
+                                                                i
+                                                            )
+                                                        }
+                                                        className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd - mm - yyyy"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <select
+                                                    className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                    value={
+                                                        dE.EDUCATION_DEGREE_ID
+                                                    }
+                                                    onChange={(e) =>
+                                                        inputEditEducation(
+                                                            "EDUCATION_DEGREE_ID",
+                                                            e.target.value,
+                                                            i
                                                         )
                                                     }
-                                                    className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd - mm - yyyy"
+                                                    required
+                                                >
+                                                    <option
+                                                        value={""}
+                                                        className="text-white"
+                                                    >
+                                                        -- Choose Degree --
+                                                    </option>
+                                                    {dataEducationDegree?.map(
+                                                        (
+                                                            EducationDegree: any,
+                                                            a: number
+                                                        ) => {
+                                                            return (
+                                                                <option
+                                                                    key={a}
+                                                                    value={
+                                                                        EducationDegree.EDUCATION_DEGREE_ID
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        EducationDegree.EDUCATION_DEGREE_NAME
+                                                                    }
+                                                                </option>
+                                                            );
+                                                        }
+                                                    )}
+                                                </select>
+                                            </div>
+                                            <div className="col-span-3">
+                                                <TextInput
+                                                    type="text"
+                                                    value={
+                                                        dE.EMPLOYEE_EDUCATION_MAJOR
+                                                    }
+                                                    className="mt-1"
+                                                    onChange={(e) =>
+                                                        inputEditEducation(
+                                                            "EMPLOYEE_EDUCATION_MAJOR",
+                                                            e.target.value,
+                                                            i
+                                                        )
+                                                    }
+                                                    placeholder="Major"
+                                                    required
                                                 />
                                             </div>
-                                            {/* <TextInput
-                                                id="PERSON_END_DATE"
-                                                type="date"
-                                                name="PERSON_END_DATE"
-                                                value={data.PERSON_END_DATE}
-                                                className="mt-2"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "PERSON_END_DATE",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="End Date"
-                                            /> */}
-                                        </>
-                                    ) : null}
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-1 mt-3">
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSON_SALARY_ADJUSTMENT1"
-                                        value={"First Salary Adjustment "}
-                                    />
-                                    <div className="relative max-w-sm">
-                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                            <svg
-                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                            </svg>
+                                            <div className="col-span-3">
+                                                <TextInput
+                                                    type="text"
+                                                    value={
+                                                        dE.EMPLOYEE_EDUCATION_SCHOOL
+                                                    }
+                                                    className="mt-1"
+                                                    onChange={(e) =>
+                                                        inputEditEducation(
+                                                            "EMPLOYEE_EDUCATION_SCHOOL",
+                                                            e.target.value,
+                                                            i
+                                                        )
+                                                    }
+                                                    placeholder="School/College/University"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <span>
+                                                    <XMarkIcon
+                                                        className="w-7 mt-2 text-red-600 cursor-pointer"
+                                                        onClick={() => {
+                                                            const updatedData =
+                                                                dataEditEducation.employee_education.filter(
+                                                                    (
+                                                                        data: any,
+                                                                        a: number
+                                                                    ) => a !== i
+                                                                );
+                                                            setDataEditEducation(
+                                                                {
+                                                                    ...dataEditEducation,
+                                                                    employee_education:
+                                                                        updatedData,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                </span>
+                                            </div>
                                         </div>
-                                        <DatePicker
-                                            selected={
-                                                data.PERSON_SALARY_ADJUSTMENT1
-                                            }
-                                            onChange={(date: any) =>
-                                                setData(
-                                                    "PERSON_SALARY_ADJUSTMENT1",
-                                                    date.toLocaleDateString(
-                                                        "en-CA"
-                                                    )
-                                                )
-                                            }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd - mm - yyyy"
-                                        />
-                                    </div>
-                                    {/* <TextInput
-                                        id="PERSON_SALARY_ADJUSTMENT1"
-                                        type="date"
-                                        name="PERSON_SALARY_ADJUSTMENT1"
-                                        value={data.PERSON_SALARY_ADJUSTMENT1}
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setData(
-                                                "PERSON_SALARY_ADJUSTMENT1",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="First Salary Adjustment"
-                                    /> */}
+                                    );
+                                }
+                            )}
+
+                            <div className="mt-2">
+                                <div
+                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
+                                    onClick={(e) => addRowEditEducation(e)}
+                                >
+                                    <span>+ Add Education</span>
                                 </div>
-                                <div>
-                                    <InputLabel
-                                        htmlFor="PERSON_SALARY_ADJUSTMENT2"
-                                        value={"Secondary Salary Adjustment "}
-                                    />
-                                    <div className="relative max-w-sm">
-                                        <div className="absolute inset-y-0 z-9999 start-0 flex items-center px-3 mt-2 pointer-events-none">
-                                            <svg
-                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                            </svg>
-                                        </div>
-                                        <DatePicker
-                                            selected={
-                                                data.PERSON_SALARY_ADJUSTMENT2
-                                            }
-                                            onChange={(date: any) =>
-                                                setData(
-                                                    "PERSON_SALARY_ADJUSTMENT2",
-                                                    date.toLocaleDateString(
-                                                        "en-CA"
-                                                    )
-                                                )
-                                            }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8 z-999999"
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd - mm - yyyy"
-                                        />
-                                    </div>
-                                    {/* <TextInput
-                                        id="PERSON_SALARY_ADJUSTMENT2"
-                                        type="date"
-                                        name="PERSON_SALARY_ADJUSTMENT2"
-                                        value={data.PERSON_SALARY_ADJUSTMENT2}
-                                        className="mt-2"
-                                        onChange={(e) =>
-                                            setData(
-                                                "PERSON_SALARY_ADJUSTMENT2",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="Secondary Salary Adjustment"
-                                    /> */}
-                                </div>
-                            </div>
-                            <div>
-                                <InputLabel
-                                    htmlFor="PERSON_RECRUITMENT_LOCATION"
-                                    value="Recruitment Location"
-                                />
-                                <TextArea
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    id="PERSON_RECRUITMENT_LOCATION"
-                                    name="PERSON_RECRUITMENT_LOCATION"
-                                    defaultValue={
-                                        data.PERSON_RECRUITMENT_LOCATION
-                                    }
-                                    onChange={(e: any) =>
-                                        setData(
-                                            "PERSON_RECRUITMENT_LOCATION",
-                                            e.target.value
-                                        )
-                                    }
-                                />
                             </div>
                         </div>
                     </>
                 }
             />
-            {/* End Employment add */}
-            <div className="mb-4">
+            {/* End Education */}
+
+            {/* Add Certificate */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modalCertificate.add}
+                onClose={() => {
+                    setModalCertificate({
+                        add: false,
+                    });
+                }}
+                title={"Add Certificate"}
+                url={`/addCertificate`}
+                data={dataCertificate}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
+                }
+                onSuccess={handleSuccessAddCertificate}
+                body={
+                    <>
+                        <div className="mb-2">
+                            <div className="grid grid-cols-14 gap-3">
+                                <div className="col-span-3">
+                                    <div className="text-sm">
+                                        <span>Certificate Name</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Is Qualification</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Qualification</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Point</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Certificate Date</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Certificate Expiry Date</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {dataCertificate.dataCertificates?.map(
+                                (dC: any, i: number) => {
+                                    return (
+                                        <div className="grid grid-cols-14 gap-3">
+                                            <div className="col-span-3">
+                                                <div>
+                                                    <TextInput
+                                                        type="text"
+                                                        value={
+                                                            dC.EMPLOYEE_CERTIFICATE_NAME
+                                                        }
+                                                        className="mt-1"
+                                                        onChange={(e) => {
+                                                            inputAddCertificate(
+                                                                "EMPLOYEE_CERTIFICATE_NAME",
+                                                                e.target.value,
+                                                                i
+                                                            );
+                                                        }}
+                                                        placeholder="Certificate Name"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div className="mt-2">
+                                                    <Checkbox
+                                                        value={"0"}
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.checked
+                                                            ) {
+                                                                inputAddCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_IS_QUALIFICATION",
+                                                                    "1",
+                                                                    i
+                                                                );
+                                                            } else {
+                                                                inputAddCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_IS_QUALIFICATION",
+                                                                    "0",
+                                                                    i
+                                                                );
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span className="text-sm">
+                                                        {"   "}
+                                                        Yes
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {dC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION ===
+                                            "1" ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <select
+                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            value={
+                                                                dC.CERTIFICATE_QUALIFICATION_ID
+                                                            }
+                                                            onChange={(e) => {
+                                                                inputAddCertificate(
+                                                                    "CERTIFICATE_QUALIFICATION_ID",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            required
+                                                        >
+                                                            <option
+                                                                value={""}
+                                                                className="text-white"
+                                                            >
+                                                                -- Choose
+                                                                Qualification --
+                                                            </option>
+                                                            {dataQualification?.map(
+                                                                (
+                                                                    dataQua: any,
+                                                                    a: number
+                                                                ) => {
+                                                                    return (
+                                                                        <option
+                                                                            key={
+                                                                                a
+                                                                            }
+                                                                            value={
+                                                                                dataQua.CERTIFICATE_QUALIFICATION_ID
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                dataQua.CERTIFICATE_QUALIFICATION_NAME
+                                                                            }
+                                                                        </option>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <select
+                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 bg-gray-300"
+                                                            value={
+                                                                dC.CERTIFICATE_QUALIFICATION_ID
+                                                            }
+                                                            required
+                                                            disabled
+                                                        >
+                                                            <option
+                                                                value={""}
+                                                                className="text-white"
+                                                            >
+                                                                -- Choose
+                                                                Qualification --
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {dC.CERTIFICATE_QUALIFICATION_ID !==
+                                                "1" &&
+                                            dC.CERTIFICATE_QUALIFICATION_ID !==
+                                                "2" &&
+                                            dC.CERTIFICATE_QUALIFICATION_ID !==
+                                                "3" &&
+                                            dC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION ===
+                                                "1" ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={
+                                                                dC.EMPLOYEE_CERTIFICATE_POINT
+                                                            }
+                                                            className="mt-1"
+                                                            onChange={(e) => {
+                                                                inputAddCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="col-span-2"
+                                                    title="Point only for CIIB, APAI, AAPAI"
+                                                >
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={""}
+                                                            className="mt-1 bg-gray-500"
+                                                            onChange={(e) => {
+                                                                inputAddCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="col-span-2">
+                                                <div>
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            selected={
+                                                                dC.EMPLOYEE_CERTIFICATE_START_DATE
+                                                            }
+                                                            onChange={(
+                                                                date: any
+                                                            ) =>
+                                                                inputAddCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_START_DATE",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                )
+                                                            }
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div>
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            selected={
+                                                                dC.EMPLOYEE_CERTIFICATE_EXPIRES_DATE
+                                                            }
+                                                            onChange={(
+                                                                date: any
+                                                            ) =>
+                                                                inputAddCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_EXPIRES_DATE",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                )
+                                                            }
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div>
+                                                    <span>
+                                                        <XMarkIcon
+                                                            className="w-6 mt-3 text-red-600 cursor-pointer"
+                                                            onClick={() => {
+                                                                const updatedData =
+                                                                    dataCertificate.dataCertificates.filter(
+                                                                        (
+                                                                            data: any,
+                                                                            a: number
+                                                                        ) =>
+                                                                            a !==
+                                                                            i
+                                                                    );
+                                                                setDataCertificate(
+                                                                    {
+                                                                        ...dataCertificate,
+                                                                        dataCertificates:
+                                                                            updatedData,
+                                                                    }
+                                                                );
+                                                            }}
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            )}
+
+                            <div className="mt-2 w-fit">
+                                <div
+                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
+                                    onClick={(e) => addRowAddCertificate(e)}
+                                >
+                                    <span>+ Add Certificate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* End Certificate */}
+
+            {/* Edit Certificate */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modalCertificate.edit}
+                onClose={() => {
+                    setModalCertificate({
+                        edit: false,
+                    });
+                }}
+                title={"Edit Certificate"}
+                url={`/EditCertificate`}
+                data={dataEditCertificate}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[97%]"
+                }
+                onSuccess={handleSuccessEditCertificate}
+                body={
+                    <>
+                        <div className="mb-2">
+                            <div className="grid grid-cols-14 gap-3">
+                                <div className="col-span-3">
+                                    <div className="text-sm">
+                                        <span>Certificate Name</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Is Qualification</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Qualification</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Point</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Certificate Date</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="text-sm">
+                                        <span>Certificate Expiry Date</span>
+                                        <span className="text-red-600">*</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {dataEditCertificate.employee_certificate?.map(
+                                (pC: any, i: number) => {
+                                    return (
+                                        <div className="grid grid-cols-14 gap-3">
+                                            <div className="col-span-3">
+                                                <div>
+                                                    <TextInput
+                                                        type="text"
+                                                        value={
+                                                            pC.EMPLOYEE_CERTIFICATE_NAME
+                                                        }
+                                                        className="mt-1"
+                                                        onChange={(e) => {
+                                                            inputEditCertificate(
+                                                                "EMPLOYEE_CERTIFICATE_NAME",
+                                                                e.target.value,
+                                                                i
+                                                            );
+                                                        }}
+                                                        placeholder="Certificate Name"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div className="mt-2">
+                                                    <Checkbox
+                                                        value={
+                                                            pC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION
+                                                        }
+                                                        defaultChecked={
+                                                            pC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION
+                                                        }
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.checked
+                                                            ) {
+                                                                inputEditCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_IS_QUALIFICATION",
+                                                                    1,
+                                                                    i
+                                                                );
+                                                            } else {
+                                                                inputEditCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_IS_QUALIFICATION",
+                                                                    0,
+                                                                    i
+                                                                );
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span className="text-sm">
+                                                        {"   "}
+                                                        Yes
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {pC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION ===
+                                            1 ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <select
+                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                            value={
+                                                                pC.CERTIFICATE_QUALIFICATION_ID
+                                                            }
+                                                            onChange={(e) => {
+                                                                inputEditCertificate(
+                                                                    "CERTIFICATE_QUALIFICATION_ID",
+                                                                    parseInt(
+                                                                        e.target
+                                                                            .value
+                                                                    ),
+                                                                    i
+                                                                );
+                                                            }}
+                                                            required
+                                                        >
+                                                            <option
+                                                                value={""}
+                                                                className="text-white"
+                                                            >
+                                                                -- Choose
+                                                                Qualification --
+                                                            </option>
+                                                            {dataQualification?.map(
+                                                                (
+                                                                    dataQua: any,
+                                                                    a: number
+                                                                ) => {
+                                                                    return (
+                                                                        <option
+                                                                            key={
+                                                                                a
+                                                                            }
+                                                                            value={
+                                                                                dataQua.CERTIFICATE_QUALIFICATION_ID
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                dataQua.CERTIFICATE_QUALIFICATION_NAME
+                                                                            }
+                                                                        </option>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <select
+                                                            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 bg-gray-300"
+                                                            value={
+                                                                pC.CERTIFICATE_QUALIFICATION_ID
+                                                            }
+                                                            required
+                                                            disabled
+                                                        >
+                                                            <option
+                                                                value={""}
+                                                                className="text-white"
+                                                            >
+                                                                -- Choose
+                                                                Qualification --
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {pC.CERTIFICATE_QUALIFICATION_ID !==
+                                                1 &&
+                                            pC.CERTIFICATE_QUALIFICATION_ID !==
+                                                2 &&
+                                            pC.CERTIFICATE_QUALIFICATION_ID !==
+                                                3 &&
+                                            pC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION ===
+                                                1 ? (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={
+                                                                pC.EMPLOYEE_CERTIFICATE_POINT
+                                                            }
+                                                            className="mt-1"
+                                                            onChange={(e) => {
+                                                                inputEditCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="col-span-2">
+                                                    <div>
+                                                        <TextInput
+                                                            type="text"
+                                                            value={""}
+                                                            className="mt-1 bg-gray-500"
+                                                            onChange={(e) => {
+                                                                inputEditCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_POINT",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            placeholder="Point"
+                                                            required
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="col-span-2">
+                                                <div>
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            popperPlacement="top-end"
+                                                            selected={
+                                                                pC.EMPLOYEE_CERTIFICATE_START_DATE
+                                                            }
+                                                            onChange={(
+                                                                date: any
+                                                            ) => {
+                                                                inputEditCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_START_DATE",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2">
+                                                <div>
+                                                    <div className="relative max-w-sm">
+                                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                            <svg
+                                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                            </svg>
+                                                        </div>
+                                                        <DatePicker
+                                                            selected={
+                                                                pC.EMPLOYEE_CERTIFICATE_EXPIRES_DATE
+                                                            }
+                                                            onChange={(
+                                                                date: any
+                                                            ) => {
+                                                                inputEditCertificate(
+                                                                    "EMPLOYEE_CERTIFICATE_EXPIRES_DATE",
+                                                                    date.toLocaleDateString(
+                                                                        "en-CA"
+                                                                    ),
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                            dateFormat={
+                                                                "dd-MM-yyyy"
+                                                            }
+                                                            placeholderText="dd - mm - yyyy"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div>
+                                                    <span>
+                                                        <XMarkIcon
+                                                            className="w-6 mt-3 text-red-600 cursor-pointer"
+                                                            onClick={() => {
+                                                                const updatedData =
+                                                                    dataEditCertificate.employee_certificate.filter(
+                                                                        (
+                                                                            data: any,
+                                                                            a: number
+                                                                        ) =>
+                                                                            a !==
+                                                                            i
+                                                                    );
+                                                                setDataEditCertificate(
+                                                                    {
+                                                                        ...dataEditCertificate,
+                                                                        employee_certificate:
+                                                                            updatedData,
+                                                                    }
+                                                                );
+                                                            }}
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            )}
+
+                            <div className="mt-2 w-fit">
+                                <div
+                                    className="text-sm hover:cursor-pointer hover:underline hover:text-gray-500"
+                                    onClick={(e) => addRowEditCertificate(e)}
+                                >
+                                    <span>+ Add Certificate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* End Certificate */}
+            <div>
                 <div className="sm:hidden">
                     <label htmlFor="tabs" className="sr-only">
                         Select a tab
@@ -2887,7 +2525,9 @@ export default function EmploymentDetail({
                     <select
                         id="tabs"
                         name="tabs"
-                        defaultValue={tabs.find((tab) => tab.current).name}
+                        // defaultValue={
+                        //     tabs?.find((tab: any) => tab.current).name
+                        // }
                         className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                     >
                         {tabs.map((tab) => (
@@ -2927,8 +2567,8 @@ export default function EmploymentDetail({
                 </div>
                 {tab.nameTab === "Employee" ? (
                     <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md h-48">
-                        {detailPerson.PERSON_CATEGORY !== null &&
-                        detailPerson.PERSON_HIRE_DATE !== null ? (
+                        {dataDetailEmployee.EMPLOYEE_CTEAGORY !== null &&
+                        dataDetailEmployee.EMPLOYEE_HIRE_DATE !== null ? (
                             <>
                                 <div className="grid grid-cols-3 gap-4 divide-x px-1 py-4">
                                     <div className="px-2">
@@ -2936,27 +2576,29 @@ export default function EmploymentDetail({
                                             Employee Id
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSONE_ID === null
+                                            {dataDetailEmployee.EMPLOYEE_NUMBER_ID ===
+                                            null
                                                 ? "-"
-                                                : detailPerson.PERSONE_ID}
+                                                : dataDetailEmployee.EMPLOYEE_NUMBER_ID}
                                         </div>
                                         <div className="text-red-700 mt-2">
                                             Tax Status
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.TAX_STATUS_ID === null
+                                            {dataDetailEmployee.TAX_STATUS_ID ===
+                                            null
                                                 ? "-"
-                                                : detailPerson.tax_status
+                                                : dataDetailEmployee.tax_status
                                                       ?.TAX_STATUS_NAME}
                                         </div>
                                         <div className="text-red-700 mt-2">
                                             Location Recruitment
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSON_RECRUITMENT_LOCATION ===
+                                            {dataDetailEmployee.EMPLOYEE_RECRUITMENT_LOCATION ===
                                             null
                                                 ? "-"
-                                                : detailPerson.PERSON_RECRUITMENT_LOCATION}
+                                                : dataDetailEmployee.EMPLOYEE_RECRUITMENT_LOCATION}
                                         </div>
                                     </div>
                                     <div className="px-2">
@@ -2964,9 +2606,10 @@ export default function EmploymentDetail({
                                             Category
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSON_CATEGORY === 1
+                                            {dataDetailEmployee.EMPLOYEE_CATEGORY ===
+                                            1
                                                 ? "Full-time"
-                                                : detailPerson.PERSON_CATEGORY ===
+                                                : dataDetailEmployee.EMPLOYEE_CATEGORY ===
                                                   2
                                                 ? "Contract"
                                                 : "Intern"}
@@ -2975,14 +2618,14 @@ export default function EmploymentDetail({
                                             Hire date
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSON_HIRE_DATE ===
+                                            {dataDetailEmployee.EMPLOYEE_HIRE_DATE ===
                                             null
                                                 ? "-"
                                                 : dateFormat(
-                                                      detailPerson.PERSON_HIRE_DATE,
+                                                      dataDetailEmployee.EMPLOYEE_HIRE_DATE,
                                                       "dd-mm-yyyy"
                                                   )}
-                                            {/* {detailPerson.PERSON_HIRE_DATE} */}
+                                            {/* {dataDetailEmployee.EMPLOYEE_HIRE_DATE} */}
                                         </div>
                                     </div>
                                     <div className="px-2">
@@ -3005,29 +2648,31 @@ export default function EmploymentDetail({
                                             </div>
                                         </div>
                                         <div className="text-gray-600 text-sm">
-                                            {detailPerson.PERSON_IS_DELETED ===
+                                            {dataDetailEmployee.EMPLOYEE_IS_DELETED ===
                                             0
                                                 ? "Active"
-                                                : detailPerson.PERSON_IS_DELETED !==
+                                                : dataDetailEmployee.EMPLOYEE_IS_DELETED !==
                                                   null
                                                 ? "Inactive"
                                                 : "-"}
                                         </div>
-                                        {detailPerson.PERSON_CATEGORY === 2 ||
-                                        detailPerson.PERSON_CATEGORY === 3 ? (
+                                        {dataDetailEmployee.EMPLOYEE_CATEGORY ===
+                                            2 ||
+                                        dataDetailEmployee.EMPLOYEE_CATEGORY ===
+                                            3 ? (
                                             <>
                                                 <div className="text-red-700 mt-2">
                                                     End date
                                                 </div>
                                                 <div className="text-gray-600 text-sm">
                                                     {/* {
-                                                        detailPerson.PERSON_END_DATE
+                                                        dataDetailEmployee.EMPLOYEE_END_DATE
                                                             } */}
-                                                    {detailPerson.PERSON_END_DATE ===
+                                                    {dataDetailEmployee.EMPLOYEE_END_DATE ===
                                                     null
                                                         ? "-"
                                                         : dateFormat(
-                                                              detailPerson.PERSON_END_DATE,
+                                                              dataDetailEmployee.EMPLOYEE_END_DATE,
                                                               "dd-mm-yyyy"
                                                           )}
                                                 </div>
@@ -3057,7 +2702,7 @@ export default function EmploymentDetail({
                     </div>
                 ) : tab.nameTab === "Education" ? (
                     <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md h-40">
-                        {detailPerson.person_education?.length === 0 ? (
+                        {dataDetailEmployee.employee_education?.length === 0 ? (
                             <div className="px-2 p-4">
                                 <div
                                     className="bg-red-500 w-fit p-2 rounded-md text-white hover:cursor-pointer hover:bg-red-400"
@@ -3112,7 +2757,7 @@ export default function EmploymentDetail({
                                         </div>
                                     </div>
                                 </div>
-                                {detailPerson.person_education?.map(
+                                {dataDetailEmployee.employee_education?.map(
                                     (pE: any, i: number) => {
                                         return (
                                             <div
@@ -3122,11 +2767,11 @@ export default function EmploymentDetail({
                                                 <div className="col-span-2 text-sm text-gray-500">
                                                     <div>
                                                         <span>
-                                                            {pE.PERSON_EDUCATION_START ===
+                                                            {pE.EMPLOYEE_EDUCATION_START ===
                                                             null
                                                                 ? "-"
                                                                 : dateFormat(
-                                                                      pE.PERSON_EDUCATION_START,
+                                                                      pE.EMPLOYEE_EDUCATION_START,
                                                                       "dd-mm-yyyy"
                                                                   )}
                                                         </span>
@@ -3135,11 +2780,11 @@ export default function EmploymentDetail({
                                                 <div className="col-span-2 text-sm text-gray-500 px-2">
                                                     <div>
                                                         <span>
-                                                            {pE.PERSON_EDUCATION_END ===
+                                                            {pE.EMPLOYEE_EDUCATION_END ===
                                                             null
                                                                 ? "-"
                                                                 : dateFormat(
-                                                                      pE.PERSON_EDUCATION_END,
+                                                                      pE.EMPLOYEE_EDUCATION_END,
                                                                       "dd-mm-yyyy"
                                                                   )}
                                                         </span>
@@ -3160,7 +2805,7 @@ export default function EmploymentDetail({
                                                     <div>
                                                         <span>
                                                             {
-                                                                pE.PERSON_EDUCATION_MAJOR
+                                                                pE.EMPLOYEE_EDUCATION_MAJOR
                                                             }
                                                         </span>
                                                     </div>
@@ -3169,7 +2814,7 @@ export default function EmploymentDetail({
                                                     <div>
                                                         <span>
                                                             {
-                                                                pE.PERSON_EDUCATION_SCHOOL
+                                                                pE.EMPLOYEE_EDUCATION_SCHOOL
                                                             }
                                                         </span>
                                                     </div>
@@ -3183,7 +2828,8 @@ export default function EmploymentDetail({
                     </div>
                 ) : tab.nameTab === "Certificate" ? (
                     <div className="bg-white shadow-md p-2 rounded-bl-md rounded-br-md rounded-tr-md h-40">
-                        {detailPerson.person_certificate?.length === 0 ? (
+                        {dataDetailEmployee.employee_certificate?.length ===
+                        0 ? (
                             <div className="px-2 p-4">
                                 <div
                                     className="bg-red-500 w-fit p-2 rounded-md text-white hover:cursor-pointer hover:bg-red-400"
@@ -3243,7 +2889,7 @@ export default function EmploymentDetail({
                                         </div>
                                     </div>
                                 </div>
-                                {detailPerson.person_certificate?.map(
+                                {dataDetailEmployee.employee_certificate?.map(
                                     (pC: any, a: number) => {
                                         return (
                                             <div
@@ -3254,14 +2900,14 @@ export default function EmploymentDetail({
                                                     <div className="text-sm text-gray-500">
                                                         <span>
                                                             {
-                                                                pC.PERSON_CERTIFICATE_NAME
+                                                                pC.EMPLOYEE_CERTIFICATE_NAME
                                                             }
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2 px-1">
                                                     <div className="text-sm text-gray-500">
-                                                        {pC.PERSON_CERTIFICATE_IS_QUALIFICATION ===
+                                                        {pC.EMPLOYEE_CERTIFICATE_IS_QUALIFICATION ===
                                                         1 ? (
                                                             <div className="bg-green-600 px-3 py-1 rounded-md w-fit text-white">
                                                                 <span>Yes</span>
@@ -3291,13 +2937,13 @@ export default function EmploymentDetail({
                                                 </div>
                                                 <div className="col-span-2 px-1">
                                                     <div className="text-sm text-gray-500">
-                                                        {pC.PERSON_CERTIFICATE_POINT ===
+                                                        {pC.EMPLOYEE_CERTIFICATE_POINT ===
                                                         null ? (
                                                             <span>{"-"}</span>
                                                         ) : (
                                                             <span>
                                                                 {
-                                                                    pC.PERSON_CERTIFICATE_POINT
+                                                                    pC.EMPLOYEE_CERTIFICATE_POINT
                                                                 }
                                                             </span>
                                                         )}
@@ -3306,11 +2952,11 @@ export default function EmploymentDetail({
                                                 <div className="col-span-2 px-1">
                                                     <div className="text-sm text-gray-500">
                                                         <span>
-                                                            {pC.PERSON_CERTIFICATE_START_DATE ===
+                                                            {pC.EMPLOYEE_CERTIFICATE_START_DATE ===
                                                             null
                                                                 ? "-"
                                                                 : dateFormat(
-                                                                      pC.PERSON_CERTIFICATE_START_DATE,
+                                                                      pC.EMPLOYEE_CERTIFICATE_START_DATE,
                                                                       "dd-mm-yyyy"
                                                                   )}
                                                         </span>
@@ -3319,11 +2965,11 @@ export default function EmploymentDetail({
                                                 <div className="col-span-2 px-1">
                                                     <div className="text-sm text-gray-500">
                                                         <span>
-                                                            {pC.PERSON_CERTIFICATE_EXPIRES_DATE ===
+                                                            {pC.EMPLOYEE_CERTIFICATE_EXPIRES_DATE ===
                                                             null
                                                                 ? "-"
                                                                 : dateFormat(
-                                                                      pC.PERSON_CERTIFICATE_EXPIRES_DATE,
+                                                                      pC.EMPLOYEE_CERTIFICATE_EXPIRES_DATE,
                                                                       "dd-mm-yyyy"
                                                                   )}
                                                         </span>
@@ -3338,25 +2984,12 @@ export default function EmploymentDetail({
                     </div>
                 ) : (
                     <div className="bg-white shadow-md p-4 rounded-bl-md rounded-br-md rounded-tr-md h-full">
-                        {/* <div>
-                            <div
-                                className="bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-400"
-                                onClick={(e) => {
-                                    handleAddDocument(e);
-                                }}
-                            >
-                                <span>Add Document</span>
-                            </div>
-                        </div> */}
                         <div className="grid-cols-4 grid gap-4">
-                            {/* <div className="text-sm font-semibold ">
-                                <span>Images</span>
-                            </div> */}
                             <div className="text-sm font-semibold ">
                                 <span>KTP</span>
                             </div>
                         </div>
-                        {detailPerson.m_person_document?.filter(
+                        {dataDetailEmployee.m_employee_document?.filter(
                             (m: any) => m.CATEGORY_DOCUMENT === 1
                         )?.length === 0 ? (
                             <div
@@ -3376,50 +3009,13 @@ export default function EmploymentDetail({
                             </div>
                         ) : (
                             <>
-                                {detailPerson.m_person_document
+                                {dataDetailEmployee.m_employee_document
                                     ?.filter(
                                         (m: any) => m.CATEGORY_DOCUMENT === 1
                                     )
                                     .map((mPD: any, l: number) => {
                                         return (
                                             <div className="grid-cols-4 grid gap-4 mb-2">
-                                                {/* <div className="text-sm ">
-                                                <span>
-                                                    <img
-                                                        className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                                                        src={
-                                                            window.location.origin +
-                                                            "/storage/" +
-                                                            mPD.document_person
-                                                                ?.DOCUMENT_DIRNAME +
-                                                            mPD.document_person
-                                                                ?.DOCUMENT_FILENAME
-                                                        }
-                                                        alt="Image Person"
-                                                        // onClick={(e) => {
-                                                        //     downloadImage(
-                                                        //         mPD.document_person
-                                                        //             ?.DOCUMENT_ID
-                                                        //     );
-                                                        // }}
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            window.open(
-                                                                window.location
-                                                                    .origin +
-                                                                    "/storage/" +
-                                                                    mPD
-                                                                        .document_person
-                                                                        ?.DOCUMENT_DIRNAME +
-                                                                    mPD
-                                                                        .document_person
-                                                                        ?.DOCUMENT_FILENAME,
-                                                                "_blank"
-                                                            );
-                                                        }}
-                                                    />
-                                                </span>
-                                            </div> */}
                                                 <div
                                                     className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
                                                     onClick={(e) => {
@@ -3464,7 +3060,7 @@ export default function EmploymentDetail({
                                                             onClick={(e) =>
                                                                 alertDelete(
                                                                     mPD.DOCUMENT_ID,
-                                                                    mPD.PERSON_ID
+                                                                    mPD.EMPLOYEE_ID
                                                                 )
                                                             }
                                                         />
@@ -3477,14 +3073,11 @@ export default function EmploymentDetail({
                         )}
 
                         <div className="mt-2 grid-cols-4 grid gap-4">
-                            {/* <div className="text-sm font-semibold ">
-                                <span>Images</span>
-                            </div> */}
                             <div className="text-sm font-semibold ">
                                 <span>Other Document</span>
                             </div>
                         </div>
-                        {detailPerson.m_person_document?.filter(
+                        {dataDetailEmployee.m_employee_document?.filter(
                             (m: any) => m.CATEGORY_DOCUMENT === 2
                         )?.length === 0 ? (
                             <div
@@ -3519,50 +3112,13 @@ export default function EmploymentDetail({
                                         <span>Add Other Document</span>
                                     </div>
                                 </div>
-                                {detailPerson.m_person_document
+                                {dataDetailEmployee.m_employee_document
                                     ?.filter(
                                         (m: any) => m.CATEGORY_DOCUMENT === 2
                                     )
                                     .map((mPD: any, l: number) => {
                                         return (
                                             <div className="grid-cols-4 grid gap-4 mb-2">
-                                                {/* <div className="text-sm ">
-                                                <span>
-                                                    <img
-                                                        className="h-44 w-44 rounded-md border-2 bg-gray-50 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                                                        src={
-                                                            window.location.origin +
-                                                            "/storage/" +
-                                                            mPD.document_person
-                                                                ?.DOCUMENT_DIRNAME +
-                                                            mPD.document_person
-                                                                ?.DOCUMENT_FILENAME
-                                                        }
-                                                        alt="Image Person"
-                                                        // onClick={(e) => {
-                                                        //     downloadImage(
-                                                        //         mPD.document_person
-                                                        //             ?.DOCUMENT_ID
-                                                        //     );
-                                                        // }}
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            window.open(
-                                                                window.location
-                                                                    .origin +
-                                                                    "/storage/" +
-                                                                    mPD
-                                                                        .document_person
-                                                                        ?.DOCUMENT_DIRNAME +
-                                                                    mPD
-                                                                        .document_person
-                                                                        ?.DOCUMENT_FILENAME,
-                                                                "_blank"
-                                                            );
-                                                        }}
-                                                    />
-                                                </span>
-                                            </div> */}
                                                 <div
                                                     className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
                                                     onClick={(e) => {
@@ -3607,7 +3163,7 @@ export default function EmploymentDetail({
                                                             onClick={(e) =>
                                                                 alertDelete(
                                                                     mPD.DOCUMENT_ID,
-                                                                    mPD.PERSON_ID
+                                                                    mPD.EMPLOYEE_ID
                                                                 )
                                                             }
                                                         />

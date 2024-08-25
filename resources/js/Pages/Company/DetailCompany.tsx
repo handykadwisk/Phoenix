@@ -9,6 +9,8 @@ import axios from "axios";
 import { FormEvent, PropsWithChildren, useEffect, useState } from "react";
 import Employee from "./Employee/Employee";
 import Structure from "./Structure/Structure";
+import Division from "../Division/Division";
+import DivisionCompany from "../DivisionCompany/DivisionCompany";
 
 export default function DetailCompany({
     idCompany,
@@ -117,6 +119,31 @@ export default function DetailCompany({
     const [nameCompany, setNameCompany] = useState<any>({
         COMPANY_NAME: "",
     });
+
+    // Division Modal
+    const [divisionModal, setDivisionModal] = useState({
+        add: false,
+        edit: false,
+        view: false,
+    });
+
+    // OnClick Division
+    const handleClickDivision = async (
+        e: FormEvent,
+        idCompany: number,
+        nameCompany: string
+    ) => {
+        e.preventDefault();
+        setNameCompany({
+            COMPANY_NAME: nameCompany,
+        });
+        setDivisionModal({
+            add: false,
+            edit: false,
+            view: !divisionModal.view,
+        });
+    };
+    // End Division Click
 
     return (
         <>
@@ -395,7 +422,7 @@ export default function DetailCompany({
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[85%]"
                 }
                 submitButtonName={""}
                 body={
@@ -440,6 +467,39 @@ export default function DetailCompany({
                 }
             />
             {/* End Modal Detail Structure */}
+
+            {/* Modal Division */}
+            <ModalToAction
+                show={divisionModal.view}
+                onClose={() =>
+                    setDivisionModal({
+                        add: false,
+                        edit: false,
+                        view: false,
+                    })
+                }
+                title={"Division"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DivisionCompany
+                            // isSuccess={isSuccess}
+                            idCompany={idCompany}
+                            // setIsSuccess={setIsSuccess}
+                            nameCompany={nameCompany.COMPANY_NAME}
+                        />
+                    </>
+                }
+            />
+            {/* end Modal Division */}
 
             <div className="bg-white rounded-md shadow-md mb-2 p-4">
                 <div className="flex justify-between">
@@ -512,6 +572,48 @@ export default function DetailCompany({
                 >
                     <div className="flex justify-center items-center text-sm font-medium">
                         <span>Structure</span>
+                    </div>
+                </div>
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                    onClick={(e) =>
+                        handleClickDivision(
+                            e,
+                            detailCompany.COMPANY_ID,
+                            detailCompany.COMPANY_NAME
+                        )
+                    }
+                >
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Division</span>
+                    </div>
+                </div>
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                    // onClick={(e) =>
+                    //     handleClickDivision(
+                    //         e,
+                    //         detailCompany.COMPANY_ID,
+                    //         detailCompany.COMPANY_NAME
+                    //     )
+                    // }
+                >
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Address Location Company</span>
+                    </div>
+                </div>
+                <div
+                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                    // onClick={(e) =>
+                    //     handleClickDivision(
+                    //         e,
+                    //         detailCompany.COMPANY_ID,
+                    //         detailCompany.COMPANY_NAME
+                    //     )
+                    // }
+                >
+                    <div className="flex justify-center items-center text-sm font-medium">
+                        <span>Job Desc</span>
                     </div>
                 </div>
             </div>

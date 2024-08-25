@@ -344,7 +344,7 @@ export default function Company({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[85%]"
                 }
                 submitButtonName={""}
                 body={
@@ -398,29 +398,31 @@ export default function Company({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 h-[100%] xs:mt-4 lg:mt-0">
-                    <AGGrid
-                        addButtonLabel={undefined}
-                        addButtonModalState={undefined}
-                        withParam={""}
-                        searchParam={null}
-                        // loading={isLoading.get_policy}
-                        url={"getCompany"}
-                        doubleClickEvent={handleDetailCompany}
-                        triggeringRefreshData={isSuccess}
-                        colDefs={[
-                            {
-                                headerName: "No.",
-                                valueGetter: "node.rowIndex + 1",
-                                flex: 1,
-                            },
-                            {
-                                headerName: "Company Name",
-                                field: "COMPANY_NAME",
-                                flex: 7,
-                            },
-                        ]}
-                    />
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={null}
+                            // loading={isLoading.get_policy}
+                            url={"getCompany"}
+                            doubleClickEvent={handleDetailCompany}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Company Name",
+                                    field: "COMPANY_NAME",
+                                    flex: 7,
+                                },
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>
