@@ -406,6 +406,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertManyInsured', [PolicyInsuredController::class, 'store'])->name('policyInsured.store');
     Route::get('/getDataInsured/{id}', [PolicyInsuredController::class, 'getDataInsured'])->name('policyInsured.getDataInsured');
     Route::get('/getInsuredById/{id}', [PolicyInsuredController::class, 'getInsuredById'])->name('policyCoverage.getInsuredById');
+    Route::post('/getSummaryInsured', [PolicyInsuredController::class, 'getSummaryInsured'])->name('policyCoverage.getSummaryInsured');
     Route::post('/editInsured', [PolicyInsuredController::class, 'editInsured'])->name('policyCoverage.editInsured');
     Route::post('/getInsurerNettPremi', [PolicyInsuredController::class, 'getInsurerNettPremi'])->name('policyCoverage.getInsurerNettPremi');
 
@@ -414,6 +415,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertPartners', [PolicyPartnerController::class, 'store'])->name('policyPartner.store');
     Route::post('/editPartners', [PolicyPartnerController::class, 'editPartners'])->name('policyPartner.editPartners');
     Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
+    Route::get('/getPolicyExchangeRate/{id}', [PolicyPartnerController::class, 'getPolicyExchangeRate'])->name('policyPartner.getPolicyExchangeRate');
+    Route::get('/getRelationByType/{id}', [PolicyPartnerController::class, 'getRelationByType'])->name('policyPartner.getRelationByType');
+    Route::get('/getPersonBaa/{id}', [PolicyPartnerController::class, 'getPersonBaa'])->name('policyPartner.getPersonBaa');
+
+    Route::get('/getSummary/{id}', [PolicyPartnerController::class, 'getSummary'])->name('policyPartner.getSummary');
 
     // HR
     Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
