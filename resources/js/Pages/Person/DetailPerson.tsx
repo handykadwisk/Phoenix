@@ -809,6 +809,8 @@ export default function DetailPerson({
         });
     };
 
+    console.log("data", detailPerson.t_person_bank);
+
     const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
@@ -2705,7 +2707,7 @@ export default function DetailPerson({
                         )} */}
                         <div className="grid grid-cols-3 gap-3 mt-4 xs:grid xs:grid-cols-1 lg:grid lg:grid-cols-3">
                             {detailPerson.relation?.HR_MANAGED_BY_APP !== 0 ? (
-                                <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
+                                <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer hidden">
                                     <a
                                         className="m-auto"
                                         onClick={(e) => handleEmploymentNew(e)}
@@ -2716,13 +2718,13 @@ export default function DetailPerson({
                             ) : null}
 
                             <div
-                                className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer"
+                                className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer hidden"
                                 onClick={(e) => handleAddressPerson(e)}
                             >
                                 <a className="m-auto">Address Person</a>
                             </div>
                             {detailPerson.relation?.HR_MANAGED_BY_APP !== 0 ? (
-                                <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer">
+                                <div className="bg-red-500 p-2 rounded-md shadow-md text-center text-white hover:bg-red-700 flex cursor-pointer hidden">
                                     <a
                                         className="m-auto"
                                         onClick={(e) => handleBankAccount(e)}

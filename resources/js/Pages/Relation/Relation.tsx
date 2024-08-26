@@ -106,8 +106,8 @@ export default function Relation({ auth }: PageProps) {
     const [isSuccess, setIsSuccess] = useState<any>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [mRelation, setMRelation] = useState<any>([]);
-    const [switchPage, setSwitchPage] = useState(false);
-    const [switchPageTBK, setSwitchPageTBK] = useState(false);
+    const [switchPage, setSwitchPage] = useState(true);
+    const [switchPagePKS, setSwitchPagePKS] = useState({});
 
     const getMappingParent = async (name: string, column: string) => {
         // setIsLoading(true)
@@ -164,6 +164,11 @@ export default function Relation({ auth }: PageProps) {
         profession_id: "",
         relation_type_id: [],
         corporate_pic_for: null,
+        NPWP_RELATION: "",
+        date_of_birth: "",
+        DEFAULT_PAYABLE: 0,
+        no_pks: [],
+        bank_account: [],
     });
 
     const [dataById, setDataById] = useState<any>({
@@ -236,6 +241,12 @@ export default function Relation({ auth }: PageProps) {
                 mark_tbk_relation: "",
                 profession_id: "",
                 relation_type_id: [],
+                corporate_pic_for: null,
+                NPWP_RELATION: "",
+                date_of_birth: "",
+                DEFAULT_PAYABLE: 0,
+                no_pks: [],
+                bank_account: [],
             });
             Swal.fire({
                 title: "Success",
@@ -260,7 +271,7 @@ export default function Relation({ auth }: PageProps) {
                 }
             });
             setSwitchPage(false);
-            setSwitchPageTBK(false);
+            setSwitchPagePKS(false);
             setIsSuccess(message);
         }
     };
@@ -324,10 +335,10 @@ export default function Relation({ auth }: PageProps) {
 
     const handleCheckboxTBKEdit = (e: any) => {
         if (e == true) {
-            setSwitchPageTBK(true);
+            setSwitchPagePKS(true);
             setDataById({ ...dataById, MARK_TBK_RELATION: "1" });
         } else {
-            setSwitchPageTBK(false);
+            setSwitchPagePKS(false);
             setDataById({ ...dataById, MARK_TBK_RELATION: "0" });
         }
     };
@@ -473,7 +484,17 @@ export default function Relation({ auth }: PageProps) {
         setSearchRelation({ ...searchRelation, relation_search: changeVal });
     };
 
-    console.log(searchRelation.relation_search);
+    const [bank, setBank] = useState<any>([]);
+    const getRBank = async () => {
+        await axios
+            .post(`/getRBank`)
+            .then((res) => {
+                setBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -499,6 +520,7 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     })
                 }
+                bank={bank}
                 idGroupRelation={""}
                 handleSuccess={handleSuccess}
                 relationStatus={relationStatus}
@@ -511,8 +533,8 @@ export default function Relation({ auth }: PageProps) {
                 setData={setData}
                 switchPage={switchPage}
                 setSwitchPage={setSwitchPage}
-                switchPageTBK={switchPageTBK}
-                setSwitchPageTBK={setSwitchPageTBK}
+                switchPagePKS={switchPagePKS}
+                setSwitchPagePKS={setSwitchPagePKS}
             />
             {/* end modal add relation */}
 
@@ -544,7 +566,7 @@ export default function Relation({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
                 submitButtonName={""}
                 body={
@@ -568,11 +590,12 @@ export default function Relation({ auth }: PageProps) {
 
             {/* Page */}
             <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
-                <div className="flex flex-col relative">
+                <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
                             className="p-2"
                             onClick={() => {
+                                getRBank();
                                 setSwitchPage(false);
                                 setModal({
                                     add: true,
@@ -706,29 +729,31 @@ export default function Relation({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
-                    <AGGrid
-                        addButtonLabel={undefined}
-                        addButtonModalState={undefined}
-                        withParam={""}
-                        searchParam={searchRelation.relation_search}
-                        // loading={isLoading.get_policy}
-                        url={"getRelation"}
-                        doubleClickEvent={handleDetailRelation}
-                        triggeringRefreshData={isSuccess}
-                        colDefs={[
-                            {
-                                headerName: "No.",
-                                valueGetter: "node.rowIndex + 1",
-                                flex: 1,
-                            },
-                            {
-                                headerName: "Relation Name",
-                                field: "RELATION_ORGANIZATION_ALIAS",
-                                flex: 7,
-                            },
-                        ]}
-                    />
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={searchRelation.relation_search}
+                            // loading={isLoading.get_policy}
+                            url={"getRelation"}
+                            doubleClickEvent={handleDetailRelation}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Relation Name",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                },
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

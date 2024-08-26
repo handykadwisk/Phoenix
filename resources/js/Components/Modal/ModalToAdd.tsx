@@ -51,7 +51,6 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
-                console.log(res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -124,12 +123,14 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                                <div
-                                                    className="max-h-full overflow-y-auto custom-scrollbar px-1"
-                                                    ref={modalRef}
-                                                >
-                                                    {body}
-                                                </div>
+                                            {/* <div className="max-h-[100%]"> */}
+                                            <div
+                                                className="overflow-y-auto custom-scrollbar px-2 modal-action"
+                                                ref={modalRef}
+                                            >
+                                                {body}
+                                            </div>
+                                            {/* </div> */}
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             <PrimaryButton

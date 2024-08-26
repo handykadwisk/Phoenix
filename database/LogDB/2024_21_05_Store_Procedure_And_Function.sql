@@ -31,6 +31,30 @@ BEGIN
 END */$$
 DELIMITER ;
 
+/* Function  structure for function  `f_get_path_company_division` */
+
+/*!50003 DROP FUNCTION IF EXISTS `f_get_path_company_division` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_company_division`(`input_company_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_company_division`(input_company_id,input, @path);
+  RETURN @path;
+END */$$
+DELIMITER ;
+
+/* Function  structure for function  `f_get_path_company_structure` */
+
+/*!50003 DROP FUNCTION IF EXISTS `f_get_path_company_structure` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `f_get_path_company_structure`(`input_company_id` INT, `input` INT) RETURNS text CHARSET latin1
+BEGIN
+  CALL `sp_path_company_structure`(input_company_id,input, @path);
+  RETURN @path;
+END */$$
+DELIMITER ;
+
 /* Function  structure for function  `f_get_path_relation_division` */
 
 /*!50003 DROP FUNCTION IF EXISTS `f_get_path_relation_division` */;
@@ -100,6 +124,140 @@ DELIMITER $$
 BEGIN
   CALL `sp_path_relation_structure`(input_relation_organization_id,input, @path);
   RETURN @path;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_combo_company_division` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_combo_company_division` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_company_division`(IN `input_company_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_company_id IS NULL 
+  THEN 
+  SELECT 
+    COMPANY_DIVISION_ID,
+    COMPANY_DIVISION_PARENT_ID,
+    COMPANY_ID,
+    COMPANY_DIVISION_ALIAS,
+    @path_combo := `f_get_path_company_division` (NULL, COMPANY_DIVISION_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      COMPANY_DIVISION_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        COMPANY_DIVISION_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_company_division 
+  ORDER BY COMPANY_ID,
+    mapping ;
+  ELSE 
+  SELECT 
+    COMPANY_DIVISION_ID,
+    COMPANY_DIVISION_PARENT_ID,
+    COMPANY_ID,
+    COMPANY_DIVISION_ALIAS,
+    @path_combo := `f_get_path_company_division` (input_company_id, COMPANY_DIVISION_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      COMPANY_DIVISION_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        COMPANY_DIVISION_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_company_division 
+  WHERE COMPANY_ID = input_company_id 
+  ORDER BY COMPANY_ID,
+    mapping ;
+  END IF ;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_combo_company_structure` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_combo_company_structure` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_combo_company_structure`(IN `input_company_id` INT)
+BEGIN
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_company_id IS NULL 
+  THEN 
+  SELECT 
+    COMPANY_STRUCTURE_ID,
+    COMPANY_STRUCTURE_PARENT_ID,
+    COMPANY_ID,
+    COMPANY_STRUCTURE_ALIAS,
+    @path_combo := `f_get_path_company_structure` (NULL, COMPANY_STRUCTURE_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      COMPANY_STRUCTURE_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        COMPANY_STRUCTURE_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_company_structure 
+  ORDER BY COMPANY_ID,
+    mapping ;
+  ELSE 
+  SELECT 
+    COMPANY_STRUCTURE_ID,
+    COMPANY_STRUCTURE_PARENT_ID,
+    COMPANY_ID,
+    COMPANY_STRUCTURE_ALIAS,
+    @path_combo := `f_get_path_company_structure` (input_company_id, COMPANY_STRUCTURE_ID) mapping,
+    IF(
+      (
+        LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+      ) <= 1,
+      COMPANY_STRUCTURE_ALIAS,
+      CONCAT(
+        REPEAT(
+          '++',
+          (
+            LENGTH(@path_combo) - LENGTH(REPLACE(@path_combo, ".", ""))
+          ) - 1
+        ),
+        COMPANY_STRUCTURE_ALIAS
+      )
+    ) text_combo 
+  FROM
+    t_company_structure 
+  WHERE COMPANY_ID = input_company_id 
+  ORDER BY COMPANY_ID,
+    mapping ;
+  END IF ;
 END */$$
 DELIMITER ;
 
@@ -547,6 +705,100 @@ BEGIN
 END */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `sp_path_company_division` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_path_company_division` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_company_division`(IN `input_comapny_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_comapny_id IS NULL 
+  THEN 
+  SELECT 
+    COMPANY_DIVISION_ID,
+    COMPANY_DIVISION_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_company_division 
+  WHERE COMPANY_DIVISION_ID = input ;
+  ELSE 
+  SELECT 
+    COMPANY_DIVISION_ID,
+    COMPANY_DIVISION_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_company_division 
+  WHERE COMPANY_DIVISION_ID = input 
+    AND COMPANY_ID = input_comapny_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_company_division` (
+    input_comapny_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_path_company_structure` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_path_company_structure` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_path_company_structure`(IN `input_comapny_id` INT, IN `input` INT, OUT `output` TEXT)
+BEGIN
+  DECLARE _id INT ;
+  DECLARE _parent INT ;
+  DECLARE _path TEXT ;
+  SET `max_sp_recursion_depth` = 5000 ;
+  IF input_comapny_id IS NULL 
+  THEN 
+  SELECT 
+    COMPANY_STRUCTURE_ID,
+    COMPANY_STRUCTURE_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_company_structure 
+  WHERE COMPANY_STRUCTURE_ID = input ;
+  ELSE 
+  SELECT 
+    COMPANY_STRUCTURE_ID,
+    COMPANY_STRUCTURE_PARENT_ID INTO _id,
+    _parent 
+  FROM
+    t_company_structure 
+  WHERE COMPANY_STRUCTURE_ID = input 
+    AND COMPANY_ID = input_comapny_id ;
+  END IF ;
+  IF _parent IS NULL 
+  OR _parent = 0 
+  THEN SET _path = CONCAT(_id, '.') ;
+  ELSE CALL `sp_path_company_structure` (
+    input_comapny_id,
+    _parent,
+    _path
+  ) ;
+  SELECT 
+    CONCAT(_path, _id, '.') INTO _path ;
+  END IF ;
+  SELECT 
+    _path INTO output ;
+END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `sp_path_relation_division` */
 
 /*!50003 DROP PROCEDURE IF EXISTS  `sp_path_relation_division` */;
@@ -826,6 +1078,38 @@ BEGIN
   END IF ;
   SELECT 
     _path INTO output ;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_set_mapping_company_division` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_set_mapping_company_division` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_company_division`(IN `input_company_id` INT)
+BEGIN
+IF input_company_id IS NULL THEN
+UPDATE t_company_division SET COMPANY_DIVISION_MAPPING=f_get_path_company_division(input_company_id, COMPANY_DIVISION_ID); 
+ELSE
+UPDATE t_company_division SET COMPANY_DIVISION_MAPPING=f_get_path_company_division(input_company_id, COMPANY_DIVISION_ID) WHERE COMPANY_ID=input_company_id; 
+END IF;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_set_mapping_company_structure` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_set_mapping_company_structure` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_mapping_company_structure`(IN `input_company_id` INT)
+BEGIN
+IF input_company_id IS NULL THEN
+UPDATE t_company_structure SET COMPANY_STRUCTURE_MAPPING=f_get_path_company_structure(input_company_id, COMPANY_STRUCTURE_ID); 
+ELSE
+UPDATE t_company_structure SET COMPANY_STRUCTURE_MAPPING=f_get_path_company_structure(input_company_id, COMPANY_STRUCTURE_ID) WHERE COMPANY_ID=input_company_id; 
+END IF;
 END */$$
 DELIMITER ;
 

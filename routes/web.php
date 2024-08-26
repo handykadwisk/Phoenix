@@ -30,12 +30,17 @@ use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\TCompanyController;
+use App\Http\Controllers\TCompanyDivisionController;
+use App\Http\Controllers\TCompanyStructureController;
+use App\Http\Controllers\TEmployeeController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
+use App\Models\TCompanyDivision;
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
@@ -67,6 +72,21 @@ Route::middleware('auth')->group(function () {
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');
     Route::post('/getRelationDetail', [RelationController::class, 'get_detail'])->name('getRelationDetail.get_detail');
     Route::post('/getCekAbbreviation', [RelationController::class, 'getCekAbbreviation'])->name('getCekAbbreviation.getCekAbbreviation');
+    Route::post('/getRelationAll', [RelationController::class, 'getRelationAll'])->name('getRelationAll.getRelationAll');
+    Route::post('/getCorporatePIC', [RelationController::class, 'get_corporate'])->name('getCorporatePIC.get_corporate');
+    Route::post('/editCorporatePIC', [RelationController::class, 'edit_corporate'])->name('editCorporatePIC.edit_corporate');
+    Route::post('/getIndividuAKA', [RelationController::class, 'get_individu_aka'])->name('getIndividuAKA.get_individu_aka');
+    Route::post('/editBankRelation', [RelationController::class, 'edit_bank'])->name('editBankRelation.edit_bank');
+    Route::get('/getDocumentPKSAgent', [RelationController::class, 'getPKSAgentJson'])->name('getDocumentPKSAgent.getPKSAgentJson');
+    Route::get('/getDocumentPKSFbi', [RelationController::class, 'getPKSFbiJson'])->name('getDocumentPKSFbi.getPKSFbiJson');
+    Route::post('/editDocumentPks', [RelationController::class, 'edit_document_pks'])->name('editDocumentPks.edit_document_pks');
+
+
+
+
+
+
+
 
 
 
@@ -147,30 +167,31 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRBank', [TPersonController::class, 'getRBank'])->name('getRBank.getRBank');
     Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
-    Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
+    // Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
     Route::post('/getDistrict', [TPersonController::class, 'get_district'])->name('getDistrict.get_district');
     Route::post('/getVillage', [TPersonController::class, 'get_village'])->name('getVillage.get_village');
     Route::post('/get_regency', [TPersonController::class, 'get_regency'])->name('get_regency.get_regency');
     Route::post('/getAddressStatus', [TPersonController::class, 'get_address_status'])->name('getAddressStatus.get_address_status');
-    Route::post('/addAddressPerson', [TPersonController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
+    // Route::post('/addAddressPerson', [TPersonController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
     Route::post('/getPersonAddress', [TPersonController::class, 'getPersonAddress'])->name('getPersonAddress.getPersonAddress');
     Route::post('/detailAddress', [TPersonController::class, 'getDetailAddress'])->name('detailAddress.getDetailAddress');
-    Route::post('/editAddress', [TPersonController::class, 'editAddress'])->name('editAddress.geteditAddress');
+    // Route::post('/editAddress', [TPersonController::class, 'editAddress'])->name('editAddress.geteditAddress');
     Route::post('/getEducationDegree', [TPersonController::class, 'getEducationDegree'])->name('getEducationDegree.getEducationDegree');
-    Route::post('/addEducationPerson', [TPersonController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
-    Route::post('/editEducationPerson', [TPersonController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
+    // Route::post('/addEducationPerson', [TPersonController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
+    // Route::post('/editEducationPerson', [TPersonController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
     Route::post('/getQualification', [TPersonController::class, 'getQualification'])->name('getQualification.getQualification');
-    Route::post('/addCertificate', [TPersonController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
-    Route::post('/EditCertificate', [TPersonController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
-    Route::post('/addDocumentPerson', [TPersonController::class, 'add_document'])->name('addDocumentPerson.add_document');
-    Route::post('/deleteDocument', [TPersonController::class, 'delete_document'])->name('deleteDocument.delete_document');
+    // Route::post('/addCertificate', [TPersonController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
+    // Route::post('/EditCertificate', [TPersonController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
+    // Route::post('/addDocumentPerson', [TPersonController::class, 'add_document'])->name('addDocumentPerson.add_document');
+    // Route::post('/deleteDocument', [TPersonController::class, 'delete_document'])->name('deleteDocument.delete_document');
     Route::get('/downloadImage/{id}', [TPersonController::class, 'download_document'])->name('downloadImage.download_document');
     Route::post('/getForBankAccount', [TPersonController::class, 'getForBankAccount'])->name('getForBankAccount.getForBankAccount');
     Route::post('/getTPersonBank', [TPersonController::class, 'getTPersonBank'])->name('getTPersonBank.getTPersonBank');
-    Route::post('/editBankAccount', [TPersonController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
-
-
-
+    // Route::post('/editBankAccount', [TPersonController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+    // Route::get('/downloadPersonDocument/{id}', [TPersonController::class, 'person_document_download'])->name('downloadPersonDocument.person_document_download');
+    Route::post('/getIndividuRelation', [TPersonController::class, 'get_individu_relation'])->name('getIndividuRelation.get_individu_relation');
+    Route::post('/addPic', [TPersonController::class, 'add_pic'])->name('addPic.add_pic');
+    Route::post('/deletePerson', [TPersonController::class, 'delete_person'])->name('deletePerson.delete_person');
 
 
 
@@ -395,7 +416,52 @@ Route::middleware('auth')->group(function () {
     Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
 
     // HR
-    Route::get('hr/settingCompany', [RelationController::class, 'index'])->name('hr/settingCompany');
+    Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
+    Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
+    Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
+    Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
+    Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
+
+    // Employee
+    Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
+    Route::post('/addEmployee', [TEmployeeController::class, 'store'])->name('addEmployee.store');
+    Route::post('/getDetailEmployee', [TEmployeeController::class, 'get_employeeById'])->name('getDetailEmployee.get_employeeById');
+    Route::post('/editEmployee', [TEmployeeController::class, 'edit_Employee'])->name('editEmployee.edit_Employee');
+    Route::post('/employmentEdit', [TEmployeeController::class, 'employmentEdit'])->name('employmentEdit.employmentEdit');
+    Route::post('/getEmployeeDetail', [TEmployeeController::class, 'get_detail'])->name('getEmployeeDetail.get_detail');
+    Route::post('/editEmployeeDetail', [TEmployeeController::class, 'editEmployeeDetail'])->name('editEmployeeDetail.editEmployeeDetail');
+    Route::post('/addEducationPerson', [TEmployeeController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
+    Route::post('/editEducationPerson', [TEmployeeController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
+    Route::post('/addCertificate', [TEmployeeController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
+    Route::post('/EditCertificate', [TEmployeeController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
+    Route::post('/addDocumentPerson', [TEmployeeController::class, 'add_document'])->name('addDocumentPerson.add_document');
+    Route::get('/downloadPersonDocument/{id}', [TEmployeeController::class, 'person_document_download'])->name('downloadPersonDocument.person_document_download');
+    Route::post('/deleteDocument', [TEmployeeController::class, 'delete_document'])->name('deleteDocument.delete_document');
+    Route::post('/addAddressPerson', [TEmployeeController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
+    Route::post('/getEmployeeAddress', [TEmployeeController::class, 'getEmployeeAddress'])->name('getEmployeeAddress.getEmployeeAddress');
+    Route::post('/editAddress', [TEmployeeController::class, 'editAddress'])->name('editAddress.editAddress');
+    Route::post('/addBankAccount', [TEmployeeController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
+    Route::post('/editBankAccount', [TEmployeeController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+
+
+
+    // Company Structure
+    Route::post('/getCompanyStructureCombo', [TCompanyStructureController::class, 'get_StructureCombo'])->name('getCompanyStructureCombo.get_StructureCombo');
+    Route::post('/addCompanyStructure', [TCompanyStructureController::class, 'store'])->name('addCompanyStructure.store');
+    Route::get('/getCompanyStructure', [TCompanyStructureController::class, 'getCompanyStructureJson'])->name('getCompanyStructure.getCompanyStructureJson');
+    Route::post('/getCompanyStructureDetail', [TCompanyStructureController::class, 'get_CompanyStructureDetail'])->name('getCompanyStructureDetail.get_CompanyStructureDetail');
+    Route::post('/editStructureCompany', [TCompanyStructureController::class, 'edit'])->name('editStructureCompany.edit');
+
+    // Company Division
+    Route::get('/getDivisionCompany', [TCompanyDivisionController::class, 'getCompanyDivisionJson'])->name('getDivisionCompany.getCompanyDivisionJson');
+    Route::post('/addDivisionCompany', [TCompanyDivisionController::class, 'store'])->name('addDivisionCompany.store');
+    Route::post('/getDivisionComboCompany', [TCompanyDivisionController::class, 'getDivisionComboCompany'])->name('getDivisionComboCompany.getDivisionComboCompany');
+    Route::post('/getDivisionDetailCompany', [TCompanyDivisionController::class, 'get_detail'])->name('getDivisionDetailCompany.get_detail');
+    Route::post('/editDivisionCompany', [TCompanyDivisionController::class, 'edit'])->name('editDivisionCompany.edit');
+
+
+
+
 
 
 
