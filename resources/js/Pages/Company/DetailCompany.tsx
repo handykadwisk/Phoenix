@@ -11,6 +11,8 @@ import Employee from "./Employee/Employee";
 import Structure from "./Structure/Structure";
 import Division from "../Division/Division";
 import DivisionCompany from "../DivisionCompany/DivisionCompany";
+import AddressCompany from "../AddressCompany/AddressCompany";
+import JobCompany from "../JobCompany/JobCompany";
 
 export default function DetailCompany({
     idCompany,
@@ -145,8 +147,120 @@ export default function DetailCompany({
     };
     // End Division Click
 
+    // location modal
+    const [locationModal, setLocationModal] = useState({
+        add: false,
+        edit: false,
+        view: false,
+    });
+    // OnClick Address Location
+    const handleClickAddressLocation = async (
+        e: FormEvent,
+        idCompany: number,
+        nameCompany: string
+    ) => {
+        e.preventDefault();
+        setNameCompany({
+            COMPANY_NAME: nameCompany,
+        });
+        setLocationModal({
+            add: false,
+            edit: false,
+            view: !locationModal.view,
+        });
+    };
+    // End Address Location Click
+
+    // job des modal
+    const [jobDeskModal, setJobDeskModal] = useState({
+        add: false,
+        edit: false,
+        view: false,
+    });
+    // OnClick Address Location
+    const handleClickJobDesk = async (
+        e: FormEvent,
+        idCompany: number,
+        nameCompany: string
+    ) => {
+        e.preventDefault();
+        setNameCompany({
+            COMPANY_NAME: nameCompany,
+        });
+
+        setJobDeskModal({
+            add: false,
+            edit: false,
+            view: !jobDeskModal.view,
+        });
+    };
+    // End Address Location Click
     return (
         <>
+            {/* modal for job desc */}
+            <ModalToAction
+                show={jobDeskModal.view}
+                onClose={() =>
+                    setJobDeskModal({
+                        add: false,
+                        edit: false,
+                        view: false,
+                    })
+                }
+                title={"Job Desc"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <JobCompany
+                            auth={""}
+                            idCompany={idCompany}
+                            nameCompany={nameCompany.COMPANY_NAME}
+                        />
+                    </>
+                }
+            />
+            {/* end modal for job desc */}
+
+            {/* Modal Address Location */}
+            <ModalToAction
+                show={locationModal.view}
+                onClose={() =>
+                    setLocationModal({
+                        add: false,
+                        edit: false,
+                        view: false,
+                    })
+                }
+                title={"Address & Location"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[85%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <AddressCompany
+                            auth={""}
+                            idCompany={idCompany}
+                            nameCompany={nameCompany.COMPANY_NAME}
+                        />
+                    </>
+                }
+            />
+            {/* end Modal Address Location */}
+
             {/* Modal Edit Company */}
             <ModalToAdd
                 buttonAddOns={""}
@@ -590,13 +704,13 @@ export default function DetailCompany({
                 </div>
                 <div
                     className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    // onClick={(e) =>
-                    //     handleClickDivision(
-                    //         e,
-                    //         detailCompany.COMPANY_ID,
-                    //         detailCompany.COMPANY_NAME
-                    //     )
-                    // }
+                    onClick={(e) =>
+                        handleClickAddressLocation(
+                            e,
+                            detailCompany.COMPANY_ID,
+                            detailCompany.COMPANY_NAME
+                        )
+                    }
                 >
                     <div className="flex justify-center items-center text-sm font-medium">
                         <span>Address Location Company</span>
@@ -604,13 +718,13 @@ export default function DetailCompany({
                 </div>
                 <div
                     className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    // onClick={(e) =>
-                    //     handleClickDivision(
-                    //         e,
-                    //         detailCompany.COMPANY_ID,
-                    //         detailCompany.COMPANY_NAME
-                    //     )
-                    // }
+                    onClick={(e) =>
+                        handleClickJobDesk(
+                            e,
+                            detailCompany.COMPANY_ID,
+                            detailCompany.COMPANY_NAME
+                        )
+                    }
                 >
                     <div className="flex justify-center items-center text-sm font-medium">
                         <span>Job Desc</span>
