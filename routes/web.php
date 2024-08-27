@@ -257,6 +257,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCARequestStatus', [CashAdvanceController::class, 'getCountCARequestStatus'])->name('getCountCARequestStatus');
     Route::get('/getCountCAApprove1Status', [CashAdvanceController::class, 'getCountCAApprove1Status'])->name('getCountCAApprove1Status');
     Route::get('/getCountCAApprove2Status', [CashAdvanceController::class, 'getCountCAApprove2Status'])->name('getCountCAApprove2Status');
+    Route::get('/getCountCAApprove3Status', [CashAdvanceController::class, 'getCountCAApprove3Status'])->name('getCountCAApprove3Status');
     Route::get('/getCountCAPendingReportStatus', [CashAdvanceController::class, 'getCountCAPendingReportStatus'])->name('getCountCAPendingReportStatus');
     Route::get('/getCountCANeedRevisionStatus', [CashAdvanceController::class, 'getCountCANeedRevisionStatus'])->name('getCountCANeedRevisionStatus');
     Route::get('/getCountCARejectStatus', [CashAdvanceController::class, 'getCountCARejectStatus'])->name('getCountCARejectStatus');
@@ -265,7 +266,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCAReportRequestStatus', [CashAdvanceReportController::class, 'getCountCAReportRequestStatus'])->name('getCountCAReportRequestStatus');
     Route::get('/getCountCAReportApprove1Status', [CashAdvanceReportController::class, 'getCountCAReportApprove1Status'])->name('getCountCAReportApprove1Status');
     Route::get('/getCountCAReportApprove2Status', [CashAdvanceReportController::class, 'getCountCAReportApprove2Status'])->name('getCountCAReportApprove2Status');
-    Route::get('/getCountCAReportPendingReportStatus', [CashAdvanceReportController::class, 'getCountCAReportPendingReportStatus'])->name('getCountCAReportPendingReportStatus');
+    Route::get('/getCountCAReportApprove3Status', [CashAdvanceReportController::class, 'getCountCAReportApprove3Status'])->name('getCountCAReportApprove3Status');
     Route::get('/getCountCAReportNeedRevisionStatus', [CashAdvanceReportController::class, 'getCountCAReportNeedRevisionStatus'])->name('getCountCAReportNeedRevisionStatus');
     Route::get('/getCountCAReportRejectStatus', [CashAdvanceReportController::class, 'getCountCAReportRejectStatus'])->name('getCountCARejectStatus');
     Route::get('/getCountCAReportComplitedStatus', [CashAdvanceReportController::class, 'getCountCAReportComplitedStatus'])->name('getCountCAReportComplitedStatus');
@@ -281,6 +282,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/cashAdvanceRevised/{id}', [CashAdvanceController::class, 'cash_advance_revised'])->name('cashAdvance.revised');
     Route::patch('/cashAdvanceExecute/{id}', [CashAdvanceController::class, 'cash_advance_execute'])->name('cashAdvance.execute');
     Route::get('/cashAdvanceDownload/{id}/{key}', [CashAdvanceController::class, 'cash_advance_download'])->name('cashAdvance.download');
+    Route::get('/cashAdvanceDocReader/{id}/{key}', [CashAdvanceController::class, 'cash_advance_doc_reader'])->name('cashAdvanceDocReader.cash_advance_doc_reader');
 
     // Cash Advance Report
     Route::post('/getCAReport', [CashAdvanceReportController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
@@ -290,19 +292,38 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCashAdvanceMethod', [CashAdvanceReportController::class, 'getCashAdvanceMethod'])->name('getCashAdvanceMethod');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
     Route::patch('/cashAdvanceReportApprove/{id}', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
-    Route::patch('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
+    Route::post('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
     Route::post('/cashAdvanceReportExecute', [CashAdvanceReportController::class, 'cash_advance_report_execute'])->name('cashAdvanceReport.execute');
     Route::get('/cashAdvanceReportDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_download'])->name('cashAdvanceReport.download');
+    Route::get('/cashAdvanceReportProofOfDocumentDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_download'])->name('cashAdvanceReportProofOfDocument.download');
+    Route::get('/cashAdvanceReportDocReader/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_doc_reader'])->name('cashAdvanceReport.cash_advance_doc_reader');
+    Route::get('/cashAdvanceReportProofOfDocumentDocReader/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_doc_reader'])->name('cashAdvanceReport.cash_advance_doc_reader');
+
+    // Get Count Reimburse Status
+    Route::get('/getCountReimburseRequestStatus', [ReimburseController::class, 'getCountReimburseRequestStatus'])->name('getCountReimburseRequestStatus');
+    Route::get('/getCountReimburseApprove1Status', [ReimburseController::class, 'getCountReimburseApprove1Status'])->name('getCountReimburseApprove1Status');
+    Route::get('/getCountReimburseApprove2Status', [ReimburseController::class, 'getCountReimburseApprove2Status'])->name('getCountReimburseApprove2Status');
+    Route::get('/getCountReimburseApprove3Status', [ReimburseController::class, 'getCountReimburseApprove3Status'])->name('getCountReimburseApprove3Status');
+    Route::get('/getCountReimburseNeedRevisionStatus', [ReimburseController::class, 'getCountReimburseNeedRevisionStatus'])->name('getCountReimburseNeedRevisionStatus');
+    Route::get('/getCountReimburseRejectStatus', [ReimburseController::class, 'getCountReimburseRejectStatus'])->name('getCountReimburseRejectStatus');
+    Route::get('/getCountReimburseComplitedStatus', [ReimburseController::class, 'getCountReimburseComplitedStatus'])->name('getCountReimburseComplitedStatus');
 
     // Reimburse
     Route::post('/getReimburse', [ReimburseController::class, 'getReimburse'])->name('cashAdvance.getReimburse');
     Route::get('/getReimburseNumber', [ReimburseController::class, 'getReimburseNumber'])->name('getReimburseNumber');
     Route::get('/getReimburseById/{id}', [ReimburseController::class, 'getReimburseById'])->name('getReimburseById');
+    Route::get('/getReimburseApproval', [ReimburseController::class, 'getReimburseApproval'])->name('getReimburseApproval');
+    Route::get('/getReimburseNotes', [ReimburseController::class, 'getReimburseNotes'])->name('getReimburseNotes');
+    Route::get('/getReimburseMethod', [ReimburseController::class, 'getReimburseMethod'])->name('getReimburseMethod');
     Route::get('/reimburse', [ReimburseController::class, 'index'])->name('reimburse');
     Route::post('/reimburse', [ReimburseController::class, 'store'])->name('reimburse.store');
-    Route::patch('/reimburseApprove/{id}', [ReimburseController::class, 'approve'])->name('reimburse.approve');
-    Route::patch('/reimburseRevised/{id}', [ReimburseController::class, 'revised'])->name('reimburse.revised');
-    Route::get('/reimburseDownload/{id}', [ReimburseController::class, 'download'])->name('reimburse.download');
+    Route::patch('/reimburseApprove', [ReimburseController::class, 'approve'])->name('reimburse.approve');
+    Route::post('/reimburseRevised', [ReimburseController::class, 'revised'])->name('reimburse.revised');
+    Route::post('/reimburseExecute', [ReimburseController::class, 'execute'])->name('reimburse.execute');
+    Route::get('/reimburseDownload/{id}/{key}', [ReimburseController::class, 'download'])->name('reimburse.download');
+    Route::get('/reimburseProofOfDocumentDownload/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_download'])->name('reimburseProofOfDocument.download');
+    Route::get('/reimburseDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_doc_reader'])->name('reimburseDocReader.reimburse_doc_reader');
+    Route::get('/reimburseProofOfDocumentDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_doc_reader'])->name('reimburseProofOfDocumentDocReader.reimburse_proof_of_document_doc_reader');
 
     // Other Expenses
     Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');

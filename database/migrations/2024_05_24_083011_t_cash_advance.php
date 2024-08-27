@@ -15,6 +15,8 @@ return new class extends Migration
             $table->increments('CASH_ADVANCE_ID')->primary();
             $table->string('CASH_ADVANCE_NUMBER')->nullable();
             $table->string('CASH_ADVANCE_DIVISION')->nullable();
+            $table->string('CASH_ADVANCE_COST_CENTER')->nullable();
+            $table->string('CASH_ADVANCE_BRANCH')->nullable();
             $table->smallInteger('CASH_ADVANCE_USED_BY')->nullable();
             $table->smallInteger('CASH_ADVANCE_REQUESTED_BY')->nullable();
             $table->date('CASH_ADVANCE_REQUESTED_DATE')->nullable();

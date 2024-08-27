@@ -235,62 +235,58 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Mapping data menu
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $dashboard->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $relation->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $policy->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $finance
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $cashAdvance
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $reimburse
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $otherExpenses
-        ]);
         // RoleAccessMenu::create([
         //     'role_id' => $admin->id,
-        //     'menu_id' => $setting
+        //     'menu_id' => $dashboard->id
         // ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $approvalLimit
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $relation->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $policy->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $finance
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $cashAdvance
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $reimburse
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $otherExpenses
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $approvalLimit
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $setting->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $setting->id
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $ACLMenu->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $ACLMenu->id
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $ACLPermission->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $ACLPermission->id
+        // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $ACLRole->id
-        ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $ACLRole->id
+        // ]);
 
         RoleAccessMenu::create([
             'role_id' => $admin->id,
@@ -492,7 +488,7 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path13)
         );
 
-        $file_path14 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_cost_classification.sql');
+        $file_path14 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_approval.sql');
 
         DB::unprepared(
             file_get_contents($file_path14)
@@ -590,6 +586,18 @@ class DatabaseSeeder extends Seeder
 
         DB::unprepared(
             file_get_contents($file_path24)
+        );
+
+        $file_path25 = resource_path('../database/LogDB/2024_08_13_t_relation_office.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path25)
+        );
+
+        $file_path26 = resource_path('../database/LogDB/2024_08_15_r_reimburse_notes.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path26)
         );
     }
 }

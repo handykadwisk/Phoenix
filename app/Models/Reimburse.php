@@ -21,9 +21,14 @@ class Reimburse extends Model
 
     protected $with = [
         'reimburse_detail',
-        'user',
-        'user_used_by',
-        'user_approval',
+        'm_reimburse_proof_of_document',
+        'division',
+        'cost_center',
+        'office',
+        'notes',
+        'person',
+        'person_used_by',
+        'person_approval',
         'approval_status'
     ];
 
@@ -31,24 +36,49 @@ class Reimburse extends Model
     {
         return $this->hasMany(ReimburseDetail::class, 'REIMBURSE_ID');
     }
-    
-    public function user(): BelongsTo
+
+    public function m_reimburse_proof_of_document(): HasMany
     {
-        return $this->belongsTo(User::class, 'REIMBURSE_REQUESTED_BY');
+        return $this->hasMany(MReimburseProofOfDocument::class, 'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_ID');
     }
 
-    public function user_used_by(): BelongsTo
+    public function division(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'REIMBURSE_USED_BY');
+        return $this->belongsTo(TRelationDivision::class, 'REIMBURSE_DIVISION');
     }
 
-    public function user_approval(): BelongsTo
+    public function cost_center(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'REIMBURSE_FIRST_APPROVAL_BY');
+        return $this->belongsTo(TRelationDivision::class, 'REIMBURSE_COST_CENTER');
+    }
+
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(TRelationOffice::class, 'REIMBURSE_BRANCH');
+    }
+
+    public function notes(): BelongsTo
+    {
+        return $this->belongsTo(RReimburseNotes::class, 'REIMBURSE_TYPE');
+    }
+
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REIMBURSE_REQUESTED_BY');
+    }
+
+    public function person_used_by(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REIMBURSE_USED_BY');
+    }
+
+    public function person_approval(): BelongsTo
+    {
+        return $this->belongsTo(TPerson::class, 'REIMBURSE_FIRST_APPROVAL_BY');
     }
 
     public function approval_status(): BelongsTo
     {
-        return $this->belongsTo(CashAdvanceStatus::class, 'REIMBURSE_FIRST_APPROVAL_STATUS', 'CA_STATUS_ID');
+        return $this->belongsTo(CashAdvanceStatus::class, 'REIMBURSE_FIRST_APPROVAL_STATUS', 'CASH_ADVANCE_STATUS_ID');
     }
 }
