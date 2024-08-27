@@ -26,9 +26,9 @@ class Reimburse extends Model
         'cost_center',
         'office',
         'notes',
-        'person',
-        'person_used_by',
-        'person_approval',
+        'employee',
+        'employee_used_by',
+        'employee_approval',
         'approval_status'
     ];
 
@@ -44,17 +44,17 @@ class Reimburse extends Model
 
     public function division(): BelongsTo
     {
-        return $this->belongsTo(TRelationDivision::class, 'REIMBURSE_DIVISION');
+        return $this->belongsTo(TCompanyDivision::class, 'REIMBURSE_DIVISION');
     }
 
     public function cost_center(): BelongsTo
     {
-        return $this->belongsTo(TRelationDivision::class, 'REIMBURSE_COST_CENTER');
+        return $this->belongsTo(TCompanyDivision::class, 'REIMBURSE_COST_CENTER');
     }
 
     public function office(): BelongsTo
     {
-        return $this->belongsTo(TRelationOffice::class, 'REIMBURSE_BRANCH');
+        return $this->belongsTo(TCompanyOffice::class, 'REIMBURSE_BRANCH');
     }
 
     public function notes(): BelongsTo
@@ -62,19 +62,19 @@ class Reimburse extends Model
         return $this->belongsTo(RReimburseNotes::class, 'REIMBURSE_TYPE');
     }
 
-    public function person(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'REIMBURSE_REQUESTED_BY');
+        return $this->belongsTo(TEmployee::class, 'REIMBURSE_REQUESTED_BY');
     }
 
-    public function person_used_by(): BelongsTo
+    public function employee_used_by(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'REIMBURSE_USED_BY');
+        return $this->belongsTo(TEmployee::class, 'REIMBURSE_USED_BY');
     }
 
-    public function person_approval(): BelongsTo
+    public function employee_approval(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'REIMBURSE_FIRST_APPROVAL_BY');
+        return $this->belongsTo(TEmployee::class, 'REIMBURSE_FIRST_APPROVAL_BY');
     }
 
     public function approval_status(): BelongsTo

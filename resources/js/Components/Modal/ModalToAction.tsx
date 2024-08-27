@@ -80,7 +80,7 @@ export default function ModalToAction({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-50"
+                    className="relative z-9999"
                     onClose={close}
                     initialFocus={modalRef}
                 >
@@ -134,7 +134,7 @@ export default function ModalToAction({
                                             )}
                                             {/* <div className="max-h-full"> */}
                                             <div
-                                                className="modal-action overflow-y-auto custom-scrollbar px-2"
+                                                className="modal-action h-full overflow-y-auto custom-scrollbar px-2"
                                                 ref={modalRef}
                                             >
                                                 {body}

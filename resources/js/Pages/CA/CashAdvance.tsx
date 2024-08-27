@@ -69,7 +69,7 @@ export default function CashAdvance({ auth }: PageProps) {
     };
 
     // Modal Add Start
-    const [modal, setModal] = useState({
+    const [modal, setModal] = useState<any>({
         add: false,
         delete: false,
         edit: false,
@@ -284,7 +284,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Success End
 
     // Handle Add Row Start
-    const [DataRow, setDataRow] = useState([
+    const [DataRow, setDataRow] = useState<any>([
         {
             cash_advance_detail_start_date: "",
             cash_advance_detail_end_date: "",
@@ -799,7 +799,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // Handle Remove Row Revised Show Files End
 
     // Handle Add Row Report CA Start
-    const [DataReportRow, setDataReportRow] = useState([
+    const [DataReportRow, setDataReportRow] = useState<any>([
         {
             cash_advance_detail_start_date: "",
             cash_advance_detail_end_date: "",
@@ -1301,12 +1301,10 @@ export default function CashAdvance({ auth }: PageProps) {
 
     // Data Start
     const {
-        users,
         cash_advance_purpose,
-        cash_advance_cost_classification,
         relations,
         coa,
-        persons,
+        employees,
         office,
         division,
     }: any = usePage().props;
@@ -1535,7 +1533,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setData({
             ...data,
             cash_advance_division:
-                auth.user.person.division?.RELATION_DIVISION_ID,
+                auth.user.employee.division?.COMPANY_DIVISION_ID,
             cash_advance_delivery_method_transfer: transfer_method,
             cash_advance_delivery_method_cash: cash_method,
         });
@@ -2070,11 +2068,11 @@ export default function CashAdvance({ auth }: PageProps) {
 
     let total_amount = 0;
 
-    DataRow.forEach((item) => {
+    DataRow.forEach((item: any) => {
         total_amount += Number(item.cash_advance_detail_amount);
 
         if (isNaN(total_amount)) {
-            total_amount = "";
+            total_amount = 0;
         }
     });
 
@@ -2090,11 +2088,11 @@ export default function CashAdvance({ auth }: PageProps) {
 
     let total_amount_report = 0;
 
-    DataReportRow.forEach((item) => {
+    DataReportRow.forEach((item: any) => {
         total_amount_report += Number(item.cash_advance_detail_amount);
 
         if (isNaN(total_amount_report)) {
-            total_amount_report = "";
+            total_amount_report = 0;
         }
     });
 
@@ -2103,7 +2101,7 @@ export default function CashAdvance({ auth }: PageProps) {
     dataById.cash_advance_detail.forEach((item: any) => {
         revised_total_amount += Number(item.CASH_ADVANCE_DETAIL_AMOUNT);
         if (isNaN(revised_total_amount)) {
-            revised_total_amount = "";
+            revised_total_amount = 0;
         }
     });
 
@@ -2123,7 +2121,7 @@ export default function CashAdvance({ auth }: PageProps) {
             item.REPORT_CASH_ADVANCE_DETAIL_AMOUNT
         );
         if (isNaN(revised_total_amount_report)) {
-            revised_total_amount_report = "";
+            revised_total_amount_report = 0;
         }
     });
 
@@ -2222,54 +2220,46 @@ export default function CashAdvance({ auth }: PageProps) {
     };
 
     const selectDivision = division
-        ?.filter(
-            (m: any) =>
-                m.RELATION_ORGANIZATION_ID ===
-                auth.user.person.RELATION_ORGANIZATION_ID
-        )
+        ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
         .map((query: any) => {
             return {
-                value: query.RELATION_DIVISION_ID,
-                label: query.RELATION_DIVISION_ALIAS,
+                value: query.COMPANY_DIVISION_ID,
+                label: query.COMPANY_DIVISION_ALIAS,
             };
         });
 
-    const selectPerson = persons
+    const selectEmployee = employees
         ?.filter(
             (m: any) =>
                 m.DIVISION_ID === data.cash_advance_cost_center.value &&
-                m.STRUCTURE_ID === 4
+                m.STRUCTURE_ID === 5
         )
         .map((query: any) => {
             return {
-                value: query.PERSON_ID,
-                label: query.PERSON_FIRST_NAME,
+                value: query.EMPLOYEE_ID,
+                label: query.EMPLOYEE_FIRST_NAME,
             };
         });
 
-    const selectApproval = persons
-        ?.filter(
-            (m: any) =>
-                m.DIVISION_ID === auth.user.person?.DIVISION_ID &&
-                (m.STRUCTURE_ID === 2 || m.STRUCTURE_ID === 3)
-        )
+    const selectBranch = office
+        ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
         .map((query: any) => {
             return {
-                value: query.PERSON_ID,
-                label: query.PERSON_FIRST_NAME,
+                value: query.COMPANY_OFFICE_ID,
+                label: query.COMPANY_OFFICE_ALIAS,
             };
         });
 
-    const selectOffice = office
+    const selectApproval = employees
         ?.filter(
             (m: any) =>
-                m.RELATION_ORGANIZATION_ID ===
-                auth.user.person?.RELATION_ORGANIZATION_ID
+                m.DIVISION_ID === auth.user.employee?.DIVISION_ID &&
+                (m.STRUCTURE_ID === 3 || m.STRUCTURE_ID === 4)
         )
         .map((query: any) => {
             return {
-                value: query.RELATION_OFFICE_ID,
-                label: query.RELATION_OFFICE_ALIAS,
+                value: query.EMPLOYEE_ID,
+                label: query.EMPLOYEE_FIRST_NAME,
             };
         });
 
@@ -2299,7 +2289,7 @@ export default function CashAdvance({ auth }: PageProps) {
     console.log("Data Cash Advance", data);
     // console.log("Cash Advance", cashAdvance.data);
     // console.log("Data CA By Id", dataById);
-    // console.log("Data CA Report", dataCAReport);
+    console.log("Data CA Report", dataCAReport);
     // console.log("Data CA Report By Id", dataReportById);
 
     return (
@@ -2307,11 +2297,7 @@ export default function CashAdvance({ auth }: PageProps) {
             <Head title="Cash Advance" />
 
             {isSuccess && (
-                <ToastMessage
-                    message={isSuccess}
-                    isShow={true}
-                    isSuccess={true}
-                />
+                <ToastMessage message={isSuccess} isShow={true} type={"true"} />
             )}
 
             {/* Modal Add Start */}
@@ -2461,8 +2447,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="cash_advance_division"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2512,7 +2498,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectPerson}
+                                    options={selectEmployee}
                                     isSearchable={true}
                                     placeholder={"Choose Used By"}
                                     value={data.cash_advance_used_by}
@@ -2539,7 +2525,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectOffice}
+                                    options={selectBranch}
                                     isSearchable={true}
                                     placeholder={"Choose Branch"}
                                     value={data.cash_advance_branch}
@@ -2657,7 +2643,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody id="form_table">
-                                    {DataRow.map((val, i) => (
+                                    {DataRow.map((val: any, i: number) => (
                                         <tr className="text-center" key={i}>
                                             <TD className="border">{i + 1}.</TD>
                                             <TD className="border">
@@ -3242,7 +3228,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
@@ -3265,8 +3253,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -3292,7 +3280,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3309,8 +3297,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3327,7 +3315,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3344,8 +3332,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -3591,9 +3579,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 value=""
                                                 className="w-full lg:w-1/4"
                                                 placeholder="Bank Account Name - Bank Account - Account Number"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
                                                 required
                                                 readOnly
                                             />
@@ -3655,7 +3640,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.CASH_ADVANCE_REQUEST_NOTE}
+                                value={dataById.CASH_ADVANCE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>
@@ -3869,7 +3854,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
@@ -3892,8 +3879,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -3919,7 +3906,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3936,8 +3923,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3954,7 +3941,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3971,8 +3958,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -4153,7 +4140,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         type="text"
                                                         name="CASH_ADVANCE_DETAIL_NOTE"
                                                         value={
-                                                            cad.CASH_ADVANCE_DETAIL_NOTE
+                                                            cad.CASH_ADVANCE_DETAIL_NOTE ||
+                                                            ""
                                                         }
                                                         className="w-1/2"
                                                         autoComplete="off"
@@ -4335,7 +4323,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.CASH_ADVANCE_REQUEST_NOTE}
+                                value={dataById.CASH_ADVANCE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>
@@ -4368,7 +4356,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="w-48 border-none"
                                         />
                                         <TableTD
-                                            value={dataById.person_used_by?.PERSON_FIRST_NAME}
+                                            value={dataById.employee_used_by?.EMPLOYEE_FIRST_NAME}
                                             className="border-none"
                                         />
                                         <TableTD
@@ -4653,7 +4641,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
@@ -4676,8 +4666,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -4703,7 +4693,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -4720,8 +4710,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -4738,7 +4728,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -4755,8 +4745,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -5311,7 +5301,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.CASH_ADVANCE_REQUEST_NOTE}
+                                value={dataById.CASH_ADVANCE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>
@@ -5460,8 +5450,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemohon"
@@ -5478,7 +5468,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     readOnly
@@ -5514,8 +5506,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -5533,8 +5525,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -6010,50 +6002,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                 name="cash_advance_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.CASH_ADVANCE_REQUEST_NOTE}
+                                value={dataById.CASH_ADVANCE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>
-
-                        {/* <div className="p-2 my-5">
-                            <table className="w-2/6 table-auto">
-                                <thead>
-                                    <tr>
-                                        <TableTH
-                                            label="STATUS"
-                                            className="uppercase"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTH
-                                            label="Date & Time"
-                                            className=""
-                                        />
-                                        <TableTH label="Name" className="" />
-                                        <TableTH label="Status" className="" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <TableTD
-                                            value={dateFormat(
-                                                dataById.created_at,
-                                                "dd-mm-yyyy HH:MM:ss"
-                                            )}
-                                            className="w-48 border-none"
-                                        />
-                                        <TableTD
-                                            value={dataById.person_used_by?.PERSON_FIRST_NAME}
-                                            className="border-none"
-                                        />
-                                        <TableTD
-                                            value="Created"
-                                            className="border-none"
-                                        />
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> */}
                     </>
                 }
             />
@@ -6141,7 +6093,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
@@ -6164,8 +6118,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -6191,7 +6145,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -6208,8 +6162,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -6226,7 +6180,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -6243,8 +6197,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -6332,229 +6286,242 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody id="form_table">
-                                    {DataReportRow.map((val, i) => (
-                                        <tr className="text-center" key={i}>
-                                            <TD className="border">{i + 1}.</TD>
-                                            <TD className="border">
-                                                <DatePicker
-                                                    name="cash_advance_detail_start_date"
-                                                    selected={
-                                                        val.cash_advance_detail_start_date
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        handleChangeAddReportDate(
-                                                            date,
-                                                            "cash_advance_detail_start_date",
-                                                            i
-                                                        )
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <DatePicker
-                                                    name="cash_advance_detail_end_date"
-                                                    selected={
-                                                        val.cash_advance_detail_end_date
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        handleChangeAddReportDate(
-                                                            date,
-                                                            "cash_advance_detail_end_date",
-                                                            i
-                                                        )
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_purpose"
-                                                    type="text"
-                                                    name="cash_advance_detail_purpose"
-                                                    value={
-                                                        val.cash_advance_detail_purpose
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <Select
-                                                    classNames={{
-                                                        menuButton: () =>
-                                                            `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                        menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                        listItem: ({
-                                                            isSelected,
-                                                        }: any) =>
-                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                                isSelected
-                                                                    ? `text-white bg-red-600`
-                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                                            }`,
-                                                    }}
-                                                    options={selectRelation}
-                                                    isSearchable={true}
-                                                    placeholder={
-                                                        "Choose Business Relation"
-                                                    }
-                                                    value={
-                                                        val.cash_advance_detail_relation_organization_id
-                                                    }
-                                                    onChange={(val: any) =>
-                                                        handleChangeAddReportCustom(
-                                                            val,
-                                                            "cash_advance_detail_relation_organization_id",
-                                                            i
-                                                        )
-                                                    }
-                                                    primaryColor={"bg-red-500"}
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_relation_name"
-                                                    type="text"
-                                                    name="cash_advance_detail_relation_name"
-                                                    value={
-                                                        val.cash_advance_detail_relation_name
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_relation_position"
-                                                    type="text"
-                                                    name="cash_advance_detail_relation_position"
-                                                    value={
-                                                        val.cash_advance_detail_relation_position
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_location"
-                                                    type="text"
-                                                    name="cash_advance_detail_location"
-                                                    value={
-                                                        val.cash_advance_detail_location
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAddReport(
-                                                            e,
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <CurrencyInput
-                                                    id="cash_advance_detail_amount"
-                                                    name="cash_advance_detail_amount"
-                                                    value={
-                                                        val.cash_advance_detail_amount
-                                                    }
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    onValueChange={(val: any) =>
-                                                        handleChangeAddReportCustom(
-                                                            val,
-                                                            "cash_advance_detail_amount",
-                                                            i
-                                                        )
-                                                    }
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                    required
-                                                    placeholder="0.00"
-                                                    autoComplete="off"
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <div className="">
-                                                    <button
-                                                        type="button"
-                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
-                                                        onClick={() => {
-                                                            setModalFiles({
-                                                                add_files:
-                                                                    false,
-                                                                show_files:
-                                                                    false,
-                                                                add_files_report:
-                                                                    true,
-                                                                show_files_report:
-                                                                    false,
-                                                                index: i,
-                                                            });
-                                                        }}
-                                                    >
-                                                        {dataCAReport
-                                                            .CashAdvanceDetail[
-                                                            i
-                                                        ]
-                                                            ?.cash_advance_detail_document_id
-                                                            .length > 0
-                                                            ? dataCAReport
-                                                                  .CashAdvanceDetail[
-                                                                  i
-                                                              ]
-                                                                  ?.cash_advance_detail_document_id
-                                                                  ?.length +
-                                                              " Files"
-                                                            : "Add Files"}
-                                                    </button>
-                                                </div>
-                                            </TD>
-                                            <TD className="border">
-                                                {DataReportRow.length > 1 && (
-                                                    <Button
-                                                        className="my-1.5 px-3 py-1 ml-2"
-                                                        onClick={() =>
-                                                            handleRemoveReportRow(
+                                    {DataReportRow.map(
+                                        (val: any, i: number) => (
+                                            <tr className="text-center" key={i}>
+                                                <TD className="border">
+                                                    {i + 1}.
+                                                </TD>
+                                                <TD className="border">
+                                                    <DatePicker
+                                                        name="cash_advance_detail_start_date"
+                                                        selected={
+                                                            val.cash_advance_detail_start_date
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            handleChangeAddReportDate(
+                                                                date,
+                                                                "cash_advance_detail_start_date",
                                                                 i
                                                             )
                                                         }
-                                                        type="button"
-                                                    >
-                                                        X
-                                                    </Button>
-                                                )}
-                                            </TD>
-                                        </tr>
-                                    ))}
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <DatePicker
+                                                        name="cash_advance_detail_end_date"
+                                                        selected={
+                                                            val.cash_advance_detail_end_date
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            handleChangeAddReportDate(
+                                                                date,
+                                                                "cash_advance_detail_end_date",
+                                                                i
+                                                            )
+                                                        }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_purpose"
+                                                        type="text"
+                                                        name="cash_advance_detail_purpose"
+                                                        value={
+                                                            val.cash_advance_detail_purpose
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAddReport(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectRelation}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose Business Relation"
+                                                        }
+                                                        value={
+                                                            val.cash_advance_detail_relation_organization_id
+                                                        }
+                                                        onChange={(val: any) =>
+                                                            handleChangeAddReportCustom(
+                                                                val,
+                                                                "cash_advance_detail_relation_organization_id",
+                                                                i
+                                                            )
+                                                        }
+                                                        primaryColor={
+                                                            "bg-red-500"
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_relation_name"
+                                                        type="text"
+                                                        name="cash_advance_detail_relation_name"
+                                                        value={
+                                                            val.cash_advance_detail_relation_name
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAddReport(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_relation_position"
+                                                        type="text"
+                                                        name="cash_advance_detail_relation_position"
+                                                        value={
+                                                            val.cash_advance_detail_relation_position
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAddReport(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_location"
+                                                        type="text"
+                                                        name="cash_advance_detail_location"
+                                                        value={
+                                                            val.cash_advance_detail_location
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAddReport(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <CurrencyInput
+                                                        id="cash_advance_detail_amount"
+                                                        name="cash_advance_detail_amount"
+                                                        value={
+                                                            val.cash_advance_detail_amount
+                                                        }
+                                                        decimalScale={2}
+                                                        decimalsLimit={2}
+                                                        onValueChange={(
+                                                            val: any
+                                                        ) =>
+                                                            handleChangeAddReportCustom(
+                                                                val,
+                                                                "cash_advance_detail_amount",
+                                                                i
+                                                            )
+                                                        }
+                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                        required
+                                                        placeholder="0.00"
+                                                        autoComplete="off"
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <div className="">
+                                                        <button
+                                                            type="button"
+                                                            className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                            onClick={() => {
+                                                                setModalFiles({
+                                                                    add_files:
+                                                                        false,
+                                                                    show_files:
+                                                                        false,
+                                                                    add_files_report:
+                                                                        true,
+                                                                    show_files_report:
+                                                                        false,
+                                                                    index: i,
+                                                                });
+                                                            }}
+                                                        >
+                                                            {dataCAReport
+                                                                .CashAdvanceDetail[
+                                                                i
+                                                            ]
+                                                                ?.cash_advance_detail_document_id
+                                                                .length > 0
+                                                                ? dataCAReport
+                                                                      .CashAdvanceDetail[
+                                                                      i
+                                                                  ]
+                                                                      ?.cash_advance_detail_document_id
+                                                                      ?.length +
+                                                                  " Files"
+                                                                : "Add Files"}
+                                                        </button>
+                                                    </div>
+                                                </TD>
+                                                <TD className="border">
+                                                    {DataReportRow.length >
+                                                        1 && (
+                                                        <Button
+                                                            className="my-1.5 px-3 py-1 ml-2"
+                                                            onClick={() =>
+                                                                handleRemoveReportRow(
+                                                                    i
+                                                                )
+                                                            }
+                                                            type="button"
+                                                        >
+                                                            X
+                                                        </Button>
+                                                    )}
+                                                </TD>
+                                            </tr>
+                                        )
+                                    )}
                                 </tbody>
                                 <tfoot>
                                     <tr className="text-right text-sm leading-9">
@@ -7035,7 +7002,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     readOnly
@@ -7052,8 +7021,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -7072,7 +7041,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataReportById?.cash_advance.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -7089,8 +7058,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataReportById?.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataReportById?.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -7108,7 +7077,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="branch"
                                     value={
                                         dataReportById?.cash_advance.office
-                                            ?.RELATION_OFFICE_ALIAS
+                                            ?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -7125,8 +7094,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataReportById?.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataReportById?.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -7402,7 +7371,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
                                 value={
-                                    dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE
+                                    dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE ||
+                                    ""
                                 }
                                 onChange={(e) =>
                                     setData(
@@ -7599,7 +7569,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     readOnly
@@ -7616,8 +7588,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -7636,7 +7608,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataReportById?.cash_advance.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -7653,8 +7625,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataReportById?.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataReportById?.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -7672,7 +7644,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="branch"
                                     value={
                                         dataReportById?.cash_advance.office
-                                            ?.RELATION_OFFICE_ALIAS
+                                            ?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -7689,8 +7661,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataReportById?.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataReportById?.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -7888,7 +7860,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             )
                                                         }
                                                         value={
-                                                            cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_APPROVAL ||
+                                                            ""
                                                         }
                                                     >
                                                         <option value="">
@@ -7995,7 +7968,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         type="text"
                                                         name="REPORT_CASH_ADVANCE_DETAIL_REMARKS"
                                                         value={
-                                                            cad.REPORT_CASH_ADVANCE_DETAIL_REMARKS
+                                                            cad.REPORT_CASH_ADVANCE_DETAIL_REMARKS ||
+                                                            ""
                                                         }
                                                         className="w-1/2"
                                                         autoComplete="off"
@@ -8078,7 +8052,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                         })
                                     }
                                     value={
-                                        dataReportById?.REPORT_CASH_ADVANCE_TYPE
+                                        dataReportById?.REPORT_CASH_ADVANCE_TYPE ||
+                                        ""
                                     }
                                 >
                                     <option value="">
@@ -8121,7 +8096,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
                                 value={
-                                    dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE
+                                    dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE ||
+                                    ""
                                 }
                                 readOnly
                             />
@@ -8415,7 +8391,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     autoComplete="namaPengguna"
                                     readOnly
@@ -8432,8 +8410,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            .RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            .COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     autoComplete="divisi"
@@ -8452,7 +8430,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataReportById?.cash_advance.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -8469,8 +8447,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataReportById?.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataReportById?.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -8488,7 +8466,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="branch"
                                     value={
                                         dataReportById?.cash_advance.office
-                                            ?.RELATION_OFFICE_ALIAS
+                                            ?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -8505,8 +8483,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataReportById?.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataReportById?.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     autoComplete="namaPemberiApproval"
@@ -8972,7 +8950,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
                                 value={
-                                    dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE
+                                    dataReportById?.REPORT_CASH_ADVANCE_REQUEST_NOTE ||
+                                    ""
                                 }
                                 onChange={(e) =>
                                     setDataReportById({

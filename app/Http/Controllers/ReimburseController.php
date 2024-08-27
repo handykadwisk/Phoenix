@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvancePurpose;
 use App\Models\COA;
 use App\Models\Reimburse;
@@ -11,15 +10,12 @@ use App\Models\Document;
 use App\Models\MReimburseDocument;
 use App\Models\MReimburseProofOfDocument;
 use App\Models\RCashAdvanceApproval;
-use App\Models\RCashAdvanceDifferent;
 use App\Models\RCashAdvanceMethod;
 use App\Models\Relation;
 use App\Models\RReimburseNotes;
-use App\Models\TDocument;
-use App\Models\TPerson;
-use App\Models\TRelationDivision;
-use App\Models\TRelationOffice;
-use App\Models\User;
+use App\Models\TCompanyDivision;
+use App\Models\TCompanyOffice;
+use App\Models\TEmployee;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,18 +43,18 @@ class ReimburseController extends Controller
         
         if ($searchQuery) {
             if ($searchQuery->input('reimburse_requested_by')) {
-                $data->whereHas('person',
+                $data->whereHas('employee',
                 function($query) use($reimburse_requested_by)
                 {
-                    $query->where('PERSON_FIRST_NAME', 'like', '%'. $reimburse_requested_by .'%');
+                    $query->where('EMPLOYEE_FIRST_NAME', 'like', '%'. $reimburse_requested_by .'%');
                 });
             }
 
             if ($searchQuery->input('reimburse_used_by')) {
-                $data->whereHas('person_used_by',
+                $data->whereHas('employee_used_by',
                 function($query) use($reimburse_used_by)
                 {
-                    $query->where('PERSON_FIRST_NAME', 'like', '%'. $reimburse_used_by .'%');
+                    $query->where('EMPLOYEE_FIRST_NAME', 'like', '%'. $reimburse_used_by .'%');
                 });
             }
 
@@ -73,8 +69,8 @@ class ReimburseController extends Controller
                 $data->whereHas('division',
                 function($query) use($reimburse_division)
                 {
-                    $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $reimburse_division .'%')
-                            ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $reimburse_division .'%');
+                    $query->where('COMPANY_DIVISION_ALIAS', 'like', '%'. $reimburse_division .'%')
+                            ->orWhere('COMPANY_DIVISION_INITIAL', 'like', '%'. $reimburse_division .'%');
                 });
             }
 
@@ -82,8 +78,8 @@ class ReimburseController extends Controller
                 $data->whereHas('cost_center',
                 function($query) use($reimburse_cost_center)
                 {
-                    $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $reimburse_cost_center .'%')
-                            ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $reimburse_cost_center .'%');
+                    $query->where('COMPANY_DIVISION_ALIAS', 'like', '%'. $reimburse_cost_center .'%')
+                            ->orWhere('COMPANY_DIVISION_INITIAL', 'like', '%'. $reimburse_cost_center .'%');
                 });
             }
 
@@ -210,9 +206,9 @@ class ReimburseController extends Controller
             'purposes' => CashAdvancePurpose::all(),
             'relations' => Relation::all(),
             'coa' => COA::all(),
-            'persons' => TPerson::all(),
-            'office' => TRelationOffice::all(),
-            'division' => TRelationDivision::all()
+            'employees' => TEmployee::all(),
+            'office' => TCompanyOffice::all(),
+            'division' => TCompanyDivision::all()
         ];
 
         return Inertia::render('Reimburse/Reimburse', $data);
@@ -284,7 +280,7 @@ class ReimburseController extends Controller
 
     public function reimburse_doc_reader($reimburse_detail_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $reimburse_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -300,7 +296,7 @@ class ReimburseController extends Controller
 
     public function reimburse_proof_of_document_doc_reader($reimburse_detail_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $reimburse_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -316,7 +312,7 @@ class ReimburseController extends Controller
 
     public function download($reimburse_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $reimburse_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -336,7 +332,7 @@ class ReimburseController extends Controller
 
     public function reimburse_proof_of_document_download($reimburse_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $reimburse_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -480,7 +476,7 @@ class ReimburseController extends Controller
                             Storage::makeDirectory($uploadPath, 0777, true, true);
                             Storage::disk('public')->putFileAs($uploadPath, $file, $reimburse_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
         
-                            $document = TDocument::create([
+                            $document = Document::create([
                                 'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                                 'DOCUMENT_FILENAME'               => $documentFileName,
                                 'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -534,8 +530,8 @@ class ReimburseController extends Controller
         // dd($request);
         $reimburse_detail = $request->reimburse_detail;
         
-        $division_alias = $request->division['RELATION_DIVISION_ALIAS'];
-        $division_initial = $request->division['RELATION_DIVISION_INITIAL'];
+        $division_alias = $request->division['COMPANY_DIVISION_ALIAS'];
+        $division_initial = $request->division['COMPANY_DIVISION_INITIAL'];
 
         $total_amount_approve = 0;
 
@@ -739,7 +735,7 @@ class ReimburseController extends Controller
                             Storage::makeDirectory($uploadPath, 0777, true, true);
                             Storage::disk('public')->putFileAs($uploadPath, $uploadFile, $reimburseDetailId . '-' . $this->RemoveSpecialChar($uploadFile->getClientOriginalName()));
             
-                            $document = TDocument::create([
+                            $document = Document::create([
                                 'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                                 'DOCUMENT_FILENAME'               => $documentFileName,
                                 'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -804,7 +800,7 @@ class ReimburseController extends Controller
                     $documentId = $document_value['DOCUMENT_ID'];
                     $reimburseDetailId = $document_value['REIMBURSE_DETAIL_ID'];
     
-                    $getDocument = TDocument::find($documentId);
+                    $getDocument = Document::find($documentId);
     
                     $documentFilename = $reimburseDetailId . '-' . $getDocument->DOCUMENT_ORIGINAL_NAME;
                     $documentDirname = $getDocument->DOCUMENT_DIRNAME;
@@ -820,7 +816,7 @@ class ReimburseController extends Controller
                     MReimburseDocument::where('REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_DOCUMENT_ID', $documentId)->delete();
     
                     // Delete data from table t_document
-                    TDocument::destroy($documentId);
+                    Document::destroy($documentId);
                 }
             }
     
@@ -866,7 +862,7 @@ class ReimburseController extends Controller
                 Storage::makeDirectory($uploadPath, 0777, true, true);
                 Storage::disk('public')->putFileAs($uploadPath, $uploadedFile, $reimburse_id . '-' . $this->RemoveSpecialChar($uploadedFile->getClientOriginalName()));
 
-                $document = TDocument::create([
+                $document = Document::create([
                     'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                     'DOCUMENT_FILENAME'               => $documentFileName,
                     'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -876,7 +872,7 @@ class ReimburseController extends Controller
                 ])->DOCUMENT_ID;
 
                 if($document) {
-                    TDocument::where('DOCUMENT_ID', $document)->update([
+                    Document::where('DOCUMENT_ID', $document)->update([
                         'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
                     ]);
                 }

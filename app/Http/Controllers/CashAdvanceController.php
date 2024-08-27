@@ -7,13 +7,13 @@ use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvanceDetail;
 use App\Models\CashAdvancePurpose;
 use App\Models\CashAdvanceReport;
-use App\Models\Document;
-use App\Models\CashAdvanceDetailReport;
 use App\Models\COA;
 use App\Models\MCashAdvanceDocument;
-use App\Models\RCashAdvanceDifferent;
 use App\Models\Relation;
-use App\Models\TDocument;
+use App\Models\Document;
+use App\Models\TCompanyDivision;
+use App\Models\TCompanyOffice;
+use App\Models\TEmployee;
 use App\Models\TPerson;
 use App\Models\TRelationDivision;
 use App\Models\TRelationOffice;
@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder;
 
 class CashAdvanceController extends Controller
 {
@@ -49,18 +48,18 @@ class CashAdvanceController extends Controller
 
             if ($searchQuery) {
                 if ($searchQuery->input('cash_advance_requested_by')) {
-                    $data->whereHas('person',
+                    $data->whereHas('employee',
                     function($query) use($cash_advance_requested_by)
                     {
-                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
+                        $query->where('EMPLOYEE_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
                     });
                 }
 
                 if ($searchQuery->input('cash_advance_used_by')) {
-                    $data->whereHas('person_used_by',
+                    $data->whereHas('employee_used_by',
                     function($query) use($cash_advance_used_by)
                     {
-                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
+                        $query->where('EMPLOYEE_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
                     });
                 }
 
@@ -75,8 +74,8 @@ class CashAdvanceController extends Controller
                     $data->whereHas('division',
                     function($query) use($cash_advance_division)
                     {
-                        $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $cash_advance_division .'%')
-                                ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $cash_advance_division .'%');
+                        $query->where('COMPANY_DIVISION_ALIAS', 'like', '%'. $cash_advance_division .'%')
+                                ->orWhere('COMPANY_DIVISION_INITIAL', 'like', '%'. $cash_advance_division .'%');
                     });
                 }
     
@@ -84,8 +83,8 @@ class CashAdvanceController extends Controller
                     $data->whereHas('cost_center',
                     function($query) use($cash_advance_cost_center)
                     {
-                        $query->where('RELATION_DIVISION_ALIAS', 'like', '%'. $cash_advance_cost_center .'%')
-                                ->orWhere('RELATION_DIVISION_INITIAL', 'like', '%'. $cash_advance_cost_center .'%');
+                        $query->where('COMPANY_DIVISION_ALIAS', 'like', '%'. $cash_advance_cost_center .'%')
+                                ->orWhere('COMPANY_DIVISION_INITIAL', 'like', '%'. $cash_advance_cost_center .'%');
                     });
                 }
 
@@ -114,18 +113,18 @@ class CashAdvanceController extends Controller
 
             if ($searchQuery) {
                 if ($searchQuery->input('cash_advance_requested_by')) {
-                    $data->whereHas('person',
+                    $data->whereHas('employee',
                     function($query) use($cash_advance_requested_by)
                     {
-                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
+                        $query->where('EMPLOYEE_FIRST_NAME', 'like', '%'. $cash_advance_requested_by .'%');
                     });
                 }
 
                 if ($searchQuery->input('cash_advance_used_by')) {
-                    $data->whereHas('person_used_by',
+                    $data->whereHas('employee_used_by',
                     function($query) use($cash_advance_used_by)
                     {
-                        $query->where('PERSON_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
+                        $query->where('EMPLOYEE_FIRST_NAME', 'like', '%'. $cash_advance_used_by .'%');
                     });
                 }
 
@@ -246,9 +245,9 @@ class CashAdvanceController extends Controller
             'cash_advance_cost_classification' => CashAdvanceCostClassification::all(),
             'relations' => Relation::all(),
             'coa' => COA::all(),
-            'persons' => TPerson::all(),
-            'office' => TRelationOffice::all(),
-            'division' => TRelationDivision::all()
+            'employees' => TEmployee::all(),
+            'office' => TCompanyOffice::all(),
+            'division' => TCompanyDivision::all()
         ];
 
         return Inertia::render('CA/CashAdvance', $data);
@@ -337,7 +336,7 @@ class CashAdvanceController extends Controller
 
     public function cash_advance_doc_reader($cash_advance_detail_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $cash_advance_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -353,7 +352,7 @@ class CashAdvanceController extends Controller
 
     public function cash_advance_download($cash_advance_detail_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $cash_advance_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -374,7 +373,6 @@ class CashAdvanceController extends Controller
     public function store(Request $request)
     {
         $user_id = Auth::user()->id;
-        $person = TPerson::find($request->cash_advance_first_approval_by['value']);
 
         $total_amount = 0;
 
@@ -390,7 +388,7 @@ class CashAdvanceController extends Controller
         $cash_advance_branch = $request->cash_advance_branch['value'];
         $cash_advance_requested_date = now();
         $cash_advance_first_approval_by = $request->cash_advance_first_approval_by['value'];
-        $cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
+        $cash_advance_first_approval_user = $request->cash_advance_first_approval_by['label'];
         $cash_advance_first_approval_status = 1;
         $cash_advance_request_note = $request->cash_advance_request_note;
         $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
@@ -481,7 +479,7 @@ class CashAdvanceController extends Controller
                         Storage::makeDirectory($uploadPath, 0777, true, true);
                         Storage::disk('public')->putFileAs($uploadPath, $file, $cash_advance_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName()));
     
-                        $document = TDocument::create([
+                        $document = Document::create([
                             'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                             'DOCUMENT_FILENAME'               => $documentFileName,
                             'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -688,7 +686,7 @@ class CashAdvanceController extends Controller
                         Storage::makeDirectory($uploadPath, 0777, true, true);
                         Storage::disk('public')->putFileAs($uploadPath, $uploadFile, $cashAdvanceDetailId . '-' . $this->RemoveSpecialChar($uploadFile->getClientOriginalName()));
         
-                        $document = TDocument::create([
+                        $document = Document::create([
                             'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                             'DOCUMENT_FILENAME'               => $documentFileName,
                             'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -753,7 +751,7 @@ class CashAdvanceController extends Controller
                 $documentId = $document_value['DOCUMENT_ID'];
                 $cashAdvanceDetailId = $document_value['CASH_ADVANCE_DETAIL_ID'];
 
-                $getDocument = TDocument::find($documentId);
+                $getDocument = Document::find($documentId);
 
                 $documentFilename = $cashAdvanceDetailId . '-' . $getDocument->DOCUMENT_ORIGINAL_NAME;
                 $documentDirname = $getDocument->DOCUMENT_DIRNAME;
@@ -769,7 +767,7 @@ class CashAdvanceController extends Controller
                 MCashAdvanceDocument::where('CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID', $documentId)->delete();
 
                 // Delete data from table t_document
-                TDocument::destroy($documentId);
+                Document::destroy($documentId);
             }
         }
 

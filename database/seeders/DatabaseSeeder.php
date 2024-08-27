@@ -288,33 +288,30 @@ class DatabaseSeeder extends Seeder
         //     'menu_id' => $ACLRole->id
         // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $group->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $childRelation->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $childAgent->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $childBAA->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $HR->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $hrCompany->id
-        ]);
-
-
-
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $group->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $childRelation->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $childAgent->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $childBAA->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $HR->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $hrCompany->id
+        // ]);
 
         // create user
         User::create(
@@ -598,6 +595,36 @@ class DatabaseSeeder extends Seeder
 
         DB::unprepared(
             file_get_contents($file_path26)
+        );
+
+        $file_path27 = resource_path('../database/LogDB/2024_08_27_t_company.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path27)
+        );
+
+        $file_path28 = resource_path('../database/LogDB/2024_08_27_t_company_division.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path28)
+        );
+
+        $file_path29 = resource_path('../database/LogDB/2024_08_27_t_company_structure.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path29)
+        );
+
+        $file_path30 = resource_path('../database/LogDB/2024_08_27_t_company_office.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path30)
+        );
+
+        $file_path31 = resource_path('../database/LogDB/2024_08_27_t_employee.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path31)
         );
     }
 }

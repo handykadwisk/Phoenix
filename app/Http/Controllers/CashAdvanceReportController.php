@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CashAdvance;
-use App\Models\CashAdvanceCostClassification;
 use App\Models\CashAdvanceDetailReport;
 use App\Models\CashAdvanceReport;
 use App\Models\Document;
-use App\Models\MCashAdvanceDocument;
 use App\Models\MCashAdvanceProofOfDocument;
 use App\Models\MCashAdvanceReportDocument;
 use App\Models\RCashAdvanceApproval;
 use App\Models\RCashAdvanceDifferent;
 use App\Models\RCashAdvanceMethod;
-use App\Models\TDocument;
+use App\Models\TEmployee;
 use App\Models\TPerson;
-use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,28 +23,10 @@ use Inertia\Inertia;
 
 class CashAdvanceReportController extends Controller
 {
-    // public function getReportCAData($dataPerPage = 2, $searchQuery = null)
-    // {
-    //     $data = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_ID', 'desc');
-    //     if ($searchQuery) {
-    //         if ($searchQuery->input('REPORT_CASH_ADVANCE_NUMBER')) {
-    //             $data->where('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID', 'like', '%'.$searchQuery->REPORT_CASH_ADVANCE_NUMBER.'%');
-    //         }
-    //     }
-    //     return $data->paginate($dataPerPage);
-    // }
-
-    // public function getCAReport(Request $request)
-    // {
-    //     $data = $this->getReportCAData(10, $request);
-    //     return response()->json($data);
-    // }
-
     public function getCAReportById(string $id) 
     {
         $data = CashAdvanceReport::with('cash_advance')->findOrFail($id);
-        // $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID', $id);
-        // dd($data);
+
         return response()->json($data);
     }
 
@@ -165,16 +143,6 @@ class CashAdvanceReportController extends Controller
 
     public function getCashAdvanceReportNumber()
     {
-        // if ($cash_advance_type == 1) {
-        //     $code = 'CA/';
-        //     $start_char = 10;
-        //     $start_char_2 = 3;
-        // } else {
-        //     $code = 'RMBS/';
-        //     $start_char = 12;
-        //     $start_char_2 = 5;
-        // }
-
         $code = 'PV/RCA/';
         $start_char = 14;
         $start_char_2 = 7;
@@ -204,7 +172,7 @@ class CashAdvanceReportController extends Controller
 
     public function cash_advance_report_doc_reader($cash_advance_report_detail_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $cash_advance_report_detail_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -220,7 +188,7 @@ class CashAdvanceReportController extends Controller
 
     public function cash_advance_report_proof_of_document_doc_reader($cash_advance_report_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $cash_advance_report_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -236,7 +204,7 @@ class CashAdvanceReportController extends Controller
 
     public function cash_advance_report_download($cash_advance_detail_report_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $cash_advance_detail_report_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -256,7 +224,7 @@ class CashAdvanceReportController extends Controller
 
     public function cash_advance_report_proof_of_document_download($report_cash_advance_id, $document_id)
     {
-        $document = TDocument::find($document_id);
+        $document = Document::find($document_id);
 
         $document_filename = $report_cash_advance_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
         $document_dirname = $document->DOCUMENT_DIRNAME;
@@ -276,10 +244,8 @@ class CashAdvanceReportController extends Controller
 
     public function cash_advance_report(Request $request)
     {
-        // dd($request);
-
         $user_id = Auth::user()->id;
-        $person = TPerson::find($request->cash_advance_first_approval_by);
+        $employee = TEmployee::find($request->cash_advance_first_approval_by);
 
         $total_amount_report = 0;
 
@@ -304,7 +270,7 @@ class CashAdvanceReportController extends Controller
         $report_cash_advance_requested_by = $user_id;
         $report_cash_advance_requested_date = now();
         $report_cash_advance_first_approval_by = $request->cash_advance_first_approval_by;
-        $report_cash_advance_first_approval_user = $person->PERSON_FIRST_NAME;
+        $report_cash_advance_first_approval_user = $employee->PERSON_FIRST_NAME;
         $report_cash_advance_first_approval_status = 1;
         $report_cash_advance_request_note = $request->cash_advance_request_note;
         $report_cash_advance_type = $type;
@@ -397,7 +363,7 @@ class CashAdvanceReportController extends Controller
                         Storage::makeDirectory($uploadPath, 0777, true, true);
                         Storage::disk('public')->putFileAs($uploadPath, $uploadedFile, $report_cash_advance_detail_id . '-' . $this->RemoveSpecialChar($uploadedFile->getClientOriginalName()));
     
-                        $document = TDocument::create([
+                        $document = Document::create([
                             'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                             'DOCUMENT_FILENAME'               => $documentFileName,
                             'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -407,7 +373,7 @@ class CashAdvanceReportController extends Controller
                         ])->DOCUMENT_ID;
     
                         if($document) {
-                            TDocument::where('DOCUMENT_ID', $document)->update([
+                            Document::where('DOCUMENT_ID', $document)->update([
                                 'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
                             ]);
                         }
@@ -633,7 +599,7 @@ class CashAdvanceReportController extends Controller
                         Storage::makeDirectory($uploadPath, 0777, true, true);
                         Storage::disk('public')->putFileAs($uploadPath, $uploadFile, $cashAdvanceDetailReportId . '-' . $this->RemoveSpecialChar($uploadFile->getClientOriginalName()));
         
-                        $document = TDocument::create([
+                        $document = Document::create([
                             'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                             'DOCUMENT_FILENAME'               => $documentFileName,
                             'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -686,7 +652,7 @@ class CashAdvanceReportController extends Controller
                     $documentId = $document_value['DOCUMENT_ID'];
                     $cashAdvanceDetailReportId = $document_value['REPORT_CASH_ADVANCE_DETAIL_ID'];
 
-                    $getDocument = TDocument::find($documentId);
+                    $getDocument = Document::find($documentId);
 
                     $documentFilename = $cashAdvanceDetailReportId . '-' . $getDocument->DOCUMENT_ORIGINAL_NAME;
                     $documentDirname = $getDocument->DOCUMENT_DIRNAME;
@@ -702,7 +668,7 @@ class CashAdvanceReportController extends Controller
                     MCashAdvanceReportDocument::where('CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID', $documentId)->delete();
 
                     // Delete data from table t_document
-                    TDocument::destroy($documentId);
+                    Document::destroy($documentId);
                 }
             }
 
@@ -760,7 +726,7 @@ class CashAdvanceReportController extends Controller
                 Storage::makeDirectory($uploadPath, 0777, true, true);
                 Storage::disk('public')->putFileAs($uploadPath, $uploadedFile, $report_cash_advance_id . '-' . $this->RemoveSpecialChar($uploadedFile->getClientOriginalName()));
 
-                $document = TDocument::create([
+                $document = Document::create([
                     'DOCUMENT_ORIGINAL_NAME'          => $documentOriginalName,
                     'DOCUMENT_FILENAME'               => $documentFileName,
                     'DOCUMENT_DIRNAME'                => $documentDirName,
@@ -770,7 +736,7 @@ class CashAdvanceReportController extends Controller
                 ])->DOCUMENT_ID;
 
                 if($document) {
-                    TDocument::where('DOCUMENT_ID', $document)->update([
+                    Document::where('DOCUMENT_ID', $document)->update([
                         'DOCUMENT_FILENAME'           => $document . "-" . $documentOriginalName,
                     ]);
                 }

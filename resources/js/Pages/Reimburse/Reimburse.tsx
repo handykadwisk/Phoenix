@@ -54,7 +54,7 @@ export default function Reimburse({ auth }: PageProps) {
     };
 
     // Modal Add Start
-    const [modal, setModal] = useState({
+    const [modal, setModal] = useState<any>({
         add: false,
         delete: false,
         edit: false,
@@ -94,7 +94,7 @@ export default function Reimburse({ auth }: PageProps) {
         });
     };
 
-    const { data, setData, errors, reset } = useForm({
+    const { data, setData, errors, reset } = useForm<any>({
         reimburse_id: "",
         reimburse_used_by: "",
         reimburse_requested_by: "",
@@ -188,7 +188,7 @@ export default function Reimburse({ auth }: PageProps) {
     });
 
     // Handle Add Row Start
-    const [DataRow, setDataRow] = useState([
+    const [DataRow, setDataRow] = useState<any>([
         {
             reimburse_detail_date: "",
             reimburse_detail_purpose: "",
@@ -596,7 +596,7 @@ export default function Reimburse({ auth }: PageProps) {
     // Handle Remove Row Proof of Document Row End
 
     // Handle Add Row Report Reimburse Start
-    const [DataReportRow, setDataReportRow] = useState([
+    const [DataReportRow, setDataReportRow] = useState<any>([
         {
             reimburse_detail_date: "",
             reimburse_detail_purpose: "",
@@ -751,7 +751,7 @@ export default function Reimburse({ auth }: PageProps) {
     // Clear Search End
 
     // Data Start
-    const { purposes, relations, coa, persons, office, division }: any =
+    const { purposes, relations, coa, employees, office, division }: any =
         usePage().props;
     // Data End
 
@@ -797,7 +797,7 @@ export default function Reimburse({ auth }: PageProps) {
 
         setData(
             "reimburse_division",
-            auth.user.person.division?.RELATION_DIVISION_ID
+            auth.user.employee.division?.COMPANY_DIVISION_ID
         );
 
         setModal({
@@ -870,7 +870,7 @@ export default function Reimburse({ auth }: PageProps) {
     // Handle Revised End
 
     // Handle Execute Start
-    const handleExecuteModal = async (e: FormEvent, id: number) => {
+    const handleExecuteModal = async (e: FormEvent, id: any) => {
         e.preventDefault();
 
         await axios
@@ -932,28 +932,28 @@ export default function Reimburse({ auth }: PageProps) {
         });
 
         if (
-            auth.user.person.division?.RELATION_DIVISION_ALIAS ===
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
                 "FINANCE ACCOUNTING" &&
-            auth.user.person.division?.RELATION_DIVISION_INITIAL === "FA"
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FA"
         ) {
             setDataById({
                 ...dataById,
-                REIMBURSE_SECOND_APPROVAL_BY: auth.user.person.PERSON_ID,
+                REIMBURSE_SECOND_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
                 REIMBURSE_SECOND_APPROVAL_USER:
-                    auth.user.person.PERSON_FIRST_NAME,
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
                 REIMBURSE_SECOND_APPROVAL_STATUS: status,
             });
         }
 
         if (
-            auth.user.person.division?.RELATION_DIVISION_ALIAS === "DIREKSI" &&
-            auth.user.person.division?.RELATION_DIVISION_INITIAL === "DIREKSI"
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "DIREKSI" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIREKSI"
         ) {
             setDataById({
                 ...dataById,
-                REIMBURSE_THIRD_APPROVAL_BY: auth.user.person.PERSON_ID,
+                REIMBURSE_THIRD_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
                 REIMBURSE_THIRD_APPROVAL_USER:
-                    auth.user.person.PERSON_FIRST_NAME,
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
                 REIMBURSE_THIRD_APPROVAL_STATUS: status,
             });
         }
@@ -1130,7 +1130,7 @@ export default function Reimburse({ auth }: PageProps) {
 
     let total = 0;
 
-    DataRow.forEach((item) => {
+    DataRow.forEach((item: any) => {
         total += Number(item.reimburse_detail_amount);
     });
 
@@ -1163,54 +1163,46 @@ export default function Reimburse({ auth }: PageProps) {
     }, [reimburse_total_amount_approve, dataById.REIMBURSE_TOTAL_AMOUNT]);
 
     const selectDivision = division
-        ?.filter(
-            (m: any) =>
-                m.RELATION_ORGANIZATION_ID ===
-                auth.user.person.RELATION_ORGANIZATION_ID
-        )
+        ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
         .map((query: any) => {
             return {
-                value: query.RELATION_DIVISION_ID,
-                label: query.RELATION_DIVISION_ALIAS,
+                value: query.COMPANY_DIVISION_ID,
+                label: query.COMPANY_DIVISION_ALIAS,
             };
         });
 
-    const selectPerson = persons
+    const selectEmployee = employees
         ?.filter(
             (m: any) =>
                 m.DIVISION_ID === data.reimburse_cost_center.value &&
-                m.STRUCTURE_ID === 4
+                m.STRUCTURE_ID === 5
         )
         .map((query: any) => {
             return {
-                value: query.PERSON_ID,
-                label: query.PERSON_FIRST_NAME,
+                value: query.EMPLOYEE_ID,
+                label: query.EMPLOYEE_FIRST_NAME,
             };
         });
 
-    const selectApproval = persons
-        ?.filter(
-            (m: any) =>
-                m.DIVISION_ID === auth.user.person?.DIVISION_ID &&
-                (m.STRUCTURE_ID === 2 || m.STRUCTURE_ID === 3)
-        )
+    const selectBranch = office
+        ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
         .map((query: any) => {
             return {
-                value: query.PERSON_ID,
-                label: query.PERSON_FIRST_NAME,
+                value: query.COMPANY_OFFICE_ID,
+                label: query.COMPANY_OFFICE_ALIAS,
             };
         });
 
-    const selectOffice = office
+    const selectApproval = employees
         ?.filter(
             (m: any) =>
-                m.RELATION_ORGANIZATION_ID ===
-                auth.user.person?.RELATION_ORGANIZATION_ID
+                m.DIVISION_ID === auth.user.employee?.DIVISION_ID &&
+                (m.STRUCTURE_ID === 3 || m.STRUCTURE_ID === 4)
         )
         .map((query: any) => {
             return {
-                value: query.RELATION_OFFICE_ID,
-                label: query.RELATION_OFFICE_ALIAS,
+                value: query.EMPLOYEE_ID,
+                label: query.EMPLOYEE_FIRST_NAME,
             };
         });
 
@@ -1247,11 +1239,7 @@ export default function Reimburse({ auth }: PageProps) {
             <Head title="Reimburse" />
 
             {isSuccess && (
-                <ToastMessage
-                    message={isSuccess}
-                    isShow={true}
-                    isSuccess={true}
-                />
+                <ToastMessage message={isSuccess} isShow={true} type={"true"} />
             )}
 
             {/* Modal Add Start */}
@@ -1360,7 +1348,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -1376,8 +1366,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="reimburse_division"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -1427,7 +1417,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectPerson}
+                                    options={selectEmployee}
                                     isSearchable={true}
                                     placeholder={"Choose Used By"}
                                     value={data.reimburse_used_by}
@@ -1454,7 +1444,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectOffice}
+                                    options={selectBranch}
                                     isSearchable={true}
                                     placeholder={"Choose Branch"}
                                     value={data.reimburse_branch}
@@ -1579,7 +1569,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {DataRow.map((val, i) => (
+                                    {DataRow.map((val: any, i: number) => (
                                         <tr className="text-center" key={i}>
                                             <TD className="border">{i + 1}.</TD>
                                             <TD className="border">
@@ -1711,6 +1701,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                             i
                                                         )
                                                     }
+                                                    primaryColor="bg-red-500"
                                                 />
                                             </TD>
                                             <TD className="border">
@@ -2081,7 +2072,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -2097,8 +2090,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2116,7 +2109,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2133,8 +2126,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2151,7 +2144,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2168,8 +2161,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2579,7 +2572,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -2595,8 +2590,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2614,7 +2609,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2631,8 +2626,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2649,7 +2644,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2666,8 +2661,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3354,7 +3349,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -3370,8 +3367,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3389,7 +3386,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3406,8 +3403,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3424,7 +3421,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3441,8 +3438,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -4120,7 +4117,7 @@ export default function Reimburse({ auth }: PageProps) {
             {/* Modal Execute End */}
 
             {/* Content Start */}
-            <div className="p-6 text-gray-900 mb-60">
+            <div className="p-6 text-gray-900">
                 <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
                     <div className="flex flex-col">
                         <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">

@@ -50,11 +50,11 @@ class User extends Authenticatable
         ];
     }
 
-    protected $with = ['person'];
+    protected $with = ['employee'];
 
-    public function person(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'person_id');
+        return $this->belongsTo(TEmployee::class, 'employee_id');
     }
 
     public function role()
@@ -65,9 +65,4 @@ class User extends Authenticatable
     public function additional() {
         return $this->hasOne(UserAdditional::class, 'user_id');
     }
-
-    // public function cash_advance(): HasMany
-    // {
-    //     return $this->hasMany(CashAdvance::class, 'USED_BY');
-    // }
 }
