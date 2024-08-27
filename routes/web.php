@@ -205,6 +205,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cashAdvanceReportDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_download'])->name('cashAdvanceReport.download');
     Route::get('/cashAdvanceReportProofOfDocumentDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_download'])->name('cashAdvanceReportProofOfDocument.download');
     Route::get('/cashAdvanceReportDocReader/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_doc_reader'])->name('cashAdvanceReport.cash_advance_doc_reader');
+    Route::get('/cashAdvanceReportProofOfDocumentDocReader/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_doc_reader'])->name('cashAdvanceReport.cash_advance_doc_reader');
 
     // Get Count Reimburse Status
     Route::get('/getCountReimburseRequestStatus', [ReimburseController::class, 'getCountReimburseRequestStatus'])->name('getCountReimburseRequestStatus');
@@ -230,6 +231,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reimburseDownload/{id}/{key}', [ReimburseController::class, 'download'])->name('reimburse.download');
     Route::get('/reimburseProofOfDocumentDownload/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_download'])->name('reimburseProofOfDocument.download');
     Route::get('/reimburseDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_doc_reader'])->name('reimburseDocReader.reimburse_doc_reader');
+    Route::get('/reimburseProofOfDocumentDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_doc_reader'])->name('reimburseProofOfDocumentDocReader.reimburse_proof_of_document_doc_reader');
 
     // Other Expenses
     Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');

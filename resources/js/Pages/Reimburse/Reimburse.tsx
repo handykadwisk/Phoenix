@@ -2007,12 +2007,15 @@ export default function Reimburse({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
+                                                        <a
+                                                            href={`/reimburseDocReader/${dataById.REIMBURSE_ID}/${file?.document.DOCUMENT_ID}`}
+                                                            target="_blank"
+                                                        >
                                                             {
                                                                 file.document
                                                                     ?.DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -2278,20 +2281,21 @@ export default function Reimburse({ auth }: PageProps) {
                                                     }
                                                 </TD>
                                                 <TD className="border py-2">
-                                                    {
-                                                        rd.relation_organization
-                                                            ?.RELATION_ORGANIZATION_ALIAS
-                                                    }
+                                                    {rd.relation_organization
+                                                        ? rd
+                                                              .relation_organization
+                                                              .RELATION_ORGANIZATION_ALIAS
+                                                        : "-"}
                                                 </TD>
                                                 <TD className="border py-2">
-                                                    {
-                                                        rd.REIMBURSE_DETAIL_RELATION_NAME
-                                                    }
+                                                    {rd.REIMBURSE_DETAIL_RELATION_NAME
+                                                        ? rd.REIMBURSE_DETAIL_RELATION_NAME
+                                                        : "-"}
                                                 </TD>
                                                 <TD className="border py-2">
-                                                    {
-                                                        rd.REIMBURSE_DETAIL_RELATION_POSITION
-                                                    }
+                                                    {rd.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        ? rd.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        : "-"}
                                                 </TD>
                                                 <TD className="border py-2">
                                                     {formatCurrency.format(
@@ -2715,9 +2719,6 @@ export default function Reimburse({ auth }: PageProps) {
                                             rowSpan="2"
                                         >
                                             Cost Classification
-                                            {/* <span className="text-red-600">
-                                                *
-                                            </span> */}
                                         </TH>
                                         <TH
                                             className="border px-3 py-2"
@@ -2807,20 +2808,21 @@ export default function Reimburse({ auth }: PageProps) {
                                                     }
                                                 </TD>
                                                 <TD className="border px-3 py-2">
-                                                    {
-                                                        rd.relation_organization
-                                                            ?.RELATION_ORGANIZATION_ALIAS
-                                                    }
+                                                    {rd.relation_organization
+                                                        ? rd
+                                                              .relation_organization
+                                                              .RELATION_ORGANIZATION_ALIAS
+                                                        : "-"}
                                                 </TD>
                                                 <TD className="border px-3 py-2">
-                                                    {
-                                                        rd.REIMBURSE_DETAIL_RELATION_NAME
-                                                    }
+                                                    {rd.REIMBURSE_DETAIL_RELATION_NAME
+                                                        ? rd.REIMBURSE_DETAIL_RELATION_NAME
+                                                        : "-"}
                                                 </TD>
                                                 <TD className="border px-3 py-2">
-                                                    {
-                                                        rd.REIMBURSE_DETAIL_RELATION_POSITION
-                                                    }
+                                                    {rd.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        ? rd.REIMBURSE_DETAIL_RELATION_POSITION
+                                                        : "-"}
                                                 </TD>
                                                 <TD className="border px-3 py-2">
                                                     {formatCurrency.format(
@@ -3706,7 +3708,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                         type="text"
                                                         name="REIMBURSE_DETAIL_RELATION_NAME"
                                                         value={
-                                                            rd.REIMBURSE_DETAIL_RELATION_NAME
+                                                            rd.REIMBURSE_DETAIL_RELATION_NAME ||
+                                                            ""
                                                         }
                                                         className="w-1/2"
                                                         autoComplete="off"
@@ -3724,7 +3727,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                         type="text"
                                                         name="REIMBURSE_DETAIL_RELATION_POSITION"
                                                         value={
-                                                            rd.REIMBURSE_DETAIL_RELATION_POSITION
+                                                            rd.REIMBURSE_DETAIL_RELATION_POSITION ||
+                                                            ""
                                                         }
                                                         className="w-1/2"
                                                         autoComplete="off"
@@ -3864,7 +3868,7 @@ export default function Reimburse({ auth }: PageProps) {
                                 name="reimburse_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.REIMBURSE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>

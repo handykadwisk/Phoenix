@@ -218,6 +218,22 @@ class CashAdvanceReportController extends Controller
         return Inertia::render('CA/CashAdvanceDocReader', $data);
     }
 
+    public function cash_advance_report_proof_of_document_doc_reader($cash_advance_report_id, $document_id)
+    {
+        $document = TDocument::find($document_id);
+
+        $document_filename = $cash_advance_report_id . '-' . $document->DOCUMENT_ORIGINAL_NAME;
+        $document_dirname = $document->DOCUMENT_DIRNAME;
+
+        $filePath = "/storage" . "/". $document_dirname . "/" . $document_filename;
+
+        $data = [
+            'uri' => $filePath
+        ];
+
+        return Inertia::render('CA/CashAdvanceDocReader', $data);
+    }
+
     public function cash_advance_report_download($cash_advance_detail_report_id, $document_id)
     {
         $document = TDocument::find($document_id);
@@ -479,6 +495,7 @@ class CashAdvanceReportController extends Controller
                 $report_cash_advance_detail_approval = $cad['REPORT_CASH_ADVANCE_DETAIL_APPROVAL'];
                 $report_cash_advance_detail_amount_approve = $cad['REPORT_CASH_ADVANCE_DETAIL_AMOUNT_APPROVE'];
                 $report_cash_advance_detail_remarks = $cad['REPORT_CASH_ADVANCE_DETAIL_REMARKS'];
+                $report_cash_advance_detail_cost_classification = $cost_classification;
                 if ($cost_classification != null || $cost_classification != "") {
                     $report_cash_advance_detail_cost_classification = $cost_classification['value'];
                 }

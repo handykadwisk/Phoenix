@@ -6935,15 +6935,15 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             value="File"
                                                             className="mb-2"
                                                         />
-                                                        <p>
+                                                        <a
+                                                            href={`/cashAdvanceReportProofOfDocumentDocReader/${dataReportById?.REPORT_CASH_ADVANCE_ID}/${file?.document.DOCUMENT_ID}`}
+                                                            target="_blank"
+                                                        >
                                                             {
-                                                                dataReportById
-                                                                    ?.m_cash_advance_proof_of_document[
-                                                                    i
-                                                                ]?.document
+                                                                file?.document
                                                                     .DOCUMENT_ORIGINAL_NAME
                                                             }
-                                                        </p>
+                                                        </a>
                                                     </div>
                                                     <button
                                                         type="button"
