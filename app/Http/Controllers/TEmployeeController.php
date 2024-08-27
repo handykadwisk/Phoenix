@@ -191,7 +191,7 @@ class TEmployeeController extends Controller
     }
 
     public function get_employeeById(Request $request){
-        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->where('EMPLOYEE_ID', $request->idEmployee)->first();
+        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->where('EMPLOYEE_ID', $request->idEmployee)->first();
         return response()->json($data);
     }
 
@@ -1029,20 +1029,20 @@ class TEmployeeController extends Controller
 
 
         // if (isset($request->BANK_ACCOUNT[0]['EMPLOYEE_BANK_ACCOUNT_ID'])) {
-            $dataTPerson = TEmployeeBankAccount::where('EMPLOYEE_ID', $request->BANK_ACCOUNT[0]['EMPLOYEE_ID'])->get();
-            // dd($dataTPerson);
+            $dataTEmployee = TEmployeeBankAccount::where('EMPLOYEE_ID', $request->BANK_ACCOUNT[0]['EMPLOYEE_ID'])->get();
+            // dd($dataTEmployee);
             // Delete M Bank Account Existing By Id
-            for ($i=0; $i < sizeof($dataTPerson); $i++) { 
+            for ($i=0; $i < sizeof($dataTEmployee); $i++) { 
                 
-                $dataExisting = MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTPerson[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->get();
+                $dataExisting = MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->get();
                 if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
-                    MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTPerson[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->delete();
+                    MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->delete();
                 }
             }
             // Delete Data T Person Bank Account
-            // $dataExistingTPerson = TEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTPerson[0]['EMPLOYEE_ID'])->get();
-            if ($dataTPerson->count()>0) { //jika ada delete data sebelumnya
-                TEmployeeBankAccount::where('EMPLOYEE_ID', $dataTPerson[0]['EMPLOYEE_ID'])->delete();
+            // $dataExistingTPerson = TEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[0]['EMPLOYEE_ID'])->get();
+            if ($dataTEmployee->count()>0) { //jika ada delete data sebelumnya
+                TEmployeeBankAccount::where('EMPLOYEE_ID', $dataTEmployee[0]['EMPLOYEE_ID'])->delete();
             }
             
         // }
@@ -1101,5 +1101,76 @@ class TEmployeeController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function uploadProfile(Request $request){
+        // dd($request);
+        // document
+        $imgProfile = $request->file('files');
+        // print_r($imgProfile);die;
+        if ($imgProfile) {
+                // $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
+                $documentImg = is_countable($request->file('files'));
+                if($documentImg){
+                    for ($i=0; $i < sizeof($request->file('files')); $i++) { 
+                        $uploadDocument = $request->file('files');
+                        
+                        // Create Folder For Person Document
+                        $parentDir = ((floor(($request->id)/1000))*1000).'/';
+                        $personID = $request->id . '/';
+                        $typeDir = "";
+                        $uploadPath = 'images/'. $parentDir . $personID . $typeDir;
+        
+        
+                        // get Data Document
+                        $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                        $documentFileName = $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                        $documentDirName = $uploadPath;
+                        $documentFileType = $uploadDocument[$i]->getMimeType();
+                        $documentFileSize = $uploadDocument[$i]->getSize();
+        
+                        // create folder in directory laravel
+                        Storage::makeDirectory($uploadPath, 0777, true, true);
+                        Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+        
+                        // masukan data file ke database
+                        $document = Document::create([
+                            'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                            'DOCUMENT_FILENAME'             => $documentFileName,
+                            'DOCUMENT_DIRNAME'              => $documentDirName,
+                            'DOCUMENT_FILETYPE'             => $documentFileType,
+                            'DOCUMENT_FILESIZE'             => $documentFileSize,
+                            'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                        ])->DOCUMENT_ID;
+        
+                        if ($document) {
+                            TEmployee::where('EMPLOYEE_ID', $request->id)
+                              ->update([
+                                'EMPLOYEE_IMAGE_ID'    => $document
+                              ]);
+                        }
+                    }
+                }
+    
+            }
+
+            // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Updated (Person).",
+            "module"      => "Person",
+            "id"          => $request->id
+        ]),
+        'action_by'  => Auth::user()->email
+        ]);
+
+        return new JsonResponse([
+            $request->id,
+            "Profile Employee Has Change"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+
     }
 }

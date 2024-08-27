@@ -54,4 +54,8 @@ class TEmployee extends Model
     public function TEmployeeBank(){
         return $this->hasMany(TEmployeeBankAccount::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
     }
+
+    public function Document(){
+        return $this->hasOne(Document::class, 'DOCUMENT_ID', 'EMPLOYEE_IMAGE_ID');
+    }
 }

@@ -30,6 +30,7 @@ import ModalAddEmployee from "./ModalAddEmployee";
 import DetailEmployeeAddress from "./DetailEmployeeAddress";
 import AddBankAccountEmployee from "./AddBankAccountEmployee";
 import DetailBankAccountEmployee from "./DetailBankAccountEmployee";
+import Swal from "sweetalert2";
 
 export default function DetailEmployee({
     idEmployee,
@@ -49,6 +50,7 @@ export default function DetailEmployee({
 
     // FILE
     const [file, setFile] = useState<any>();
+    const [fileNew, setFileNew] = useState<any>();
 
     // modal detail employment
     const [editModalEmployment, setEditModalEmployment] = useState<any>({
@@ -422,6 +424,64 @@ export default function DetailEmployee({
                 setIsSuccess("");
             }, 5000);
         }
+    };
+
+    // Upload File
+    const handleChange = (e: any) => {
+        if (
+            e.target.files[0].type === "image/jpeg" ||
+            e.target.files[0].type === "image/jpg" ||
+            e.target.files[0].type === "image/png"
+        ) {
+            setFile(URL.createObjectURL(e.target.files[0]));
+            setFileNew(e.target.files);
+        } else {
+            Swal.fire({
+                title: "Failed",
+                text: "File Tidak Mendukung!!",
+                icon: "error",
+            }).then((result: any) => {
+                // console.log(result);
+                if (result.value) {
+                    return false;
+                    // getPersons();
+                    // setGetDetailRelation(message);
+                    // setModal({
+                    //     add: false,
+                    //     delete: false,
+                    //     edit: false,
+                    //     view: true,
+                    //     document: false,
+                    //     search: false,
+                    // });
+                }
+            });
+        }
+    };
+
+    const saveUpload = async (files: any, id: string) => {
+        // console.log(data);
+        await axios
+            .post(
+                `/uploadProfile`,
+                { files, id },
+                {
+                    headers: {
+                        "Content-type": "multipart/form-data",
+                    },
+                }
+            )
+            .then((res) => {
+                setIsSuccess(res.data[1]);
+                setFile(null);
+                getDetailEmployee(res.data[0]);
+                setTimeout(() => {
+                    setIsSuccess("");
+                }, 5000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     return (
@@ -1252,15 +1312,26 @@ export default function DetailEmployee({
             <div className="grid grid-cols-3 gap-3 mb-2">
                 <div className="bg-white p-2 rounded-md shadow-md">
                     <div className="flex justify-end">
-                        <div
-                            className="text-red-600 cursor-pointer"
-                            title="Edit Employment"
-                            onClick={(e) => handleEditEmployment(e)}
-                        >
-                            <span>
-                                <PencilSquareIcon className="w-5" />
-                            </span>
-                        </div>
+                        {file ? (
+                            <div
+                                className="mt-3 flex justify-center items-center font-semibold text-red-600 cursor-pointer"
+                                onClick={(e) => saveUpload(fileNew, idEmployee)}
+                            >
+                                <div className="bg-red-600 text-white w-24 text-center px-2 py-2 rounded-md hover:bg-red-500 text-sm">
+                                    Save
+                                </div>
+                            </div>
+                        ) : (
+                            <div
+                                className="text-red-600 cursor-pointer"
+                                title="Edit Employment"
+                                onClick={(e) => handleEditEmployment(e)}
+                            >
+                                <span>
+                                    <PencilSquareIcon className="w-5" />
+                                </span>
+                            </div>
+                        )}
                     </div>
                     <div className="flex justify-center items-center relative mt-2">
                         <label
@@ -1286,13 +1357,14 @@ export default function DetailEmployee({
                             ) : (
                                 <img
                                     className="h-44 w-44 rounded-full border-2 bg-gray-50"
-                                    // src={
-                                    //     window.location.origin +
-                                    //     "/storage/" +
-                                    //     dataDetailEmployee.document
-                                    //         ?.DOCUMENT_DIRNAME +
-                                    //     dataDetailEmployee.document?.DOCUMENT_FILENAME
-                                    // }
+                                    src={
+                                        window.location.origin +
+                                        "/storage/" +
+                                        dataDetailEmployee.document
+                                            ?.DOCUMENT_DIRNAME +
+                                        dataDetailEmployee.document
+                                            ?.DOCUMENT_FILENAME
+                                    }
                                     alt="Image Person"
                                 />
                             )}
@@ -1531,7 +1603,15 @@ export default function DetailEmployee({
                             </div>
                         </div>
                         <div className="px-2 xs:px-0 lg:px-2">
-                            <div className="font-semibold text-red-600">
+                            <div
+                                className="font-semibold text-red-600 cursor-context-menu"
+                                onContextMenu={(e: any) => {
+                                    return <span>aloo</span>;
+                                }}
+                                // onClick={(e: any) => {
+                                //     console.log(e.target);
+                                // }}
+                            >
                                 <span>Contact Emergency</span>
                             </div>
                             {dataDetailEmployee.t_employment_emergency

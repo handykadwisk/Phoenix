@@ -32,8 +32,10 @@ use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\TCompanyController;
 use App\Http\Controllers\TCompanyDivisionController;
+use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
+use App\Http\Controllers\TJobDescCompanyController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -469,6 +471,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editAddress', [TEmployeeController::class, 'editAddress'])->name('editAddress.editAddress');
     Route::post('/addBankAccount', [TEmployeeController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
     Route::post('/editBankAccount', [TEmployeeController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+    Route::post('/uploadProfile', [TEmployeeController::class, 'uploadProfile'])->name('uploadProfile.uploadProfile');
 
 
 
@@ -486,7 +489,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/getDivisionDetailCompany', [TCompanyDivisionController::class, 'get_detail'])->name('getDivisionDetailCompany.get_detail');
     Route::post('/editDivisionCompany', [TCompanyDivisionController::class, 'edit'])->name('editDivisionCompany.edit');
 
+    // Office
+    Route::get('/getOfficeCompany', [TCompanyOfficeController::class, 'getOfficeCompanyJson'])->name('getOfficeCompany.getOfficeCompanyJson');
+    // Route::post('/getLocationType', [TCompanyOfficeController::class, 'getLocationType'])->name('getLocationType.getLocationType');
+    Route::post('/getOfficeComboCompany', [TCompanyOfficeController::class, 'getOfficeComboCompany'])->name('getOfficeComboCompany.getOfficeComboCompany');
+    // Route::post('/getWilayah', [TCompanyOfficeController::class, 'get_wilayah'])->name('getWilayah.get_wilayah');
+    // Route::post('/getRegency', [TCompanyOfficeController::class, 'get_regency'])->name('getRegency.get_regency');
+    Route::post('/addAddressCompany', [TCompanyOfficeController::class, 'store'])->name('addAddressCompany.store');
+    Route::post('/getOfficeCompanyDetail', [TCompanyOfficeController::class, 'get_detail'])->name('getOfficeCompanyDetail.get_detail');
+    Route::post('/editOfficeCompany', [TCompanyOfficeController::class, 'edit'])->name('editOfficeCompany.edit');
 
+     // Job Desc
+     Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
+    Route::post('/getJobDescCompanyCombo', [TJobDescCompanyController::class, 'getJobDescCompanyCombo'])->name('getJobDescCompanyCombo.getJobDescCompanyCombo');
+    Route::post('/addJobDescCompany', [TJobDescCompanyController::class, 'store'])->name('addJobDescCompany.store');
+     Route::post('/getJobDescCompanyDetail', [TJobDescCompanyController::class, 'get_detail'])->name('getJobDescCompanyDetail.get_detail');
+     Route::post('/editJobDescCompany', [TJobDescCompanyController::class, 'edit'])->name('editJobDescCompany.edit');
 
 
 
