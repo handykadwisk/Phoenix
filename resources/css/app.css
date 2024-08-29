@@ -45,6 +45,39 @@
         height: calc(100vh - 4rem - 40px - 16px - 8.1rem);
     }
 
+    .login-layout {
+        height: calc(100vh - 4.1rem - 0rem - 0rem - 0rem);
+    }
+
+    .cls_attach_chat {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+    }
+    .cls_attach_task {
+        height: 15px;
+        width: 15px;
+        background-color: blue;
+        border-radius: 50%;
+        /* display: inline-block; */
+    }
+
+    .cls_attach_reminder {
+        height: 15px;
+        width: 15px;
+        background-color: yellow;
+        border-radius: 50%;
+        /* display: inline-block; */
+    }
+    .cls_attach_document {
+        height: 15px;
+        width: 15px;
+        background-color: green;
+        border-radius: 50%;
+        /* display: inline-block; */
+    }
+
     .switch {
         position: relative;
         display: inline-block;

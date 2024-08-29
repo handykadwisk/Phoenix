@@ -651,7 +651,7 @@ export default function DetailCompany({
                             <span>-</span>
                         </div>
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2 hidden">
                         <div className="font-semibold">
                             <span>Address & Location</span>
                         </div>

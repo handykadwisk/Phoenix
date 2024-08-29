@@ -1,12 +1,17 @@
 import {
     FormEvent,
+    HTMLAttributes,
     PropsWithChildren,
     useEffect,
     useRef,
     useState,
 } from "react";
 import axios from "axios";
-import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import {
+    ChatBubbleLeftRightIcon,
+    PencilSquareIcon,
+    XMarkIcon,
+} from "@heroicons/react/20/solid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -28,6 +33,8 @@ import DatePicker from "react-datepicker";
 import SwitchPage from "@/Components/Switch";
 import Select from "react-tailwindcss-select";
 import DetailDocumentRelation from "./DetailDocument";
+import MenuPlugin from "../PluginModul/MenuPlugin";
+import renderClassFunction from "@/Utility/renderClassFunction";
 
 export default function DetailRelation({
     detailRelation,
@@ -49,6 +56,12 @@ export default function DetailRelation({
     const [salutations, setSalutations] = useState<any>([]);
     const [postSalutations, setPostSalutations] = useState<any>([]);
     const [switchPage, setSwitchPage] = useState(false);
+
+    // data menu
+    const [dataPluginProcess, setDataPluginProcess] = useState<any>({
+        TAG_ID: "",
+        PLUGIN_PROCESS_ID: "",
+    });
 
     const [isSuccess, setIsSuccess] = useState<string>("");
 
@@ -105,6 +118,113 @@ export default function DetailRelation({
     useEffect(() => {
         getDetailRelation(detailRelation);
     }, [detailRelation]);
+
+    const getMark = document.querySelectorAll(
+        ".cls_can_attach_process"
+    ) as NodeListOf<any>;
+
+    // for hook react render class
+    const {
+        // handleContextMenu,
+        // handleClick,
+        showContext,
+        idDiv,
+        menuPosition,
+        setShowContext,
+    } = renderClassFunction(getMark, detailRelation);
+    // handleContextMenu();
+
+    // handleContextMenu;
+    // handleClick;
+    // const handleContextMenu = async (e: any) => {
+    //     e.preventDefault();
+    //     // console.log(e.currentTarget.id);
+    //     setShowContext({
+    //         ...showContext,
+    //         visible: true,
+    //     });
+    //     setIdDiv({
+    //         ...idDiv,
+    //         setIdName: e.currentTarget.id,
+    //     });
+    //     setMenuPosition({
+    //         x: e.clientX + "px",
+    //         y: e.clientY + "px",
+    //     });
+    // };
+
+    // const handleClick = async (e: any) => {
+    //     e.preventDefault();
+    //     console.log(e.currentTarget.id);
+    //     setShowContext({
+    //         ...showContext,
+    //         visible: false,
+    //     });
+    // };
+
+    // const getContents = () => {
+    //     const getMark = document.querySelectorAll(
+    //         ".cls_can_attach_process"
+    //     ) as NodeListOf<any>;
+    //     getMark.forEach((element) => {
+    //         if (element.className === "cls_can_attach_process") {
+    //             element?.setAttribute("class", "cursor-help");
+    //             element?.setAttribute(
+    //                 "title",
+    //                 "Attach, Chat, Task, etc For This"
+    //             );
+    //         }
+    //         element?.addEventListener("contextmenu", handleContextMenu);
+    //         element?.addEventListener("click", handleClick);
+    //         // console.log(element); // Safe, since it's known to be HTMLElement
+    //     });
+    // };
+
+    // useEffect(() => {
+    //     getContents();
+    // }, []);
+
+    // handleContextMenu = (event) => {
+    //     event.preventDefault();
+
+    //     this.setState({ visible: true });
+
+    //     const clickX = event.clientX;
+    //     const clickY = event.clientY;
+    //     const screenW = window.innerWidth;
+    //     const screenH = window.innerHeight;
+    //     const rootW = this.root.offsetWidth;
+    //     const rootH = this.root.offsetHeight;
+
+    //     const right = screenW - clickX > rootW;
+    //     const left = !right;
+    //     const top = screenH - clickY > rootH;
+    //     const bottom = !top;
+
+    //     if (right) {
+    //         this.root.style.left = `${clickX + 5}px`;
+    //     }
+
+    //     if (left) {
+    //         this.root.style.left = `${clickX - rootW - 5}px`;
+    //     }
+
+    //     if (top) {
+    //         this.root.style.top = `${clickY + 5}px`;
+    //     }
+
+    //     if (bottom) {
+    //         this.root.style.top = `${clickY - rootH - 5}px`;
+    //     }
+    // };
+
+    // useEffect(() => {
+
+    //     // return () => {
+    //     //     const getTest = document.getElementById("test") as HTMLFormElement;
+    //     //     getTest?.removeEventListener("click", handleClick);
+    //     // };
+    // }, [detailRelation]);
 
     const getMappingParent = async (name: string, column: string) => {
         // setIsLoading(true)
@@ -598,7 +718,6 @@ export default function DetailRelation({
         valueWebsite = dataById.RELATION_ORGANIZATION_WEBSITE;
     }
 
-    console.log(dataRelationNew);
     // modal edit bank account
     const [modalEditBankRelation, setModalEditBankRelation] = useState<any>({
         edit: false,
@@ -711,6 +830,175 @@ export default function DetailRelation({
             }, 5000);
         }
     };
+
+    // const [showContext, setShowContext] = useState<any>({
+    //     visible: false,
+    // });
+
+    // const [idDiv, setIdDiv] = useState<any>({
+    //     setIdName: "",
+    // });
+    // const [menuPosition, setMenuPosition] = useState<any>({
+    //     x: "",
+    //     y: "",
+    // });
+
+    // const []
+
+    // const handleContextMenu = (event: FormEvent) => {
+    //     event.preventDefault();
+    //     console.log(event.currentTarget.id);
+    //     if (event.currentTarget.id === event.currentTarget.id) {
+    //         setShowContext({
+    //             ...showContext,
+    //             visible: true,
+    //         });
+    //         setIdDiv({
+    //             ...idDiv,
+    //             setIdName: event.currentTarget.id,
+    //         });
+    //         setMenuPosition({
+    //             x: event.clientX + "px",
+    //             y: event.clientY + "px",
+    //         });
+    //     }
+    // };
+
+    // const handleContextMenu = (event: any) => {
+    //     event.preventDefault();
+    //     setShowContext({
+    //         ...showContext,
+    //         visible: true,
+    //     });
+    // };
+
+    // const handleClick = (event: any) => {
+    //     console.log(event);
+    //     const showVisible = showContext.visible;
+
+    //     if (!showVisible) {
+    //         setShowContext({
+    //             ...showContext,
+    //             visible: false,
+    //         });
+    //     }
+    // };
+
+    // const handleScroll = () => {
+    //     const visib = showContext.visible;
+
+    //     if (!visib) {
+    //         setShowContext({
+    //             ...showContext,
+    //             visible: false,
+    //         });
+    //     }
+    // };
+
+    // const runContent = async () => {
+    //     const getMark = document.querySelectorAll(
+    //         ".cls_can_attach_process"
+    //     ) as NodeListOf<any>;
+    //     getMark.forEach((element) => {
+    //         if (element.className === "cls_can_attach_process") {
+    //             element?.addEventListener("contextmenu", handleContextMenu);
+    //             element?.addEventListener("click", handleClick);
+    //             element?.addEventListener("scroll", handleScroll);
+    //         }
+    //         // console.log(element.title); // Safe, since it's known to be HTMLElement
+    //     });
+    // };
+
+    // const endContent = async () => {
+    //     const getMark = document.querySelectorAll(
+    //         ".cls_can_attach_process"
+    //     ) as NodeListOf<any>;
+    //     getMark.forEach((element) => {
+    //         if (element.className === "cls_can_attach_process") {
+    //             element?.removeEventListener("contextmenu", handleContextMenu);
+    //             element?.removeEventListener("click", handleClick);
+    //             element?.removeEventListener("scroll", handleScroll);
+    //         }
+    //         // console.log(element.title); // Safe, since it's known to be HTMLElement
+    //     });
+    // };
+
+    const getContent = async () => {
+        const getMark = document.querySelectorAll(
+            ".cls_can_attach_process"
+        ) as NodeListOf<any>;
+        getMark.forEach((element) => {
+            if (element.className === "cls_can_attach_process") {
+                element?.setAttribute("class", "cursor-help");
+                element?.setAttribute(
+                    "title",
+                    "Attach, Chat, Task, etc For This"
+                );
+            }
+            // console.log(element.title); // Safe, since it's known to be HTMLElement
+        });
+    };
+
+    // const [menuPosition, setMenuPosition] = useState<{
+    //     x: number;
+    //     y: number;
+    // } | null>(null);
+
+    // const handleClick = () => {
+    //     console.log("aloo");
+    //     setMenuPosition(null); // Hide the menu when clicking elsewhere
+    // };
+
+    // componentDidMount(){
+
+    // }
+    // const [refreshPlugin, setRefreshPlugin] = useState<boolean>(false);
+    // if (refreshPlugin === false) {
+    // } else {
+
+    // }
+    useEffect(() => {
+        getTPluginProcess();
+    }, []);
+    const [dataTPlugin, setDataTPlugin] = useState<any>([]);
+
+    const getTPluginProcess = async () => {
+        await axios
+            .post(`/getTPluginProcess`)
+            .then((res) => {
+                setDataTPlugin(res.data);
+                console.log("TPlug", res.data);
+                // setRefreshPlugin(true);
+                // setTimeout(() => {
+                //     setRefreshPlugin(false);
+                // }, 2000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const handleSuccessPlugin = async (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[1]);
+            // getDetailRelation(message[0]);
+            getTPluginProcess();
+            // getContents();
+            const {
+                // handleContextMenu,
+                // handleClick,
+                showContext,
+                idDiv,
+                menuPosition,
+                setShowContext,
+            } = renderClassFunction(getMark, detailRelation);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
     return (
         <>
             {isSuccess && (
@@ -2152,13 +2440,77 @@ export default function DetailRelation({
 
             {/* Detail Relation*/}
             {/* Top */}
-            <div className="bg-white p-4 rounded-md shadow-md mb-3">
+            {showContext.visible && (
+                <>
+                    <MenuPlugin
+                        handleSuccessPlugin={handleSuccessPlugin}
+                        showContext={showContext}
+                        setShowContext={setShowContext}
+                        idDiv={idDiv}
+                        dataPluginProcess={dataPluginProcess}
+                        setDataPluginProcess={setDataPluginProcess}
+                        top={`${menuPosition.y}px`}
+                        left={`${menuPosition.x}px`}
+                    />
+                </>
+            )}
+            <div
+                className="bg-white p-4 rounded-md shadow-md mb-3"
+                // onClick={(e) => {
+                //     setShowContext({
+                //         ...showContext,
+                //         visible: false,
+                //     });
+                // }}
+            >
                 {/* Official Information */}
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-fit">
-                        <span className="border-b-2 border-red-600">
-                            Relation Information
-                        </span>
+                    <div className="text-md font-semibold w-full">
+                        <div className="flex gap-2 items-center">
+                            <div
+                                // id={
+                                //     "relation_header_" +
+                                //     detailRelation +
+                                //     "_relation_information"
+                                // }
+                                className="cls_can_attach_process"
+                                // onContextMenu={handleContextMenu}
+                                // onClick={(e) => {
+                                //     setShowContext({
+                                //         ...showContext,
+                                //         visible: false,
+                                //     });
+                                // }}
+                            >
+                                <span className="border-b-2 border-red-600">
+                                    Relation Information
+                                </span>
+                            </div>
+                            {/* <div className={"cls_attach_task"}>
+                            </div>
+                            <div className={"cls_attach_chat"}>
+                            </div>
+                            <div className={"cls_attach_reminder"}>
+                            </div>
+                            <div className={"cls_attach_document"}>
+                            </div> */}
+                            {dataTPlugin
+                                ?.filter(
+                                    (m: any) =>
+                                        m.TAG_ID ===
+                                        "relation_information_c4f_1"
+                                )
+                                .map((tPlug: any, i: number) => {
+                                    const className =
+                                        tPlug.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+                                    return (
+                                        <div
+                                            key={i}
+                                            className={className}
+                                        ></div>
+                                    );
+                                })}
+                        </div>
                     </div>
                     <a
                         onClick={(e) =>
@@ -2237,7 +2589,7 @@ export default function DetailRelation({
                             </div>
                         )}
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2 hidden">
                         <div className="font-semibold">
                             <span>Address & Location</span>
                         </div>
@@ -2249,8 +2601,36 @@ export default function DetailRelation({
                 {/* End Official Information */}
 
                 {/* Relation Type And */}
-                <div className="text-md font-semibold border-b-2 w-fit border-red-600 mt-4">
-                    <span>Relation Type</span>
+                <div className="text-md font-semibold mt-4">
+                    <div className="flex gap-2 items-center">
+                        <div
+                            className="cls_can_attach_process"
+                            // onContextMenu={(e: any) => {
+                            //     handleContextMenu(e);
+                            // }}
+                            // onClick={(e) => {
+                            //     setShowContext({
+                            //         ...showContext,
+                            //         visible: false,
+                            //     });
+                            // }}
+                        >
+                            <span className="border-b-2 border-red-600">
+                                Relation Type
+                            </span>
+                        </div>
+                        {dataTPlugin
+                            ?.filter(
+                                (m: any) => m.TAG_ID === "relation_type_f3d_1"
+                            )
+                            .map((tPlug: any, i: number) => {
+                                const className =
+                                    tPlug.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+                                return (
+                                    <div key={i} className={className}></div>
+                                );
+                            })}
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                     <div className="grid grid-cols-1 gap-4 mt-2">
