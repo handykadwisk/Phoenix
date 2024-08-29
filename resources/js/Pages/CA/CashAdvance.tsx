@@ -1860,24 +1860,32 @@ export default function CashAdvance({ auth }: PageProps) {
             CASH_ADVANCE_FIRST_APPROVAL_STATUS: status,
         });
 
-        // console.log(dataById);
-
-        await axios
-            .patch(
-                `/cashAdvanceApprove/${dataById.CASH_ADVANCE_ID}`,
-                dataById,
-                {
-                    headers: {
-                        "Content-type": "multipart/form-data",
-                    },
-                }
-            )
-            .then((res) => {
-                // console.log(res);
-            })
-            .catch((err) => {
-                console.log(err);
+        if (
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "Finance" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FIN"
+        ) {
+            setDataById({
+                ...dataById,
+                CASH_ADVANCE_SECOND_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
+                CASH_ADVANCE_SECOND_APPROVAL_USER:
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
+                CASH_ADVANCE_SECOND_APPROVAL_STATUS: status,
             });
+        }
+
+        if (
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
+                "Directors" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIR"
+        ) {
+            setDataById({
+                ...dataById,
+                CASH_ADVANCE_THIRD_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
+                CASH_ADVANCE_THIRD_APPROVAL_USER:
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
+                CASH_ADVANCE_THIRD_APPROVAL_STATUS: status,
+            });
+        }
     };
 
     const handleBtnReportStatus = async (status: number) => {
@@ -1886,76 +1894,54 @@ export default function CashAdvance({ auth }: PageProps) {
             REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS: status,
         });
 
+        if (
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "Finance" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FIN"
+        ) {
+            setDataReportById({
+                ...dataReportById,
+                REPORT_CASH_ADVANCE_SECOND_APPROVAL_BY:
+                    auth.user.employee.EMPLOYEE_ID,
+                REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER:
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
+                REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS: status,
+            });
+        }
+
+        if (
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
+                "Directors" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIR"
+        ) {
+            setDataReportById({
+                ...dataReportById,
+                REPORT_CASH_ADVANCE_THIRD_APPROVAL_BY:
+                    auth.user.employee.EMPLOYEE_ID,
+                REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER:
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
+                REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS: status,
+            });
+        }
+
         // console.log(dataById);
 
-        await axios
-            .patch(
-                `/cashAdvanceReportApprove/${dataReportById.CASH_ADVANCE_ID}`,
-                dataReportById,
-                {
-                    headers: {
-                        "Content-type": "multipart/form-data",
-                    },
-                }
-            )
-            .then((res) => {
-                // console.log(res);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const handleBtnRevised = async () => {
-        await axios
-            .patch(
-                `/cashAdvanceRevised/${dataById.CASH_ADVANCE_ID}`,
-                dataById,
-                {
-                    headers: {
-                        "Content-type": "multipart/form-data",
-                    },
-                }
-            )
-            .then((res) => {
-                // console.log(res);
-                close();
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    // Handle Add Files Start
-    const handleAddFilesModal = async (e: FormEvent, id: number) => {
-        e.preventDefault();
-
         // await axios
-        //     .get(`/getCAReportById/${id}`)
+        //     .patch(
+        //         `/cashAdvanceReportApprove/${dataReportById.CASH_ADVANCE_ID}`,
+        //         dataReportById,
+        //         {
+        //             headers: {
+        //                 "Content-type": "multipart/form-data",
+        //             },
+        //         }
+        //     )
         //     .then((res) => {
-        //         setDataReportById(res.data);
-        //         console.log(res.data);
+        //         console.log(res);
         //     })
-        //     .catch((err) => console.log(err));
-
-        setModal({
-            add: false,
-            delete: false,
-            edit: false,
-            view: false,
-            document: false,
-            search: false,
-            search_ca_report: false,
-            approve: false,
-            report: false,
-            execute: false,
-            view_report: false,
-            approve_report: false,
-            revised_report: false,
-            execute_report: false,
-        });
+        //     .catch((err) => {
+        //         console.log(err);
+        //     });
     };
-    // Handle Add Files End
 
     const handleFileDownload = async (
         cash_advance_detail_id: number,
@@ -2287,10 +2273,11 @@ export default function CashAdvance({ auth }: PageProps) {
     });
 
     console.log("Data Cash Advance", data);
-    // console.log("Cash Advance", cashAdvance.data);
+    console.log("Cash Advance", cashAdvance.data);
     // console.log("Data CA By Id", dataById);
-    console.log("Data CA Report", dataCAReport);
+    // console.log("Data CA Report", dataCAReport);
     // console.log("Data CA Report By Id", dataReportById);
+    console.log("Auth", auth.user);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Cash Advance"}>
@@ -3713,13 +3700,12 @@ export default function CashAdvance({ auth }: PageProps) {
                     })
                 }
                 title="Approve Cash Advance"
-                url={`/cashAdvanceApprove/${dataById.cash_advance_detail.CASH_ADVANCE_DETAIL_ID}`}
+                url={`/cashAdvanceApprove`}
                 data={dataById}
                 method="patch"
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={""}
-                // panelWidth={"70%"}
                 body={
                     <>
                         <ModalToAction
@@ -7412,13 +7398,12 @@ export default function CashAdvance({ auth }: PageProps) {
                     })
                 }
                 title="Cash Advance Approve Report"
-                url={`/cashAdvanceReportApprove/${dataReportById?.CASH_ADVANCE_ID}`}
+                url={`/cashAdvanceReportApprove`}
                 data={dataReportById}
                 method="patch"
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={""}
-                // panelWidth={"70%"}
                 body={
                     <>
                         <ModalToAction
@@ -10059,25 +10044,250 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                     <TableTD
                                                         value={
-                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                            "-"
-                                                            // </span>
+                                                            <>
+                                                                {(ca?.cash_advance_report ===
+                                                                    null ||
+                                                                    ca?.cash_advance_report ===
+                                                                        "") && (
+                                                                    <span>
+                                                                        -
+                                                                    </span>
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
                                                         }
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={
-                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                            "-"
-                                                            // </span>
+                                                            <>
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    "" ||
+                                                                    (ca
+                                                                        .cash_advance_report
+                                                                        ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                        null && (
+                                                                        <span>
+                                                                            -
+                                                                        </span>
+                                                                    ))}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    5 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Execute"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                                    6 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Complited"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
                                                         }
                                                         className=""
                                                     />
                                                     <TableTD
                                                         value={
-                                                            // <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
-                                                            "-"
-                                                            // </span>
+                                                            <>
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    "" ||
+                                                                    (ca
+                                                                        .cash_advance_report
+                                                                        ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                        null && (
+                                                                        <span>
+                                                                            -
+                                                                        </span>
+                                                                    ))}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    1 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-gray-200 text-gray-700"
+                                                                        title="Request"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    2 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-green-100 text-green-700"
+                                                                        title="Approve"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    3 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-yellow-300 text-white"
+                                                                        title="Need Revision"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {ca
+                                                                    .cash_advance_report
+                                                                    ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS ===
+                                                                    4 && (
+                                                                    <BadgeFlat
+                                                                        className=" bg-red-100 text-red-700"
+                                                                        title="Reject"
+                                                                        body={
+                                                                            ca
+                                                                                .cash_advance_report
+                                                                                ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </>
                                                         }
                                                         className=""
                                                     />

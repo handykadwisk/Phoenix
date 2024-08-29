@@ -932,9 +932,8 @@ export default function Reimburse({ auth }: PageProps) {
         });
 
         if (
-            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
-                "FINANCE ACCOUNTING" &&
-            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FA"
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "Finance" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FIN"
         ) {
             setDataById({
                 ...dataById,
@@ -946,8 +945,9 @@ export default function Reimburse({ auth }: PageProps) {
         }
 
         if (
-            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "DIREKSI" &&
-            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIREKSI"
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
+                "Directors" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIR"
         ) {
             setDataById({
                 ...dataById,
@@ -957,20 +957,6 @@ export default function Reimburse({ auth }: PageProps) {
                 REIMBURSE_THIRD_APPROVAL_STATUS: status,
             });
         }
-
-        await axios
-            .patch(`/reimburseApprove`, dataById, {
-                headers: {
-                    "Content-type": "multipart/form-data",
-                },
-            })
-            .then((res) => {
-                console.log(res);
-                close();
-            })
-            .catch((err) => {
-                console.log(err);
-            });
     };
 
     const handleFileDownload = async (
@@ -1233,6 +1219,7 @@ export default function Reimburse({ auth }: PageProps) {
     // console.log(DataRow);
     // console.log("Reimburse", reimburse.data);
     console.log("Data By Id", dataById);
+    console.log("Auth", auth.user);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Reimburse"}>
@@ -2396,7 +2383,8 @@ export default function Reimburse({ auth }: PageProps) {
                                             });
                                         }}
                                     >
-                                        Show Files
+                                        {dataById.m_reimburse_proof_of_document
+                                            ?.length + " Files"}
                                     </button>
                                 ) : (
                                     "-"
@@ -4120,7 +4108,7 @@ export default function Reimburse({ auth }: PageProps) {
             <div className="p-6 text-gray-900">
                 <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
                     <div className="flex flex-col">
-                        <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
+                        <div className="rounded-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
                             <Button
                                 className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                                 onClick={(e) => handleAddModal(e)}
