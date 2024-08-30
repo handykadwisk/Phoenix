@@ -14,6 +14,8 @@ const renderClassFunction = (getMark: any, detailRelation: number) => {
     const [menuPosition, setMenuPosition] = useState<any>({
         x: "",
         y: "",
+        marginTop: "",
+        marginLeft: "",
     });
 
     const handleContextMenu = async (e: any) => {
@@ -28,26 +30,14 @@ const renderClassFunction = (getMark: any, detailRelation: number) => {
             setIdName: e.currentTarget.id,
         });
 
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const menuWidth = 90;
-        const menuHeight = 90;
-        // Calculate the position of the context menu
-        let x = e.clientX;
-        let y = e.clientY;
+        const container = e.currentTarget.closest(".modal-action-container");
+        const containerRect = container.getBoundingClientRect();
 
-        // Adjust position if the menu exceeds the viewport width
-        if (x + menuWidth > viewportWidth) {
-            x = viewportWidth - menuWidth;
-        }
-
-        // Adjust position if the menu exceeds the viewport height
-        if (y + menuHeight > viewportHeight) {
-            y = viewportHeight - menuHeight;
-        }
         setMenuPosition({
-            x: x,
-            y: y,
+            x: e.clientX,
+            y: e.clientY,
+            marginTop: containerRect.top,
+            marginLeft: containerRect.left,
         });
     };
 
@@ -68,14 +58,12 @@ const renderClassFunction = (getMark: any, detailRelation: number) => {
         //     ".cls_can_attach_process"
         // ) as NodeListOf<any>;
         // console.log(getMark);
-        getMark.forEach((element: any) => {
-            if (element.className === "cls_can_attach_process") {
-                element?.setAttribute("class", "cursor-help");
-                element?.setAttribute(
-                    "title",
-                    "Attach, Chat, Task, etc For This"
-                );
-            }
+        getMark.forEach((element: any, index: number) => {
+            // console.log(element);
+            // if (element.className === "cls_can_attach_process") {
+            element?.classList.add("cursor-help");
+            element?.setAttribute("title", "Attach, Chat, Task, etc For This");
+            // }
             // generate String
             const hashDigest = sha256(
                 element?.innerText.replace(" ", "_").toLowerCase()
@@ -93,6 +81,30 @@ const renderClassFunction = (getMark: any, detailRelation: number) => {
             element?.addEventListener("contextmenu", handleContextMenu);
             element?.addEventListener("click", handleClick);
             // console.log(element); // Safe, since it's known to be HTMLElement
+
+            // console.log(dataTPlugin);
+            // dataTPlugin?.forEach((dataPlug: any, i: number) => {
+            //     console.log(dataPlug);
+            //     // const container = document.querySelector(".pluginChat");
+            //     // // console.log(container);
+            //     // const newDiv = document.createElement("div");
+            //     // const className =
+            //     //     dataPlug.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+            //     // console.log("asda", className);
+            //     // newDiv.className = className;
+
+            //     // // Tambahkan div baru ke elemen container
+            //     // if (
+            //     //     dataPlug.T_TAG ===
+            //     //     element?.innerText.replace(" ", "_").toLowerCase() +
+            //     //         `_` +
+            //     //         toString.substring(0, 3) +
+            //     //         `_` +
+            //     //         detailRelation
+            //     // ) {
+            //     //     container?.appendChild(newDiv);
+            //     // }
+            // });
         });
     };
 

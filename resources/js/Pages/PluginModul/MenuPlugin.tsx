@@ -28,6 +28,8 @@ import { BeatLoader } from "react-spinners";
 export default function MenuPlugin({
     top,
     left,
+    marginLeft,
+    marginTop,
     idDiv,
     dataPluginProcess,
     setDataPluginProcess,
@@ -37,6 +39,8 @@ export default function MenuPlugin({
 }: PropsWithChildren<{
     top: any;
     left: any;
+    marginLeft: any | null;
+    marginTop: any | null;
     idDiv: any;
     dataPluginProcess: any;
     setDataPluginProcess: any;
@@ -119,8 +123,10 @@ export default function MenuPlugin({
                 // className="absolute top-[110px] left-[208px] bg-white p-2 rounded-md shadow-lg z-999 border border-red-600"
                 style={{
                     position: "absolute",
-                    top: top,
-                    left: left,
+                    top: `${top}px`,
+                    left: `${left}px`,
+                    marginTop: `-${marginTop}px`,
+                    marginLeft: `-${marginLeft}px`,
                     width: "300px",
                     backgroundColor: "white",
                     border: "px solid black",

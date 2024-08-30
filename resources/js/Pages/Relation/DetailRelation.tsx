@@ -115,10 +115,6 @@ export default function DetailRelation({
         view: false,
     });
 
-    useEffect(() => {
-        getDetailRelation(detailRelation);
-    }, [detailRelation]);
-
     const getMark = document.querySelectorAll(
         ".cls_can_attach_process"
     ) as NodeListOf<any>;
@@ -132,6 +128,59 @@ export default function DetailRelation({
         menuPosition,
         setShowContext,
     } = renderClassFunction(getMark, detailRelation);
+
+    useEffect(() => {
+        getDetailRelation(detailRelation);
+    }, [detailRelation]);
+
+    useEffect(() => {
+        getTPluginProcess();
+    }, [detailRelation]);
+
+    const [dataTPlugin, setDataTPlugin] = useState<any>([]);
+
+    const getTPluginProcess = async () => {
+        await axios
+            .post(`/getTPluginProcess`)
+            .then((res) => {
+                getPlugin(res.data);
+                // setDataTPlugin(res.data);
+                // console.log("TPlug", res.data);
+                // setRefreshPlugin(true);
+                // setTimeout(() => {
+                //     setRefreshPlugin(false);
+                // }, 2000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    // useEffect(() => {
+    //     getPlugin(dataTPlugin);
+    // }, [detailRelation]);
+
+    const getPlugin = (dataTPlugin: any) => {
+        // console.log(dataTPlugin);
+        dataTPlugin.forEach((item: any) => {
+            // Temukan container berdasarkan ID dari data
+            const container = document.querySelector(
+                `.cls_can_attach_process[id="${item.TAG_ID}"]`
+            );
+            // console.log(container);
+
+            if (container) {
+                // Buat elemen div baru
+                const newDiv = document.createElement("div");
+                const className =
+                    item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+                newDiv.className = className;
+                // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+
+                // Tambahkan div baru ke dalam container yang sesuai
+                container.appendChild(newDiv);
+            }
+        });
+    };
     // handleContextMenu();
 
     // handleContextMenu;
@@ -957,26 +1006,6 @@ export default function DetailRelation({
     // } else {
 
     // }
-    useEffect(() => {
-        getTPluginProcess();
-    }, []);
-    const [dataTPlugin, setDataTPlugin] = useState<any>([]);
-
-    const getTPluginProcess = async () => {
-        await axios
-            .post(`/getTPluginProcess`)
-            .then((res) => {
-                setDataTPlugin(res.data);
-                console.log("TPlug", res.data);
-                // setRefreshPlugin(true);
-                // setTimeout(() => {
-                //     setRefreshPlugin(false);
-                // }, 2000);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
 
     const handleSuccessPlugin = async (message: string) => {
         setIsSuccess("");
@@ -985,14 +1014,6 @@ export default function DetailRelation({
             // getDetailRelation(message[0]);
             getTPluginProcess();
             // getContents();
-            const {
-                // handleContextMenu,
-                // handleClick,
-                showContext,
-                idDiv,
-                menuPosition,
-                setShowContext,
-            } = renderClassFunction(getMark, detailRelation);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
@@ -2449,8 +2470,10 @@ export default function DetailRelation({
                         idDiv={idDiv}
                         dataPluginProcess={dataPluginProcess}
                         setDataPluginProcess={setDataPluginProcess}
-                        top={`${menuPosition.y}px`}
-                        left={`${menuPosition.x}px`}
+                        top={menuPosition.y}
+                        left={menuPosition.x}
+                        marginTop={menuPosition.marginTop}
+                        marginLeft={menuPosition.marginLeft}
                     />
                 </>
             )}
@@ -2466,14 +2489,14 @@ export default function DetailRelation({
                 {/* Official Information */}
                 <div className="flex justify-between">
                     <div className="text-md font-semibold w-full">
-                        <div className="flex gap-2 items-center">
+                        <div className="">
                             <div
                                 // id={
                                 //     "relation_header_" +
                                 //     detailRelation +
                                 //     "_relation_information"
                                 // }
-                                className="cls_can_attach_process"
+                                className="cls_can_attach_process flex gap-2 items-center"
                                 // onContextMenu={handleContextMenu}
                                 // onClick={(e) => {
                                 //     setShowContext({
@@ -2482,10 +2505,29 @@ export default function DetailRelation({
                                 //     });
                                 // }}
                             >
-                                <span className="border-b-2 border-red-600">
-                                    Relation Information
-                                </span>
+                                <div>
+                                    <span className="border-b-2 border-red-600">
+                                        Relation Information
+                                    </span>
+                                </div>
+                                {/* {dataTPlugin
+                                        ?.filter(
+                                            (m: any) =>
+                                                m.TAG_ID ===
+                                                "relation_information_c4f_1"
+                                        )
+                                        .map((tPlug: any, i: number) => {
+                                            const className =
+                                                tPlug.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className={className}
+                                                ></div>
+                                            );
+                                        })} */}
                             </div>
+
                             {/* <div className={"cls_attach_task"}>
                             </div>
                             <div className={"cls_attach_chat"}>
@@ -2494,22 +2536,6 @@ export default function DetailRelation({
                             </div>
                             <div className={"cls_attach_document"}>
                             </div> */}
-                            {dataTPlugin
-                                ?.filter(
-                                    (m: any) =>
-                                        m.TAG_ID ===
-                                        "relation_information_c4f_1"
-                                )
-                                .map((tPlug: any, i: number) => {
-                                    const className =
-                                        tPlug.r_plugin_process.PLUG_PROCESS_CLASS.toString();
-                                    return (
-                                        <div
-                                            key={i}
-                                            className={className}
-                                        ></div>
-                                    );
-                                })}
                         </div>
                     </div>
                     <a
@@ -2602,9 +2628,9 @@ export default function DetailRelation({
 
                 {/* Relation Type And */}
                 <div className="text-md font-semibold mt-4">
-                    <div className="flex gap-2 items-center">
+                    <div className="">
                         <div
-                            className="cls_can_attach_process"
+                            className="cls_can_attach_process flex gap-2 items-center"
                             // onContextMenu={(e: any) => {
                             //     handleContextMenu(e);
                             // }}
@@ -2619,17 +2645,6 @@ export default function DetailRelation({
                                 Relation Type
                             </span>
                         </div>
-                        {dataTPlugin
-                            ?.filter(
-                                (m: any) => m.TAG_ID === "relation_type_f3d_1"
-                            )
-                            .map((tPlug: any, i: number) => {
-                                const className =
-                                    tPlug.r_plugin_process.PLUG_PROCESS_CLASS.toString();
-                                return (
-                                    <div key={i} className={className}></div>
-                                );
-                            })}
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-2">
