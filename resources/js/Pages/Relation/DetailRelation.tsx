@@ -51,6 +51,19 @@ export default function DetailRelation({
     relationLOB: any;
     setGetDetailRelation: any;
 }>) {
+    // const getMark = document.querySelectorAll(
+    //     ".cls_can_attach_process"
+    // ) as NodeListOf<any>;
+
+    // for hook react render class
+    const {
+        // handleContextMenu,
+        // handleClick,
+        showContext,
+        idDiv,
+        menuPosition,
+        setShowContext,
+    } = renderClassFunction(detailRelation);
     // const { success, detailRelation }: any = usePage().props;
     const [dataRelationNew, setDataRelationNew] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
@@ -115,20 +128,6 @@ export default function DetailRelation({
         view: false,
     });
 
-    const getMark = document.querySelectorAll(
-        ".cls_can_attach_process"
-    ) as NodeListOf<any>;
-
-    // for hook react render class
-    const {
-        // handleContextMenu,
-        // handleClick,
-        showContext,
-        idDiv,
-        menuPosition,
-        setShowContext,
-    } = renderClassFunction(getMark, detailRelation);
-
     useEffect(() => {
         getDetailRelation(detailRelation);
     }, [detailRelation]);
@@ -143,8 +142,9 @@ export default function DetailRelation({
         await axios
             .post(`/getTPluginProcess`)
             .then((res) => {
+                // getPlugin(res.data);
+                setDataTPlugin(res.data);
                 getPlugin(res.data);
-                // setDataTPlugin(res.data);
                 // console.log("TPlug", res.data);
                 // setRefreshPlugin(true);
                 // setTimeout(() => {
@@ -157,27 +157,76 @@ export default function DetailRelation({
     };
     // useEffect(() => {
     //     getPlugin(dataTPlugin);
-    // }, [detailRelation]);
+    // }, [dataTPlugin]);
 
     const getPlugin = (dataTPlugin: any) => {
-        // console.log(dataTPlugin);
+        console.log(dataTPlugin);
         dataTPlugin.forEach((item: any) => {
+            const className =
+                item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+            // Temukan container berdasarkan ID dari data
+            const divElements = document.querySelectorAll(`.${className}`);
+
+            divElements.forEach((div) => {
+                div.remove();
+            });
+        });
+
+        dataTPlugin.forEach((item: any) => {
+            const className =
+                item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
             // Temukan container berdasarkan ID dari data
             const container = document.querySelector(
                 `.cls_can_attach_process[id="${item.TAG_ID}"]`
             );
-            // console.log(container);
+            // console.log(container?.id);
 
-            if (container) {
+            // cek ada ga div yang idnya sama TAG_ID
+
+            if (container?.id === item.TAG_ID) {
                 // Buat elemen div baru
-                const newDiv = document.createElement("div");
-                const className =
-                    item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
-                newDiv.className = className;
-                // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+                // const newDiv = document.createElement("div");
+                // // hapus dulu cls yang lama
 
-                // Tambahkan div baru ke dalam container yang sesuai
-                container.appendChild(newDiv);
+                // newDiv.className = "";
+                // newDiv.className = className;
+                // // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+
+                // // Tambahkan div baru ke dalam container yang sesuai
+                // container?.appendChild(newDiv);
+                // const classDiv = document.querySelectorAll(`.${className}`);
+                const divExists =
+                    document.querySelector(`.${className}`) !== null;
+                console.log(divExists);
+                // // classDiv.forEach((div: any) => {
+                // //     div.remove();
+                // // });
+                if (divExists === false) {
+                    console.log("ada");
+
+                    // Buat elemen div baru
+                    const newDiv = document.createElement("div");
+                    // hapus dulu cls yang lama
+
+                    newDiv.className = "";
+                    newDiv.className = className;
+                    // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+
+                    // Tambahkan div baru ke dalam container yang sesuai
+                    container?.appendChild(newDiv);
+                } else {
+                    console.log("gaada");
+
+                    const newDiv = document.createElement("div");
+                    // hapus dulu cls yang lama
+
+                    newDiv.className = "";
+                    newDiv.className = className;
+                    // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+
+                    // Tambahkan div baru ke dalam container yang sesuai
+                    container?.appendChild(newDiv);
+                }
             }
         });
     };
@@ -281,9 +330,9 @@ export default function DetailRelation({
         await axios
             .post(`/getMappingParent`, { name, column })
             .then((res: any) => {
-                setMappingParent({
-                    mapping_parent: res.data,
-                });
+                // setMappingParent({
+                //     mapping_parent: res.data,
+                // });
             })
             .catch((err) => {
                 console.log(err);

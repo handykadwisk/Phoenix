@@ -243,50 +243,75 @@ export default function DetailEmployeeAddress({
 
     const getRegencyLabel = (value: any) => {
         if (value) {
-            const selectedRegency = regencySelect.filter(
-                (optionRegency: any) => optionRegency.value === value
+            const selected = regencySelect.filter(
+                (option: any) => option.value === value
             );
-            if (selectedRegency?.length === 0) {
-                editAddressNew.ADDRESS_REGENCY;
-            } else {
-                return {
-                    label: selectedRegency[0].label,
-                    value: editAddressNew.ADDRESS_REGENCY,
-                };
-            }
+            return selected[0]?.label;
         }
     };
+    // const getRegencyLabel = (value: any) => {
+    //     if (value) {
+    //         const selectedRegency = regencySelect.filter(
+    //             (optionRegency: any) => optionRegency.value === value
+    //         );
+    //         if (selectedRegency?.length === 0) {
+    //             editAddressNew.ADDRESS_REGENCY;
+    //         } else {
+    //             return {
+    //                 label: selectedRegency[0].label,
+    //                 value: editAddressNew.ADDRESS_REGENCY,
+    //             };
+    //         }
+    //     }
+    // };
 
     const getDistrictLabel = (value: any) => {
         if (value) {
-            const selectedDistrict = districtSelect.filter(
-                (optionDistrict: any) => optionDistrict.value === value
+            const selected = districtSelect.filter(
+                (option: any) => option.value === value
             );
-            if (selectedDistrict?.length === 0) {
-                editAddressNew.ADDRESS_DISTRICT;
-            } else {
-                return {
-                    label: selectedDistrict[0].label,
-                    value: editAddressNew.ADDRESS_DISTRICT,
-                };
-            }
+            return selected[0]?.label;
         }
     };
+    // const getDistrictLabel = (value: any) => {
+    //     if (value) {
+    //         const selectedDistrict = districtSelect.filter(
+    //             (optionDistrict: any) => optionDistrict.value === value
+    //         );
+    //         if (selectedDistrict?.length === 0) {
+    //             editAddressNew.ADDRESS_DISTRICT;
+    //         } else {
+    //             return {
+    //                 label: selectedDistrict[0].label,
+    //                 value: editAddressNew.ADDRESS_DISTRICT,
+    //             };
+    //         }
+    //     }
+    // };
+
     const getVillageLabel = (value: any) => {
         if (value) {
-            const selectedVillage = villageSelect.filter(
-                (optionVillage: any) => optionVillage.value === value
+            const selected = villageSelect.filter(
+                (option: any) => option.value === value
             );
-            if (selectedVillage?.length === 0) {
-                editAddressNew.ADDRESS_VILLAGE;
-            } else {
-                return {
-                    label: selectedVillage[0].label,
-                    value: editAddressNew.ADDRESS_VILLAGE,
-                };
-            }
+            return selected[0]?.label;
         }
     };
+    // const getVillageLabel = (value: any) => {
+    //     if (value) {
+    //         const selectedVillage = villageSelect.filter(
+    //             (optionVillage: any) => optionVillage.value === value
+    //         );
+    //         if (selectedVillage?.length === 0) {
+    //             editAddressNew.ADDRESS_VILLAGE;
+    //         } else {
+    //             return {
+    //                 label: selectedVillage[0].label,
+    //                 value: editAddressNew.ADDRESS_VILLAGE,
+    //             };
+    //         }
+    //     }
+    // };
 
     const districtSelect = district?.map((query: any) => {
         return {
@@ -642,9 +667,15 @@ export default function DetailEmployeeAddress({
                                                         placeholder={
                                                             "--Select Regency--"
                                                         }
-                                                        value={getRegencyLabel(
-                                                            dE.ADDRESS_REGENCY
-                                                        )}
+                                                        value={{
+                                                            label: getRegencyLabel(
+                                                                dE.ADDRESS_REGENCY
+                                                            ),
+                                                            value: dE.ADDRESS_REGENCY,
+                                                        }}
+                                                        // value={getRegencyLabel(
+                                                        //     dE.ADDRESS_REGENCY
+                                                        // )}
                                                         // onChange={(e) =>
                                                         //     inputDataBank(
                                                         //         "BANK_ID",
@@ -695,9 +726,15 @@ export default function DetailEmployeeAddress({
                                                         placeholder={
                                                             "--Select Regency--"
                                                         }
-                                                        value={getDistrictLabel(
-                                                            dE.ADDRESS_DISTRICT
-                                                        )}
+                                                        value={{
+                                                            label: getDistrictLabel(
+                                                                dE.ADDRESS_DISTRICT
+                                                            ),
+                                                            value: dE.ADDRESS_DISTRICT,
+                                                        }}
+                                                        // value={getDistrictLabel(
+                                                        //     dE.ADDRESS_DISTRICT
+                                                        // )}
                                                         // onChange={(e) =>
                                                         //     inputDataBank(
                                                         //         "BANK_ID",
@@ -746,9 +783,15 @@ export default function DetailEmployeeAddress({
                                                         placeholder={
                                                             "--Select Province--"
                                                         }
-                                                        value={getVillageLabel(
-                                                            dE.ADDRESS_VILLAGE
-                                                        )}
+                                                        value={{
+                                                            label: getVillageLabel(
+                                                                dE.ADDRESS_VILLAGE
+                                                            ),
+                                                            value: dE.ADDRESS_VILLAGE,
+                                                        }}
+                                                        // value={getVillageLabel(
+                                                        //     dE.ADDRESS_VILLAGE
+                                                        // )}
                                                         // onChange={(e) =>
                                                         //     inputDataBank(
                                                         //         "BANK_ID",
@@ -879,7 +922,7 @@ export default function DetailEmployeeAddress({
                                                         //         ],
                                                         //     });
                                                         // }}
-                                                        onChange={(e) =>
+                                                        onChange={(e: any) =>
                                                             inputAddressOther(
                                                                 "ADDRESS_DETAIL",
                                                                 e.target.value,

@@ -24,6 +24,7 @@ export default function Structure({
     isSuccess: any | string | null;
     nameCompany: string;
 }>) {
+    const [refreshGrid, setRefreshGrid] = useState<any>("");
     // modal Structure
     const [modalStructure, setModalStructure] = useState<any>({
         add: false,
@@ -93,6 +94,10 @@ export default function Structure({
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
+            setRefreshGrid("success");
+            setTimeout(() => {
+                setRefreshGrid("");
+            }, 1000);
         }
     };
 
@@ -114,6 +119,39 @@ export default function Structure({
         });
     };
 
+    const [searchStructure, setSearchStructure] = useState<any>({
+        company_structure: [
+            {
+                COMPANY_STRUCTURE_NAME: "",
+                COMPANY_STRUCTURE_ID: "",
+                flag: "",
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchStructure.company_structure];
+        changeVal[i][name] = value;
+        setSearchStructure({
+            ...searchStructure,
+            company_structure: changeVal,
+        });
+    };
+
+    // search
+    const clearSearchStructure = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("COMPANY_STRUCTURE_NAME", "", 0);
+        inputDataSearch("flag", "", 0);
+        setRefreshGrid("success");
+        setTimeout(() => {
+            setRefreshGrid("");
+        }, 1000);
+    };
     return (
         <>
             {/* modal add structure */}
@@ -303,37 +341,54 @@ export default function Structure({
                             id="PERSON_FIRST_NAME"
                             type="text"
                             name="PERSON_FIRST_NAME"
-                            // value={searchPerson.PERSON_FIRST_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchPerson({
-                                    ...searchPerson,
-                                    PERSON_FIRST_NAME: e.target.value,
-                                })
+                            value={
+                                searchStructure.company_structure[0]
+                                    .COMPANY_STRUCTURE_NAME === ""
+                                    ? ""
+                                    : searchStructure.company_structure[0]
+                                          .COMPANY_STRUCTURE_NAME
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (searchPerson.PERSON_FIRST_NAME !== "") {
-                                        getPersons();
-                                        setSearchPerson({
-                                            ...searchPerson,
-                                            PERSON_FIRST_NAME: "",
-                                        });
-                                    }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "COMPANY_STRUCTURE_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchStructure.company_structure[0]
+                                        .COMPANY_STRUCTURE_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
                             }}
                             placeholder="Search Employee Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPerson()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchStructure.company_structure[0]
+                                            .COMPANY_STRUCTURE_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPerson()}
+                                onClick={(e) => clearSearchStructure(e)}
                             >
                                 Clear Search
                             </div>
@@ -346,11 +401,11 @@ export default function Structure({
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
                             withParam={idCompany}
-                            searchParam={null}
+                            searchParam={searchStructure.company_structure}
                             // loading={isLoading.get_policy}
                             url={"getCompanyStructure"}
                             doubleClickEvent={handleClickDetailCompanyStructure}
-                            triggeringRefreshData={isSuccess}
+                            triggeringRefreshData={refreshGrid}
                             colDefs={[
                                 {
                                     headerName: "No.",

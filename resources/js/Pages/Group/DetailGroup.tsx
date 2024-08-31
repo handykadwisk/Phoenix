@@ -47,6 +47,12 @@ export default function DetailGroup({
     setIdGroup: any;
 }>) {
     const [dataRelationGroupNew, setDataRelationGroupNew] = useState<any>([]);
+    const [getDetailRelation, setGetDetailRelation] = useState<any>({
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
+        RELATION_SALUTATION_PRE: "",
+        RELATION_SALUTATION_POST: "",
+    });
     const [relationGroupNew, setRelationGroupNew] = useState<any>([]);
     const [relationId, setRelationId] = useState<any>({
         idRelation: "",
@@ -351,7 +357,7 @@ export default function DetailGroup({
         return (
             <>
                 {dataChildrenNew?.length !== 0
-                    ? dataChildrenNew?.map((dChild: any, a: number) => (
+                    ? dataChildrenNew?.map((dChilds: any, a: number) => (
                           <div className="pt-1 pl-[0.32rem]" key={a}>
                               <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700 hover:cursor-pointer">
                                   <li>
@@ -359,7 +365,7 @@ export default function DetailGroup({
                                           className="relative flex justify-between hover:text-red-600 w-fit"
                                           onClick={() => {
                                               handleClick(
-                                                  dChild.RELATION_GROUP_ID
+                                                  dChilds.RELATION_GROUP_ID
                                               );
                                           }}
                                       >
@@ -374,7 +380,7 @@ export default function DetailGroup({
                                               <div className="text-sm">
                                                   <span>
                                                       {
-                                                          dChild.RELATION_GROUP_NAME
+                                                          dChilds.RELATION_GROUP_NAME
                                                       }
                                                   </span>
                                               </div>
@@ -386,7 +392,9 @@ export default function DetailGroup({
                                       <div
                                           className="hidden"
                                           key={a}
-                                          id={"item" + dChild.RELATION_GROUP_ID}
+                                          id={
+                                              "item" + dChilds.RELATION_GROUP_ID
+                                          }
                                       >
                                           <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
                                               <li>
@@ -396,7 +404,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickChangeParent(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -409,7 +417,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickAddSubGroup(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -422,7 +430,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickAddRelation(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -435,7 +443,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickDetailGroup(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -445,15 +453,15 @@ export default function DetailGroup({
                                               </li>
                                           </ul>
                                       </div>
-                                      {dChild.r_group?.length !== 0
-                                          ? dChild.r_group?.map(
+                                      {dChilds.r_group?.length !== 0
+                                          ? dChilds.r_group?.map(
                                                 (
                                                     dataRelationsNew: any,
-                                                    z: number
+                                                    b: number
                                                 ) => (
                                                     <div
                                                         className="pt-1 pl-[0.32rem]"
-                                                        key={z}
+                                                        key={b}
                                                     >
                                                         <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                             <li>
@@ -461,7 +469,7 @@ export default function DetailGroup({
                                                                     className="relative flex justify-between hover:text-red-600 w-fit"
                                                                     onClick={() => {
                                                                         handleClickRelation(
-                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                            dataRelationsNew.RELATION_ORGANIZATION_NAME
                                                                         );
                                                                     }}
                                                                 >
@@ -488,10 +496,10 @@ export default function DetailGroup({
                                                                 </div>
                                                                 <div
                                                                     className="hidden"
-                                                                    key={z}
+                                                                    key={b}
                                                                     id={
                                                                         "item" +
-                                                                        dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                        dataRelationsNew.RELATION_ORGANIZATION_NAME
                                                                     }
                                                                 >
                                                                     <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
@@ -556,7 +564,7 @@ export default function DetailGroup({
                                                 )
                                             )
                                           : null}
-                                      {BasicInfo(dChild.children)}
+                                      {BasicInfo(dChilds.children)}
                                   </li>
                               </ul>
                           </div>
@@ -567,6 +575,7 @@ export default function DetailGroup({
     }
 
     const handleClick = (i: any) => {
+        console.log(i);
         const element = document.getElementById("item" + i);
         if (!element?.className) {
             element?.setAttribute("class", "hidden");
@@ -576,6 +585,7 @@ export default function DetailGroup({
     };
 
     const handleClickRelation = (i: any) => {
+        console.log(i);
         const element = document.getElementById("item" + i);
         if (!element?.className) {
             element?.setAttribute("class", "hidden");
@@ -1287,7 +1297,7 @@ export default function DetailGroup({
             {/* end modal relation existing */}
 
             {/* modal add relation */}
-            <AddRelationPopup
+            {/* <AddRelationPopup
                 show={modal.add}
                 modal={() =>
                     setModal({
@@ -1312,7 +1322,7 @@ export default function DetailGroup({
                 setSwitchPage={setSwitchPage}
                 switchPageTBK={switchPageTBK}
                 setSwitchPageTBK={setSwitchPageTBK}
-            />
+            /> */}
             {/* end modal add relation */}
 
             {/* modal detail  */}
@@ -1343,9 +1353,9 @@ export default function DetailGroup({
                 body={
                     <>
                         <DetailRelationPopup
+                            setGetDetailRelation={setGetDetailRelation}
                             detailRelation={relationId.idRelation}
                             relationStatus={relationStatus}
-                            relationGroup={relationGroup}
                             relationType={relationType}
                             profession={profession}
                             relationLOB={relationLOB}
@@ -1507,11 +1517,11 @@ export default function DetailGroup({
                                                     ? item.r_group?.map(
                                                           (
                                                               dataRelation: any,
-                                                              z: number
+                                                              c: number
                                                           ) => (
                                                               <div
                                                                   className="pt-1 pl-[0.32rem]"
-                                                                  key={z}
+                                                                  key={c}
                                                               >
                                                                   <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                                       <li>
@@ -1519,7 +1529,7 @@ export default function DetailGroup({
                                                                               className="relative flex justify-between hover:text-red-600 w-fit"
                                                                               onClick={() => {
                                                                                   handleClickRelation(
-                                                                                      dataRelation.RELATION_ORGANIZATION_ID
+                                                                                      dataRelation.RELATION_ORGANIZATION_NAME
                                                                                   );
                                                                               }}
                                                                           >
@@ -1547,11 +1557,11 @@ export default function DetailGroup({
                                                                           <div
                                                                               className="hidden"
                                                                               key={
-                                                                                  z
+                                                                                  c
                                                                               }
                                                                               id={
                                                                                   "item" +
-                                                                                  dataRelation.RELATION_ORGANIZATION_ID
+                                                                                  dataRelation.RELATION_ORGANIZATION_NAME
                                                                               }
                                                                           >
                                                                               <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">

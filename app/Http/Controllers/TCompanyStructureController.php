@@ -33,28 +33,18 @@ class TCompanyStructureController extends Controller
         }
         // dd($newSearch[0]['COMPANY_TYPE_ID']['value']);
 
-        // if ($request->newFilter !== "") {
-        //     if ($newSearch[0]["flag"] !== "") {
-        //         $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-        //     }else{
-        //         foreach ($newSearch[0] as $keyId => $searchValue) {
-        //             if ($keyId === 'COMPANY_ORGANIZATION_NAME') {
-        //                 $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-        //             }elseif ($keyId === 'COMPANY_TYPE_ID'){
-        //                 if (!isset($searchValue['value'])) {
-        //                     $valueTypeId = $searchValue;
-        //                 }else{
-        //                     $valueTypeId = $searchValue['value'];
-        //                 }
-        //                 // dd($searchValue);
-        //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-        //                     // Query the name field in status table
-        //                     $q->where('COMPANY_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('COMPANY_STRUCTURE_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'COMPANY_STRUCTURE_NAME') {
+                        $query->where('COMPANY_STRUCTURE_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;

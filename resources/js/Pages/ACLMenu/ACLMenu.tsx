@@ -170,6 +170,7 @@ export default function ACLMenu({ auth }: PageProps) {
 
             {/* modal Add */}
             <ModalToAdd
+                buttonAddOns={undefined}
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -394,20 +395,28 @@ export default function ACLMenu({ auth }: PageProps) {
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Name Menu"}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Menu URL"}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }

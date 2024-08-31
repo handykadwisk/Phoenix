@@ -1866,9 +1866,9 @@ export default function DetailPerson({
                 body={
                     <>
                         <DetailEmployment
-                            idPerson={idPerson}
-                            taxStatus={taxStatus}
-                            handleSuccessEmployment={handleSuccessEmployment}
+                            idEmployee={null}
+                            taxStatus={null}
+                            setIsSuccess={null}
                         />
                     </>
                 }

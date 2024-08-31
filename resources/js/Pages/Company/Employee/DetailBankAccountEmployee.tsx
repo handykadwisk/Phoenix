@@ -95,18 +95,28 @@ export default function DetailBankAccountEmployee({
 
     const getNameBank = (value: any) => {
         if (value) {
-            const selected = bank.filter(
-                (option: any) => option.BANK_ID === parseInt(value)
+            const selected = bankSelect.filter(
+                (option: any) => option.value === parseInt(value)
             );
-            const nameBank = selected[0];
-            if (nameBank !== undefined) {
-                return {
-                    label: nameBank.BANK_ABBREVIATION,
-                    value: value,
-                };
-            }
+            return selected[0]?.label;
         }
     };
+    // const getNameBank = (value: any) => {
+    //     if (value) {
+    //         const selected = bank.filter(
+    //             (option: any) => option.BANK_ID === parseInt(value)
+    //         );
+    //         const nameBank = selected[0];
+    //         if (nameBank !== undefined) {
+    //             return {
+    //                 label: nameBank.BANK_ABBREVIATION,
+    //                 value: value,
+    //             };
+    //         } else {
+    //             return null;
+    //         }
+    //     }
+    // };
 
     const getNameForBank = (dB: any, i: number) => {
         const bankFor = dB.m_for_bank?.map((query: any) => {
@@ -254,7 +264,13 @@ export default function DetailBankAccountEmployee({
                                                 options={bankSelect}
                                                 isSearchable={true}
                                                 placeholder={"Bank Name *"}
-                                                value={getNameBank(dB.BANK_ID)}
+                                                value={{
+                                                    label: getNameBank(
+                                                        dB.BANK_ID
+                                                    ),
+                                                    value: dB.BANK_ID,
+                                                }}
+                                                // value={getNameBank(dB.BANK_ID)}
                                                 // onChange={(e) =>
                                                 //     inputDataBank(
                                                 //         "BANK_ID",

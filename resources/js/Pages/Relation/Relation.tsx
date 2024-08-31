@@ -533,8 +533,6 @@ export default function Relation({ auth }: PageProps) {
                 setData={setData}
                 switchPage={switchPage}
                 setSwitchPage={setSwitchPage}
-                switchPagePKS={switchPagePKS}
-                setSwitchPagePKS={setSwitchPagePKS}
             />
             {/* end modal add relation */}
 
@@ -576,11 +574,9 @@ export default function Relation({ auth }: PageProps) {
                                 getDetailRelation.RELATION_ORGANIZATION_ID
                             }
                             relationStatus={relationStatus}
-                            relationGroup={relationGroup}
                             relationType={relationType}
                             profession={profession}
                             relationLOB={relationLOB}
-                            getDetailMap={getDetailRelation}
                             setGetDetailRelation={setGetDetailRelation}
                         />
                     </>

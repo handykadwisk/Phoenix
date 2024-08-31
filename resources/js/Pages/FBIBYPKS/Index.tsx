@@ -59,6 +59,40 @@ export default function Index({ auth }: PageProps) {
         });
     };
 
+    const [searchFBIPKS, setSearchFBIPKSsearchFBIPKS] = useState<any>({
+        fbi_pks: [
+            {
+                RELATION_ORGANIZATION_NAME: "",
+                fbi_pks_ID: "",
+                flag: "",
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchFBIPKS.fbi_pks];
+        changeVal[i][name] = value;
+        setSearchFBIPKSsearchFBIPKS({
+            ...searchFBIPKS,
+            fbi_pks: changeVal,
+        });
+    };
+
+    const [refreshGrid, setRefreshGrid] = useState<any>("");
+    // search
+    const clearSearchFBIPKS = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("RELATION_ORGANIZATION_NAME", "", 0);
+        inputDataSearch("flag", "", 0);
+        setRefreshGrid("success");
+        setTimeout(() => {
+            setRefreshGrid("");
+        }, 1000);
+    };
     return (
         <AuthenticatedLayout user={auth.user} header={"FBI By PKS"}>
             <Head title="FBI By PKS" />
@@ -95,76 +129,96 @@ export default function Index({ auth }: PageProps) {
 
             <div className="grid grid-cols-4 gap-4 p-4">
                 <div className="flex flex-col">
-                    <div className="bg-white mb-4 hidden rounded-md shadow-md p-4">
+                    {/* <div className="bg-white mb-4 hidden rounded-md shadow-md p-4">
                         <div
                             className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
                             onClick={(e) => addAgentPopup(e)}
                         >
                             <span>Add Agent</span>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[100%] h-[100%]">
                         <TextInput
                             type="text"
-                            // value={searchAgent.RELATION_ORGANIZATION_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchAgent({
-                                    ...searchAgent,
-                                    RELATION_ORGANIZATION_NAME: e.target.value,
-                                })
+                            value={
+                                searchFBIPKS.fbi_pks[0]
+                                    .RELATION_ORGANIZATION_NAME === ""
+                                    ? ""
+                                    : searchFBIPKS.fbi_pks[0]
+                                          .RELATION_ORGANIZATION_NAME
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (
-                                        searchAgent.RELATION_ORGANIZATION_NAME !==
-                                        ""
-                                    ) {
-                                        getAgent();
-                                    }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "RELATION_ORGANIZATION_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchFBIPKS.fbi_pks[0]
+                                        .RELATION_ORGANIZATION_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
                             }}
                             placeholder="Search FBI By PKS Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchAgent()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchFBIPKS.fbi_pks[0]
+                                            .RELATION_ORGANIZATION_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchAgent()}
+                                onClick={(e) => clearSearchFBIPKS(e)}
                             >
                                 Clear Search
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100%]">
-                    <AGGrid
-                        searchParam={""}
-                        addButtonLabel={null}
-                        addButtonModalState={undefined}
-                        withParam={null}
-                        // loading={isLoading.get_policy}
-                        url={"getRelationFBI"}
-                        doubleClickEvent={handleDetailFBI}
-                        triggeringRefreshData={isSuccess}
-                        colDefs={[
-                            {
-                                headerName: "No.",
-                                valueGetter: "node.rowIndex + 1",
-                                flex: 1,
-                            },
-                            {
-                                headerName: "Relation FBI By PKS",
-                                field: "RELATION_ORGANIZATION_ALIAS",
-                                flex: 7,
-                            },
-                        ]}
-                    />
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            searchParam={searchFBIPKS.fbi_pks}
+                            addButtonLabel={null}
+                            addButtonModalState={undefined}
+                            withParam={null}
+                            // loading={isLoading.get_policy}
+                            url={"getRelationFBI"}
+                            doubleClickEvent={handleDetailFBI}
+                            triggeringRefreshData={refreshGrid}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Relation FBI By PKS",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                },
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

@@ -291,7 +291,7 @@ export default function AddressPerson({
                                             //         ],
                                             //     });
                                             // }}
-                                            onChange={(e) =>
+                                            onChange={(e: any) =>
                                                 inputDetailAddress(
                                                     "ADDRESS_DETAIL",
                                                     e.target.value,
@@ -628,7 +628,7 @@ export default function AddressPerson({
                                                         //         ],
                                                         //     });
                                                         // }}
-                                                        onChange={(e) =>
+                                                        onChange={(e: any) =>
                                                             inputAddressDomicile(
                                                                 "ADDRESS_DETAIL",
                                                                 e.target.value,
@@ -1017,7 +1017,7 @@ export default function AddressPerson({
                                                         //         ],
                                                         //     });
                                                         // }}
-                                                        onChange={(e) =>
+                                                        onChange={(e: any) =>
                                                             inputAddressOther(
                                                                 "ADDRESS_DETAIL",
                                                                 e.target.value,

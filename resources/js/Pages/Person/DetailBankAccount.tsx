@@ -95,16 +95,10 @@ export default function DetailBankAccount({
 
     const getNameBank = (value: any) => {
         if (value) {
-            const selected = bank.filter(
-                (option: any) => option.BANK_ID === parseInt(value)
+            const selected = bankSelect.filter(
+                (option: any) => option.value === value
             );
-            const nameBank = selected[0];
-            if (nameBank !== undefined) {
-                return {
-                    label: nameBank.BANK_ABBREVIATION,
-                    value: value,
-                };
-            }
+            return selected[0]?.label;
         }
     };
 
@@ -254,7 +248,13 @@ export default function DetailBankAccount({
                                                 options={bankSelect}
                                                 isSearchable={true}
                                                 placeholder={"Bank Name *"}
-                                                value={getNameBank(dB.BANK_ID)}
+                                                value={{
+                                                    label: getNameBank(
+                                                        dB.BANK_ID
+                                                    ),
+                                                    value: dB.BANK_ID,
+                                                }}
+                                                // value={getNameBank(dB.BANK_ID)}
                                                 // onChange={(e) =>
                                                 //     inputDataBank(
                                                 //         "BANK_ID",

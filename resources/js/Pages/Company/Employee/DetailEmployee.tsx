@@ -913,10 +913,10 @@ export default function DetailEmployee({
                                             //     )
                                             // }
                                             onChange={(val: any) => {
-                                                setDataEditEmployment(
-                                                    "STRUCTURE_ID",
-                                                    val
-                                                );
+                                                setDataEditEmployment({
+                                                    ...dataEditEmployment,
+                                                    STRUCTURE_ID: val,
+                                                });
                                             }}
                                             primaryColor={"bg-red-500"}
                                         />
@@ -951,10 +951,10 @@ export default function DetailEmployee({
                                             //     )
                                             // }
                                             onChange={(val: any) => {
-                                                setDataEditEmployment(
-                                                    "DIVISION_ID",
-                                                    val
-                                                );
+                                                setDataEditEmployment({
+                                                    ...dataEditEmployment,
+                                                    DIVISION_ID: val,
+                                                });
                                             }}
                                             primaryColor={"bg-red-500"}
                                         />
@@ -987,10 +987,10 @@ export default function DetailEmployee({
                                             //     )
                                             // }
                                             onChange={(val: any) => {
-                                                setDataEditEmployment(
-                                                    "OFFICE_ID",
-                                                    val
-                                                );
+                                                setDataEditEmployment({
+                                                    ...dataEditEmployment,
+                                                    OFFICE_ID: val,
+                                                });
                                             }}
                                             primaryColor={"bg-red-500"}
                                         />

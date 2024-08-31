@@ -82,28 +82,19 @@ class TEmployeeController extends Controller
         }
         // dd($newSearch[0]['RELATION_TYPE_ID']['value']);
 
-        // if ($request->newFilter !== "") {
-        //     if ($newSearch[0]["flag"] !== "") {
-        //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-        //     }else{
-        //         foreach ($newSearch[0] as $keyId => $searchValue) {
-        //             if ($keyId === 'RELATION_ORGANIZATION_NAME') {
-        //                 $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-        //             }elseif ($keyId === 'RELATION_TYPE_ID'){
-        //                 if (!isset($searchValue['value'])) {
-        //                     $valueTypeId = $searchValue;
-        //                 }else{
-        //                     $valueTypeId = $searchValue['value'];
-        //                 }
-        //                 // dd($searchValue);
-        //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-        //                     // Query the name field in status table
-        //                     $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('EMPLOYEE_FIRST_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'EMPLOYEE_FIRST_NAME') {
+                        $query->where('EMPLOYEE_FIRST_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;

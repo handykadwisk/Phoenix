@@ -100,7 +100,6 @@ class RelationController extends Controller
             }else{
                 // dd("masuk sini");
                 foreach ($newSearch[0] as $keyId => $searchValue) {
-                    // dd($keyId);
                     if ($keyId === 'RELATION_ORGANIZATION_NAME') {
                         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
                     }elseif ($keyId === 'RELATION_TYPE_ID'){
@@ -109,52 +108,13 @@ class RelationController extends Controller
                         }else{
                             $valueTypeId = $searchValue['value'];
                         }
-                        // dd($searchValue);
                         $query->whereHas('mRelationType', function($q) use($valueTypeId) {
                             // Query the name field in status table
                             $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
                         });
                     }
-                    // elseif ($keyId === 'policy_inception_date') {
-                    //     $query->where('policy_due_date', '>=', date('Y-m-d', strtotime($searchValue)));
-                    // }
                 }
             }
-            // for ($i=0; $i < sizeof($newSearch); $i++) { 
-            //     // get id Relation Type
-
-            //     // Filter By Search
-            //     if ($newSearch[$i]['flag'] === "flag") {
-            //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['flag'] . '%');
-            //         // dd("masuk sini");
-            //     }
-                
-            //     if ($newSearch[$i]['RELATION_ORGANIZATION_NAME'] !== ""){
-            //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['RELATION_ORGANIZATION_NAME'] . '%');
-            //     }
-                
-            //     if($newSearch[$i]['RELATION_TYPE_ID']['value'] !== "" ||$newSearch[$i]['RELATION_TYPE_ID'] !== "" ){
-            //         // dd("masuk sin");
-            //         $valueTypeId = $newSearch[$i]['RELATION_TYPE_ID']['value'];
-            //         // dd($valueTypeId);
-            //         $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-            //             // Query the name field in status table
-            //             $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-            //         });
-            //     }
-            //     // if ($newSearch[$i]['RELATION_ORGANIZATION_NAME'] == "flag" && $newSearch[$i]['RELATION_TYPE_ID'] == "flag") {
-            //     //     $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['RELATION_ORGANIZATION_NAME'] . '%');
-            //     // }else if($newSearch[$i]['RELATION_ORGANIZATION_NAME'] == $newSearch[$i]['RELATION_ORGANIZATION_NAME']){
-            //     //     $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[$i]['RELATION_ORGANIZATION_NAME'] . '%');
-            //     // }else if($newSearch[$i]['RELATION_TYPE_ID']['value'] == $newSearch[$i]['RELATION_TYPE_ID']['value']){
-            //     //     $valueTypeId = $newSearch[$i]['RELATION_TYPE_ID']['value'];
-            //     //     // dd($valueTypeId);
-            //     //     $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-            //     //         // Query the name field in status table
-            //     //         $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-            //     //     });
-            //     // }
-            // }
         }
 
         // if ($filterModel) {

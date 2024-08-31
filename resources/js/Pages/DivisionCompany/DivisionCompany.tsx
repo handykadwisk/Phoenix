@@ -34,9 +34,6 @@ export default function DivisionCompany({
     }, []);
 
     const [dataDivision, setDataDivision] = useState<any>([]);
-    const [searchDivision, setSearchDivision] = useState<any>({
-        COMPANY_DIVISION_ALIAS: "",
-    });
 
     const [detailDivision, setDetailDivision] = useState<any>({
         COMPANY_DIVISION_ID: "",
@@ -125,19 +122,6 @@ export default function DivisionCompany({
         }
     };
 
-    const clearSearchDivision = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getDivision?${pageNumber}`, {
-                idCompany,
-            })
-            .then((res) => {
-                setDataDivision(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     const [isSuccess, setIsSuccess] = useState<string>("");
 
     const handleClickDetailCompanyDivision = async (data: any) => {
@@ -154,6 +138,40 @@ export default function DivisionCompany({
             document: false,
             search: false,
         });
+    };
+
+    const [searchDivision, setSearchDivision] = useState<any>({
+        company_division: [
+            {
+                COMPANY_DIVISION_NAME: "",
+                COMPANY_DIVISION_ID: "",
+                flag: "",
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchDivision.company_division];
+        changeVal[i][name] = value;
+        setSearchDivision({
+            ...searchDivision,
+            company_division: changeVal,
+        });
+    };
+    const [refreshGrid, setRefreshGrid] = useState<any>("");
+    // search
+    const clearSearchDivision = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("COMPANY_DIVISION_NAME", "", 0);
+        inputDataSearch("flag", "", 0);
+        setRefreshGrid("success");
+        setTimeout(() => {
+            setRefreshGrid("");
+        }, 1000);
     };
 
     return (
@@ -359,37 +377,55 @@ export default function DivisionCompany({
                             id="PERSON_FIRST_NAME"
                             type="text"
                             name="PERSON_FIRST_NAME"
-                            // value={searchPerson.PERSON_FIRST_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchPerson({
-                                    ...searchPerson,
-                                    PERSON_FIRST_NAME: e.target.value,
-                                })
+                            value={
+                                searchDivision.company_division[0]
+                                    .COMPANY_DIVISION_NAME === ""
+                                    ? ""
+                                    : searchDivision.company_division[0]
+                                          .COMPANY_DIVISION_NAME
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (searchPerson.PERSON_FIRST_NAME !== "") {
-                                        getPersons();
-                                        setSearchPerson({
-                                            ...searchPerson,
-                                            PERSON_FIRST_NAME: "",
-                                        });
-                                    }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "COMPANY_DIVISION_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchDivision.company_division[0]
+                                        .COMPANY_DIVISION_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
                             }}
                             placeholder="Search Division Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPerson()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    console.log("aaaa");
+                                    if (
+                                        searchDivision.company_division[0]
+                                            .COMPANY_DIVISION_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPerson()}
+                                onClick={(e) => clearSearchDivision(e)}
                             >
                                 Clear Search
                             </div>
@@ -402,11 +438,11 @@ export default function DivisionCompany({
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
                             withParam={idCompany}
-                            searchParam={null}
+                            searchParam={searchDivision.company_division}
                             // loading={isLoading.get_policy}
                             url={"getDivisionCompany"}
                             doubleClickEvent={handleClickDetailCompanyDivision}
-                            triggeringRefreshData={isSuccess}
+                            triggeringRefreshData={refreshGrid}
                             colDefs={[
                                 {
                                     headerName: "No.",

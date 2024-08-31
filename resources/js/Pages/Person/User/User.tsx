@@ -60,7 +60,7 @@ export default function User({
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <div
                             className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
-                            onClick={(e) => handleAddModel(e)}
+                            // onClick={(e) => handleAddModel(e)}
                         >
                             <span>Add User</span>
                         </div>
@@ -72,35 +72,35 @@ export default function User({
                             name="PERSON_FIRST_NAME"
                             // value={searchPerson.PERSON_FIRST_NAME}
                             className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchPerson({
-                                    ...searchPerson,
-                                    PERSON_FIRST_NAME: e.target.value,
-                                })
-                            }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (searchPerson.PERSON_FIRST_NAME !== "") {
-                                        getPersons();
-                                        setSearchPerson({
-                                            ...searchPerson,
-                                            PERSON_FIRST_NAME: "",
-                                        });
-                                    }
-                                }
-                            }}
+                            // onChange={(e) =>
+                            //     setSearchPerson({
+                            //         ...searchPerson,
+                            //         PERSON_FIRST_NAME: e.target.value,
+                            //     })
+                            // }
+                            // onKeyDown={(e) => {
+                            //     if (e.key === "Enter") {
+                            //         if (searchPerson.PERSON_FIRST_NAME !== "") {
+                            //             getPersons();
+                            //             setSearchPerson({
+                            //                 ...searchPerson,
+                            //                 PERSON_FIRST_NAME: "",
+                            //             });
+                            //         }
+                            //     }
+                            // }}
                             placeholder="Search User Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPerson()}
+                                // onClick={() => clearSearchPerson()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPerson()}
+                                // onClick={() => clearSearchPerson()}
                             >
                                 Clear Search
                             </div>
@@ -113,12 +113,16 @@ export default function User({
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }
@@ -131,18 +135,18 @@ export default function User({
                                     (dPerson: any, i: number) => {
                                         return (
                                             <tr
-                                                onDoubleClick={(e) => {
-                                                    setDetailPerson({
-                                                        PERSON_ID:
-                                                            dPerson.PERSON_ID,
-                                                        PERSON_FIRST_NAME:
-                                                            dPerson.PERSON_FIRST_NAME,
-                                                    });
-                                                    handleDetailModel(
-                                                        e,
-                                                        dPerson.PERSON_ID
-                                                    );
-                                                }}
+                                                // onDoubleClick={(e) => {
+                                                //     setDetailPerson({
+                                                //         PERSON_ID:
+                                                //             dPerson.PERSON_ID,
+                                                //         PERSON_FIRST_NAME:
+                                                //             dPerson.PERSON_FIRST_NAME,
+                                                //     });
+                                                //     handleDetailModel(
+                                                //         e,
+                                                //         dPerson.PERSON_ID
+                                                //     );
+                                                // }}
                                                 key={i}
                                                 className={
                                                     i % 2 === 0
