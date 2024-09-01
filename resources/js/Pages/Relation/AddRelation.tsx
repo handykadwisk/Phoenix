@@ -383,6 +383,8 @@ export default function AddRelation({
         setData("bank_account", changeVal);
     };
 
+    console.log(data);
+
     return (
         <>
             <ModalToAdd

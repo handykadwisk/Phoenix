@@ -240,7 +240,6 @@ const renderClassFunction = (detailRelation: number) => {
         });
 
         return () => {
-            console.log("berhenti");
             const getMark = document.querySelectorAll(
                 ".cls_can_attach_process"
             ) as NodeListOf<any>;

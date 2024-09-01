@@ -32,9 +32,6 @@ export default function Employee({
     const handleAddModel = async (e: FormEvent) => {
         e.preventDefault();
         getPersonRelationship();
-        getStructure(idCompany);
-        getDivision(idCompany);
-        getOffice(idCompany);
         setModalEmployee({
             add: !modalEmployee.add,
             view: false,
@@ -43,37 +40,11 @@ export default function Employee({
 
     const [structure, setStructure] = useState<any>([]);
     // get Structure
-    const getStructure = async (idCompany: any) => {
+    const getStructure = async () => {
         await axios
-            .post(`/getStructureCompany`, { idCompany })
+            .post(`/getStructurePerson`)
             .then((res) => {
                 setStructure(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [division, setDivision] = useState<any>([]);
-    // get Structure
-    const getDivision = async (idCompany: any) => {
-        await axios
-            .post(`/getComboDivision`, { idCompany })
-            .then((res) => {
-                setDivision(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const [office, setOffice] = useState<any>([]);
-    // get Structure
-    const getOffice = async (idCompany: any) => {
-        await axios
-            .post(`/getComboOffice`, { idCompany })
-            .then((res) => {
-                setOffice(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -101,22 +72,8 @@ export default function Employee({
 
     const structureSelect = structure?.map((query: any) => {
         return {
-            value: query.COMPANY_STRUCTURE_ID,
-            label: query.text_combo,
-        };
-    });
-
-    const divisionSelect = division?.map((query: any) => {
-        return {
-            value: query.COMPANY_DIVISION_ID,
-            label: query.text_combo,
-        };
-    });
-
-    const officeSelect = office?.map((query: any) => {
-        return {
-            value: query.COMPANY_OFFICE_ID,
-            label: query.text_combo,
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
         };
     });
 
@@ -216,9 +173,6 @@ export default function Employee({
             EMPLOYEE_ID: data.EMPLOYEE_ID,
         });
         getPersonRelationship();
-        getStructure(idCompany);
-        getDivision(idCompany);
-        getOffice(idCompany);
         setModalEmployee({
             add: false,
             view: !modalEmployee.view,
@@ -551,7 +505,7 @@ export default function Employee({
                                                             : `text-gray-500 hover:bg-red-500 hover:text-white`
                                                     }`,
                                             }}
-                                            options={divisionSelect}
+                                            options={structureSelect}
                                             isSearchable={true}
                                             placeholder={"--Select Division--"}
                                             value={data.DIVISION_ID}
@@ -584,7 +538,7 @@ export default function Employee({
                                                             : `text-gray-500 hover:bg-red-500 hover:text-white`
                                                     }`,
                                             }}
-                                            options={officeSelect}
+                                            options={structureSelect}
                                             isSearchable={true}
                                             placeholder={"--Select Office--"}
                                             value={data.OFFICE_ID}
@@ -886,6 +840,7 @@ export default function Employee({
                         add: false,
                         view: false,
                     });
+                    getStructure();
                 }}
                 title={"Detail Employee"}
                 url={""}
@@ -901,9 +856,6 @@ export default function Employee({
                     <>
                         <DetailEmployee
                             idEmployee={dataEmployee.EMPLOYEE_ID}
-                            division={division}
-                            structure={structure}
-                            office={office}
                             dataRelationship={dataRelationship}
                             setIsSuccess={setIsSuccess}
                         />

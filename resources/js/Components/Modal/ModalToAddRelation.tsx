@@ -42,6 +42,7 @@ export default function ModalToAdd({
         e.preventDefault();
 
         setIsProcessing(true);
+        // console.log(data);
         await axios
             .post(url, data, {
                 headers: {
@@ -49,6 +50,7 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
+                console.log(res);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data[0]);

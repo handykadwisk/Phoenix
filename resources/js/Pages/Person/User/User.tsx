@@ -18,6 +18,41 @@ export default function User({
     idRelation: any;
     dataUsers: any;
 }>) {
+    // useEffect(() => {
+    //     getUsers();
+    // }, []);
+
+    // const [dataUsers, setDataUsers] = useState<any>([]);
+    console.log("xxx", dataUsers.data.users);
+
+    // const getPersons = async (pageNumber = "page=1") => {
+    //     await axios
+    //         .post(`/getPersons?${pageNumber}`, {
+    //             idRelation,
+    //             // PERSON_FIRST_NAME: searchPerson.PERSON_FIRST_NAME,
+    //         })
+    //         .then((res) => {
+    //             setDataPerson(res.data);
+    //             // if (modal.search) {
+    //             //     setModal({
+    //             //         add: false,
+    //             //         delete: false,
+    //             //         edit: false,
+    //             //         view: false,
+    //             //         document: false,
+    //             //         search: false,
+    //             //     });
+    //             //     setSearchRelation({
+    //             //         ...searchRelation,
+    //             //         RELATION_ORGANIZATION_NAME: "",
+    //             //     });
+    //             // }
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         });
+    // };
+
     return (
         <>
             <div className="grid grid-cols-4 gap-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">

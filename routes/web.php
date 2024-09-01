@@ -424,7 +424,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/addBankAccount', [TEmployeeController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
     Route::post('/editBankAccount', [TEmployeeController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
     Route::post('/uploadProfile', [TEmployeeController::class, 'uploadProfile'])->name('uploadProfile.uploadProfile');
-    
 
 
 
@@ -434,8 +433,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCompanyStructure', [TCompanyStructureController::class, 'getCompanyStructureJson'])->name('getCompanyStructure.getCompanyStructureJson');
     Route::post('/getCompanyStructureDetail', [TCompanyStructureController::class, 'get_CompanyStructureDetail'])->name('getCompanyStructureDetail.get_CompanyStructureDetail');
     Route::post('/editStructureCompany', [TCompanyStructureController::class, 'edit'])->name('editStructureCompany.edit');
-    Route::post('/getStructureCompany', [TCompanyStructureController::class, 'getStructure'])->name('getStructureCompany.getStructure');
-    
 
     // Company Division
     Route::get('/getDivisionCompany', [TCompanyDivisionController::class, 'getCompanyDivisionJson'])->name('getDivisionCompany.getCompanyDivisionJson');
@@ -443,8 +440,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getDivisionComboCompany', [TCompanyDivisionController::class, 'getDivisionComboCompany'])->name('getDivisionComboCompany.getDivisionComboCompany');
     Route::post('/getDivisionDetailCompany', [TCompanyDivisionController::class, 'get_detail'])->name('getDivisionDetailCompany.get_detail');
     Route::post('/editDivisionCompany', [TCompanyDivisionController::class, 'edit'])->name('editDivisionCompany.edit');
-    Route::post('/getComboDivision', [TCompanyDivisionController::class, 'getDivision'])->name('getComboDivision.getDivision');
-
+    
     // Office
     Route::get('/getOfficeCompany', [TCompanyOfficeController::class, 'getOfficeCompanyJson'])->name('getOfficeCompany.getOfficeCompanyJson');
     // Route::post('/getLocationType', [TCompanyOfficeController::class, 'getLocationType'])->name('getLocationType.getLocationType');
@@ -454,7 +450,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/addAddressCompany', [TCompanyOfficeController::class, 'store'])->name('addAddressCompany.store');
     Route::post('/getOfficeCompanyDetail', [TCompanyOfficeController::class, 'get_detail'])->name('getOfficeCompanyDetail.get_detail');
     Route::post('/editOfficeCompany', [TCompanyOfficeController::class, 'edit'])->name('editOfficeCompany.edit');
-    Route::post('/getComboOffice', [TCompanyOfficeController::class, 'getOffice'])->name('getComboOffice.getOffice');
 
      // Job Desc
     Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');

@@ -62,6 +62,7 @@ export default function DetailPerson({
     idRelation: any;
     dataPersonRelationship: any;
 }>) {
+    // console.log("xx", dataPersonRelationship);
     const [detailPerson, setDetailPerson] = useState<any>([]);
     const [taxStatus, setTaxStatus] = useState<any>([]);
     const [structure, setStructure] = useState<any>([]);
@@ -114,6 +115,7 @@ export default function DetailPerson({
                 text: "File Tidak Mendukung!!",
                 icon: "error",
             }).then((result: any) => {
+                // console.log(result);
                 if (result.value) {
                     return false;
                     // getPersons();
@@ -386,6 +388,7 @@ export default function DetailPerson({
     };
 
     const saveUpload = async (files: any, id: string) => {
+        // console.log(data);
         await axios
             .post(
                 `/uploadFile`,
@@ -620,6 +623,7 @@ export default function DetailPerson({
                 text: "Add Address",
                 icon: "success",
             }).then((result: any) => {
+                // console.log(result);
                 if (result.value) {
                     getPersonDetail(message[0]);
                     // getPersons();
@@ -691,6 +695,7 @@ export default function DetailPerson({
                 text: "Employment Information Added",
                 icon: "success",
             }).then((result: any) => {
+                // console.log(result);
                 if (result.value) {
                     getPersonDetail(message[0]);
                     // getPersons();
@@ -716,6 +721,7 @@ export default function DetailPerson({
             text: "Bank Account Added",
             icon: "success",
         }).then((result: any) => {
+            // console.log(result);
             if (result.value) {
                 getPersonDetail(idPerson);
             }
@@ -780,6 +786,7 @@ export default function DetailPerson({
     ) => {
         const changeVal: any = [...editPerson.m_person_contact];
         changeVal[i].t_person_contact[name] = value;
+        // console.log("zzzz", changeVal);
         setEditPerson({
             ...editPerson,
             m_person_contact: changeVal,
@@ -801,6 +808,8 @@ export default function DetailPerson({
             ],
         });
     };
+
+    console.log("data", detailPerson.t_person_bank);
 
     const [isSuccess, setIsSuccess] = useState<string>("");
     return (

@@ -43,6 +43,7 @@ export default function DetailPerson({
     idPerson: any;
     taxStatus: any;
 }>) {
+    // console.log(dataById);
     return (
         <>
             <div className="mt-4">

@@ -410,8 +410,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setIsLoading(true);
         await axios
             .post(`/getOtherExpenses?${pageNumber}`, {
-                OTHER_EXPENSES_NUMBER:
-                    searchOtherExpenses.OTHER_EXPENSES_NUMBER,
+                OTHER_EXPENSES_NUMBER: searchOtherExpenses.OTHER_EXPENSES_NUMBER,
             })
             .then((res) => {
                 setOtherExpenses(res.data);
@@ -440,8 +439,7 @@ export default function CashAdvance({ auth }: PageProps) {
         setIsLoading(true);
         await axios
             .post(`/getReportCA?${pageNumber}`, {
-                OTHER_EXPENSES_NUMBER:
-                    searchOtherExpenses.OTHER_EXPENSES_NUMBER,
+                OTHER_EXPENSES_NUMBER: searchOtherExpenses.OTHER_EXPENSES_NUMBER,
             })
             .then((res) => {
                 setOtherExpenses(res.data);
@@ -691,15 +689,11 @@ export default function CashAdvance({ auth }: PageProps) {
         // console.log(dataById);
 
         await axios
-            .patch(
-                `/otherExpensesApprove/${dataById.OTHER_EXPENSES_ID}`,
-                dataById,
-                {
-                    headers: {
-                        "Content-type": "multipart/form-data",
-                    },
-                }
-            )
+            .patch(`/otherExpensesApprove/${dataById.OTHER_EXPENSES_ID}`, dataById, {
+                headers: {
+                    "Content-type": "multipart/form-data",
+                },
+            })
             .then((res) => {
                 console.log(res);
                 close();
@@ -711,15 +705,11 @@ export default function CashAdvance({ auth }: PageProps) {
 
     const handleBtnRevised = async () => {
         await axios
-            .patch(
-                `/otherExpensesRevised/${dataById.OTHER_EXPENSES_ID}`,
-                dataById,
-                {
-                    headers: {
-                        "Content-type": "multipart/form-data",
-                    },
-                }
-            )
+            .patch(`/otherExpensesRevised/${dataById.OTHER_EXPENSES_ID}`, dataById, {
+                headers: {
+                    "Content-type": "multipart/form-data",
+                },
+            })
             .then((res) => {
                 console.log(res);
                 close();
@@ -786,15 +776,15 @@ export default function CashAdvance({ auth }: PageProps) {
     };
 
     const [checkedTransfer, setCheckedTransfer] = useState(false);
-    const handleCheckedTransfer = (e: any) => {
-        setData("other_expenses_delivery_method_transfer", e.target.value);
-        setCheckedTransfer(!checkedTransfer);
+    const handleCheckedTransfer = (e:any) => {
+        setData("other_expenses_delivery_method_transfer", e.target.value)
+        setCheckedTransfer(!checkedTransfer); 
     };
 
     const [checkedCash, setCheckedCash] = useState(false);
-    const handleCheckedCash = (e: any) => {
-        setData("other_expenses_delivery_method_cash", e.target.value);
-        setCheckedCash(!checkedCash);
+    const handleCheckedCash = (e:any) => {
+        setData("other_expenses_delivery_method_cash", e.target.value)
+        setCheckedCash(!checkedCash); 
     };
 
     console.log(data);
@@ -902,10 +892,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     name="namaPemohon"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     onChange={(e) =>
-                                        setData(
-                                            "other_expenses_used_by",
-                                            e.target.value
-                                        )
+                                        setData("other_expenses_used_by", e.target.value)
                                     }
                                     required
                                 >
@@ -1004,8 +991,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                         )}
                                     </tr>
                                     <tr className="text-center">
-                                        <TH label="Name" className="border" />
-                                        <TH label="Person" className="border" />
+                                        <TH
+                                            label="Name"
+                                            className="border"
+                                        />
+                                        <TH
+                                            label="Person"
+                                            className="border"
+                                        />
                                         <TH
                                             label="Position"
                                             className="border"
@@ -1021,9 +1014,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_date"
                                                     type="date"
                                                     name="other_expenses_detail_date"
-                                                    value={
-                                                        val.other_expenses_detail_date
-                                                    }
+                                                    value={val.other_expenses_detail_date}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_date"
                                                     onChange={(e) =>
@@ -1089,9 +1080,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_relation_name"
                                                     type="text"
                                                     name="other_expenses_detail_relation_name"
-                                                    value={
-                                                        val.other_expenses_detail_relation_name
-                                                    }
+                                                    value={val.other_expenses_detail_relation_name}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_relation_name"
                                                     onChange={(e) =>
@@ -1104,9 +1093,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_relation_position"
                                                     type="text"
                                                     name="other_expenses_detail_relation_position"
-                                                    value={
-                                                        val.other_expenses_detail_relation_position
-                                                    }
+                                                    value={val.other_expenses_detail_relation_position}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_relation_position"
                                                     onChange={(e) =>
@@ -1119,9 +1106,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_location"
                                                     type="text"
                                                     name="other_expenses_detail_location"
-                                                    value={
-                                                        val.other_expenses_detail_location
-                                                    }
+                                                    value={val.other_expenses_detail_location}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_location"
                                                     onChange={(e) =>
@@ -1135,9 +1120,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_amount"
                                                     type="number"
                                                     name="other_expenses_detail_amount"
-                                                    value={
-                                                        val.other_expenses_detail_amount
-                                                    }
+                                                    value={val.other_expenses_detail_amount}
                                                     className="w-1/2 text-right"
                                                     autoComplete="other_expenses_detail_amount"
                                                     onChange={(e) =>
@@ -1330,10 +1313,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 rows={5}
                                 value={data.other_expenses_request_note}
                                 onChange={(e) =>
-                                    setData(
-                                        "other_expenses_request_note",
-                                        e.target.value
-                                    )
+                                    setData("other_expenses_request_note", e.target.value)
                                 }
                             />
                         </div>
@@ -1388,8 +1368,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            OTHER_EXPENSES_NUMBER:
-                                                e.target.value,
+                                            OTHER_EXPENSES_NUMBER: e.target.value,
                                         })
                                     }
                                     readOnly
@@ -1496,8 +1475,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            OTHER_EXPENSES_DIVISION:
-                                                e.target.value,
+                                            OTHER_EXPENSES_DIVISION: e.target.value,
                                         })
                                     }
                                     readOnly
@@ -1619,12 +1597,15 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border px-3">
-                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
-                                                        "1" && "Peruntukan A"}
-                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
-                                                        "2" && "Peruntukan B"}
-                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE ===
-                                                        "3" && "Peruntukan C"}
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE === "1" &&
+                                                        "Peruntukan A"
+                                                    }
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE === "2" &&
+                                                        "Peruntukan B"
+                                                    }
+                                                    {cad.OTHER_EXPENSES_DETAIL_PURPOSE === "3" &&
+                                                        "Peruntukan C"
+                                                    }
                                                 </TD>
                                                 <TD className="border px-3">
                                                     {cad.OTHER_EXPENSES_DETAIL_RELATION_ORGANIZATION_ID ===
@@ -1654,24 +1635,21 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !==
-                                                null ? (
-                                                    <TD className="border px-3 py-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                handleFileDownload(
-                                                                    cad.OTHER_EXPENSES_DETAIL_ID
-                                                                )
-                                                            }
-                                                        >
-                                                            <ArrowDownTrayIcon className="w-6 m-auto" />
-                                                        </button>
-                                                    </TD>
+                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !== null ? (
+                                                <TD className="border px-3 py-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleFileDownload(
+                                                                cad.OTHER_EXPENSES_DETAIL_ID
+                                                            )
+                                                        }
+                                                    >
+                                                        <ArrowDownTrayIcon className="w-6 m-auto" />
+                                                    </button>
+                                                </TD>
                                                 ) : (
-                                                    <TD className="border px-3 py-2">
-                                                        -
-                                                    </TD>
+                                                    <TD className="border px-3 py-2">-</TD>
                                                 )}
                                             </tr>
                                         )
@@ -1711,10 +1689,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 rows={5}
                                 value={dataById.OTHER_EXPENSES_REQUEST_NOTE}
                                 onChange={(e) =>
-                                    setData(
-                                        "other_expenses_request_note",
-                                        e.target.value
-                                    )
+                                    setData("other_expenses_request_note", e.target.value)
                                 }
                                 readOnly
                             />
@@ -2002,8 +1977,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !==
-                                                null ? (
+                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !== null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
@@ -2017,9 +1991,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         </button>
                                                     </TD>
                                                 ) : (
-                                                    <TD className="border px-3 py-2">
-                                                        -
-                                                    </TD>
+                                                    <TD className="border px-3 py-2">-</TD>
                                                 )}
                                                 <TD className="border">
                                                     <select
@@ -2256,8 +2228,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     onChange={(e) =>
                                         setDataById({
                                             ...dataById,
-                                            OTHER_EXPENSES_NUMBER:
-                                                e.target.value,
+                                            OTHER_EXPENSES_NUMBER: e.target.value,
                                         })
                                     }
                                     readOnly
@@ -2318,10 +2289,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="namaPemohon"
                                     onChange={(e) =>
-                                        setData(
-                                            "other_expenses_used_by",
-                                            e.target.value
-                                        )
+                                        setData("other_expenses_used_by", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -2340,10 +2308,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="namaPengguna"
                                     onChange={(e) =>
-                                        setData(
-                                            "other_expenses_requested_by",
-                                            e.target.value
-                                        )
+                                        setData("other_expenses_requested_by", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -2362,10 +2327,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     className=""
                                     autoComplete="other_expenses_division"
                                     onChange={(e) =>
-                                        setData(
-                                            "other_expenses_division",
-                                            e.target.value
-                                        )
+                                        setData("other_expenses_division", e.target.value)
                                     }
                                     readOnly
                                 />
@@ -2561,22 +2523,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         <option value="">
                                                             -- Choose purpose --
                                                         </option>
-                                                        {purposes.map(
-                                                            (purpose) => (
-                                                                <option
-                                                                    key={
-                                                                        purpose.id
-                                                                    }
-                                                                    value={
-                                                                        purpose.id
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        purpose.purpose
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
+                                                        {purposes.map((purpose) => (
+                                                            <option
+                                                                key={purpose.id}
+                                                                value={purpose.id}
+                                                            >
+                                                                {purpose.purpose}
+                                                            </option>
+                                                        ))}
                                                     </select>
                                                 </TD>
                                                 <TD className="border">
@@ -2723,9 +2677,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border text-left px-3">
-                                                    {
-                                                        cad.OTHER_EXPENSES_DETAIL_NOTE
-                                                    }
+                                                    {cad.OTHER_EXPENSES_DETAIL_NOTE}
                                                 </TD>
                                                 {dataById.other_expenses_detail
                                                     .length > 1 && (
@@ -3236,8 +3188,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         cad.OTHER_EXPENSES_DETAIL_AMOUNT
                                                     )}
                                                 </TD>
-                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !==
-                                                null ? (
+                                                {cad.OTHER_EXPENSES_DETAIL_DOCUMENT_ID !== null ? (
                                                     <TD className="border px-3 py-2">
                                                         <button
                                                             type="button"
@@ -3251,9 +3202,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         </button>
                                                     </TD>
                                                 ) : (
-                                                    <TD className="border px-3 py-2">
-                                                        -
-                                                    </TD>
+                                                    <TD className="border px-3 py-2">-</TD>
                                                 )}
                                                 <TD className="border px-3">
                                                     {cad.OTHER_EXPENSES_DETAIL_STATUS ===
@@ -3270,9 +3219,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     )}
                                                 </TD>
                                                 <TD className="border">
-                                                    {
-                                                        cad.OTHER_EXPENSES_DETAIL_NOTE
-                                                    }
+                                                    {cad.OTHER_EXPENSES_DETAIL_NOTE}
                                                 </TD>
                                             </tr>
                                         )
@@ -3585,9 +3532,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     }
                                     required
                                 >
-                                    <option value="">
-                                        -- Choose Other Expenses --
-                                    </option>
+                                    <option value="">-- Choose  Other Expenses --</option>
                                     {OtherExpensesNumber.map((ca: any) => (
                                         <option
                                             key={ca.OTHER_EXPENSES_ID}
@@ -3739,9 +3684,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_date"
                                                     type="date"
                                                     name="other_expenses_detail_date"
-                                                    value={
-                                                        val.other_expenses_detail_date
-                                                    }
+                                                    value={val.other_expenses_detail_date}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_date"
                                                     onChange={(e) =>
@@ -3757,9 +3700,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_end_date"
                                                     type="date"
                                                     name="other_expenses_detail_end_date"
-                                                    value={
-                                                        val.other_expenses_detail_end_date
-                                                    }
+                                                    value={val.other_expenses_detail_end_date}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_end_date"
                                                     onChange={(e) =>
@@ -3771,7 +3712,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 />
                                             </TD>
                                             <TD className="border">
-                                                <select
+                                            <select
                                                     id="other_expenses_detail_purpose"
                                                     name="other_expenses_detail_purpose"
                                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -3833,9 +3774,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_relation_name"
                                                     type="text"
                                                     name="other_expenses_detail_relation_name"
-                                                    value={
-                                                        val.other_expenses_detail_relation_name
-                                                    }
+                                                    value={val.other_expenses_detail_relation_name}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_relation_name"
                                                     onChange={(e) =>
@@ -3851,9 +3790,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_relation_position"
                                                     type="text"
                                                     name="other_expenses_detail_relation_position"
-                                                    value={
-                                                        val.other_expenses_detail_relation_position
-                                                    }
+                                                    value={val.other_expenses_detail_relation_position}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_relation_position"
                                                     onChange={(e) =>
@@ -3869,9 +3806,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_location"
                                                     type="text"
                                                     name="other_expenses_detail_location"
-                                                    value={
-                                                        val.other_expenses_detail_location
-                                                    }
+                                                    value={val.other_expenses_detail_location}
                                                     className="w-1/2"
                                                     autoComplete="other_expenses_detail_location"
                                                     onChange={(e) =>
@@ -3887,9 +3822,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     id="other_expenses_detail_amount"
                                                     type="number"
                                                     name="other_expenses_detail_amount"
-                                                    value={
-                                                        val.other_expenses_detail_amount
-                                                    }
+                                                    value={val.other_expenses_detail_amount}
                                                     className="w-1/2 text-right"
                                                     autoComplete="other_expenses_detail_amount"
                                                     placeholder="0"
@@ -3951,7 +3884,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD>0</TD>
+                                        <TD>
+                                            0
+                                        </TD>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -3973,10 +3908,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 rows={5}
                                 value={data.other_expenses_request_note}
                                 onChange={(e) =>
-                                    setData(
-                                        "other_expenses_request_note",
-                                        e.target.value
-                                    )
+                                    setData("other_expenses_request_note", e.target.value)
                                 }
                                 readOnly
                                 //
@@ -4070,9 +4002,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 id="OTHER_EXPENSES_NUMBER"
                                 type="text"
                                 name="OTHER_EXPENSES_NUMBER"
-                                value={
-                                    searchOtherExpenses.OTHER_EXPENSES_NUMBER
-                                }
+                                value={searchOtherExpenses.OTHER_EXPENSES_NUMBER}
                                 className=""
                                 onChange={(e) =>
                                     setSearchOtherExpenses({
@@ -4200,7 +4130,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         className="mx-2 h-5 w-5 text-gray-400"
                                         aria-hidden="true"
                                     />
-                                    Search Other Expenses
+                                    Search  Other Expenses
                                 </button>
                             </div>
                             <div className="flex justify-center items-center">
@@ -4313,7 +4243,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="leading-10 text-gray-500"
                                                 colSpan="9"
                                             >
-                                                Please Search Other Expenses
+                                                Please Search  Other Expenses
                                             </TD>
                                         </tr>
                                     )}
@@ -4361,7 +4291,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         className=""
                                                     />
                                                     {ca.approval_status
-                                                        .CA_STATUS_ID === 0 && (
+                                                        .CA_STATUS_ID ===
+                                                        0 && (
                                                         <TableTD
                                                             value={
                                                                 <span className="inline-flex items-center rounded-md bg-gray-200 px-3 py-2 text-xs font-medium text-gray-700">
@@ -4376,7 +4307,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         />
                                                     )}
                                                     {ca.approval_status
-                                                        .CA_STATUS_ID === 1 && (
+                                                        .CA_STATUS_ID ===
+                                                        1 && (
                                                         <TableTD
                                                             value={
                                                                 <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-2 text-xs font-medium text-green-700">
@@ -4391,7 +4323,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         />
                                                     )}
                                                     {ca.approval_status
-                                                        .CA_STATUS_ID === 2 && (
+                                                        .CA_STATUS_ID ===
+                                                        2 && (
                                                         <TableTD
                                                             value={
                                                                 <span className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-xs font-medium text-red-700">
@@ -4406,7 +4339,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         />
                                                     )}
                                                     {ca.approval_status
-                                                        .CA_STATUS_ID === 3 && (
+                                                        .CA_STATUS_ID ===
+                                                        3 && (
                                                         <TableTD
                                                             value={
                                                                 <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">
@@ -4421,7 +4355,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         />
                                                     )}
                                                     {ca.approval_status
-                                                        .CA_STATUS_ID === 4 && (
+                                                        .CA_STATUS_ID ===
+                                                        4 && (
                                                         <TableTD
                                                             value={
                                                                 <span className="inline-flex items-center rounded-md bg-yellow-300 px-3 py-2 text-xs font-medium text-white">

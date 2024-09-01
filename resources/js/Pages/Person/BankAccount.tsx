@@ -124,6 +124,8 @@ export default function BankAccount({
         });
     };
 
+    console.log(dataBankAccount);
+
     return (
         <>
             <ModalToAdd

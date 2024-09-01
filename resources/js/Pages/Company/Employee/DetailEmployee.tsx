@@ -36,16 +36,10 @@ export default function DetailEmployee({
     idEmployee,
     dataRelationship,
     setIsSuccess,
-    division,
-    structure,
-    office,
 }: PropsWithChildren<{
     idEmployee: any;
     dataRelationship: any;
     setIsSuccess: any;
-    division: any;
-    structure: any;
-    office: any;
 }>) {
     // load data structure
     useEffect(() => {
@@ -116,25 +110,11 @@ export default function DetailEmployee({
         ],
     });
 
-    // const [structure, setStructure] = useState<any>([]);
+    const [structure, setStructure] = useState<any>([]);
     const structureSelect = structure?.map((query: any) => {
         return {
-            value: query.COMPANY_STRUCTURE_ID,
-            label: query.text_combo,
-        };
-    });
-
-    const divisionSelect = division?.map((query: any) => {
-        return {
-            value: query.COMPANY_DIVISION_ID,
-            label: query.text_combo,
-        };
-    });
-
-    const officeSelect = office?.map((query: any) => {
-        return {
-            value: query.COMPANY_OFFICE_ID,
-            label: query.text_combo,
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
         };
     });
 
@@ -502,33 +482,6 @@ export default function DetailEmployee({
             .catch((err) => {
                 console.log(err);
             });
-    };
-
-    const getStructureLabel = (value: any) => {
-        if (value) {
-            const selected = structureSelect.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0]?.label;
-        }
-    };
-
-    const getDivisionLabel = (value: any) => {
-        if (value) {
-            const selected = divisionSelect.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0]?.label;
-        }
-    };
-
-    const getOfficeLabel = (value: any) => {
-        if (value) {
-            const selected = officeSelect.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0]?.label;
-        }
     };
 
     return (
@@ -950,20 +903,19 @@ export default function DetailEmployee({
                                             isSearchable={true}
                                             placeholder={"--Select Structure--"}
                                             value={
-                                                dataEditEmployment.STRUCTURE_ID ===
-                                                null
-                                                    ? dataEditEmployment.STRUCTURE_ID
-                                                    : {
-                                                          label: getStructureLabel(
-                                                              dataEditEmployment.STRUCTURE_ID
-                                                          ),
-                                                          value: dataEditEmployment.STRUCTURE_ID,
-                                                      }
+                                                dataEditEmployment.STRUCTURE_ID
                                             }
+                                            // onChange={(e) =>
+                                            //     inputDataBank(
+                                            //         "BANK_ID",
+                                            //         e.target.value,
+                                            //         i
+                                            //     )
+                                            // }
                                             onChange={(val: any) => {
                                                 setDataEditEmployment({
                                                     ...dataEditEmployment,
-                                                    STRUCTURE_ID: val.value,
+                                                    STRUCTURE_ID: val,
                                                 });
                                             }}
                                             primaryColor={"bg-red-500"}
@@ -985,24 +937,23 @@ export default function DetailEmployee({
                                                             : `text-gray-500 hover:bg-red-500 hover:text-white`
                                                     }`,
                                             }}
-                                            options={divisionSelect}
+                                            options={structureSelect}
                                             isSearchable={true}
                                             placeholder={"--Select Division--"}
                                             value={
-                                                dataEditEmployment.DIVISION_ID ===
-                                                null
-                                                    ? dataEditEmployment.DIVISION_ID
-                                                    : {
-                                                          label: getDivisionLabel(
-                                                              dataEditEmployment.DIVISION_ID
-                                                          ),
-                                                          value: dataEditEmployment.DIVISION_ID,
-                                                      }
+                                                dataEditEmployment.DIVISION_ID
                                             }
+                                            // onChange={(e) =>
+                                            //     inputDataBank(
+                                            //         "BANK_ID",
+                                            //         e.target.value,
+                                            //         i
+                                            //     )
+                                            // }
                                             onChange={(val: any) => {
                                                 setDataEditEmployment({
                                                     ...dataEditEmployment,
-                                                    DIVISION_ID: val.value,
+                                                    DIVISION_ID: val,
                                                 });
                                             }}
                                             primaryColor={"bg-red-500"}
@@ -1024,20 +975,10 @@ export default function DetailEmployee({
                                                             : `text-gray-500 hover:bg-red-500 hover:text-white`
                                                     }`,
                                             }}
-                                            options={officeSelect}
+                                            options={structureSelect}
                                             isSearchable={true}
                                             placeholder={"--Select Office--"}
-                                            value={
-                                                dataEditEmployment.OFFICE_ID ===
-                                                null
-                                                    ? dataEditEmployment.OFFICE_ID
-                                                    : {
-                                                          label: getOfficeLabel(
-                                                              dataEditEmployment.OFFICE_ID
-                                                          ),
-                                                          value: dataEditEmployment.OFFICE_ID,
-                                                      }
-                                            }
+                                            value={dataEditEmployment.OFFICE_ID}
                                             // onChange={(e) =>
                                             //     inputDataBank(
                                             //         "BANK_ID",
@@ -1048,7 +989,7 @@ export default function DetailEmployee({
                                             onChange={(val: any) => {
                                                 setDataEditEmployment({
                                                     ...dataEditEmployment,
-                                                    OFFICE_ID: val.value,
+                                                    OFFICE_ID: val,
                                                 });
                                             }}
                                             primaryColor={"bg-red-500"}
@@ -1751,8 +1692,7 @@ export default function DetailEmployee({
                                             {dataDetailEmployee.STRUCTURE_ID ===
                                             null
                                                 ? "-"
-                                                : dataDetailEmployee.structure
-                                                      ?.COMPANY_STRUCTURE_NAME}
+                                                : ""}
                                         </span>
                                     </div>
                                 </div>
@@ -1770,8 +1710,7 @@ export default function DetailEmployee({
                                             {dataDetailEmployee.DIVISION_ID ===
                                             null
                                                 ? "-"
-                                                : dataDetailEmployee.division
-                                                      ?.COMPANY_DIVISION_NAME}
+                                                : ""}
                                         </span>
                                     </div>
                                 </div>
@@ -1789,8 +1728,7 @@ export default function DetailEmployee({
                                             {dataDetailEmployee.OFFICE_ID ===
                                             null
                                                 ? "-"
-                                                : dataDetailEmployee.office
-                                                      ?.COMPANY_OFFICE_ALIAS}
+                                                : ""}
                                         </span>
                                     </div>
                                 </div>

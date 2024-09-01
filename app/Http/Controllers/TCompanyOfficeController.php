@@ -221,14 +221,4 @@ class TCompanyOfficeController extends Controller
             'X-Inertia' => true
         ]);
     }
-
-    public function getOffice(Request $request){
-        $data = DB::select('call sp_combo_company_office(?)', [$request->id]);
-        return response()->json($data);
-        // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
-        // // dd($structure);
-        // // $structure = TRelationStructure::find('RELATION_ORGANIZATION_ID', $request->id);
-
-        // return response()->json($structure);
-    }
 }

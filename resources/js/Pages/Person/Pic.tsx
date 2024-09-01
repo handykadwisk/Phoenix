@@ -146,6 +146,7 @@ export default function PIC({
                 text: "New Person Added",
                 icon: "success",
             }).then((result: any) => {
+                // console.log(result);
                 if (result.value) {
                     getPersons();
                     // setGetDetailRelation(message);
@@ -167,6 +168,7 @@ export default function PIC({
             .post(`/getIndividuRelation`)
             .then((res) => {
                 setIndividuRelation(res.data);
+                console.log("pic", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -179,6 +181,7 @@ export default function PIC({
             .post(`/getIndividuAKA`, { idIndividu })
             .then((res) => {
                 setAkaIndividu(res.data);
+                console.log("pic", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -235,6 +238,7 @@ export default function PIC({
                     text: "Person Delete",
                     icon: "success",
                 }).then((result: any) => {
+                    // console.log(result);
                     if (result.value) {
                         getPersons();
                         // getPersons();
