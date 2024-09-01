@@ -116,7 +116,6 @@ export default function DetailBankAccount({
                 };
             }
         });
-        console.log("avaa", bankFor);
         return bankFor;
     };
 
@@ -153,7 +152,6 @@ export default function DetailBankAccount({
     ) => {
         const changeVal: any = [...dataEditBankAccount.BANK_ACCOUNT];
         changeVal[i].m_for_bank = value;
-        // console.log(changeVal);
         setDataEditBankAccount({
             ...dataEditBankAccount,
             BANK_ACCOUNT: changeVal,
@@ -182,8 +180,6 @@ export default function DetailBankAccount({
             label: query.FOR_BANK_ACCOUNT_NAME,
         };
     });
-
-    console.log("hasil", dataEditBankAccount.BANK_ACCOUNT);
 
     const close = () => {
         modal();

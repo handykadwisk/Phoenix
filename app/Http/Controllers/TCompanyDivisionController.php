@@ -149,4 +149,14 @@ class TCompanyDivisionController extends Controller
         ]);
     }
 
+    public function getDivision(Request $request){
+        $data = DB::select('call sp_combo_company_division(?)', [$request->id]);
+        return response()->json($data);
+        // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
+        // // dd($structure);
+        // // $structure = TRelationStructure::find('RELATION_ORGANIZATION_ID', $request->id);
+
+        // return response()->json($structure);
+    }
+
 }
