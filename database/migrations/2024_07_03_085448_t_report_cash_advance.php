@@ -15,10 +15,12 @@ return new class extends Migration
             $table->increments('REPORT_CASH_ADVANCE_ID')->primary();
             $table->smallInteger('REPORT_CASH_ADVANCE_CASH_ADVANCE_ID')->nullable();
             $table->string('REPORT_CASH_ADVANCE_NUMBER')->nullable();
-            $table->string('REPORT_CASH_ADVANCE_DIVISION')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_DIVISION')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_COST_CENTER')->nullable();
+            $table->smallInteger('REPORT_CASH_ADVANCE_BRANCH')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_USED_BY')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_REQUESTED_BY')->nullable();
-            $table->dateTime('REPORT_CASH_ADVANCE_REQUESTED_DATE')->nullable();
+            $table->date('REPORT_CASH_ADVANCE_REQUESTED_DATE')->nullable();
             $table->smallInteger('REPORT_CASH_ADVANCE_FIRST_APPROVAL_BY')->nullable();
             $table->string('REPORT_CASH_ADVANCE_FIRST_APPROVAL_USER')->nullable();
             $table->dateTime('REPORT_CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE')->nullable();

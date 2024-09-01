@@ -39,28 +39,28 @@ class CashAdvanceReportController extends Controller
 
     public function getCountCAReportApprove1Status()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
+                                ->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', null)
+                                ->where('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', null)
+                                ->count();
 
         return response()->json($data);
     }
 
     public function getCountCAReportApprove2Status()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
+                                ->where('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', null)
+                                ->count();
 
         return response()->json($data);
     }
 
     public function getCountCAReportApprove3Status()
     {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)->count();
-
-        return response()->json($data);
-    }
-
-    public function getCountCAReportPendingReportStatus()
-    {
-        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)->count();
+        $data = CashAdvanceReport::where('REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)
+                                ->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', '!=', 6)
+                                ->count();
 
         return response()->json($data);
     }
@@ -267,7 +267,9 @@ class CashAdvanceReportController extends Controller
             
             $report_cash_advance_id = $request->cash_advance_id;
             $report_cash_advance_number = $this->getCashAdvanceReportNumber();
-            $report_cash_advance_division = "IT";
+            $report_cash_advance_division = $request->cash_advance_division;
+            $report_cash_advance_cost_center = $request->cash_advance_cost_center;
+            $report_cash_advance_branch = $request->cash_advance_branch;
             $report_cash_advance_used_by = $request->cash_advance_used_by;
             $report_cash_advance_requested_by = $user_id;
             $report_cash_advance_requested_date = now();
@@ -278,14 +280,16 @@ class CashAdvanceReportController extends Controller
             $report_cash_advance_type = $type;
             $report_cash_advance_total_amount = $total_amount_report;
             $report_cash_advance_total_amount_request = $request->cash_advance_total_amount_request;
-            $cash_advance_created_at = now();
-            $cash_advance_created_by = $user_id;
+            $report_cash_advance_created_at = now();
+            $report_cash_advance_created_by = $user_id;
     
             // Insert Report CA
             $report_cash_advance = CashAdvanceReport::create([
                 'REPORT_CASH_ADVANCE_CASH_ADVANCE_ID' => $report_cash_advance_id,
                 'REPORT_CASH_ADVANCE_NUMBER' => $report_cash_advance_number,
                 'REPORT_CASH_ADVANCE_DIVISION' => $report_cash_advance_division,
+                'REPORT_CASH_ADVANCE_COST_CENTER' => $report_cash_advance_cost_center,
+                'REPORT_CASH_ADVANCE_BRANCH' => $report_cash_advance_branch,
                 'REPORT_CASH_ADVANCE_USED_BY' => $report_cash_advance_used_by,
                 'REPORT_CASH_ADVANCE_REQUESTED_BY' => $report_cash_advance_requested_by,
                 'REPORT_CASH_ADVANCE_REQUESTED_DATE' => $report_cash_advance_requested_date,
@@ -297,8 +301,8 @@ class CashAdvanceReportController extends Controller
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST' => $report_cash_advance_total_amount_request,
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT' => $report_cash_advance_total_amount_different,
-                'REPORT_CASH_ADVANCE_CREATED_AT' => $cash_advance_created_at,
-                'REPORT_CASH_ADVANCE_CREATED_BY' => $cash_advance_created_by
+                'REPORT_CASH_ADVANCE_CREATED_AT' => $report_cash_advance_created_at,
+                'REPORT_CASH_ADVANCE_CREATED_BY' => $report_cash_advance_created_by
             ])->REPORT_CASH_ADVANCE_ID;
     
             // Created Log Report CA
@@ -312,12 +316,17 @@ class CashAdvanceReportController extends Controller
                 'action_by'  => Auth::user()->email
             ]);
     
-            foreach ($request->CashAdvanceDetail as $key => $cad) {
+            foreach ($request->CashAdvanceDetail as $cad) {
+                $relation_organization_id = $cad['cash_advance_detail_relation_organization_id'];
+
                 $report_cash_advance_detail_start_date = $cad['cash_advance_detail_start_date'];
                 $report_cash_advance_detail_end_date = $cad['cash_advance_detail_end_date'];
                 $report_cash_advance_detail_purpose = $cad['cash_advance_detail_purpose'];
                 $report_cash_advance_detail_location = $cad['cash_advance_detail_location'];
-                $cash_advance_detail_relation_organization_id = $cad['cash_advance_detail_relation_organization_id']['value'];
+                $cash_advance_detail_relation_organization_id = $relation_organization_id;
+                if ($relation_organization_id != null || $relation_organization_id != "") {
+                    $cash_advance_detail_relation_organization_id = $relation_organization_id['value'];
+                }
                 $report_cash_advance_detail_relation_name = $cad['cash_advance_detail_relation_name'];
                 $report_cash_advance_detail_relation_position = $cad['cash_advance_detail_relation_position'];
                 $report_cash_advance_detail_amount = $cad['cash_advance_detail_amount'];
@@ -589,14 +598,18 @@ class CashAdvanceReportController extends Controller
             ]);
     
             foreach ($cash_advance_detail_report as $cad) {
+                $relation_organization_id = isset($rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID']) ? $rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'] : null;
+                $relation_name = isset($rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME']) ? $rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME'] : null;
+                $relation_position = isset($rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION']) ? $rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION'] : null;
+
                 $report_cash_advance_detail_id = $cad['REPORT_CASH_ADVANCE_DETAIL_ID'];
                 $report_cash_advance_detail_start_date = $cad['REPORT_CASH_ADVANCE_DETAIL_START_DATE'];
                 $report_cash_advance_detail_end_date = $cad['REPORT_CASH_ADVANCE_DETAIL_END_DATE'];
                 $report_cash_advance_detail_purpose = $cad['REPORT_CASH_ADVANCE_DETAIL_PURPOSE'];
+                $report_cash_advance_detail_relation_organization_id = !empty($relation_organization_id) ? $relation_organization_id : null;
+                $report_cash_advance_detail_relation_name = !empty($relation_name) ? $relation_name : null;
+                $report_cash_advance_detail_relation_position = !empty($relation_position) ? $relation_position : null;
                 $report_cash_advance_detail_location = $cad['REPORT_CASH_ADVANCE_DETAIL_LOCATION'];
-                $report_cash_advance_detail_relation_organization_id = $cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'];
-                $report_cash_advance_detail_relation_name = $cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME'];
-                $report_cash_advance_detail_relation_position = $cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION'];
                 $report_cash_advance_detail_amount = $cad['REPORT_CASH_ADVANCE_DETAIL_AMOUNT'];
     
                 $cashAdvanceDetailReport = CashAdvanceDetailReport::updateOrCreate(

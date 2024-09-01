@@ -30,16 +30,27 @@ class ReimburseController extends Controller
 {
     public function getReimburseData($dataPerPage = 2, $searchQuery = null)
     {
+        $division = $searchQuery->reimburse_division;
+        $cost_center = $searchQuery->reimburse_cost_center;
+
         $reimburse_requested_by = $searchQuery->reimburse_requested_by;
         $reimburse_used_by = $searchQuery->reimburse_used_by;
         $reimburse_start_date = $searchQuery->reimburse_start_date;
         $reimburse_end_date = $searchQuery->reimburse_end_date;
-        $reimburse_division = $searchQuery->reimburse_division;
-        $reimburse_cost_center = $searchQuery->reimburse_cost_center;
+        $reimburse_division = $division;
+        if ($division != null || $division != "") {
+            $reimburse_division = $division['value'];
+        }
+        $reimburse_cost_center = $cost_center;
+        if ($cost_center != null || $cost_center != "") {
+            $reimburse_cost_center = $cost_center['value'];
+        }
         $status = $searchQuery->status;
         $status_type = $searchQuery->status_type;
 
         $data = Reimburse::orderBy('REIMBURSE_ID', 'desc');
+
+        // dd($searchQuery);
         
         if ($searchQuery) {
             if ($searchQuery->input('reimburse_requested_by')) {
@@ -65,22 +76,16 @@ class ReimburseController extends Controller
                 $data->whereBetween('REIMBURSE_REQUESTED_DATE', [$reimburse_start_date, $reimburse_end_date]);
             }
 
-            if ($searchQuery->input('reimburse_division')) {
-                $data->whereHas('division',
-                function($query) use($reimburse_division)
-                {
-                    $query->where('COMPANY_DIVISION_ALIAS', 'like', '%'. $reimburse_division .'%')
-                            ->orWhere('COMPANY_DIVISION_INITIAL', 'like', '%'. $reimburse_division .'%');
-                });
+            if (
+                $searchQuery->input('reimburse_division')
+            ) {
+                $data->where('REIMBURSE_DIVISION', $reimburse_division);
             }
 
-            if ($searchQuery->input('reimburse_cost_center')) {
-                $data->whereHas('cost_center',
-                function($query) use($reimburse_cost_center)
-                {
-                    $query->where('COMPANY_DIVISION_ALIAS', 'like', '%'. $reimburse_cost_center .'%')
-                            ->orWhere('COMPANY_DIVISION_INITIAL', 'like', '%'. $reimburse_cost_center .'%');
-                });
+            if (
+                $searchQuery->input('reimburse_cost_center')
+            ) {
+                $data->where('REIMBURSE_COST_CENTER', $reimburse_cost_center);
             }
 
             if ($status == 1 && $status_type == "Approve1") {
@@ -140,21 +145,28 @@ class ReimburseController extends Controller
 
     public function getCountReimburseApprove1Status()
     {
-        $data = Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 2)->count();
+        $data = Reimburse::where('REIMBURSE_FIRST_APPROVAL_STATUS', 2)
+                        ->where('REIMBURSE_SECOND_APPROVAL_STATUS', null)
+                        ->where('REIMBURSE_THIRD_APPROVAL_STATUS', null)
+                        ->count();
 
         return response()->json($data);
     }
 
     public function getCountReimburseApprove2Status()
     {
-        $data = Reimburse::where('REIMBURSE_SECOND_APPROVAL_STATUS', 2)->count();
+        $data = Reimburse::where('REIMBURSE_SECOND_APPROVAL_STATUS', 2)
+                        ->where('REIMBURSE_THIRD_APPROVAL_STATUS', null)
+                        ->count();
 
         return response()->json($data);
     }
 
     public function getCountReimburseApprove3Status()
     {
-        $data = Reimburse::where('REIMBURSE_THIRD_APPROVAL_STATUS', 2)->count();
+        $data = Reimburse::where('REIMBURSE_THIRD_APPROVAL_STATUS', 2)
+                        ->where('REIMBURSE_SECOND_APPROVAL_STATUS', '!=', 6)
+                        ->count();
 
         return response()->json($data);
     }
@@ -432,7 +444,7 @@ class ReimburseController extends Controller
                 $reimburse_detail_type = $rd['reimburse_detail_type'];
                 $reimburse_detail_relation_organization_id = $relation_organization_id;
                 if ($relation_organization_id != null || $relation_organization_id != "") {
-                    $reimburse_detail_relation_organization_id = $rd['reimburse_detail_relation_organization_id']['value'];
+                    $reimburse_detail_relation_organization_id = $relation_organization_id['value'];
                 }
                 $reimburse_detail_relation_name = $rd['reimburse_detail_relation_name'];
                 $reimburse_detail_relation_position = $rd['reimburse_detail_relation_position'];
@@ -688,20 +700,19 @@ class ReimburseController extends Controller
             ]);
     
             foreach ($request->reimburse_detail as $rd) {
-                $relation_organization_id = $rd['REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID'];
-    
+                $relation_organization_id = isset($rd['REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID']) ? $rd['REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID'] : null;
+                $relation_name = isset($rd['REIMBURSE_DETAIL_RELATION_NAME']) ? $rd['REIMBURSE_DETAIL_RELATION_NAME'] : null;
+                $relation_position = isset($rd['REIMBURSE_DETAIL_RELATION_POSITION']) ? $rd['REIMBURSE_DETAIL_RELATION_POSITION'] : null;
+
                 $reimburse_detail_id = $rd['REIMBURSE_DETAIL_ID'];
                 $reimburse_detail_date = $rd['REIMBURSE_DETAIL_DATE'];
                 $reimburse_detail_purpose = $rd['REIMBURSE_DETAIL_PURPOSE'];
                 $reimburse_detail_location = $rd['REIMBURSE_DETAIL_LOCATION'];
                 $reimburse_detail_address = $rd['REIMBURSE_DETAIL_ADDRESS'];
                 $reimburse_detail_type = $rd['REIMBURSE_DETAIL_TYPE'];
-                $reimburse_detail_relation_organization_id = $relation_organization_id;
-                if ($relation_organization_id != NULL || $relation_organization_id != "") {
-                    $reimburse_detail_relation_organization_id = $rd['REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID'];
-                }
-                $reimburse_detail_relation_name = $rd['REIMBURSE_DETAIL_RELATION_NAME'];
-                $reimburse_detail_relation_position = $rd['REIMBURSE_DETAIL_RELATION_POSITION'];
+                $reimburse_detail_relation_organization_id = !empty($relation_organization_id) ? $relation_organization_id : null;
+                $reimburse_detail_relation_name = !empty($relation_name) ? $relation_name : null;
+                $reimburse_detail_relation_position = !empty($relation_position) ? $relation_position : null;
                 $reimburse_detail_amount = $rd['REIMBURSE_DETAIL_AMOUNT'];
                 
                 $ReimburseDetail = ReimburseDetail::updateOrCreate(

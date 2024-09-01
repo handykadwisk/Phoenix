@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('t_reimburse', function (Blueprint $table) {
             $table->increments('REIMBURSE_ID')->primary();
             $table->string('REIMBURSE_NUMBER')->nullable();
-            $table->string('REIMBURSE_DIVISION')->nullable();
-            $table->string('REIMBURSE_COST_CENTER')->nullable();
-            $table->string('REIMBURSE_BRANCH')->nullable();
+            $table->smallInteger('REIMBURSE_DIVISION')->nullable();
+            $table->smallInteger('REIMBURSE_COST_CENTER')->nullable();
+            $table->smallInteger('REIMBURSE_BRANCH')->nullable();
             $table->smallInteger('REIMBURSE_USED_BY')->nullable();
             $table->smallInteger('REIMBURSE_REQUESTED_BY')->nullable();
-            $table->dateTime('REIMBURSE_REQUESTED_DATE')->nullable();
+            $table->date('REIMBURSE_REQUESTED_DATE')->nullable();
             $table->smallInteger('REIMBURSE_FIRST_APPROVAL_BY')->nullable();
             $table->string('REIMBURSE_FIRST_APPROVAL_USER')->nullable();
             $table->dateTime('REIMBURSE_FIRST_APPROVAL_CHANGE_STATUS_DATE')->nullable();
