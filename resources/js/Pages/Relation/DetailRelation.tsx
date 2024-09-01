@@ -160,7 +160,6 @@ export default function DetailRelation({
     // }, [dataTPlugin]);
 
     const getPlugin = (dataTPlugin: any) => {
-        console.log(dataTPlugin);
         dataTPlugin.forEach((item: any) => {
             const className =
                 item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
@@ -197,13 +196,10 @@ export default function DetailRelation({
                 // const classDiv = document.querySelectorAll(`.${className}`);
                 const divExists =
                     document.querySelector(`.${className}`) !== null;
-                console.log(divExists);
                 // // classDiv.forEach((div: any) => {
                 // //     div.remove();
                 // // });
                 if (divExists === false) {
-                    console.log("ada");
-
                     // Buat elemen div baru
                     const newDiv = document.createElement("div");
                     // hapus dulu cls yang lama
@@ -215,8 +211,6 @@ export default function DetailRelation({
                     // Tambahkan div baru ke dalam container yang sesuai
                     container?.appendChild(newDiv);
                 } else {
-                    console.log("gaada");
-
                     const newDiv = document.createElement("div");
                     // hapus dulu cls yang lama
 
@@ -1062,6 +1056,10 @@ export default function DetailRelation({
             setIsSuccess(message[1]);
             // getDetailRelation(message[0]);
             getTPluginProcess();
+            setShowContext({
+                ...showContext,
+                visible: false,
+            });
             // getContents();
             setTimeout(() => {
                 setIsSuccess("");
@@ -2545,7 +2543,7 @@ export default function DetailRelation({
                                 //     detailRelation +
                                 //     "_relation_information"
                                 // }
-                                className="cls_can_attach_process flex gap-2 items-center"
+                                className="cls_can_attach_process flex gap-2 items-center w-fit"
                                 // onContextMenu={handleContextMenu}
                                 // onClick={(e) => {
                                 //     setShowContext({

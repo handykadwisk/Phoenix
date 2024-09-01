@@ -58,4 +58,16 @@ class TEmployee extends Model
     public function Document(){
         return $this->hasOne(Document::class, 'DOCUMENT_ID', 'EMPLOYEE_IMAGE_ID');
     }
+
+    public function office(){
+        return $this->hasOne(TCompanyOffice::class, 'COMPANY_OFFICE_ID', 'OFFICE_ID');
+    }
+
+    public function structure(){
+        return $this->hasOne(TCompanyStructure::class, 'COMPANY_STRUCTURE_ID', 'STRUCTURE_ID');
+    }
+
+    public function division(){
+        return $this->hasOne(TCompanyDivision::class, 'COMPANY_DIVISION_ID', 'DIVISION_ID');
+    }
 }

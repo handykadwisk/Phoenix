@@ -113,8 +113,6 @@ export default function AddPerson({
         setData({ ...data, PERSON_CONTACT: changeVal });
     };
 
-    console.log(data);
-
     return (
         <>
             <ModalToAdd

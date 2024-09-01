@@ -150,4 +150,15 @@ class TCompanyStructureController extends Controller
         ]);
     }
 
+    // get Structure by relation id
+    public function getStructure(Request $request){
+        $data = DB::select('call sp_combo_company_structure(?)', [$request->id]);
+        return response()->json($data);
+        // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
+        // // dd($structure);
+        // // $structure = TRelationStructure::find('RELATION_ORGANIZATION_ID', $request->id);
+
+        // return response()->json($structure);
+    }
+
 }

@@ -406,7 +406,6 @@ export default function DivisionCompany({
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
-                                    console.log("aaaa");
                                     if (
                                         searchDivision.company_division[0]
                                             .COMPANY_DIVISION_NAME === ""

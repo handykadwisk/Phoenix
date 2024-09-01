@@ -513,5 +513,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_for_bank_account)
         );
 
+        // create 2024_31_08_r_plugin_process
+        $r_plugin_process = resource_path('../database/LogDB/2024_31_08_r_plugin_process.sql');
+
+        DB::unprepared(
+            file_get_contents($r_plugin_process)
+        );
+
     }
 }

@@ -215,7 +215,6 @@ export default function Person({
                 text: "New Person Added",
                 icon: "success",
             }).then((result: any) => {
-                // console.log(result);
                 if (result.value) {
                     getPersons();
                     // setGetDetailRelation(message);

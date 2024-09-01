@@ -43,7 +43,6 @@ export default function DetailSubGroup({
     dataDetailGroups: any;
     handleSuccessEdit: any;
 }>) {
-    // console.log("xx", dataDetailGroups);
     useEffect(() => {
         setDetailGroups(dataDetailGroups);
     }, [dataDetailGroups]);
