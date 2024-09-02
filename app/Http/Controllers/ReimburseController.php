@@ -364,7 +364,6 @@ class ReimburseController extends Controller
 
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'reimburse_cost_center' => 'required',
             'reimburse_used_by' => 'required',
@@ -384,12 +383,6 @@ class ReimburseController extends Controller
             $user = Auth::user();
             $user_id = $user->id;
 
-            $total_amount = 0;
-
-            foreach ($request->ReimburseDetail as $value) {
-                $total_amount += $value['reimburse_detail_amount'];
-            }
-
             $reimburse_number = $this->getReimburseNumber();
             $reimburse_used_by = $request->reimburse_used_by['value'];
             $reimburse_requested_by = $user_id;
@@ -401,7 +394,7 @@ class ReimburseController extends Controller
             $reimburse_first_approval_user = $request->reimburse_first_approval_by['label'];
             $reimburse_first_approval_status = 1;
             $reimburse_request_note = $request->reimburse_request_note;
-            $reimburse_total_amount = $total_amount;
+            $reimburse_total_amount = $request->reimburse_total_amount;
             $reimburse_created_at = now();
             $reimburse_created_by = $user_id;
 
@@ -425,13 +418,13 @@ class ReimburseController extends Controller
 
             // Created Log CA
             UserLog::create([
-                'created_by' => Auth::user()->id,
+                'created_by' => $user->id,
                 'action'     => json_encode([
                     "description" => "Created (Reimburse).",
                     "module"      => "Reimburse",
                     "id"          => $reimburse
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => $user->email
             ]);
 
             foreach ($request->ReimburseDetail as $rd) {
@@ -477,7 +470,7 @@ class ReimburseController extends Controller
                             $typeDir = '';
                             $uploadPath = 'documents/' . 'Reimburse/'. $parentDir . $CAId . $typeDir;
         
-                            $userId = Auth::user()->id;
+                            $userId = $user->id;
         
                             $documentOriginalName =  $this->RemoveSpecialChar($file->getClientOriginalName());
                             $documentFileName =  $reimburse_detail_id . '-' . $this->RemoveSpecialChar($file->getClientOriginalName());
@@ -519,22 +512,22 @@ class ReimburseController extends Controller
 
                 // Created Log CA Detail
                 UserLog::create([
-                    'created_by' => Auth::user()->id,
+                    'created_by' => $user->id,
                     'action'     => json_encode([
                         "description" => "Created (Reimburse Detail).",
                         "module"      => "Reimburse",
                         "id"          => $reimburse_detail_id
                     ]),
-                    'action_by'  => Auth::user()->email
+                    'action_by'  => $user->email
                 ]);
             }
-
-            return new JsonResponse([
-                'New Reimburse has been added.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'New Reimburse has been added.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function approve(Request $request)
@@ -652,12 +645,13 @@ class ReimburseController extends Controller
                 }
             }
     
-            return new JsonResponse([
-                'Reimburse has been approved.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Reimburse has been approved.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function revised(Request $request)
@@ -841,13 +835,13 @@ class ReimburseController extends Controller
                     Document::destroy($documentId);
                 }
             }
-    
-            return new JsonResponse([
-                'Reimburse has been revised.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Reimburse has been revised.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function execute(Request $request)

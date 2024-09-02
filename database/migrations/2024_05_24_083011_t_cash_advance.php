@@ -39,7 +39,7 @@ return new class extends Migration
             $table->smallInteger('CASH_ADVANCE_DELIVERY_METHOD_TRANSFER')->nullable();
             $table->decimal('CASH_ADVANCE_TRANSFER_AMOUNT', 16, 2)->nullable();
             $table->dateTime('CASH_ADVANCE_TRANSFER_DATE')->nullable();
-            $table->string('CASH_ADVANCE_FROM_BANK_ACCOUNT')->nullable();
+            $table->string('CASH_ADVANCE_BANK_ACCOUNT')->nullable();
             $table->smallInteger('CASH_ADVANCE_DELIVERY_METHOD_CASH')->nullable();
             $table->decimal('CASH_ADVANCE_CASH_AMOUNT', 16, 2)->nullable();
             $table->dateTime('CASH_ADVANCE_RECEIVE_DATE')->nullable();

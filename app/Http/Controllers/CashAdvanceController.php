@@ -14,6 +14,7 @@ use App\Models\Document;
 use App\Models\TCompanyDivision;
 use App\Models\TCompanyOffice;
 use App\Models\TEmployee;
+use App\Models\TEmployeeBankAccount;
 use App\Models\TPerson;
 use App\Models\User;
 use App\Models\UserLog;
@@ -285,6 +286,17 @@ class CashAdvanceController extends Controller
         return response()->json($data);
     }
 
+    public function getEmployeeBankAccount()
+    {
+        $data = TEmployeeBankAccount::with('mForBank')
+                                    ->whereHas('mForBank', function ($query) {
+                                        $query->where('FOR_BANK_ACCOUNT_ID', 1);
+                                    })
+                                    ->get();
+
+        return response()->json($data);
+    }
+
     public function index()
     {   
         $data = [
@@ -440,6 +452,7 @@ class CashAdvanceController extends Controller
             $cash_advance_first_approval_user = $request->cash_advance_first_approval_by['label'];
             $cash_advance_first_approval_status = 1;
             $cash_advance_request_note = $request->cash_advance_request_note;
+            $cash_advance_bank_account = $request->cash_advance_bank_account;
             $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
             $cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
             $cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
@@ -461,6 +474,7 @@ class CashAdvanceController extends Controller
                 'CASH_ADVANCE_FIRST_APPROVAL_USER' => $cash_advance_first_approval_user,
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
                 'CASH_ADVANCE_REQUEST_NOTE' => $cash_advance_request_note,
+                'CASH_ADVANCE_BANK_ACCOUNT' => $cash_advance_bank_account,
                 'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
@@ -572,28 +586,29 @@ class CashAdvanceController extends Controller
                     'action_by'  => Auth::user()->email
                 ]);
             }
-    
-            return new JsonResponse([
-                'New Cash Advance has been added.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'New Cash Advance has been added.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function cash_advance_approve(Request $request)
     {
         DB::transaction(function () use ($request) {
-            // dd($request);
             $cash_advance_id = $request->CASH_ADVANCE_ID;
             $cash_advance_first_approval_change_status_date = date('Y-m-d H:i:s');
             $cash_advance_first_approval_status = $request->CASH_ADVANCE_FIRST_APPROVAL_STATUS;
+            $cash_advance_bank_account = $request->CASH_ADVANCE_BANK_ACCOUNT;
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
     
             CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
                 'CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $cash_advance_first_approval_change_status_date,
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
+                'CASH_ADVANCE_BANK_ACCOUNT' => $cash_advance_bank_account,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount
             ]);
@@ -666,13 +681,13 @@ class CashAdvanceController extends Controller
                     ]);
                 }
             }
-    
-            return new JsonResponse([
-                'Cash Advance has been approved.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Cash Advance has been approved.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function cash_advance_revised(Request $request)
@@ -694,6 +709,7 @@ class CashAdvanceController extends Controller
             $cash_advance_total_amount = $total_amount;
             $cash_advance_first_approval_status = 1;
             $cash_advance_request_note = $request->CASH_ADVANCE_REQUEST_NOTE;
+            $cash_advance_bank_account = $request->CASH_ADVANCE_BANK_ACCOUNT;
             $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_delivery_method_cash = $request->CASH_ADVANCE_DELIVERY_METHOD_CASH;
@@ -705,6 +721,7 @@ class CashAdvanceController extends Controller
             CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
                 'CASH_ADVANCE_REQUEST_NOTE' => $cash_advance_request_note,
+                'CASH_ADVANCE_BANK_ACCOUNT' => $cash_advance_bank_account,
                 'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
@@ -869,13 +886,13 @@ class CashAdvanceController extends Controller
                     Document::destroy($documentId);
                 }
             }
-    
-            return new JsonResponse([
-                'Cash Advance has been revised.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Cash Advance has been revised.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function cash_advance_execute(Request $request)

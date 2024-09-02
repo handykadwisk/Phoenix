@@ -52,6 +52,7 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
+                console.log("ada", res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -61,15 +62,6 @@ export default function ModalToAdd({
                 setIsProcessing(false);
                 setIsError(err.response.data[0]);
                 console.log(err);
-                // if (err.response && err.response.status === 422) {
-                //     Swal.fire({
-                //         icon: "error",
-                //         title: "Oops...",
-                //         text: err.response.data.message,
-                //         timer: 3000,
-                //         timerProgressBar: true,
-                //     });
-                // }
             });
     };
 

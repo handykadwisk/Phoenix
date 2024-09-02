@@ -4,10 +4,9 @@ import { PropsWithChildren } from "react";
 import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
-import Swal from "sweetalert2";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
-export default function ModalToAction({
+export default function ModalToDocument({
     show = false,
     closeable = true,
     onClose = () => {},
@@ -80,7 +79,7 @@ export default function ModalToAction({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-50"
+                    className="relative z-9999"
                     onClose={close}
                     initialFocus={modalRef}
                 >
@@ -97,7 +96,7 @@ export default function ModalToAction({
                     </Transition.Child>
 
                     <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <div className="flex min-h-full justify-center p-4 text-center items-center lg:p-0">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"
