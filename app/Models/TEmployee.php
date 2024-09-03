@@ -67,7 +67,7 @@ class TEmployee extends Model
         return $this->hasOne(TCompanyStructure::class, 'COMPANY_STRUCTURE_ID', 'STRUCTURE_ID');
     }
 
-    public function division(){
+    public function divisionCompany(){
         return $this->hasOne(TCompanyDivision::class, 'COMPANY_DIVISION_ID', 'DIVISION_ID');
     }
 }

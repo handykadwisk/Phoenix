@@ -196,7 +196,7 @@ class TEmployeeController extends Controller
     }
 
     public function get_employeeById(Request $request){
-        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('division')->where('EMPLOYEE_ID', $request->idEmployee)->first();
+        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('divisionCompany')->where('EMPLOYEE_ID', $request->idEmployee)->first();
         return response()->json($data);
     }
 
@@ -970,7 +970,7 @@ class TEmployeeController extends Controller
             for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
                 $createEmployeeBank = TEmployeeBankAccount::create([
                     "EMPLOYEE_ID" => $request->BANK_ACCOUNT[$i]["idEmployee"],
-                    "EMPLOYEE_BANK_ACCOUNT_NAME" => $request->BANK_ACCOUNT[$i]["EMPLOYEE_BANK_ACCOUNT_NUMBER"],
+                    "EMPLOYEE_BANK_ACCOUNT_NAME" => $request->BANK_ACCOUNT[$i]["EMPLOYEE_BANK_ACCOUNT_NAME"],
                     "EMPLOYEE_BANK_ACCOUNT_NUMBER" => $request->BANK_ACCOUNT[$i]["EMPLOYEE_BANK_ACCOUNT_NUMBER"],
                     // "EMPLOYEE_BANK_ACCOUNT_FOR" => $valueBankFor,
                     "BANK_ID" => $request->BANK_ACCOUNT[$i]['BANK_ID']['value'],
