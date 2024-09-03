@@ -598,9 +598,9 @@ class CashAdvanceReportController extends Controller
             ]);
     
             foreach ($cash_advance_detail_report as $cad) {
-                $relation_organization_id = isset($rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID']) ? $rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'] : null;
-                $relation_name = isset($rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME']) ? $rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME'] : null;
-                $relation_position = isset($rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION']) ? $rd['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION'] : null;
+                $relation_organization_id = isset($cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID']) ? $cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'] : null;
+                $relation_name = isset($cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME']) ? $cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_NAME'] : null;
+                $relation_position = isset($cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION']) ? $cad['REPORT_CASH_ADVANCE_DETAIL_RELATION_POSITION'] : null;
 
                 $report_cash_advance_detail_id = $cad['REPORT_CASH_ADVANCE_DETAIL_ID'];
                 $report_cash_advance_detail_start_date = $cad['REPORT_CASH_ADVANCE_DETAIL_START_DATE'];

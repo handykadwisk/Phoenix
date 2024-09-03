@@ -47,7 +47,7 @@ class CashAdvance extends Model
 
     public function bank_account(): BelongsTo
     {
-        return $this->belongsTo(TEmployeeBankAccount::class, 'CASH_ADVANCE_BANK_ACCOUNT');
+        return $this->belongsTo(TEmployeeBankAccount::class, 'CASH_ADVANCE_TO_BANK_ACCOUNT');
     }
 
     public function division(): BelongsTo

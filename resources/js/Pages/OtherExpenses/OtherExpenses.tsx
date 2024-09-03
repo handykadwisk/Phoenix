@@ -810,7 +810,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 <ToastMessage
                     message={isSuccess}
                     isShow={true}
-                    isSuccess={true}
+                    type={"success"}
                 />
             )}
 
@@ -836,7 +836,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 url={`/otherExpenses`}
                 data={data}
                 onSuccess={handleSuccess}
-                panelWidth={"65%"}
+                buttonAddOns={null}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -1368,7 +1368,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess=""
                 headers={null}
                 submitButtonName=""
-                panelWidth={"65%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -1750,7 +1749,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={""}
-                panelWidth={"70%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -2236,7 +2234,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={"Save"}
-                panelWidth={"70%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -2984,7 +2981,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={"Execute"}
-                panelWidth={"70%"}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -3561,7 +3557,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 url={`/otherExpensesReport`}
                 data={data}
                 onSuccess={handleSuccess}
-                panelWidth={"65%"}
+                buttonAddOns={null}
                 body={
                     <>
                         <div className="grid md:grid-cols-2 my-10">
@@ -4271,38 +4267,56 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <TableTH
                                             className="max-w-[0px]"
                                             label={"No"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Other Expenses Number"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Request Date"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Amount"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Status"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Approve 1"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Approve 2"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className="min-w-[50px]"
                                             label={"Approve 3"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                         <TableTH
                                             className={"min-w-[50px]"}
                                             label={"Action"}
+                                            colSpan=""
+                                            rowSpan=""
                                         />
                                     </tr>
                                 </thead>
@@ -4450,6 +4464,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     <TableTD
                                                         value={
                                                             <Dropdown
+                                                                className={""}
                                                                 title="Actions"
                                                                 children={
                                                                     <>
