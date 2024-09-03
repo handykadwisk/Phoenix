@@ -533,6 +533,7 @@ export default function DebitNoteIndex({ auth }: PageProps) {
                             </Button> */}
                             {/* modal add policy */}
                             <ModalToAdd
+                                buttonAddOns={""}
                                 show={modal.add}
                                 onClose={() =>
                                     setModal({
@@ -1926,6 +1927,7 @@ export default function DebitNoteIndex({ auth }: PageProps) {
 
                             {/* table policy in here */}
                             <Table
+                                pagination={""}
                                 addButtonLabel={"Create Debit Note"}
                                 addButtonModalState={() =>
                                     setModal({
@@ -1954,30 +1956,42 @@ export default function DebitNoteIndex({ auth }: PageProps) {
                                 tableHead={
                                     <>
                                         <TableTH
+                                        colSpan={""}
+                                                    rowSpan={""}
                                             className={"min-w-[50px]"}
                                             label={"No"}
                                         />
                                         <TableTH
+                                        colSpan={""}
+                                                    rowSpan={""}
                                             className={"min-w-[50px]"}
                                             label={"Policy Number"}
                                         />
                                         <TableTH
+                                        colSpan={""}
+                                                    rowSpan={""}
                                             className={"min-w-[50px]"}
                                             label={"Client Name"}
                                         />
                                         <TableTH
+                                        colSpan={""}
+                                                    rowSpan={""}
                                             className={
                                                 "min-w-[50px] px-12 sm:px-4"
                                             }
                                             label={"Insurance Type"}
                                         />
                                         <TableTH
+                                        colSpan={""}
+                                                    rowSpan={""}
                                             className={
                                                 "min-w-[50px] px-12 sm:px-4"
                                             }
                                             label={"Period"}
                                         />
                                         <TableTH
+                                        colSpan={""}
+                                                    rowSpan={""}
                                             className={"min-w-[50px]"}
                                             label={"Action"}
                                         />

@@ -442,8 +442,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/getPolicyExchangeRate/{id}', [PolicyPartnerController::class, 'getPolicyExchangeRate'])->name('policyPartner.getPolicyExchangeRate');
     Route::get('/getRelationByType/{id}', [PolicyPartnerController::class, 'getRelationByType'])->name('policyPartner.getRelationByType');
     Route::get('/getPersonBaa/{id}', [PolicyPartnerController::class, 'getPersonBaa'])->name('policyPartner.getPersonBaa');
+    Route::get('/getCoa', [PolicyPartnerController::class, 'getCoa'])->name('policyPartner.getCoa');
 
     Route::get('/getSummary/{id}', [PolicyPartnerController::class, 'getSummary'])->name('policyPartner.getSummary');
+    Route::get('/getPksNumber/{id}', [PolicyPartnerController::class, 'getPksNumber'])->name('policyPartner.getPksNumber');
+    Route::get('/getDefaultPayable/{id}', [PolicyPartnerController::class, 'getDefaultPayable'])->name('policyPartner.getDefaultPayable');
 
     // HR
     Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');

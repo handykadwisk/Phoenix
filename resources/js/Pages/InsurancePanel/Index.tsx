@@ -735,6 +735,7 @@ export default function InsurancePanelIndex({ auth }: PageProps) {
         <AuthenticatedLayout user={auth.user} header={"Insurer"}>
             <Head title="Insurer" />
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() => {
                     setModal({
@@ -1775,16 +1776,22 @@ export default function InsurancePanelIndex({ auth }: PageProps) {
                                         <thead className="bg-gray-100">
                                             <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                                 <TableTH
+                                                    colSpan={""}
+                                                    rowSpan={""}
                                                     className={
                                                         "max-w-[0px] text-center"
                                                     }
                                                     label={"No"}
                                                 />
                                                 <TableTH
+                                                    colSpan={""}
+                                                    rowSpan={""}
                                                     className={"min-w-[50px]"}
                                                     label={"Insurer"}
                                                 />
                                                 <TableTH
+                                                    colSpan={""}
+                                                    rowSpan={""}
                                                     className={"min-w-[50px]"}
                                                     label={"Share"}
                                                 />
