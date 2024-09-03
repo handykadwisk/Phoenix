@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TEmployee extends Model
 {
@@ -18,6 +19,13 @@ class TEmployee extends Model
     ];
 
     public $timestamps = false;
+
+    protected $with = ['division'];
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(TCompanyDivision::class, 'DIVISION_ID');
+    }
 
     public function Company(){
         return $this->hasOne(TCompany::class, 'COMPANY_ID', 'COMPANY_ID');
@@ -65,9 +73,5 @@ class TEmployee extends Model
 
     public function structure(){
         return $this->hasOne(TCompanyStructure::class, 'COMPANY_STRUCTURE_ID', 'STRUCTURE_ID');
-    }
-
-    public function division(){
-        return $this->hasOne(TCompanyDivision::class, 'COMPANY_DIVISION_ID', 'DIVISION_ID');
     }
 }

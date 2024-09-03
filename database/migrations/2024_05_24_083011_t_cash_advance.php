@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('t_cash_advance', function (Blueprint $table) {
             $table->increments('CASH_ADVANCE_ID')->primary();
             $table->string('CASH_ADVANCE_NUMBER')->nullable();
-            $table->string('CASH_ADVANCE_DIVISION')->nullable();
-            $table->string('CASH_ADVANCE_COST_CENTER')->nullable();
-            $table->string('CASH_ADVANCE_BRANCH')->nullable();
+            $table->smallInteger('CASH_ADVANCE_DIVISION')->nullable();
+            $table->smallInteger('CASH_ADVANCE_COST_CENTER')->nullable();
+            $table->smallInteger('CASH_ADVANCE_BRANCH')->nullable();
             $table->smallInteger('CASH_ADVANCE_USED_BY')->nullable();
             $table->smallInteger('CASH_ADVANCE_REQUESTED_BY')->nullable();
             $table->date('CASH_ADVANCE_REQUESTED_DATE')->nullable();
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->smallInteger('CASH_ADVANCE_DELIVERY_METHOD_TRANSFER')->nullable();
             $table->decimal('CASH_ADVANCE_TRANSFER_AMOUNT', 16, 2)->nullable();
             $table->dateTime('CASH_ADVANCE_TRANSFER_DATE')->nullable();
-            $table->string('CASH_ADVANCE_FROM_BANK_ACCOUNT')->nullable();
+            $table->string('CASH_ADVANCE_BANK_ACCOUNT')->nullable();
             $table->smallInteger('CASH_ADVANCE_DELIVERY_METHOD_CASH')->nullable();
             $table->decimal('CASH_ADVANCE_CASH_AMOUNT', 16, 2)->nullable();
             $table->dateTime('CASH_ADVANCE_RECEIVE_DATE')->nullable();

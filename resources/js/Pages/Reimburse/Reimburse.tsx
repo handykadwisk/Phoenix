@@ -25,10 +25,12 @@ import Select from "react-tailwindcss-select";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
 import BadgeFlat from "@/Components/BadgeFlat";
+import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import InputSearch from "@/Components/InputSearch";
+import ModalToDocument from "@/Components/Modal/ModalToDocument";
 
 export default function Reimburse({ auth }: PageProps) {
     useEffect(() => {
-        getReimburseNumber();
         getReimburseRequestStatus();
         getReimburseApprove1Status();
         getReimburseApprove2Status();
@@ -54,7 +56,7 @@ export default function Reimburse({ auth }: PageProps) {
     };
 
     // Modal Add Start
-    const [modal, setModal] = useState({
+    const [modal, setModal] = useState<any>({
         add: false,
         delete: false,
         edit: false,
@@ -94,7 +96,7 @@ export default function Reimburse({ auth }: PageProps) {
         });
     };
 
-    const { data, setData, errors, reset } = useForm({
+    const { data, setData, errors, reset } = useForm<any>({
         reimburse_id: "",
         reimburse_used_by: "",
         reimburse_requested_by: "",
@@ -105,6 +107,7 @@ export default function Reimburse({ auth }: PageProps) {
         reimburse_request_note: "",
         reimburse_method: "",
         reimburse_settlement_date: "",
+        reimburse_total_amount: "",
         proof_of_document: [],
         ReimburseDetail: [
             {
@@ -125,104 +128,119 @@ export default function Reimburse({ auth }: PageProps) {
 
     // Handle Success Start
     const [isSuccess, setIsSuccess] = useState<string>("");
-
+    // console.log(">>>>>>>>", data);
     const handleSuccess = (message: string) => {
         setIsSuccess("");
-        reset();
-        setData({
-            reimburse_id: "",
-            reimburse_used_by: "",
-            reimburse_requested_by: "",
-            reimburse_division: "",
-            reimburse_cost_center: "",
-            reimburse_branch: "",
-            reimburse_first_approval_by: "",
-            reimburse_request_note: "",
-            reimburse_method: "",
-            reimburse_settlement_date: "",
-            proof_of_document: [],
-            ReimburseDetail: [
-                {
-                    reimburse_detail_date: "",
-                    reimburse_detail_purpose: "",
-                    reimburse_detail_location: "",
-                    reimburse_detail_address: "",
-                    reimburse_detail_type: "",
-                    reimburse_detail_relation_name: "",
-                    reimburse_detail_relation_position: "",
-                    reimburse_detail_relation_organization_id: "",
-                    reimburse_detail_amount: "",
-                    reimburse_detail_note: "",
-                    reimburse_detail_document: [],
-                },
-            ],
-        });
 
-        setIsSuccess(message);
-        getReimburse();
-        getReimburseNumber();
-        getReimburseRequestStatus();
-        getReimburseApprove1Status();
-        getReimburseApprove2Status();
-        getReimburseApprove3Status();
-        getReimburseNeedRevisionStatus();
-        getReimburseRejectStatus();
-        getReimburseApproval();
-        getReimburseNotes();
-        getReimburseMethod();
+        reset();
+        if (message != "") {
+            setIsSuccess(message[0]);
+            setData({
+                reimburse_id: "",
+                reimburse_used_by: "",
+                reimburse_requested_by: "",
+                reimburse_division: "",
+                reimburse_cost_center: "",
+                reimburse_branch: "",
+                reimburse_first_approval_by: "",
+                reimburse_request_note: "",
+                reimburse_method: "",
+                reimburse_settlement_date: "",
+                reimburse_total_amount: "",
+                proof_of_document: [],
+                ReimburseDetail: [
+                    {
+                        reimburse_detail_date: "",
+                        reimburse_detail_purpose: "",
+                        reimburse_detail_location: "",
+                        reimburse_detail_address: "",
+                        reimburse_detail_type: "",
+                        reimburse_detail_relation_name: "",
+                        reimburse_detail_relation_position: "",
+                        reimburse_detail_relation_organization_id: "",
+                        reimburse_detail_amount: "",
+                        reimburse_detail_note: "",
+                        reimburse_detail_document: [],
+                    },
+                ],
+            });
+
+            // setIsSuccess(message);
+            getReimburse();
+            getReimburseRequestStatus();
+            getReimburseApprove1Status();
+            getReimburseApprove2Status();
+            getReimburseApprove3Status();
+            getReimburseNeedRevisionStatus();
+            getReimburseRejectStatus();
+            getReimburseApproval();
+            getReimburseNotes();
+            getReimburseMethod();
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
     // Handle Success End
 
     const [dataById, setDataById] = useState<any>({
-        REIMBURSE_REQUEST_NOTE: "",
+        // REIMBURSE_REQUEST_NOTE: "",
         reimburse_detail: [
             {
                 REIMBURSE_DETAIL_ID: "",
+                REIMBURSE_DETAIL_DATE: "",
                 REIMBURSE_DETAIL_PURPOSE: "",
                 REIMBURSE_DETAIL_LOCATION: "",
+                REIMBURSE_DETAIL_ADDRESS: "",
+                REIMBURSE_DETAIL_TYPE: "",
+                REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID: "",
+                REIMBURSE_DETAIL_RELATION_NAME: "",
+                REIMBURSE_DETAIL_RELATION_POSITION: "",
                 REIMBURSE_DETAIL_AMOUNT: "",
-                REIMBURSE_DETAIL_NOTE: "",
-                REIMBURSE_DETAIL_DOCUMENT_ID: "",
+                REIMBURSE_DETAIL_APPROVAL: "",
+                REIMBURSE_DETAIL_COST_CLASSIFICATION: "",
+                REIMBURSE_DETAIL_AMOUNT_APPROVE: "",
+                REIMBURSE_DETAIL_REMARKS: "",
             },
         ],
     });
 
     // Handle Add Row Start
-    const [DataRow, setDataRow] = useState([
-        {
-            reimburse_detail_date: "",
-            reimburse_detail_purpose: "",
-            reimburse_detail_location: "",
-            reimburse_detail_address: "",
-            reimburse_detail_type: "",
-            reimburse_detail_relation_name: "",
-            reimburse_detail_relation_position: "",
-            reimburse_detail_relation_organization_id: "",
-            reimburse_detail_amount: "",
-            reimburse_detail_note: "",
-            reimburse_detail_document: [],
-        },
-    ]);
+    // const [DataRow, setDataRow] = useState<any>([
+    //     {
+    //         reimburse_detail_date: "",
+    //         reimburse_detail_purpose: "",
+    //         reimburse_detail_location: "",
+    //         reimburse_detail_address: "",
+    //         reimburse_detail_type: "",
+    //         reimburse_detail_relation_name: "",
+    //         reimburse_detail_relation_position: "",
+    //         reimburse_detail_relation_organization_id: "",
+    //         reimburse_detail_amount: "",
+    //         reimburse_detail_note: "",
+    //         reimburse_detail_document: [],
+    //     },
+    // ]);
 
     const handleAddRow = (e: FormEvent) => {
         e.preventDefault();
 
-        setDataRow([
-            ...DataRow,
-            {
-                reimburse_detail_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_location: "",
-                reimburse_detail_address: "",
-                reimburse_detail_type: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_note: "",
-                reimburse_detail_document: [],
-            },
-        ]);
+        // setDataRow([
+        //     ...DataRow,
+        //     {
+        //         reimburse_detail_date: "",
+        //         reimburse_detail_purpose: "",
+        //         reimburse_detail_location: "",
+        //         reimburse_detail_address: "",
+        //         reimburse_detail_type: "",
+        //         reimburse_detail_relation_name: "",
+        //         reimburse_detail_relation_position: "",
+        //         reimburse_detail_relation_organization_id: "",
+        //         reimburse_detail_amount: "",
+        //         reimburse_detail_note: "",
+        //         reimburse_detail_document: [],
+        //     },
+        // ]);
 
         setData("ReimburseDetail", [
             ...data.ReimburseDetail,
@@ -249,7 +267,7 @@ export default function Reimburse({ auth }: PageProps) {
 
         deleteRow.splice(i, 1);
 
-        setDataRow(deleteRow);
+        // setDataRow(deleteRow);
 
         setData("ReimburseDetail", deleteRow);
     };
@@ -263,7 +281,7 @@ export default function Reimburse({ auth }: PageProps) {
 
         onchangeVal[i][name] = value;
 
-        setDataRow(onchangeVal);
+        // setDataRow(onchangeVal);
 
         setData("ReimburseDetail", onchangeVal);
     };
@@ -275,7 +293,7 @@ export default function Reimburse({ auth }: PageProps) {
 
         onchangeVal[i][name] = date.toLocaleDateString("en-CA");
 
-        setDataRow(onchangeVal);
+        // setDataRow(onchangeVal);
 
         setData("ReimburseDetail", onchangeVal);
     };
@@ -287,7 +305,7 @@ export default function Reimburse({ auth }: PageProps) {
 
         onchangeVal[i][name] = value;
 
-        setDataRow(onchangeVal);
+        // setDataRow(onchangeVal);
 
         setData("ReimburseDetail", onchangeVal);
     };
@@ -595,102 +613,7 @@ export default function Reimburse({ auth }: PageProps) {
     };
     // Handle Remove Row Proof of Document Row End
 
-    // Handle Add Row Report Reimburse Start
-    const [DataReportRow, setDataReportRow] = useState([
-        {
-            reimburse_detail_date: "",
-            reimburse_detail_purpose: "",
-            reimburse_detail_location: "",
-            reimburse_detail_address: "",
-            reimburse_detail_type: "",
-            reimburse_detail_relation_name: "",
-            reimburse_detail_relation_position: "",
-            reimburse_detail_relation_organization_id: "",
-            reimburse_detail_amount: "",
-            reimburse_detail_note: "",
-            reimburse_detail_document: [],
-        },
-    ]);
-
-    const handleAddReportRow = (e: FormEvent) => {
-        e.preventDefault();
-
-        setDataReportRow([
-            ...DataReportRow,
-            {
-                reimburse_detail_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_location: "",
-                reimburse_detail_address: "",
-                reimburse_detail_type: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_note: "",
-                reimburse_detail_document: [],
-            },
-        ]);
-
-        setData("ReimburseDetail", [
-            ...data.ReimburseDetail,
-            {
-                reimburse_detail_date: "",
-                reimburse_detail_purpose: "",
-                reimburse_detail_location: "",
-                reimburse_detail_address: "",
-                reimburse_detail_type: "",
-                reimburse_detail_relation_name: "",
-                reimburse_detail_relation_position: "",
-                reimburse_detail_relation_organization_id: "",
-                reimburse_detail_amount: "",
-                reimburse_detail_note: "",
-                reimburse_detail_document: [],
-            },
-        ]);
-    };
-    // Handle Add Row Report Reimburse End
-
-    // Handle Change Add Report Reimburse Start
-    const handleChangeAddReport = (e: any, i: number) => {
-        const { name, value } = e.target;
-
-        const onchangeVal: any = [...data.ReimburseDetail];
-
-        onchangeVal[i][name] = value;
-
-        setDataReportRow(onchangeVal);
-
-        setData("ReimburseDetail", onchangeVal);
-    };
-    // Handle Change Add Report Reimburse End
-
-    // Handle Remove Row Report Reimburse Start
-    const handleRemoveReportRow = (i: number) => {
-        const deleteRow = [...data.ReimburseDetail];
-
-        deleteRow.splice(i, 1);
-
-        setDataReportRow(deleteRow);
-
-        setData("ReimburseDetail", deleteRow);
-    };
-    // Handle Remove Row Report Reimburse End
-
     const [reimburse, setReimburse] = useState<any>([]);
-    const [CANumber, setReimburseNumber] = useState<any>([]);
-
-    const getReimburseNumber = async () => {
-        await axios
-            .get(`/getReimburseNumber`)
-            .then(function (response) {
-                setReimburseNumber(response.data);
-                console.log("xxx", response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    };
 
     // Search Start
     const [searchReimburse, setSearchReimburse] = useState<any>({
@@ -751,7 +674,7 @@ export default function Reimburse({ auth }: PageProps) {
     // Clear Search End
 
     // Data Start
-    const { purposes, relations, coa, persons, office, division }: any =
+    const { purposes, relations, coa, employees, office, division }: any =
         usePage().props;
     // Data End
 
@@ -797,7 +720,7 @@ export default function Reimburse({ auth }: PageProps) {
 
         setData(
             "reimburse_division",
-            auth.user.person.division?.RELATION_DIVISION_ID
+            auth.user.employee.division?.COMPANY_DIVISION_ID
         );
 
         setModal({
@@ -870,7 +793,7 @@ export default function Reimburse({ auth }: PageProps) {
     // Handle Revised End
 
     // Handle Execute Start
-    const handleExecuteModal = async (e: FormEvent, id: number) => {
+    const handleExecuteModal = async (e: FormEvent, id: any) => {
         e.preventDefault();
 
         await axios
@@ -932,45 +855,31 @@ export default function Reimburse({ auth }: PageProps) {
         });
 
         if (
-            auth.user.person.division?.RELATION_DIVISION_ALIAS ===
-                "FINANCE ACCOUNTING" &&
-            auth.user.person.division?.RELATION_DIVISION_INITIAL === "FA"
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "Finance" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FIN"
         ) {
             setDataById({
                 ...dataById,
-                REIMBURSE_SECOND_APPROVAL_BY: auth.user.person.PERSON_ID,
+                REIMBURSE_SECOND_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
                 REIMBURSE_SECOND_APPROVAL_USER:
-                    auth.user.person.PERSON_FIRST_NAME,
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
                 REIMBURSE_SECOND_APPROVAL_STATUS: status,
             });
         }
 
         if (
-            auth.user.person.division?.RELATION_DIVISION_ALIAS === "DIREKSI" &&
-            auth.user.person.division?.RELATION_DIVISION_INITIAL === "DIREKSI"
+            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
+                "Directors" &&
+            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIR"
         ) {
             setDataById({
                 ...dataById,
-                REIMBURSE_THIRD_APPROVAL_BY: auth.user.person.PERSON_ID,
+                REIMBURSE_THIRD_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
                 REIMBURSE_THIRD_APPROVAL_USER:
-                    auth.user.person.PERSON_FIRST_NAME,
+                    auth.user.employee.EMPLOYEE_FIRST_NAME,
                 REIMBURSE_THIRD_APPROVAL_STATUS: status,
             });
         }
-
-        await axios
-            .patch(`/reimburseApprove`, dataById, {
-                headers: {
-                    "Content-type": "multipart/form-data",
-                },
-            })
-            .then((res) => {
-                console.log(res);
-                close();
-            })
-            .catch((err) => {
-                console.log(err);
-            });
     };
 
     const handleFileDownload = async (
@@ -1128,16 +1037,40 @@ export default function Reimburse({ auth }: PageProps) {
     });
     // End Function Format Currency
 
-    let total = 0;
+    const [totalAmount, setTotalAmount] = useState(0);
 
-    DataRow.forEach((item) => {
-        total += Number(item.reimburse_detail_amount);
-    });
+    useEffect(() => {
+        let newTotalAmount = 0;
+
+        data.ReimburseDetail.forEach((item: any) => {
+            const amount = Number(item.reimburse_detail_amount);
+
+            if (!isNaN(amount)) {
+                newTotalAmount += amount;
+            }
+        });
+
+        if (newTotalAmount !== 0) {
+            setTotalAmount(newTotalAmount);
+        } else {
+            setTotalAmount(0);
+        }
+    }, [data]);
+
+    useEffect(() => {
+        if (totalAmount !== 0) {
+            setData("reimburse_total_amount", totalAmount);
+        }
+    }, [totalAmount]);
 
     let revised_total_amount = 0;
 
     dataById.reimburse_detail.forEach((item: any) => {
         revised_total_amount += Number(item.REIMBURSE_DETAIL_AMOUNT);
+
+        if (isNaN(revised_total_amount)) {
+            revised_total_amount = 0;
+        }
     });
 
     let reimburse_total_amount_approve = 0;
@@ -1163,54 +1096,46 @@ export default function Reimburse({ auth }: PageProps) {
     }, [reimburse_total_amount_approve, dataById.REIMBURSE_TOTAL_AMOUNT]);
 
     const selectDivision = division
-        ?.filter(
-            (m: any) =>
-                m.RELATION_ORGANIZATION_ID ===
-                auth.user.person.RELATION_ORGANIZATION_ID
-        )
+        ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
         .map((query: any) => {
             return {
-                value: query.RELATION_DIVISION_ID,
-                label: query.RELATION_DIVISION_ALIAS,
+                value: query.COMPANY_DIVISION_ID,
+                label: query.COMPANY_DIVISION_ALIAS,
             };
         });
 
-    const selectPerson = persons
+    const selectEmployee = employees
         ?.filter(
             (m: any) =>
                 m.DIVISION_ID === data.reimburse_cost_center.value &&
-                m.STRUCTURE_ID === 4
+                m.STRUCTURE_ID === 5
         )
         .map((query: any) => {
             return {
-                value: query.PERSON_ID,
-                label: query.PERSON_FIRST_NAME,
+                value: query.EMPLOYEE_ID,
+                label: query.EMPLOYEE_FIRST_NAME,
             };
         });
 
-    const selectApproval = persons
-        ?.filter(
-            (m: any) =>
-                m.DIVISION_ID === auth.user.person?.DIVISION_ID &&
-                (m.STRUCTURE_ID === 2 || m.STRUCTURE_ID === 3)
-        )
+    const selectBranch = office
+        ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
         .map((query: any) => {
             return {
-                value: query.PERSON_ID,
-                label: query.PERSON_FIRST_NAME,
+                value: query.COMPANY_OFFICE_ID,
+                label: query.COMPANY_OFFICE_ALIAS,
             };
         });
 
-    const selectOffice = office
+    const selectApproval = employees
         ?.filter(
             (m: any) =>
-                m.RELATION_ORGANIZATION_ID ===
-                auth.user.person?.RELATION_ORGANIZATION_ID
+                m.DIVISION_ID === data.reimburse_cost_center.value &&
+                (m.STRUCTURE_ID === 3 || m.STRUCTURE_ID === 4)
         )
         .map((query: any) => {
             return {
-                value: query.RELATION_OFFICE_ID,
-                label: query.RELATION_OFFICE_ALIAS,
+                value: query.EMPLOYEE_ID,
+                label: query.EMPLOYEE_FIRST_NAME,
             };
         });
 
@@ -1237,10 +1162,12 @@ export default function Reimburse({ auth }: PageProps) {
         };
     });
 
-    console.log(data);
+    console.log("Data Reimburse", data);
     // console.log(DataRow);
     // console.log("Reimburse", reimburse.data);
     console.log("Data By Id", dataById);
+    // console.log("Auth", auth.user);
+    // console.log(searchReimburse);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Reimburse"}>
@@ -1250,7 +1177,7 @@ export default function Reimburse({ auth }: PageProps) {
                 <ToastMessage
                     message={isSuccess}
                     isShow={true}
-                    isSuccess={true}
+                    type={"success"}
                 />
             )}
 
@@ -1279,8 +1206,8 @@ export default function Reimburse({ auth }: PageProps) {
                 buttonAddOns={null}
                 body={
                     <>
-                        <ModalToAction
-                            classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]`}
+                        <ModalToDocument
+                            classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[100%] md:min-w-[70%] lg:min-w-[35%]`}
                             show={modalFiles.add_files}
                             closeable={true}
                             onClose={() => handleOnCloseModalFiles()}
@@ -1301,7 +1228,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                 <>
                                                     <div
                                                         key={i}
-                                                        className={`w-full col-span-11 mb-5`}
+                                                        className={`w-full col-span-11 mt-3`}
                                                     >
                                                         <InputLabel
                                                             htmlFor="files"
@@ -1325,7 +1252,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                         )}
                                                     </div>
                                                     <button
-                                                        className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
+                                                        className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-12 py-1 rounded-lg"
                                                         onClick={(e) =>
                                                             handleRemoveFilesRow(
                                                                 e,
@@ -1341,7 +1268,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     </div>
                                     <button
                                         type="button"
-                                        className="text-sm cursor-pointer hover:underline"
+                                        className="text-sm cursor-pointer hover:underline mt-5"
                                         onClick={(e) => handleAddRowFiles(e)}
                                     >
                                         + Add Row
@@ -1360,7 +1287,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -1376,8 +1305,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="reimburse_division"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -1427,7 +1356,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectPerson}
+                                    options={selectEmployee}
                                     isSearchable={true}
                                     placeholder={"Choose Used By"}
                                     value={data.reimburse_used_by}
@@ -1454,7 +1383,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectOffice}
+                                    options={selectBranch}
                                     isSearchable={true}
                                     placeholder={"Choose Branch"}
                                     value={data.reimburse_branch}
@@ -1528,7 +1457,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             className="border px-2"
                                             rowSpan="2"
                                         />
-                                        {DataRow.length > 1 && (
+                                        {data.ReimburseDetail.length > 1 && (
                                             <TH
                                                 label="Action"
                                                 className="border"
@@ -1579,237 +1508,269 @@ export default function Reimburse({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {DataRow.map((val, i) => (
-                                        <tr className="text-center" key={i}>
-                                            <TD className="border">{i + 1}.</TD>
-                                            <TD className="border">
-                                                <DatePicker
-                                                    name="reimburse_detail_date"
-                                                    selected={
-                                                        val.reimburse_detail_date
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        handleChangeAddDate(
-                                                            date,
-                                                            "reimburse_detail_date",
-                                                            i
-                                                        )
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_purpose"
-                                                    type="text"
-                                                    name="reimburse_detail_purpose"
-                                                    value={
-                                                        val.reimburse_detail_purpose
-                                                    }
-                                                    className="w-1/2"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_location"
-                                                    type="text"
-                                                    name="reimburse_detail_location"
-                                                    value={
-                                                        val.reimburse_detail_location
-                                                    }
-                                                    className="w-1/2"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_address"
-                                                    type="text"
-                                                    name="reimburse_detail_address"
-                                                    value={
-                                                        val.reimburse_detail_address
-                                                    }
-                                                    className="w-1/2"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <select
-                                                    id="reimburse_detail_type"
-                                                    name="reimburse_detail_type"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    required
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Type --
-                                                    </option>
-                                                    {purposes.map(
-                                                        (purpose: any) => (
-                                                            <option
-                                                                key={
-                                                                    purpose.CASH_ADVANCE_PURPOSE_ID
-                                                                }
-                                                                value={
-                                                                    purpose.CASH_ADVANCE_PURPOSE_ID
-                                                                }
-                                                            >
-                                                                {
-                                                                    purpose.CASH_ADVANCE_PURPOSE
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </select>
-                                            </TD>
-                                            <TD className="border">
-                                                <Select
-                                                    classNames={{
-                                                        menuButton: () =>
-                                                            `flex w-full text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                        menu: "absolute w-full text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                        listItem: ({
-                                                            isSelected,
-                                                        }: any) =>
-                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                                isSelected
-                                                                    ? `text-white bg-red-600`
-                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                                            }`,
-                                                    }}
-                                                    options={selectRelation}
-                                                    isSearchable={true}
-                                                    placeholder={
-                                                        "Choose Business Relation"
-                                                    }
-                                                    value={
-                                                        val.reimburse_detail_relation_organization_id
-                                                    }
-                                                    onChange={(val: any) =>
-                                                        handleChangeAddCustom(
-                                                            val,
-                                                            "reimburse_detail_relation_organization_id",
-                                                            i
-                                                        )
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_relation_name"
-                                                    type="text"
-                                                    name="reimburse_detail_relation_name"
-                                                    value={
-                                                        val.reimburse_detail_relation_name
-                                                    }
-                                                    className="w-1/2"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    autoComplete="off"
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="reimburse_detail_relation_position"
-                                                    type="text"
-                                                    name="reimburse_detail_relation_position"
-                                                    value={
-                                                        val.reimburse_detail_relation_position
-                                                    }
-                                                    className="w-1/2"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    autoComplete="off"
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <CurrencyInput
-                                                    id="reimburse_detail_amount"
-                                                    name="reimburse_detail_amount"
-                                                    value={
-                                                        val.reimburse_detail_amount
-                                                    }
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    onValueChange={(val: any) =>
-                                                        handleChangeAddCustom(
-                                                            val,
-                                                            "reimburse_detail_amount",
-                                                            i
-                                                        )
-                                                    }
-                                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
-                                                    placeholder="0.00"
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <button
-                                                    type="button"
-                                                    className="w-full bg-black hover:bg-slate-800 text-sm py-2 px-3 text-white"
-                                                    onClick={() => {
-                                                        setModalFiles({
-                                                            add_files: true,
-                                                            add_files_execute:
-                                                                false,
-                                                            show_files: false,
-                                                            show_files_revised:
-                                                                false,
-                                                            show_files_proof_of_document:
-                                                                false,
-                                                            index: i,
-                                                            index_show: "",
-                                                            index_show_revised:
-                                                                "",
-                                                        });
-                                                    }}
-                                                >
-                                                    {val
-                                                        .reimburse_detail_document
-                                                        ?.length > 0
-                                                        ? val
-                                                              ?.reimburse_detail_document
-                                                              .length + " Files"
-                                                        : "Add Files"}
-                                                </button>
-                                            </TD>
-                                            {DataRow.length > 1 && (
+                                    {data.ReimburseDetail?.map(
+                                        (val: any, i: number) => (
+                                            <tr className="text-center" key={i}>
                                                 <TD className="border">
-                                                    <Button
-                                                        className="my-1.5 px-3 py-1"
-                                                        onClick={() =>
-                                                            handleRemoveRow(i)
-                                                        }
-                                                        type="button"
-                                                    >
-                                                        X
-                                                    </Button>
+                                                    {i + 1}.
                                                 </TD>
-                                            )}
-                                        </tr>
-                                    ))}
+                                                <TD className="border">
+                                                    <DatePicker
+                                                        name="reimburse_detail_date"
+                                                        selected={
+                                                            val.reimburse_detail_date
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            handleChangeAddDate(
+                                                                date,
+                                                                "reimburse_detail_date",
+                                                                i
+                                                            )
+                                                        }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="reimburse_detail_purpose"
+                                                        type="text"
+                                                        name="reimburse_detail_purpose"
+                                                        value={
+                                                            val.reimburse_detail_purpose
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="reimburse_detail_location"
+                                                        type="text"
+                                                        name="reimburse_detail_location"
+                                                        value={
+                                                            val.reimburse_detail_location
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="reimburse_detail_address"
+                                                        type="text"
+                                                        name="reimburse_detail_address"
+                                                        value={
+                                                            val.reimburse_detail_address
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <select
+                                                        id="reimburse_detail_type"
+                                                        name="reimburse_detail_type"
+                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                        required
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    >
+                                                        <option value="">
+                                                            -- Choose Type --
+                                                        </option>
+                                                        {purposes.map(
+                                                            (purpose: any) => (
+                                                                <option
+                                                                    key={
+                                                                        purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                    }
+                                                                    value={
+                                                                        purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        purpose.CASH_ADVANCE_PURPOSE
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </select>
+                                                </TD>
+                                                <TD className="border">
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex w-full text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute w-full text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectRelation}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose Business Relation"
+                                                        }
+                                                        value={
+                                                            val.reimburse_detail_relation_organization_id
+                                                        }
+                                                        onChange={(val: any) =>
+                                                            handleChangeAddCustom(
+                                                                val,
+                                                                "reimburse_detail_relation_organization_id",
+                                                                i
+                                                            )
+                                                        }
+                                                        primaryColor="bg-red-500"
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="reimburse_detail_relation_name"
+                                                        type="text"
+                                                        name="reimburse_detail_relation_name"
+                                                        value={
+                                                            val.reimburse_detail_relation_name
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="reimburse_detail_relation_position"
+                                                        type="text"
+                                                        name="reimburse_detail_relation_position"
+                                                        value={
+                                                            val.reimburse_detail_relation_position
+                                                        }
+                                                        className="w-1/2"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        autoComplete="off"
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <CurrencyInput
+                                                        id="reimburse_detail_amount"
+                                                        name="reimburse_detail_amount"
+                                                        value={
+                                                            val.reimburse_detail_amount
+                                                        }
+                                                        decimalScale={2}
+                                                        decimalsLimit={2}
+                                                        onValueChange={(
+                                                            val: any
+                                                        ) =>
+                                                            handleChangeAddCustom(
+                                                                val,
+                                                                "reimburse_detail_amount",
+                                                                i
+                                                            )
+                                                        }
+                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
+                                                        placeholder="0.00"
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <button
+                                                        type="button"
+                                                        className="w-full bg-black hover:bg-slate-800 text-sm py-2 px-3 text-white"
+                                                        onClick={() => {
+                                                            setModalFiles({
+                                                                add_files: true,
+                                                                add_files_execute:
+                                                                    false,
+                                                                show_files:
+                                                                    false,
+                                                                show_files_revised:
+                                                                    false,
+                                                                show_files_proof_of_document:
+                                                                    false,
+                                                                index: i,
+                                                                index_show: "",
+                                                                index_show_revised:
+                                                                    "",
+                                                            });
+                                                        }}
+                                                    >
+                                                        {val
+                                                            .reimburse_detail_document
+                                                            ?.length > 0
+                                                            ? val
+                                                                  ?.reimburse_detail_document
+                                                                  .length +
+                                                              " Files"
+                                                            : "Add Files"}
+                                                    </button>
+                                                </TD>
+                                                {data.ReimburseDetail.length >
+                                                    1 && (
+                                                    <TD className="border">
+                                                        <Button
+                                                            className="my-1.5 px-3 py-1"
+                                                            onClick={() =>
+                                                                handleRemoveRow(
+                                                                    i
+                                                                )
+                                                            }
+                                                            type="button"
+                                                        >
+                                                            X
+                                                        </Button>
+                                                    </TD>
+                                                )}
+                                            </tr>
+                                        )
+                                    )}
                                 </tbody>
                                 <tfoot>
                                     <tr className="text-center text-sm">
@@ -1829,7 +1790,9 @@ export default function Reimburse({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD>{formatCurrency.format(total)}</TD>
+                                        <TD>
+                                            {formatCurrency.format(totalAmount)}
+                                        </TD>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -1889,9 +1852,9 @@ export default function Reimburse({ auth }: PageProps) {
                 submitButtonName=""
                 body={
                     <>
-                        <ModalToAction
+                        <ModalToDocument
                             classPanel={
-                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[100%] md:min-w-[70%] lg:min-w-[35%]"
                             }
                             show={modalFiles.show_files}
                             closeable={true}
@@ -1966,9 +1929,9 @@ export default function Reimburse({ auth }: PageProps) {
                                 </>
                             }
                         />
-                        <ModalToAction
+                        <ModalToDocument
                             classPanel={
-                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[100%] md:min-w-[70%] lg:min-w-[35%]"
                             }
                             show={modalFiles.show_files_proof_of_document}
                             closeable={true}
@@ -2081,7 +2044,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -2097,8 +2062,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2116,7 +2081,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2133,8 +2098,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2151,7 +2116,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2168,8 +2133,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2403,7 +2368,8 @@ export default function Reimburse({ auth }: PageProps) {
                                             });
                                         }}
                                     >
-                                        Show Files
+                                        {dataById.m_reimburse_proof_of_document
+                                            ?.length + " Files"}
                                     </button>
                                 ) : (
                                     "-"
@@ -2459,9 +2425,9 @@ export default function Reimburse({ auth }: PageProps) {
                 submitButtonName={""}
                 body={
                     <>
-                        <ModalToAction
+                        <ModalToDocument
                             classPanel={
-                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[100%] md:min-w-[70%] lg:min-w-[35%]"
                             }
                             show={modalFiles.show_files}
                             closeable={true}
@@ -2579,7 +2545,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -2595,8 +2563,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2614,7 +2582,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2631,8 +2599,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2649,7 +2617,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2666,8 +2634,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2769,7 +2737,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             className="border px-3 py-2"
                                         />
                                     </tr>
-                                </thead>{" "}
+                                </thead>
                                 <tbody>
                                     {dataById.reimburse_detail.map(
                                         (rd: any, i: number) => (
@@ -2876,8 +2844,10 @@ export default function Reimburse({ auth }: PageProps) {
                                                             )
                                                         }
                                                         value={
-                                                            rd.REIMBURSE_DETAIL_APPROVAL
+                                                            rd.REIMBURSE_DETAIL_APPROVAL ||
+                                                            ""
                                                         }
+                                                        aria-label="Choose Reimburse Detail Approval"
                                                         required
                                                     >
                                                         <option value="">
@@ -2923,7 +2893,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                             "Choose COA"
                                                         }
                                                         value={
-                                                            rd.REIMBURSE_DETAIL_COST_CLASSIFICATION
+                                                            rd.REIMBURSE_DETAIL_COST_CLASSIFICATION ||
+                                                            ""
                                                         }
                                                         onChange={(val: any) =>
                                                             handleChangeApproveReportCustom(
@@ -2959,15 +2930,23 @@ export default function Reimburse({ auth }: PageProps) {
                                                             rd.REIMBURSE_DETAIL_APPROVAL ===
                                                                 "3" ||
                                                             rd.REIMBURSE_DETAIL_APPROVAL ===
-                                                                "1"
+                                                                3 ||
+                                                            rd.REIMBURSE_DETAIL_APPROVAL ===
+                                                                "1" ||
+                                                            rd.REIMBURSE_DETAIL_APPROVAL ===
+                                                                1
                                                                 ? "bg-gray-100"
                                                                 : ""
                                                         }`}
                                                         disabled={
                                                             rd.REIMBURSE_DETAIL_APPROVAL ===
                                                                 "3" ||
+                                                            rd.REIMBURSE_DETAIL_APPROVAL ===
+                                                                3 ||
+                                                            rd.REIMBURSE_DETAIL_APPROVAL ===
+                                                                "1" ||
                                                             (rd.REIMBURSE_DETAIL_APPROVAL ===
-                                                                "1" &&
+                                                                1 &&
                                                                 true)
                                                         }
                                                         required
@@ -2982,7 +2961,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                             type="text"
                                                             name="REIMBURSE_DETAIL_REMARKS"
                                                             value={
-                                                                rd.REIMBURSE_DETAIL_REMARKS
+                                                                rd.REIMBURSE_DETAIL_REMARKS ||
+                                                                ""
                                                             }
                                                             className=""
                                                             autoComplete="off"
@@ -3064,7 +3044,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             REIMBURSE_TYPE: e.target.value,
                                         })
                                     }
-                                    value={dataById?.REIMBURSE_TYPE}
+                                    value={dataById?.REIMBURSE_TYPE || ""}
                                 >
                                     <option value="">
                                         -- Choose Information --
@@ -3153,9 +3133,9 @@ export default function Reimburse({ auth }: PageProps) {
                 submitButtonName={"Save"}
                 body={
                     <>
-                        <ModalToAction
+                        <ModalToDocument
                             classPanel={
-                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                                "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[100%] md:min-w-[70%] lg:min-w-[35%]"
                             }
                             show={modalFiles.show_files_revised}
                             closeable={true}
@@ -3181,8 +3161,8 @@ export default function Reimburse({ auth }: PageProps) {
                                                     (file: any, i: number) => (
                                                         <>
                                                             <div
-                                                                className={`w-full col-span-11 mb-4`}
                                                                 key={i}
+                                                                className={`w-full col-span-11 mb-4`}
                                                             >
                                                                 <InputLabel
                                                                     htmlFor="files"
@@ -3237,6 +3217,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                                 .REIMBURSE_DETAIL_DOCUMENT
                                                                 ?.name ? (
                                                                 <div
+                                                                    key={i}
                                                                     className={`w-full col-span-11 mb-4`}
                                                                 >
                                                                     <InputLabel
@@ -3277,7 +3258,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                                 </div>
                                                             )}
                                                             <button
-                                                                className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-7 py-1 rounded-lg"
+                                                                className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-4 py-1 rounded-lg"
                                                                 onClick={(e) =>
                                                                     handleRemoveRowRevisedFiles(
                                                                         e,
@@ -3354,7 +3335,9 @@ export default function Reimburse({ auth }: PageProps) {
                                     id="namaPengguna"
                                     type="text"
                                     name="namaPengguna"
-                                    value={auth.user.person.PERSON_FIRST_NAME}
+                                    value={
+                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                    }
                                     className="bg-gray-100"
                                     readOnly
                                 />
@@ -3370,8 +3353,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.person.division
-                                            ?.RELATION_DIVISION_ALIAS
+                                        auth.user.employee.division
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3389,7 +3372,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     name="cost_center"
                                     value={
                                         dataById.cost_center
-                                            ?.RELATION_DIVISION_ALIAS
+                                            ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3406,8 +3389,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemohon"
                                     value={
-                                        dataById.person_used_by
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_used_by
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3424,7 +3407,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="branch"
                                     value={
-                                        dataById.office?.RELATION_OFFICE_ALIAS
+                                        dataById.office?.COMPANY_OFFICE_ALIAS
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3441,8 +3424,8 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPemberiApproval"
                                     value={
-                                        dataById.person_approval
-                                            ?.PERSON_FIRST_NAME
+                                        dataById.employee_approval
+                                            ?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -4034,9 +4017,9 @@ export default function Reimburse({ auth }: PageProps) {
                                             : "Add Files"}
                                     </button>
                                 </div>
-                                <ModalToAction
+                                <ModalToDocument
                                     classPanel={
-                                        "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 sm:min-w-full lg:min-w-[35%]"
+                                        "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[100%] md:min-w-[70%] lg:min-w-[35%]"
                                     }
                                     show={modalFiles.add_files_execute}
                                     closeable={true}
@@ -4120,62 +4103,87 @@ export default function Reimburse({ auth }: PageProps) {
             {/* Modal Execute End */}
 
             {/* Content Start */}
-            <div className="p-6 text-gray-900 mb-60">
+            <div className="p-6 text-gray-900">
                 <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
                     <div className="flex flex-col">
-                        <div className="rounded-tr-md rounded-br-md rounded-bl-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
+                        <div className="rounded-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
                             <Button
-                                className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                                className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                                 onClick={(e) => handleAddModal(e)}
                             >
                                 {"Add Reimburse"}
                             </Button>
                         </div>
                         <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5">
-                            <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
+                            <fieldset className="py-3 rounded-lg border-slate-100 border-2">
                                 <legend className="ml-8 text-sm">Search</legend>
                                 <div className="mt-3 px-4">
+                                    <InputSearch
+                                        id="reimburse_requested_by"
+                                        name="reimburse_requested_by"
+                                        type="text"
+                                        value={
+                                            searchReimburse.reimburse_requested_by
+                                        }
+                                        placeholder="Applicant"
+                                        autoComplete="off"
+                                        onChange={(e: any) =>
+                                            setSearchReimburse({
+                                                ...searchReimburse,
+                                                reimburse_requested_by:
+                                                    e.target.value,
+                                            })
+                                        }
+                                    />
                                     <div className="mb-5">
-                                        <Input
-                                            id="reimburse_requested_by"
-                                            name="reimburse_requested_by"
-                                            type="text"
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex items-center text-xs sm:text-sm text-gray-400 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({
+                                                    isSelected,
+                                                }: any) =>
+                                                    `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                        isSelected
+                                                            ? `text-white bg-red-600`
+                                                            : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                    }`,
+                                            }}
+                                            options={selectDivision}
+                                            isSearchable={true}
+                                            placeholder={"Applicant Division"}
                                             value={
-                                                searchReimburse.reimburse_requested_by
+                                                searchReimburse.reimburse_division
                                             }
-                                            placeholder="Applicant"
-                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
-                                            autoComplete="off"
-                                            onChange={(e: any) =>
+                                            onChange={(val: any) =>
                                                 setSearchReimburse({
                                                     ...searchReimburse,
-                                                    reimburse_requested_by:
-                                                        e.target.value,
+                                                    reimburse_division: val,
                                                 })
                                             }
+                                            primaryColor={"bg-red-500"}
                                         />
                                     </div>
-                                    <div className="mb-5">
-                                        <Input
-                                            id="reimburse_used_by"
-                                            name="reimburse_used_by"
-                                            type="text"
-                                            value={
-                                                searchReimburse.reimburse_used_by
-                                            }
-                                            placeholder="Used By"
-                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
-                                            autoComplete="off"
-                                            onChange={(e: any) =>
-                                                setSearchReimburse({
-                                                    ...searchReimburse,
-                                                    reimburse_used_by:
-                                                        e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 mb-5">
+                                    <InputSearch
+                                        id="reimburse_used_by"
+                                        name="reimburse_used_by"
+                                        type="text"
+                                        value={
+                                            searchReimburse.reimburse_used_by
+                                        }
+                                        placeholder="Used By"
+                                        autoComplete="off"
+                                        onChange={(e: any) =>
+                                            setSearchReimburse({
+                                                ...searchReimburse,
+                                                reimburse_used_by:
+                                                    e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <div className="grid grid-cols-1 mb-5 relative">
+                                        <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                                         <DatePicker
                                             name="reimburse_start_date"
                                             selected={
@@ -4192,10 +4200,11 @@ export default function Reimburse({ auth }: PageProps) {
                                             }
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd-mm-yyyyy (Start Date)"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
+                                            className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-1 mb-5">
+                                    <div className="grid grid-cols-1 mb-5 relative">
+                                        <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                                         <DatePicker
                                             name="reimburse_end_date"
                                             selected={
@@ -4211,59 +4220,49 @@ export default function Reimburse({ auth }: PageProps) {
                                                 })
                                             }
                                             dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd-mm-yyyyy (End Date)"
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-2 file:-my-1.5 focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
+                                            placeholderText="dd-mm-yyyy (End Date)"
+                                            className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
                                         />
                                     </div>
                                     <div className="mb-5">
-                                        <Input
-                                            id="reimburse_division"
-                                            name="reimburse_division"
-                                            type="text"
-                                            value={
-                                                searchReimburse.reimburse_division
-                                            }
-                                            placeholder="Division"
-                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
-                                            autoComplete="off"
-                                            onChange={(e: any) =>
-                                                setSearchReimburse({
-                                                    ...searchReimburse,
-                                                    reimburse_division:
-                                                        e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        <Input
-                                            id="reimburse_cost_center"
-                                            name="reimburse_cost_center"
-                                            type="text"
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex items-center text-xs sm:text-sm text-gray-400 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({
+                                                    isSelected,
+                                                }: any) =>
+                                                    `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                        isSelected
+                                                            ? `text-white bg-red-600`
+                                                            : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                    }`,
+                                            }}
+                                            options={selectDivision}
+                                            isSearchable={true}
+                                            placeholder={"Cost Center"}
                                             value={
                                                 searchReimburse.reimburse_cost_center
                                             }
-                                            placeholder="Cost Center"
-                                            className="focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm"
-                                            autoComplete="off"
-                                            onChange={(e: any) =>
+                                            onChange={(val: any) =>
                                                 setSearchReimburse({
                                                     ...searchReimburse,
-                                                    reimburse_cost_center:
-                                                        e.target.value,
+                                                    reimburse_cost_center: val,
                                                 })
                                             }
+                                            primaryColor={"bg-red-500"}
                                         />
                                     </div>
                                     <div className="flex flex-col md:flex-row justify-end gap-2">
                                         <Button
-                                            className="mb-4 w-full md:w-[35%] text-white text-sm md:text-base py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                             onClick={() => getReimburse()}
                                         >
                                             Search
                                         </Button>
                                         <Button
-                                            className="mb-4 w-full md:w-[35%] text-white text-sm md:text-base py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                            className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                             onClick={() =>
                                                 clearSearchReimburse()
                                             }
@@ -4528,7 +4527,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                     />
                                                     <TableTD
                                                         value={dateFormat(
-                                                            dataReimburse.REIMBURSE_REQUETED_DATE,
+                                                            dataReimburse.REIMBURSE_REQUESTED_DATE,
                                                             "dd-mm-yyyy"
                                                         )}
                                                         className=""
@@ -4796,7 +4795,7 @@ export default function Reimburse({ auth }: PageProps) {
                             links={reimburse.links}
                             fromData={reimburse.from}
                             toData={reimburse.to}
-                            totalData={reimburse.total}
+                            totalData={reimburse.totalAmount}
                             clickHref={(url: string) =>
                                 getReimburse(url.split("?").pop())
                             }

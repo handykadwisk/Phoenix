@@ -288,91 +288,104 @@ class DatabaseSeeder extends Seeder
         //     'menu_id' => $ACLRole->id
         // ]);
 
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $group->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $childRelation->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $childAgent->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $childBAA->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $HR->id
-        ]);
-        RoleAccessMenu::create([
-            'role_id' => $admin->id,
-            'menu_id' => $hrCompany->id
-        ]);
-
-
-
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $group->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $childRelation->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $childAgent->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $childBAA->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $HR->id
+        // ]);
+        // RoleAccessMenu::create([
+        //     'role_id' => $admin->id,
+        //     'menu_id' => $hrCompany->id
+        // ]);
 
         // create user
-        User::create(
-            [
-                'name' => 'Admin',
-                'email' => 'admin@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $admin->id
-            ]
-        );
-        User::create(
-            [
-                'name' => 'Fadhlan',
-                'email' => 'fadhlan@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
-        User::create(
-            [
-                'name' => 'Haris',
-                'email' => 'haris@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
-        User::create(
-            [
-                'name' => 'Pian',
-                'email' => 'pian@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
-        User::create(
-            [
-                'name' => 'Fitano',
-                'email' => 'fitano@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
-        User::create(
-            [
-                'name' => 'Mei',
-                'email' => 'mei@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
-        User::create(
-            [
-                'name' => 'Apep',
-                'email' => 'apep@email.com',
-                'password' => bcrypt('12345678'),
-                'role_id' => $user->id
-            ]
-        );
+        // User::create(
+        //     [
+        //         'name' => 'Admin',
+        //         'email' => 'admin@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $admin->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Fadhlan',
+        //         'email' => 'fadhlan@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Haris',
+        //         'email' => 'haris@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Pian',
+        //         'email' => 'pian@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Fitano',
+        //         'email' => 'fitano@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Mei',
+        //         'email' => 'mei@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Apep',
+        //         'email' => 'apep@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Ica',
+        //         'email' => 'ica@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
+        // User::create(
+        //     [
+        //         'name' => 'Fika',
+        //         'email' => 'fika@email.com',
+        //         'password' => bcrypt('12345678'),
+        //         'role_id' => $user->id
+        //     ]
+        // );
 
         // // create 2024_21_05_Store_Procedure_And_Function
         // $file_path1 = resource_path('../database/LogDB/2024_21_05_Store_Procedure_And_Function.sql');
@@ -564,5 +577,41 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_plugin_process)
         );
 
+
+        $file_path27 = resource_path('../database/LogDB/2024_08_27_t_company.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path27)
+        );
+
+        $file_path28 = resource_path('../database/LogDB/2024_08_27_t_company_division.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path28)
+        );
+
+        $file_path29 = resource_path('../database/LogDB/2024_08_27_t_company_structure.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path29)
+        );
+
+        $file_path30 = resource_path('../database/LogDB/2024_08_27_t_company_office.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path30)
+        );
+
+        $file_path31 = resource_path('../database/LogDB/2024_08_27_t_employee.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path31)
+        );
+
+        $file_path32 = resource_path('../database/LogDB/2024_08_27_t_user.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path32)
+        );
     }
 }

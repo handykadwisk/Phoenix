@@ -22,13 +22,14 @@ class CashAdvance extends Model
 
     protected $with = [
         'cash_advance_detail',
+        'bank_account',
         'division',
         'cost_center',
         'office',
         'user',
-        'person',
-        'person_used_by',
-        'person_approval',
+        'employee',
+        'employee_used_by',
+        'employee_approval',
         'user_used_by',
         'user_approval',
         'approval_status'
@@ -44,34 +45,39 @@ class CashAdvance extends Model
         return $this->hasMany(CashAdvanceDetail::class, 'CASH_ADVANCE_ID');
     }
 
+    public function bank_account(): BelongsTo
+    {
+        return $this->belongsTo(TEmployeeBankAccount::class, 'CASH_ADVANCE_BANK_ACCOUNT');
+    }
+
     public function division(): BelongsTo
     {
-        return $this->belongsTo(TRelationDivision::class, 'CASH_ADVANCE_DIVISION');
+        return $this->belongsTo(TCompanyDivision::class, 'CASH_ADVANCE_DIVISION');
     }
 
     public function cost_center(): BelongsTo
     {
-        return $this->belongsTo(TRelationDivision::class, 'CASH_ADVANCE_COST_CENTER');
+        return $this->belongsTo(TCompanyDivision::class, 'CASH_ADVANCE_COST_CENTER');
     }
 
     public function office(): BelongsTo
     {
-        return $this->belongsTo(TRelationOffice::class, 'CASH_ADVANCE_BRANCH');
+        return $this->belongsTo(TCompanyOffice::class, 'CASH_ADVANCE_BRANCH');
     }
 
-    public function person(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'CASH_ADVANCE_REQUESTED_BY');
+        return $this->belongsTo(TEmployee::class, 'CASH_ADVANCE_REQUESTED_BY');
     }
 
-    public function person_used_by(): BelongsTo
+    public function employee_used_by(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'CASH_ADVANCE_USED_BY');
+        return $this->belongsTo(TEmployee::class, 'CASH_ADVANCE_USED_BY');
     }
 
-    public function person_approval(): BelongsTo
+    public function employee_approval(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'CASH_ADVANCE_FIRST_APPROVAL_BY');
+        return $this->belongsTo(TEmployee::class, 'CASH_ADVANCE_FIRST_APPROVAL_BY');
     }
     
     public function user(): BelongsTo

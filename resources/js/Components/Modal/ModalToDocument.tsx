@@ -5,9 +5,8 @@ import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-// import Swal from "sweetalert2";
 
-export default function ModalToAdd({
+export default function ModalToDocument({
     show = false,
     closeable = true,
     onClose = () => {},
@@ -15,9 +14,11 @@ export default function ModalToAdd({
     body,
     url,
     data,
+    method,
     onSuccess,
-    classPanel = "",
-    buttonAddOns,
+    headers,
+    submitButtonName,
+    classPanel,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -25,10 +26,12 @@ export default function ModalToAdd({
     title: string;
     body: any;
     url: string;
-    data: any;
+    data: any | null;
+    method: string;
+    onSuccess: any | null | undefined;
+    headers: any | null | undefined;
     classPanel: any;
-    onSuccess: any;
-    buttonAddOns: any | undefined | null;
+    submitButtonName: string | null;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -37,30 +40,36 @@ export default function ModalToAdd({
     const close = () => {
         if (closeable) {
             onClose();
+            setIsError("");
         }
     };
 
+    const callAxios = axios.create({
+        headers,
+    });
+
     const action = async (e: any) => {
-        // return false;
         e.preventDefault();
 
         setIsProcessing(true);
-        await axios
-            .post(url, data, {
-                headers: {
-                    "Content-type": "multipart/form-data",
-                },
-            })
+        // onSuccess("");
+
+        await callAxios({ url, data, method })
             .then((res) => {
-                console.log("ada", res.data);
                 setIsProcessing(false);
                 setIsError("");
-                onSuccess(res.data);
+                if (
+                    onSuccess !== null ||
+                    onSuccess !== "" ||
+                    onSuccess !== undefined
+                ) {
+                    onSuccess(res.data);
+                }
                 close();
             })
             .catch((err) => {
                 setIsProcessing(false);
-                setIsError(err.response.data[0]);
+                // setIsError(err.response.data);
                 console.log(err);
             });
     };
@@ -70,8 +79,8 @@ export default function ModalToAdd({
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-999"
-                    onClose={() => {}}
+                    className="relative z-9999"
+                    onClose={close}
                     initialFocus={modalRef}
                 >
                     <Transition.Child
@@ -87,7 +96,7 @@ export default function ModalToAdd({
                     </Transition.Child>
 
                     <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <div className="flex min-h-full justify-center p-4 text-center items-center lg:p-0">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"
@@ -97,12 +106,9 @@ export default function ModalToAdd({
                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
-                                <Dialog.Panel
-                                    className={classPanel}
-                                    // style={{ maxWidth: "65%" }}
-                                >
+                                <Dialog.Panel className={classPanel}>
                                     <form onSubmit={action}>
-                                        <div className="bg-gray-100 p-6 sm:pb-4">
+                                        <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                             <div className="flex justify-between">
                                                 <div className="px-1">
                                                     <Dialog.Title
@@ -125,9 +131,9 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {/* <div className="max-h-[100%]"> */}
+                                            {/* <div className="max-h-full"> */}
                                             <div
-                                                className="overflow-y-auto custom-scrollbar px-2 modal-action"
+                                                className="modal-action h-full overflow-y-auto custom-scrollbar px-2"
                                                 ref={modalRef}
                                             >
                                                 {body}
@@ -135,18 +141,12 @@ export default function ModalToAdd({
                                             {/* </div> */}
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            <PrimaryButton
-                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
-                                                disabled={isProcessing}
-                                            >
-                                                Submit
-                                            </PrimaryButton>
-                                            {buttonAddOns && (
+                                            {submitButtonName && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
                                                     disabled={isProcessing}
                                                 >
-                                                    {buttonAddOns}
+                                                    {submitButtonName}
                                                 </PrimaryButton>
                                             )}
                                             <button
@@ -154,7 +154,7 @@ export default function ModalToAdd({
                                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                                 onClick={close}
                                             >
-                                                Cancel
+                                                {data ? "Cancel" : "Close"}
                                             </button>
                                         </div>
                                     </form>

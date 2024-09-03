@@ -24,6 +24,6 @@ class MCashAdvanceProofOfDocument extends Model
 
     public function document(): BelongsTo
     {
-        return $this->belongsTo(TDocument::class, 'CASH_ADVANCE_PROOF_OF_DOCUMENT_REPORT_CASH_ADVANCE_DOCUMENT_ID');
+        return $this->belongsTo(Document::class, 'CASH_ADVANCE_PROOF_OF_DOCUMENT_REPORT_CASH_ADVANCE_DOCUMENT_ID');
     }
 }

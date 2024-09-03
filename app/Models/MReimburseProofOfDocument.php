@@ -24,6 +24,6 @@ class MReimburseProofOfDocument extends Model
 
     public function document(): BelongsTo
     {
-        return $this->belongsTo(TDocument::class, 'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_DOCUMENT_ID');
+        return $this->belongsTo(Document::class, 'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_DOCUMENT_ID');
     }
 }

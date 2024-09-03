@@ -274,6 +274,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCAReportRejectStatus', [CashAdvanceReportController::class, 'getCountCAReportRejectStatus'])->name('getCountCARejectStatus');
     Route::get('/getCountCAReportComplitedStatus', [CashAdvanceReportController::class, 'getCountCAReportComplitedStatus'])->name('getCountCAReportComplitedStatus');
 
+    Route::get('/getEmployeeBankAccount', [CashAdvanceController::class, 'getEmployeeBankAccount'])->name('cashAdvance.getEmployeeBankAccount');
+
     // Cash Advance
     Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
     Route::get('/getCANumber', [CashAdvanceController::class, 'getCANumber'])->name('getCANumber');
@@ -281,7 +283,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
     Route::post('/cashAdvance', [CashAdvanceController::class, 'store'])->name('cashAdvance.store');
     Route::post('/cashAdvanceAddFiles', [CashAdvanceController::class, 'cash_advance_add_files'])->name('cashAdvance.report_cash_advance');
-    Route::patch('/cashAdvanceApprove/{id}', [CashAdvanceController::class, 'cash_advance_approve'])->name('cashAdvance.approve');
+    Route::patch('/cashAdvanceApprove', [CashAdvanceController::class, 'cash_advance_approve'])->name('cashAdvance.approve');
     Route::post('/cashAdvanceRevised/{id}', [CashAdvanceController::class, 'cash_advance_revised'])->name('cashAdvance.revised');
     Route::patch('/cashAdvanceExecute/{id}', [CashAdvanceController::class, 'cash_advance_execute'])->name('cashAdvance.execute');
     Route::get('/cashAdvanceDownload/{id}/{key}', [CashAdvanceController::class, 'cash_advance_download'])->name('cashAdvance.download');
@@ -294,7 +296,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCashAdvanceApproval', [CashAdvanceReportController::class, 'getCashAdvanceApproval'])->name('getCashAdvanceApproval');
     Route::get('/getCashAdvanceMethod', [CashAdvanceReportController::class, 'getCashAdvanceMethod'])->name('getCashAdvanceMethod');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
-    Route::patch('/cashAdvanceReportApprove/{id}', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
+    Route::patch('/cashAdvanceReportApprove', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
     Route::post('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
     Route::post('/cashAdvanceReportExecute', [CashAdvanceReportController::class, 'cash_advance_report_execute'])->name('cashAdvanceReport.execute');
     Route::get('/cashAdvanceReportDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_download'])->name('cashAdvanceReport.download');
