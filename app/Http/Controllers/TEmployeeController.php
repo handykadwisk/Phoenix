@@ -196,7 +196,7 @@ class TEmployeeController extends Controller
     }
 
     public function get_employeeById(Request $request){
-        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('division')->where('EMPLOYEE_ID', $request->idEmployee)->first();
+        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('divisionCompany')->where('EMPLOYEE_ID', $request->idEmployee)->first();
         return response()->json($data);
     }
 
