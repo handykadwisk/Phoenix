@@ -46,6 +46,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAReportNeedRevisionStatus();
         getCAReportRejectStatus();
         getEmployeeBankAccount();
+        getCompanies();
         getCADifferents();
         getCAApproval();
         getCAMethod();
@@ -68,6 +69,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAReportNeedRevisionStatus();
         getCAReportRejectStatus();
         getEmployeeBankAccount();
+        getCompanies();
         getCADifferents();
         getCAApproval();
         getCAMethod();
@@ -144,7 +146,7 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_total_amount: "",
         cash_advance_total_amount_request: "",
         cash_advance_transfer_date: "",
-        cash_advance_bank_account: "",
+        cash_advance_to_bank_account: "",
         cash_advance_receive_date: "",
         cash_advance_receive_name: "",
         type: "",
@@ -187,7 +189,7 @@ export default function CashAdvance({ auth }: PageProps) {
         cash_advance_total_amount: "",
         cash_advance_total_amount_request: "",
         cash_advance_transfer_date: "",
-        cash_advance_bank_account: "",
+        cash_advance_to_bank_account: "",
         cash_advance_receive_date: "",
         cash_advance_receive_name: "",
         type: "",
@@ -236,7 +238,7 @@ export default function CashAdvance({ auth }: PageProps) {
             cash_advance_total_amount: "",
             cash_advance_total_amount_request: "",
             cash_advance_transfer_date: "",
-            cash_advance_bank_account: "",
+            cash_advance_to_bank_account: "",
             cash_advance_receive_date: "",
             cash_advance_receive_name: "",
             amount_approve: "",
@@ -282,6 +284,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAReportNeedRevisionStatus();
         getCAReportRejectStatus();
         getEmployeeBankAccount();
+        getCompanies();
         getCADifferents();
         getCAApproval();
         getCAMethod();
@@ -1497,6 +1500,18 @@ export default function CashAdvance({ auth }: PageProps) {
             });
     };
 
+    const [companies, setCompanies] = useState<any>([]);
+    const getCompanies = async () => {
+        await axios
+            .get(`/getCompanies`)
+            .then((res) => {
+                setCompanies(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     // Handle Add Start
     const handleAddModal = async (
         e: FormEvent,
@@ -2235,8 +2250,8 @@ export default function CashAdvance({ auth }: PageProps) {
     });
 
     console.log("Data Cash Advance", data);
-    console.log("Cash Advance", cashAdvance.data);
-    // console.log("Data CA By Id", dataById);
+    // console.log("Cash Advance", cashAdvance.data);
+    console.log("Data CA By Id", dataById);
     // console.log("Data CA Report", dataCAReport);
     // console.log("Data CA Report By Id", dataReportById);
     // console.log("Auth", auth.user);
@@ -2568,7 +2583,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             className="border"
                                             rowSpan="2"
                                         />
-                                        {DataRow.length > 1 && (
+                                        {data.CashAdvanceDetail?.length > 1 && (
                                             <TH
                                                 label="Action"
                                                 className="border"
@@ -2598,233 +2613,262 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                 </thead>
                                 <tbody id="form_table">
-                                    {DataRow.map((val: any, i: number) => (
-                                        <tr className="text-center" key={i}>
-                                            <TD className="border">{i + 1}.</TD>
-                                            <TD className="border">
-                                                <DatePicker
-                                                    name="cash_advance_detail_start_date"
-                                                    selected={
-                                                        val.cash_advance_detail_start_date
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        handleChangeAddDate(
-                                                            date,
-                                                            "cash_advance_detail_start_date",
-                                                            i
-                                                        )
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <DatePicker
-                                                    name="cash_advance_detail_end_date"
-                                                    selected={
-                                                        val.cash_advance_detail_end_date
-                                                    }
-                                                    onChange={(date: any) =>
-                                                        handleChangeAddDate(
-                                                            date,
-                                                            "cash_advance_detail_end_date",
-                                                            i
-                                                        )
-                                                    }
-                                                    dateFormat={"dd-MM-yyyy"}
-                                                    placeholderText="dd-mm-yyyyy"
-                                                    className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                    autoComplete="off"
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <select
-                                                    id="cash_advance_detail_purpose"
-                                                    name="cash_advance_detail_purpose"
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    required
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    value={
-                                                        val.cash_advance_detail_purpose
-                                                    }
-                                                >
-                                                    <option value="">
-                                                        -- Choose Purpose --
-                                                    </option>
-                                                    {cash_advance_purpose.map(
-                                                        (purpose: any) => (
-                                                            <option
-                                                                key={
-                                                                    purpose.CASH_ADVANCE_PURPOSE_ID
-                                                                }
-                                                                value={
-                                                                    purpose.CASH_ADVANCE_PURPOSE_ID
-                                                                }
-                                                            >
-                                                                {
-                                                                    purpose.CASH_ADVANCE_PURPOSE
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </select>
-                                            </TD>
-                                            <TD className="border">
-                                                <Select
-                                                    classNames={{
-                                                        menuButton: () =>
-                                                            `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                        menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                        listItem: ({
-                                                            isSelected,
-                                                        }: any) =>
-                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                                isSelected
-                                                                    ? `text-white bg-red-600`
-                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                                            }`,
-                                                    }}
-                                                    options={selectRelation}
-                                                    isSearchable={true}
-                                                    placeholder={
-                                                        "Choose Business Relation"
-                                                    }
-                                                    value={
-                                                        val.cash_advance_detail_relation_organization_id
-                                                    }
-                                                    onChange={(val: any) =>
-                                                        handleChangeAddCustom(
-                                                            val,
-                                                            "cash_advance_detail_relation_organization_id",
-                                                            i
-                                                        )
-                                                    }
-                                                    primaryColor={"bg-red-500"}
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_relation_name"
-                                                    type="text"
-                                                    name="cash_advance_detail_relation_name"
-                                                    value={
-                                                        val.cash_advance_detail_relation_name
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_relation_position"
-                                                    type="text"
-                                                    name="cash_advance_detail_relation_position"
-                                                    value={
-                                                        val.cash_advance_detail_relation_position
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <TextInput
-                                                    id="cash_advance_detail_location"
-                                                    type="text"
-                                                    name="cash_advance_detail_location"
-                                                    value={
-                                                        val.cash_advance_detail_location
-                                                    }
-                                                    className="w-1/2"
-                                                    autoComplete="off"
-                                                    onChange={(e) =>
-                                                        handleChangeAdd(e, i)
-                                                    }
-                                                    required
-                                                />
-                                            </TD>
-                                            <TD className="border">
-                                                <CurrencyInput
-                                                    id="cash_advance_detail_amount"
-                                                    name="cash_advance_detail_amount"
-                                                    value={
-                                                        val.cash_advance_detail_amount
-                                                    }
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    onValueChange={(val: any) =>
-                                                        handleChangeAddCustom(
-                                                            val,
-                                                            "cash_advance_detail_amount",
-                                                            i
-                                                        )
-                                                    }
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                    required
-                                                    placeholder="0.00"
-                                                    autoComplete="off"
-                                                />
-                                            </TD>
-                                            <TD className="border px-2">
-                                                <div className="">
-                                                    <button
-                                                        type="button"
-                                                        className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
-                                                        onClick={() => {
-                                                            setModalFiles({
-                                                                add_files: true,
-                                                                show_files:
-                                                                    false,
-                                                                add_files_report:
-                                                                    false,
-                                                                show_files_report:
-                                                                    false,
-                                                                index: i,
-                                                            });
-                                                        }}
-                                                    >
-                                                        {data.CashAdvanceDetail[
-                                                            i
-                                                        ]
-                                                            ?.cash_advance_detail_document_id
-                                                            .length > 0
-                                                            ? data
-                                                                  .CashAdvanceDetail[
-                                                                  i
-                                                              ]
-                                                                  ?.cash_advance_detail_document_id
-                                                                  ?.length +
-                                                              " Files"
-                                                            : "Add Files"}
-                                                    </button>
-                                                </div>
-                                            </TD>
-                                            {DataRow.length > 1 && (
+                                    {data.CashAdvanceDetail?.map(
+                                        (val: any, i: number) => (
+                                            <tr className="text-center" key={i}>
                                                 <TD className="border">
-                                                    <Button
-                                                        className="my-1.5 px-3 py-1"
-                                                        onClick={() =>
-                                                            handleRemoveRow(i)
-                                                        }
-                                                        type="button"
-                                                    >
-                                                        X
-                                                    </Button>
+                                                    {i + 1}.
                                                 </TD>
-                                            )}
-                                        </tr>
-                                    ))}
+                                                <TD className="border">
+                                                    <DatePicker
+                                                        name="cash_advance_detail_start_date"
+                                                        selected={
+                                                            val.cash_advance_detail_start_date
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            handleChangeAddDate(
+                                                                date,
+                                                                "cash_advance_detail_start_date",
+                                                                i
+                                                            )
+                                                        }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <DatePicker
+                                                        name="cash_advance_detail_end_date"
+                                                        selected={
+                                                            val.cash_advance_detail_end_date
+                                                        }
+                                                        onChange={(date: any) =>
+                                                            handleChangeAddDate(
+                                                                date,
+                                                                "cash_advance_detail_end_date",
+                                                                i
+                                                            )
+                                                        }
+                                                        dateFormat={
+                                                            "dd-MM-yyyy"
+                                                        }
+                                                        placeholderText="dd-mm-yyyyy"
+                                                        className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                        autoComplete="off"
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <select
+                                                        id="cash_advance_detail_purpose"
+                                                        name="cash_advance_detail_purpose"
+                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                        required
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        value={
+                                                            val.cash_advance_detail_purpose
+                                                        }
+                                                    >
+                                                        <option value="">
+                                                            -- Choose Purpose --
+                                                        </option>
+                                                        {cash_advance_purpose.map(
+                                                            (purpose: any) => (
+                                                                <option
+                                                                    key={
+                                                                        purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                    }
+                                                                    value={
+                                                                        purpose.CASH_ADVANCE_PURPOSE_ID
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        purpose.CASH_ADVANCE_PURPOSE
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </select>
+                                                </TD>
+                                                <TD className="border">
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex w-80 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute w-80 text-left z-20 bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectRelation}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose Business Relation"
+                                                        }
+                                                        value={
+                                                            val.cash_advance_detail_relation_organization_id
+                                                        }
+                                                        onChange={(val: any) =>
+                                                            handleChangeAddCustom(
+                                                                val,
+                                                                "cash_advance_detail_relation_organization_id",
+                                                                i
+                                                            )
+                                                        }
+                                                        primaryColor={
+                                                            "bg-red-500"
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_relation_name"
+                                                        type="text"
+                                                        name="cash_advance_detail_relation_name"
+                                                        value={
+                                                            val.cash_advance_detail_relation_name
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_relation_position"
+                                                        type="text"
+                                                        name="cash_advance_detail_relation_position"
+                                                        value={
+                                                            val.cash_advance_detail_relation_position
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <TextInput
+                                                        id="cash_advance_detail_location"
+                                                        type="text"
+                                                        name="cash_advance_detail_location"
+                                                        value={
+                                                            val.cash_advance_detail_location
+                                                        }
+                                                        className="w-1/2"
+                                                        autoComplete="off"
+                                                        onChange={(e) =>
+                                                            handleChangeAdd(
+                                                                e,
+                                                                i
+                                                            )
+                                                        }
+                                                        required
+                                                    />
+                                                </TD>
+                                                <TD className="border">
+                                                    <CurrencyInput
+                                                        id="cash_advance_detail_amount"
+                                                        name="cash_advance_detail_amount"
+                                                        value={
+                                                            val.cash_advance_detail_amount
+                                                        }
+                                                        decimalScale={2}
+                                                        decimalsLimit={2}
+                                                        onValueChange={(
+                                                            val: any
+                                                        ) =>
+                                                            handleChangeAddCustom(
+                                                                val,
+                                                                "cash_advance_detail_amount",
+                                                                i
+                                                            )
+                                                        }
+                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                        required
+                                                        placeholder="0.00"
+                                                        autoComplete="off"
+                                                    />
+                                                </TD>
+                                                <TD className="border px-2">
+                                                    <div className="">
+                                                        <button
+                                                            type="button"
+                                                            className="bg-black hover:bg-slate-800 text-sm text-white py-2 px-3"
+                                                            onClick={() => {
+                                                                setModalFiles({
+                                                                    add_files:
+                                                                        true,
+                                                                    show_files:
+                                                                        false,
+                                                                    add_files_report:
+                                                                        false,
+                                                                    show_files_report:
+                                                                        false,
+                                                                    index: i,
+                                                                });
+                                                            }}
+                                                        >
+                                                            {data
+                                                                .CashAdvanceDetail[
+                                                                i
+                                                            ]
+                                                                ?.cash_advance_detail_document_id
+                                                                .length > 0
+                                                                ? data
+                                                                      .CashAdvanceDetail[
+                                                                      i
+                                                                  ]
+                                                                      ?.cash_advance_detail_document_id
+                                                                      ?.length +
+                                                                  " Files"
+                                                                : "Add Files"}
+                                                        </button>
+                                                    </div>
+                                                </TD>
+                                                {data.CashAdvanceDetail
+                                                    ?.length > 1 && (
+                                                    <TD className="border">
+                                                        <Button
+                                                            className="my-1.5 px-3 py-1"
+                                                            onClick={() =>
+                                                                handleRemoveRow(
+                                                                    i
+                                                                )
+                                                            }
+                                                            type="button"
+                                                        >
+                                                            X
+                                                        </Button>
+                                                    </TD>
+                                                )}
+                                            </tr>
+                                        )
+                                    )}
                                 </tbody>
                                 <tfoot>
                                     <tr className="text-center text-sm">
@@ -2880,7 +2924,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex w-full gap-4">
+                                        <div className="block md:flex w-full gap-4">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="transfer"
@@ -2905,7 +2949,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             val
                                                         )
                                                     }
-                                                    className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                    className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                     placeholder="0.00"
                                                     autoComplete="off"
                                                 />
@@ -2921,12 +2965,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 />
                                             )}
                                             <select
-                                                id="cash_advance_bank_account"
-                                                name="cash_advance_bank_account"
+                                                id="cash_advance_to_bank_account"
+                                                name="cash_advance_to_bank_account"
                                                 className="block w-full md:w-2/6 ml-3 mt-5 md:mt-0 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                 onChange={(e) =>
                                                     setData(
-                                                        "cash_advance_bank_account",
+                                                        "cash_advance_to_bank_account",
                                                         e.target.value
                                                     )
                                                 }
@@ -2974,7 +3018,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex w-full">
+                                        <div className="block md:flex w-full">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="cash"
@@ -3009,7 +3053,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     value="0"
                                                     decimalScale={2}
                                                     decimalsLimit={2}
-                                                    className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ml-9"
+                                                    className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                     disabled
                                                 />
                                             )}
@@ -3532,7 +3576,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 required
                                             />
                                         </div>
-                                        <div className="flex w-full gap-4">
+                                        <div className="block md:flex w-full gap-4">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="transfer"
@@ -3549,7 +3593,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                 disabled
                                                 placeholder="0.00"
                                             />
@@ -3558,8 +3602,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="text"
                                                 name="account_number"
                                                 value={`${dataById.bank_account?.employee.EMPLOYEE_FIRST_NAME} - ${dataById.bank_account?.EMPLOYEE_BANK_ACCOUNT_NAME} - ${dataById.bank_account?.EMPLOYEE_BANK_ACCOUNT_NUMBER}`}
-                                                className="w-full lg:w-1/4"
-                                                placeholder="Bank Account Name - Bank Account - Account Number"
+                                                className="w-full md:w-1/4 ml-3 mt-5 md:mt-0"
                                                 required
                                                 readOnly
                                             />
@@ -3583,7 +3626,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex w-full">
+                                        <div className="block md:flex w-full">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="cash"
@@ -3600,7 +3643,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ml-9"
+                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                 disabled
                                                 placeholder="0.00"
                                             />
@@ -4223,12 +4266,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 id=""
                                                 className="block w-full md:w-2/6 ml-3 mt-5 md:mt-0 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                 value={
-                                                    dataById.CASH_ADVANCE_BANK_ACCOUNT
+                                                    dataById.CASH_ADVANCE_TO_BANK_ACCOUNT
                                                 }
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_BANK_ACCOUNT:
+                                                        CASH_ADVANCE_TO_BANK_ACCOUNT:
                                                             e.target.value,
                                                     })
                                                 }
@@ -5195,7 +5238,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex w-full gap-4">
+                                        <div className="block md:flex w-full gap-4">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="transfer"
@@ -5212,7 +5255,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5234,12 +5277,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 id=""
                                                 className="block w-full md:w-2/6 ml-3 mt-5 md:mt-0 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                 value={
-                                                    dataById.CASH_ADVANCE_BANK_ACCOUNT
+                                                    dataById.CASH_ADVANCE_TO_BANK_ACCOUNT
                                                 }
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
-                                                        CASH_ADVANCE_BANK_ACCOUNT:
+                                                        CASH_ADVANCE_TO_BANK_ACCOUNT:
                                                             e.target.value,
                                                     })
                                                 }
@@ -5297,7 +5340,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 // required
                                             />
                                         </div>
-                                        <div className="flex w-full">
+                                        <div className="block md:flex w-full">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="cash"
@@ -5314,7 +5357,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ml-9"
+                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5531,7 +5574,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                 />
                                 <TextInput
                                     id="tanggalPengajuan"
-                                    type="TEXT"
+                                    type="text"
                                     name="tanggalPengajuan"
                                     value={dateFormat(
                                         dataById.REPORT_CASH_ADVANCE_REQUESTED_DATE,
@@ -5796,7 +5839,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex w-full gap-4">
+                                        <div className="block md:flex w-full gap-4">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="transfer"
@@ -5814,7 +5857,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5831,18 +5874,51 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     !checkedTransferEdit
                                                 }
                                             />
-                                            <TextInput
-                                                id="account_number"
-                                                type="text"
-                                                name="account_number"
-                                                value={""}
-                                                className="w-full lg:w-1/4"
-                                                placeholder="To Bank Account"
-                                                // onChange={(e) =>
-                                                //     handleChangeAdd(e, i)
-                                                // }
-                                                readOnly
-                                            />
+                                            <select
+                                                name=""
+                                                id=""
+                                                className="block w-full md:w-2/6 ml-3 mt-5 md:mt-0 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                value={
+                                                    dataById.CASH_ADVANCE_TO_BANK_ACCOUNT
+                                                }
+                                                onChange={(e) =>
+                                                    setDataById({
+                                                        ...dataById,
+                                                        CASH_ADVANCE_TO_BANK_ACCOUNT:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    -- Choose Bank Account --
+                                                </option>
+                                                {employeeBankAccount
+                                                    .filter(
+                                                        (m: any) =>
+                                                            m.EMPLOYEE_ID ===
+                                                            dataById
+                                                                .employee_used_by
+                                                                ?.EMPLOYEE_ID
+                                                    )
+                                                    .map((account: any) => (
+                                                        <option
+                                                            key={
+                                                                account.EMPLOYEE_BANK_ACCOUNT_ID
+                                                            }
+                                                            value={
+                                                                account.EMPLOYEE_BANK_ACCOUNT_ID
+                                                            }
+                                                        >
+                                                            {account?.employee
+                                                                .EMPLOYEE_FIRST_NAME +
+                                                                " - " +
+                                                                account.EMPLOYEE_BANK_ACCOUNT_NAME +
+                                                                " - " +
+                                                                account.EMPLOYEE_BANK_ACCOUNT_NUMBER}
+                                                        </option>
+                                                    ))}
+                                            </select>
                                         </div>
                                     </div>
 
@@ -5854,7 +5930,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 false && !checkedTransferEdit
                                         }
                                     >
-                                        <div className="mb-5">
+                                        <div className="grid grid-cols-1 mb-5">
                                             <InputLabel
                                                 htmlFor="cash_advance_transfer_date"
                                                 className="mb-2"
@@ -5879,7 +5955,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 dateFormat={"dd-MM-yyyy"}
                                                 placeholderText="dd-mm-yyyyy"
-                                                className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                className="w-full sm:w-[30%] border-0 rounded-md shadow-md text-sm h-9 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                                 autoComplete="off"
                                             />
                                         </div>
@@ -5894,7 +5970,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             <select
                                                 name="CASH_ADVANCE_FROM_BANK_ACCOUNT"
                                                 id="CASH_ADVANCE_FROM_BANK_ACCOUNT"
-                                                className="block w-full lg:w-7/12 rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                className="block w-full sm:w-[30%] rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5906,12 +5982,20 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <option value="">
                                                     -- Choose Bank Account --
                                                 </option>
-                                                <option value="Bank 1">
-                                                    Bank 1
-                                                </option>
-                                                <option value="Bank 2">
-                                                    Bank 2
-                                                </option>
+                                                {companies.map(
+                                                    (company: any) => (
+                                                        <option
+                                                            value={
+                                                                company.COMPANY_ID
+                                                            }
+                                                            key={
+                                                                company.COMPANY_ID
+                                                            }
+                                                        >
+                                                            {`${company.COMPANY_NAME} - ${company.COMPANY_BANK_ACCOUNT_NAME} - ${company.COMPANY_BANK_ACCOUNT_NUMBER}`}
+                                                        </option>
+                                                    )
+                                                )}
                                             </select>
                                         </div>
                                     </div>
@@ -5936,7 +6020,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex w-full">
+                                        <div className="block md:flex w-full">
                                             <div className="ml-3 text-sm leading-9">
                                                 <label
                                                     htmlFor="cash"
@@ -5953,7 +6037,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ml-9"
+                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5981,7 +6065,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 false && !checkedCashEdit
                                         }
                                     >
-                                        <div className="mb-5">
+                                        <div className="grid grid-cols-1 mb-5">
                                             <InputLabel
                                                 htmlFor="CASH_ADVANCE_RECEIVE_DATE"
                                                 className="mb-2"
@@ -6005,7 +6089,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 dateFormat={"dd-MM-yyyy"}
                                                 placeholderText="dd-mm-yyyyy"
-                                                className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                className="w-full md:w-[30%] border-0 rounded-md shadow-md text-sm h-9 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                                 autoComplete="off"
                                             />
                                         </div>
@@ -6025,7 +6109,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     dataById.CASH_ADVANCE_RECEIVE_NAME ||
                                                     ""
                                                 }
-                                                className="w-full lg:w-7/12"
+                                                className="w-full md:w-[30%]"
                                                 onChange={(e) =>
                                                     setDataById({
                                                         ...dataById,
@@ -8068,11 +8152,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                         )
                                     )}
                                 </select>
-                                {/* <TextInput
-                                    value={dataReportById?.REPORT_CASH_ADVANCE_TYPE === 1 ? "Settlement" : "Refund"}
-                                    className="bg-gray-100"
-                                    readOnly
-                                /> */}
                             </div>
                         </div>
 

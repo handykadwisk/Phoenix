@@ -11,6 +11,7 @@ use App\Models\COA;
 use App\Models\MCashAdvanceDocument;
 use App\Models\Relation;
 use App\Models\Document;
+use App\Models\TCompany;
 use App\Models\TCompanyDivision;
 use App\Models\TCompanyOffice;
 use App\Models\TEmployee;
@@ -297,6 +298,13 @@ class CashAdvanceController extends Controller
         return response()->json($data);
     }
 
+    public function getCompanies()
+    {
+        $data = TCompany::all();
+
+        return response()->json($data);
+    }
+
     public function index()
     {   
         $data = [
@@ -452,7 +460,7 @@ class CashAdvanceController extends Controller
             $cash_advance_first_approval_user = $request->cash_advance_first_approval_by['label'];
             $cash_advance_first_approval_status = 1;
             $cash_advance_request_note = $request->cash_advance_request_note;
-            $cash_advance_bank_account = $request->cash_advance_bank_account;
+            $cash_advance_to_bank_account = $request->cash_advance_to_bank_account;
             $cash_advance_delivery_method_transfer = $request->cash_advance_delivery_method_transfer;
             $cash_advance_transfer_amount = $request->cash_advance_transfer_amount;
             $cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
@@ -474,7 +482,7 @@ class CashAdvanceController extends Controller
                 'CASH_ADVANCE_FIRST_APPROVAL_USER' => $cash_advance_first_approval_user,
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
                 'CASH_ADVANCE_REQUEST_NOTE' => $cash_advance_request_note,
-                'CASH_ADVANCE_BANK_ACCOUNT' => $cash_advance_bank_account,
+                'CASH_ADVANCE_TO_BANK_ACCOUNT' => $cash_advance_to_bank_account,
                 'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
@@ -601,14 +609,14 @@ class CashAdvanceController extends Controller
             $cash_advance_id = $request->CASH_ADVANCE_ID;
             $cash_advance_first_approval_change_status_date = date('Y-m-d H:i:s');
             $cash_advance_first_approval_status = $request->CASH_ADVANCE_FIRST_APPROVAL_STATUS;
-            $cash_advance_bank_account = $request->CASH_ADVANCE_BANK_ACCOUNT;
+            $cash_advance_to_bank_account = $request->CASH_ADVANCE_TO_BANK_ACCOUNT;
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
     
             CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
                 'CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $cash_advance_first_approval_change_status_date,
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
-                'CASH_ADVANCE_BANK_ACCOUNT' => $cash_advance_bank_account,
+                'CASH_ADVANCE_TO_BANK_ACCOUNT' => $cash_advance_to_bank_account,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount
             ]);
@@ -709,7 +717,7 @@ class CashAdvanceController extends Controller
             $cash_advance_total_amount = $total_amount;
             $cash_advance_first_approval_status = 1;
             $cash_advance_request_note = $request->CASH_ADVANCE_REQUEST_NOTE;
-            $cash_advance_bank_account = $request->CASH_ADVANCE_BANK_ACCOUNT;
+            $cash_advance_to_bank_account = $request->CASH_ADVANCE_TO_BANK_ACCOUNT;
             $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_delivery_method_cash = $request->CASH_ADVANCE_DELIVERY_METHOD_CASH;
@@ -721,7 +729,7 @@ class CashAdvanceController extends Controller
             CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
                 'CASH_ADVANCE_REQUEST_NOTE' => $cash_advance_request_note,
-                'CASH_ADVANCE_BANK_ACCOUNT' => $cash_advance_bank_account,
+                'CASH_ADVANCE_TO_BANK_ACCOUNT' => $cash_advance_to_bank_account,
                 'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
@@ -744,9 +752,9 @@ class CashAdvanceController extends Controller
     
             // Update data from table cash advance detail
             foreach ($cash_advance_detail as $cad) {
-                $relation_organization_id = isset($rd['CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID']) ? $rd['CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'] : null;
-                $relation_name = isset($rd['CASH_ADVANCE_DETAIL_RELATION_NAME']) ? $rd['CASH_ADVANCE_DETAIL_RELATION_NAME'] : null;
-                $relation_position = isset($rd['CASH_ADVANCE_DETAIL_RELATION_POSITION']) ? $rd['CASH_ADVANCE_DETAIL_RELATION_POSITION'] : null;
+                $relation_organization_id = isset($cad['CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID']) ? $cad['CASH_ADVANCE_DETAIL_RELATION_ORGANIZATION_ID'] : null;
+                $relation_name = isset($cad['CASH_ADVANCE_DETAIL_RELATION_NAME']) ? $cad['CASH_ADVANCE_DETAIL_RELATION_NAME'] : null;
+                $relation_position = isset($cad['CASH_ADVANCE_DETAIL_RELATION_POSITION']) ? $cad['CASH_ADVANCE_DETAIL_RELATION_POSITION'] : null;
                 
                 $cash_advance_detail_id = $cad['CASH_ADVANCE_DETAIL_ID'];
                 $cash_advance_detail_start_date = $cad['CASH_ADVANCE_DETAIL_START_DATE'];
@@ -903,6 +911,7 @@ class CashAdvanceController extends Controller
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_transfer_date = $request->CASH_ADVANCE_TRANSFER_DATE;
             $cash_advance_from_bank_account = $request->CASH_ADVANCE_FROM_BANK_ACCOUNT;
+            $cash_advance_to_bank_account = $request->CASH_ADVANCE_TO_BANK_ACCOUNT;
             $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
             $cash_advance_receive_date = $request->CASH_ADVANCE_RECEIVE_DATE;
             $cash_advance_receive_name = $request->CASH_ADVANCE_RECEIVE_NAME;
@@ -912,6 +921,7 @@ class CashAdvanceController extends Controller
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_TRANSFER_DATE' => $cash_advance_transfer_date,
                 'CASH_ADVANCE_FROM_BANK_ACCOUNT' => $cash_advance_from_bank_account,
+                'CASH_ADVANCE_TO_BANK_ACCOUNT' => $cash_advance_to_bank_account,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
                 'CASH_ADVANCE_RECEIVE_DATE' => $cash_advance_receive_date,
                 'CASH_ADVANCE_RECEIVE_NAME' => $cash_advance_receive_name,
@@ -927,12 +937,12 @@ class CashAdvanceController extends Controller
                 ]),
                 'action_by'  => Auth::user()->email
             ]);
-    
-            return new JsonResponse([
-                'Cash Advance has been execute.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Cash Advance has been execute.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

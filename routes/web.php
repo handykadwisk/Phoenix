@@ -274,6 +274,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCAReportComplitedStatus', [CashAdvanceReportController::class, 'getCountCAReportComplitedStatus'])->name('getCountCAReportComplitedStatus');
 
     Route::get('/getEmployeeBankAccount', [CashAdvanceController::class, 'getEmployeeBankAccount'])->name('cashAdvance.getEmployeeBankAccount');
+    Route::get('/getCompanies', [CashAdvanceController::class, 'getCompanies'])->name('cashAdvance.getCompanies');
 
     // Cash Advance
     Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
