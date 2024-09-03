@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MPolicyCoverageDetail;
 use App\Models\MPolicyExchangeRate;
 use App\Models\MPolicyPartners;
+use App\Models\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -420,8 +421,8 @@ class PolicyPartnerController extends Controller
     }
 
     public function getRelationByType($id) {  
-        $data = DB::table('t_relation')
-            ->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
+        $data = Relation::leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')
+            ->with('pksNumber')
             ->where('RELATION_TYPE_ID', '=', $id)
             ->get();
         return response()->json($data);

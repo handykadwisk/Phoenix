@@ -343,6 +343,8 @@ export default function ModalDetailPolicy({
                 ...items[i].policy_coverage_detail,
                 {
                     POLICY_COVERAGE_ID: "",
+                    INTEREST_INSURED_ID: "",
+                    REMARKS: "",
                     CURRENCY_ID: "",
                     SUM_INSURED: 0,
                     RATE: 0,
@@ -353,6 +355,8 @@ export default function ModalDetailPolicy({
                     INSURANCE_DISC_PERCENTAGE: 0,
                     INSURANCE_DISC_AMOUNT: 0,
                     PREMIUM: 0,
+                    DEPOSIT_PREMIUM_PERCENTAGE: 0,
+                    DEPOSIT_PREMIUM_AMOUNT: 0,
                 },
             ],
         };
@@ -385,9 +389,35 @@ export default function ModalDetailPolicy({
             ...policy_coverage_details[detailNum],
         };
 
+        if (name == "SUM_INSURED") {
+            if (value == undefined) {
+                value = 0;
+            } else {
+                policy_coverage_detail["SUM_INSURED"] = value;
+            }
+        }
+        if (name == "RATE") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+        if (name == "LOST_LIMIT_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+        if (name == "DEPOSIT_PREMIUM_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+
         let sum_insured = policy_coverage_detail["SUM_INSURED"];
         // let policy_coverage_id = policy_coverage_detail["POLICY_COVERAGE_ID"];
         if (name == "RATE") {
+            if (value == undefined) {
+                value = 0;
+            }
             // console.log("xxxx: ", sum_insured,  parseFloat(value), parseFloat(value) / 100);
             policy_coverage_detail["GROSS_PREMIUM"] =
                 (sum_insured * value) / 100;
@@ -404,6 +434,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "GROSS_PREMIUM") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_coverage_detail["PREMIUM"] =
                 (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
                 policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
@@ -417,6 +450,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "LOST_LIMIT_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_coverage_detail["PREMIUM"] =
                 (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
                 policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
@@ -430,6 +466,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "LOST_LIMIT_SCALE") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_coverage_detail["LOST_LIMIT_AMOUNT"] =
                 (policy_coverage_detail["GROSS_PREMIUM"] *
                     policy_coverage_detail["LOST_LIMIT_SCALE"]) /
@@ -447,6 +486,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "INSURANCE_DISC_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_coverage_detail["INSURANCE_DISC_AMOUNT"] =
                 ((policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
                 policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
@@ -467,6 +509,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "INSURANCE_DISC_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_coverage_detail["PREMIUM"] =
                 (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
                 policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
@@ -480,6 +525,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "DEPOSIT_PREMIUM_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             // policy_coverage_detail["LOST_LIMIT_SCALE"] = policy_coverage_detail["LOST_LIMIT_SCALE"] + 20;
             policy_coverage_detail["DEPOSIT_PREMIUM_AMOUNT"] =
                 (policy_coverage_detail["PREMIUM"] *
@@ -556,8 +604,34 @@ export default function ModalDetailPolicy({
             ...dataEditPolicyCoverage.policy_coverage_detail,
         ];
 
+        if (name == "SUM_INSURED") {
+            if (value == undefined) {
+                value = 0;
+            } else {
+                changeVal[i]["SUM_INSURED"] = value;
+            }
+        }
+        if (name == "RATE") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+        if (name == "LOST_LIMIT_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+        if (name == "DEPOSIT_PREMIUM_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
+        }
+
         let sum_insured = changeVal[i]["SUM_INSURED"];
         if (name == "RATE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["GROSS_PREMIUM"] = (sum_insured * value) / 100;
             changeVal[i]["PREMIUM"] =
                 (changeVal[i]["LOST_LIMIT_AMOUNT"] == 0 ||
@@ -567,6 +641,9 @@ export default function ModalDetailPolicy({
                 changeVal[i]["INSURANCE_DISC_AMOUNT"];
         }
         if (name == "GROSS_PREMIUM") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["PREMIUM"] =
                 (changeVal[i]["LOST_LIMIT_AMOUNT"] == 0 ||
                 changeVal[i]["LOST_LIMIT_AMOUNT"] == null
@@ -576,6 +653,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "LOST_LIMIT_SCALE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["LOST_LIMIT_AMOUNT"] =
                 (changeVal[i]["GROSS_PREMIUM"] *
                     changeVal[i]["LOST_LIMIT_SCALE"]) /
@@ -588,6 +668,9 @@ export default function ModalDetailPolicy({
                 changeVal[i]["INSURANCE_DISC_AMOUNT"];
         }
         if (name == "LOST_LIMIT_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["PREMIUM"] =
                 (changeVal[i]["LOST_LIMIT_AMOUNT"] == 0 ||
                 changeVal[i]["LOST_LIMIT_AMOUNT"] == null
@@ -597,6 +680,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "INSURANCE_DISC_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["INSURANCE_DISC_AMOUNT"] =
                 ((changeVal[i]["LOST_LIMIT_AMOUNT"] == 0 ||
                 changeVal[i]["LOST_LIMIT_AMOUNT"] == null
@@ -612,6 +698,9 @@ export default function ModalDetailPolicy({
                 changeVal[i]["INSURANCE_DISC_AMOUNT"];
         }
         if (name == "INSURANCE_DISC_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["PREMIUM"] =
                 (changeVal[i]["LOST_LIMIT_AMOUNT"] == 0 ||
                 changeVal[i]["LOST_LIMIT_AMOUNT"] == null
@@ -621,6 +710,9 @@ export default function ModalDetailPolicy({
         }
 
         if (name == "DEPOSIT_PREMIUM_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["DEPOSIT_PREMIUM_AMOUNT"] =
                 (changeVal[i]["PREMIUM"] *
                     changeVal[i]["DEPOSIT_PREMIUM_PERCENTAGE"]) /
@@ -649,6 +741,8 @@ export default function ModalDetailPolicy({
                 {
                     POLICY_COVERAGE_DETAIL_ID: null,
                     POLICY_COVERAGE_ID: coverage_id,
+                    INTEREST_INSURED_ID: "",
+                    REMARKS: "",
                     CURRENCY_ID: "",
                     SUM_INSURED: 0,
                     RATE: 0,
@@ -659,6 +753,8 @@ export default function ModalDetailPolicy({
                     INSURANCE_DISC_PERCENTAGE: 0,
                     INSURANCE_DISC_AMOUNT: 0,
                     PREMIUM: 0,
+                    DEPOSIT_PREMIUM_PERCENTAGE: 0,
+                    DEPOSIT_PREMIUM_AMOUNT: 0,
                 },
             ],
         });
@@ -855,6 +951,14 @@ export default function ModalDetailPolicy({
         const premiums = [...item.premium];
         const premium = { ...premiums[coverageNum] };
 
+        if (name == "GROSS_PREMI") {
+            if (value == undefined) {
+                value = 0;
+            } else {
+                premium["GROSS_PREMI"] = value;
+            }
+        }
+
         let coverage_premium = premium["GROSS_PREMI"];
 
         if (name == "BROKERAGE_FEE_PERCENTAGE") {
@@ -863,6 +967,23 @@ export default function ModalDetailPolicy({
             }
             premium["BROKERAGE_FEE"] =
                 (coverage_premium * premium["BROKERAGE_FEE_PERCENTAGE"]) / 100;
+            let bf_after_ppn = 0;
+            let bf_ppn = 0;
+            let bf_pph = 0;
+            // Include VAT
+            // PPn BF = 2,2 % (1,022)
+            // PPh BF = 2 %
+            if (premium["BROKERAGE_FEE_VAT"] == 1) {
+                bf_after_ppn = parseFloat( premium["BROKERAGE_FEE"]) / 1.022;
+                bf_ppn =  premium["BROKERAGE_FEE"] - bf_after_ppn;
+                bf_pph = (( premium["BROKERAGE_FEE"] - bf_ppn) * 2) / 100;
+            } else {
+                bf_ppn = 0;
+                bf_pph = ( premium["BROKERAGE_FEE"] * 2) / 100;
+            }
+            premium["BROKERAGE_FEE_PPN"] = -bf_ppn;
+            premium["BROKERAGE_FEE_PPH"] = -bf_pph;
+            premium["BROKERAGE_FEE_NETT_AMOUNT"] =  premium["BROKERAGE_FEE"] - bf_ppn - bf_pph;
         }
         if (name == "BROKERAGE_FEE") {
             if (value == undefined) {
@@ -895,6 +1016,20 @@ export default function ModalDetailPolicy({
             premium["ENGINEERING_FEE"] =
                 (coverage_premium * premium["ENGINEERING_FEE_PERCENTAGE"]) /
                 100;
+            let ef_after_ppn = 0;
+            let ef_ppn = 0;
+            let ef_pph = 0;
+            // Include VAT
+            if (premium["ENGINEERING_FEE_VAT"] == 1) {
+                ef_after_ppn = parseFloat(premium["ENGINEERING_FEE"]) / 1.022;
+                ef_ppn = premium["ENGINEERING_FEE"] - ef_after_ppn;
+                ef_pph = ((premium["ENGINEERING_FEE"] - ef_ppn) * 2) / 100;
+            } else {
+                ef_pph = (premium["ENGINEERING_FEE"] * 2) / 100;
+            }
+            premium["ENGINEERING_FEE_PPN"] = -ef_ppn;
+            premium["ENGINEERING_FEE_PPH"] = -ef_pph;
+            premium["ENGINEERING_FEE_NETT_AMOUNT"] = premium["ENGINEERING_FEE"] - ef_ppn - ef_pph;
         }
         if (name == "ENGINEERING_FEE") {
             if (value == undefined) {
@@ -1844,6 +1979,9 @@ export default function ModalDetailPolicy({
         const ef_full_amount = policy_insured_detail["EF_FULL_AMOUNT"];
         const cf_full_amount = policy_insured_detail["CONSULTANCY_FEE"];
         if (name == "DISC_BF_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_insured_detail["DISC_BF_AMOUNT"] =
                 (bf_full_amount * policy_insured_detail["DISC_BF_PERCENTAGE"]) /
                 100;
@@ -1851,10 +1989,16 @@ export default function ModalDetailPolicy({
                 bf_full_amount - policy_insured_detail["DISC_BF_AMOUNT"];
         }
         if (name == "DISC_BF_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_insured_detail["BF_NETT_AMOUNT"] = bf_full_amount - value;
         }
 
         if (name == "DISC_EF_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_insured_detail["DISC_EF_AMOUNT"] =
                 (ef_full_amount * policy_insured_detail["DISC_EF_PERCENTAGE"]) /
                 100;
@@ -1862,10 +2006,16 @@ export default function ModalDetailPolicy({
                 ef_full_amount - policy_insured_detail["DISC_EF_AMOUNT"];
         }
         if (name == "DISC_EF_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_insured_detail["EF_NETT_AMOUNT"] = ef_full_amount - value;
         }
 
         if (name == "DISC_CF_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_insured_detail["DISC_CF_AMOUNT"] =
                 (cf_full_amount * policy_insured_detail["DISC_CF_PERCENTAGE"]) /
                 100;
@@ -1873,6 +2023,9 @@ export default function ModalDetailPolicy({
                 cf_full_amount - policy_insured_detail["DISC_CF_AMOUNT"];
         }
         if (name == "DISC_CF_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             policy_insured_detail["CF_NETT_AMOUNT"] = cf_full_amount - value;
         }
 
@@ -1882,23 +2035,17 @@ export default function ModalDetailPolicy({
             parseFloat(policy_insured_detail["CF_NETT_AMOUNT"]);
 
         policy_insured_detail["PREMIUM_TO_INSURED"] =
-            insurer_nett_premi +
+            parseFloat(insurer_nett_premi) +
             parseFloat(policy_insured_detail["BF_NETT_AMOUNT"]) +
             parseFloat(policy_insured_detail["EF_NETT_AMOUNT"]) +
             parseFloat(policy_insured_detail["CF_NETT_AMOUNT"]);
 
         policy_insured_detail[name] = value;
-        // if (name == "CURRENCY_ID" || name == "POLICY_COVERAGE_ID") {
-
-        //     // policy_insured_detail["PREMIUM_AMOUNT"] = insurerNettPremi;
-        //     console.log("insurerNettPremi: ", insurerNettPremi);
-        // }
         policy_insured_details[detailNum] = policy_insured_detail;
         item.policy_insured_detail = policy_insured_details;
         items[insuredNum] = item;
         setDataInsured(items);
     };
-    // console.log("insurerNettPremi luar: ", insurerNettPremi);
 
     const inputDataInsured = (name: string, value: any, i: number) => {
         const items = [...dataInsured];
@@ -1907,15 +2054,24 @@ export default function ModalDetailPolicy({
         let disc_admin_cost_amount = 0;
         let admin_cost_nett_amount = 0;
         if (name == "DISC_ADMIN_COST_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             disc_admin_cost_amount = item["ADMIN_COST"] * (value / 100);
             admin_cost_nett_amount =
                 item["ADMIN_COST"] - disc_admin_cost_amount;
         }
         if (name == "DISC_ADMIN_COST_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             admin_cost_nett_amount = item["ADMIN_COST"] - value;
         }
 
         if (name == "ADMIN_COST") {
+            if (value == undefined) {
+                value = 0;
+            }
             admin_cost_nett_amount = value;
         }
 
@@ -1988,32 +2144,56 @@ export default function ModalDetailPolicy({
         const ef_full_amount = changeVal[i]["EF_FULL_AMOUNT"];
         const cf_full_amount = changeVal[i]["CONSULTANCY_FEE"];
         if (name == "DISC_BF_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["DISC_BF_AMOUNT"] =
                 (bf_full_amount * changeVal[i]["DISC_BF_PERCENTAGE"]) / 100;
             changeVal[i]["BF_NETT_AMOUNT"] =
                 bf_full_amount - changeVal[i]["DISC_BF_AMOUNT"];
         }
         if (name == "DISC_BF_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["BF_NETT_AMOUNT"] = bf_full_amount - value;
         }
 
         if (name == "DISC_EF_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["DISC_EF_AMOUNT"] =
                 (ef_full_amount * changeVal[i]["DISC_EF_PERCENTAGE"]) / 100;
             changeVal[i]["EF_NETT_AMOUNT"] =
                 ef_full_amount - changeVal[i]["DISC_EF_AMOUNT"];
         }
         if (name == "DISC_EF_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["EF_NETT_AMOUNT"] = ef_full_amount - value;
         }
 
         if (name == "DISC_CF_PERCENTAGE") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["DISC_CF_AMOUNT"] =
                 (cf_full_amount * changeVal[i]["DISC_CF_PERCENTAGE"]) / 100;
             changeVal[i]["CF_NETT_AMOUNT"] =
                 cf_full_amount - changeVal[i]["DISC_CF_AMOUNT"];
         }
+        if (name == "DISC_CF_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
+            changeVal[i]["CF_NETT_AMOUNT"] = cf_full_amount - value;
+        }
         if (name == "CF_NETT_AMOUNT") {
+            if (value == undefined) {
+                value = 0;
+            }
             changeVal[i]["CF_NETT_AMOUNT"] = cf_full_amount - value;
         }
 
@@ -2023,7 +2203,7 @@ export default function ModalDetailPolicy({
             parseFloat(changeVal[i]["CF_NETT_AMOUNT"]);
         // alert(changeVal[i]["CF_NETT_AMOUNT"]);
         changeVal[i]["PREMIUM_TO_INSURED"] =
-            insurer_nett_premi +
+            parseFloat(insurer_nett_premi) +
             parseFloat(changeVal[i]["BF_NETT_AMOUNT"]) +
             parseFloat(changeVal[i]["EF_NETT_AMOUNT"]) +
             parseFloat(changeVal[i]["CF_NETT_AMOUNT"]);
@@ -2450,6 +2630,7 @@ export default function ModalDetailPolicy({
                                         val["CONSULTANCY_FEE_PERCENTAGE"],
                                     CONSULTANCY_FEE_AMOUNT:
                                         val["CONSULTANCY_FEE_AMOUNT"],
+                                    M_PKS_RELATION_ID: val["M_PKS_RELATION_ID"],
                                     BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
                                     BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
                                     BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
@@ -2491,6 +2672,7 @@ export default function ModalDetailPolicy({
                                         val["CONSULTANCY_FEE_PERCENTAGE"],
                                     CONSULTANCY_FEE_AMOUNT:
                                         val["CONSULTANCY_FEE_AMOUNT"],
+                                    M_PKS_RELATION_ID: val["M_PKS_RELATION_ID"],
                                     BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
                                     BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
                                     BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
@@ -2532,6 +2714,7 @@ export default function ModalDetailPolicy({
                                         val["CONSULTANCY_FEE_PERCENTAGE"],
                                     CONSULTANCY_FEE_AMOUNT:
                                         val["CONSULTANCY_FEE_AMOUNT"],
+                                    M_PKS_RELATION_ID: val["M_PKS_RELATION_ID"],
                                     BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
                                     BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
                                     BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
@@ -2628,6 +2811,8 @@ export default function ModalDetailPolicy({
 
     const [summaryFinancial, setSummaryFinancial] = useState<any>([]);
 
+        
+   
     const getPksNumber = async (relation_id: any) => {
         await axios
             .get(`/getPksNumber/${relation_id}`)
@@ -2712,6 +2897,7 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
+    console.log("listAgent safdsafds: ", listAgent);
     const getBAA = async (relation_type: number) => {
         setIsLoading({
             ...isLoading,
@@ -2849,20 +3035,23 @@ export default function ModalDetailPolicy({
     const handleEditPartners = async (policy_id: any) => {
         setRelationIdForPayable([]);
         // getFbiPks(13);
-        // getAgent(3);
+        getAgent(3);
         // getBAA(12);
         getSummaryInsured(policy_id);
         // console.log("DataSummaryInsured: ", dataSummaryInsured);
         // getPolicyExchangeRate(policy_id);
         // console.log("PolicyExchangeRate: ", policyExchangeRate);
         getDataPartner(policy_id);
-        console.log("ListDataPartners: ", listDataPartners);
+        // console.log("ListDataPartners: ", listDataPartners);
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
-        console.log("CurrencyFromCoverage: ", currencyFromCoverage);
+        // console.log("CurrencyFromCoverage: ", currencyFromCoverage);
         setTimeout(function () {
-            setTriggerEditSumIncome(triggerEditSumIncome + 1);
+            getExchangeRate();
         }, 1000);
-        getExchangeRate();
+        // setTimeout(function () {
+        setTriggerEditSumIncome(triggerEditSumIncome + 1);
+        // }, 1000);
+        // getExchangeRate();
 
         setModal({
             add: false,
@@ -2906,6 +3095,21 @@ export default function ModalDetailPolicy({
                     ADMIN_COST: 0,
                     CONSULTANCY_FEE_PERCENTAGE: 0,
                     CONSULTANCY_FEE_AMOUNT: 0,
+
+                    M_PKS_RELATION_ID: "",
+                    BROKERAGE_FEE_VAT: "",
+                    BROKERAGE_FEE_PPN: 0,
+                    BROKERAGE_FEE_PPH: 0,
+                    BROKERAGE_FEE_NETT_AMOUNT: 0,
+                    ENGINEERING_FEE_VAT: "",
+                    ENGINEERING_FEE_PPN: 0,
+                    ENGINEERING_FEE_PPH: 0,
+                    ENGINEERING_FEE_NETT_AMOUNT: 0,
+                    CONSULTANCY_FEE_VAT: "",
+                    CONSULTANCY_FEE_PPN: 0,
+                    CONSULTANCY_FEE_PPH: 0,
+                    CONSULTANCY_FEE_NETT_AMOUNT: 0,
+                    PAYABLE: "",
                 },
             ],
         };
@@ -3283,7 +3487,7 @@ export default function ModalDetailPolicy({
         const fbi_by_pks = { ...items[0] };
         const agent_commission = { ...items[1] };
         const acquisition_cost = { ...items[2] };
-
+console.log("items: ", items)
         // Nett Brokerage Fee
         const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
             prev: any,
@@ -3354,7 +3558,7 @@ export default function ModalDetailPolicy({
         const initBF = parseFloat(dataInitialForBP.BF_NETT_AMOUNT);
         const initEF = parseFloat(dataInitialForBP.EF_NETT_AMOUNT);
         const initCF = parseFloat(dataInitialForBP.CF_NETT_AMOUNT);
-        // console.log("dataInitialForBP: ", dataInitialForBP);
+        console.log("dataInitialForBP: ", dataInitialForBP);
 
         const nettBF =
             parseFloat(nettBF_fbi) +
@@ -3419,6 +3623,7 @@ export default function ModalDetailPolicy({
             }
         });
         getDataPartner(policy.POLICY_ID);
+        setTriggerEditSumIncome(0);
     };
     // End Edit Partners
 
@@ -4319,7 +4524,7 @@ export default function ModalDetailPolicy({
                                                                                         m
                                                                                     )
                                                                                 }
-                                                                                required
+                                                                                // required
                                                                                 autoComplete="off"
                                                                             />
                                                                         </div>
@@ -8014,13 +8219,13 @@ export default function ModalDetailPolicy({
                                                                                 <div className="flex items-center">
                                                                                     <input
                                                                                         id={
-                                                                                            "engineering_fee_vat-"+
+                                                                                            "engineering_fee_vat-" +
                                                                                             i +
                                                                                             "-" +
                                                                                             j
                                                                                         }
                                                                                         name={
-                                                                                            "engineering_fee_vat-"+
+                                                                                            "engineering_fee_vat-" +
                                                                                             i +
                                                                                             "-" +
                                                                                             j
@@ -8647,7 +8852,7 @@ export default function ModalDetailPolicy({
                                                                     );
                                                                 }}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                required
+                                                                readOnly
                                                             />
                                                         </td>
                                                     </tr>
@@ -8882,7 +9087,7 @@ export default function ModalDetailPolicy({
                                                                                     j
                                                                                 )
                                                                             }
-                                                                            required
+                                                                            // required
                                                                             autoComplete="off"
                                                                         />
                                                                     </div>
@@ -10959,6 +11164,7 @@ export default function ModalDetailPolicy({
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                     setTriggerSumIncome(0);
+                    setTriggerEditSumIncome(0);
                     setDataNettIncome([]);
                     setGrandTotalNettIncome(0);
                     setDataEditNettIncome([]);
@@ -11766,11 +11972,46 @@ export default function ModalDetailPolicy({
                                                                         <i>
                                                                             Choose
                                                                             PKS
-                                                                            Number
+                                                                            Numbers
                                                                         </i>{" "}
                                                                         --
                                                                     </option>
-                                                                    {listPksNumber.map(
+                                                                    {listAgent
+                                                                        ?.filter(
+                                                                            (
+                                                                                list: any
+                                                                            ) =>
+                                                                                list.RELATION_ORGANIZATION_ID ==
+                                                                                detail.RELATION_ID
+                                                                        )
+                                                                        .map(
+                                                                            (
+                                                                                result: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    result.pks_number?.map((hasil: any, a: number) => {
+                                                                                        return (
+                                                                                            <option
+                                                                                                key={
+                                                                                                    a
+                                                                                                }
+                                                                                                value={
+                                                                                                    hasil
+                                                                                                        ?.M_PKS_RELATION_ID
+                                                                                                }
+                                                                                            >
+                                                                                                {
+                                                                                                    hasil
+                                                                                                        ?.NO_PKS
+                                                                                                }
+                                                                                            </option>
+                                                                                        );
+                                                                                    })
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    {/* {listPksNumber.map(
                                                                         (
                                                                             item: any,
                                                                             i: number
@@ -11790,7 +12031,7 @@ export default function ModalDetailPolicy({
                                                                                 </option>
                                                                             );
                                                                         }
-                                                                    )}
+                                                                    )} */}
                                                                 </select>
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
@@ -13875,9 +14116,9 @@ export default function ModalDetailPolicy({
                                                 handleEditPartners(
                                                     policy.POLICY_ID
                                                 );
-                                                setTriggerEditSumIncome(
-                                                    triggerEditSumIncome + 1
-                                                );
+                                                // setTriggerEditSumIncome(
+                                                //     triggerEditSumIncome + 1
+                                                // );
                                             }}
                                         >
                                             Edit Business Partners
