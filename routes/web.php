@@ -36,6 +36,7 @@ use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
 use App\Http\Controllers\TJobDescCompanyController;
+use App\Http\Controllers\TTagPluginProcessController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -475,12 +476,15 @@ Route::middleware('auth')->group(function () {
 
 
 
+
     // Company Structure
     Route::post('/getCompanyStructureCombo', [TCompanyStructureController::class, 'get_StructureCombo'])->name('getCompanyStructureCombo.get_StructureCombo');
     Route::post('/addCompanyStructure', [TCompanyStructureController::class, 'store'])->name('addCompanyStructure.store');
     Route::get('/getCompanyStructure', [TCompanyStructureController::class, 'getCompanyStructureJson'])->name('getCompanyStructure.getCompanyStructureJson');
     Route::post('/getCompanyStructureDetail', [TCompanyStructureController::class, 'get_CompanyStructureDetail'])->name('getCompanyStructureDetail.get_CompanyStructureDetail');
     Route::post('/editStructureCompany', [TCompanyStructureController::class, 'edit'])->name('editStructureCompany.edit');
+    Route::post('/getStructureCompany', [TCompanyStructureController::class, 'getStructure'])->name('getStructureCompany.getStructure');
+
 
     // Company Division
     Route::get('/getDivisionCompany', [TCompanyDivisionController::class, 'getCompanyDivisionJson'])->name('getDivisionCompany.getCompanyDivisionJson');
@@ -488,6 +492,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getDivisionComboCompany', [TCompanyDivisionController::class, 'getDivisionComboCompany'])->name('getDivisionComboCompany.getDivisionComboCompany');
     Route::post('/getDivisionDetailCompany', [TCompanyDivisionController::class, 'get_detail'])->name('getDivisionDetailCompany.get_detail');
     Route::post('/editDivisionCompany', [TCompanyDivisionController::class, 'edit'])->name('editDivisionCompany.edit');
+    Route::post('/getComboDivision', [TCompanyDivisionController::class, 'getDivision'])->name('getComboDivision.getDivision');
 
     // Office
     Route::get('/getOfficeCompany', [TCompanyOfficeController::class, 'getOfficeCompanyJson'])->name('getOfficeCompany.getOfficeCompanyJson');
@@ -498,14 +503,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/addAddressCompany', [TCompanyOfficeController::class, 'store'])->name('addAddressCompany.store');
     Route::post('/getOfficeCompanyDetail', [TCompanyOfficeController::class, 'get_detail'])->name('getOfficeCompanyDetail.get_detail');
     Route::post('/editOfficeCompany', [TCompanyOfficeController::class, 'edit'])->name('editOfficeCompany.edit');
+    Route::post('/getComboOffice', [TCompanyOfficeController::class, 'getOffice'])->name('getComboOffice.getOffice');
 
      // Job Desc
-     Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
+    Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
     Route::post('/getJobDescCompanyCombo', [TJobDescCompanyController::class, 'getJobDescCompanyCombo'])->name('getJobDescCompanyCombo.getJobDescCompanyCombo');
     Route::post('/addJobDescCompany', [TJobDescCompanyController::class, 'store'])->name('addJobDescCompany.store');
-     Route::post('/getJobDescCompanyDetail', [TJobDescCompanyController::class, 'get_detail'])->name('getJobDescCompanyDetail.get_detail');
-     Route::post('/editJobDescCompany', [TJobDescCompanyController::class, 'edit'])->name('editJobDescCompany.edit');
+    Route::post('/getJobDescCompanyDetail', [TJobDescCompanyController::class, 'get_detail'])->name('getJobDescCompanyDetail.get_detail');
+    Route::post('/editJobDescCompany', [TJobDescCompanyController::class, 'edit'])->name('editJobDescCompany.edit');
 
+    // Plugin Process
+    Route::post('/getRPluginProcess', [TTagPluginProcessController::class, 'getPlugin'])->name('getRPluginProcess.getPlugin');
+    Route::post('/addPluginProcess', [TTagPluginProcessController::class, 'store'])->name('addPluginProcess.store');
+    Route::post('/getTPluginProcess', [TTagPluginProcessController::class, 'getTPlugin'])->name('getTPluginProcess.getTPlugin');
 
 
 

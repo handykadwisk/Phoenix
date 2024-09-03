@@ -557,47 +557,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_for_bank_account)
         );
 
-
-        $file_path20 = resource_path('../database/LogDB/2024_08_01_t_relation_division.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path20)
-        );
-
-        $file_path21 = resource_path('../database/LogDB/2024_08_01_t_relation_structure.sql');
+        // create 2024_31_08_r_plugin_process
+        $r_plugin_process = resource_path('../database/LogDB/2024_31_08_r_plugin_process.sql');
 
         DB::unprepared(
-            file_get_contents($file_path21)
+            file_get_contents($r_plugin_process)
         );
 
-        $file_path22 = resource_path('../database/LogDB/2024_08_04_t_person.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path22)
-        );
-
-        $file_path23 = resource_path('../database/LogDB/2024_08_05_r_cash_advance_method.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path23)
-        );
-
-        $file_path24 = resource_path('../database/LogDB/2024_08_05_r_cash_advance_differents.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path24)
-        );
-
-        $file_path25 = resource_path('../database/LogDB/2024_08_13_t_relation_office.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path25)
-        );
-
-        $file_path26 = resource_path('../database/LogDB/2024_08_15_r_reimburse_notes.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path26)
-        );
     }
 }

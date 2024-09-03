@@ -370,12 +370,16 @@ export default function ACLRole({ auth }: PageProps) {
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Name Role"}
                                     />
@@ -387,20 +391,20 @@ export default function ACLRole({ auth }: PageProps) {
                                         return (
                                             <tr
                                                 onDoubleClick={() => {
-                                                    setDetailPermission({
-                                                        PERMISSION_ID:
-                                                            dPermission.PERMISSION_ID,
-                                                        PERMISSION_NAME:
-                                                            dPermission.PERMISSION_NAME,
-                                                    });
+                                                    // setDetailPermission({
+                                                    //     PERMISSION_ID:
+                                                    //         dPermission.PERMISSION_ID,
+                                                    //     PERMISSION_NAME:
+                                                    //         dPermission.PERMISSION_NAME,
+                                                    // });
                                                     setModal({
                                                         add: false,
                                                         edit: !modal.edit,
                                                         detail: false,
                                                     });
-                                                    getPermissionById(
-                                                        dPermission.PERMISSION_ID
-                                                    );
+                                                    // getPermissionById(
+                                                    //     dPermission.PERMISSION_ID
+                                                    // );
                                                 }}
                                                 key={i}
                                                 className={

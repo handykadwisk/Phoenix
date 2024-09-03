@@ -82,28 +82,19 @@ class TEmployeeController extends Controller
         }
         // dd($newSearch[0]['RELATION_TYPE_ID']['value']);
 
-        // if ($request->newFilter !== "") {
-        //     if ($newSearch[0]["flag"] !== "") {
-        //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-        //     }else{
-        //         foreach ($newSearch[0] as $keyId => $searchValue) {
-        //             if ($keyId === 'RELATION_ORGANIZATION_NAME') {
-        //                 $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-        //             }elseif ($keyId === 'RELATION_TYPE_ID'){
-        //                 if (!isset($searchValue['value'])) {
-        //                     $valueTypeId = $searchValue;
-        //                 }else{
-        //                     $valueTypeId = $searchValue['value'];
-        //                 }
-        //                 // dd($searchValue);
-        //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-        //                     // Query the name field in status table
-        //                     $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('EMPLOYEE_FIRST_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'EMPLOYEE_FIRST_NAME') {
+                        $query->where('EMPLOYEE_FIRST_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
@@ -117,6 +108,20 @@ class TEmployeeController extends Controller
 
 
     public function store(Request $request){
+        $STRUCTURE_ID = $request->STRUCTURE_ID;
+        if ($request->STRUCTURE_ID != NULL || $request->STRUCTURE_ID != "") {
+            $STRUCTURE_ID = $request->STRUCTURE_ID['value'];
+        }
+
+        $DIVISION_ID = $request->DIVISION_ID;
+        if ($request->DIVISION_ID != NULL || $request->DIVISION_ID != "") {
+            $DIVISION_ID = $request->DIVISION_ID['value'];
+        }
+
+        $OFFICE_ID = $request->OFFICE_ID;
+        if ($request->OFFICE_ID != NULL || $request->OFFICE_ID != "") {
+            $OFFICE_ID = $request->OFFICE_ID['value'];
+        }
         $employee = TEmployee::create([
             "EMPLOYEE_FIRST_NAME"               => $request->EMPLOYEE_FIRST_NAME,
             "EMPLOYEE_GENDER"                   => $request->EMPLOYEE_GENDER,
@@ -128,9 +133,9 @@ class TEmployeeController extends Controller
             "EMPLOYEE_BLOOD_TYPE"               => $request->EMPLOYEE_BLOOD_TYPE,
             "EMPLOYEE_BLOOD_RHESUS"             => $request->EMPLOYEE_BLOOD_RHESUS,
             "EMPLOYEE_MARITAL_STATUS"           => $request->EMPLOYEE_MARITAL_STATUS,
-            "STRUCTURE_ID"                      => $request->STRUCTURE_ID,
-            "DIVISION_ID"                       => $request->DIVISION_ID,
-            "OFFICE_ID"                         => $request->OFFICE_ID,
+            "STRUCTURE_ID"                      => $STRUCTURE_ID,
+            "DIVISION_ID"                       => $DIVISION_ID,
+            "OFFICE_ID"                         => $OFFICE_ID,
             "COMPANY_ID"                        => $request->COMPANY_ID,
             "EMPLOYEE_CREATED_BY"               => Auth::user()->id,
             "EMPLOYEE_CREATED_DATE"             => now()
@@ -191,7 +196,7 @@ class TEmployeeController extends Controller
     }
 
     public function get_employeeById(Request $request){
-        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->where('EMPLOYEE_ID', $request->idEmployee)->first();
+        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('division')->where('EMPLOYEE_ID', $request->idEmployee)->first();
         return response()->json($data);
     }
 

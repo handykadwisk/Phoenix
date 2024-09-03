@@ -33,28 +33,18 @@ class TCompanyDivisionController extends Controller
         }
         // dd($newSearch[0]['COMPANY_TYPE_ID']['value']);
 
-        // if ($request->newFilter !== "") {
-        //     if ($newSearch[0]["flag"] !== "") {
-        //         $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-        //     }else{
-        //         foreach ($newSearch[0] as $keyId => $searchValue) {
-        //             if ($keyId === 'COMPANY_ORGANIZATION_NAME') {
-        //                 $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-        //             }elseif ($keyId === 'COMPANY_TYPE_ID'){
-        //                 if (!isset($searchValue['value'])) {
-        //                     $valueTypeId = $searchValue;
-        //                 }else{
-        //                     $valueTypeId = $searchValue['value'];
-        //                 }
-        //                 // dd($searchValue);
-        //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-        //                     // Query the name field in status table
-        //                     $q->where('COMPANY_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('COMPANY_DIVISION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'COMPANY_DIVISION_NAME') {
+                        $query->where('COMPANY_DIVISION_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
@@ -157,6 +147,16 @@ class TCompanyDivisionController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function getDivision(Request $request){
+        $data = DB::select('call sp_combo_company_division(?)', [$request->id]);
+        return response()->json($data);
+        // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
+        // // dd($structure);
+        // // $structure = TRelationStructure::find('RELATION_ORGANIZATION_ID', $request->id);
+
+        // return response()->json($structure);
     }
 
 }

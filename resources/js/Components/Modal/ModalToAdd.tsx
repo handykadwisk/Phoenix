@@ -28,7 +28,7 @@ export default function ModalToAdd({
     data: any;
     classPanel: any;
     onSuccess: any;
-    buttonAddOns: any;
+    buttonAddOns: any | undefined | null;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");

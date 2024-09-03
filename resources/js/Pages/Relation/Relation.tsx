@@ -533,8 +533,6 @@ export default function Relation({ auth }: PageProps) {
                 setData={setData}
                 switchPage={switchPage}
                 setSwitchPage={setSwitchPage}
-                switchPagePKS={switchPagePKS}
-                setSwitchPagePKS={setSwitchPagePKS}
             />
             {/* end modal add relation */}
 
@@ -566,7 +564,7 @@ export default function Relation({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%] modal-action-container"
                 }
                 submitButtonName={""}
                 body={
@@ -576,11 +574,9 @@ export default function Relation({ auth }: PageProps) {
                                 getDetailRelation.RELATION_ORGANIZATION_ID
                             }
                             relationStatus={relationStatus}
-                            relationGroup={relationGroup}
                             relationType={relationType}
                             profession={profession}
                             relationLOB={relationLOB}
-                            getDetailMap={getDetailRelation}
                             setGetDetailRelation={setGetDetailRelation}
                         />
                     </>

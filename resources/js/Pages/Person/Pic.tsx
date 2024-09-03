@@ -146,7 +146,6 @@ export default function PIC({
                 text: "New Person Added",
                 icon: "success",
             }).then((result: any) => {
-                // console.log(result);
                 if (result.value) {
                     getPersons();
                     // setGetDetailRelation(message);
@@ -168,7 +167,6 @@ export default function PIC({
             .post(`/getIndividuRelation`)
             .then((res) => {
                 setIndividuRelation(res.data);
-                console.log("pic", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -181,7 +179,6 @@ export default function PIC({
             .post(`/getIndividuAKA`, { idIndividu })
             .then((res) => {
                 setAkaIndividu(res.data);
-                console.log("pic", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -238,7 +235,6 @@ export default function PIC({
                     text: "Person Delete",
                     icon: "success",
                 }).then((result: any) => {
-                    // console.log(result);
                     if (result.value) {
                         getPersons();
                         // getPersons();
@@ -397,13 +393,13 @@ export default function PIC({
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPerson()}
+                                // onClick={() => clearSearchPerson()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPerson()}
+                                // onClick={() => clearSearchPerson()}
                             >
                                 Clear Search
                             </div>

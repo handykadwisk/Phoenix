@@ -33,8 +33,6 @@ export default function DetailRelation({
     idRelation: any;
     // setIsSuccessNew: any;
 }>) {
-    console.log(idRelation);
-
     // header custom for policy number
     const customHeader = (props: any) => {
         return (

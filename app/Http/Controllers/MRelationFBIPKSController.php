@@ -29,6 +29,7 @@ class MRelationFBIPKSController extends Controller
         $query = Relation::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
         $query->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')->where('RELATION_TYPE_ID', "13");
 
         if ($sortModel) {
@@ -39,17 +40,18 @@ class MRelationFBIPKSController extends Controller
             }
         }
 
-        // if ($filterModel) {
-        //     foreach ($filterModel as $colId => $filterValue) {
-        //         if ($colId === 'RELATION_ORGANIZATION_ALIAS') {
-        //             $query->where('RELATION_ORGANIZATION_ALIAS', 'LIKE', '%' . $filterValue . '%');
-        //         } 
-        //         // elseif ($colId === 'policy_inception_date') {
-        //         //     $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
-        //         //           ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
-        //         // }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'RELATION_ORGANIZATION_NAME') {
+                        $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 

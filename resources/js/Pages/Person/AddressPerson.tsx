@@ -171,7 +171,6 @@ export default function AddressPerson({
     ) => {
         const changeVal: any = [...dataAddress.address_ktp];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setDataAddress({
             ...dataAddress,
             address_ktp: changeVal,
@@ -185,7 +184,6 @@ export default function AddressPerson({
     ) => {
         const changeVal: any = [...dataAddress.address_domicile];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setDataAddress({
             ...dataAddress,
             address_domicile: changeVal,
@@ -199,7 +197,6 @@ export default function AddressPerson({
     ) => {
         const changeVal: any = [...dataAddress.other_address];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setDataAddress({
             ...dataAddress,
             other_address: changeVal,
@@ -291,7 +288,7 @@ export default function AddressPerson({
                                             //         ],
                                             //     });
                                             // }}
-                                            onChange={(e) =>
+                                            onChange={(e: any) =>
                                                 inputDetailAddress(
                                                     "ADDRESS_DETAIL",
                                                     e.target.value,
@@ -628,7 +625,7 @@ export default function AddressPerson({
                                                         //         ],
                                                         //     });
                                                         // }}
-                                                        onChange={(e) =>
+                                                        onChange={(e: any) =>
                                                             inputAddressDomicile(
                                                                 "ADDRESS_DETAIL",
                                                                 e.target.value,
@@ -1017,7 +1014,7 @@ export default function AddressPerson({
                                                         //         ],
                                                         //     });
                                                         // }}
-                                                        onChange={(e) =>
+                                                        onChange={(e: any) =>
                                                             inputAddressOther(
                                                                 "ADDRESS_DETAIL",
                                                                 e.target.value,

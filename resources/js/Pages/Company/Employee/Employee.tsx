@@ -21,6 +21,7 @@ export default function Employee({
     setIsSuccess: any | string | null;
     isSuccess: any | string | null;
 }>) {
+    const [refreshGrid, setRefreshGrid] = useState<any>("");
     // modal for add employee
     const [modalEmployee, setModalEmployee] = useState<any>({
         add: false,
@@ -31,6 +32,9 @@ export default function Employee({
     const handleAddModel = async (e: FormEvent) => {
         e.preventDefault();
         getPersonRelationship();
+        getStructure(idCompany);
+        getDivision(idCompany);
+        getOffice(idCompany);
         setModalEmployee({
             add: !modalEmployee.add,
             view: false,
@@ -39,11 +43,37 @@ export default function Employee({
 
     const [structure, setStructure] = useState<any>([]);
     // get Structure
-    const getStructure = async () => {
+    const getStructure = async (idCompany: any) => {
         await axios
-            .post(`/getStructurePerson`)
+            .post(`/getStructureCompany`, { idCompany })
             .then((res) => {
                 setStructure(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [division, setDivision] = useState<any>([]);
+    // get Structure
+    const getDivision = async (idCompany: any) => {
+        await axios
+            .post(`/getComboDivision`, { idCompany })
+            .then((res) => {
+                setDivision(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [office, setOffice] = useState<any>([]);
+    // get Structure
+    const getOffice = async (idCompany: any) => {
+        await axios
+            .post(`/getComboOffice`, { idCompany })
+            .then((res) => {
+                setOffice(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -71,8 +101,22 @@ export default function Employee({
 
     const structureSelect = structure?.map((query: any) => {
         return {
-            value: query.RELATION_ORGANIZATION_ID,
-            label: query.RELATION_ORGANIZATION_NAME,
+            value: query.COMPANY_STRUCTURE_ID,
+            label: query.text_combo,
+        };
+    });
+
+    const divisionSelect = division?.map((query: any) => {
+        return {
+            value: query.COMPANY_DIVISION_ID,
+            label: query.text_combo,
+        };
+    });
+
+    const officeSelect = office?.map((query: any) => {
+        return {
+            value: query.COMPANY_OFFICE_ID,
+            label: query.text_combo,
         };
     });
 
@@ -157,6 +201,10 @@ export default function Employee({
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
+            setRefreshGrid("success");
+            setTimeout(() => {
+                setRefreshGrid("");
+            }, 1000);
         }
     };
 
@@ -168,11 +216,46 @@ export default function Employee({
             EMPLOYEE_ID: data.EMPLOYEE_ID,
         });
         getPersonRelationship();
+        getStructure(idCompany);
+        getDivision(idCompany);
+        getOffice(idCompany);
         setModalEmployee({
             add: false,
             view: !modalEmployee.view,
         });
     };
+
+    const [searchEmployee, setSearchEmployee] = useState<any>({
+        company_employee: [
+            {
+                EMPLOYEE_FIRST_NAME: "",
+                EMPLOYEE_ID: "",
+                flag: "",
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchEmployee.company_employee];
+        changeVal[i][name] = value;
+        setSearchEmployee({ ...searchEmployee, company_employee: changeVal });
+    };
+
+    // search
+    const clearSearchEmployee = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("EMPLOYEE_FIRST_NAME", "", 0);
+        inputDataSearch("flag", "", 0);
+        setRefreshGrid("success");
+        setTimeout(() => {
+            setRefreshGrid("");
+        }, 1000);
+    };
+
     return (
         <>
             {/* modal add employee */}
@@ -468,7 +551,7 @@ export default function Employee({
                                                             : `text-gray-500 hover:bg-red-500 hover:text-white`
                                                     }`,
                                             }}
-                                            options={structureSelect}
+                                            options={divisionSelect}
                                             isSearchable={true}
                                             placeholder={"--Select Division--"}
                                             value={data.DIVISION_ID}
@@ -501,7 +584,7 @@ export default function Employee({
                                                             : `text-gray-500 hover:bg-red-500 hover:text-white`
                                                     }`,
                                             }}
-                                            options={structureSelect}
+                                            options={officeSelect}
                                             isSearchable={true}
                                             placeholder={"--Select Office--"}
                                             value={data.OFFICE_ID}
@@ -803,7 +886,6 @@ export default function Employee({
                         add: false,
                         view: false,
                     });
-                    getStructure();
                 }}
                 title={"Detail Employee"}
                 url={""}
@@ -819,6 +901,9 @@ export default function Employee({
                     <>
                         <DetailEmployee
                             idEmployee={dataEmployee.EMPLOYEE_ID}
+                            division={division}
+                            structure={structure}
+                            office={office}
                             dataRelationship={dataRelationship}
                             setIsSuccess={setIsSuccess}
                         />
@@ -842,37 +927,62 @@ export default function Employee({
                             id="PERSON_FIRST_NAME"
                             type="text"
                             name="PERSON_FIRST_NAME"
-                            // value={searchPerson.PERSON_FIRST_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchPerson({
-                                    ...searchPerson,
-                                    PERSON_FIRST_NAME: e.target.value,
-                                })
+                            value={
+                                searchEmployee.company_employee[0]
+                                    .EMPLOYEE_FIRST_NAME === ""
+                                    ? ""
+                                    : searchEmployee.company_employee[0]
+                                          .EMPLOYEE_FIRST_NAME
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (searchPerson.PERSON_FIRST_NAME !== "") {
-                                        getPersons();
-                                        setSearchPerson({
-                                            ...searchPerson,
-                                            PERSON_FIRST_NAME: "",
-                                        });
-                                    }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "EMPLOYEE_FIRST_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchEmployee.company_employee[0]
+                                        .EMPLOYEE_FIRST_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
+
+                                // setSearchRelation([
+                                //     ...searchRelation,
+                                //     {
+                                //         RELATION_ORGANIZATION_NAME:
+                                //             e.target.value,
+                                //     },
+                                // ])
                             }}
                             placeholder="Search Employee Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPerson()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchEmployee.company_employee[0]
+                                            .EMPLOYEE_FIRST_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPerson()}
+                                onClick={(e) => clearSearchEmployee(e)}
                             >
                                 Clear Search
                             </div>
@@ -885,11 +995,11 @@ export default function Employee({
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
                             withParam={idCompany}
-                            searchParam={null}
+                            searchParam={searchEmployee.company_employee}
                             // loading={isLoading.get_policy}
                             url={"getEmployee"}
                             doubleClickEvent={handleClickDetailEmployee}
-                            triggeringRefreshData={isSuccess}
+                            triggeringRefreshData={refreshGrid}
                             colDefs={[
                                 {
                                     headerName: "No.",

@@ -46,8 +46,6 @@ export default function AddRelation({
     switchPage,
     bank,
     setSwitchPage,
-    switchPageTBK,
-    setSwitchPageTBK,
 }: PropsWithChildren<{
     idGroupRelation: string;
     relationStatus: any;
@@ -64,8 +62,6 @@ export default function AddRelation({
     setData: any;
     switchPage: any;
     setSwitchPage: any;
-    switchPageTBK: any;
-    setSwitchPageTBK: any;
 }>) {
     // console.log("xx", relationGroup);
     const [salutations, setSalutations] = useState<any>([]);
@@ -107,11 +103,26 @@ export default function AddRelation({
 
         if (id == "1") {
             // jika corporate
-            document.getElementById("relationLob").style.display = "";
-            document.getElementById("relationJobs").style.display = "none";
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "none";
         } else if (id == "2") {
-            document.getElementById("relationLob").style.display = "none";
-            document.getElementById("relationJobs").style.display = "";
+            // jika corporate
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "none";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "";
         }
     };
 
@@ -131,11 +142,26 @@ export default function AddRelation({
     const disableLob = async (id: string) => {
         if (id == "1") {
             // jika corporate
-            document.getElementById("relationLob").style.display = "";
-            document.getElementById("relationJobs").style.display = "none";
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "none";
         } else if (id == "2") {
-            document.getElementById("relationLob").style.display = "none";
-            document.getElementById("relationJobs").style.display = "";
+            // jika corporate
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "none";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "";
         }
     };
     const inputRef = useRef<HTMLInputElement>(null);
@@ -356,8 +382,6 @@ export default function AddRelation({
         changeVal[i][name] = value;
         setData("bank_account", changeVal);
     };
-
-    console.log(data);
 
     return (
         <>
