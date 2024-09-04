@@ -28,6 +28,7 @@ import Alert from "@/Components/Alert";
 import Select from "react-tailwindcss-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DetailPolicy from "./DetailPolicy";
 // import DatePicker from "react-date-picker";
 // import { Datepicker } from "flowbite-react";
 
@@ -1178,7 +1179,16 @@ console.log('searchPolicy: ', searchPolicy)
                 submitButtonName={""}
                 body={
                     <>
-                        <ModalDetailPolicy
+                        {/* <ModalDetailPolicy
+                            onDeleteSuccess={handleSuccessDelete}
+                            policy={dataById}
+                            insurance={insurance}
+                            clients={clients}
+                            insuranceType={insuranceType}
+                            policyStatus={policyStatus}
+                            currency={currency}
+                        /> */}
+                        <DetailPolicy
                             onDeleteSuccess={handleSuccessDelete}
                             policy={dataById}
                             insurance={insurance}
@@ -1277,13 +1287,22 @@ console.log('searchPolicy: ', searchPolicy)
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
                                         className={"max-w-[20px] text-center"}
-                                        label={"No"} colSpan={undefined} rowSpan={undefined}                                    />
+                                        label={"No"}
+                                        colSpan={undefined}
+                                        rowSpan={undefined}
+                                    />
                                     <TableTH
                                         className={"min-w-[50px]"}
-                                        label={"Policy Number"} colSpan={undefined} rowSpan={undefined}                                    />
+                                        label={"Policy Number"}
+                                        colSpan={undefined}
+                                        rowSpan={undefined}
+                                    />
                                     <TableTH
                                         className={"min-w-[50px]"}
-                                        label={"Client Name"} colSpan={undefined} rowSpan={undefined}                                    />
+                                        label={"Client Name"}
+                                        colSpan={undefined}
+                                        rowSpan={undefined}
+                                    />
                                 </tr>
                             </thead>
                             <tbody>

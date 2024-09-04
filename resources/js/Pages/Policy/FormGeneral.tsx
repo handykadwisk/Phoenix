@@ -32,7 +32,7 @@ import DatePicker from "react-datepicker";
 import Checkbox from "@/Components/Checkbox";
 // import ModalTest from "./ModalTest";
 
-export default function ModalDetailPolicy({
+export default function FormGeneral({
     policy,
     insurance,
     clients,
@@ -54,7 +54,6 @@ export default function ModalDetailPolicy({
     const [currencyFromCoverage, setCurrencyFromCoverage] = useState<any>([]);
     const [dataById, setDataById] = useState<any>(policy);
     const [flagSwitch, setFlagSwitch] = useState<boolean>(false);
-    const [sumByCurrency, setSumByCurrency] = useState<any>([]);
     const [dataInsurer, setDataInsurer] = useState<any>([]);
     const [dataEditInsurer, setDataEditInsurer] = useState<any>([]);
     const [flagDelete, setFlagDelete] = useState<number>(0);
@@ -88,7 +87,6 @@ export default function ModalDetailPolicy({
         getDataCoverageName(policy.POLICY_ID);
         getDataInsured(policy.POLICY_ID);
         getDetailPolicy(policy.POLICY_ID);
-        getSummaryPremi();
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
         getDataPartner(policy.POLICY_ID);
         getPolicyExchangeRate(policy.POLICY_ID);
@@ -136,77 +134,7 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    const getSummaryPremi = () => {
-        const dataToGroup: any = [...dataById.policy_premium];
-
-        const groupBy = (data: any, keys: any) => {
-            return Object.values(
-                data.reduce((acc: any, val: any) => {
-                    const currency_id = keys.reduce(
-                        (finalName: any, key: any) => finalName + val[key],
-                        ""
-                    );
-                    if (acc[currency_id]) {
-                        acc[currency_id].values.push(
-                            val.NETT_PREMI ? val.NETT_PREMI : 0
-                        );
-                        acc[currency_id].sum += val.NETT_PREMI
-                            ? val.NETT_PREMI
-                            : 0;
-                        acc[currency_id].sum_gross_premi += val.GROSS_PREMI
-                            ? val.GROSS_PREMI
-                            : 0;
-                        acc[currency_id].sum_admin_cost += val.ADMIN_COST
-                            ? val.ADMIN_COST
-                            : 0;
-                        acc[currency_id].sum_disc_broker += val.DISC_BROKER
-                            ? val.DISC_BROKER
-                            : 0;
-                        acc[currency_id].sum_disc_consultation +=
-                            val.DISC_CONSULTATION ? val.DISC_CONSULTATION : 0;
-                        acc[currency_id].sum_disc_admin += val.DISC_ADMIN
-                            ? val.DISC_ADMIN
-                            : 0;
-                        acc[currency_id].sum_fee_based_income +=
-                            val.FEE_BASE_INCOME ? val.FEE_BASE_INCOME : 0;
-                        acc[currency_id].sum_agent_commision +=
-                            val.AGENT_COMMISION ? val.AGENT_COMMISION : 0;
-                        acc[currency_id].sum_acquisition_cost +=
-                            val.ACQUISITION_COST ? val.ACQUISITION_COST : 0;
-                    } else {
-                        acc[currency_id] = {
-                            currency_id,
-                            sum: val.NETT_PREMI ? val.NETT_PREMI : 0,
-                            sum_gross_premi: val.GROSS_PREMI
-                                ? val.GROSS_PREMI
-                                : 0,
-                            sum_admin_cost: val.ADMIN_COST ? val.ADMIN_COST : 0,
-                            sum_disc_broker: val.DISC_BROKER
-                                ? val.DISC_BROKER
-                                : 0,
-                            sum_disc_consultation: val.DISC_CONSULTATION
-                                ? val.DISC_CONSULTATION
-                                : 0,
-                            sum_disc_admin: val.DISC_ADMIN ? val.DISC_ADMIN : 0,
-                            sum_fee_based_income: val.FEE_BASE_INCOME
-                                ? val.FEE_BASE_INCOME
-                                : 0,
-                            sum_agent_commision: val.AGENT_COMMISION
-                                ? val.AGENT_COMMISION
-                                : 0,
-                            sum_acquisition_cost: val.ACQUISITION_COST
-                                ? val.ACQUISITION_COST
-                                : 0,
-                            values: [val.NETT_PREMI ? val.NETT_PREMI : 0],
-                        };
-                    }
-                    return acc;
-                }, {})
-            );
-        };
-        setSumByCurrency(groupBy(dataToGroup, ["CURRENCY_ID"]));
-    };
-
+   
     const getCoverageNameByPolicyId = async (policy_id: number) => {
         await axios
             .get(`/getCoverageByPolicyId/${policy_id}`)
@@ -417,7 +345,6 @@ export default function ModalDetailPolicy({
             if (value == undefined) {
                 value = 0;
             }
-            // console.log("xxxx: ", sum_insured,  parseFloat(value), parseFloat(value) / 100);
             policy_coverage_detail["GROSS_PREMIUM"] =
                 (sum_insured * value) / 100;
             policy_coverage_detail["PREMIUM"] =
@@ -546,7 +473,6 @@ export default function ModalDetailPolicy({
         setDataPolicyCoverage(items);
     };
 
-    // console.log("DataPolicyCoverage: ", dataPolicyCoverage);
 
     const inputDataCoverage = (
         name: string,
@@ -860,19 +786,19 @@ export default function ModalDetailPolicy({
                     GROSS_PREMI: coverageName[j]["PREMIUM"],
                     BROKERAGE_FEE_PERCENTAGE: 0,
                     BROKERAGE_FEE: 0,
-                    BROKERAGE_FEE_VAT: "",
+                    BROKERAGE_FEE_VAT: 0,
                     BROKERAGE_FEE_PPN: 0,
                     BROKERAGE_FEE_PPH: 0,
                     BROKERAGE_FEE_NETT_AMOUNT: 0,
                     ENGINEERING_FEE_PERCENTAGE: 0,
                     ENGINEERING_FEE: 0,
-                    ENGINEERING_FEE_VAT: "",
+                    ENGINEERING_FEE_VAT: 0,
                     ENGINEERING_FEE_PPN: 0,
                     ENGINEERING_FEE_PPH: 0,
                     ENGINEERING_FEE_NETT_AMOUNT: 0,
                     CONSULTANCY_FEE_PERCENTAGE: 0,
                     CONSULTANCY_FEE: 0,
-                    CONSULTANCY_FEE_VAT: "",
+                    CONSULTANCY_FEE_VAT: 0,
                     CONSULTANCY_FEE_PPN: 0,
                     CONSULTANCY_FEE_PPH: 0,
                     CONSULTANCY_FEE_NETT_AMOUNT: 0,
@@ -888,7 +814,6 @@ export default function ModalDetailPolicy({
         setDataInsurer(arr);
     };
 
-    console.log("dataInsurer: ", dataInsurer);
 
     const addRowInsurerCoverage = (e: FormEvent, i: number) => {
         e.preventDefault();
@@ -933,7 +858,6 @@ export default function ModalDetailPolicy({
                 item["POLICY_COST"] = 0;
             }
         }
-        // console.log(value)
         item[name] = value;
         items[i] = item;
         setDataInsurer(items);
@@ -1150,7 +1074,6 @@ export default function ModalDetailPolicy({
         items[insurerNum] = item;
         setDataInsurer(items);
     };
-    // console.log('dataInsurer: ', dataInsurer);
 
     // End Add Insurer
 
@@ -1278,110 +1201,6 @@ export default function ModalDetailPolicy({
         setDataEditInsurer(items);
     };
 
-    const deleteRowEditInsurerCoverage = (
-        insurerNum: number,
-        coverageNum: number
-    ) => {
-        const items = [...dataEditInsurer];
-
-        const item = { ...items[insurerNum] };
-
-        const premium = [...item.premium];
-
-        premium.splice(coverageNum, 1);
-
-        item.premium = premium;
-
-        // item[name] = value;
-        items[insurerNum] = item;
-        if (
-            dataEditInsurer[insurerNum].premium[coverageNum]
-                .POLICY_COVERAGE_ID !== null
-        ) {
-            if (dataEditInsurer.deletedInsurerCoverage) {
-                alert("a");
-                // setDataEditInsurer({
-                //     ...dataEditInsurer,
-                //     premium: premium,
-                //     deletedInsurerCoverage: [
-                //         ...dataEditInsurer.deletedInsurerCoverage,
-                //         {
-                //             policy_coverage_id:
-                //                 dataEditInsurer.premium[coverageNum]
-                //                     .POLICY_COVERAGE_ID,
-                //         },
-                //     ],
-                // });
-            } else {
-                alert("b");
-                setDataEditInsurer({
-                    // ...dataEditInsurer,
-                    ...[dataEditInsurer][insurerNum].premium,
-                    premium: premium,
-                    // deletedInsurerCoverage: [
-                    //     {
-                    //         policy_coverage_id:
-                    //             dataEditInsurer[insurerNum].premium[coverageNum]
-                    //                 .POLICY_COVERAGE_ID,
-                    //     },
-                    // ],
-                });
-            }
-            // console.log("ada POLICY_COVERAGE_ID");
-        } else {
-            alert("c");
-            // setDataEditInsurer({
-            //     ...dataEditInsurer,
-            //     premium: premium,
-            // });
-            // console.log("Tidak ada POLICY_COVERAGE_ID");
-        }
-
-        // arr[k]["premium"];
-
-        // items[insurerNum] = item;
-        // setDataEditInsurer(items);
-    };
-
-    const deleteRowEditEndorsementPremium = (i: number) => {
-        const val = [...dataById.endorsement_premium];
-        val.splice(i, 1);
-        if (dataById.endorsement_premium[i].endorsement_premium_id !== null) {
-            if (dataById.deletedEndorsementPremium) {
-                // alert("a");
-                setDataById({
-                    ...dataById,
-                    endorsement_premium: val,
-                    deletedEndorsementPremium: [
-                        ...dataById.deletedEndorsementPremium,
-                        {
-                            endorsement_premium_id:
-                                dataById.endorsement_premium[i]
-                                    .ENDORSEMENT_PREMIUM_ID,
-                        },
-                    ],
-                });
-            } else {
-                // alert("b");
-                setDataById({
-                    ...dataById,
-                    endorsement_premium: val,
-                    deletedEndorsementPremium: [
-                        {
-                            endorsement_premium_id:
-                                dataById.endorsement_premium[i]
-                                    .ENDORSEMENT_PREMIUM_ID,
-                        },
-                    ],
-                });
-            }
-        } else {
-            setDataById({
-                ...dataById,
-                endorsement_premium: val,
-            });
-        }
-    };
 
     const editDataInsurer = (name: string, value: any, i: number) => {
         const items = [...dataEditInsurer];
@@ -1604,201 +1423,8 @@ export default function ModalDetailPolicy({
     };
     // End Edit Insurer
 
-    // edit
-    const handleEditModal = async () => {
-        // e.preventDefault();
-        const id = policy.POLICY_ID;
-        setFlagSwitch(policy.SELF_INSURED ? true : false);
-        // setPolicyDetail(id);
 
-        await axios
-            .get(`/getPolicy/${id}`)
-            .then((res) => setDataById(res.data))
-            .catch((err) => console.log(err));
-
-        setModal({
-            add: false,
-            delete: false,
-            edit: !modal.edit,
-            view: false,
-            document: false,
-            search: false,
-            addInsurer: false,
-            editInsurer: false,
-            addCoverage: false,
-            editCoverage: false,
-            addInsured: false,
-            editInsured: false,
-            addPartners: false,
-            editPartners: false,
-        });
-    };
-    const editPolicyPremium = (
-        name: string,
-        value: string | undefined,
-        i: number
-    ) => {
-        const changeVal: any = [...dataById.policy_premium];
-        changeVal[i][name] = value;
-        setDataById({ ...dataById, policy_premium: changeVal });
-    };
-    const addRowEditPolicyPremium = (e: FormEvent) => {
-        e.preventDefault();
-        setDataById({
-            ...dataById,
-            policy_premium: [
-                ...dataById.policy_premium,
-                {
-                    POLICY_INITIAL_PREMIUM_ID: null,
-                    POLICY_ID: dataById.POLICY_ID,
-                    CURRENCY_ID: "",
-                    COVERAGE_NAME: "",
-                    GROSS_PREMI: 0,
-                    ADMIN_COST: 0,
-                    DISC_BROKER: 0,
-                    DISC_CONSULTATION: 0,
-                    DISC_ADMIN: 0,
-                    NETT_PREMI: 0,
-                    FEE_BASED_INCOME: 0,
-                    AGENT_COMMISION: 0,
-                    ACQUISITION_COST: 0,
-                },
-            ],
-        });
-        getSummaryPremi();
-    };
-
-    const deleteRowEditPolicyPremium = (i: number) => {
-        const val = [...dataById.policy_premium];
-        val.splice(i, 1);
-        if (dataById.policy_premium[i].policy_initial_premium_id !== null) {
-            if (dataById.deletedPolicyPremium) {
-                // alert("a");
-                setDataById({
-                    ...dataById,
-                    policy_premium: val,
-                    deletedPolicyPremium: [
-                        ...dataById.deletedPolicyPremium,
-                        {
-                            policy_initial_premium_id:
-                                dataById.policy_premium[i]
-                                    .POLICY_INITIAL_PREMIUM_ID,
-                        },
-                    ],
-                });
-            } else {
-                // alert("b");
-                setDataById({
-                    ...dataById,
-                    policy_premium: val,
-                    deletedPolicyPremium: [
-                        {
-                            policy_initial_premium_id:
-                                dataById.policy_premium[i]
-                                    .POLICY_INITIAL_PREMIUM_ID,
-                        },
-                    ],
-                });
-            }
-        } else {
-            setDataById({
-                ...dataById,
-                policy_premium: val,
-            });
-        }
-    };
-
-    useEffect(() => {
-        getSummaryPremi();
-    }, [flagDelete]);
-
-    const editPolicyInstallment = (
-        name: string,
-        value: string | undefined,
-        i: number
-    ) => {
-        const changeVal: any = [...dataById.policy_installment];
-        changeVal[i][name] = value;
-        setDataById({ ...dataById, policy_installment: changeVal });
-    };
-
-    const addRowEditInstallment = (e: FormEvent) => {
-        e.preventDefault();
-        setDataById({
-            ...dataById,
-            policy_installment: [
-                ...dataById.policy_installment,
-                {
-                    POLICY_INSTALLMENT_ID: null,
-                    POLICY_ID: dataById.POLICY_ID,
-                    POLICY_INSTALLMENT_TERM: "",
-                    POLICY_INSTALLMENT_PERCENTAGE: "",
-                    INSTALLMENT_DUE_DATE: "",
-                    POLICY_INSTALLMENT_AMOUNT: "",
-                },
-            ],
-        });
-    };
-
-    const deleteRowEditInstallment = (i: number) => {
-        const val = [...dataById.policy_installment];
-        val.splice(i, 1);
-        if (dataById.policy_installment[i].policy_installment_id !== null) {
-            if (dataById.deletedInstallment) {
-                // alert("a");
-                setDataById({
-                    ...dataById,
-                    policy_installment: val,
-                    deletedPolicyPremium: [
-                        ...dataById.deletedInstallment,
-                        {
-                            policy_installment_id:
-                                dataById.policy_installment[i]
-                                    .POLICY_INISTALLMENT_ID,
-                        },
-                    ],
-                });
-            } else {
-                // alert("b");
-                setDataById({
-                    ...dataById,
-                    policy_installment: val,
-                    deletedPolicyPremium: [
-                        {
-                            policy_installment_id:
-                                dataById.policy_installment[i]
-                                    .POLICY_INSTALLMENT_ID,
-                        },
-                    ],
-                });
-            }
-        } else {
-            setDataById({
-                ...dataById,
-                policy_installment: val,
-            });
-        }
-    };
-    const editCalculate = (i: number) => {
-        const changeVal: any = [...dataById.policy_premium];
-
-        const gross_premi = changeVal[i]["GROSS_PREMI"];
-        const admin_cost = changeVal[i]["ADMIN_COST"];
-        const disc_broker = changeVal[i]["DISC_BROKER"];
-        const disc_consultation = changeVal[i]["DISC_CONSULTATION"];
-        const disc_admin = changeVal[i]["DISC_ADMIN"];
-        changeVal[i]["NETT_PREMI"] =
-            parseFloat(gross_premi) +
-            parseFloat(admin_cost) -
-            parseFloat(disc_broker) -
-            parseFloat(disc_admin) -
-            parseFloat(disc_consultation);
-        setDataById({ ...dataById, policy_premium: changeVal });
-
-        getSummaryPremi();
-    };
-    // end edit
-
+   
     // Add Insured
     const [dataInsured, setDataInsured] = useState<any>([]);
     const [dataInsuredView, setdataInsuredView] = useState<any>([]);
@@ -1878,7 +1504,6 @@ export default function ModalDetailPolicy({
                 setDataInsured([
                     { ...fieldDataInsured, POLICY_ID: policy.POLICY_ID },
                 ]);
-                // console.log("fieldDataInsured: ", fieldDataInsured);
 
                 // setDataInsurerForInsured(res.data);
             })
@@ -1886,8 +1511,6 @@ export default function ModalDetailPolicy({
                 console.log(err);
             });
     };
-
-    // console.log("dataInsured: ", dataInsured);
 
     const handleAddInsured = async (policy_id: any) => {
         // setDataInsured([{ ...fieldDataInsured, POLICY_ID: policy_id }]);
@@ -2111,7 +1734,6 @@ export default function ModalDetailPolicy({
     const editDataInsured = (name: string, value: any) => {
         const item = { ...dataEditInsured };
 
-        // console.log('item: ', item)
 
         let disc_admin_cost_amount = 0;
         let admin_cost_nett_amount = 0;
@@ -2278,7 +1900,6 @@ export default function ModalDetailPolicy({
             });
         }
     };
-    // console.log("dataEditInsured: ", dataEditInsured);
     // End Edit Insured
 
     // Add Partners
@@ -2396,185 +2017,14 @@ export default function ModalDetailPolicy({
             },
         ],
     };
-    const [dataIncome, setDataIncome] = useState<any>([]);
-    const [dataNettIncome, setDataNettIncome] = useState<any>([]);
-    const [grandTotalNettIncome, setGrandTotalNettIncome] = useState<number>(0);
+    
     const [dataEditNettIncome, setDataEditNettIncome] = useState<any>([]);
     const [grandTotalEditNettIncome, setGrandTotalEditNettIncome] =
         useState<number>(0);
-    const [dataPartners, setDataPartners] = useState<any>([]);
+    
     const [listDataPartners, setListDataPartners] = useState<any>([]);
 
-    const handleAddPartners = async (policy_id: any) => {
-        setDataPartners(arrDataPartners);
-        setDataIncome(arrDataIncome);
-        setModal({
-            add: false,
-            delete: false,
-            edit: false,
-            view: false,
-            document: false,
-            search: false,
-            addInsurer: false,
-            editInsurer: false,
-            addCoverage: false,
-            editCoverage: false,
-            addInsured: false,
-            editInsured: false,
-            addPartners: !modal.addPartners,
-            editPartners: false,
-        });
-    };
-
-    const addRowPartners = (e: FormEvent, income_type: number, i: number) => {
-        e.preventDefault();
-
-        const items = [...dataIncome];
-        const item = {
-            ...items[i],
-            income_detail: [
-                ...items[i].income_detail,
-                {
-                    INCOME_TYPE: income_type,
-                    POLICY_ID: policy.POLICY_ID,
-                    NAME: "",
-                    BROKERAGE_FEE_PERCENTAGE: 0,
-                    BROKERAGE_FEE_AMOUNT: 0,
-                    ENGINEERING_FEE_PERCENTAGE: 0,
-                    ENGINEERING_FEE_AMOUNT: 0,
-                    ADMIN_COST: 0,
-                    CONSULTANCY_FEE_PERCENTAGE: 0,
-                    CONSULTANCY_FEE_AMOUNT: 0,
-                },
-            ],
-        };
-        items[i] = item;
-        setDataIncome(items);
-    };
-
-    const inputDataIncome = (
-        name: string,
-        value: string | undefined,
-        incomeNum: number,
-        detailNum: number
-    ) => {
-        const items = [...dataIncome];
-        const item = { ...items[incomeNum] };
-        const detail = [...item.income_detail];
-        const detailItem = { ...detail[detailNum] };
-        detailItem[name] = value;
-        detail[detailNum] = detailItem;
-        item.income_detail = detail;
-        items[incomeNum] = item;
-        setDataIncome(items);
-
-        setTimeout(function () {
-            setTriggerSumIncome(triggerSumIncome + 1);
-        }, 1000);
-    };
-
-    const deleteRowIncome = (incomeNum: number, detailNum: number) => {
-        const items = [...dataIncome];
-        const item = { ...items[incomeNum] };
-        const detail = [...item.income_detail];
-        detail.splice(detailNum, 1);
-        item.income_detail = detail;
-        items[incomeNum] = item;
-
-        setDataIncome(items);
-    };
-
-    useEffect(() => {
-        if (triggerSumIncome != 0) {
-            getSumNettIncome();
-        }
-    }, [triggerSumIncome]);
-
-    const getSumNettIncome = () => {
-        const items = [...dataIncome];
-        const fbi_by_pks = { ...items[0] };
-        const agent_commission = { ...items[1] };
-        const acquisition_cost = { ...items[2] };
-
-        // Nett Brokerage Fee
-        const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
-            prev: any,
-            current: any
-        ) {
-            return prev + +current.BROKERAGE_FEE_AMOUNT;
-        },
-        0);
-        const nettBF_agent = agent_commission.income_detail.reduce(function (
-            prev: any,
-            current: any
-        ) {
-            return prev + +current.BROKERAGE_FEE_AMOUNT;
-        },
-        0);
-
-        const nettBF_acquisition = acquisition_cost.income_detail.reduce(
-            function (prev: any, current: any) {
-                return prev + +current.BROKERAGE_FEE_AMOUNT;
-            },
-            0
-        );
-
-        // Nett Engineering Fee
-        const nettEF_fbi = fbi_by_pks.income_detail.reduce(function (
-            prev: any,
-            current: any
-        ) {
-            return prev + +current.ENGINEERING_FEE_AMOUNT;
-        },
-        0);
-        const nettEF_agent = agent_commission.income_detail.reduce(function (
-            prev: any,
-            current: any
-        ) {
-            return prev + +current.ENGINEERING_FEE_AMOUNT;
-        },
-        0);
-        const nettEF_acquisition = acquisition_cost.income_detail.reduce(
-            function (prev: any, current: any) {
-                return prev + +current.ENGINEERING_FEE_AMOUNT;
-            },
-            0
-        );
-
-        // Nett Consultancy Fee
-        const nettCF_fbi = fbi_by_pks.income_detail.reduce(function (
-            prev: any,
-            current: any
-        ) {
-            return prev + +current.CONSULTANCY_FEE_AMOUNT;
-        },
-        0);
-        const nettCF_agent = agent_commission.income_detail.reduce(function (
-            prev: any,
-            current: any
-        ) {
-            return prev + +current.CONSULTANCY_FEE_AMOUNT;
-        },
-        0);
-        const nettCF_acquisition = acquisition_cost.income_detail.reduce(
-            function (prev: any, current: any) {
-                return prev + +current.CONSULTANCY_FEE_AMOUNT;
-            },
-            0
-        );
-
-        const nettBF = nettBF_fbi + nettBF_agent + nettBF_acquisition;
-        const nettEF = nettEF_fbi + nettEF_agent + nettEF_acquisition;
-        const nettCF = nettCF_fbi + nettCF_agent + nettCF_acquisition;
-        setDataNettIncome([
-            {
-                nettBf: nettBF,
-                nettEf: nettEF,
-                nettCf: nettCF,
-            },
-        ]);
-        setGrandTotalNettIncome(nettBF + nettEF + nettCF);
-    };
+   
     // End Add Partners
 
     const fieldPartner = [
@@ -2743,18 +2193,6 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    console.log("listDataPartners: ", listDataPartners);
-
-    // const [modalTest, setModalTest] = useState<any>({
-    //     add:false
-    // })
-
-    // const handleTest = async (e:FormEvent, policy_id: any) => {
-    //     getDataPartner(policy_id);
-    //     setModalTest({
-    //         add: !modalTest.add,
-    //     });
-    // };
 
     const [dataSummaryInsured, setDataSummaryInsured] = useState<any>([]);
     const [tmpDataSummaryInsured, setTmpDataSummaryInsured] = useState<any>([]);
@@ -2779,7 +2217,6 @@ export default function ModalDetailPolicy({
             setDataSummaryInsured(tmpDataSummaryInsured);
         }
     }, [tmpDataSummaryInsured]);
-    console.log("dataSummaryInsured: ", dataSummaryInsured);
 
     useEffect(() => {
         if (dataSummaryInsured.length > 0) {
@@ -2794,13 +2231,6 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    // useEffect(() => {
-    //     if (tmpPolicyExchangeRate.length > 0) {
-    //         setPolicyExchangeRate(tmpPolicyExchangeRate);
-    //     }
-    // }, [tmpPolicyExchangeRate]);
-
-    // console.log("setPolicyExchangeRate: ", policyExchangeRate);
 
     const getExchangeRateByCurrId = (currId: any) => {
         const dataCurr = policyExchangeRate;
@@ -2834,35 +2264,7 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    console.log("summaryFinancial :", summaryFinancial);
-    // const [testSummary, setTestSummary] = useState<any>([]);
-    useEffect(() => {
-        if (summaryFinancial.length > 0) {
-            console.log(summaryFinancial)
-            summaryFinancial.map((record: any, i: number) => {
-                console.log("record: ", record)
-                record.detail.map(
-                    (course: any, j: number) => {
-                        console.log("course: ", course);
-                })
-             })
-            // const groupedData = summaryFinancial.reduce((acc: any, cur: any) => {
-            //     // console.log('acc: ', acc);
-            //     // console.log("cur: ", cur);
-            //     let titleValue = cur.TITLE;
-            //     if (acc[titleValue]) {
-            //         acc[titleValue].push(cur);
-            //     } else {
-            //         acc[titleValue] = [cur];
-            //     }
-            //     return acc;
-            // }, {});
-            // // setTestSummary(groupedData);
-
-            // console.log("sdfsd :",groupedData);
-        }
-    }, [summaryFinancial]);
-
+   
     const [listCoa, setListCoa] = useState<any>([]);
     const getCoa = async () => {
         await axios
@@ -2872,12 +2274,6 @@ export default function ModalDetailPolicy({
             })
             .catch((err) => console.log(err));
     };
-    const selectCoa = listCoa?.map((query: any) => {
-        return {
-            value: query.COA_ID,
-            label: query.COA_TITLE,
-        };
-    });
 
     const [listAgent, setListAgent] = useState<any>([]);
     const [listBAA, setListBAA] = useState<any>([]);
@@ -2896,7 +2292,6 @@ export default function ModalDetailPolicy({
             .catch((err) => console.log(err));
     };
 
-    console.log("listAgent safdsafds: ", listAgent);
     const getBAA = async (relation_type: number) => {
         setIsLoading({
             ...isLoading,
@@ -2909,7 +2304,6 @@ export default function ModalDetailPolicy({
             })
             .catch((err) => console.log(err));
     };
-    // console.log("listBaa: ", listBAA);
 
     const getFbiPks = async (relation_type: number) => {
         setIsLoading({
@@ -2926,17 +2320,14 @@ export default function ModalDetailPolicy({
 
     const [exchangeRate, setExchangeRate] = useState<any>([]);
 
-    const getExchangeRate = async () => {
-        console.log("dataSummaryInsured.length: ", dataSummaryInsured.length);
-        console.log("setPolicyExchangeRate: ", policyExchangeRate);
+    // const getExchangeRate = async () => {
+    const getExchangeRate = () => {
         if (dataSummaryInsured.length > 0) {
             let exRate: any = [];
             for (let j = 0; j < dataSummaryInsured.length; j++) {
-                // console.log("exchange rate: ", dataSummaryInsured[j]);
                 const rate = getExchangeRateByCurrId(
                     dataSummaryInsured[j]["CURRENCY_ID"]
                 );
-                // console.log(" rate: ", rate);
                 exRate.push({
                     POLICY_EXCHANGE_RATE_ID: rate
                         ? rate["POLICY_EXCHANGE_RATE_ID"]
@@ -2952,11 +2343,9 @@ export default function ModalDetailPolicy({
                     CF_NETT_AMOUNT: dataSummaryInsured[j]["CF_NETT_AMOUNT"],
                 });
             }
-            console.log("sdafsd: ", exRate);
             setExchangeRate(exRate);
         }
     };
-    // console.log("exchangeRate: ", exchangeRate);
 
     const [dataInitialForBP, setDataInitialForBP] = useState<any>({
         BF_NETT_AMOUNT: 0,
@@ -2965,27 +2354,11 @@ export default function ModalDetailPolicy({
     });
     const inputExRate = (name: string, value: any, i: number) => {
         const items = [...exchangeRate];
-        // console.log(items);
         const item = { ...items[i] };
         item[name] = value;
         items[i] = item;
         setExchangeRate(items);
 
-        // const item = [ ...exchangeRate ]
-        // const bfInit = item["BF_NETT_AMOUNT"] * value;
-        // const cfInit = item["CF_NETT_AMOUNT"] * value;
-        // const efInit = item["EF_NETT_AMOUNT"] * value;
-        // setDataInitialForBP({
-        //     BF_NETT_AMOUNT: dataInit.BF_NETT_AMOUNT + bfInit,
-        //     CF_NETT_AMOUNT: dataInit.CF_NETT_AMOUNT + cfInit,
-        //     EF_NETT_AMOUNT: dataInit.EF_NETT_AMOUNT + efInit,
-        // });
-        // console.log('items: ', items)
-        // console.log(
-        //     "item[i]: ",
-        //     bfInit, cfInit, efInit
-        // );
-        // console.log("dataSummaryInsured: ", dataSummaryInsured);
     };
     useEffect(() => {
         if (exchangeRate) {
@@ -3027,8 +2400,6 @@ export default function ModalDetailPolicy({
         }
     }, [exchangeRate]);
 
-    // console.log("dataExchangeRate: ", exchangeRate);
-    // console.log("dataInitialForBP: ", dataInitialForBP);
 
     // Edit Partners
     const handleEditPartners = async (policy_id: any) => {
@@ -3037,19 +2408,13 @@ export default function ModalDetailPolicy({
         getAgent(3);
         // getBAA(12);
         getSummaryInsured(policy_id);
-        // console.log("DataSummaryInsured: ", dataSummaryInsured);
         // getPolicyExchangeRate(policy_id);
-        // console.log("PolicyExchangeRate: ", policyExchangeRate);
         getDataPartner(policy_id);
-        // console.log("ListDataPartners: ", listDataPartners);
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
-        // console.log("CurrencyFromCoverage: ", currencyFromCoverage);
         setTimeout(function () {
             getExchangeRate();
         }, 1000);
-        // setTimeout(function () {
         setTriggerEditSumIncome(triggerEditSumIncome + 1);
-        // }, 1000);
         // getExchangeRate();
 
         setModal({
@@ -3116,11 +2481,6 @@ export default function ModalDetailPolicy({
         setListDataPartners(items);
     };
 
-    // name: "RELATION_ID",
-    //             value: value,
-    //             incomeNum: incomeNum,
-    //             detailNum: detailNum,
-
     const getDefaultPayable = async (name: any, relation_id: any, incomeNum:any, detailNum:any) => {
         await axios
             .get(`/getDefaultPayable/${relation_id}`)
@@ -3132,8 +2492,6 @@ export default function ModalDetailPolicy({
                     detailNum: detailNum,
                     // defaultPayable: defaultPayable
                 });
-                // alert(res.data);
-                // console.log("dsafsd: ",res.data)
                 return res.data
             })
             .catch((err) => console.log(err));
@@ -3145,8 +2503,6 @@ export default function ModalDetailPolicy({
         incomeNum: number,
         detailNum: number
     ) => {
-        // let xx:any = 0
-
         const items = [...listDataPartners];
         const item = { ...items[incomeNum] };
         const detail = [...item.income_detail];
@@ -3155,12 +2511,12 @@ export default function ModalDetailPolicy({
         const initBF = dataInitialForBP.BF_NETT_AMOUNT;
         const initCF = dataInitialForBP.CF_NETT_AMOUNT;
         const initEF = dataInitialForBP.EF_NETT_AMOUNT;
-        // alert(name);
+        
         let bf_ppn = 0;
         let bf_pph = 0;
 
         if (name == "BROKERAGE_FEE_PERCENTAGE") {
-            // alert('a')
+            
             detailItem["BROKERAGE_FEE_AMOUNT"] =
                 (initBF * detailItem["BROKERAGE_FEE_PERCENTAGE"]) / 100;
             if (value == undefined) {
@@ -3168,8 +2524,7 @@ export default function ModalDetailPolicy({
             }
             console.log("detailItem: ",detailItem)
             let bf_after_ppn = 0;
-            // let bf_ppn = 0;
-            // let bf_pph = 0;
+            
             if (detailItem["INCOME_TYPE"] == 1) {
                 if (detailItem["BROKERAGE_FEE_VAT"] == 1) {                    
                     bf_ppn = -((detailItem["BROKERAGE_FEE_AMOUNT"] * 11) / 100);
@@ -3185,7 +2540,7 @@ export default function ModalDetailPolicy({
             }
 
             if (detailItem["INCOME_TYPE"] == 2) {
-                // alert('a')
+                
                 if (detailItem["BROKERAGE_FEE_VAT"] == 1) {                    
                     // untuk perusahaan 2%
                     // bf_pph = -((detailItem["BROKERAGE_FEE_AMOUNT"] * 2) / 100);
@@ -3457,10 +2812,7 @@ export default function ModalDetailPolicy({
     useEffect(() => {
         // alert(Object.keys(relationIdForPayable).length);
         if (Object.keys(relationIdForPayable).length > 0) {
-            // alert('a')
-            // console.log("xxxx: ", relationIdForPayable);
-
-            // console.log("value: ", relationIdForPayable["value"]);
+            
             const items = [...listDataPartners];
             const item = { ...items[relationIdForPayable["incomeNum"]] };
             const detail = [...item.income_detail];
@@ -3563,8 +2915,7 @@ console.log("items: ", items)
             parseFloat(nettBF_fbi) +
             parseFloat(nettBF_agent) +
             parseFloat(nettBF_acquisition);
-        // console.log("nettBF: ", nettBF, initEF, initCF);
-        // console.log("initBF - nettBF: ", initBF, initEF, initCF);
+        
         const nettEF =
             parseFloat(nettEF_fbi) +
             parseFloat(nettEF_agent) +
@@ -3661,38 +3012,6 @@ console.log("items: ", items)
         });
         setDataInsured([]);
         // setDataInsurerForInsured([]);
-    };
-
-    const handleSuccessPartners = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Succeed Register Business Partners",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
-        });
-        getDataPartner(policy.POLICY_ID);
-        setDataIncome([]);
-        setTriggerSumIncome(0);
-        setDataNettIncome([]);
-        setGrandTotalNettIncome(0);
     };
 
     const handleSuccess = (message: string) => {
@@ -3858,31 +3177,6 @@ console.log("items: ", items)
 
     return (
         <>
-            {/* Modal Test  */}
-            {/* <ModalToAction
-                show={modalTest.add}
-                onClose={() => {
-                    setModalTest({
-                        add: false,
-                    });
-                }}
-                title={"Edit Policy"}
-                url={""}
-                data={""}
-                onSuccess={""}
-                method={""}
-                headers={null}
-                submitButtonName={"Submit"}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-6xl"
-                }
-                body={
-                    <>
-                        <ModalTest />
-                    </>
-                }
-            /> */}
-            {/* End Modal Test */}
             {/* modal edit */}
             <ModalToAction
                 show={modal.edit}
@@ -3902,8 +3196,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    }),
-                        setSumByCurrency([]);
+                    })
                 }}
                 title={"Edit Policy"}
                 url={`/editPolicy/${dataById.POLICY_ID}`}
@@ -4221,8 +3514,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    }),
-                        setSumByCurrency([]);
+                    })
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                 }}
@@ -4335,43 +3627,20 @@ console.log("items: ", items)
                                                         >
                                                             Gross Premium
                                                         </th>
-                                                        {/* <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Gross Premium
-                                                        </th> */}
+                                                        
                                                         <th
                                                             colSpan={3}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
                                                         >
                                                             Loss Limit Premium
                                                         </th>
-                                                        {/* <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Loss Limit Amount
-                                                        </th>
-                                                        <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Loss Limit Scale
-                                                        </th> */}
+
                                                         <th
                                                             colSpan={2}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
                                                         >
                                                             Insurance Discount
                                                         </th>
-                                                        {/* <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Insurance Discount
-                                                            Amount
-                                                        </th> */}
 
                                                         <th
                                                             rowSpan={2}
@@ -4823,7 +4092,7 @@ console.log("items: ", items)
                                                                                 );
                                                                             }}
                                                                             className="block w-48 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                            required
+                                                                            readOnly
                                                                         />
                                                                     </td>
                                                                     <td className="p-4 border">
@@ -4973,8 +4242,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    }),
-                        setSumByCurrency([]);
+                    })
                     setDataInsurer([]);
                 }}
                 title={"Edit Coverage"}
@@ -5509,7 +4777,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-48 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -5644,8 +4912,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    }),
-                        setSumByCurrency([]);
+                    })
                     setDataInsurer([]);
                 }}
                 title={"Add Insurer"}
@@ -6101,12 +5368,7 @@ console.log("items: ", items)
                                                             <th className="text-center p-4 border ">
                                                                 Nett Amount
                                                             </th>
-                                                            {/* <th className="text-center p-4 border ">
-                                                                %
-                                                            </th>
-                                                            <th className="text-center p-4 border ">
-                                                                Amount
-                                                            </th> */}
+                                                            
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -6139,6 +5401,7 @@ console.log("items: ", items)
                                                                                         j
                                                                                     );
                                                                                 }}
+                                                                                disabled
                                                                             >
                                                                                 <option
                                                                                     value={
@@ -6196,7 +5459,7 @@ console.log("items: ", items)
                                                                                             j
                                                                                         )
                                                                                     }
-                                                                                    required
+                                                                                    readOnly
                                                                                     autoComplete="off"
                                                                                 />
                                                                             </div>
@@ -6219,6 +5482,7 @@ console.log("items: ", items)
                                                                                         j
                                                                                     );
                                                                                 }}
+                                                                                disabled
                                                                             >
                                                                                 <option>
                                                                                     --{" "}
@@ -6270,6 +5534,7 @@ console.log("items: ", items)
                                                                                         j
                                                                                     );
                                                                                 }}
+                                                                                disabled
                                                                             >
                                                                                 <option>
                                                                                     --{" "}
@@ -6326,7 +5591,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6476,33 +5741,6 @@ console.log("items: ", items)
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <Checkbox
-                                                                                name={
-                                                                                    "brokerage_fee_vat-" +
-                                                                                    i
-                                                                                }
-                                                                                id={
-                                                                                    dIP.BROKERAGE_FEE_VAT
-                                                                                }
-                                                                                value={
-                                                                                    dIP.BROKERAGE_FEE_VAT
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    inputInsurerCoverage(
-                                                                                        "BROKERAGE_FEE_VAT",
-                                                                                        e
-                                                                                            .target
-                                                                                            .checked ==
-                                                                                            true
-                                                                                            ? 1
-                                                                                            : 0,
-                                                                                        i,
-                                                                                        j
-                                                                                    )
-                                                                                }
-                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -6528,7 +5766,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6555,7 +5793,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6582,7 +5820,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6733,33 +5971,6 @@ console.log("items: ", items)
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <Checkbox
-                                                                                name={
-                                                                                    "engineering_fee_vat-" +
-                                                                                    i
-                                                                                }
-                                                                                id={
-                                                                                    dIP.ENGINEERING_FEE_VAT
-                                                                                }
-                                                                                value={
-                                                                                    dIP.ENGINEERING_FEE_VAT
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    inputInsurerCoverage(
-                                                                                        "ENGINEERING_FEE_VAT",
-                                                                                        e
-                                                                                            .target
-                                                                                            .checked ==
-                                                                                            true
-                                                                                            ? 1
-                                                                                            : 0,
-                                                                                        i,
-                                                                                        j
-                                                                                    )
-                                                                                }
-                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -6785,7 +5996,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6812,7 +6023,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6839,7 +6050,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -6962,33 +6173,6 @@ console.log("items: ", items)
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <Checkbox
-                                                                                name={
-                                                                                    "consultancy_fee_vat-" +
-                                                                                    i
-                                                                                }
-                                                                                id={
-                                                                                    dIP.CONSULTANCY_FEE_VAT
-                                                                                }
-                                                                                value={
-                                                                                    dIP.CONSULTANCY_FEE_VAT
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    inputInsurerCoverage(
-                                                                                        "CONSULTANCY_FEE_VAT",
-                                                                                        e
-                                                                                            .target
-                                                                                            .checked ==
-                                                                                            true
-                                                                                            ? 1
-                                                                                            : 0,
-                                                                                        i,
-                                                                                        j
-                                                                                    )
-                                                                                }
-                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -7014,7 +6198,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -7041,7 +6225,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -7068,7 +6252,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
 
@@ -7096,59 +6280,14 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
-
-                                                                        {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                viewBox="0 0 24 24"
-                                                                                strokeWidth={
-                                                                                    1.5
-                                                                                }
-                                                                                stroke="currentColor"
-                                                                                className="mx-auto h-6 text-red-500 cursor-pointer"
-                                                                                onClick={() => {
-                                                                                    deleteRowInsurerCoverage(
-                                                                                        i,
-                                                                                        j
-                                                                                    );
-                                                                                }}
-                                                                            >
-                                                                                <path
-                                                                                    fill="#AB7C94"
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    d="M6 18 18 6M6 6l12 12"
-                                                                                />
-                                                                            </svg>
-                                                                        </td> */}
                                                                     </tr>
                                                                 );
                                                             }
                                                         )}
-                                                        {/* <tr>
-                                                            <td
-                                                                colSpan={2}
-                                                                className=" h-10 w-40 mb-2 mt-2"
-                                                            >
-                                                                <a
-                                                                    href=""
-                                                                    className="text-xs mt-1 text-primary-pelindo ms-1"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) =>
-                                                                        addRowInsurerCoverage(
-                                                                            e,
-                                                                            i
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    + Add Row
-                                                                </a>
-                                                            </td>
-                                                        </tr> */}
+                                                        
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -7182,8 +6321,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    }),
-                        setSumByCurrency([]);
+                    })
                     setDataInsurer([]);
                 }}
                 title={"Edit Insurer"}
@@ -7236,17 +6374,7 @@ console.log("items: ", items)
                                             {dataEditInsurer.length}
                                         </span>
                                     </div>
-                                    {/* <div className="col-span-2">
-                                        <TextInput
-                                            id="insurer_number"
-                                            type="number"
-                                            name="insurer_number"
-                                            value={dataEditInsurer.length}
-                                            className=""
-                                            autoComplete="off"
-                                            readOnly
-                                        />
-                                    </div> */}
+                                    
                                 </div>
                             </div>
                             <div className=""></div>
@@ -7660,6 +6788,7 @@ console.log("items: ", items)
                                                                                         j
                                                                                     );
                                                                                 }}
+                                                                                disabled
                                                                             >
                                                                                 <option
                                                                                     value={
@@ -7717,7 +6846,7 @@ console.log("items: ", items)
                                                                                             j
                                                                                         )
                                                                                     }
-                                                                                    required
+                                                                                    readOnly
                                                                                     autoComplete="off"
                                                                                 />
                                                                             </div>
@@ -7740,6 +6869,7 @@ console.log("items: ", items)
                                                                                         j
                                                                                     );
                                                                                 }}
+                                                                                disabled
                                                                             >
                                                                                 <option>
                                                                                     --{" "}
@@ -7791,6 +6921,7 @@ console.log("items: ", items)
                                                                                         j
                                                                                     );
                                                                                 }}
+                                                                                disabled
                                                                             >
                                                                                 <option>
                                                                                     --{" "}
@@ -7847,7 +6978,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -7997,39 +7128,6 @@ console.log("items: ", items)
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <Checkbox
-                                                                                name={
-                                                                                    "brokerage_fee_vat-" +
-                                                                                    i
-                                                                                }
-                                                                                id={
-                                                                                    dIP.BROKERAGE_FEE_VAT
-                                                                                }
-                                                                                value={
-                                                                                    dIP.BROKERAGE_FEE_VAT
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    editInsurerCoverage(
-                                                                                        "BROKERAGE_FEE_VAT",
-                                                                                        e
-                                                                                            .target
-                                                                                            .checked ==
-                                                                                            true
-                                                                                            ? 1
-                                                                                            : 0,
-                                                                                        i,
-                                                                                        j
-                                                                                    )
-                                                                                }
-                                                                                checked={
-                                                                                    dIP.BROKERAGE_FEE_VAT ==
-                                                                                    0
-                                                                                        ? false
-                                                                                        : true
-                                                                                }
-                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -8055,7 +7153,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -8082,7 +7180,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -8109,7 +7207,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
 
@@ -8261,39 +7359,6 @@ console.log("items: ", items)
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <Checkbox
-                                                                                name={
-                                                                                    "engineering_fee_vat-" +
-                                                                                    i
-                                                                                }
-                                                                                id={
-                                                                                    dIP.ENGINEERING_FEE_VAT
-                                                                                }
-                                                                                value={
-                                                                                    dIP.ENGINEERING_FEE_VAT
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    editInsurerCoverage(
-                                                                                        "ENGINEERING_FEE_VAT",
-                                                                                        e
-                                                                                            .target
-                                                                                            .checked ==
-                                                                                            true
-                                                                                            ? 1
-                                                                                            : 0,
-                                                                                        i,
-                                                                                        j
-                                                                                    )
-                                                                                }
-                                                                                checked={
-                                                                                    dIP.ENGINEERING_FEE_VAT ==
-                                                                                    0
-                                                                                        ? false
-                                                                                        : true
-                                                                                }
-                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -8319,7 +7384,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -8346,7 +7411,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -8373,7 +7438,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
 
@@ -8497,39 +7562,6 @@ console.log("items: ", items)
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <Checkbox
-                                                                                name={
-                                                                                    "consultancy_fee_vat-" +
-                                                                                    i
-                                                                                }
-                                                                                id={
-                                                                                    dIP.CONSULTANCY_FEE_VAT
-                                                                                }
-                                                                                value={
-                                                                                    dIP.CONSULTANCY_FEE_VAT
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    editInsurerCoverage(
-                                                                                        "CONSULTANCY_FEE_VAT",
-                                                                                        e
-                                                                                            .target
-                                                                                            .checked ==
-                                                                                            true
-                                                                                            ? 1
-                                                                                            : 0,
-                                                                                        i,
-                                                                                        j
-                                                                                    )
-                                                                                }
-                                                                                checked={
-                                                                                    dIP.CONSULTANCY_FEE_VAT ==
-                                                                                    0
-                                                                                        ? false
-                                                                                        : true
-                                                                                }
-                                                                            /> */}
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                             <CurrencyInput
@@ -8555,7 +7587,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -8582,7 +7614,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
                                                                         <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -8609,7 +7641,7 @@ console.log("items: ", items)
                                                                                     );
                                                                                 }}
                                                                                 className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                                required
+                                                                                readOnly
                                                                             />
                                                                         </td>
 
@@ -8678,8 +7710,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    }),
-                        setSumByCurrency([]);
+                    })
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                     // setDataInsurerForInsured([]);
@@ -8857,37 +7888,6 @@ console.log("items: ", items)
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            {/* <div className="grid grid-cols-2">
-                                                <div>
-                                                    <InputLabel
-                                                        htmlFor="admin_cost"
-                                                        value="Admin Cost"
-                                                    />
-                                                </div>
-                                                <div className=" text-red-600">
-                                                    *
-                                                </div>
-                                            </div> */}
-                                            {/* <div className="col-span-3">
-                                                <CurrencyInput
-                                                    id="admin_cost"
-                                                    name="POLICY_ADMIN_COST"
-                                                    value={
-                                                        insured.POLICY_ADMIN_COST
-                                                    }
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    onValueChange={(values) => {
-                                                        inputDataInsured(
-                                                            "POLICY_ADMIN_COST",
-                                                            values,
-                                                            i
-                                                        );
-                                                    }}
-                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                    required
-                                                />
-                                            </div> */}
                                         </div>
                                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
                                             <table className="table-auto w-full">
@@ -9029,6 +8029,7 @@ console.log("items: ", items)
                                                                                 j
                                                                             );
                                                                         }}
+                                                                        disabled
                                                                     >
                                                                         <option
                                                                             value={
@@ -9086,7 +8087,7 @@ console.log("items: ", items)
                                                                                     j
                                                                                 )
                                                                             }
-                                                                            // required
+                                                                            readOnly
                                                                             autoComplete="off"
                                                                         />
                                                                     </div>
@@ -9109,6 +8110,7 @@ console.log("items: ", items)
                                                                                 j
                                                                             );
                                                                         }}
+                                                                        disabled
                                                                     >
                                                                         <option
                                                                             value={
@@ -9163,6 +8165,7 @@ console.log("items: ", items)
                                                                                 j
                                                                             );
                                                                         }}
+                                                                        disabled
                                                                     >
                                                                         <option
                                                                             value={
@@ -9223,7 +8226,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9250,7 +8253,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9331,7 +8334,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9358,7 +8361,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9439,7 +8442,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9466,7 +8469,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9547,7 +8550,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9574,7 +8577,7 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                                 <td className="p-4 border">
@@ -9601,31 +8604,12 @@ console.log("items: ", items)
                                                                             );
                                                                         }}
                                                                         className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                        required
+                                                                        readOnly
                                                                     />
                                                                 </td>
                                                             </tr>
                                                         )
                                                     )}
-                                                    {/* <tr>
-                                                        <td
-                                                            colSpan={2}
-                                                            className=" h-10 w-40 mb-2 mt-2"
-                                                        >
-                                                            <a
-                                                                href=""
-                                                                className="text-xs mt-1 text-primary-pelindo ms-1"
-                                                                onClick={(e) =>
-                                                                    addRowInsuredDetail(
-                                                                        e,
-                                                                        i
-                                                                    )
-                                                                }
-                                                            >
-                                                                + Add Row
-                                                            </a>
-                                                        </td>
-                                                    </tr> */}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -9634,15 +8618,6 @@ console.log("items: ", items)
                                 </div>
                             </div>
                         ))}
-                        {/* <div className="ml-4 w-40 mb-2 mt-2">
-                            <a
-                                href=""
-                                className="text-xs mt-1 text-primary-pelindo ms-1"
-                                onClick={(e) => addRowInsured(e)}
-                            >
-                                + Add Interest Insured
-                            </a>
-                        </div> */}
                     </>
                 }
             />
@@ -9668,7 +8643,6 @@ console.log("items: ", items)
                         addPartners: false,
                         editPartners: false,
                     }),
-                        setSumByCurrency([]);
                     setDataInsurer([]);
                 }}
                 title={"Edit Insured Nett Premium & Broker Nett Income"}
@@ -9764,13 +8738,6 @@ console.log("items: ", items)
                                                                     "ADMIN_COST",
                                                                     values
                                                                 );
-                                                                // setDataEditInsured(
-                                                                //     {
-                                                                //         ...dataEditInsured,
-                                                                //         ADMIN_COST:
-                                                                //             values,
-                                                                //     }
-                                                                // );
                                                             }}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                             required
@@ -9792,13 +8759,6 @@ console.log("items: ", items)
                                                                     "DISC_ADMIN_COST_PERCENTAGE",
                                                                     values
                                                                 );
-                                                                // setDataEditInsured(
-                                                                //     {
-                                                                //         ...dataEditInsured,
-                                                                //         DISC_ADMIN_COST_PERCENTAGE:
-                                                                //             values,
-                                                                //     }
-                                                                // );
                                                             }}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                             required
@@ -9820,13 +8780,6 @@ console.log("items: ", items)
                                                                     "DISC_ADMIN_COST_AMOUNT",
                                                                     values
                                                                 );
-                                                                // setDataEditInsured(
-                                                                //     {
-                                                                //         ...dataEditInsured,
-                                                                //         DISC_ADMIN_COST_AMOUNT:
-                                                                //             values,
-                                                                //     }
-                                                                // );
                                                             }}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                             required
@@ -9853,42 +8806,12 @@ console.log("items: ", items)
                                                                 );
                                                             }}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                            required
+                                                            readOnly
                                                         />
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        {/* <div className="grid grid-cols-2">
-                                            <div>
-                                                <InputLabel
-                                                    htmlFor="admin_cost"
-                                                    value="Admin Cost"
-                                                />
-                                            </div>
-                                            <div className=" text-red-600">
-                                                *
-                                            </div>
-                                        </div>
-                                        <div className="col-span-3">
-                                            <CurrencyInput
-                                                id="admin_cost"
-                                                name="ADMIN_COST"
-                                                value={
-                                                    dataEditInsured.ADMIN_COST
-                                                }
-                                                decimalScale={2}
-                                                decimalsLimit={2}
-                                                onValueChange={(values) => {
-                                                    setDataEditInsured({
-                                                        ...dataEditInsured,
-                                                        ADMIN_COST: values,
-                                                    });
-                                                }}
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                                required
-                                            />
-                                        </div> */}
                                     </div>
 
                                     <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
@@ -10029,6 +8952,7 @@ console.log("items: ", items)
                                                                             j
                                                                         );
                                                                     }}
+                                                                    disabled
                                                                 >
                                                                     <option
                                                                         value={
@@ -10085,7 +9009,7 @@ console.log("items: ", items)
                                                                                 j
                                                                             )
                                                                         }
-                                                                        required
+                                                                        readOnly
                                                                         autoComplete="off"
                                                                     />
                                                                 </div>
@@ -10107,6 +9031,7 @@ console.log("items: ", items)
                                                                             j
                                                                         );
                                                                     }}
+                                                                    disabled
                                                                 >
                                                                     <option>
                                                                         --{" "}
@@ -10156,6 +9081,7 @@ console.log("items: ", items)
                                                                             j
                                                                         );
                                                                     }}
+                                                                    disabled
                                                                 >
                                                                     <option
                                                                         value={
@@ -10215,7 +9141,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10241,7 +9167,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
 
@@ -10320,7 +9246,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10346,7 +9272,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10424,7 +9350,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
 
@@ -10451,7 +9377,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10529,7 +9455,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10555,7 +9481,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10581,7 +9507,7 @@ console.log("items: ", items)
                                                                         );
                                                                     }}
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
+                                                                    readOnly
                                                                 />
                                                             </td>
                                                             <td className="p-4 border">
@@ -10614,25 +9540,7 @@ console.log("items: ", items)
                                                         </tr>
                                                     )
                                                 )}
-                                                {/* <tr>
-                                                    <td
-                                                        colSpan={2}
-                                                        className=" h-10 w-40 mb-2 mt-2"
-                                                    >
-                                                        <a
-                                                            href=""
-                                                            className="text-xs mt-1 text-primary-pelindo ms-1"
-                                                            onClick={(e) => {
-                                                                addRowEditInsuredDetail(
-                                                                    e,
-                                                                    dataEditInsured.POLICY_INSURED_ID
-                                                                );
-                                                            }}
-                                                        >
-                                                            + Add Row
-                                                        </a>
-                                                    </td>
-                                                </tr> */}
+                                                
                                             </tbody>
                                         </table>
                                     </div>
@@ -10645,498 +9553,6 @@ console.log("items: ", items)
             />
             {/* End Modal Edit Insured */}
 
-            {/* modal Add Partners */}
-            <ModalToAdd
-                buttonAddOns={""}
-                show={modal.addPartners}
-                onClose={() => {
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                        addInsurer: false,
-                        editInsurer: false,
-                        addCoverage: false,
-                        editCoverage: false,
-                        addInsured: false,
-                        editInsured: false,
-                        addPartners: false,
-                        editPartners: false,
-                    }),
-                        setSumByCurrency([]);
-                    setDataInsurer([]);
-                    setDataPolicyCoverage([]);
-                    setTriggerSumIncome(0);
-                    setDataNettIncome([]);
-                    setGrandTotalNettIncome(0);
-                }}
-                title={"Add Business Partners"}
-                url={`/insertPartners`}
-                data={dataIncome}
-                onSuccess={handleSuccessPartners}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-7xl"
-                }
-                body={
-                    <>
-                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
-                            <table className="table-auto w-full">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            rowSpan={2}
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
-                                        >
-                                            Type of Income{" "}
-                                            <span className="text-red-600">
-                                                *
-                                            </span>
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            colSpan={2}
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Brokerage Fee
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            colSpan={2}
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Engineering Fee
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            colSpan={2}
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Consultancy Fee
-                                        </th>
-                                        <th
-                                            rowSpan={2}
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
-                                        >
-                                            Admin Cost
-                                        </th>
-                                        <th
-                                            rowSpan={2}
-                                            scope="col"
-                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
-                                        >
-                                            Action
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            %
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Amount
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            %
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Amount
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            %
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Amount
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white">
-                                    {dataIncome.map(
-                                        (income: any, i: number) => (
-                                            <Fragment
-                                                key={income.INCOME_CATEGORY_ID}
-                                            >
-                                                <tr className="border-t border-gray-200">
-                                                    <th
-                                                        scope="colgroup"
-                                                        colSpan={9}
-                                                        className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                                    >
-                                                        <td className="text-left w-40">
-                                                            {income.INCOME_NAME}
-                                                        </td>
-                                                        <td className="text-left w-32">
-                                                            <a
-                                                                href=""
-                                                                className="text-xs mt-1 text-primary ms-1"
-                                                                onClick={(e) =>
-                                                                    addRowPartners(
-                                                                        e,
-                                                                        income.INCOME_CATEGORY_ID,
-                                                                        i
-                                                                    )
-                                                                }
-                                                            >
-                                                                + Add Row
-                                                            </a>
-                                                        </td>
-                                                    </th>
-                                                </tr>
-                                                {income.income_detail.map(
-                                                    (
-                                                        detail: any,
-                                                        detailIdx: number
-                                                    ) => (
-                                                        <tr
-                                                            key={detailIdx}
-                                                            className={
-                                                                detailIdx === 0
-                                                                    ? "border-gray-300"
-                                                                    : "border-gray-200"
-                                                            }
-                                                        >
-                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm  text-gray-900 sm:pl-3 border-[1px]">
-                                                                <div className="block w-40 mx-auto text-left">
-                                                                    <TextInput
-                                                                        id="name"
-                                                                        type="text"
-                                                                        name="name"
-                                                                        value={
-                                                                            detail.NAME
-                                                                        }
-                                                                        className=""
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            inputDataIncome(
-                                                                                "NAME",
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                                i,
-                                                                                detailIdx
-                                                                            )
-                                                                        }
-                                                                        required
-                                                                        autoComplete="off"
-                                                                    />
-                                                                </div>
-                                                            </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
-                                                                <CurrencyInput
-                                                                    id="brokerage_fee_percentage"
-                                                                    name="BROKERAGE_FEE_PERCENTAGE"
-                                                                    value={
-                                                                        detail.BROKERAGE_FEE_PERCENTAGE
-                                                                    }
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    onValueChange={(
-                                                                        values
-                                                                    ) => {
-                                                                        inputDataIncome(
-                                                                            "BROKERAGE_FEE_PERCENTAGE",
-                                                                            values,
-                                                                            i,
-                                                                            detailIdx
-                                                                        );
-                                                                    }}
-                                                                    className="block w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
-                                                                />
-                                                            </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
-                                                                <CurrencyInput
-                                                                    id="brokerage_fee_amount"
-                                                                    name="BROKERAGE_FEE_AMOUNT"
-                                                                    value={
-                                                                        detail.BROKERAGE_FEE_AMOUNT
-                                                                    }
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    onValueChange={(
-                                                                        values
-                                                                    ) => {
-                                                                        inputDataIncome(
-                                                                            "BROKERAGE_FEE_AMOUNT",
-                                                                            values,
-                                                                            i,
-                                                                            detailIdx
-                                                                        );
-                                                                    }}
-                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
-                                                                />
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
-                                                                <CurrencyInput
-                                                                    id="engineering_fee_percentage"
-                                                                    name="ENGINEERING_FEE_PERCENTAGE"
-                                                                    value={
-                                                                        detail.ENGINEERING_FEE_PERCENTAGE
-                                                                    }
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    onValueChange={(
-                                                                        values
-                                                                    ) => {
-                                                                        inputDataIncome(
-                                                                            "ENGINEERING_FEE_PERCENTAGE",
-                                                                            values,
-                                                                            i,
-                                                                            detailIdx
-                                                                        );
-                                                                    }}
-                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
-                                                                />
-                                                            </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
-                                                                <CurrencyInput
-                                                                    id="engineering_fee_amount"
-                                                                    name="ENGINEERING_FEE_AMOUNT"
-                                                                    value={
-                                                                        detail.ENGINEERING_FEE_AMOUNT
-                                                                    }
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    onValueChange={(
-                                                                        values
-                                                                    ) => {
-                                                                        inputDataIncome(
-                                                                            "ENGINEERING_FEE_AMOUNT",
-                                                                            values,
-                                                                            i,
-                                                                            detailIdx
-                                                                        );
-                                                                    }}
-                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
-                                                                />
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
-                                                                <CurrencyInput
-                                                                    id="consultancy_fee_percentage"
-                                                                    name="CONSULTANCY_FEE_PERCENTAGE"
-                                                                    value={
-                                                                        detail.CONSULTANCY_FEE_PERCENTAGE
-                                                                    }
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    onValueChange={(
-                                                                        values
-                                                                    ) => {
-                                                                        inputDataIncome(
-                                                                            "CONSULTANCY_FEE_PERCENTAGE",
-                                                                            values,
-                                                                            i,
-                                                                            detailIdx
-                                                                        );
-                                                                    }}
-                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
-                                                                />
-                                                            </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
-                                                                <CurrencyInput
-                                                                    id="consultancy_fee_amount"
-                                                                    name="CONSULTANCY_FEE_AMOUNT"
-                                                                    value={
-                                                                        detail.CONSULTANCY_FEE_AMOUNT
-                                                                    }
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    onValueChange={(
-                                                                        values
-                                                                    ) => {
-                                                                        inputDataIncome(
-                                                                            "CONSULTANCY_FEE_AMOUNT",
-                                                                            values,
-                                                                            i,
-                                                                            detailIdx
-                                                                        );
-                                                                    }}
-                                                                    className="block w-32 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                    required
-                                                                />
-                                                            </td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]"></td>
-                                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
-                                                                {detailIdx >
-                                                                0 ? (
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 24 24"
-                                                                        strokeWidth={
-                                                                            1.5
-                                                                        }
-                                                                        stroke="currentColor"
-                                                                        className="mx-auto h-6 text-red-500 cursor-pointer"
-                                                                        onClick={() => {
-                                                                            deleteRowIncome(
-                                                                                i,
-                                                                                detailIdx
-                                                                            );
-                                                                            setTriggerSumIncome(
-                                                                                triggerSumIncome +
-                                                                                    1
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <path
-                                                                            fill="#AB7C94"
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            d="M6 18 18 6M6 6l12 12"
-                                                                        />
-                                                                    </svg>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                )}
-                                            </Fragment>
-                                        )
-                                    )}
-                                    {dataNettIncome?.map(
-                                        (nett: any, x: number) => (
-                                            <tr
-                                                key={x}
-                                                className={"border-gray-200"}
-                                            >
-                                                <th
-                                                    scope="colgroup"
-                                                    className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                                >
-                                                    Nett Margin
-                                                </th>
-
-                                                <td
-                                                    colSpan={2}
-                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                                >
-                                                    {new Intl.NumberFormat(
-                                                        "id",
-                                                        {
-                                                            style: "decimal",
-                                                        }
-                                                    ).format(nett.nettBf)}
-                                                </td>
-
-                                                <td
-                                                    colSpan={2}
-                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                                >
-                                                    {new Intl.NumberFormat(
-                                                        "id",
-                                                        {
-                                                            style: "decimal",
-                                                        }
-                                                    ).format(nett.nettEf)}
-                                                </td>
-
-                                                <td
-                                                    colSpan={2}
-                                                    className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                                >
-                                                    {new Intl.NumberFormat(
-                                                        "id",
-                                                        {
-                                                            style: "decimal",
-                                                        }
-                                                    ).format(nett.nettCf)}
-                                                </td>
-                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]">
-                                                    Admin Cost
-                                                </td>
-                                                <td className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"></td>
-                                            </tr>
-                                        )
-                                    )}
-
-                                    {/* Gran Total */}
-                                    {grandTotalNettIncome != 0 ? (
-                                        <tr
-                                            key={1}
-                                            className={"border-gray-200"}
-                                        >
-                                            <th
-                                                scope="colgroup"
-                                                className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                                            >
-                                                Grand Total Nett Margin
-                                            </th>
-                                            <td
-                                                colSpan={2}
-                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                            >
-                                                {new Intl.NumberFormat("id", {
-                                                    style: "decimal",
-                                                }).format(grandTotalNettIncome)}
-                                            </td>
-
-                                            <td
-                                                colSpan={7}
-                                                className="bg-gray-50 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 border-[1px]"
-                                            ></td>
-                                        </tr>
-                                    ) : (
-                                        ""
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </>
-                }
-            />
-            {/* end modal Add Partners  */}
 
             {/* modal Edit Partners */}
             <ModalToAdd
@@ -11159,13 +9575,10 @@ console.log("items: ", items)
                         addPartners: false,
                         editPartners: false,
                     }),
-                        setSumByCurrency([]);
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                     setTriggerSumIncome(0);
                     setTriggerEditSumIncome(0);
-                    setDataNettIncome([]);
-                    setGrandTotalNettIncome(0);
                     setDataEditNettIncome([]);
                     setGrandTotalEditNettIncome(0);
                     setRelationIdForPayable([]);
@@ -12010,27 +10423,7 @@ console.log("items: ", items)
                                                                                 );
                                                                             }
                                                                         )}
-                                                                    {/* {listPksNumber.map(
-                                                                        (
-                                                                            item: any,
-                                                                            i: number
-                                                                        ) => {
-                                                                            return (
-                                                                                <option
-                                                                                    key={
-                                                                                        i
-                                                                                    }
-                                                                                    value={
-                                                                                        item.M_PKS_RELATION_ID
-                                                                                    }
-                                                                                >
-                                                                                    {
-                                                                                        item.NO_PKS
-                                                                                    }
-                                                                                </option>
-                                                                            );
-                                                                        }
-                                                                    )} */}
+                                                                        
                                                                 </select>
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
@@ -12841,10 +11234,6 @@ console.log("items: ", items)
                                                 )}
                                             </td>
 
-                                            {/* <td
-                                                colSpan={7}
-                                                className=" relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3"
-                                            ></td> */}
                                         </tr>
                                     ) : (
                                         ""
@@ -12863,148 +11252,7 @@ console.log("items: ", items)
                     <div className="grid grid-cols-1 xs:grid-cols-1 md:grid-cols-1">
                         {/* All Information */}
                         <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
-                            <div className="mb-2">
-                                <div className="flex">
-                                    <div className="text-xl font-semibold leading-6 items-center text-gray-900 ml-4 mr-4 border-b-2 w-fit">
-                                        <span className="">
-                                            Policy Number:{" "}
-                                            {policyDetail.POLICY_NUMBER}{" "}
-                                        </span>
-                                    </div>
-                                    <div className="rounded-md bg-green-50 px-2 py-1 content-center text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                                        {policyDetail.POLICY_STATUS_ID == 1 ? (
-                                            <span>Current</span>
-                                        ) : (
-                                            <span>Lapse</span>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <button
-                                            type="button"
-                                            className="ml-4 mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto"
-                                            onClick={() => {
-                                                handleEditModal();
-                                            }}
-                                        >
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
-                                <div className="">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="">
-                                            <span>Client Name</span>
-                                        </div>
-                                        <div className=" col-span-3">
-                                            <span className="font-normal text-gray-500">
-                                                {
-                                                    policyDetail.relation
-                                                        .RELATION_ORGANIZATION_NAME
-                                                }
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="">
-                                    {policyDetail.SELF_INSURED ? (
-                                        <div className="grid grid-cols-4 gap-4">
-                                            <div className="">
-                                                <span>Self Insured</span>
-                                            </div>
-                                            <div className=" col-span-3">
-                                                <span className="font-normal text-gray-500">
-                                                    {policyDetail.SELF_INSURED}{" "}
-                                                    {" %"}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        ""
-                                    )}
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
-                                <div className="">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="">
-                                            <span>The Insured</span>
-                                        </div>
-                                        <div className=" col-span-3">
-                                            <span className="font-normal text-gray-500">
-                                                {
-                                                    policyDetail.POLICY_THE_INSURED
-                                                }
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="">
-                                            <span>Inception Date</span>
-                                        </div>
-                                        <div className=" col-span-3">
-                                            <span className="font-normal text-gray-500">
-                                                {dateFormat(
-                                                    policyDetail.POLICY_INCEPTION_DATE,
-                                                    "dd-mm-yyyy"
-                                                )}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
-                                <div className="">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="">
-                                            <span>Insurance Type</span>
-                                        </div>
-                                        <div className=" col-span-3">
-                                            <span className="font-normal text-gray-500">
-                                                {
-                                                    policyDetail.insurance_type
-                                                        .INSURANCE_TYPE_NAME
-                                                }
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="">
-                                            <span>Expiry Date</span>
-                                        </div>
-                                        <div className=" col-span-3">
-                                            <span className="font-normal text-gray-500">
-                                                {dateFormat(
-                                                    policyDetail.POLICY_DUE_DATE,
-                                                    "dd-mm-yyyy"
-                                                )}
-                                                {/* {policyDetail.POLICY_DUE_DATE} */}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 ml-4 mb-3">
-                                <div className="">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="">
-                                            <span>Policy Type</span>
-                                        </div>
-                                        <div className=" col-span-3">
-                                            <span className="font-normal text-gray-500">
-                                                {policyDetail.POLICY_TYPE == 1
-                                                    ? "Full Policy"
-                                                    : "Master Policy/Certificate"}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
 
                             <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4">
                                 <div className="border-b-2 w-fit font-semibold text-lg">
@@ -13088,12 +11336,7 @@ console.log("items: ", items)
                                                                     Gross
                                                                     Premium
                                                                 </th>
-                                                                {/* <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Gross Premium
-                                                        </th> */}
+                                                                
                                                                 <th
                                                                     colSpan={3}
                                                                     className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
@@ -13101,18 +11344,7 @@ console.log("items: ", items)
                                                                     Loss Limit
                                                                     Premium
                                                                 </th>
-                                                                {/* <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Loss Limit Amount
-                                                        </th>
-                                                        <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Loss Limit Scale
-                                                        </th> */}
+                                                                
                                                                 <th
                                                                     colSpan={2}
                                                                     className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
@@ -13120,13 +11352,6 @@ console.log("items: ", items)
                                                                     Insurance
                                                                     Discount
                                                                 </th>
-                                                                {/* <th
-                                                            rowSpan={2}
-                                                            className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
-                                                        >
-                                                            Insurance Discount
-                                                            Amount
-                                                        </th> */}
 
                                                                 <th
                                                                     rowSpan={2}
@@ -14094,19 +12319,7 @@ console.log("items: ", items)
                                     <span>Business Partners</span>
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    {/* <div>
-                                        <button
-                                            type="button"
-                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
-                                            onClick={() => {
-                                                handleAddPartners(
-                                                    policy.POLICY_ID
-                                                );
-                                            }}
-                                        >
-                                            Add Business Partners
-                                        </button>
-                                    </div> */}
+                                    
                                     <div>
                                         <button
                                             type="button"
@@ -14123,20 +12336,6 @@ console.log("items: ", items)
                                             Edit Business Partners
                                         </button>
                                     </div>
-                                    {/* <div>
-                                        <button
-                                            type="button"
-                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
-                                            onClick={(e) => {
-                                                handleTest(e, policy.POLICY_ID);
-                                                // setTriggerEditSumIncome(
-                                                //     triggerEditSumIncome + 1
-                                                // );
-                                            }}
-                                        >
-                                            Button Test
-                                        </button>
-                                    </div> */}
                                 </div>
                                 {listDataPartners.length > 0 ? (
                                     <div className="w-full mt-4 align-middle">
@@ -14492,418 +12691,6 @@ console.log("items: ", items)
                             </div>
                             {/* End Partners */}
 
-                            {/* Partners */}
-                            <div className="bg-white shadow-md rounded-md mt-6 p-4 max-w-full ml-4">
-                                <div className="border-b-2 w-fit font-semibold text-lg">
-                                    <span>Summary</span>
-                                </div>
-                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
-                                    {/* <table className="table-auto w-full">
-                                        <thead className="border-b bg-gray-50">
-                                            <tr className="text-sm font-semibold text-gray-900">
-                                                <th
-                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
-                                                >
-                                                    Title
-                                                </th>
-                                                <th
-                                                    className="text-center md:p-4 p-0 md:w-20  border-r border-gray-300 "
-                                                >
-                                                    Currency
-                                                </th>
-                                                <th
-                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
-                                                >
-                                                    Original Value
-                                                </th>
-                                                <th
-                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
-                                                >
-                                                    IDR Conversion
-                                                </th>
-                                                <th
-                                                    className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 "
-                                                >
-                                                    Total
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    COA
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {summaryFinancial?.map(
-                                                (sum: any, m: number) => {
-                                                    let tmpUrutan = 0;
-                                                    return sum.AMOUNT != 0 ? (
-                                                        <tr className="text-md">
-                                                            <td className="p-1 border">
-                                                                <div className="block w-full mx-auto text-left">
-                                                                    {sum.TITLE}
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-1 border">
-                                                                <div className="block w-20 mx-auto text-left">
-                                                                    {getCurrencyById(
-                                                                        sum.CURRENCY_ID
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-1 border">
-                                                                <div className="block w-40 mx-auto text-right">
-                                                                    {new Intl.NumberFormat(
-                                                                        "id",
-                                                                        {
-                                                                            style: "decimal",
-                                                                        }
-                                                                    ).format(
-                                                                        sum.AMOUNT
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-1 border">
-                                                                <div className="block w-52 mx-auto text-right">
-                                                                    {new Intl.NumberFormat(
-                                                                        "id",
-                                                                        {
-                                                                            style: "decimal",
-                                                                        }
-                                                                    ).format(
-                                                                        sum.AMOUNT *
-                                                                            sum.EXCHANGE_RATE
-                                                                    )}
-                                                                </div>
-                                                                {sum.EXCHANGE_RATE ==
-                                                                1 ? (
-                                                                    ""
-                                                                ) : (
-                                                                    <div className="block w-52 mx-auto text-xs text-right">
-                                                                        Kurs:{" "}
-                                                                        {new Intl.NumberFormat(
-                                                                            "id",
-                                                                            {
-                                                                                style: "decimal",
-                                                                            }
-                                                                        ).format(
-                                                                            sum.EXCHANGE_RATE
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                            <td className="p-1 border">
-                                                                <div className="block w-40 mx-auto text-right"></div>
-                                                            </td>
-                                                        </tr>
-                                                    ) : (
-                                                        ""
-                                                    );
-                                                }
-                                            )}
-                                        </tbody>
-                                    </table> */}
-                                    <table className="table-auto w-full">
-                                        <thead className="border-b bg-gray-50">
-                                            <tr className="text-sm font-semibold text-gray-900">
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    Title
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-20  border-r border-gray-300 ">
-                                                    Currency
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    Original Value
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    PPn
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    PPh
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    Nett Value
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    IDR Conversion
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    Total
-                                                </th>
-                                                <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300 ">
-                                                    COA
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {summaryFinancial.map(
-                                                (record: any, i: number) => {
-                                                    // return record.map(
-                                                    //     (course:any, j:number) => {
-                                                    return record.detail.map(
-                                                        (r: any, k: number) => {
-                                                            let titleTdEl;
-                                                            if (k === 0) {
-                                                                titleTdEl = (
-                                                                    <td
-                                                                        rowSpan={
-                                                                            record
-                                                                                .detail
-                                                                                .length
-                                                                        }
-                                                                        className="p-1 border"
-                                                                    >
-                                                                        {
-                                                                            <div className="block w-40 mx-auto text-left">
-                                                                                {
-                                                                                    record.title
-                                                                                }
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                );
-                                                            }
-
-                                                            let totalTdEl;
-                                                            if (k === 0) {
-                                                                console.log(
-                                                                    record.detail
-                                                                );
-                                                                totalTdEl = (
-                                                                    <td
-                                                                        rowSpan={
-                                                                            record
-                                                                                .detail
-                                                                                .length
-                                                                        }
-                                                                        className="p-1 border"
-                                                                    >
-                                                                        {
-                                                                            <div className="block w-40 mx-auto text-right">
-                                                                                {/* {record.detail.reduce(
-                                                                                    function (
-                                                                                        prev: any,
-                                                                                        current: any
-                                                                                    ) {
-                                                                                        return (
-                                                                                            prev +
-                                                                                            +(
-                                                                                                current.AMOUNT *
-                                                                                                current.EXCHANGE_RATE
-                                                                                            )
-                                                                                        );
-                                                                                    },
-                                                                                    0
-                                                                                )} */}
-                                                                                {new Intl.NumberFormat(
-                                                                                    "id",
-                                                                                    {
-                                                                                        style: "decimal",
-                                                                                    }
-                                                                                ).format(
-                                                                                    record.detail.reduce(
-                                                                                        function (
-                                                                                            prev: any,
-                                                                                            current: any
-                                                                                        ) {
-                                                                                            return (
-                                                                                                prev +
-                                                                                                +(
-                                                                                                    current.AMOUNT *
-                                                                                                    current.EXCHANGE_RATE
-                                                                                                )
-                                                                                            );
-                                                                                        },
-                                                                                        0
-                                                                                    )
-                                                                                )}
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                );
-                                                            }
-
-                                                            return r.AMOUNT !=
-                                                                0 ? (
-                                                                <tr
-                                                                    key={k}
-                                                                    className="text-sm"
-                                                                >
-                                                                    {titleTdEl}
-                                                                    <td className="p-1 border">
-                                                                        {
-                                                                            <div className="block w-20 mx-auto text-left">
-                                                                                {getCurrencyById(
-                                                                                    r.CURRENCY_ID
-                                                                                )}
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                    <td className="p-1 border">
-                                                                        {
-                                                                            <div className="block w-40 mx-auto text-right">
-                                                                                {new Intl.NumberFormat(
-                                                                                    "id",
-                                                                                    {
-                                                                                        style: "decimal",
-                                                                                    }
-                                                                                ).format(
-                                                                                    parseFloat(
-                                                                                        r.AMOUNT
-                                                                                    ) +
-                                                                                        -1 *
-                                                                                            parseFloat(
-                                                                                                r.PPN
-                                                                                            ) +
-                                                                                        -1 *
-                                                                                            parseFloat(
-                                                                                                r.PPH
-                                                                                            )
-                                                                                )}
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                    <td className="p-1 border">
-                                                                        {
-                                                                            <div className="block w-40 mx-auto text-right">
-                                                                                {new Intl.NumberFormat(
-                                                                                    "id",
-                                                                                    {
-                                                                                        style: "decimal",
-                                                                                    }
-                                                                                ).format(
-                                                                                    r.PPN
-                                                                                )}
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                    <td className="p-1 border">
-                                                                        {
-                                                                            <div className="block w-40 mx-auto text-right">
-                                                                                {new Intl.NumberFormat(
-                                                                                    "id",
-                                                                                    {
-                                                                                        style: "decimal",
-                                                                                    }
-                                                                                ).format(
-                                                                                    r.PPH
-                                                                                )}
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                    <td className="p-1 border">
-                                                                        {
-                                                                            <div className="block w-40 mx-auto text-right">
-                                                                                {/* Nett
-                                                                                Value */}
-                                                                                {new Intl.NumberFormat(
-                                                                                    "id",
-                                                                                    {
-                                                                                        style: "decimal",
-                                                                                    }
-                                                                                ).format(
-                                                                                    // r.AMOUNT
-                                                                                    parseFloat(
-                                                                                        r.AMOUNT
-                                                                                    ) +
-                                                                                        -1 *
-                                                                                            parseFloat(
-                                                                                                r.PPN
-                                                                                            ) +
-                                                                                        -1 *
-                                                                                            parseFloat(
-                                                                                                r.PPH
-                                                                                            ) +
-                                                                                        parseFloat(
-                                                                                            r.PPN
-                                                                                        ) +
-                                                                                        parseFloat(
-                                                                                            r.PPH
-                                                                                        )
-                                                                                )}
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                    <td className="p-1 border">
-                                                                        <div className="block w-52 mx-auto text-right">
-                                                                            {new Intl.NumberFormat(
-                                                                                "id",
-                                                                                {
-                                                                                    style: "decimal",
-                                                                                }
-                                                                            ).format(
-                                                                                r.AMOUNT *
-                                                                                    r.EXCHANGE_RATE
-                                                                            )}
-                                                                        </div>
-                                                                        {r.EXCHANGE_RATE ==
-                                                                        1 ? (
-                                                                            ""
-                                                                        ) : (
-                                                                            <div className="block w-52 mx-auto text-xs text-right">
-                                                                                Kurs:{" "}
-                                                                                {new Intl.NumberFormat(
-                                                                                    "id",
-                                                                                    {
-                                                                                        style: "decimal",
-                                                                                    }
-                                                                                ).format(
-                                                                                    r.EXCHANGE_RATE
-                                                                                )}
-                                                                            </div>
-                                                                        )}
-                                                                    </td>
-                                                                    {totalTdEl}
-                                                                    <td className="p-1 border">
-                                                                        <select className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6">
-                                                                            <option
-                                                                                value={
-                                                                                    ""
-                                                                                }
-                                                                            >
-                                                                                --{" "}
-                                                                                <i>
-                                                                                    Choose
-                                                                                    COA
-                                                                                </i>{" "}
-                                                                                --
-                                                                            </option>
-                                                                            {listCoa.map(
-                                                                                (
-                                                                                    item: any,
-                                                                                    i: number
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <option
-                                                                                            key={
-                                                                                                i
-                                                                                            }
-                                                                                            value={
-                                                                                                item.COA_ID
-                                                                                            }
-                                                                                        >
-                                                                                            {
-                                                                                                item.COA_TITLE
-                                                                                            }
-                                                                                        </option>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
-                                                            ) : (
-                                                                ""
-                                                            );
-                                                        }
-                                                    );
-                                                    //     }
-                                                    // );
-                                                }
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            {/* End Report Summary */}
                         </div>
                         {/* end all information */}
                     </div>
