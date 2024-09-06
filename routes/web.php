@@ -36,6 +36,7 @@ use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
 use App\Http\Controllers\TJobDescCompanyController;
+use App\Http\Controllers\TMessageChatController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
@@ -467,6 +468,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRPluginProcess', [TTagPluginProcessController::class, 'getPlugin'])->name('getRPluginProcess.getPlugin');
     Route::post('/addPluginProcess', [TTagPluginProcessController::class, 'store'])->name('addPluginProcess.store');
     Route::post('/getTPluginProcess', [TTagPluginProcessController::class, 'getTPlugin'])->name('getTPluginProcess.getTPlugin');
+
+    // Message Chat
+    Route::post('/getMessageChatByTypeId', [TMessageChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
+    Route::post('/addChatMessage', [TMessageChatController::class, 'store'])->name('addChatMessage.store');
     
     
 
