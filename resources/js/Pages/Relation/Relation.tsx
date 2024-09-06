@@ -578,6 +578,7 @@ export default function Relation({ auth }: PageProps) {
                             profession={profession}
                             relationLOB={relationLOB}
                             setGetDetailRelation={setGetDetailRelation}
+                            auth={auth}
                         />
                     </>
                 }

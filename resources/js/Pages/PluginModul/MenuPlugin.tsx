@@ -33,6 +33,7 @@ export default function MenuPlugin({
     idDiv,
     dataPluginProcess,
     setDataPluginProcess,
+    handleAddPluginProcess,
     showContext,
     setShowContext,
     handleSuccessPlugin,
@@ -45,6 +46,7 @@ export default function MenuPlugin({
     dataPluginProcess: any;
     setDataPluginProcess: any;
     showContext: any;
+    handleAddPluginProcess: any;
     setShowContext: any;
     handleSuccessPlugin: any;
 }>) {
@@ -82,25 +84,29 @@ export default function MenuPlugin({
         add: false,
     });
 
-    const handleAddPluginProcess = async (e: FormEvent, idPlug: number) => {
-        // e.preventDefault();
+    // const handleAddPluginProcess = async (e: FormEvent, idPlug: number) => {
+    //     // e.preventDefault();
 
-        setShowContext({
-            ...showContext,
-            visible: true,
-        });
-        setModalPlugin({
-            add: !modalPlugin.add,
-        });
-        setDataPluginProcess({
-            TAG_ID: idDiv.setIdName,
-            PLUGIN_PROCESS_ID: idPlug,
-        });
-    };
+    //     setModalPlugin({
+    //         add: !modalPlugin.add,
+    //     });
+    //     setDataPluginProcess({
+    //         TAG_ID: idDiv.setIdName,
+    //         PLUGIN_PROCESS_ID: idPlug,
+    //     });
+
+    //     if (modalPlugin.add === false) {
+    //         alert("masuk");
+    //         setShowContext({
+    //             ...showContext,
+    //             visible: false,
+    //         });
+    //     }
+    // };
 
     return (
         <>
-            <ModalToAdd
+            {/* <ModalToAdd
                 buttonAddOns={""}
                 show={modalPlugin.add}
                 onClose={() =>
@@ -116,7 +122,7 @@ export default function MenuPlugin({
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
                 }
                 body={<></>}
-            />
+            /> */}
 
             <div
                 ref={menuRef}
@@ -133,7 +139,7 @@ export default function MenuPlugin({
                     borderRadius: "5px",
                     padding: "5px",
                     boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
-                    zIndex: 1000,
+                    zIndex: 9999999999,
                 }}
             >
                 {isLoading.get_detail ? (
