@@ -1,0 +1,70 @@
+.tooltip {
+    display: inline-block;
+    position: relative;
+    border-bottom: 1px dotted #666;
+    text-align: left;
+}
+
+.tooltip h3 {
+    margin: 12px 0;
+}
+
+.tooltip .bottom {
+    min-width: 200px;
+    top: 40px;
+    left: 100%;
+    transform: translate(-50%, 0);
+    padding: 10px;
+    color: #666666;
+    background-color: #eeeeee;
+    font-weight: normal;
+    font-size: 13px;
+    border-radius: 8px;
+    position: absolute;
+    z-index: 99999999;
+    box-sizing: border-box;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.tooltip:hover .bottom {
+    display: block;
+}
+
+.tooltip .bottom i {
+    position: absolute;
+    bottom: 100%;
+    left: 20%;
+    margin-left: -12px;
+    width: 24px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.tooltip .bottom i::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 50%;
+    transform: translate(-50%, 50%) rotate(45deg);
+    background-color: #eeeeee;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.chatBalon {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-right: 23px;
+    border: 2px solid #f05252;
+    margin-bottom: 10px;
+    /* border-radius: 10px; */
+    border-top-left-radius: 7.3px;
+    border-top-right-radius: 7.3px;
+    /*padding: 10px;
+    */
+    background-color: white;
+    width: 25%;
+    height: 70%;
+}

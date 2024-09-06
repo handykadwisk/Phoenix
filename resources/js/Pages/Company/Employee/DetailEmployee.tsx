@@ -1772,7 +1772,7 @@ export default function DetailEmployee({
                                                 ? "-"
                                                 : dataDetailEmployee
                                                       .division_company
-                                                      ?.COMPANY_DIVISION_NAME}
+                                                      ?.COMPANY_DIVISION_ALIAS}
                                         </span>
                                     </div>
                                 </div>
