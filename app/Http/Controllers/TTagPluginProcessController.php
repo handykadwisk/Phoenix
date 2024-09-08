@@ -20,7 +20,6 @@ class TTagPluginProcessController extends Controller
 
     public function store(Request $request){
 // dd($request);
-
         // cek sudah ada apa belum di tplug
         $cekExisting = TTagPluginProcess::where('PLUGIN_PROCESS_ID', $request->PLUGIN_PROCESS_ID)->where('TAG_ID', $request->TAG_ID)->first();
         // dd($cekExisting);
@@ -51,6 +50,7 @@ class TTagPluginProcessController extends Controller
 
         // register type chatnya apa?
         $createTypeChat = TTypeChat::create([
+            "TAG_ID"                    => $request->TAG_ID,
             "TYPE_CHAT_TITLE"           => $request->TITLE_CHAT,
             "TYPE_CHAT_OBJECT"          => $request->OBJECT_CHAT,
             "CREATED_TYPE_CHAT_DATE"    => now(),

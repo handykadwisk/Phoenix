@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TMessageChat;
+use App\Models\TTypeChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -24,6 +25,7 @@ class TMessageChatController extends Controller
     }
 
     public function store(Request $request){
+        // dd($request);
         $createMessage = TMessageChat::create([
             "TYPE_CHAT_ID"                  => $request->TYPE_CHAT_ID,
             "USER_ID"                       => Auth::user()->id,
@@ -38,5 +40,10 @@ class TMessageChatController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function getTypeChatByTagId(Request $request){
+        $data = TTypeChat::where('TAG_ID', $request->tagIdChat)->get();
+        return response()->json($data);
     }
 }

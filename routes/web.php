@@ -472,6 +472,8 @@ Route::middleware('auth')->group(function () {
     // Message Chat
     Route::post('/getMessageChatByTypeId', [TMessageChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
     Route::post('/addChatMessage', [TMessageChatController::class, 'store'])->name('addChatMessage.store');
+    Route::post('/getTypeChatByTagId', [TMessageChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
+    
     
     
 

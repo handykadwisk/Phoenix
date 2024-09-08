@@ -159,12 +159,18 @@ export default function DetailRelation({
     const {
         // handleContextMenu,
         // handleClick,
+        flagPlugin,
+        setFlagPlugin,
+        showChatMessage,
+        setShowChatMessage,
         showContext,
         idDiv,
+        tagIdChat,
         menuPosition,
         setShowContext,
     } = renderClassFunction(detailRelation, dataTPlugin);
     // handleContextMenu();
+    console.log("ada", showChatMessage);
 
     // handleContextMenu;
     // handleClick;
@@ -984,9 +990,9 @@ export default function DetailRelation({
     };
 
     // modal chat
-    const [showChatMessage, setShowChatMessage] = useState({
-        chatModal: false,
-    });
+    // const [showChatMessage, setShowChatMessage] = useState({
+    //     chatModal: false,
+    // });
 
     // Parameter for chat message
     const [typeChatId, setTypeChatId] = useState<any>({
@@ -1008,6 +1014,7 @@ export default function DetailRelation({
                 setShowChatMessage({
                     chatModal: !showChatMessage.chatModal,
                 });
+                setFlagPlugin(false);
                 setTypeChatId({
                     typeID: message[3],
                 });
@@ -2573,14 +2580,18 @@ export default function DetailRelation({
             )} */}
 
             <ModalChatMessage
-                show={showChatMessage.chatModal}
-                onClose={() =>
-                    setShowChatMessage({
-                        chatModal: false,
-                    })
-                }
+                showChatMessage={showChatMessage}
+                setShowChatMessage={setShowChatMessage}
+                // onClose={() =>
+                //     setShowChatMessage({
+                //         chatModal: false,
+                //     })
+                // }
                 typeChatId={typeChatId.typeID}
+                tagIdChat={tagIdChat}
                 auth={auth}
+                flagPlugin={flagPlugin}
+                setFlagPlugin={setFlagPlugin}
             />
 
             {/* modal end chat */}
