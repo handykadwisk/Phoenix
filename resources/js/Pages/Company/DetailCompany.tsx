@@ -201,9 +201,6 @@ export default function DetailCompany({
     // End Address Location Click
     return (
         <>
-            <MyProvider>
-                <MyComponent />
-            </MyProvider>
             {/* <div className="cls">Relation Information</div> */}
             {/* modal for job desc */}
             <ModalToAction
@@ -622,10 +619,12 @@ export default function DetailCompany({
                 }
             />
             {/* end Modal Division */}
-
+            <MyProvider>
+                <MyComponent otherId={idCompany} setIsSuccess={setIsSuccess} />
+            </MyProvider>
             <div className="bg-white rounded-md shadow-md mb-2 p-4">
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-fit">
+                    <div className="text-md font-semibold w-fit cls">
                         <span className="border-b-2 border-red-600">
                             Company Information
                         </span>

@@ -12,7 +12,6 @@ const MyContext = createContext<MyContextType | undefined>(undefined);
 // Provider komponen
 export const MyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [value, setValue] = useState<string>("default value");
-    // const getMark = document.querySelectorAll(".cls") as NodeListOf<any>;
     // // console.log(getMark);
     // getMark.forEach((element: any, index: number) => {
     //     element?.classList.add("cursor-help");

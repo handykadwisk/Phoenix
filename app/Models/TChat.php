@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TTypeChat extends Model
+class TChat extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'TYPE_CHAT_ID';
+    protected $primaryKey = 'CHAT_ID';
 
-    protected $table = 't_type_chat';
+    protected $table = 't_chat';
 
     protected $guarded = [
-        'TYPE_CHAT_ID',
+        'CHAT_ID',
     ];
 
     public $timestamps = false;

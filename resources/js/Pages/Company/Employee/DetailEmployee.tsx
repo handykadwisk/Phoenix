@@ -68,7 +68,6 @@ export default function DetailEmployee({
             .post(`/getDetailEmployee`, { idEmployee })
             .then((res) => {
                 setDataDetailEmployee(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -176,7 +175,6 @@ export default function DetailEmployee({
     ) => {
         const changeVal: any = [...dataEditEmployment.m_employment_contact];
         changeVal[i].t_employee_contact[name] = value;
-        // console.log("zzzz", changeVal);
         setDataEditEmployment({
             ...dataEditEmployment,
             m_employment_contact: changeVal,
@@ -461,7 +459,6 @@ export default function DetailEmployee({
                 text: "File Tidak Mendukung!!",
                 icon: "error",
             }).then((result: any) => {
-                // console.log(result);
                 if (result.value) {
                     return false;
                     // getPersons();
@@ -480,7 +477,6 @@ export default function DetailEmployee({
     };
 
     const saveUpload = async (files: any, id: string) => {
-        // console.log(data);
         await axios
             .post(
                 `/uploadProfile`,
@@ -1667,9 +1663,6 @@ export default function DetailEmployee({
                                 onContextMenu={(e: any) => {
                                     return <span>aloo</span>;
                                 }}
-                                // onClick={(e: any) => {
-                                //     console.log(e.target);
-                                // }}
                             >
                                 <span>Contact Emergency</span>
                             </div>

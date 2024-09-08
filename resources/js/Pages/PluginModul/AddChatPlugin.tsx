@@ -110,7 +110,7 @@ export default function AddChatPlugin({
                                     placeholder="Title Chat"
                                 />
                             </div>
-                            <div className="mb-2">
+                            <div className="mb-2 hidden">
                                 <InputLabel
                                     htmlFor="Object_Chat"
                                     value="Object Chat"

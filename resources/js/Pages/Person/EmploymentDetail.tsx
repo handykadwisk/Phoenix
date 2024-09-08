@@ -63,7 +63,6 @@ PropsWithChildren<{
             .post(`/getEmployeeDetail`, { id })
             .then((res) => {
                 setDataDetailEmployee(res.data);
-                console.log("asdasda", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -515,7 +514,6 @@ PropsWithChildren<{
             responseType: "blob",
         })
             .then((response) => {
-                console.log(response);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -555,7 +553,6 @@ PropsWithChildren<{
     };
 
     const deleteDocument = async (idDocument: string, idEmployee: string) => {
-        // console.log(data);
         await axios
             .post(`/deleteDocument`, { idDocument, idEmployee })
             .then((res) => {
@@ -564,7 +561,6 @@ PropsWithChildren<{
                     text: "Images Delete",
                     icon: "success",
                 }).then((result: any) => {
-                    // console.log(result);
                     if (result.value) {
                         getEmployee(idEmployee);
                     }

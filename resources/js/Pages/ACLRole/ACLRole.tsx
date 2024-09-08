@@ -64,26 +64,6 @@ export default function ACLRole({ auth }: PageProps) {
             });
     };
 
-    // const [detailPermission, setDetailPermission] = useState<any>({
-    //     PERMISSION_ID: "",
-    //     PERMISSION_NAME: "",
-    // });
-    // const getPermissionById = async (idPermission: string) => {
-    //     // const idPermission = detailPermission.PERMISSION_ID;
-    //     // console.log("aa :", idPermission);
-    //     await axios
-    //         .post(`/getPermissionById`, {
-    //             idPermission,
-    //         })
-    //         .then((res) => {
-    //             setDataById(res.data);
-    //             // console.log(res.data);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
-
     const clearSearchRole = async (pageNumber = "page=1") => {
         await axios
             .post(`/getRole?${pageNumber}`)

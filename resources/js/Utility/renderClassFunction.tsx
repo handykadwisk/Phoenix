@@ -89,6 +89,7 @@ const renderClassFunction = (detailRelation?: number, dataTPlugin?: any) => {
         getMark.forEach((element: any, index: number) => {
             element?.classList.add("cursor-help");
             element?.classList.add("tooltip");
+            element?.classList.add("hover:bg-yellow-100/35");
             // element?.setAttribute("title", "Attach, Chat, Task, etc For This");
             const elements = element?.getElementsByClassName("bottom");
 

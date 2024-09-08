@@ -143,12 +143,6 @@ export default function DetailRelation({
             .then((res) => {
                 // getPlugin(res.data);
                 setDataTPlugin(res.data);
-                // getPlugin(res.data);
-                // console.log("TPlug", res.data);
-                // setRefreshPlugin(true);
-                // setTimeout(() => {
-                //     setRefreshPlugin(false);
-                // }, 2000);
             })
             .catch((err) => {
                 console.log(err);
@@ -170,7 +164,6 @@ export default function DetailRelation({
         setShowContext,
     } = renderClassFunction(detailRelation, dataTPlugin);
     // handleContextMenu();
-    console.log("ada", showChatMessage);
 
     // handleContextMenu;
     // handleClick;
@@ -2483,12 +2476,6 @@ export default function DetailRelation({
                 <>
                     <MenuPlugin
                         handleAddPluginProcess={handleAddPluginProcess}
-                        handleSuccessPlugin={handleSuccessPlugin}
-                        showContext={showContext}
-                        setShowContext={setShowContext}
-                        idDiv={idDiv}
-                        dataPluginProcess={dataPluginProcess}
-                        setDataPluginProcess={setDataPluginProcess}
                         top={menuPosition.y}
                         left={menuPosition.x}
                         marginTop={menuPosition.marginTop}

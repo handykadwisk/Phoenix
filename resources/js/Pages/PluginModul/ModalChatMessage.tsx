@@ -119,7 +119,7 @@ export default function ModalChatMessage({
 
     const [data, setData] = useState<any>({
         INITIATE_YOUR_CHAT: "",
-        TYPE_CHAT_ID: "",
+        CHAT_ID: "",
     });
 
     const messagesEndRef = useRef<any>(null);
@@ -137,6 +137,7 @@ export default function ModalChatMessage({
             getMessageChatByTypeId(message[0]);
             setData({
                 INITIATE_YOUR_CHAT: "",
+                CHAT_ID: message[0],
             });
 
             // const fixedBottom = document.getElementById("messageChat");
@@ -164,6 +165,7 @@ export default function ModalChatMessage({
                 console.log(err);
             });
     };
+    console.log(data);
     return (
         <>
             <Transition.Root show={showChatMessage.chatModal} as={Fragment}>
@@ -226,7 +228,7 @@ export default function ModalChatMessage({
                                     {flagPlugin === false ? (
                                         <>
                                             <div
-                                                className="messageChat h-[348px] overflow-y-auto custom-scrollbar"
+                                                className="messageChat chat-height overflow-y-auto custom-scrollbar"
                                                 id="messageChat"
                                                 ref={messagesEndRef}
                                             >
@@ -273,7 +275,7 @@ export default function ModalChatMessage({
                                                                                         auth
                                                                                             .user
                                                                                             .id ===
-                                                                                        items.USER_ID
+                                                                                        items.CREATED_CHAT_DETAIL_BY
                                                                                             ? "mb-1 text-right"
                                                                                             : "mb-2"
                                                                                     }
@@ -283,13 +285,13 @@ export default function ModalChatMessage({
                                                                                             auth
                                                                                                 .user
                                                                                                 .id ===
-                                                                                            items.USER_ID
+                                                                                            items.CREATED_CHAT_DETAIL_BY
                                                                                                 ? "bg-blue-500 text-white rounded-lg py-2 px-2 inline-block text-xs"
                                                                                                 : "bg-gray-200 text-gray-700 rounded-lg py-2 px-2 inline-block text-xs"
                                                                                         }
                                                                                     >
                                                                                         {
-                                                                                            items.MESSAGE_CHAT_TEXT
+                                                                                            items.CHAT_DETAIL_TEXT
                                                                                         }
                                                                                     </p>
                                                                                     <p className="text-[10px]">
@@ -298,7 +300,7 @@ export default function ModalChatMessage({
                                                                                             .name +
                                                                                             " - " +
                                                                                             format(
-                                                                                                items.CREATED_MESSAGE_CHAT_DATE,
+                                                                                                items.CREATED_CHAT_DETAIL_DATE,
                                                                                                 "HH:mm"
                                                                                             )}
                                                                                     </p>
@@ -331,7 +333,7 @@ export default function ModalChatMessage({
                                                                     INITIATE_YOUR_CHAT:
                                                                         e.target
                                                                             .value,
-                                                                    TYPE_CHAT_ID:
+                                                                    CHAT_ID:
                                                                         typeChatId,
                                                                 });
                                                             } else {
@@ -363,43 +365,56 @@ export default function ModalChatMessage({
                                                 <div className="m-2 bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-300 text-xs">
                                                     <span>Add Chat</span>
                                                 </div>
-                                                {detailTypeChat?.map(
-                                                    (
-                                                        dTypeChat: any,
-                                                        i: number
-                                                    ) => {
-                                                        return (
-                                                            <div key={i}>
-                                                                <div
-                                                                    className="hover:bg-red-600 cursor-pointer m-2 p-2 rounded-md shadow-md mb-2 hover:text-white text-sm"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
-                                                                        getMessageChatByTypeId(
-                                                                            dTypeChat.TYPE_CHAT_ID
-                                                                        );
-                                                                        setFlagPlugin(
-                                                                            false
-                                                                        );
-                                                                        setData(
-                                                                            {
-                                                                                ...data,
-                                                                                TYPE_CHAT_ID:
-                                                                                    dTypeChat.TYPE_CHAT_ID,
+                                                <div className="p-2">
+                                                    <fieldset className="pb-2 pt-2 rounded-lg border-slate-100 border-2 p2">
+                                                        <legend className="ml-2 px-3 text-sm">
+                                                            List Chat
+                                                        </legend>
+                                                        <div className="">
+                                                            {detailTypeChat?.map(
+                                                                (
+                                                                    dTypeChat: any,
+                                                                    i: number
+                                                                ) => {
+                                                                    return (
+                                                                        <div
+                                                                            key={
+                                                                                i
                                                                             }
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    <span>
-                                                                        {
-                                                                            dTypeChat.TYPE_CHAT_TITLE
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    }
-                                                )}
+                                                                        >
+                                                                            <div
+                                                                                className="hover:bg-red-600 cursor-pointer m-2 p-2 rounded-md shadow-md mb-2 hover:text-white text-sm"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    getMessageChatByTypeId(
+                                                                                        dTypeChat.CHAT_ID
+                                                                                    );
+                                                                                    setFlagPlugin(
+                                                                                        false
+                                                                                    );
+                                                                                    setData(
+                                                                                        {
+                                                                                            ...data,
+                                                                                            CHAT_ID:
+                                                                                                dTypeChat.CHAT_ID,
+                                                                                        }
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                <span>
+                                                                                    {
+                                                                                        dTypeChat.CHAT_TITLE
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </div>
+                                                    </fieldset>
+                                                </div>
                                             </div>
                                         </>
                                     )}

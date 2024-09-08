@@ -42,7 +42,6 @@ export default function DetailStructure({
             .post(`/getCompanyStructureDetail`, { id })
             .then((res) => {
                 setDataStructureNew(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);

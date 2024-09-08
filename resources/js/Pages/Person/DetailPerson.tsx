@@ -143,7 +143,6 @@ export default function DetailPerson({
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
-                console.log("xx", res.data);
             })
             .catch((err) => {
                 console.log(err);

@@ -3,11 +3,10 @@ import { Head, usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
 
 export default function Dashboard({ auth, language }: any) {
-
     // props language dikirim langsung dari middleware Language yang diinject langsung melalui Inertia. cek file Language.php di folder Middleware
     // kemudian ambil array pertama dari language
     // selanjutnya, tinggal panggil di tiap string yang mau diambil dari file language. contoh: lang.policy --ada di bawah contohnya--
-    const lang: any = language[0]
+    const lang: any = language[0];
 
     const stats = [
         // { name: lang.policy, stat: "71,897" },

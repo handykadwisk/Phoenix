@@ -36,7 +36,7 @@ use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
 use App\Http\Controllers\TJobDescCompanyController;
-use App\Http\Controllers\TMessageChatController;
+use App\Http\Controllers\TDetailChatController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
@@ -470,9 +470,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/getTPluginProcess', [TTagPluginProcessController::class, 'getTPlugin'])->name('getTPluginProcess.getTPlugin');
 
     // Message Chat
-    Route::post('/getMessageChatByTypeId', [TMessageChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
-    Route::post('/addChatMessage', [TMessageChatController::class, 'store'])->name('addChatMessage.store');
-    Route::post('/getTypeChatByTagId', [TMessageChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
+    Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
+    Route::post('/addChatMessage', [TDetailChatController::class, 'store'])->name('addChatMessage.store');
+    Route::post('/getTypeChatByTagId', [TDetailChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
     
     
     

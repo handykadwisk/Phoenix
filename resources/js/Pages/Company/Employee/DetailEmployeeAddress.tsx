@@ -83,7 +83,6 @@ export default function DetailEmployeeAddress({
     });
 
     const getDistrict = async (id: any) => {
-        // console.log(id);
         const valueKode = id;
         await axios
             .post(`/getDistrict`, { valueKode })
@@ -96,7 +95,6 @@ export default function DetailEmployeeAddress({
     };
 
     const getDistrictOther = async (id: any) => {
-        // console.log(id);
         const valueKode = id;
         await axios
             .post(`/getDistrict`, { valueKode })
@@ -161,7 +159,6 @@ export default function DetailEmployeeAddress({
             .post(`/getEmployeeAddress`, { id })
             .then((res) => {
                 setDetailAddressPerson(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -231,7 +228,6 @@ export default function DetailEmployeeAddress({
         getDistrict(idRegency);
         getVillage(idDistrict);
     };
-    // console.log(editAddressNew);
     const getProvinceLabel = (value: any) => {
         if (value) {
             const selected = wilayahSelect.filter(
@@ -358,7 +354,6 @@ export default function DetailEmployeeAddress({
     ) => {
         const changeVal: any = [...editAddressNew.other_address];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setEditAddressNew({
             ...editAddressNew,
             other_address: changeVal,
@@ -372,7 +367,6 @@ export default function DetailEmployeeAddress({
     ) => {
         const changeVal: any = [...editAddressNew.dataEdit];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setEditAddressNew({
             ...editAddressNew,
             dataEdit: changeVal,

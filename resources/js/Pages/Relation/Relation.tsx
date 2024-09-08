@@ -64,7 +64,6 @@ export default function Relation({ auth }: PageProps) {
         ],
     });
 
-    // console.log(searchRelation.relation_search);
     const getRelation = async (pageNumber = "page=1") => {
         await axios
             .post(`/getRelation?${pageNumber}`, {
