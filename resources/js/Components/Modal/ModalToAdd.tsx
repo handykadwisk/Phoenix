@@ -5,9 +5,8 @@ import PrimaryButton from "../Button/PrimaryButton";
 import axios from "axios";
 import Alert from "../Alert";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-// import Swal from "sweetalert2";
 
-export default function ModalToAdd({
+export default function ModalAttendance({
     show = false,
     closeable = true,
     onClose = () => {},
@@ -18,6 +17,7 @@ export default function ModalToAdd({
     onSuccess,
     classPanel = "",
     buttonAddOns,
+    disableSubmit = false,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -29,6 +29,7 @@ export default function ModalToAdd({
     classPanel: any;
     onSuccess: any;
     buttonAddOns: any | undefined | null;
+    disableSubmit?: boolean;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -41,7 +42,6 @@ export default function ModalToAdd({
     };
 
     const action = async (e: any) => {
-        // return false;
         e.preventDefault();
 
         setIsProcessing(true);
@@ -52,7 +52,6 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
-                console.log("ada", res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -125,22 +124,25 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {/* <div className="max-h-[100%]"> */}
                                             <div
                                                 className="overflow-y-auto custom-scrollbar px-2 modal-action"
                                                 ref={modalRef}
                                             >
                                                 {body}
                                             </div>
-                                            {/* </div> */}
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            <PrimaryButton
-                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
-                                                disabled={isProcessing}
-                                            >
-                                                Submit
-                                            </PrimaryButton>
+                                            {disableSubmit ? (
+                                                ""
+                                            ) : (
+                                                <PrimaryButton
+                                                    className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                    disabled={isProcessing}
+                                                >
+                                                    Submit
+                                                </PrimaryButton>
+                                            )}
+
                                             {buttonAddOns && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
