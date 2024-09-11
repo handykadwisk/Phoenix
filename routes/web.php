@@ -30,6 +30,9 @@ use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\RoleAccesMenuController;
+use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\RUserTypeController;
 use App\Http\Controllers\TCompanyController;
 use App\Http\Controllers\TCompanyDivisionController;
 use App\Http\Controllers\TCompanyOfficeController;
@@ -37,6 +40,7 @@ use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
 use App\Http\Controllers\TJobDescCompanyController;
 use App\Http\Controllers\TTagPluginProcessController;
+use App\Http\Controllers\UserManagementController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +48,7 @@ use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
 use App\Models\TCompanyDivision;
+use App\Models\TEmployee;
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
@@ -65,6 +70,7 @@ Route::middleware('auth')->group(function () {
 
     // BR
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
+    Route::get('/getAllRelations',[RelationController::class,'getAllRelations'])->name('getAllRelations');
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
     Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
@@ -241,7 +247,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMenuCombo', [MenuController::class, 'getMenuCombo'])->name('getMenuCombo.getMenuCombo');
     Route::post('/getMenuById', [MenuController::class, 'getMenuById'])->name('getMenuById.getMenuById');
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
-
+    Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
+    Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
+    
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
     Route::post('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
@@ -253,6 +261,40 @@ Route::middleware('auth')->group(function () {
     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
+    Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
+
+     // Role
+     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
+     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
+     Route::post('/getAllRole', [RoleController::class, 'getRole'])->name('/getAllRole');
+     Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
+     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
+
+    // access role menu
+    Route::get('/getRoleAccessMenuByRoleId/{role_id}', [RoleAccesMenuController::class, 'getAccessMenuByRoleId'])->name('getRoleAccessMenuByRoleId.getMenuByRole');
+    Route::post('/roleAccessMenu', [RoleAccesMenuController::class, 'store'])->name('roleAccessMenu.store');
+
+
+    //role permission
+    Route::get('/rolePermission/{role_id}', [RolePermissionController::class, 'getPermissionByRoleId'])->name('rolePermission.getPermissionByRoleId');
+    Route::post('/rolePermission', [RolePermissionController::class, 'store'])->name('rolePermission.store');
+
+    //settings/userManagement
+    Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUerJson');
+    Route::get('/settings/user', [UserManagementController::class, 'index'])->name('settings/user');
+    Route::post('/settings/addUser', [UserManagementController::class, 'store'])->name('settings/addUser.store');
+    Route::get('/settings/getUserJson', [UserManagementController::class, 'getUserDataByMRole'])->name('settings/getUserJson.getUserJson');
+    Route::post('/settings/getUserId/{id}', [UserManagementController::class, 'getUserDataById'])->name('settings/getUserId.getUserId');
+    Route::post('/settings/UserId/{id}', [UserManagementController::class, 'dataById'])->name('settings/UserId.getUserId');
+    Route::patch('/settings/userEdit/{id}', [UserManagementController::class, 'update'])->name('settings/userEdit.update');
+    Route::patch('/settings/userResetPassword/{id}', [UserManagementController::class, 'resetPassword'])->name('settings/userResetPassword.resetPassword');
+
+
+
+    //setting/usertype
+    Route::get('/settings/type',[RUserTypeController::class, 'index' ])->name('type');
+    // Route::get('/getType', [RUserTypeController::class, 'getTypeJson'])->name('getType');
+    Route::post('/getType', [RUserTypeController::class, 'getTypeJson'])->name('getType.getTypeJson');
 
     // Finance > Operasional
 
@@ -459,6 +501,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
 
     // Employee
+    Route::get('/getAllEmployee',[TEmployeeController::class,'getAllEmployeeJson'])->name('getAllEmployee.');
     Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
     Route::post('/addEmployee', [TEmployeeController::class, 'store'])->name('addEmployee.store');
     Route::post('/getDetailEmployee', [TEmployeeController::class, 'get_employeeById'])->name('getDetailEmployee.get_employeeById');
@@ -479,7 +522,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/addBankAccount', [TEmployeeController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
     Route::post('/editBankAccount', [TEmployeeController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
     Route::post('/uploadProfile', [TEmployeeController::class, 'uploadProfile'])->name('uploadProfile.uploadProfile');
-
+    
 
 
 
@@ -514,7 +557,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editOfficeCompany', [TCompanyOfficeController::class, 'edit'])->name('editOfficeCompany.edit');
     Route::post('/getComboOffice', [TCompanyOfficeController::class, 'getOffice'])->name('getComboOffice.getOffice');
 
-     // Job Desc
+    // Job Desc
     Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
     Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
     Route::post('/getJobDescCompanyCombo', [TJobDescCompanyController::class, 'getJobDescCompanyCombo'])->name('getJobDescCompanyCombo.getJobDescCompanyCombo');
@@ -526,10 +569,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRPluginProcess', [TTagPluginProcessController::class, 'getPlugin'])->name('getRPluginProcess.getPlugin');
     Route::post('/addPluginProcess', [TTagPluginProcessController::class, 'store'])->name('addPluginProcess.store');
     Route::post('/getTPluginProcess', [TTagPluginProcessController::class, 'getTPlugin'])->name('getTPluginProcess.getTPlugin');
-
-
-
-
 });
 
 require __DIR__ . '/auth.php';

@@ -20,11 +20,8 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role_id'
+    protected $guarded = [
+        'id'
     ];
 
     /**
@@ -57,9 +54,20 @@ class User extends Authenticatable
         return $this->belongsTo(TEmployee::class, 'employee_id');
     }
 
-    public function role()
+    public function roles()
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        return $this->belongsToMany(Role::class, 'm_role_users', 'user_id', 'role_id');
+    }
+
+    public function menu()
+    {
+        return $this->belongsToMany(Menu::class, 'role_menu', 'role_id', 'menu_id');
+    }
+
+    
+    public function type()
+    {
+        return $this->belongsTo(RUserType::class, 'user_type_id');
     }
     
     public function additional() {

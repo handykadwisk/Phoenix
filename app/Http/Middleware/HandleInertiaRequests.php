@@ -8,6 +8,7 @@ use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -33,13 +34,30 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $menu = Menu::where('menu_is_deleted', 0)->get()->toArray();
+        // Log::info($menu);
+
         if (Auth::check()) {
+            // Cek apakah type_user_id adalah 1
+            $menu = [];
+            if ($user->type_user_id === 1) {
+                // Ambil semua menu jika type_user_id adalah 1 (administrator atau sejenisnya)
+                Log::info('Admin user detected');
+                $menu = Menu::where('menu_is_deleted', 0)->get()->toArray();
+            } else {
+                // Jika bukan type_user_id 1, ambil berdasarkan role user
+                $menu = $user->roles->pluck('menu')->flatten()->unique('id')->values()->toArray();
+            }
+        
+
             return [
                 ...parent::share($request),
                 'auth' => [
                     'user'       => $request->user(),
-                    'role'       => $request->user()->role,
-                    'menu'       => $request->user()->role->menu,
+                    'role'       => $request->user()->roles->pluck('id'),
+                    'menu'       => $menu,  // Menu yang sudah di-filter
+                    'permission' => $user->roles->pluck('permission')->flatten(),
                     'additional' => $request->user()->additional
                 ],
                 'custom_menu' => Menu::where(['menu_is_deleted' => 0, 'menu_parent_id' => null])->get(),
@@ -51,6 +69,7 @@ class HandleInertiaRequests extends Middleware
                     'location' => $request->url(),
                 ],
             ];
+
         } else {
             return [
                 ...parent::share($request),

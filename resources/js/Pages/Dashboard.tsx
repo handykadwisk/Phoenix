@@ -8,7 +8,8 @@ export default function Dashboard({ auth, language }: any) {
     // kemudian ambil array pertama dari language
     // selanjutnya, tinggal panggil di tiap string yang mau diambil dari file language. contoh: lang.policy --ada di bawah contohnya--
     const lang: any = language[0]
-
+    console.log('auth',auth);
+    
     const stats = [
         // { name: lang.policy, stat: "71,897" },
         // { name: lang.claim, stat: "58.16%" },

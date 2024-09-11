@@ -57,7 +57,7 @@ class TPermissionController extends Controller
                 "module"      => "Permission",
                 "id"          => $permission->PERMISSION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -93,7 +93,7 @@ class TPermissionController extends Controller
                 "module"      => "Permission",
                 "id"          => $request->PERMISSION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
