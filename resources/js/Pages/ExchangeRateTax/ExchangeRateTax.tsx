@@ -152,31 +152,36 @@ export default function ExchangeRateController({ auth }: PageProps) {
             const resDate = await axios.get(
                 `/getExchangeRateTaxByDate/${selectedDate}`
             );
+            console.log(
+                "Response from /getExchangeRateTaxByDate:",
+                resDate.data
+            );
 
-            let exchangeRateData;
+            let exchangeRateData: any;
 
             // Jika data exchange_rate_tax_detail tidak ada, ambil data dari /getCurrencies
-            if (resDate.data.exchange_rate_tax_detail !== undefined) {
-                exchangeRateData = resDate.data.exchange_rate_tax_detail;
-            } else {
+            if (
+                !resDate.data.exchange_rate_tax_detail ||
+                resDate.data.exchange_rate_tax_detail.length === 0
+            ) {
                 console.log(
                     "Data exchange rate by date tidak ditemukan, mengambil dari /getCurrencies"
                 );
+
                 const resCurrency = await axios.get(`/getCurrencies`);
-                exchangeRateData = resCurrency.data.exchange_rate_tax_detail;
+                console.log("Response from /getCurrencies:", resCurrency.data);
+
+                if (resCurrency.data.exchange_rate_tax_detail) {
+                    exchangeRateData =
+                        resCurrency.data.exchange_rate_tax_detail;
+                } else {
+                    console.error(
+                        "Data exchange_rate_tax_detail tidak ditemukan di /getCurrencies"
+                    );
+                }
+            } else {
+                exchangeRateData = resDate.data.exchange_rate_tax_detail;
             }
-            // if (
-            //     resDate.data.exchange_rate_tax_detail === undefined ||
-            //     resDate.data.exchange_rate_tax_detail.length === 0
-            // ) {
-            //     console.log(
-            //         "Data exchange rate by date tidak ditemukan, mengambil dari /getCurrencies"
-            //     );
-            //     const resCurrency = await axios.get(`/getCurrencies`);
-            //     exchangeRateData = resCurrency.data.exchange_rate_tax_detail;
-            // } else {
-            //     exchangeRateData = resDate.data.exchange_rate_tax_detail;
-            // }
 
             console.log("Exchange Rate Data : ", exchangeRateData);
 
@@ -199,7 +204,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                 return updatedData;
             });
         } catch (err) {
-            console.log("Error", err);
+            console.error("Error:", err);
         }
     };
 
