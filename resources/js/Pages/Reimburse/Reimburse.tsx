@@ -1165,7 +1165,7 @@ export default function Reimburse({ auth }: PageProps) {
     console.log("Data Reimburse", data);
     // console.log(DataRow);
     // console.log("Reimburse", reimburse.data);
-    console.log("Data By Id", dataById);
+    // console.log("Data By Id", dataById);
     // console.log("Auth", auth.user);
     // console.log(searchReimburse);
 
@@ -4486,9 +4486,9 @@ export default function Reimburse({ auth }: PageProps) {
                                 </thead>
                                 <tbody>
                                     {reimburse.data === undefined && (
-                                        <tr>
+                                        <tr className="text-center">
                                             <TD
-                                                className="leading-10 text-gray-500"
+                                                className="leading-10 font-medium text-gray-500"
                                                 colSpan="12"
                                             >
                                                 Please Search Reimburse
@@ -4496,9 +4496,9 @@ export default function Reimburse({ auth }: PageProps) {
                                         </tr>
                                     )}
                                     {reimburse.data?.length === 0 ? (
-                                        <tr>
+                                        <tr className="text-center">
                                             <TD
-                                                className="leading-10 text-gray-500"
+                                                className="leading-10 font-medium text-gray-500"
                                                 colSpan="12"
                                             >
                                                 Data not available

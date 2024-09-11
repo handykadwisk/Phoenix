@@ -9859,9 +9859,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                 </thead>
                                 <tbody>
                                     {cashAdvance.data === undefined && (
-                                        <tr>
+                                        <tr className="text-center">
                                             <TD
-                                                className="leading-10 text-gray-500"
+                                                className="leading-10 font-medium text-gray-500"
                                                 colSpan="12"
                                             >
                                                 Please Search Cash Advance
@@ -9869,9 +9869,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </tr>
                                     )}
                                     {cashAdvance.data?.length === 0 ? (
-                                        <tr>
+                                        <tr className="text-center">
                                             <TD
-                                                className="leading-10 text-gray-500"
+                                                className="leading-10 font-medium text-gray-500"
                                                 colSpan="12"
                                             >
                                                 Data not available

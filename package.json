@@ -47,13 +47,14 @@
         "react-currency-input-field": "^3.8.0",
         "react-date-picker": "^11.0.0",
         "react-datepicker": "^7.3.0",
-        "react-loader-spinner": "^6.1.6",
         "react-doc-viewer": "^0.1.14",
+        "react-loader-spinner": "^6.1.6",
         "react-select": "^5.8.0",
         "react-spinners": "^0.14.1",
         "react-tailwindcss-select": "^1.8.5",
         "sweetalert2": "^11.6.13",
         "sweetalert2-react-content": "^5.0.7",
-        "use-state-with-callback": "^3.0.2"
+        "use-state-with-callback": "^3.0.2",
+        "xlsx": "^0.18.5"
     }
 }

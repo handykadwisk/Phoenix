@@ -4,6 +4,8 @@ use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
+use App\Http\Controllers\ExchangeRateBIController;
+use App\Http\Controllers\ExchangeRateTaxController;
 use App\Http\Controllers\InsurancePanelController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
@@ -343,6 +345,28 @@ Route::middleware('auth')->group(function () {
 
     // Approval Limit
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
+
+    // Exchange Rate Tax
+    Route::get('/getCurrencies', [ExchangeRateTaxController::class, 'getCurrencies'])->name('getCurrencies');
+    Route::post('/getExchangeRateTax', [ExchangeRateTaxController::class, 'getExchangeRateTax'])->name('getExchangeRateTax');
+    Route::get('/getExchangeRateTaxById/{id}', [ExchangeRateTaxController::class, 'getExchangeRateTaxById'])->name('getExchangeRateTaxById');
+    Route::get('/getExchangeRateTaxByDate/{date}', [ExchangeRateTaxController::class, 'getExchangeRateTaxByDate'])->name('getExchangeRateTaxByDate');
+    Route::get('/getExchangeRateTaxDetailById/{id}', [ExchangeRateTaxController::class, 'getExchangeRateTaxDetailById'])->name('getExchangeRateTaxDetailById');
+    Route::get('/exchangeRateTax', [ExchangeRateTaxController::class, 'index'])->name('exchangeRateTax');
+    Route::post('/exchangeRateTaxAdd', [ExchangeRateTaxController::class, 'exchange_rate_tax_add'])->name('exchangeRateTax.add');
+    Route::patch('/exchangeRateTaxEdit', [ExchangeRateTaxController::class, 'exchange_rate_tax_edit'])->name('exchangeRateTax.edit');
+    Route::get('/exchangeRateTaxDownloadTemplate', [ExchangeRateTaxController::class, 'exchange_rate_tax_download_template'])->name('exchangeRateTaxDownloadTemplate');
+
+    // Exchange Rate BI
+    Route::get('/getCurrencies', [ExchangeRateBIController::class, 'getCurrencies'])->name('getCurrencies');
+    Route::post('/getExchangeRateBI', [ExchangeRateBIController::class, 'getExchangeRateBI'])->name('getExchangeRateBI');
+    Route::get('/getExchangeRateBIById/{id}', [ExchangeRateBIController::class, 'getExchangeRateBIById'])->name('getExchangeRateBIById');
+    Route::get('/getExchangeRateBIByDate/{date}', [ExchangeRateBIController::class, 'getExchangeRateBIByDate'])->name('getExchangeRateBIByDate');
+    Route::get('/getExchangeRateBIDetailById/{id}', [ExchangeRateBIController::class, 'getExchangeRateBIDetailById'])->name('getExchangeRateBIDetailById');
+    Route::get('/exchangeRateBI', [ExchangeRateBIController::class, 'index'])->name('exchangeRateBI');
+    Route::post('/exchangeRateBIAdd', [ExchangeRateBIController::class, 'exchange_rate_bi_add'])->name('exchangeRateBI.add');
+    Route::patch('/exchangeRateBIEdit', [ExchangeRateBIController::class, 'exchange_rate_bi_edit'])->name('exchangeRateBI.edit');
+    Route::get('/exchangeRateBIDownloadTemplate', [ExchangeRateBIController::class, 'exchange_rate_bi_download_template'])->name('exchangeRateBIDownloadTemplate');
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
