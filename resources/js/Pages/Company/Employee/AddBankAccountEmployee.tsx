@@ -124,8 +124,6 @@ export default function AddBankAccountEmployee({
         });
     };
 
-    console.log(dataBankAccount);
-
     return (
         <>
             <ModalToAdd

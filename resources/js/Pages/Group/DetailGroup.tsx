@@ -101,7 +101,6 @@ export default function DetailGroup({
             .post(`/getGroup`, { idGroup })
             .then((res: any) => {
                 setRelationGroupNew(res.data);
-                // console.log("xxx", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -116,7 +115,6 @@ export default function DetailGroup({
             text: "New Sub Group Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -154,7 +152,6 @@ export default function DetailGroup({
             text: "New Relation Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -332,7 +329,6 @@ export default function DetailGroup({
     // remove Relation From Group
     const removeRelation = async (e: FormEvent, idRelation: any) => {
         e.preventDefault();
-        // console.log(data);
         await axios
             .post(`/removeRelation`, { idRelation })
             .then((res) => {
@@ -341,7 +337,6 @@ export default function DetailGroup({
                     text: "Remove Relation From Group",
                     icon: "success",
                 }).then((result: any) => {
-                    // console.log(result);
                     if (result.value) {
                         getDetailGroup(idGroup);
                         getGroupName(idGroup);
@@ -575,7 +570,6 @@ export default function DetailGroup({
     }
 
     const handleClick = (i: any) => {
-        console.log(i);
         const element = document.getElementById("item" + i);
         if (!element?.className) {
             element?.setAttribute("class", "hidden");
@@ -585,7 +579,6 @@ export default function DetailGroup({
     };
 
     const handleClickRelation = (i: any) => {
-        console.log(i);
         const element = document.getElementById("item" + i);
         if (!element?.className) {
             element?.setAttribute("class", "hidden");
@@ -689,7 +682,6 @@ export default function DetailGroup({
             text: "Change Sub Group Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -721,7 +713,6 @@ export default function DetailGroup({
             text: "Change Parent",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -749,7 +740,6 @@ export default function DetailGroup({
             text: "Edit Group",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);

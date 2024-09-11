@@ -14,17 +14,18 @@ use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class MenuController extends Controller
 {
-     // Get All Relation Type 
-     public function getAllRelationType()
-     {
-         $relationType = RelationType::get();
- 
-         return $relationType;
-     }
+    // Get All Relation Type 
+    public function getAllRelationType()
+    {
+        $relationType = RelationType::get();
+        return $relationType;
+    }
 
     // show interface acl menu when click menu setting->acl menu
     public function index(Request $request)
@@ -60,17 +61,19 @@ class MenuController extends Controller
     {
 
         // dd($searchQuery->RELATION_ORGANIZATION_NAME);
-        $data = Menu::orderBy('menu_sequence', 'asc')->with('parent')->where('menu_is_deleted', 0);
+        $data = Menu::orderBy('menu_sequence', 'asc')->with('parent');
         if ($searchQuery) {
             if ($searchQuery->input('menu_name')) {
-                    $data->where('menu_name', 'like', '%'.$searchQuery->menu_name.'%');
+                $data->where('menu_name', 'like', '%' . $searchQuery->menu_name . '%');
             }
-        } 
+        }
         // dd($data->toSql());
         return $data->paginate($dataPerPage);
     }
 
-    public function getMenusJson(Request $request){
+
+    public function getMenusJson(Request $request)
+    {
         $data = $this->getMenuData(5, $request);
         // print_r($data);
         // die;
@@ -78,21 +81,28 @@ class MenuController extends Controller
     }
 
     // get menu for combo
-    public function getMenuCombo(Request $request){
+    public function getMenuCombo(Request $request)
+    {
         $data = Menu::orderBy('menu_sequence', 'asc')->with('parent')->where('menu_is_deleted', 0)->get();
+        $res = Menu::where(['menu_is_deleted' => 0, 'menu_parent_id' => null])->orderBy('menu_sequence', 'asc')->get();
 
-        return response()->json($data);
+        return response()->json($res);
     }
 
     // save to store r_menu
-    public function store(Request $request){
-        // dd($request);
+    public function store(Request $request)
+    {
+        // Log::info($request);
+        $lastSequence = Menu::max('menu_sequence');
+
+        // Assign the next sequence or 1 if no previous records exist
+        $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
 
         $Menu = Menu::create([
             "menu_parent_id"        => $request->menu_parent,
             "menu_name"             => $request->menu_name,
             "menu_url"              => $request->menu_url,
-            "menu_sequence"         => $request->menu_sequence,
+            "menu_sequence"         => $nextSequence,
             "menu_is_deleted"       => 0,
             "menu_created_by"       => Auth::user()->id,
             "menu_created_date"     => now()
@@ -119,21 +129,23 @@ class MenuController extends Controller
     }
 
     // get menu for combo
-    public function getMenuById(Request $request){
+    public function getMenuById(Request $request)
+    {
         $data = Menu::find($request->idMenu);
 
         return response()->json($data);
     }
 
     // edit store r_menu
-    public function edit(Request $request){
+    public function edit(Request $request)
+    {
         // dd($request);
         $Menu = Menu::where('id', $request->id)->update([
             "menu_parent_id"        => $request->menu_parent_id,
             "menu_name"             => $request->menu_name,
             "menu_url"              => $request->menu_url,
             "menu_sequence"         => $request->menu_sequence,
-            "menu_is_deleted"       => 0,
+            "menu_is_deleted"       => $request->menu_is_deleted,
             "menu_updated_by"       => Auth::user()->id,
             "menu_updated_date"     => now()
         ]);
@@ -156,5 +168,40 @@ class MenuController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    // get menu from role_id
+    public function getMenuByRoleId(Request $request)
+    {
+        $data = Menu::where('role_id', $request->id);
+        // Log::info($data);
+
+    }
+    public function updateMenuSequence(Request $request)
+    {
+        // Log::info($request);
+        $items = $request->all();
+        foreach ($items as $item) {
+            $this->updateItemSequence($item);
+            // Log::info($item);
+
+        }
+
+        return response()->json(['message' => 'Menu sequence updated successfully']);
+    }
+
+    private function updateItemSequence($item)
+    {
+        // Update the menu sequence for the item
+        DB::table('r_menu')
+            ->where('id', $item['id'])
+            ->update(['menu_sequence' => $item['menu_sequence']]);
+
+        // Update the menu sequence for the children
+        if (isset($item['children'])) {
+            foreach ($item['children'] as $child) {
+                $this->updateItemSequence($child);
+            }
+        }
     }
 }

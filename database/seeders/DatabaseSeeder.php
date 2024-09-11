@@ -26,205 +26,241 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // create menu
-        $dashboard = Menu::create(
-            [
-                'menu_name'       => 'Dashboard',
-                'menu_url'        => 'dashboard',
-                'menu_is_deleted' => 1,
-                'menu_sequence'   => 1,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $relation = Menu::create(
-            [
-                'menu_name'       => 'Relation',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 2,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $policy = Menu::create(
-            [
-                'menu_name'       => 'Policy',
-                'menu_url'        => 'policy',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 3,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $group = Menu::create(
-            [
-                'menu_name'       => 'Policy',
-                'menu_parent_id'  => $relation->id,
-                'menu_url'        => 'policy/policy',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 8,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $group = Menu::create(
-            [
-                'menu_name'       => 'Group',
-                'menu_parent_id'  => $relation->id,
-                'menu_url'        => 'relation/group',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 5,
-                'menu_created_by' => 'admin'
-            ]
-        );
-        $childRelation = Menu::create(
-            [
-                'menu_name'       => 'Relation',
-                'menu_parent_id'  => $relation->id,
-                'menu_url'        => 'relation',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 4,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $this->call([
+        //     tuser::class,
 
-        $childAgent = Menu::create(
-            [
-                'menu_name'       => 'Agent',
-                'menu_parent_id'  => $relation->id,
-                'menu_url'        => 'relation/agent',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 6,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // ]);
+        $this->call([
+            rusertype::class,
 
-        $childBAA = Menu::create(
-            [
-                'menu_name'       => 'BAA',
-                'menu_parent_id'  => $relation->id,
-                'menu_url'        => 'relation/baa',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 7,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        ]);
+        $this->call([
+            r_menu::class,
 
-        $finance = Menu::create(
-            [
-                'menu_name'       => 'Finance',
-                'menu_url'        => NULL,
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        )->id;
+        ]);
+        $this->call([
+            mroleusers::class,
 
-        $cashAdvance = Menu::create(
-            [
-                'menu_parent_id' => $finance,
-                'menu_name'       => 'Cash Advance',
-                'menu_url'        => 'cashAdvance',
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        )->id;
+        ]);
 
-        $reimburse = Menu::create(
-            [
-                'menu_parent_id' => $finance,
-                'menu_name'       => 'Reimburse',
-                'menu_url'        => 'reimburse',
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        )->id;
 
-        $otherExpenses = Menu::create(
-            [
-                'menu_parent_id' => $finance,
-                'menu_name'       => 'Other Expenses',
-                'menu_url'        => 'otherExpenses',
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        )->id;
 
-        // $setting = Menu::create(
+        // // create menu
+        // $dashboard = Menu::create(
         //     [
-        //         'menu_name'       => 'Settings',
+        //         'menu_name'       => 'Dashboard',
+        //         'menu_url'        => 'dashboard',
+        //         'menu_is_deleted' => 1,
+        //         'menu_sequence'   => 1,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+        // $relation = Menu::create(
+        //     [
+        //         'menu_name'       => 'Relation',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 2,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+        // $policy = Menu::create(
+        //     [
+        //         'menu_name'       => 'Policy',
+        //         'menu_url'        => 'policy',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 3,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+        // $group = Menu::create(
+        //     [
+        //         'menu_name'       => 'Policy',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'policy/policy',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 8,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+        // $group = Menu::create(
+        //     [
+        //         'menu_name'       => 'Group',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'relation/group',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 5,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+        // $childRelation = Menu::create(
+        //     [
+        //         'menu_name'       => 'Relation',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'relation',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 4,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $finance = Menu::create(
+        //     [
+        //         'menu_name'       => 'Finance',
         //         'menu_url'        => NULL,
         //         'menu_is_deleted' => 0,
         //         'menu_created_by' => 'admin'
         //     ]
         // )->id;
 
-        $approvalLimit = Menu::create(
-            [
-                'menu_parent_id'  => $finance,
-                'menu_name'       => 'Approval Limit',
-                'menu_url'        => 'approvalLimit',
-                'menu_is_deleted' => 0,
-                'menu_created_by' => 'admin'
-            ]
-        )->id;
+        // $cashAdvance = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Cash Advance',
+        //         'menu_url'        => 'cashAdvance',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
-        $setting = Menu::create(
-            [
-                'menu_name'       => 'Setting',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 99,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $reimburse = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Reimburse',
+        //         'menu_url'        => 'reimburse',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
-        $ACLMenu = Menu::create(
-            [
-                'menu_name'       => 'ACL - Menu',
-                'menu_parent_id'  => $setting->id,
-                'menu_url'        => 'setting/menu',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 6,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $otherExpenses = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Other Expenses',
+        //         'menu_url'        => 'otherExpenses',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
-        $ACLPermission = Menu::create(
-            [
-                'menu_name'       => 'ACL - Permission',
-                'menu_parent_id'  => $setting->id,
-                'menu_url'        => 'setting/permission',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 6,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $finance = Menu::create(
+        //     [
+        //         'menu_name'       => 'Finance',
+        //         'menu_url'        => NULL,
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
-        $ACLRole = Menu::create(
-            [
-                'menu_name'       => 'ACL - Role',
-                'menu_parent_id'  => $setting->id,
-                'menu_url'        => 'setting/role',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 6,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $cashAdvance = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Cash Advance',
+        //         'menu_url'        => 'cashAdvance',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
-        $HR = Menu::create(
-            [
-                'menu_name'       => 'HR',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 77,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $reimburse = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Reimburse',
+        //         'menu_url'        => 'reimburse',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
-        $hrCompany = Menu::create(
-            [
-                'menu_name'       => 'Company Setting',
-                'menu_parent_id'  => $HR->id,
-                'menu_url'        => 'hr/settingCompany',
-                'menu_is_deleted' => 0,
-                'menu_sequence'   => 1,
-                'menu_created_by' => 'admin'
-            ]
-        );
+        // $otherExpenses = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Other Expenses',
+        //         'menu_url'        => 'otherExpenses',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
+
+        // // $setting = Menu::create(
+        // //     [
+        // //         'menu_name'       => 'Settings',
+        // //         'menu_url'        => NULL,
+        // //         'menu_is_deleted' => 0,
+        // //         'menu_created_by' => 'admin'
+        // //     ]
+        // // )->id;
+
+        // $approvalLimit = Menu::create(
+        //     [
+        //         'menu_parent_id'  => $finance,
+        //         'menu_name'       => 'Approval Limit',
+        //         'menu_url'        => 'approvalLimit',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
+
+        // $setting = Menu::create(
+        //     [
+        //         'menu_name'       => 'Setting',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 99,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $ACLMenu = Menu::create(
+        //     [
+        //         'menu_name'       => 'ACL - Menu',
+        //         'menu_parent_id'  => $setting->id,
+        //         'menu_url'        => 'setting/menu',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 6,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $ACLPermission = Menu::create(
+        //     [
+        //         'menu_name'       => 'ACL - Permission',
+        //         'menu_parent_id'  => $setting->id,
+        //         'menu_url'        => 'setting/permission',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 6,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $ACLRole = Menu::create(
+        //     [
+        //         'menu_name'       => 'ACL - Role',
+        //         'menu_parent_id'  => $setting->id,
+        //         'menu_url'        => 'setting/role',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 6,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $HR = Menu::create(
+        //     [
+        //         'menu_name'       => 'HR',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 77,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $hrCompany = Menu::create(
+        //     [
+        //         'menu_name'       => 'Company Setting',
+        //         'menu_parent_id'  => $HR->id,
+        //         'menu_url'        => 'hr/settingCompany',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 1,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
 
         // create role
         $admin = Role::create([
@@ -408,12 +444,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path3)
         );
 
-        // create 2024_27_06_r_wilayah_kemendagri
-        $file_path4 = resource_path('../database/LogDB/2024_27_06_r_wilayah_kemendagri.sql');
+        // // create 2024_27_06_r_wilayah_kemendagri
+        // $file_path4 = resource_path('../database/LogDB/2024_27_06_r_wilayah_kemendagri.sql');
 
-        DB::unprepared(
-            file_get_contents($file_path4)
-        );
+        // DB::unprepared(
+        //     file_get_contents($file_path4)
+        // );
 
         // create 2024_20_06_r_bank
         $file_path5 = resource_path('../database/LogDB/2024_20_06_r_bank.sql');
@@ -573,9 +609,9 @@ class DatabaseSeeder extends Seeder
         // create 2024_31_08_r_plugin_process
         $r_plugin_process = resource_path('../database/LogDB/2024_31_08_r_plugin_process.sql');
 
-        DB::unprepared(
-            file_get_contents($r_plugin_process)
-        );
+        // DB::unprepared(
+        //     file_get_contents($r_plugin_process)
+        // );
 
 
         $file_path27 = resource_path('../database/LogDB/2024_08_27_t_company.sql');
@@ -608,10 +644,16 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path31)
         );
 
-        $file_path32 = resource_path('../database/LogDB/2024_08_27_t_user.sql');
+        // $file_path32 = resource_path('../database/LogDB/2024_08_27_t_user.sql');
 
         DB::unprepared(
             file_get_contents($file_path32)
+        );
+
+        $file_path33 = resource_path('../database/LogDB/2024_07_31_t_menu.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path33)
         );
     }
 }

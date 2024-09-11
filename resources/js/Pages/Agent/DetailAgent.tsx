@@ -38,7 +38,6 @@ export default function DetailAgent({
     const [relationAgent, setRelationAgent] = useState<any>([]);
 
     const [isSuccessNew, setIsSuccessNew] = useState<any>("");
-    // console.log(dataAgent);
     // useEffect(() => {
     //     getMRelationAgent(idAgent);
     // }, [idAgent]);
@@ -121,7 +120,6 @@ export default function DetailAgent({
                 item.name_relation?.toLocaleLowerCase()?.trim() ===
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
-    // console.log(dataRelation.name_relation);
 
     const handleSuccess = async (message: string) => {
         // if (modal.add) {
@@ -134,7 +132,6 @@ export default function DetailAgent({
             text: "Relation Add",
             icon: "success",
         }).then((result: any) => {
-            // console.log(message);
             if (result.value) {
                 // getMRelationAgent(message[0]);
                 setIsSuccessNew({
@@ -151,7 +148,6 @@ export default function DetailAgent({
                 setIsSuccessNew({
                     isSuccessNew: "success",
                 });
-                // console.log(id);
                 // getMRelationAgent(idAgent);
             })
             .catch((err) => {
@@ -160,7 +156,6 @@ export default function DetailAgent({
     };
 
     const deleteRelation = async (id: string) => {
-        // console.log(data);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't delete this!",
@@ -174,16 +169,6 @@ export default function DetailAgent({
                 deleteProcess(id);
             }
         });
-        // Swal.fire({
-        //     title: "Success",
-        //     text: "Images Change",
-        //     icon: "success",
-        // }).then((result: any) => {
-        //     // console.log(result);
-        //     if (result.value) {
-        //         deleteProcess(id);
-        //     }
-        // });
     };
     const CustomButtonComponent = (props: any) => {
         return (

@@ -212,7 +212,8 @@ class InsurancePanelController extends Controller
         ]);
 
         return new JsonResponse([
-            'Create Insurer Succeed.'
+            "msg" => "Success Add Insurer",
+            "id" => $request->id
         ], 200, [
             'X-Inertia' => true
         ]);
@@ -285,7 +286,8 @@ class InsurancePanelController extends Controller
         ]);
 
         return new JsonResponse([
-            'Edit Insurer Succeed.'
+            "msg" => "Success Edit Insurer",
+            "id" => $request->id
         ], 200, [
             'X-Inertia' => true
         ]);

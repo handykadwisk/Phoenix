@@ -1,8 +1,8 @@
 // useCounter.js
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import sha256 from "crypto-js/sha256";
 
-const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
+const renderClassFunction = (detailRelation?: number, dataTPlugin?: any) => {
     // state untuk munculin menu
     const [showContext, setShowContext] = useState<any>({
         visible: false,
@@ -11,6 +11,16 @@ const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
     const [idDiv, setIdDiv] = useState<any>({
         setIdName: "",
     });
+
+    const [tagIdChat, setTagIdChat] = useState<any>({
+        TAG_ID: "",
+    });
+
+    const [showChatMessage, setShowChatMessage] = useState({
+        chatModal: false,
+    });
+
+    const [flagPlugin, setFlagPlugin] = useState<boolean>(false);
 
     // state untuk menuu position jika di klik
     const [menuPosition, setMenuPosition] = useState<any>({
@@ -79,6 +89,7 @@ const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
         getMark.forEach((element: any, index: number) => {
             element?.classList.add("cursor-help");
             element?.classList.add("tooltip");
+            element?.classList.add("hover:bg-yellow-100/35");
             // element?.setAttribute("title", "Attach, Chat, Task, etc For This");
             const elements = element?.getElementsByClassName("bottom");
 
@@ -193,8 +204,24 @@ const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
     }, [divId.length !== 0]);
 
     useEffect(() => {
-        const handleModalClick = async () => {
-            alert("aloo");
+        const handleModalClick = async (
+            PLUGIN_PROCESS_ID: any,
+            TAG_ID: any
+            // event: FormEvent
+        ) => {
+            // event.preventDefault();
+
+            if (PLUGIN_PROCESS_ID === "1" || PLUGIN_PROCESS_ID === 1) {
+                setShowChatMessage({
+                    chatModal: true,
+                });
+                setTagIdChat({
+                    TAG_ID: TAG_ID,
+                });
+                setFlagPlugin(true);
+            } else {
+                alert("Coming Soon");
+            }
         };
 
         dataTPlugin.forEach((item: any) => {
@@ -244,7 +271,13 @@ const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
                     // newDiv.className = "";
                     // newDiv.className = className;
                     newDiv.classList.add(className);
-                    newDiv.addEventListener("click", handleModalClick);
+                    newDiv.addEventListener("click", function (event: any) {
+                        handleModalClick(item.PLUGIN_PROCESS_ID, item.TAG_ID);
+                    });
+                    // newDiv.addEventListener(
+                    //     "click",
+                    //     handleModalClick(item.PLUGIN_PROCESS_ID)
+                    // );
                     newDiv.classList.add("hover:cursor-pointer");
                     // newDiv.textContent = item.PLUGIN_PROCESS_ID;
 
@@ -257,7 +290,9 @@ const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
                     // newDiv.className = "";
                     // newDiv.className = className;
                     newDiv.classList.add(className);
-                    newDiv.addEventListener("click", handleModalClick);
+                    newDiv.addEventListener("click", function (event: any) {
+                        handleModalClick(item.PLUGIN_PROCESS_ID, item.TAG_ID);
+                    });
                     newDiv.classList.add("hover:cursor-pointer");
                     // newDiv.textContent = item.PLUGIN_PROCESS_ID;
 
@@ -269,8 +304,13 @@ const renderClassFunction = (detailRelation: number, dataTPlugin: any) => {
     }, [dataTPlugin]);
 
     return {
+        flagPlugin,
+        setFlagPlugin,
+        showChatMessage,
+        setShowChatMessage,
         showContext,
         idDiv,
+        tagIdChat,
         menuPosition,
         setShowContext,
     };

@@ -58,7 +58,6 @@ export default function DetailJobCompany({
             .post(`/getJobDescCompanyDetail`, { id })
             .then((res) => {
                 setDataDetailJobDesc(res.data);
-                console.log(res.data);
 
                 setIsLoading({
                     ...isLoading,

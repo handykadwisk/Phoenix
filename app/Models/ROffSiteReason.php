@@ -5,17 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TTypeChat extends Model
+class ROffSiteReason extends Model
 {
     use HasFactory;
+    protected $primaryKey = 'OFF_SITE_REASON_ID';
 
-    protected $primaryKey = 'TYPE_CHAT_ID';
-
-    protected $table = 't_type_chat';
-
-    protected $guarded = [
-        'TYPE_CHAT_ID',
-    ];
+    protected $table = 'r_off_site_reason';
 
     public $timestamps = false;
 }

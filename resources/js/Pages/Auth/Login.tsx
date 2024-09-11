@@ -16,7 +16,7 @@ export default function Login({
     canResetPassword: boolean;
 }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: "",
+        user_login: "",
         password: "",
         remember: false,
     });
@@ -32,6 +32,8 @@ export default function Login({
 
         post(route("login"));
     };
+    console.log(errors);
+    
 
     return (
         <GuestLayout>
@@ -61,25 +63,25 @@ export default function Login({
                             <form onSubmit={submit} className="space-y-6">
                                 <div>
                                     <label
-                                        htmlFor="email"
+                                        htmlFor="user_login"
                                         className="block text-sm font-medium leading-6 text-gray-900"
                                     >
-                                        Email address
+                                        User Login
                                     </label>
                                     <div className="mt-2">
                                         <TextInput
-                                            id="email"
-                                            type="email"
-                                            name="email"
-                                            value={data.email}
+                                            id="user_login"
+                                            type="text"
+                                            name="user_login"
+                                            value={data.user_login}
                                             className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             isFocused={true}
                                             onChange={(e) =>
-                                                setData("email", e.target.value)
+                                                setData("user_login", e.target.value)
                                             }
                                         />
                                         <InputError
-                                            message={errors.email}
+                                            message={errors.user_login}
                                             className="mt-2"
                                         />
                                     </div>

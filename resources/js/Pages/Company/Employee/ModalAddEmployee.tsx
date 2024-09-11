@@ -171,7 +171,6 @@ export default function ModalAddEmployee({
     ) => {
         const changeVal: any = [...dataAddress.address_ktp];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setDataAddress({
             ...dataAddress,
             address_ktp: changeVal,
@@ -185,7 +184,6 @@ export default function ModalAddEmployee({
     ) => {
         const changeVal: any = [...dataAddress.address_domicile];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setDataAddress({
             ...dataAddress,
             address_domicile: changeVal,
@@ -199,7 +197,6 @@ export default function ModalAddEmployee({
     ) => {
         const changeVal: any = [...dataAddress.other_address];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setDataAddress({
             ...dataAddress,
             other_address: changeVal,

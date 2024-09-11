@@ -64,7 +64,6 @@ export default function Relation({ auth }: PageProps) {
         ],
     });
 
-    // console.log(searchRelation.relation_search);
     const getRelation = async (pageNumber = "page=1") => {
         await axios
             .post(`/getRelation?${pageNumber}`, {
@@ -564,7 +563,7 @@ export default function Relation({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%] modal-action-container"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
                 submitButtonName={""}
                 body={

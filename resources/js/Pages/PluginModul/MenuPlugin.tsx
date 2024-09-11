@@ -30,25 +30,13 @@ export default function MenuPlugin({
     left,
     marginLeft,
     marginTop,
-    idDiv,
-    dataPluginProcess,
-    setDataPluginProcess,
     handleAddPluginProcess,
-    showContext,
-    setShowContext,
-    handleSuccessPlugin,
 }: PropsWithChildren<{
     top: any;
     left: any;
     marginLeft: any | null;
     marginTop: any | null;
-    idDiv: any;
-    dataPluginProcess: any;
-    setDataPluginProcess: any;
-    showContext: any;
     handleAddPluginProcess: any;
-    setShowContext: any;
-    handleSuccessPlugin: any;
 }>) {
     const menuRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -162,7 +150,6 @@ export default function MenuPlugin({
                                     className="text-sm hover:cursor-pointer hover:bg-red-400 p-2 rounded-md w-full"
                                     onClick={(e: any) => {
                                         handleAddPluginProcess(
-                                            e,
                                             dataPlug.PLUGIN_PROCESS_ID
                                         );
                                     }}

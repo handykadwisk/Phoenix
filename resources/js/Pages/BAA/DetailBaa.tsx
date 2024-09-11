@@ -34,7 +34,6 @@ export default function DetailBaa({
     idBaa: any;
     // setIsSuccessBAA: any;
 }>) {
-    console.log(idBaa);
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
     });
@@ -108,8 +107,6 @@ export default function DetailBaa({
                 setIsSuccessBAA({
                     isSuccessBAA: "success",
                 });
-                // console.log(id);
-                // getMRelationAgent(idAgent);
             })
             .catch((err) => {
                 console.log(err);
@@ -117,7 +114,6 @@ export default function DetailBaa({
     };
 
     const deleteRelation = async (id: string) => {
-        // console.log(data);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't delete this!",
@@ -131,16 +127,6 @@ export default function DetailBaa({
                 deleteProcess(id);
             }
         });
-        // Swal.fire({
-        //     title: "Success",
-        //     text: "Images Change",
-        //     icon: "success",
-        // }).then((result: any) => {
-        //     // console.log(result);
-        //     if (result.value) {
-        //         deleteProcess(id);
-        //     }
-        // });
     };
 
     const CustomButtonComponent = (props: any) => {
@@ -167,9 +153,7 @@ export default function DetailBaa({
             text: "Relation Add",
             icon: "success",
         }).then((result: any) => {
-            // console.log(message);
             if (result.value) {
-                // getMRelationAgent(message[0]);
                 setIsSuccessBAA({
                     isSuccessBAA: "success",
                 });

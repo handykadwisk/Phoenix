@@ -106,6 +106,11 @@ class TEmployeeController extends Controller
         return response()->json($data);
     }
 
+    public function getAllEmployeeJson(){
+        $data = TEmployee::get();
+        return response()->json($data);
+    }
+
 
     public function store(Request $request){
         $STRUCTURE_ID = $request->STRUCTURE_ID;

@@ -23,8 +23,22 @@ class Menu extends Model
 
     public function access()
     {
-        return $this->hasMany(RoleAccessMenu::class, 'menu_id')->where('role_id', Auth::user()->role_id);
+        $user = Auth::user();
+        
+        // Jika user adalah admin, ambil semua akses menu
+        if ($user->type_user_id === 1) {
+            return $this->hasMany(RoleAccessMenu::class, 'menu_id'); // Ambil semua akses menu tanpa filter
+        }
+        
+        // Jika bukan admin, filter berdasarkan role user
+        return $this->hasMany(RoleAccessMenu::class, 'menu_id')
+                    ->whereIn('role_id', function($query) use ($user) {
+                        $query->select('role_id')
+                              ->from('m_role_users')
+                              ->where('user_id', $user->id);
+                    });
     }
+    
 
     public function children()
     {

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->increments('CURRENCY_ID')->primary();
             $table->string('CURRENCY_SYMBOL')->nullable();
             $table->string('CURRENCY_NAME')->nullable();
+            $table->smallInteger('CURRENCY_SEQ_EXCHANGE_RATE_BI')->nullable();
+            $table->smallInteger('CURRENCY_SEQ_EXCHANGE_RATE_TAX')->nullable();
         });
     }
 

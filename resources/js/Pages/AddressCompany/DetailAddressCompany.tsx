@@ -425,7 +425,6 @@ export default function DetailAddressCompany({
                                     //     )
                                     // }
                                     onChange={(val: any) => {
-                                        // console.log(val.value);
                                         // return false;
                                         getRegency(val.value);
                                         setDataById({

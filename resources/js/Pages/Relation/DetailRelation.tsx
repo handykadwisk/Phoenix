@@ -34,10 +34,8 @@ import DatePicker from "react-datepicker";
 import SwitchPage from "@/Components/Switch";
 import Select from "react-tailwindcss-select";
 import DetailDocumentRelation from "./DetailDocument";
-import MenuPlugin from "../PluginModul/MenuPlugin";
-import renderClassFunction from "@/Utility/renderClassFunction";
-import AddChatPlugin from "../PluginModul/AddChatPlugin";
-import ModalChatMessage from "../PluginModul/ModalChatMessage";
+import { MyProvider } from "@/Utility/GlobalContext";
+import PhoenixComponent from "@/Utility/PhoenixComponent";
 
 export default function DetailRelation({
     detailRelation,
@@ -56,24 +54,11 @@ export default function DetailRelation({
     setGetDetailRelation: any;
     auth?: any;
 }>) {
-    // const getMark = document.querySelectorAll(
-    //     ".cls_can_attach_process"
-    // ) as NodeListOf<any>;
-
     // const { success, detailRelation }: any = usePage().props;
     const [dataRelationNew, setDataRelationNew] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
     const [postSalutations, setPostSalutations] = useState<any>([]);
     const [switchPage, setSwitchPage] = useState(false);
-
-    // data menu
-    const [dataPluginProcess, setDataPluginProcess] = useState<any>({
-        TAG_ID: "",
-        PLUGIN_PROCESS_ID: "",
-        TITLE_CHAT: "",
-        OBJECT_CHAT: "",
-        INITIATE_YOUR_CHAT: "",
-    });
 
     const [isSuccess, setIsSuccess] = useState<string>("");
 
@@ -143,131 +128,16 @@ export default function DetailRelation({
             .then((res) => {
                 // getPlugin(res.data);
                 setDataTPlugin(res.data);
-                // getPlugin(res.data);
-                // console.log("TPlug", res.data);
-                // setRefreshPlugin(true);
-                // setTimeout(() => {
-                //     setRefreshPlugin(false);
-                // }, 2000);
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
-    // for hook react render class
-    const {
-        // handleContextMenu,
-        // handleClick,
-        showContext,
-        idDiv,
-        menuPosition,
-        setShowContext,
-    } = renderClassFunction(detailRelation, dataTPlugin);
-    // handleContextMenu();
-
-    // handleContextMenu;
-    // handleClick;
-    // const handleContextMenu = async (e: any) => {
-    //     e.preventDefault();
-    //     // console.log(e.currentTarget.id);
-    //     setShowContext({
-    //         ...showContext,
-    //         visible: true,
-    //     });
-    //     setIdDiv({
-    //         ...idDiv,
-    //         setIdName: e.currentTarget.id,
-    //     });
-    //     setMenuPosition({
-    //         x: e.clientX + "px",
-    //         y: e.clientY + "px",
-    //     });
-    // };
-
-    // const handleClick = async (e: any) => {
-    //     e.preventDefault();
-    //     console.log(e.currentTarget.id);
-    //     setShowContext({
-    //         ...showContext,
-    //         visible: false,
-    //     });
-    // };
-
-    // const getContents = () => {
-    //     const getMark = document.querySelectorAll(
-    //         ".cls_can_attach_process"
-    //     ) as NodeListOf<any>;
-    //     getMark.forEach((element) => {
-    //         if (element.className === "cls_can_attach_process") {
-    //             element?.setAttribute("class", "cursor-help");
-    //             element?.setAttribute(
-    //                 "title",
-    //                 "Attach, Chat, Task, etc For This"
-    //             );
-    //         }
-    //         element?.addEventListener("contextmenu", handleContextMenu);
-    //         element?.addEventListener("click", handleClick);
-    //         // console.log(element); // Safe, since it's known to be HTMLElement
-    //     });
-    // };
-
-    // useEffect(() => {
-    //     getContents();
-    // }, []);
-
-    // handleContextMenu = (event) => {
-    //     event.preventDefault();
-
-    //     this.setState({ visible: true });
-
-    //     const clickX = event.clientX;
-    //     const clickY = event.clientY;
-    //     const screenW = window.innerWidth;
-    //     const screenH = window.innerHeight;
-    //     const rootW = this.root.offsetWidth;
-    //     const rootH = this.root.offsetHeight;
-
-    //     const right = screenW - clickX > rootW;
-    //     const left = !right;
-    //     const top = screenH - clickY > rootH;
-    //     const bottom = !top;
-
-    //     if (right) {
-    //         this.root.style.left = `${clickX + 5}px`;
-    //     }
-
-    //     if (left) {
-    //         this.root.style.left = `${clickX - rootW - 5}px`;
-    //     }
-
-    //     if (top) {
-    //         this.root.style.top = `${clickY + 5}px`;
-    //     }
-
-    //     if (bottom) {
-    //         this.root.style.top = `${clickY - rootH - 5}px`;
-    //     }
-    // };
-
-    // useEffect(() => {
-
-    //     // return () => {
-    //     //     const getTest = document.getElementById("test") as HTMLFormElement;
-    //     //     getTest?.removeEventListener("click", handleClick);
-    //     // };
-    // }, [detailRelation]);
-
     const getMappingParent = async (name: string, column: string) => {
-        // setIsLoading(true)
-
         await axios
             .post(`/getMappingParent`, { name, column })
-            .then((res: any) => {
-                // setMappingParent({
-                //     mapping_parent: res.data,
-                // });
-            })
+            .then((res: any) => {})
             .catch((err) => {
                 console.log(err);
             });
@@ -755,17 +625,6 @@ export default function DetailRelation({
         edit: false,
     });
 
-    // const [editBankRelation, setEditBankRelation] = useState<any>([
-    //     {
-    //         bank_account: {
-    //             BANK_ID: "",
-    //             ACCOUNT_NAME: "",
-    //             ACCOUNT_NUMBER: "",
-    //             NPWP_NAME: "",
-    //         },
-    //     },
-    // ]);
-
     const [editBankRelation, setEditBankRelation] = useState<any>({
         RELATION_ORGANIZATION_ID: detailRelation,
         bank_account: [
@@ -863,168 +722,14 @@ export default function DetailRelation({
         }
     };
 
-    // const [showContext, setShowContext] = useState<any>({
-    //     visible: false,
-    // });
-
-    // const [idDiv, setIdDiv] = useState<any>({
-    //     setIdName: "",
-    // });
-    // const [menuPosition, setMenuPosition] = useState<any>({
-    //     x: "",
-    //     y: "",
-    // });
-
-    // const []
-
-    // const handleContextMenu = (event: FormEvent) => {
-    //     event.preventDefault();
-    //     console.log(event.currentTarget.id);
-    //     if (event.currentTarget.id === event.currentTarget.id) {
-    //         setShowContext({
-    //             ...showContext,
-    //             visible: true,
-    //         });
-    //         setIdDiv({
-    //             ...idDiv,
-    //             setIdName: event.currentTarget.id,
-    //         });
-    //         setMenuPosition({
-    //             x: event.clientX + "px",
-    //             y: event.clientY + "px",
-    //         });
-    //     }
-    // };
-
-    // const handleContextMenu = (event: any) => {
-    //     event.preventDefault();
-    //     setShowContext({
-    //         ...showContext,
-    //         visible: true,
-    //     });
-    // };
-
-    // const handleClick = (event: any) => {
-    //     console.log(event);
-    //     const showVisible = showContext.visible;
-
-    //     if (!showVisible) {
-    //         setShowContext({
-    //             ...showContext,
-    //             visible: false,
-    //         });
-    //     }
-    // };
-
-    // const handleScroll = () => {
-    //     const visib = showContext.visible;
-
-    //     if (!visib) {
-    //         setShowContext({
-    //             ...showContext,
-    //             visible: false,
-    //         });
-    //     }
-    // };
-
-    // const runContent = async () => {
-    //     const getMark = document.querySelectorAll(
-    //         ".cls_can_attach_process"
-    //     ) as NodeListOf<any>;
-    //     getMark.forEach((element) => {
-    //         if (element.className === "cls_can_attach_process") {
-    //             element?.addEventListener("contextmenu", handleContextMenu);
-    //             element?.addEventListener("click", handleClick);
-    //             element?.addEventListener("scroll", handleScroll);
-    //         }
-    //         // console.log(element.title); // Safe, since it's known to be HTMLElement
-    //     });
-    // };
-
-    // const endContent = async () => {
-    //     const getMark = document.querySelectorAll(
-    //         ".cls_can_attach_process"
-    //     ) as NodeListOf<any>;
-    //     getMark.forEach((element) => {
-    //         if (element.className === "cls_can_attach_process") {
-    //             element?.removeEventListener("contextmenu", handleContextMenu);
-    //             element?.removeEventListener("click", handleClick);
-    //             element?.removeEventListener("scroll", handleScroll);
-    //         }
-    //         // console.log(element.title); // Safe, since it's known to be HTMLElement
-    //     });
-    // };
-
-    const handleAddPluginProcess = async (e: FormEvent, idPlug: number) => {
-        // e.preventDefault();
-
-        setModalPlugin({
-            add: !modalPlugin.add,
-        });
-        setDataPluginProcess({
-            ...dataPluginProcess,
-            TAG_ID: idDiv.setIdName,
-            PLUGIN_PROCESS_ID: idPlug,
-            TITLE_CHAT: "",
-            OBJECT_CHAT: "chat_",
-            INITIATE_YOUR_CHAT: "",
-        });
-        // setDataPluginProcess({
-        //     TAG_ID: idDiv.setIdName,
-        //     PLUGIN_PROCESS_ID: idPlug,
-        //     UID_CHAT: "chat_",
-        // });
-
-        // if (modalPlugin.add === false) {
-        setShowContext({
-            ...showContext,
-            visible: false,
-        });
-        // }
-    };
-
-    // modal chat
-    const [showChatMessage, setShowChatMessage] = useState({
-        chatModal: false,
-    });
-
-    // Parameter for chat message
-    const [typeChatId, setTypeChatId] = useState<any>({
-        typeID: "",
-    });
-
-    const handleSuccessPlugin = async (message: string) => {
-        setIsSuccess("");
-        if (message != "") {
-            setIsSuccess(message[2]);
-            // getDetailRelation(message[0]);
-            getTPluginProcess();
-            setShowContext({
-                ...showContext,
-                visible: false,
-            });
-
-            if (message[1] === "1") {
-                setShowChatMessage({
-                    chatModal: !showChatMessage.chatModal,
-                });
-                setTypeChatId({
-                    typeID: message[3],
-                });
-            }
-
-            // getContents();
-            setTimeout(() => {
-                setIsSuccess("");
-            }, 5000);
-        }
-    };
-
-    const [modalPlugin, setModalPlugin] = useState<any>({
-        add: false,
-    });
     return (
         <>
+            <MyProvider>
+                <PhoenixComponent
+                    otherId={detailRelation}
+                    setIsSuccess={setIsSuccess}
+                />
+            </MyProvider>
             {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
@@ -1032,14 +737,6 @@ export default function DetailRelation({
                     type={"success"}
                 />
             )}
-
-            <AddChatPlugin
-                modalPlugin={modalPlugin}
-                setModalPlugin={setModalPlugin}
-                dataPluginProcess={dataPluginProcess}
-                setDataPluginProcess={setDataPluginProcess}
-                handleSuccessPlugin={handleSuccessPlugin}
-            />
 
             <ModalToAction
                 show={modalDocuemnt.view}
@@ -1478,6 +1175,9 @@ export default function DetailRelation({
                 body={
                     <>
                         <div className="lg:grid lg:gap-4 lg:grid-cols-2 xs:grid xs:gap-4 xs:grid-cols-1">
+                            <div className="cls_can_attach_process">
+                                <span>Aloo</span>
+                            </div>
                             <div className="mt-4 relative">
                                 <InputLabel
                                     className="absolute"
@@ -2469,147 +2169,15 @@ export default function DetailRelation({
                 }
             />
             {/* end modal for person */}
-
-            {/* Detail Relation*/}
-            {/* Top */}
-            {showContext.visible && (
-                <>
-                    <MenuPlugin
-                        handleAddPluginProcess={handleAddPluginProcess}
-                        handleSuccessPlugin={handleSuccessPlugin}
-                        showContext={showContext}
-                        setShowContext={setShowContext}
-                        idDiv={idDiv}
-                        dataPluginProcess={dataPluginProcess}
-                        setDataPluginProcess={setDataPluginProcess}
-                        top={menuPosition.y}
-                        left={menuPosition.x}
-                        marginTop={menuPosition.marginTop}
-                        marginLeft={menuPosition.marginLeft}
-                    />
-                </>
-            )}
-
-            {/* modal chat */}
-            {/* {!showChatMessage && (
-                <>
-                    <div className="chatBalon">
-                        <div className="bg-green-500 rounded-tr-md rounded-tl-md h-10 flex items-center justify-center text-white">
-                            <span>Live Chat</span>
-                        </div>
-                        <div className="messageChat h-[271px] overflow-y-auto">
-                            <div className="m-4">
-                                <div className="mb-2 text-right">
-                                    <p className="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block text-xs">
-                                        hello
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2">
-                                    <p className="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block text-xs">
-                                        This is a response from the chatbot.
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2 text-right">
-                                    <p className="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block text-xs">
-                                        hello
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2">
-                                    <p className="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block text-xs">
-                                        This is a response from the chatbot.
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2 text-right">
-                                    <p className="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block text-xs">
-                                        hello
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2">
-                                    <p className="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block text-xs">
-                                        This is a response from the chatbot.
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2 text-right">
-                                    <p className="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block text-xs">
-                                        hello
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                                <div className="mb-2">
-                                    <p className="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block text-xs">
-                                        This is a response from the chatbot.
-                                    </p>
-                                    <p className="text-[10px]">Admin - 23:30</p>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="m-2 flex items-center gap-2">
-                            <TextInput
-                                type="text"
-                                // value={dataPluginProcess.OBJECT_CHAT}
-                                className="w-full ring-1 ring-red-500"
-                                // onChange={(e) =>
-                                //     setDataPluginProcess({
-                                //         ...dataPluginProcess,
-                                //         OBJECT_CHAT: e.target.value,
-                                //     })
-                                // }
-                                // onChange={(e) => permissionObject(e)}
-                                placeholder="Your Chat"
-                            />
-                            <span>
-                                <PaperAirplaneIcon className="w-6" />
-                            </span>
-                        </div>
-                    </div>
-                </>
-            )} */}
-
-            <ModalChatMessage
-                show={showChatMessage.chatModal}
-                onClose={() =>
-                    setShowChatMessage({
-                        chatModal: false,
-                    })
-                }
-                typeChatId={typeChatId.typeID}
-                auth={auth}
-            />
-
             {/* modal end chat */}
-            <div
-                className="bg-white p-4 rounded-md shadow-md mb-3"
-                // onClick={(e) => {
-                //     setShowContext({
-                //         ...showContext,
-                //         visible: false,
-                //     });
-                // }}
-            >
+            <div className="bg-white p-4 rounded-md shadow-md mb-3">
                 {/* Official Information */}
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-full">
-                        <div className="flex gap-2 items-center">
-                            <div className="cls_can_attach_process w-fit">
-                                {/* <div className="bottom">
-                                    <p>Attach, Chat, Task, etc For This</p>
-                                    <i></i>
-                                </div> */}
-                                <div>
-                                    <span className="border-b-2 border-red-600">
-                                        Relation Information
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="chatPlugin"></div>
-                        </div>
+                    <div className="font-semibold text-md">
+                        <span className="border-b-2 border-red-600 cls_can_attach_process">
+                            Relation Information
+                        </span>
+                        {/* <div className="chatPlugin float-right mt-2 ml-2"></div> */}
                     </div>
                     <a
                         onClick={(e) =>
@@ -2621,7 +2189,7 @@ export default function DetailRelation({
                         className="cursor-pointer"
                         title="Edit Relation"
                     >
-                        <div className="bg-red-600 p-2 rounded-md text-white">
+                        <div className="bg-red-600 p-1 rounded-md text-white">
                             <PencilSquareIcon className="w-5" />
                         </div>
                     </a>
@@ -2700,19 +2268,14 @@ export default function DetailRelation({
                 {/* End Official Information */}
 
                 {/* Relation Type And */}
-                <div className="text-md font-semibold mt-4">
-                    <div className="flex gap-2 items-center">
-                        <div className="cls_can_attach_process w-fit">
-                            <div>
-                                <span className="border-b-2 border-red-600">
-                                    Relation Type
-                                </span>
-                            </div>
-                        </div>
-                        <div className="chatPlugin"></div>
+                <div>
+                    <div className="text-md font-semibold mt-4 w-fit">
+                        <span className="border-b-2 border-red-600 cls_can_attach_process">
+                            Relation Type
+                        </span>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="grid grid-cols-1 gap-4 mt-2">
                         <div className="mb-2 relative flex flex-wrap gap-3">
                             {dataRelationNew.m_relation_type?.map(
@@ -2741,10 +2304,10 @@ export default function DetailRelation({
                 {/* END Relation Type And */}
 
                 {/* bank account relation */}
-                <div className=" mt-4">
-                    <div className="flex justify-between">
-                        <div className="text-md font-semibold w-fit">
-                            <span className="border-b-2 border-red-600">
+                <div className="">
+                    <div className="flex justify-between items-center">
+                        <div className="text-md font-semibold mt-4 w-fit">
+                            <span className="border-b-2 border-red-600 cls_can_attach_process">
                                 Bank Account Relation
                             </span>
                         </div>
@@ -2758,7 +2321,7 @@ export default function DetailRelation({
                             className="cursor-pointer"
                             title="Edit Bank Account Relation"
                         >
-                            <div className="bg-red-600 p-2 rounded-md text-white">
+                            <div className="bg-red-600 p-1 rounded-md text-white">
                                 <PencilSquareIcon className="w-5" />
                             </div>
                         </a>
@@ -2908,17 +2471,21 @@ export default function DetailRelation({
                 <>
                     {/* Button */}
                     <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickStructure(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
+                        <div className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500">
                             <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Structure</span>
+                                <div>
+                                    <span
+                                        className="cls_can_attach_process"
+                                        onClick={(e) =>
+                                            handleClickStructure(
+                                                e,
+                                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                                            )
+                                        }
+                                    >
+                                        Structure
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div

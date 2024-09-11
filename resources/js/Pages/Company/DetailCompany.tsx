@@ -13,6 +13,7 @@ import Division from "../Division/Division";
 import DivisionCompany from "../DivisionCompany/DivisionCompany";
 import AddressCompany from "../AddressCompany/AddressCompany";
 import JobCompany from "../JobCompany/JobCompany";
+import PhoenixComponent from "@/Utility/PhoenixComponent";
 
 export default function DetailCompany({
     idCompany,
@@ -25,6 +26,7 @@ export default function DetailCompany({
     isSuccess: any | string | null;
     setDetailCompanyNew: any;
 }>) {
+    // const { value, setValue } = useMyContext();
     // load otomatis detail relation
     useEffect(() => {
         getDetailCompany(idCompany);
@@ -197,6 +199,9 @@ export default function DetailCompany({
     // End Address Location Click
     return (
         <>
+            <PhoenixComponent otherId={idCompany} setIsSuccess={setIsSuccess} />
+
+            {/* <div className="cls">Relation Information</div> */}
             {/* modal for job desc */}
             <ModalToAction
                 show={jobDeskModal.view}
@@ -615,12 +620,17 @@ export default function DetailCompany({
             />
             {/* end Modal Division */}
 
+            {/* Call Component Chat Plugin */}
+            {/* <PhoenixComponent otherId={idCompany} setIsSuccess={setIsSuccess} /> */}
+            {/* End Call Component Chat Plugin */}
             <div className="bg-white rounded-md shadow-md mb-2 p-4">
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-fit">
-                        <span className="border-b-2 border-red-600">
-                            Company Information
-                        </span>
+                    <div className="flex gap-2 items-center">
+                        <div className="text-md font-semibold w-fit">
+                            <span className="border-b-2 border-red-600 cls_can_attach_process">
+                                Company Information
+                            </span>
+                        </div>
                     </div>
                     <div
                         className="text-red-600 cursor-pointer"
@@ -636,7 +646,7 @@ export default function DetailCompany({
                 </div>
                 <div className="grid grid-cols-4 gap-4 mt-2">
                     <div>
-                        <div className="font-semibold">
+                        <div className="font-semibold cls_">
                             <span>Website</span>
                         </div>
                         <div className="text-gray-500">
@@ -644,7 +654,7 @@ export default function DetailCompany({
                         </div>
                     </div>
                     <div className="col-span-1">
-                        <div className="font-semibold">
+                        <div className="font-semibold cls_can_attach_process">
                             <span>Email</span>
                         </div>
                         <div className="text-gray-500">

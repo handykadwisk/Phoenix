@@ -45,8 +45,6 @@ export default function DetailDivisionCompany({
             .post(`/getDivisionDetailCompany`, { id })
             .then((res) => {
                 setDataDivisionNew(res.data);
-                console.log(res.data);
-                // setDataById(res.data);
             })
             .catch((err) => {
                 console.log(err);

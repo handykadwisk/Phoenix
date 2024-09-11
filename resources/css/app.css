@@ -49,6 +49,10 @@
         height: calc(100vh - 4.1rem - 0rem - 0rem - 0rem);
     }
 
+    .chat-height {
+        height: calc(100vh - 0rem - 0px - 0px - 18.1rem);
+    }
+
     .switch {
         position: relative;
         display: inline-block;
