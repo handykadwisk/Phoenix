@@ -121,7 +121,11 @@ export default function ModalToAction({
                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
-                                <Dialog.Panel className={classPanel}>
+                                <Dialog.Panel
+                                    className={
+                                        classPanel + " modal-action-container"
+                                    }
+                                >
                                     <form onSubmit={action}>
                                         <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                             <div className="flex justify-between">

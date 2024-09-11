@@ -109,26 +109,38 @@ const Header = (props: {
           }
         />
 
-        <div className="flex items-center gap-3 2xsm:gap-7">
-          <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-            <span className="sr-only">View notifications</span>
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
-          <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10 " aria-hidden="true" />
-          {/* <!-- User Area --> */}
-          <div className="relative ">
-            <DropdownUser />
-          </div>
-          {/* <!-- User Area --> */}
+                <div className="flex items-center gap-3 2xsm:gap-7">
+                    <button
+                        type="button"
+                        className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
+                    >
+                        <span className="sr-only">View notifications</span>
+                        <BellIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
+                    <div
+                        className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10"
+                        aria-hidden="true"
+                    />
+                    {/* <!-- User Area --> */}
+                    <DropdownUser />
+                    {/* <!-- User Area --> */}
+                </div>
+            </div>
+            <main>
+                <div
+                    className="px-4 sm:px-6 lg:px-8 py-5 modal-action-container"
+                    id="bodyAll"
+                >
+                    {props.children}
+                </div>
+            </main>
+            <div className="relative bottom-0 z-40 h-10 flex shrink-0 items-center justify-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                <p className="text-xs">
+                    Copyright &copy; PT. Killian Teknologi Indonesia
+                </p>
+            </div>
         </div>
-      </div>
-      <main className="py-5">
-        <div className="px-4 sm:px-6 lg:px-8">
-          {props.children}
-        </div>
-      </main>
-    </div>
-  );
+    );
 };
 
 export default Header;

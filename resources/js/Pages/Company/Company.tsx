@@ -344,7 +344,7 @@ export default function Company({ auth }: PageProps) {
                 method={""}
                 headers={""}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[85%] modal-action-container"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[85%]"
                 }
                 submitButtonName={""}
                 body={

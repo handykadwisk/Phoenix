@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
-import Button from "@/Components/Button/Button";
+import PhoenixComponent from "@/Utility/PhoenixComponent";
 
 export default function Dashboard({ auth, language }: any) {
     // props language dikirim langsung dari middleware Language yang diinject langsung melalui Inertia. cek file Language.php di folder Middleware
@@ -22,6 +22,7 @@ export default function Dashboard({ auth, language }: any) {
         <AuthenticatedLayout user={auth.user} header={lang.dashboard}>
             <Head title={lang.dashboard} />
 
+            <PhoenixComponent />
             <div>
                 <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-4">
                     <div
@@ -52,15 +53,15 @@ export default function Dashboard({ auth, language }: any) {
                             key={item.name}
                             className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
                         >
-                            <dt className="truncate text-sm font-medium text-gray-500">
+                            <div className="truncate text-sm font-medium text-gray-500 cls_can_attach_process cls_can_attach_process">
                                 {item.name}
-                            </dt>
-                            <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+                            </div>
+                            <div className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
                                 {item.stat}
-                            </dd>
+                            </div>
                         </div>
                     ))}
-                </dl>
+                </div>
             </div>
         </AuthenticatedLayout>
     );
