@@ -35,13 +35,14 @@ return new class extends Migration
         Schema::create('t_user', function (Blueprint $table) {
             $table->id();
             $table->smallInteger('employee_id')->nullable();
+            $table->smallInteger('relation_status_id')->nullable();
+            $table->string('user_login')->unique()->nullable();
             $table->string('name');
             $table->string('email')->unique();
             // $table->foreignId('role_id');
             $table->foreignId('user_type_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->smallInteger('user_status')->default(1);
             $table->rememberToken();
             $table->timestamps();
         });

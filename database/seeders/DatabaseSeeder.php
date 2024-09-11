@@ -26,7 +26,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // create menu
+        // $this->call([
+        //     tuser::class,
+
+        // ]);
+        $this->call([
+            rusertype::class,
+
+        ]);
+        $this->call([
+            r_menu::class,
+
+        ]);
+        $this->call([
+            mroleusers::class,
+
+        ]);
+
+
+
+        // // create menu
         // $dashboard = Menu::create(
         //     [
         //         'menu_name'       => 'Dashboard',
@@ -84,27 +103,44 @@ class DatabaseSeeder extends Seeder
         //     ]
         // );
 
-        // $childAgent = Menu::create(
+        // $finance = Menu::create(
         //     [
-        //         'menu_name'       => 'Agent',
-        //         'menu_parent_id'  => $relation->id,
-        //         'menu_url'        => 'relation/agent',
+        //         'menu_name'       => 'Finance',
+        //         'menu_url'        => NULL,
         //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 6,
         //         'menu_created_by' => 'admin'
         //     ]
-        // );
+        // )->id;
 
-        // $childBAA = Menu::create(
+        // $cashAdvance = Menu::create(
         //     [
-        //         'menu_name'       => 'BAA',
-        //         'menu_parent_id'  => $relation->id,
-        //         'menu_url'        => 'relation/baa',
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Cash Advance',
+        //         'menu_url'        => 'cashAdvance',
         //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 7,
         //         'menu_created_by' => 'admin'
         //     ]
-        // );
+        // )->id;
+
+        // $reimburse = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Reimburse',
+        //         'menu_url'        => 'reimburse',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
+
+        // $otherExpenses = Menu::create(
+        //     [
+        //         'menu_parent_id' => $finance,
+        //         'menu_name'       => 'Other Expenses',
+        //         'menu_url'        => 'otherExpenses',
+        //         'menu_is_deleted' => 0,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // )->id;
 
         // $finance = Menu::create(
         //     [
@@ -145,14 +181,14 @@ class DatabaseSeeder extends Seeder
         //     ]
         // )->id;
 
-        // $setting = Menu::create(
-        //     [
-        //         'menu_name'       => 'Settings',
-        //         'menu_url'        => NULL,
-        //         'menu_is_deleted' => 0,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // )->id;
+        // // $setting = Menu::create(
+        // //     [
+        // //         'menu_name'       => 'Settings',
+        // //         'menu_url'        => NULL,
+        // //         'menu_is_deleted' => 0,
+        // //         'menu_created_by' => 'admin'
+        // //     ]
+        // // )->id;
 
         // $approvalLimit = Menu::create(
         //     [
@@ -408,12 +444,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path3)
         );
 
-        // create 2024_27_06_r_wilayah_kemendagri
-        $file_path4 = resource_path('../database/LogDB/2024_27_06_r_wilayah_kemendagri.sql');
+        // // create 2024_27_06_r_wilayah_kemendagri
+        // $file_path4 = resource_path('../database/LogDB/2024_27_06_r_wilayah_kemendagri.sql');
 
-        DB::unprepared(
-            file_get_contents($file_path4)
-        );
+        // DB::unprepared(
+        //     file_get_contents($file_path4)
+        // );
 
         // create 2024_20_06_r_bank
         $file_path5 = resource_path('../database/LogDB/2024_20_06_r_bank.sql');
@@ -573,9 +609,9 @@ class DatabaseSeeder extends Seeder
         // create 2024_31_08_r_plugin_process
         $r_plugin_process = resource_path('../database/LogDB/2024_31_08_r_plugin_process.sql');
 
-        DB::unprepared(
-            file_get_contents($r_plugin_process)
-        );
+        // DB::unprepared(
+        //     file_get_contents($r_plugin_process)
+        // );
 
 
         $file_path27 = resource_path('../database/LogDB/2024_08_27_t_company.sql');
@@ -608,7 +644,7 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path31)
         );
 
-        $file_path32 = resource_path('../database/LogDB/2024_08_27_t_user.sql');
+        // $file_path32 = resource_path('../database/LogDB/2024_08_27_t_user.sql');
 
         DB::unprepared(
             file_get_contents($file_path32)

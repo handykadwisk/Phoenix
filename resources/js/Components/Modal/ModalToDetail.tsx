@@ -6,7 +6,7 @@ import axios from "axios";
 import Alert from "../Alert";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
-export default function ModalAttendance({
+export default function ModalToDetail({
     show = false,
     closeable = true,
     onClose = () => {},
@@ -17,7 +17,6 @@ export default function ModalAttendance({
     onSuccess,
     classPanel = "",
     buttonAddOns,
-    disableSubmit = false,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -28,8 +27,7 @@ export default function ModalAttendance({
     data: any;
     classPanel: any;
     onSuccess: any;
-    buttonAddOns: any | undefined | null;
-    disableSubmit?: boolean;
+    buttonAddOns: any;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -42,6 +40,8 @@ export default function ModalAttendance({
     };
 
     const action = async (e: any) => {
+        // console.log(data);
+        // return false;
         e.preventDefault();
 
         setIsProcessing(true);
@@ -52,6 +52,7 @@ export default function ModalAttendance({
                 },
             })
             .then((res) => {
+                console.log(res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -60,7 +61,7 @@ export default function ModalAttendance({
             .catch((err) => {
                 setIsProcessing(false);
                 setIsError(err.response.data[0]);
-                console.log(err.response,'ini');
+                console.log(err);
             });
     };
 
@@ -124,25 +125,22 @@ export default function ModalAttendance({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div
-                                                className="overflow-y-auto custom-scrollbar px-2 modal-action"
-                                                ref={modalRef}
-                                            >
-                                                {body}
+                                            <div className="max-h-full">
+                                                <div
+                                                    className="h-[25rem] overflow-y-auto custom-scrollbar px-1"
+                                                    ref={modalRef}
+                                                >
+                                                    {body}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            {disableSubmit ? (
-                                                ""
-                                            ) : (
-                                                <PrimaryButton
-                                                    className="inline-flex w-full sm:ml-3 sm:w-auto"
-                                                    disabled={isProcessing}
-                                                >
-                                                    Submit
-                                                </PrimaryButton>
-                                            )}
-
+                                            {/* <PrimaryButton
+                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                disabled={isProcessing}
+                                            >
+                                                Submit
+                                            </PrimaryButton> */}
                                             {buttonAddOns && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"

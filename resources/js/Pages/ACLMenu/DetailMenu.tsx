@@ -27,6 +27,8 @@ import TableTH from "@/Components/Table/TableTH";
 import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import Swal from "sweetalert2";
+import PrimaryButton from "@/Components/PrimaryButton";
+import ModalEdit from "@/Components/Modal/ModalEdit";
 
 export default function DetailGroup({
     idMenu,
@@ -41,6 +43,7 @@ export default function DetailGroup({
     modal: any;
     setModal: any;
 }>) {
+    
     useEffect(() => {
         getMenuById();
     }, [idMenu]);
@@ -69,9 +72,19 @@ export default function DetailGroup({
         menu_is_deleted: "",
     });
 
+    const toggleMenuDeleteStatus = (id: number) => {
+        // Periksa apakah id menu yang ingin diubah sesuai dengan id dalam state
+        setDataById({
+            ...dataById,
+            menu_is_deleted: dataById.menu_is_deleted === 1 ? 0 : 1
+        });
+    };
+    // console.log(dataById.menu_is_deleted, `<<<<<<<<<<<<`);
+
+
     return (
         <>
-            <ModalToAdd
+            <ModalEdit
                 show={modal}
                 onClose={setModal}
                 title={"Edit Menu"}
@@ -81,7 +94,8 @@ export default function DetailGroup({
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
-                buttonAddOns={"Delete"}
+                buttonAddOns={dataById.menu_is_deleted === 1 ? "Reactivate" : "Delete"}
+                toggleMenuDeleteStatus={toggleMenuDeleteStatus}
                 body={
                     <>
                         {/* Parent */}
@@ -141,13 +155,13 @@ export default function DetailGroup({
                             </div>
                             <div className="mt-2">
                                 <InputLabel
-                                    className="absolute"
+                                    className=""
                                     htmlFor="menu_url"
                                     value={"Menu URL"}
                                 />
-                                <div className="ml-[4.3rem] text-red-600">
+                                {/* <div className="ml-[4.3rem] text-red-600">
                                     *
-                                </div>
+                                </div> */}
                                 <TextInput
                                     id="menu_url"
                                     type="text"
@@ -160,35 +174,25 @@ export default function DetailGroup({
                                             menu_url: e.target.value,
                                         });
                                     }}
-                                    required
+                                    // required
                                     placeholder="Menu URL"
                                 />
                             </div>
-                            <div className="mt-2">
-                                <InputLabel
-                                    className="absolute"
-                                    htmlFor="menu_sequence"
-                                    value={"Menu Sequence"}
-                                />
-                                <div className="ml-[7.3rem] text-red-600">
-                                    *
-                                </div>
-                                <TextInput
-                                    id="menu_sequence"
-                                    type="text"
-                                    name="menu_sequence"
-                                    value={dataById.menu_sequence}
-                                    className="mt-2"
-                                    onChange={(e) => {
-                                        setDataById({
-                                            ...dataById,
-                                            menu_sequence: e.target.value,
-                                        });
-                                    }}
-                                    required
-                                    placeholder="Menu Sequence"
-                                />
-                            </div>
+                            {/* <button className="border mt-5 bg-red-300 shadow">
+                                    Reactivate
+                            </button> */}
+                            {/* <div className="mt-5 bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                <button
+                                    type="button"
+                                    className={
+                                        `inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 `
+                                    }
+                                    onClick={() => toggleMenuDeleteStatus(dataById.id)}
+                                >
+                                     {dataById.menu_is_deleted === 1 ? "Reactivate" : "Delete"}
+                                </button>
+                                
+                            </div> */}
                         </div>
                     </>
                 }
