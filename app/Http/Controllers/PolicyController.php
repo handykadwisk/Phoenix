@@ -149,7 +149,8 @@ class PolicyController extends Controller
 
 
         return new JsonResponse([
-            $policy
+            "msg" => "Success Registered Policy",
+            "id" => $policy
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -292,7 +293,8 @@ class PolicyController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->id
+            "msg" => "Success Edit Policy",
+            "id" => $request->id            
         ], 200, [
             'X-Inertia' => true
         ]);

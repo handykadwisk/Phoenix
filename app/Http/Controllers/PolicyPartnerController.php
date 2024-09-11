@@ -589,7 +589,8 @@ class PolicyPartnerController extends Controller
         MPolicyPartners::insert($arrData);
         
         return new JsonResponse([
-            'Update Succeed'
+            "msg" => "Succeed Update Partners",
+            "id" => $request->id
         ], 201, [
             'X-Inertia' => true
         ]);

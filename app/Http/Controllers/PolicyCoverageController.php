@@ -67,8 +67,8 @@ class PolicyCoverageController extends Controller
         ]);
         
         return new JsonResponse([
-            'Success Registered Coverage.'
-            // $policy
+            "msg" => "Success Registered Coverage.",
+            "id" => $request->id
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -131,7 +131,8 @@ class PolicyCoverageController extends Controller
         }
 
         return new JsonResponse([
-            'Update Succeed'
+            "msg" => "Success Edit Coverage.",
+            "id" => $request->id
         ], 201, [
             'X-Inertia' => true
         ]);

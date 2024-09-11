@@ -25,6 +25,7 @@ import dateFormat from "dateformat";
 import DatePicker from "react-datepicker";
 import FormGeneral from "./FormGeneral";
 import FormCertificate from "./FormCertificate";
+import ToastMessage from "@/Components/ToastMessage";
 // import ModalTest from "./ModalTest";
 
 export default function DetailPolicy({
@@ -48,7 +49,7 @@ export default function DetailPolicy({
     const [dataById, setDataById] = useState<any>(policy);
     const [flagSwitch, setFlagSwitch] = useState<boolean>(false);
     const [dataCoverageName, setDataCoverageName] = useState<any>([]);
-    // let myValue=0;
+    const [isSuccess, setIsSuccess] = useState<string>("");
 
 
     const policyType = [
@@ -147,11 +148,8 @@ export default function DetailPolicy({
 
     useEffect(() => {
         if (summaryFinancial.length > 0) {
-            console.log(summaryFinancial);
             summaryFinancial.map((record: any, i: number) => {
-                console.log("record: ", record);
                 record.detail.map((course: any, j: number) => {
-                    console.log("course: ", course);
                 });
             });
         }
@@ -169,32 +167,31 @@ export default function DetailPolicy({
 
     
 
-    const handleSuccess = (message: string) => {
+    const handleSuccess = (message: any) => {
         getDetailPolicy(policy.POLICY_ID);
 
-        Swal.fire({
-            title: "Success",
-            text: "Success Edit Policy",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
+       setIsSuccess("");
+       if (message != "") {
+           setIsSuccess(message.msg);
+           setTimeout(() => {
+               setIsSuccess("");
+           }, 5000);
+       }
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: false,
         });
     };
 
@@ -215,6 +212,13 @@ export default function DetailPolicy({
    
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal edit */}
             <ModalToAction
                 show={modal.edit}
@@ -768,9 +772,6 @@ export default function DetailPolicy({
 
                                                             let totalTdEl;
                                                             if (k === 0) {
-                                                                console.log(
-                                                                    record.detail
-                                                                );
                                                                 totalTdEl = (
                                                                     <td
                                                                         rowSpan={

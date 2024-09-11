@@ -30,6 +30,7 @@ import { BeatLoader } from "react-spinners";
 import dateFormat from "dateformat";
 import DatePicker from "react-datepicker";
 import Checkbox from "@/Components/Checkbox";
+import ToastMessage from "@/Components/ToastMessage";
 // import ModalTest from "./ModalTest";
 
 export default function FormGeneral({
@@ -65,7 +66,7 @@ export default function FormGeneral({
     const [dataPolicyCoverage, setDataPolicyCoverage] = useState<any>([]);
     const [listPksNumber, setListPksNumber] = useState<any>([]);
     const [relationIdForPayable, setRelationIdForPayable] = useState<any>([]);
-    // let myValue=0;
+    const [isSuccess, setIsSuccess] = useState<string>("");
 
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
@@ -1078,32 +1079,31 @@ export default function FormGeneral({
     // End Add Insurer
 
     // Edit Insurer
-    const handleSuccessEditInsurer = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Success Edit Insurer",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getInsurancePanel(policy.POLICY_ID);
-                getCurrencyOnPolicyCoverage(policy.POLICY_ID);
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
+    const handleSuccessEditInsurer = (message: any) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        getInsurancePanel(policy.POLICY_ID);
+        getCurrencyOnPolicyCoverage(policy.POLICY_ID);
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: false,
         });
     };
     const handleEditInsurer = async () => {
@@ -2522,7 +2522,6 @@ export default function FormGeneral({
             if (value == undefined) {
                 value = 0;
             }
-            console.log("detailItem: ",detailItem)
             let bf_after_ppn = 0;
             
             if (detailItem["INCOME_TYPE"] == 1) {
@@ -2806,7 +2805,6 @@ export default function FormGeneral({
             setTriggerEditSumIncome(triggerEditSumIncome + 1);
         }, 1000);
     };
-    console.log("relationIdForPayable: ", relationIdForPayable);
 
     // Untuk mengisi payable
     useEffect(() => {
@@ -2838,7 +2836,7 @@ export default function FormGeneral({
         const fbi_by_pks = { ...items[0] };
         const agent_commission = { ...items[1] };
         const acquisition_cost = { ...items[2] };
-console.log("items: ", items)
+
         // Nett Brokerage Fee
         const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
             prev: any,
@@ -2909,7 +2907,6 @@ console.log("items: ", items)
         const initBF = parseFloat(dataInitialForBP.BF_NETT_AMOUNT);
         const initEF = parseFloat(dataInitialForBP.EF_NETT_AMOUNT);
         const initCF = parseFloat(dataInitialForBP.CF_NETT_AMOUNT);
-        console.log("dataInitialForBP: ", dataInitialForBP);
 
         const nettBF =
             parseFloat(nettBF_fbi) +
@@ -2946,31 +2943,30 @@ console.log("items: ", items)
 
         setListDataPartners(items);
     };
-    const handleSuccessEditPartners = (message: string) => {
+    const handleSuccessEditPartners = (message: any) => {
         setRelationIdForPayable([])
-        Swal.fire({
-            title: "Success",
-            text: "Succeed Edit Business Partners",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: false,
         });
         getDataPartner(policy.POLICY_ID);
         setTriggerEditSumIncome(0);
@@ -2984,34 +2980,32 @@ console.log("items: ", items)
             .catch((err) => console.log(err));
     };
 
-    const handleSuccessInsured = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Succeed Register Insured",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getDataInsured(policy.POLICY_ID);
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
+    const handleSuccessInsured = (message: any) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        getDataInsured(policy.POLICY_ID);
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: false,
         });
         setDataInsured([]);
-        // setDataInsurerForInsured([]);
     };
 
     const handleSuccess = (message: string) => {
@@ -3044,61 +3038,59 @@ console.log("items: ", items)
         });
     };
 
-    const handleSuccessCoverageName = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Succeed Register Coverage",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getDataCoverageName(policy.POLICY_ID);
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
+    const handleSuccessCoverageName = (message: any) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        getDataCoverageName(policy.POLICY_ID);
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: false,
         });
         setDataPolicyCoverage([]);
     };
 
-    const handleSuccessInsurer = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Success Add Insurer",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getInsurancePanel(policy.POLICY_ID);
-                getCurrencyOnPolicyCoverage(policy.POLICY_ID);
-                setModal({
-                    add: false,
-                    delete: false,
-                    edit: false,
-                    view: false,
-                    document: false,
-                    search: false,
-                    addInsurer: false,
-                    editInsurer: false,
-                    addCoverage: false,
-                    editCoverage: false,
-                    addInsured: false,
-                    editInsured: false,
-                    addPartners: false,
-                    editPartners: false,
-                });
-            }
+    const handleSuccessInsurer = (message: any) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        getInsurancePanel(policy.POLICY_ID);
+        getCurrencyOnPolicyCoverage(policy.POLICY_ID);
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: false,
+            document: false,
+            search: false,
+            addInsurer: false,
+            editInsurer: false,
+            addCoverage: false,
+            editCoverage: false,
+            addInsured: false,
+            editInsured: false,
+            addPartners: false,
+            editPartners: false,
         });
     };
 
@@ -3165,18 +3157,25 @@ console.log("items: ", items)
         NETT_COMMISSION: 0,
         MARGIN: 0,
     });
-    console.log("dataCoverageName :", dataCoverageName);
+    
     const getDataForSummary = () => {
         // alert('aa')
         // setFlagSwitch(!flagSwitch);
         let gross_premium = dataCoverageName?.map((coverage: any) => {
             return coverage;
         });
-        console.log("dfasdf: ", gross_premium);
+        
     };
 
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal edit */}
             <ModalToAction
                 show={modal.edit}
@@ -3196,7 +3195,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    })
+                    });
                 }}
                 title={"Edit Policy"}
                 url={`/editPolicy/${dataById.POLICY_ID}`}
@@ -3514,7 +3513,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    })
+                    });
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                 }}
@@ -3627,7 +3626,7 @@ console.log("items: ", items)
                                                         >
                                                             Gross Premium
                                                         </th>
-                                                        
+
                                                         <th
                                                             colSpan={3}
                                                             className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
@@ -4242,7 +4241,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    })
+                    });
                     setDataInsurer([]);
                 }}
                 title={"Edit Coverage"}
@@ -4487,7 +4486,7 @@ console.log("items: ", items)
                                                                                     j
                                                                                 );
                                                                             }}
-                                                                            required
+                                                                            
                                                                             autoComplete="off"
                                                                         />
                                                                     </div>
@@ -4912,7 +4911,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    })
+                    });
                     setDataInsurer([]);
                 }}
                 title={"Add Insurer"}
@@ -5368,7 +5367,6 @@ console.log("items: ", items)
                                                             <th className="text-center p-4 border ">
                                                                 Nett Amount
                                                             </th>
-                                                            
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -6287,7 +6285,6 @@ console.log("items: ", items)
                                                                 );
                                                             }
                                                         )}
-                                                        
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -6321,7 +6318,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    })
+                    });
                     setDataInsurer([]);
                 }}
                 title={"Edit Insurer"}
@@ -6374,7 +6371,6 @@ console.log("items: ", items)
                                             {dataEditInsurer.length}
                                         </span>
                                     </div>
-                                    
                                 </div>
                             </div>
                             <div className=""></div>
@@ -7710,7 +7706,7 @@ console.log("items: ", items)
                         editInsured: false,
                         addPartners: false,
                         editPartners: false,
-                    })
+                    });
                     setDataInsurer([]);
                     setDataPolicyCoverage([]);
                     // setDataInsurerForInsured([]);
@@ -8643,7 +8639,7 @@ console.log("items: ", items)
                         addPartners: false,
                         editPartners: false,
                     }),
-                    setDataInsurer([]);
+                        setDataInsurer([]);
                 }}
                 title={"Edit Insured Nett Premium & Broker Nett Income"}
                 url={`/editInsured`}
@@ -9540,7 +9536,6 @@ console.log("items: ", items)
                                                         </tr>
                                                     )
                                                 )}
-                                                
                                             </tbody>
                                         </table>
                                     </div>
@@ -9552,7 +9547,6 @@ console.log("items: ", items)
                 }
             />
             {/* End Modal Edit Insured */}
-
 
             {/* modal Edit Partners */}
             <ModalToAdd
@@ -9575,7 +9569,7 @@ console.log("items: ", items)
                         addPartners: false,
                         editPartners: false,
                     }),
-                    setDataInsurer([]);
+                        setDataInsurer([]);
                     setDataPolicyCoverage([]);
                     setTriggerSumIncome(0);
                     setTriggerEditSumIncome(0);
@@ -10401,29 +10395,29 @@ console.log("items: ", items)
                                                                                 result: any,
                                                                                 i: number
                                                                             ) => {
-                                                                                return (
-                                                                                    result.pks_number?.map((hasil: any, a: number) => {
+                                                                                return result.pks_number?.map(
+                                                                                    (
+                                                                                        hasil: any,
+                                                                                        a: number
+                                                                                    ) => {
                                                                                         return (
                                                                                             <option
                                                                                                 key={
                                                                                                     a
                                                                                                 }
                                                                                                 value={
-                                                                                                    hasil
-                                                                                                        ?.M_PKS_RELATION_ID
+                                                                                                    hasil?.M_PKS_RELATION_ID
                                                                                                 }
                                                                                             >
                                                                                                 {
-                                                                                                    hasil
-                                                                                                        ?.NO_PKS
+                                                                                                    hasil?.NO_PKS
                                                                                                 }
                                                                                             </option>
                                                                                         );
-                                                                                    })
+                                                                                    }
                                                                                 );
                                                                             }
                                                                         )}
-                                                                        
                                                                 </select>
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
@@ -11233,7 +11227,6 @@ console.log("items: ", items)
                                                     grandTotalEditNettIncome
                                                 )}
                                             </td>
-
                                         </tr>
                                     ) : (
                                         ""
@@ -11252,8 +11245,6 @@ console.log("items: ", items)
                     <div className="grid grid-cols-1 xs:grid-cols-1 md:grid-cols-1">
                         {/* All Information */}
                         <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
-                            
-
                             <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4">
                                 <div className="border-b-2 w-fit font-semibold text-lg">
                                     <span>Coverage</span>
@@ -11336,7 +11327,7 @@ console.log("items: ", items)
                                                                     Gross
                                                                     Premium
                                                                 </th>
-                                                                
+
                                                                 <th
                                                                     colSpan={3}
                                                                     className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
@@ -11344,7 +11335,7 @@ console.log("items: ", items)
                                                                     Loss Limit
                                                                     Premium
                                                                 </th>
-                                                                
+
                                                                 <th
                                                                     colSpan={2}
                                                                     className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300"
@@ -12319,7 +12310,6 @@ console.log("items: ", items)
                                     <span>Business Partners</span>
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    
                                     <div>
                                         <button
                                             type="button"
@@ -12690,7 +12680,6 @@ console.log("items: ", items)
                                 )}
                             </div>
                             {/* End Partners */}
-
                         </div>
                         {/* end all information */}
                     </div>
