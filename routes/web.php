@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
 use App\Http\Controllers\DebitNoteController;
@@ -528,13 +529,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/addPluginProcess', [TTagPluginProcessController::class, 'store'])->name('addPluginProcess.store');
     Route::post('/getTPluginProcess', [TTagPluginProcessController::class, 'getTPlugin'])->name('getTPluginProcess.getTPlugin');
 
-    // Message Chat
-    Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
-    Route::post('/addChatMessage', [TDetailChatController::class, 'store'])->name('addChatMessage.store');
-    Route::post('/getTypeChatByTagId', [TDetailChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
-    
-    
-    
+    // Attendance
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+    Route::post('/saveClockIn', [AttendanceController::class, 'saveClockIn'])->name('attendance.saveClockIn');
+    Route::post('/saveClockOut', [AttendanceController::class, 'saveClockOut'])->name('attendance.saveClockOut');
+    Route::post('/getAttendanceByEmployeeIdAndDate', [AttendanceController::class, 'getAttendanceByEmployeeIdAndDate'])->name('attendance.getAttendanceByEmployeeIdAndDate');
+    Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
+    Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
+    Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
+
 
 
 });
