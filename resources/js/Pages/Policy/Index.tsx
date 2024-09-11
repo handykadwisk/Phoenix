@@ -278,9 +278,8 @@ export default function PolicyIndex({ auth }: PageProps) {
 
 
     }
-console.log('searchPolicy: ', searchPolicy)
-    const handleSuccess = (message: number) => {
-        // console.log("message: ", message);
+
+    const handleSuccess = (message: any) => {
         setIsSuccess("");
         reset();
         setData({
@@ -319,7 +318,7 @@ console.log('searchPolicy: ', searchPolicy)
                 },
             ],
         });
-        getData(message);
+        getData(message.id);
 
         Swal.fire({
             title: "Success",
@@ -729,15 +728,9 @@ console.log('searchPolicy: ', searchPolicy)
         }
     }, [data.policyPremium]);
 
-    // console.log("sumByCurrency: ", sumByCurrency);
     // Start fungsi hitung initial premium
     const inputCalculate = (i: number) => {
         const changeVal: any = [...data.policyPremium];
-        // const si = changeVal[i]["sum_insured"];
-        // const rate = changeVal[i]["rate"];
-        // if (si && rate) {
-        //     changeVal[i]["initial_premium"] = (si * rate) / 100;
-        // } else [(changeVal[i]["initial_premium"] = 0)];
         const gross_premi = changeVal[i]["gross_premi"];
         const admin_cost = changeVal[i]["admin_cost"];
         const disc_broker = changeVal[i]["disc_broker"];
