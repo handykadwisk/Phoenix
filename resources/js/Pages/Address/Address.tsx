@@ -182,7 +182,6 @@ export default function Address({
                 text: message[1],
                 icon: "warning",
             }).then((result: any) => {
-                // console.log(result);
                 if (result.value) {
                     setModal({
                         add: true,

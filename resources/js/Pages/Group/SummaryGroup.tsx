@@ -38,11 +38,6 @@ export default function SummaryGroup({
 }: PropsWithChildren<{
     idGroup: any;
 }>) {
-    // console.log("xx", dataDetailGroups);
-    // useEffect(() => {
-    //     setDetailGroups(dataDetailGroups);
-    // }, [dataDetailGroups]);
-
     return (
         <>
             <div className="mb-5">

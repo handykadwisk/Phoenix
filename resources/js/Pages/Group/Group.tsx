@@ -56,7 +56,6 @@ export default function Group({ auth }: PageProps) {
             .post(`/getMappingParentGroup`)
             .then((res: any) => {
                 setMappingGroup(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -126,7 +125,6 @@ export default function Group({ auth }: PageProps) {
             text: "New Group Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 setIdGroup({
                     RELATION_GROUP_ID: message[0],

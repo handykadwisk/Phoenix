@@ -143,12 +143,6 @@ export default function DetailRelation({
             .then((res) => {
                 // getPlugin(res.data);
                 setDataTPlugin(res.data);
-                // getPlugin(res.data);
-                // console.log("TPlug", res.data);
-                // setRefreshPlugin(true);
-                // setTimeout(() => {
-                //     setRefreshPlugin(false);
-                // }, 2000);
             })
             .catch((err) => {
                 console.log(err);
@@ -159,8 +153,13 @@ export default function DetailRelation({
     const {
         // handleContextMenu,
         // handleClick,
+        flagPlugin,
+        setFlagPlugin,
+        showChatMessage,
+        setShowChatMessage,
         showContext,
         idDiv,
+        tagIdChat,
         menuPosition,
         setShowContext,
     } = renderClassFunction(detailRelation, dataTPlugin);
@@ -984,9 +983,9 @@ export default function DetailRelation({
     };
 
     // modal chat
-    const [showChatMessage, setShowChatMessage] = useState({
-        chatModal: false,
-    });
+    // const [showChatMessage, setShowChatMessage] = useState({
+    //     chatModal: false,
+    // });
 
     // Parameter for chat message
     const [typeChatId, setTypeChatId] = useState<any>({
@@ -1008,6 +1007,7 @@ export default function DetailRelation({
                 setShowChatMessage({
                     chatModal: !showChatMessage.chatModal,
                 });
+                setFlagPlugin(false);
                 setTypeChatId({
                     typeID: message[3],
                 });
@@ -2476,12 +2476,6 @@ export default function DetailRelation({
                 <>
                     <MenuPlugin
                         handleAddPluginProcess={handleAddPluginProcess}
-                        handleSuccessPlugin={handleSuccessPlugin}
-                        showContext={showContext}
-                        setShowContext={setShowContext}
-                        idDiv={idDiv}
-                        dataPluginProcess={dataPluginProcess}
-                        setDataPluginProcess={setDataPluginProcess}
                         top={menuPosition.y}
                         left={menuPosition.x}
                         marginTop={menuPosition.marginTop}
@@ -2573,14 +2567,18 @@ export default function DetailRelation({
             )} */}
 
             <ModalChatMessage
-                show={showChatMessage.chatModal}
-                onClose={() =>
-                    setShowChatMessage({
-                        chatModal: false,
-                    })
-                }
+                showChatMessage={showChatMessage}
+                setShowChatMessage={setShowChatMessage}
+                // onClose={() =>
+                //     setShowChatMessage({
+                //         chatModal: false,
+                //     })
+                // }
                 typeChatId={typeChatId.typeID}
+                tagIdChat={tagIdChat}
                 auth={auth}
+                flagPlugin={flagPlugin}
+                setFlagPlugin={setFlagPlugin}
             />
 
             {/* modal end chat */}

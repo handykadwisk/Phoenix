@@ -63,7 +63,6 @@ export default function AddRelation({
     switchPage: any;
     setSwitchPage: any;
 }>) {
-    // console.log("xx", relationGroup);
     const [salutations, setSalutations] = useState<any>([]);
     const [postSalutations, setPostSalutation] = useState<any>([]);
     // const [switchPage, setSwitchPage] = useState(false);
@@ -258,9 +257,7 @@ export default function AddRelation({
                         title: "Warning",
                         text: "Abbreviation already exists",
                         icon: "warning",
-                    }).then((result: any) => {
-                        // console.log(result);
-                    });
+                    }).then((result: any) => {});
                 }
                 // cekAbbreviation(existingAbb);
             })
@@ -348,7 +345,6 @@ export default function AddRelation({
     };
 
     const handleCheckboxEnding = (e: any, i: number) => {
-        // console.log(e.target.checked);
         if (e.target.checked) {
             const changeVal: any = [...data.no_pks];
             changeVal[i]["ENDING_BY_CANCEL"] = 0;
@@ -361,7 +357,6 @@ export default function AddRelation({
     };
 
     const inputDataSwitchPKS = (e: any, i: number) => {
-        // console.log(e.target.checked);
         if (e.target.checked) {
             const changeVal: any = [...data.no_pks];
             changeVal[i]["STATUS_PKS"] = 0;

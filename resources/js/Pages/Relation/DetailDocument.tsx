@@ -37,7 +37,6 @@ export default function DetailDocumentRelation({
     setIsSuccess: any;
     isSuccess: any;
 }>) {
-    console.log(dataRelationNew);
     const [modalEditDocument, setModalEditDocument] = useState<any>({
         edit: false,
     });
@@ -91,7 +90,6 @@ export default function DetailDocumentRelation({
     };
 
     const handleCheckboxEnding = (e: any, i: number) => {
-        // console.log(e.target.checked);
         if (e.target.checked) {
             const changeVal: any = [...dataDocumentPks.no_pks];
             changeVal[i]["ENDING_BY_CANCEL"] = 0;
@@ -110,7 +108,6 @@ export default function DetailDocumentRelation({
     };
 
     const inputDataSwitchPKS = (e: any, i: number) => {
-        // console.log(e.target.checked);
         if (e.target.checked) {
             const changeVal: any = [...dataDocumentPks.no_pks];
             changeVal[i]["STATUS_PKS"] = 0;

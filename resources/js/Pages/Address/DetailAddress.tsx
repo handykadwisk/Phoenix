@@ -189,12 +189,10 @@ export default function DetailAddress({
         }
     };
     const getRegencyLabel = (value: any) => {
-        console.log(value);
         if (value) {
             const selectedRegency = regencySelect.filter(
                 (option: any) => option.value === value
             );
-            // console.log(selectedRegency);
             return selectedRegency[0].label;
         }
     };
@@ -428,7 +426,6 @@ export default function DetailAddress({
                                     //     )
                                     // }
                                     onChange={(val: any) => {
-                                        // console.log(val.value);
                                         // return false;
                                         getRegency(val.value);
                                         setDataById({

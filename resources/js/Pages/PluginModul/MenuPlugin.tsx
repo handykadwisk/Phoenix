@@ -30,25 +30,13 @@ export default function MenuPlugin({
     left,
     marginLeft,
     marginTop,
-    idDiv,
-    dataPluginProcess,
-    setDataPluginProcess,
     handleAddPluginProcess,
-    showContext,
-    setShowContext,
-    handleSuccessPlugin,
 }: PropsWithChildren<{
     top: any;
     left: any;
     marginLeft: any | null;
     marginTop: any | null;
-    idDiv: any;
-    dataPluginProcess: any;
-    setDataPluginProcess: any;
-    showContext: any;
     handleAddPluginProcess: any;
-    setShowContext: any;
-    handleSuccessPlugin: any;
 }>) {
     const menuRef = useRef<HTMLDivElement>(null);
     useEffect(() => {

@@ -69,15 +69,12 @@ export default function ACLPermission({ auth }: PageProps) {
         PERMISSION_NAME: "",
     });
     const getPermissionById = async (idPermission: string) => {
-        // const idPermission = detailPermission.PERMISSION_ID;
-        // console.log("aa :", idPermission);
         await axios
             .post(`/getPermissionById`, {
                 idPermission,
             })
             .then((res) => {
                 setDataById(res.data);
-                // console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);

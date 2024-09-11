@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\RPluginProcess;
-use App\Models\TMessageChat;
+use App\Models\TChatDetail;
 use App\Models\TTagPluginProcess;
-use App\Models\TTypeChat;
+use App\Models\TChat;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +20,6 @@ class TTagPluginProcessController extends Controller
 
     public function store(Request $request){
 // dd($request);
-
         // cek sudah ada apa belum di tplug
         $cekExisting = TTagPluginProcess::where('PLUGIN_PROCESS_ID', $request->PLUGIN_PROCESS_ID)->where('TAG_ID', $request->TAG_ID)->first();
         // dd($cekExisting);
@@ -50,22 +49,22 @@ class TTagPluginProcessController extends Controller
         }
 
         // register type chatnya apa?
-        $createTypeChat = TTypeChat::create([
-            "TYPE_CHAT_TITLE"           => $request->TITLE_CHAT,
-            "TYPE_CHAT_OBJECT"          => $request->OBJECT_CHAT,
-            "CREATED_TYPE_CHAT_DATE"    => now(),
-            "CREATED_TYPE_CHAT_BY"      => Auth::user()->id,
+        $createTypeChat = TChat::create([
+            "TAG_ID"               => $request->TAG_ID,
+            "CHAT_TITLE"           => $request->TITLE_CHAT,
+            "CHAT_OBJECT"          => $request->OBJECT_CHAT,
+            "CREATED_CHAT_DATE"    => now(),
+            "CREATED_CHAT_BY"      => Auth::user()->id,
         ]);
 
         // create message chat
         if ($createTypeChat) {
-            TMessageChat::create([
-                "TYPE_CHAT_ID"                  => $createTypeChat->TYPE_CHAT_ID,
-                "USER_ID"                       => Auth::user()->id,
-                "MESSAGE_CHAT_TEXT"             => $request->INITIATE_YOUR_CHAT,
-                "MESSAGE_CHAT_DOCUMENT_ID"      => null,
-                "CREATED_MESSAGE_CHAT_DATE"     => now(),
-                "CREATED_MESSAGE_CHAT_BY"       => Auth::user()->id,
+            TChatDetail::create([
+                "CHAT_ID"                  => $createTypeChat->CHAT_ID,
+                "CHAT_DETAIL_TEXT"             => $request->INITIATE_YOUR_CHAT,
+                "CHAT_DETAIL_DOCUMENT_ID"      => null,
+                "CREATED_CHAT_DETAIL_DATE"     => now(),
+                "CREATED_CHAT_DETAIL_BY"       => Auth::user()->id,
             ]);
         }
 
@@ -74,7 +73,7 @@ class TTagPluginProcessController extends Controller
             $idTTagRelation,
             $request->PLUGIN_PROCESS_ID,
             "Add Plugin Success",
-            (string)$createTypeChat->TYPE_CHAT_ID,
+            (string)$createTypeChat->CHAT_ID,
         ], 201, [
             'X-Inertia' => true
         ]);

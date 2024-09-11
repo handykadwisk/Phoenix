@@ -13,6 +13,9 @@ import Division from "../Division/Division";
 import DivisionCompany from "../DivisionCompany/DivisionCompany";
 import AddressCompany from "../AddressCompany/AddressCompany";
 import JobCompany from "../JobCompany/JobCompany";
+import { useMyContext } from "@/Utility/GlobalContext";
+import { MyProvider } from "@/Utility/GlobalContext";
+import MyComponent from "@/Utility/MyComponent";
 
 export default function DetailCompany({
     idCompany,
@@ -25,6 +28,7 @@ export default function DetailCompany({
     isSuccess: any | string | null;
     setDetailCompanyNew: any;
 }>) {
+    // const { value, setValue } = useMyContext();
     // load otomatis detail relation
     useEffect(() => {
         getDetailCompany(idCompany);
@@ -197,6 +201,7 @@ export default function DetailCompany({
     // End Address Location Click
     return (
         <>
+            {/* <div className="cls">Relation Information</div> */}
             {/* modal for job desc */}
             <ModalToAction
                 show={jobDeskModal.view}
@@ -614,10 +619,12 @@ export default function DetailCompany({
                 }
             />
             {/* end Modal Division */}
-
+            <MyProvider>
+                <MyComponent otherId={idCompany} setIsSuccess={setIsSuccess} />
+            </MyProvider>
             <div className="bg-white rounded-md shadow-md mb-2 p-4">
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-fit">
+                    <div className="text-md font-semibold w-fit cls">
                         <span className="border-b-2 border-red-600">
                             Company Information
                         </span>

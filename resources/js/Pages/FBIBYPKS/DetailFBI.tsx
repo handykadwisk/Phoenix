@@ -38,10 +38,6 @@ export default function DetailFBI({
     const [relationFBI, setRelationFBI] = useState<any>([]);
 
     const [isSuccessNew, setIsSuccessNew] = useState<any>("");
-    // console.log(dataAgent);
-    // useEffect(() => {
-    //     getMRelationFBI(idFBI);
-    // }, [idFBI]);
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
     });
@@ -121,7 +117,6 @@ export default function DetailFBI({
                 item.name_relation?.toLocaleLowerCase()?.trim() ===
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
-    // console.log(dataRelation.name_relation);
 
     const handleSuccess = async (message: string) => {
         // if (modal.add) {
@@ -134,7 +129,6 @@ export default function DetailFBI({
             text: "Relation Add",
             icon: "success",
         }).then((result: any) => {
-            // console.log(message);
             if (result.value) {
                 // getMRelationFBI(message[0]);
                 setIsSuccessNew({
@@ -151,8 +145,6 @@ export default function DetailFBI({
                 setIsSuccessNew({
                     isSuccessNew: "success",
                 });
-                // console.log(id);
-                // getMRelationFBI(idFBI);
             })
             .catch((err) => {
                 console.log(err);
@@ -160,7 +152,6 @@ export default function DetailFBI({
     };
 
     const deleteRelation = async (id: string) => {
-        // console.log(data);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't delete this!",
@@ -174,16 +165,6 @@ export default function DetailFBI({
                 deleteProcess(id);
             }
         });
-        // Swal.fire({
-        //     title: "Success",
-        //     text: "Images Change",
-        //     icon: "success",
-        // }).then((result: any) => {
-        //     // console.log(result);
-        //     if (result.value) {
-        //         deleteProcess(id);
-        //     }
-        // });
     };
     const CustomButtonComponent = (props: any) => {
         return (
