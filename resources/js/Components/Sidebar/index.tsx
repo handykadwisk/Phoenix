@@ -297,7 +297,7 @@ const Sidebar = ({
                                                                                             {menu.children
                                                                                                 ?.filter((children: any) => {
                                                                                                     // Jika user type adalah 1 (admin), tampilkan semua children tanpa filter access
-                                                                                                    if (auth.user.type_user_id === 1) {
+                                                                                                    if (auth.user.user_type_id === 1) {
                                                                                                         return children // Tampilkan semua children
                                                                                                     }
 
@@ -485,10 +485,12 @@ const Sidebar = ({
                                                                 >
                                                                     <ul className="mt-2 flex flex-col pl-6 space-y-1">
                                                                         {menu.children?.filter((children: any) => {
-                                                                            return (children
-                                                                                .access
-                                                                                .length >
-                                                                                0);
+                                                                            if (auth.user.user_type_id === 1) {
+                                                                                return children // Tampilkan semua children
+                                                                            }
+
+                                                                            // Jika bukan admin, filter children berdasarkan access
+                                                                            return children?.access?.length > 0;
                                                                         }).map((filteredChildren: any, index: number) => (
                                                                             <li key={index}>
                                                                                 {/* menu dropdown */}

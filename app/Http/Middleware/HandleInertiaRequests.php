@@ -35,22 +35,19 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-        $menu = Menu::where('menu_is_deleted', 0)->get()->toArray();
-        // Log::info($menu);
-
+       
+        
         if (Auth::check()) {
-            // Cek apakah type_user_id adalah 1
             $menu = [];
-            if ($user->type_user_id === 1) {
+
+            if ($user->user_type_id === 1 || $user->user_type_id === '1') {
                 // Ambil semua menu jika type_user_id adalah 1 (administrator atau sejenisnya)
-                Log::info('Admin user detected');
-                $menu = Menu::where('menu_is_deleted', 0)->get()->toArray();
+                // $menu = $menuAdmin;
+    
+                $menu = Menu::where('menu_is_deleted', 0) ->orderBy('menu_sequence', 'asc')->get()->toArray();
             } else {
-                // Jika bukan type_user_id 1, ambil berdasarkan role user
                 $menu = $user->roles->pluck('menu')->flatten()->unique('id')->values()->toArray();
             }
-        
-
             return [
                 ...parent::share($request),
                 'auth' => [
