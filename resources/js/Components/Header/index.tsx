@@ -139,7 +139,10 @@ const Header = (props: {
                 </div>
             </div>
             <main>
-                <div className="px-4 sm:px-6 lg:px-8 py-5">
+                <div
+                    className="px-4 sm:px-6 lg:px-8 py-5 modal-action-container"
+                    id="bodyAll"
+                >
                     {props.children}
                 </div>
             </main>

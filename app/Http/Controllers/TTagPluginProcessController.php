@@ -74,6 +74,7 @@ class TTagPluginProcessController extends Controller
             $request->PLUGIN_PROCESS_ID,
             "Add Plugin Success",
             (string)$createTypeChat->CHAT_ID,
+            $request->TAG_ID
         ], 201, [
             'X-Inertia' => true
         ]);

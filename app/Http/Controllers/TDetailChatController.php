@@ -42,7 +42,7 @@ class TDetailChatController extends Controller
     }
 
     public function getTypeChatByTagId(Request $request){
-        $data = TChat::where('TAG_ID', $request->tagIdChat)->get();
+        $data = TChat::where('TAG_ID', $request->tagIdChat)->with('tUser')->get();
         return response()->json($data);
     }
 }

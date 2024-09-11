@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('CHAT_ID')->unique()->primary();
             $table->string('CHAT_TITLE', 255)->nullable();
             $table->string('CHAT_OBJECT', 255)->nullable();
+            $table->string('TAG_ID', 255)->nullable();
             $table->dateTime('CREATED_CHAT_DATE')->nullable();
             $table->bigInteger('CREATED_CHAT_BY')->nullable();
         });

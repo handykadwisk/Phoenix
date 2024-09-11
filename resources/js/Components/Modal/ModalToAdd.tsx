@@ -96,7 +96,9 @@ export default function ModalToAdd({
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={classPanel}
+                                    className={
+                                        "modal-action-container " + classPanel
+                                    }
                                     // style={{ maxWidth: "65%" }}
                                 >
                                     <form onSubmit={action}>

@@ -37,8 +37,6 @@ export default function ModalChatMessage({
     setShowChatMessage: any;
     showChatMessage: any;
 }>) {
-    console.log("id", tagIdChat.TAG_ID);
-    console.log("show", typeChatId);
     useEffect(() => {
         getMessageChatByTypeId(typeChatId);
     }, [typeChatId]);
@@ -46,21 +44,6 @@ export default function ModalChatMessage({
         getTypeChatByTagId(tagIdChat.TAG_ID);
     }, [tagIdChat]);
 
-    // setInterval(() => {
-    //     // Assuming you have a function or a way to check for new messages
-    //     // Here you might simulate receiving new messages for demonstration
-    //     getMessageChatByTypeId(typeChatId);
-    // }, 5000);
-
-    // const chatContainerRef = useRef<any>(null);
-
-    // const scrollToBottom = () => {
-    //     const container: HTMLElement | null =
-    //         document.getElementById("messageChat");
-    //     if (container) {
-    //         container.scrollTop = container.scrollHeight;
-    //     }
-    // };
     const today = new Date();
 
     // Format tanggal dengan date-fns
@@ -69,7 +52,6 @@ export default function ModalChatMessage({
     // state for data message
     const [detailMessage, setDetailMessage] = useState<any>([]);
     const [detailTypeChat, setDetailTypeChat] = useState<any>([]);
-    console.log(detailMessage);
 
     // Ambil kunci dan urutkan secara terbalik
     const sortedKeys = Object.keys(detailMessage).reverse();
@@ -80,7 +62,6 @@ export default function ModalChatMessage({
         reversedObj[key] = detailMessage[key];
     });
 
-    console.log("Adasda", reversedObj);
     // Get Message Chat From Type Id
     const getMessageChatByTypeId = async (typeChatId: any) => {
         await axios
@@ -99,7 +80,6 @@ export default function ModalChatMessage({
             .post(`/getTypeChatByTagId`, { tagIdChat })
             .then((res) => {
                 setDetailTypeChat(res.data);
-                console.log("asda", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -165,7 +145,6 @@ export default function ModalChatMessage({
                 console.log(err);
             });
     };
-    console.log(data);
     return (
         <>
             <Transition.Root show={showChatMessage.chatModal} as={Fragment}>
@@ -175,18 +154,6 @@ export default function ModalChatMessage({
                     onClose={close}
                     initialFocus={modalRef}
                 >
-                    {/* <Transition.Child
-                        as={Fragment}
-                        enter="transition ease-in-out duration-300 transform"
-                        enterFrom="translate-x-full"
-                        enterTo="translate-x-0"
-                        leave="transition ease-in-out duration-400 transform"
-                        leaveFrom="translate-x-0"
-                        leaveTo="translate-x-full"
-                    >
-                        <div className="fixed inset-0 bg-black transition-opacity" />
-                    </Transition.Child> */}
-
                     <div className="fixed inset-0 z-10">
                         <div className="flex min-h-full">
                             <Transition.Child
@@ -402,11 +369,25 @@ export default function ModalChatMessage({
                                                                                     );
                                                                                 }}
                                                                             >
-                                                                                <span>
-                                                                                    {
-                                                                                        dTypeChat.CHAT_TITLE
-                                                                                    }
-                                                                                </span>
+                                                                                <div className="flex">
+                                                                                    <span>
+                                                                                        {
+                                                                                            dTypeChat.CHAT_TITLE
+                                                                                        }
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex justify-end text-[10px]">
+                                                                                    <span>
+                                                                                        {dTypeChat
+                                                                                            ?.t_user
+                                                                                            .name +
+                                                                                            " - " +
+                                                                                            format(
+                                                                                                dTypeChat.CREATED_CHAT_DATE,
+                                                                                                "dd-MM-yyyy"
+                                                                                            )}
+                                                                                    </span>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     );

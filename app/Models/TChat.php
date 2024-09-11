@@ -18,4 +18,9 @@ class TChat extends Model
     ];
 
     public $timestamps = false;
+
+    public function tUser()
+    {
+        return $this->hasOne(User::class, 'id', 'CREATED_CHAT_BY');
+    }
 }
