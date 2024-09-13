@@ -2163,11 +2163,11 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
             {/* modal end chat */}
-            {/* <AppPlugin parameterID={detailRelation} />
-             */}
-            <MyProvider>
+            <AppPlugin parameterID={detailRelation} />
+
+            {/* <MyProvider>
                 <PhoenixComponent otherId={detailRelation} />
-            </MyProvider>
+            </MyProvider> */}
             <div className="bg-white p-4 rounded-md shadow-md mb-3">
                 {/* Official Information */}
                 <div className="flex justify-between">
