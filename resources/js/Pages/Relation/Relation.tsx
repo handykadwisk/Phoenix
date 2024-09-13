@@ -559,9 +559,9 @@ export default function Relation({ auth }: PageProps) {
                 }
                 url={""}
                 data={""}
-                onSuccess={""}
+                onSuccess={undefined}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
