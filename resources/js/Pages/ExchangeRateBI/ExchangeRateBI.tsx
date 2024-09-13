@@ -48,44 +48,6 @@ export default function ExchangeRateController({ auth }: PageProps) {
         });
     };
 
-    const [dataById, setDataById] = useState<any>({});
-    const handleShowModal = async (id: number) => {
-        await axios
-            .get(`/getExchangeRateBIById/${id}`)
-            .then((res) => {
-                setDataById(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => console.log(err));
-
-        setModalShow({
-            show: true,
-        });
-    };
-
-    const [dataEdit, setDataEdit] = useState<any>({});
-    const handleEditModal = async (id: number) => {
-        await axios
-            .get(`/getExchangeRateBIDetailById/${id}`)
-            .then((res) => {
-                setDataEdit(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => console.log(err));
-
-        setModalEdit({
-            edit: true,
-        });
-    };
-
-    const handleChangeExchangeRateEdit = (val: any, name: any) => {
-        const onChange: any = { ...dataEdit };
-
-        onChange[name] = val;
-
-        setDataEdit(onChange);
-    };
-
     const [data, setData] = useState<any>({
         exchange_rate_bi_date: "",
         exchange_rate_bi_detail: [],
@@ -244,13 +206,48 @@ export default function ExchangeRateController({ auth }: PageProps) {
         setData({ ...data, exchange_rate_bi_detail: onChange });
     };
 
+    const [dataById, setDataById] = useState<any>({});
+    const handleShowModal = async (id: number) => {
+        await axios
+            .get(`/getExchangeRateBIById/${id}`)
+            .then((res) => {
+                setDataById(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModalShow({
+            show: true,
+        });
+    };
+
+    const [dataEdit, setDataEdit] = useState<any>({});
+    const handleEditModal = async (id: number) => {
+        await axios
+            .get(`/getExchangeRateBIDetailById/${id}`)
+            .then((res) => {
+                setDataEdit(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModalEdit({
+            edit: true,
+        });
+    };
+
+    const handleChangeExchangeRateEdit = (val: any, name: any) => {
+        const onChange: any = { ...dataEdit };
+
+        onChange[name] = val;
+
+        setDataEdit(onChange);
+    };
+
     const [isSuccess, setIsSuccess] = useState<string>("");
 
     const handleSuccess = (message: any) => {
         setIsSuccess("");
-        // setData({
-        //     cash_advance_id: "",
-        // });
 
         setIsSuccess(message.msg);
         getExchangeRateBI();
@@ -300,12 +297,10 @@ export default function ExchangeRateController({ auth }: PageProps) {
     const formatCurrency = new Intl.NumberFormat("default", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-        // style: "currency",
-        // currency: "IDR",
     });
     // End Function Format Currency
 
-    console.log("Data", data);
+    // console.log("Data", data);
     // console.log("Data Exchange Rate BI", exchangeRateBI);
     // console.log("Data Exchange Rate BI By Id", dataById);
     // console.log("Data Edit", dataEdit);
