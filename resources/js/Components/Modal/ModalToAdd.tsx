@@ -60,7 +60,7 @@ export default function ModalAttendance({
             .catch((err) => {
                 setIsProcessing(false);
                 setIsError(err.response.data[0]);
-                console.log(err.response,'ini');
+                console.log(err.response, "ini");
             });
     };
 
@@ -136,7 +136,7 @@ export default function ModalAttendance({
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             {disableSubmit ? (
-                                                ""
+                                                true
                                             ) : (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
