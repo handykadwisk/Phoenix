@@ -110,7 +110,7 @@ class TJobDescCompanyController extends Controller
                 "module"      => "Job Desc Company",
                 "id"          => $jobDesc->COMPANY_JOBDESC_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -162,7 +162,7 @@ class TJobDescCompanyController extends Controller
                 "module"      => "Job Desc Company",
                 "id"          => $request->COMPANY_JOBDESC_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 

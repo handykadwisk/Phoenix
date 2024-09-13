@@ -503,7 +503,7 @@ class RelationController extends Controller
                 "module"      => "Relation",
                 "id"          => $relation->RELATION_ORGANIZATION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -688,7 +688,7 @@ class RelationController extends Controller
                 "module"      => "Relation",
                 "id"          => $request->RELATION_ORGANIZATION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([

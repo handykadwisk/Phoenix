@@ -40,7 +40,7 @@ class TTagPluginProcessController extends Controller
                     "module"      => "Plugin",
                     "id"          => $tTagRelation->TAG_PLUGIN_PROCESS_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
 
             $idTTagRelation = $tTagRelation->TAG_PLUGIN_PROCESS_ID;

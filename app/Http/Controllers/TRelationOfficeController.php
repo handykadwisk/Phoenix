@@ -123,7 +123,7 @@ class TRelationOfficeController extends Controller
                 "module"      => "Office",
                 "id"          => $office->RELATION_OFFICE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -196,7 +196,7 @@ class TRelationOfficeController extends Controller
                 "module"      => "Office",
                 "id"          => $request->RELATION_OFFICE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
