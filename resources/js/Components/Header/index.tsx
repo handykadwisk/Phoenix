@@ -1,15 +1,14 @@
-import DropdownUser from './DropdownUser';
-import Breadcrumb from '../Breadcrumbs/Breadcrumb';
-import {
-  Bars3Icon
-} from '@heroicons/react/24/outline'
-import { User } from '@/types';
-import { BellIcon } from '@heroicons/react/20/solid';
-import ImageDropdown from '../ImageDropdown';
-import { FormEvent } from 'react';
-import indonesiaFlag from '../../Images/indonesia.png';
-import usFlag from '../../Images/united-states.png';
-import { router } from '@inertiajs/react'
+import DropdownUser from "./DropdownUser";
+import Breadcrumb from "../Breadcrumbs/Breadcrumb";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import { User } from "@/types";
+import { BellIcon } from "@heroicons/react/20/solid";
+import ImageDropdown from "../ImageDropdown";
+import { FormEvent } from "react";
+import indonesiaFlag from "../../Images/indonesia.png";
+import usFlag from "../../Images/united-states.png";
+import { router } from "@inertiajs/react";
+// import { MyProvider } from "@/Utility/GlobalContext";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -126,6 +125,7 @@ const Header = (props: {
                     {/* <!-- User Area --> */}
                 </div>
             </div>
+            {/* <MyProvider> */}
             <main>
                 <div
                     className="px-4 sm:px-6 lg:px-8 py-5 modal-action-container"
@@ -134,6 +134,7 @@ const Header = (props: {
                     {props.children}
                 </div>
             </main>
+            {/* </MyProvider> */}
             <div className="relative bottom-0 z-40 h-10 flex shrink-0 items-center justify-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                 <p className="text-xs">
                     Copyright &copy; PT. Killian Teknologi Indonesia

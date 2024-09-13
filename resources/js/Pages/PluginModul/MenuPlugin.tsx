@@ -150,7 +150,8 @@ export default function MenuPlugin({
                                     className="text-sm hover:cursor-pointer hover:bg-red-400 p-2 rounded-md w-full"
                                     onClick={(e: any) => {
                                         handleAddPluginProcess(
-                                            dataPlug.PLUGIN_PROCESS_ID
+                                            dataPlug.PLUGIN_PROCESS_ID,
+                                            e
                                         );
                                     }}
                                 >

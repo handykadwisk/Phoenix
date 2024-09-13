@@ -22,7 +22,7 @@ export default function Dashboard({ auth, language }: any) {
         <AuthenticatedLayout user={auth.user} header={lang.dashboard}>
             <Head title={lang.dashboard} />
 
-            <PhoenixComponent />
+            {/* <PhoenixComponent /> */}
             <div>
                 <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-4">
                     <div

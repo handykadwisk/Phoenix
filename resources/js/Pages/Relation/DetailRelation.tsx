@@ -34,8 +34,10 @@ import DatePicker from "react-datepicker";
 import SwitchPage from "@/Components/Switch";
 import Select from "react-tailwindcss-select";
 import DetailDocumentRelation from "./DetailDocument";
-import { MyProvider } from "@/Utility/GlobalContext";
+// import { MyProvider } from "@/Utility/GlobalContext";
 import PhoenixComponent from "@/Utility/PhoenixComponent";
+import { MyProvider } from "@/Utility/GlobalContext";
+import AppPlugin from "@/Utility/AppPlugin";
 
 export default function DetailRelation({
     detailRelation,
@@ -724,12 +726,6 @@ export default function DetailRelation({
 
     return (
         <>
-            <MyProvider>
-                <PhoenixComponent
-                    otherId={detailRelation}
-                    setIsSuccess={setIsSuccess}
-                />
-            </MyProvider>
             {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
@@ -1175,9 +1171,6 @@ export default function DetailRelation({
                 body={
                     <>
                         <div className="lg:grid lg:gap-4 lg:grid-cols-2 xs:grid xs:gap-4 xs:grid-cols-1">
-                            <div className="cls_can_attach_process">
-                                <span>Aloo</span>
-                            </div>
                             <div className="mt-4 relative">
                                 <InputLabel
                                     className="absolute"
@@ -2126,7 +2119,7 @@ export default function DetailRelation({
                 data={""}
                 onSuccess={""}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
                 }
@@ -2170,14 +2163,19 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
             {/* modal end chat */}
+            <AppPlugin parameterID={detailRelation} />
+
+            {/* <MyProvider>
+                <PhoenixComponent otherId={detailRelation} />
+            </MyProvider> */}
             <div className="bg-white p-4 rounded-md shadow-md mb-3">
                 {/* Official Information */}
                 <div className="flex justify-between">
                     <div className="font-semibold text-md">
-                        <span className="border-b-2 border-red-600 cls_can_attach_process">
+                        <span className="border-b-2 border-red-600 ">
                             Relation Information
+                            {/* <div className="chatPlugin float-right mt-2 ml-2"></div> */}
                         </span>
-                        {/* <div className="chatPlugin float-right mt-2 ml-2"></div> */}
                     </div>
                     <a
                         onClick={(e) =>
@@ -2270,7 +2268,7 @@ export default function DetailRelation({
                 {/* Relation Type And */}
                 <div>
                     <div className="text-md font-semibold mt-4 w-fit">
-                        <span className="border-b-2 border-red-600 cls_can_attach_process">
+                        <span className="border-b-2 border-red-600 ">
                             Relation Type
                         </span>
                     </div>
@@ -2307,7 +2305,7 @@ export default function DetailRelation({
                 <div className="">
                     <div className="flex justify-between items-center">
                         <div className="text-md font-semibold mt-4 w-fit">
-                            <span className="border-b-2 border-red-600 cls_can_attach_process">
+                            <span className="border-b-2 border-red-600">
                                 Bank Account Relation
                             </span>
                         </div>
@@ -2327,24 +2325,34 @@ export default function DetailRelation({
                         </a>
                     </div>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2 mt-2">
                     <div>
-                        <div className="text-md font-semibold">
-                            <span>Bank Name</span>
+                        <div className="text-sm font-semibold">
+                            <span className="cls_can_attach_process">
+                                Bank Name
+                            </span>
+                            {/* <div
+                                className="chatPlugin float-right mt-2 ml-2"
+                                id="2d8d70c14c03d1b22f7445fa7cea69b41664709c6a0208e21af8c7110d898423"
+                            ></div> */}
                         </div>
                     </div>
                     <div>
-                        <div className="text-md font-semibold">
-                            <span>Account Name</span>
+                        <div className="text-sm font-semibold">
+                            <span className="cls_can_attach_process w-fit">
+                                Account Name
+                            </span>
                         </div>
                     </div>
                     <div>
-                        <div className="text-md font-semibold">
-                            <span>Account Number</span>
+                        <div className="text-sm font-semibold">
+                            <span className="cls_can_attach_process">
+                                Account Number
+                            </span>
                         </div>
                     </div>
                     <div>
-                        <div className="text-md font-semibold">
+                        <div className="text-sm font-semibold">
                             <span>NPWP</span>
                         </div>
                     </div>
@@ -2380,8 +2388,8 @@ export default function DetailRelation({
                             return (
                                 <div className="grid grid-cols-4 gap-2" key={i}>
                                     <div>
-                                        <div className="text-sm text-gray-500">
-                                            <span>
+                                        <div className="text-sm text-gray-500 ">
+                                            <span className="">
                                                 {bAR.r_bank?.BANK_ABBREVIATION}
                                             </span>
                                         </div>
@@ -2475,7 +2483,7 @@ export default function DetailRelation({
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <div>
                                     <span
-                                        className="cls_can_attach_process"
+                                        className=""
                                         onClick={(e) =>
                                             handleClickStructure(
                                                 e,
