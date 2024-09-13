@@ -29,12 +29,13 @@ export default function ModalToAction({
     url: string;
     data: any | null;
     method: string;
-    onSuccess: any | null | undefined;
+    onSuccess: any;
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [isValidationError, setIsValidationError] = useState<string>("");
     const [isError, setIsError] = useState<string>("");
     const modalRef = useRef(null);
 
@@ -53,26 +54,38 @@ export default function ModalToAction({
         e.preventDefault();
 
         setIsProcessing(true);
-        // onSuccess("");
+        onSuccess("");
+        try {
+            const response = await callAxios({ url, data, method });
+            if (response) {
+                setIsProcessing(false);
+                setIsValidationError("");
+                onSuccess(response.data);
+            }
+            close();
+        } catch (error: any) {
+            setIsProcessing(false);
+            if (error.response.status === 422) {
+                setIsValidationError(error.response.data[0]);
+                setIsError(error.response.data[0]);
+            }
+            setIsError(error.response.data[0]);
+            console.log(error.response.data[0], "error");
+        }
 
-        await callAxios({ url, data, method })
-            .then((res) => {
-                setIsProcessing(false);
-                setIsError("");
-                if (
-                    onSuccess !== null ||
-                    onSuccess !== "" ||
-                    onSuccess !== undefined
-                ) {
-                    onSuccess(res.data);
-                }
-                close();
-            })
-            .catch((err) => {
-                setIsProcessing(false);
-                // setIsError(err.response.data);
-                console.log(err);
-            });
+        // await callAxios({url, data, method})
+        // .then((res) => {
+        //     setIsProcessing(false)
+        //     setIsValidationError('')
+        //     onSuccess(res.data[0])
+        //     closeAllModal()
+        // })
+        // .catch(function (error) {
+        //     setIsProcessing(false)
+        //     if (error.response.status === 500) {
+        //         setIsErrorMessage('There is something wrong. Please try again later.')
+        //     }
+        // })
     };
 
     return (
@@ -137,16 +150,22 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            {/* <div className="max-h-full"> */}
-                                            <div
-                                                className="modal-action overflow-y-auto custom-scrollbar px-2"
-                                                ref={modalRef}
-                                            >
-                                                {body}
+                                            <div className="max-h-full">
+                                                <div
+                                                    className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
+                                                    ref={modalRef}
+                                                >
+                                                    {body}
+                                                </div>
                                             </div>
-                                            {/* </div> */}
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                            {/* <PrimaryButton
+                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                disabled={isProcessing}
+                                            >
+                                                Submit
+                                            </PrimaryButton> */}
                                             {submitButtonName && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
