@@ -208,7 +208,7 @@ class InsurancePanelController extends Controller
                 "module"      => "Add Insurer",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -282,7 +282,7 @@ class InsurancePanelController extends Controller
                 "module"      => "Edit Insurer",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -355,7 +355,7 @@ class InsurancePanelController extends Controller
                 "module"      => "Insurance Panel",
                 "id"          => $insurancePanel
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -488,7 +488,7 @@ class InsurancePanelController extends Controller
                 "module"      => "Insurance Panel",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -518,7 +518,7 @@ class InsurancePanelController extends Controller
                     "module"      => "Insurer",
                     "id"          => $request->id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
             
             return new JsonResponse([

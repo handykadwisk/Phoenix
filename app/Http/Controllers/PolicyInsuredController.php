@@ -69,7 +69,7 @@ class PolicyInsuredController extends Controller
                 "module"      => "Add Coverage",
                 // "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
         
         return new JsonResponse([
