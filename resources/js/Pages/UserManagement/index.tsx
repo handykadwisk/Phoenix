@@ -234,14 +234,11 @@ export default function UserManagement({ auth, type }: any) {
     const getEmployee = async () => {
         try {
             const result = await axios.get('/getAllEmployee');
-
             setEmployee(result.data);
-            // console.log(result.data, '<<<<<<<<<<<<<<<<<<<<');
         } catch (error) {
             console.error('Fetch error:', error);
         }
     }
-    // console.log('employee',employee);
 
     //get company  
     const [relation, setRelation] = useState<any>([]);
@@ -253,7 +250,6 @@ export default function UserManagement({ auth, type }: any) {
             console.error('Fetch error:', error);
         }
     }
-
 
     // handle success
     const handleSuccess = (message: string) => {
@@ -330,9 +326,6 @@ export default function UserManagement({ auth, type }: any) {
         dataInputEdit.newRole = dataInputEdit.role.map((role: any) => role.id);
     }
 
-    // console.log(dataInput, '<<<<<dataInput');
-    // console.log(dataInputEdit, '<<<<<dataInputEdit');
-
     // Fungsi untuk menangani perubahan saat employee dipilih
     const handleEmployeeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedEmployeeId = Number(e.target.value);
@@ -376,8 +369,6 @@ export default function UserManagement({ auth, type }: any) {
         const userStatus = e.target.checked ? 1 : 0;
         setDataInputEdit({ ...dataInputEdit, user_status: userStatus });
     };
-    console.log(dataInputEdit, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
-
 
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
@@ -538,8 +529,6 @@ export default function UserManagement({ auth, type }: any) {
                                 onChange={
                                     (e) => setDataInput({
                                         ...dataInput, user_login: e.target.value,
-                                        // name: e.target.value.includes('@') ? e.target.value.split('@')[0] : e.target.value
-
                                     })}
                                 required
                                 placeholder="Email or Other unique id"
@@ -568,7 +557,6 @@ export default function UserManagement({ auth, type }: any) {
                         {/* role */}
                         {dataInput.type === 2 && (
                             <>
-
                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
@@ -576,7 +564,6 @@ export default function UserManagement({ auth, type }: any) {
                                         value={'Role'}
                                     />
                                     <div className="ml-[2.3rem] text-red-600">*</div>
-
                                     <div className="mb-2">
                                         <Select
                                             classNames={{
@@ -600,23 +587,14 @@ export default function UserManagement({ auth, type }: any) {
 
                                         />
                                     </div>
-
                                 </div>
-
-
                             </>
                         )}
                         {/* role */}
-
-
-
-
-
-
                     </>
                 }
-
             />
+
             {/* modal Edit */}
             <ModalToAction
                 headers={null}
@@ -650,7 +628,6 @@ export default function UserManagement({ auth, type }: any) {
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataInputEdit?.type?.user_type_id}
-                                        // onChange={(e) => setDataInputEdit({ ...dataInputEdit, type: Number(e.target.value) })}
                                         onChange={(e) => {
                                             const selectedType = Number(e.target.value);
                                             setDataInputEdit({
@@ -720,8 +697,6 @@ export default function UserManagement({ auth, type }: any) {
                                         <select
                                             className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={dataInputEdit?.individual_relations_id}
-                                            // value={dataInputEdit?.employee_id || ''} // Pastikan value berasal dari dataInputEdit
-
                                             onChange={handleRelationChange
                                             }
                                         >
@@ -813,7 +788,7 @@ export default function UserManagement({ auth, type }: any) {
                                     </div>
                                 </>
                             )}
-                            <div className="flex items-center ">
+                            <div className="flex items-center mt-4 ">
                                 <span className="mr-2 text-sm">User Status</span>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
@@ -821,7 +796,6 @@ export default function UserManagement({ auth, type }: any) {
                                         className="sr-only peer"
                                         checked={dataInputEdit.user_status}
                                         onChange={handleUserStatusChange}
-                                    // onChange={(e) => setDataInputEdit({ ...dataInputEdit, user_status: e.target.checked })}
                                     />
                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                                 </label>
@@ -842,11 +816,7 @@ export default function UserManagement({ auth, type }: any) {
                                  Here for Reset Password
                                 </div>
                             </div>
-
                             {/* Switch for User Status */}
-
-
-
                         </div>
                     </>
                 }

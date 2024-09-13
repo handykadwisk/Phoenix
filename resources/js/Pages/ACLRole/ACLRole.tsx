@@ -33,10 +33,8 @@ import { get } from "http";
 import { Console, log } from "console";
 import ModalToDetail from "@/Components/Modal/ModalToDetail";
 import ModalToActions from "@/Components/Modal/ModalToActions";
-// import DetailMenu from "./DetailMenu";
 
 export default function ACLRole({ auth, custom_menu, language, permission, newRole, menu }: any) {
-    // const lang: any = language[0]
 
     useEffect(() => {
         getRole();
