@@ -91,7 +91,7 @@ class TCompanyStructureController extends Controller
                 "module"      => "Company Structure",
                 "id"          => $structure->COMPANY_STRUCTURE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -137,7 +137,7 @@ class TCompanyStructureController extends Controller
                 "module"      => "Company Structure",
                 "id"          => $request->COMPANY_STRUCTURE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 

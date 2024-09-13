@@ -199,7 +199,7 @@ export default function DetailCompany({
     // End Address Location Click
     return (
         <>
-            <PhoenixComponent otherId={idCompany} setIsSuccess={setIsSuccess} />
+            {/* <PhoenixComponent otherId={idCompany} setIsSuccess={setIsSuccess} /> */}
 
             {/* <div className="cls">Relation Information</div> */}
             {/* modal for job desc */}
@@ -627,7 +627,7 @@ export default function DetailCompany({
                 <div className="flex justify-between">
                     <div className="flex gap-2 items-center">
                         <div className="text-md font-semibold w-fit">
-                            <span className="border-b-2 border-red-600 cls_can_attach_process">
+                            <span className="border-b-2 border-red-600 ">
                                 Company Information
                             </span>
                         </div>
@@ -654,7 +654,7 @@ export default function DetailCompany({
                         </div>
                     </div>
                     <div className="col-span-1">
-                        <div className="font-semibold cls_can_attach_process">
+                        <div className="font-semibold ">
                             <span>Email</span>
                         </div>
                         <div className="text-gray-500">

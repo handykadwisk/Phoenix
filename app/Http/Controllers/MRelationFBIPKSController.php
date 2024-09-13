@@ -129,7 +129,7 @@ class MRelationFBIPKSController extends Controller
                     "module"      => "M Relation FBI",
                     "id"          => $mRelationBaa->M_RELATION_BAA_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([

@@ -42,28 +42,168 @@ export default function ExchangeRateController({ auth }: PageProps) {
         upload: false,
     });
 
-    const handleAddModal = async () => {
-        await axios
+    const handleUploadModal = () => {
+        setModalUpload({
+            upload: true,
+        });
+    };
+
+    const [data, setData] = useState<any>({
+        exchange_rate_bi_date: "",
+        exchange_rate_bi_detail: [],
+    });
+
+    const cleanDataRecursively = (data: any): any => {
+        if (typeof data === "string") {
+            // Jika data adalah string, hapus karakter \r\n
+            return data.replace(/\r\n/g, "").replace(/\n/g, "");
+        } else if (Array.isArray(data)) {
+            // Jika data adalah array, lakukan pembersihan pada setiap elemen array
+            return data.map((item) => cleanDataRecursively(item));
+        } else if (typeof data === "object" && data !== null) {
+            // Jika data adalah object, lakukan pembersihan pada setiap value dalam object
+            const cleanedObject: any = {};
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    cleanedObject[key] = cleanDataRecursively(data[key]);
+                }
+            }
+            return cleanedObject;
+        }
+        return data;
+    };
+
+    const getCurrencies = (date: any) => {
+        axios
             .get(`/getCurrencies`)
             .then((res) => {
-                console.log("Currency", res.data);
+                const parseData = cleanDataRecursively(res.data);
+
                 setData({
-                    exchange_rate_bi_detail: res.data,
+                    exchange_rate_bi_date: date,
+                    exchange_rate_bi_detail: parseData,
                 });
+                console.log("Currency", parseData);
             })
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    const handleAddModal = async () => {
+        getCurrencies("");
 
         setModalAdd({
             add: true,
         });
     };
 
-    const handleUploadModal = () => {
+    const handleChangeDate = async (date: any, name: any) => {
+        const selectedDate = date.toLocaleDateString("en-CA");
+
+        try {
+            const resDate = await axios.get(
+                `/getExchangeRateBIByDate/${selectedDate}`
+            );
+
+            const exchangeRateDetail = resDate.data.exchange_rate_bi_detail;
+
+            if (!exchangeRateDetail || exchangeRateDetail === undefined) {
+                getCurrencies(selectedDate);
+
+                console.log("Using Currency", data);
+            } else {
+                console.log("Using By Date", exchangeRateDetail);
+
+                Swal.fire({
+                    title: "Data already exist",
+                    text: "Do you want to change this data?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, I want to change the data",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        setData((prevData: any) => {
+                            const updatedData = { ...prevData };
+
+                            // Simpan hasil request berdasarkan tanggal
+                            updatedData.exchange_rate_bi_detail =
+                                exchangeRateDetail;
+
+                            // Simpan nilai yang dipilih pada field
+                            updatedData[name] = selectedDate;
+
+                            return updatedData;
+                        });
+                    }
+                });
+            }
+        } catch (err) {
+            console.log("Error", err);
+        }
+    };
+
+    const handleDownloadTemplate = async () => {
+        await axios({
+            url: `/exchangeRateBIDownloadTemplate`,
+            method: "GET",
+            responseType: "blob",
+        })
+            .then((response) => {
+                console.log(response);
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", response.headers.filename);
+                document.body.appendChild(link);
+                link.click();
+            })
+            .catch((err) => {
+                console.log(err);
+                if (err.response.status === 404) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "File not found!",
+                        timer: 1500,
+                        timerProgressBar: true,
+                    });
+                }
+            });
+    };
+
+    const handleChangeUpload = (e: any) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+            const excel = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(excel, { type: "array" });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            setData({
+                exchange_rate_bi_date: data.exchange_rate_bi_date,
+                exchange_rate_bi_detail: jsonData,
+            });
+        };
+
+        reader.readAsArrayBuffer(file);
+
         setModalUpload({
-            upload: true,
+            upload: false,
         });
+    };
+
+    const handleChangeUploadFile = (val: any, field: any, i: any) => {
+        const onChange: any = [...data.exchange_rate_bi_detail];
+        onChange[i][field] = val;
+
+        setData({ ...data, exchange_rate_bi_detail: onChange });
     };
 
     const [dataById, setDataById] = useState<any>({});
@@ -104,116 +244,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
         setDataEdit(onChange);
     };
 
-    const [date, setDate] = useState(new Date());
-
-    const [data, setData] = useState<any>({
-        exchange_rate_bi_date: "",
-        exchange_rate_bi_detail: [],
-    });
-
-    const handleChangeDate = async (date: any, name: any) => {
-        const selectedDate = date.toLocaleDateString("en-CA");
-
-        try {
-            // Request ke API untuk mendapatkan data berdasarkan tanggal
-            // const res = await axios.get(
-            //     `/getExchangeRateBIByDate/${selectedDate}`
-            // );
-            // console.log("By Date", res.data.exchange_rate_bi_detail);
-
-            // Atur semua data dalam satu setData agar tidak menimpa data sebelumnya
-            setData((prevData: any) => {
-                const updatedData = { ...prevData };
-
-                // Simpan hasil request berdasarkan tanggal
-                // updatedData.exchange_rate_bi_detail =
-                //     res.data.exchange_rate_bi_detail;
-
-                // Simpan nilai yang dipilih pada field
-                updatedData[name] = selectedDate;
-
-                return updatedData;
-            });
-        } catch (err) {
-            console.log("Error", err);
-        }
-    };
-
-    const handleDownloadTemplate = async () => {
-        await axios({
-            url: `/exchangeRateBIDownloadTemplate`,
-            method: "GET",
-            responseType: "blob",
-        })
-            .then((response) => {
-                console.log(response);
-                const url = window.URL.createObjectURL(
-                    new Blob([response.data])
-                );
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", response.headers.filename);
-                document.body.appendChild(link);
-                link.click();
-            })
-            .catch((err) => {
-                console.log(err);
-                if (err.response.status === 404) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "File not found!",
-                        timer: 1500,
-                        timerProgressBar: true,
-                    });
-                }
-            });
-    };
-
-    const handleFileUpload = (e: any) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = (e: any) => {
-            const currentDate = new Date().toISOString().split("T")[0];
-
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: "array" });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-            setData({
-                // exchange_rate_bi_date: currentDate,
-                exchange_rate_bi_detail: jsonData,
-            });
-        };
-
-        reader.readAsArrayBuffer(file);
-
-        setModalUpload({
-            upload: false,
-        });
-    };
-
-    const handleChangeUploadFile = (val: any, field: any, i: any) => {
-        const onChange: any = [...data.exchange_rate_bi_detail];
-        onChange[i][field] = val;
-
-        setData({ ...data, exchange_rate_bi_detail: onChange });
-    };
-
     const [isSuccess, setIsSuccess] = useState<string>("");
 
     const handleSuccess = (message: any) => {
         setIsSuccess("");
-        // setData({
-        //     cash_advance_id: "",
-        // });
 
         setIsSuccess(message.msg);
         getExchangeRateBI();
-        // handleShowModal(message.id);
+        handleShowModal(message.id);
     };
     // Handle Success End
 
@@ -259,12 +297,10 @@ export default function ExchangeRateController({ auth }: PageProps) {
     const formatCurrency = new Intl.NumberFormat("default", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-        // style: "currency",
-        // currency: "IDR",
     });
     // End Function Format Currency
 
-    console.log("Data", data);
+    // console.log("Data", data);
     // console.log("Data Exchange Rate BI", exchangeRateBI);
     // console.log("Data Exchange Rate BI By Id", dataById);
     // console.log("Data Edit", dataEdit);
@@ -322,7 +358,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                         <Input
                                             type="file"
                                             accept=".xlsx, .xls"
-                                            onChange={handleFileUpload}
+                                            onChange={handleChangeUpload}
                                         />
                                     </div>
                                 </>
@@ -351,6 +387,8 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                         dateFormat={"dd-MM-yyyy"}
                                         placeholderText="dd-mm-yyyy"
                                         className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
+                                        required
                                     />
                                 </div>
                             </div>
@@ -358,6 +396,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 <InputLabel className="mb-2">File</InputLabel>
                                 <div className="flex pt-1 space-x-4">
                                     <Button
+                                        type="button"
                                         className="bg-green-600 hover:bg-green-500 text-sm text-white py-1.5 w-1/2"
                                         title="Download Template"
                                         onClick={handleDownloadTemplate}
@@ -383,7 +422,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                             (currency: any, i: number) => (
                                                 <tr key={i}>
                                                     <TD className="text-sm pr-5">
-                                                        {currency.CURRENCY_NAME}
+                                                        {(currency.currency
+                                                            ?.CURRENCY_NAME ||
+                                                            currency.CURRENCY_NAME) +
+                                                            " (" +
+                                                            (currency.currency
+                                                                ?.CURRENCY_SYMBOL ||
+                                                                currency.CURRENCY_SYMBOL) +
+                                                            ")"}
                                                     </TD>
                                                     <TD className="w-full">
                                                         <CurrencyInput
@@ -414,113 +460,6 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                             )
                                         )}
                                     </>
-                                    {/* {data?.exchange_rate_bi_detail ===
-                                        undefined ||
-                                        (data?.exchange_rate_bi_date ===
-                                            undefined && (
-                                            <>
-                                                {data?.exchange_rate_bi_detail.map(
-                                                    (
-                                                        currency: any,
-                                                        i: number
-                                                    ) => (
-                                                        <tr key={i}>
-                                                            <TD className="text-sm pr-5">
-                                                                {
-                                                                    currency.CURRENCY_NAME
-                                                                }
-                                                            </TD>
-                                                            <TD className="w-full">
-                                                                <CurrencyInput
-                                                                    id="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                                                    name="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                                                    decimalScale={
-                                                                        2
-                                                                    }
-                                                                    decimalsLimit={
-                                                                        2
-                                                                    }
-                                                                    value={
-                                                                        currency.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE ||
-                                                                        ""
-                                                                    }
-                                                                    onValueChange={(
-                                                                        val
-                                                                    ) =>
-                                                                        handleChangeUploadFile(
-                                                                            val,
-                                                                            "EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE",
-                                                                            i
-                                                                        )
-                                                                    }
-                                                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right`}
-                                                                    placeholder="0.00"
-                                                                    autoComplete="off"
-                                                                    required
-                                                                />
-                                                            </TD>
-                                                        </tr>
-                                                    )
-                                                )}
-                                            </>
-                                        ))}
-
-                                    {data?.exchange_rate_bi_date !==
-                                        undefined && (
-                                        <>
-                                            {data?.exchange_rate_bi_detail ? (
-                                                <>
-                                                    {data?.exchange_rate_bi_detail.map(
-                                                        (
-                                                            currency: any,
-                                                            i: number
-                                                        ) => (
-                                                            <tr key={i}>
-                                                                <TD className="text-sm pr-5">
-                                                                    {
-                                                                        currency
-                                                                            .currency
-                                                                            ?.CURRENCY_NAME
-                                                                    }
-                                                                </TD>
-                                                                <TD className="w-full">
-                                                                    <CurrencyInput
-                                                                        id="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                                                        name="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                                                        decimalScale={
-                                                                            2
-                                                                        }
-                                                                        decimalsLimit={
-                                                                            2
-                                                                        }
-                                                                        value={
-                                                                            currency.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE ||
-                                                                            ""
-                                                                        }
-                                                                        onValueChange={(
-                                                                            val
-                                                                        ) =>
-                                                                            handleChangeUploadFile(
-                                                                                val,
-                                                                                "EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE",
-                                                                                i
-                                                                            )
-                                                                        }
-                                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right`}
-                                                                        placeholder="0.00"
-                                                                        autoComplete="off"
-                                                                        required
-                                                                    />
-                                                                </TD>
-                                                            </tr>
-                                                        )
-                                                    )}
-                                                </>
-                                            ) : (
-                                                "Gaada"
-                                            )}
-                                        </>
-                                    )} */}
                                 </tbody>
                             </table>
                         </div>
@@ -531,7 +470,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
 
             {/* Modal Show Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-full`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[50%]`}
                 show={modalShow.show}
                 closeable={true}
                 onClose={() =>
@@ -738,6 +677,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 dateFormat={"dd-MM-yyyy"}
                                 placeholderText="dd-mm-yyyyy (Start Date)"
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                autoComplete="off"
                             />
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-2">

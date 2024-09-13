@@ -35,7 +35,7 @@ export default function ModalToAction({
     submitButtonName: string | null;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    const [isValidationError, setIsValidationError] = useState<string>('')
+    const [isValidationError, setIsValidationError] = useState<string>("");
     const [isError, setIsError] = useState<string>("");
     const modalRef = useRef(null);
 
@@ -53,25 +53,24 @@ export default function ModalToAction({
     const action = async (e: any) => {
         e.preventDefault()
 
-        setIsProcessing(true)
-        onSuccess('')
+        setIsProcessing(true);
+        onSuccess("");
         try {
-
-            const response = await callAxios({ url, data, method })
+            const response = await callAxios({ url, data, method });
             if (response) {
-                setIsProcessing(false)
-                setIsValidationError('')
-                onSuccess(response.data)
+                setIsProcessing(false);
+                setIsValidationError("");
+                onSuccess(response.data);
             }
-            close()
+            close();
         } catch (error: any) {
-            setIsProcessing(false)
+            setIsProcessing(false);
             if (error.response.status === 422) {
-                setIsValidationError(error.response.data[0])
-                setIsError(error.response.data[0])
+                setIsValidationError(error.response.data[0]);
+                setIsError(error.response.data[0]);
             }
-            setIsError(error.response.data[0])
-            console.log(error.response.data[0], 'error');
+            setIsError(error.response.data[0]);
+            console.log(error.response.data[0], "error");
         }
 
         // await callAxios({url, data, method})
@@ -87,10 +86,11 @@ export default function ModalToAction({
         //         setIsErrorMessage('There is something wrong. Please try again later.')
         //     }
         // })
-    }
+    };
 
     return (
         <>
+            {/* Edited Haris */}
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
@@ -160,12 +160,13 @@ export default function ModalToAction({
                                             </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            <PrimaryButton
+                                            {/* <PrimaryButton
                                                 className="inline-flex w-full sm:ml-3 sm:w-auto"
                                                 disabled={isProcessing}
                                             >
                                                 Submit
-                                            </PrimaryButton>{submitButtonName && (
+                                            </PrimaryButton> */}
+                                            {submitButtonName && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
                                                     disabled={isProcessing}

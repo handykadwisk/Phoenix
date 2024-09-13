@@ -43,66 +43,10 @@ export default function ExchangeRateController({ auth }: PageProps) {
         upload: false,
     });
 
-    // const handleAddModal = async () => {
-    //     await axios
-    //         .get(`/getCurrencies`)
-    //         .then((res) => {
-    //             console.log("Currency", res.data);
-    //             setData({
-    //                 exchange_rate_tax_detail: res.data,
-    //             });
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-
-    //     setModalAdd({
-    //         add: true,
-    //     });
-    // };
-
     const handleUploadModal = () => {
         setModalUpload({
             upload: true,
         });
-    };
-
-    const [dataById, setDataById] = useState<any>({});
-    const handleShowModal = async (id: number) => {
-        await axios
-            .get(`/getExchangeRateTaxById/${id}`)
-            .then((res) => {
-                setDataById(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => console.log(err));
-
-        setModalShow({
-            show: true,
-        });
-    };
-
-    const [dataEdit, setDataEdit] = useState<any>({});
-    const handleEditModal = async (id: number) => {
-        await axios
-            .get(`/getExchangeRateTaxDetailById/${id}`)
-            .then((res) => {
-                setDataEdit(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => console.log(err));
-
-        setModalEdit({
-            edit: true,
-        });
-    };
-
-    const handleChangeExchangeRateEdit = (val: any, name: any) => {
-        const onChange: any = { ...dataEdit };
-
-        onChange[name] = val;
-
-        setDataEdit(onChange);
     };
 
     const [data, setData] = useState<any>({
@@ -111,33 +55,74 @@ export default function ExchangeRateController({ auth }: PageProps) {
         exchange_rate_tax_detail: [],
     });
 
-    // const [date, setDate] = useState<any>();
+    const cleanDataRecursively = (data: any): any => {
+        if (typeof data === "string") {
+            return data.replace(/\r\n/g, "").replace(/\n/g, "");
+        } else if (Array.isArray(data)) {
+            return data.map((item) => cleanDataRecursively(item));
+        } else if (typeof data === "object" && data !== null) {
+            const cleanedObject: any = {};
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    cleanedObject[key] = cleanDataRecursively(data[key]);
+                }
+            }
+            return cleanedObject;
+        }
+        return data;
+    };
+
     const isWednesday = (data: any) => {
         return data.getDay() === 3;
     };
 
-    const handleAddModal = async () => {
-        const today = new Date();
+    const getCurrencies = (date: any) => {
+        let selectedDate: any = "";
 
-        await axios
-            .get(`/getCurrencies`)
+        if (date instanceof Date && !isNaN(date.getTime())) {
+            selectedDate = date;
+        } else {
+            const parsedDate = new Date(date);
+            selectedDate = isNaN(parsedDate.getTime()) ? "" : parsedDate;
+        }
+
+        axios
+            .get(`/getCurrenciesRateTax`)
             .then((res) => {
-                const currentDate = new Date(today);
-                const next7Days = new Date(today);
-                next7Days.setDate(today.getDate() + 6);
+                const parseData = cleanDataRecursively(res.data);
 
-                console.log("Currency", res.data);
-                setData({
-                    exchange_rate_tax_start_date:
-                        currentDate.toLocaleDateString("en-CA"),
-                    exchange_rate_tax_end_date:
-                        next7Days.toLocaleDateString("en-CA"),
-                    exchange_rate_tax_detail: res.data,
-                });
+                if (selectedDate !== "") {
+                    const next7Days = new Date(selectedDate);
+                    next7Days.setDate(selectedDate.getDate() + 6);
+
+                    const currentDate =
+                        selectedDate.toLocaleDateString("en-CA");
+                    const futureDate = next7Days.toLocaleDateString("en-CA");
+
+                    setData({
+                        exchange_rate_tax_start_date: currentDate,
+                        exchange_rate_tax_end_date: futureDate,
+                        exchange_rate_tax_detail: parseData,
+                    });
+
+                    console.log("Currency", parseData);
+                } else {
+                    setData({
+                        exchange_rate_tax_start_date: "",
+                        exchange_rate_tax_end_date: "",
+                        exchange_rate_tax_detail: parseData,
+                    });
+
+                    console.log("Currency (no date)", parseData);
+                }
             })
             .catch((err) => {
-                console.log(err);
+                console.error(err);
             });
+    };
+
+    const handleAddModal = () => {
+        getCurrencies("");
 
         setModalAdd({
             add: true,
@@ -148,91 +133,54 @@ export default function ExchangeRateController({ auth }: PageProps) {
         const selectedDate = date.toLocaleDateString("en-CA");
 
         try {
-            // Request ke API untuk mendapatkan data berdasarkan tanggal
-            const resDate = await axios
-                .get(`/getExchangeRateTaxByDate/${selectedDate}`)
-                .then((res) => {
-                    console.log("asdad", res.data);
-                    // setData({
-                    //     exchange_rate_tax_detail: res.data,
-                    // });
-                })
-                .catch((err) => {
-                    console.log(err);
+            const res = await axios.get(
+                `/getExchangeRateTaxByDate/${selectedDate}`
+            );
+
+            const exchangeRateTaxDetail = res.data.exchange_rate_tax_detail;
+
+            if (!exchangeRateTaxDetail || exchangeRateTaxDetail == undefined) {
+                // console.log("Pake Currency", data);
+                getCurrencies(selectedDate);
+            } else {
+                // console.log("Pake By Date", exchangeRateTaxDetail);
+                Swal.fire({
+                    title: "Data already exist",
+                    text: "Do you want to change this data?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, I want to change the data",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        setData((prevData: any) => {
+                            const updatedData = { ...prevData };
+
+                            // Simpan hasil request berdasarkan tanggal
+                            updatedData.exchange_rate_tax_detail =
+                                exchangeRateTaxDetail;
+
+                            // Simpan nilai yang dipilih pada field
+                            updatedData[name] = selectedDate;
+
+                            // Tambahkan 6 hari ke tanggal yang dipilih
+                            const futureDate = new Date(date);
+                            futureDate.setDate(futureDate.getDate() + 6);
+                            updatedData["exchange_rate_tax_end_date"] =
+                                futureDate.toLocaleDateString("en-CA");
+
+                            return updatedData;
+                        });
+                    }
                 });
-            // console.log(
-            //     "Response from /getExchangeRateTaxByDate:",
-            //     resDate.data
-            // );
-
-            let exchangeRateData: any;
-
-            // Jika data exchange_rate_tax_detail tidak ada, ambil data dari /getCurrencies
-            // if (
-            //     !resDate.data.exchange_rate_tax_detail ||
-            //     resDate.data.exchange_rate_tax_detail.length === 0
-            // ) {
-            //     console.log(
-            //         "Data exchange rate by date tidak ditemukan, mengambil dari /getCurrencies"
-            //     );
-
-            //     const resCurrency = await axios.get(`/getCurrencies`);
-            //     console.log("Response from /getCurrencies:", resCurrency.data);
-
-            //     if (resCurrency.data.exchange_rate_tax_detail) {
-            //         exchangeRateData =
-            //             resCurrency.data.exchange_rate_tax_detail;
-            //     } else {
-            //         console.error(
-            //             "Data exchange_rate_tax_detail tidak ditemukan di /getCurrencies"
-            //         );
-            //     }
-            // } else {
-            //     exchangeRateData = resDate.data.exchange_rate_tax_detail;
-            // }
-
-            console.log("Exchange Rate Data : ", exchangeRateData);
-
-            // Atur semua data dalam satu setData agar tidak menimpa data sebelumnya
-            setData((prevData: any) => {
-                const updatedData = { ...prevData };
-
-                // Simpan hasil request berdasarkan tanggal atau currency
-                updatedData.exchange_rate_tax_detail = exchangeRateData;
-
-                // Simpan nilai yang dipilih pada field
-                updatedData[name] = selectedDate;
-
-                // Tambahkan 6 hari ke tanggal yang dipilih
-                const futureDate = new Date(date);
-                futureDate.setDate(futureDate.getDate() + 6);
-                updatedData["exchange_rate_tax_end_date"] =
-                    futureDate.toLocaleDateString("en-CA");
-
-                return updatedData;
-            });
+            }
         } catch (err) {
-            console.error("Error:", err);
+            console.log("Error", err);
         }
     };
 
-    // const [currencies, setCurrencies] = useState<any>([]);
-    // const getCurrencies = async () => {
-
-    // };
-
-    // useEffect(() => {
-    //     handleAddModal();
-    // }, []);
-
-    // const today = new Date();
-    // const [futureDate, setFutureDate] = useState(() => {
-    //     const date = new Date();
-    //     date.setDate(today.getDate() + 6);
-    //     return date;
-    // });
-
-    const handleFileUpload = (e: any) => {
+    const handleChangeUpload = (e: any) => {
         const file = e.target.files[0];
         const reader = new FileReader();
 
@@ -242,19 +190,19 @@ export default function ExchangeRateController({ auth }: PageProps) {
             const next7Days = new Date(today);
             next7Days.setDate(today.getDate() + 6);
 
-            const currentDate = today.toISOString().split("T")[0];
-            const futureDate = next7Days.toISOString().split("T")[0];
+            const currentDate = today.toLocaleDateString("en-CA");
+            const futureDate = next7Days.toLocaleDateString("en-CA");
 
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: "array" });
+            const excel = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(excel, { type: "array" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
             console.log("Data Upload", jsonData);
             setData({
-                exchange_rate_tax_start_date: currentDate,
-                exchange_rate_tax_end_date: futureDate,
+                exchange_rate_tax_start_date: data.exchange_rate_tax_start_date,
+                exchange_rate_tax_end_date: data.exchange_rate_tax_end_date,
                 exchange_rate_tax_detail: jsonData,
             });
         };
@@ -304,17 +252,52 @@ export default function ExchangeRateController({ auth }: PageProps) {
             });
     };
 
+    const [dataById, setDataById] = useState<any>({});
+    const handleShowModal = async (id: number) => {
+        await axios
+            .get(`/getExchangeRateTaxById/${id}`)
+            .then((res) => {
+                setDataById(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModalShow({
+            show: true,
+        });
+    };
+
+    const [dataEdit, setDataEdit] = useState<any>({});
+    const handleEditModal = async (id: number) => {
+        await axios
+            .get(`/getExchangeRateTaxDetailById/${id}`)
+            .then((res) => {
+                setDataEdit(res.data);
+                console.log(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModalEdit({
+            edit: true,
+        });
+    };
+
+    const handleChangeExchangeRateEdit = (val: any, name: any) => {
+        const onChange: any = { ...dataEdit };
+
+        onChange[name] = val;
+
+        setDataEdit(onChange);
+    };
+
     const [isSuccess, setIsSuccess] = useState<string>("");
 
     const handleSuccess = (message: any) => {
         setIsSuccess("");
-        // setData({
-        //     cash_advance_id: "",
-        // });
 
         setIsSuccess(message.msg);
         getExchangeRateTax();
-        // handleShowModal(message.id);
+        handleShowModal(message.id);
     };
     // Handle Success End
 
@@ -364,12 +347,10 @@ export default function ExchangeRateController({ auth }: PageProps) {
     const formatCurrency = new Intl.NumberFormat("default", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-        // style: "currency",
-        // currency: "IDR",
     });
     // End Function Format Currency
 
-    console.log("Data", data);
+    // console.log("Data", data);
     // console.log("Exchange Rate Tax By Date", exchangeRateTaxByDate);
     // console.log("Currencies", currencies);
     // console.log("Data Exchange Rate Tax", exchangeRateTax);
@@ -429,7 +410,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                         <Input
                                             type="file"
                                             accept=".xlsx, .xls"
-                                            onChange={handleFileUpload}
+                                            onChange={handleChangeUpload}
                                         />
                                     </div>
                                 </>
@@ -508,7 +489,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                         (currency: any, i: number) => (
                                             <tr key={i}>
                                                 <TD className="text-sm pr-5">
-                                                    {currency.CURRENCY_NAME}
+                                                    {(currency.currency
+                                                        ?.CURRENCY_NAME ||
+                                                        currency.CURRENCY_NAME) +
+                                                        " (" +
+                                                        (currency.currency
+                                                            ?.CURRENCY_SYMBOL ||
+                                                            currency.CURRENCY_SYMBOL) +
+                                                        ")"}
                                                 </TD>
                                                 <TD className="w-full">
                                                     <CurrencyInput
@@ -758,6 +746,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 dateFormat={"dd-MM-yyyy"}
                                 placeholderText="dd-mm-yyyyy (Start Date)"
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                autoComplete="off"
                             />
                         </div>
                         <div className="grid grid-cols-1 mb-5 relative">
@@ -777,6 +766,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 dateFormat={"dd-MM-yyyy"}
                                 placeholderText="dd-mm-yyyy (End Date)"
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                autoComplete="off"
                             />
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-2">

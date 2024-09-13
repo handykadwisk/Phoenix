@@ -424,7 +424,7 @@ class ReimburseController extends Controller
                     "module"      => "Reimburse",
                     "id"          => $reimburse
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
 
             foreach ($request->ReimburseDetail as $rd) {
@@ -518,7 +518,7 @@ class ReimburseController extends Controller
                         "module"      => "Reimburse",
                         "id"          => $reimburse_detail_id
                     ]),
-                    'action_by'  => $user->email
+                    'action_by'  => $user->user_login
                 ]);
             }
         });
@@ -608,7 +608,7 @@ class ReimburseController extends Controller
                     "module"      => "Reimburse",
                     "id"          => $reimburse_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             if (is_array($reimburse_detail) && !empty($reimburse_detail)) {
@@ -640,7 +640,7 @@ class ReimburseController extends Controller
                             "module"      => "Reimburse",
                             "id"          => $reimburse_detail_id
                         ]),
-                        'action_by'  => Auth::user()->email
+                        'action_by'  => Auth::user()->user_login
                     ]);
                 }
             }
@@ -690,7 +690,7 @@ class ReimburseController extends Controller
                     "module"      => "Reimburse",
                     "id"          => $reimburse_id
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
     
             foreach ($request->reimburse_detail as $rd) {
@@ -786,7 +786,7 @@ class ReimburseController extends Controller
                         "module"      => "Reimburse",
                         "id"          => $reimburse_detail_id
                     ]),
-                    'action_by'  => $user->email
+                    'action_by'  => $user->user_login
                 ]);
             }
     
@@ -913,7 +913,7 @@ class ReimburseController extends Controller
                     "module"      => "Reimburse",
                     "id"          => $reimburse_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             return new JsonResponse([

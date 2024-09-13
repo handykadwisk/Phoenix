@@ -135,6 +135,7 @@ class PolicyController extends Controller
             'POLICY_CREATED_BY'      => Auth::user()->id
         ]);
 
+        // print_r(Auth::user());
         
         // Created Log
         UserLog::create([
@@ -144,7 +145,7 @@ class PolicyController extends Controller
                 "module"      => "Policy",
                 "id"          => $policy
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -289,7 +290,7 @@ class PolicyController extends Controller
                 "module"      => "Policy",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -319,7 +320,7 @@ class PolicyController extends Controller
                     "module"      => "Policy",
                     "id"          => $request->id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
             
             return new JsonResponse([

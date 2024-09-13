@@ -338,7 +338,7 @@ export default function Employee({
                                         placeholder="Place Of Birth"
                                     />
                                 </div>
-                                <div className="">
+                                <div className="grid grid-cols-1">
                                     <InputLabel
                                         className=""
                                         value={"Date Of Birth"}
@@ -365,7 +365,7 @@ export default function Employee({
                                                     )
                                                 )
                                             }
-                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-[420px] focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                            className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd - mm - yyyy"
                                         />

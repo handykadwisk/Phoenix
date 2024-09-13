@@ -130,7 +130,7 @@ class TCompanyOfficeController extends Controller
                 "module"      => "Company Office",
                 "id"          => $office->COMPANY_OFFICE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -209,7 +209,7 @@ class TCompanyOfficeController extends Controller
                 "module"      => "Office Company",
                 "id"          => $request->COMPANY_OFFICE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 

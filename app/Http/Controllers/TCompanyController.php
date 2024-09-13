@@ -109,7 +109,7 @@ class TCompanyController extends Controller
                 "module"      => "Company",
                 "id"          => $company->COMPANY_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -148,7 +148,7 @@ class TCompanyController extends Controller
                 "module"      => "Company",
                 "id"          => $request->COMPANY_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([

@@ -6,7 +6,6 @@ import Logo from "../../Images/phoenix.png";
 
 import { Dialog, Transition } from "@headlessui/react";
 import { Cog6ToothIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { log } from "node:console";
 
 interface SidebarProps {
     sidebarOpen: boolean;
@@ -302,7 +301,7 @@ const Sidebar = ({
                                                                                                     }
 
                                                                                                     // Jika bukan admin, filter children berdasarkan access
-                                                                                                    return children?.access?.length > 0;
+                                                                                                    return children.access.length > 0;
                                                                                                 })
                                                                                                 .map(
                                                                                                     (
@@ -490,7 +489,7 @@ const Sidebar = ({
                                                                             }
 
                                                                             // Jika bukan admin, filter children berdasarkan access
-                                                                            return children?.access?.length > 0;
+                                                                            return children.access?.length > 0;
                                                                         }).map((filteredChildren: any, index: number) => (
                                                                             <li key={index}>
                                                                                 {/* menu dropdown */}
