@@ -2,7 +2,8 @@
 SQLyog Ultimate v11.33 (64 bit)
 MySQL - 10.4.32-MariaDB : Database - phoenix2
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 

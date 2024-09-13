@@ -140,18 +140,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getMenu();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
         } else if (modal.edit) {
@@ -162,18 +150,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getMenu();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
         } else if (modal.sequence) {
@@ -184,18 +160,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getMenu();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
         }
