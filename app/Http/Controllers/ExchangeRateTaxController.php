@@ -62,9 +62,9 @@ class ExchangeRateTaxController extends Controller
         return response()->json($data);
     }
 
-    public function getCurrencies()
+    public function getCurrenciesRateTax()
     {
-        $data = RCurrency::all();
+        $data = RCurrency::orderBy('CURRENCY_SEQ_EXCHANGE_RATE_TAX', 'asc')->get();
 
         return response()->json($data);
     }
@@ -76,11 +76,15 @@ class ExchangeRateTaxController extends Controller
 
     public function exchange_rate_tax_add(Request $request)
     {
-        DB::transaction(function () use ($request) {
+        $exchange_rate_tax_id = "";
+
+        $exchange_rate_tax_id = DB::transaction(function () use ($request) {
             $user = Auth::user();
             $user_id = $user->id;
 
             $exchange_rate_tax_detail = $request->exchange_rate_tax_detail;
+
+            // dd($exchange_rate_tax_detail);
 
             $exchange_rate_tax_start_date = $request->exchange_rate_tax_start_date;
             $exchange_rate_tax_end_date = $request->exchange_rate_tax_end_date;
@@ -108,8 +112,10 @@ class ExchangeRateTaxController extends Controller
             ]);
 
             foreach ($exchange_rate_tax_detail as $value) {
-                $exchange_rate_tax_detail_id = $value['EXCHANGE_RATE_TAX_DETAIL_ID'];
-                $exchange_rate_tax_detail_currency_id = $value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID'];
+                $exchange_rate_tax_detail_id = isset($value['EXCHANGE_RATE_TAX_DETAIL_ID']) ? $value['EXCHANGE_RATE_TAX_DETAIL_ID'] : null;
+                
+                $exchange_rate_tax_detail_currency_id = isset($value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID']) ? $value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID'] : $value['CURRENCY_ID'];
+
                 $exchange_rate_tax_detail_exchange_rate = $value['EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE'];
                 $exchange_rate_tax_detail_created_by = $user_id;
                 $exchange_rate_tax_detail_created_at = now();
@@ -138,10 +144,13 @@ class ExchangeRateTaxController extends Controller
                     'action_by'  => $user->email
                 ]);
             }
+            
+            return $exchange_rate_tax;
         });
 
         return new JsonResponse([
-            'New Exchange Rate Tax has been added.'
+            'msg' => 'New Exchange Rate Tax has been added.',
+            'id' => $exchange_rate_tax_id
         ], 201, [
             'X-Inertia' => true
         ]);

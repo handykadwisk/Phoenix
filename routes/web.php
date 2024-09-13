@@ -347,7 +347,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
 
     // Exchange Rate Tax
-    Route::get('/getCurrencies', [ExchangeRateTaxController::class, 'getCurrencies'])->name('getCurrencies');
+    Route::get('/getCurrenciesRateTax', [ExchangeRateTaxController::class, 'getCurrenciesRateTax'])->name('getCurrenciesRateTax');
     Route::post('/getExchangeRateTax', [ExchangeRateTaxController::class, 'getExchangeRateTax'])->name('getExchangeRateTax');
     Route::get('/getExchangeRateTaxById/{id}', [ExchangeRateTaxController::class, 'getExchangeRateTaxById'])->name('getExchangeRateTaxById');
     Route::get('/getExchangeRateTaxByDate/{date}', [ExchangeRateTaxController::class, 'getExchangeRateTaxByDate'])->name('getExchangeRateTaxByDate');

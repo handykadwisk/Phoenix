@@ -70,8 +70,10 @@ class ExchangeRateBIController extends Controller
     }
 
     public function exchange_rate_bi_add(Request $request)
-    {
-        DB::transaction(function () use ($request) {
+    {   
+        $exchange_rate_bi_id = "";
+        
+        $exchange_rate_bi_id = DB::transaction(function () use ($request) {
             $user = Auth::user();
             $user_id = $user->id;
 
@@ -101,16 +103,17 @@ class ExchangeRateBIController extends Controller
             ]);
 
             foreach ($exchange_rate_bi_detail as $value) {
-                // $exchange_rate_bi_detail_id = $value['EXCHANGE_RATE_BI_DETAIL_ID'];
-                $exchange_rate_bi_detail_currency_id = $value['CURRENCY_ID'];
+                $exchange_rate_bi_detail_id = isset($value['EXCHANGE_RATE_BI_DETAIL_ID']) ? $value['EXCHANGE_RATE_BI_DETAIL_ID'] : null;
+                
+                $exchange_rate_bi_detail_currency_id = isset($value['EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID']) ? $value['EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID'] : $value['CURRENCY_ID'];
+
                 $exchange_rate_bi_detail_exchange_rate = $value['EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE'];
                 $exchange_rate_bi_detail_created_by = $user_id;
                 $exchange_rate_bi_detail_created_at = now();
 
-                ExchangeRateBIDetail::create(
-                // [
-                //     'EXCHANGE_RATE_BI_DETAIL_ID' => $exchange_rate_bi_detail_id,
-                // ],
+                ExchangeRateBIDetail::updateOrCreate([
+                    'EXCHANGE_RATE_BI_DETAIL_ID' => $exchange_rate_bi_detail_id,
+                ],
                 [
                     'EXCHANGE_RATE_BI_ID' => $exchange_rate_bi,
                     'EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID' => $exchange_rate_bi_detail_currency_id,
@@ -120,7 +123,7 @@ class ExchangeRateBIController extends Controller
 
                 ]
             );
-
+            
                 // Created Log CA
                 UserLog::create([
                     'created_by' => $user->id,
@@ -132,10 +135,12 @@ class ExchangeRateBIController extends Controller
                     'action_by'  => $user->email
                 ]);
             }
+            return $exchange_rate_bi;
         });
-
+        
         return new JsonResponse([
-            'New Exchange Rate BI has been added.'
+            'msg' => 'New Exchange Rate BI has been added.',
+            'id' => $exchange_rate_bi_id
         ], 201, [
             'X-Inertia' => true
         ]);
