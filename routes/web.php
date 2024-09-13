@@ -412,6 +412,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/exchangeRateBIEdit', [ExchangeRateBIController::class, 'exchange_rate_bi_edit'])->name('exchangeRateBI.edit');
     Route::get('/exchangeRateBIDownloadTemplate', [ExchangeRateBIController::class, 'exchange_rate_bi_download_template'])->name('exchangeRateBIDownloadTemplate');
 
+    // Receipt
+    Route::get('/receipt', [ExchangeRateBIController::class, 'index'])->name('receipt');
+
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
     Route::get('/detailPolicy/{id}', [PolicyController::class, 'detailPolicy'])->name('detailPolicy');

@@ -500,7 +500,7 @@ class CashAdvanceController extends Controller
                     "module"      => "Cash Advance",
                     "id"          => $cash_advance
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             foreach ($request->CashAdvanceDetail as $cad) {
@@ -591,7 +591,7 @@ class CashAdvanceController extends Controller
                         "module"      => "Cash Advance",
                         "id"          => $cash_advance_detail_id
                     ]),
-                    'action_by'  => Auth::user()->email
+                    'action_by'  => Auth::user()->user_login
                 ]);
             }
         });
@@ -665,7 +665,7 @@ class CashAdvanceController extends Controller
                     "module"      => "Cash Advance",
                     "id"          => $cash_advance_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             if (is_array($request->cash_advance_detail) && !empty($request->cash_advance_detail)) {
@@ -685,7 +685,7 @@ class CashAdvanceController extends Controller
                             "module"      => "Cash Advance",
                             "id"          => $cash_advance_detail_id
                         ]),
-                        'action_by'  => Auth::user()->email
+                        'action_by'  => Auth::user()->user_login
                     ]);
                 }
             }
@@ -747,7 +747,7 @@ class CashAdvanceController extends Controller
                     "module"      => "Cash Advance",
                     "id"          => $cash_advance_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             // Update data from table cash advance detail
@@ -845,7 +845,7 @@ class CashAdvanceController extends Controller
                         "module"      => "Cash Advance",
                         "id"          => $cashAdvanceDetailId
                     ]),
-                    'action_by'  => Auth::user()->email
+                    'action_by'  => Auth::user()->user_login
                 ]);
             }
     
@@ -935,7 +935,7 @@ class CashAdvanceController extends Controller
                     "module"      => "Cash Advance",
                     "id"          => $cash_advance_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         });
         

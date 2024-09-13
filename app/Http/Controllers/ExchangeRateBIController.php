@@ -99,7 +99,7 @@ class ExchangeRateBIController extends Controller
                     "module"      => "Exchange Rate BI",
                     "id"          => $exchange_rate_bi
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
 
             foreach ($exchange_rate_bi_detail as $value) {
@@ -132,7 +132,7 @@ class ExchangeRateBIController extends Controller
                         "module"      => "Exchange Rate BI Detail",
                         "id"          => $exchange_rate_bi
                     ]),
-                    'action_by'  => $user->email
+                    'action_by'  => $user->user_login
                 ]);
             }
             return $exchange_rate_bi;
@@ -168,7 +168,7 @@ class ExchangeRateBIController extends Controller
                     "module"      => "Exchange Rate BI",
                     "id"          => $exchange_rate_bi_id
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
 
             ExchangeRateBIDetail::where('EXCHANGE_RATE_BI_DETAIL_ID', $exchange_rate_bi_detail_id)->update([
@@ -185,7 +185,7 @@ class ExchangeRateBIController extends Controller
                     "module"      => "Exchange Rate BI Detail",
                     "id"          => $exchange_rate_bi_detail_id
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
         });
 

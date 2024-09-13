@@ -108,7 +108,7 @@ class ExchangeRateTaxController extends Controller
                     "module"      => "Exchange Rate Tax",
                     "id"          => $exchange_rate_tax
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
 
             foreach ($exchange_rate_tax_detail as $value) {
@@ -141,7 +141,7 @@ class ExchangeRateTaxController extends Controller
                         "module"      => "Exchange Rate Tax Detail",
                         "id"          => $exchange_rate_tax
                     ]),
-                    'action_by'  => $user->email
+                    'action_by'  => $user->user_login
                 ]);
             }
             
@@ -178,7 +178,7 @@ class ExchangeRateTaxController extends Controller
                     "module"      => "Exchange Rate Tax",
                     "id"          => $exchange_rate_tax_id
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
 
             ExchangeRateTaxDetail::where('EXCHANGE_RATE_TAX_DETAIL_ID', $exchange_rate_tax_detail_id)->update([
@@ -195,7 +195,7 @@ class ExchangeRateTaxController extends Controller
                     "module"      => "Exchange Rate Tax Detail",
                     "id"          => $exchange_rate_tax_detail_id
                 ]),
-                'action_by'  => $user->email
+                'action_by'  => $user->user_login
             ]);
         });
 
