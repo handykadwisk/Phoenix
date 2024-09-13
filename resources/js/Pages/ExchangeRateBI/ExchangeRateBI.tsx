@@ -677,6 +677,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 dateFormat={"dd-MM-yyyy"}
                                 placeholderText="dd-mm-yyyyy (Start Date)"
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                autoComplete="off"
                             />
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-2">

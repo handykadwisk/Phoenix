@@ -313,7 +313,7 @@ class CashAdvanceReportController extends Controller
                     "module"      => "Cash Advance Report",
                     "id"          => $report_cash_advance
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             foreach ($request->CashAdvanceDetail as $cad) {
@@ -409,7 +409,7 @@ class CashAdvanceReportController extends Controller
                         "module"      => "Cash Advance Report Detail",
                         "id"          => $report_cash_advance_detail
                     ]),
-                    'action_by'  => Auth::user()->email
+                    'action_by'  => Auth::user()->user_login
                 ]);
             }
     
@@ -501,7 +501,7 @@ class CashAdvanceReportController extends Controller
                     "module"      => "Cash Advance Report",
                     "id"          => $report_cash_advance_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             if (is_array($cash_advance_detail_report) && !empty($cash_advance_detail_report)) {
@@ -532,7 +532,7 @@ class CashAdvanceReportController extends Controller
                             "module"      => "Cash Advance Report",
                             "id"          => $report_cash_advance_detail_id
                         ]),
-                        'action_by'  => Auth::user()->email
+                        'action_by'  => Auth::user()->user_login
                     ]);
                 }
             }
@@ -594,7 +594,7 @@ class CashAdvanceReportController extends Controller
                     "module"      => "Cash Advance",
                     "id"          => $report_cash_advance_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             foreach ($cash_advance_detail_report as $cad) {
@@ -735,7 +735,7 @@ class CashAdvanceReportController extends Controller
                         "module"      => "Cash Advance Report",
                         "id"          => $report_cash_advance_detail_id
                     ]),
-                    'action_by'  => Auth::user()->email
+                    'action_by'  => Auth::user()->user_login
                 ]);
             }
             
@@ -816,7 +816,7 @@ class CashAdvanceReportController extends Controller
                     "module"      => "Cash Advance Report",
                     "id"          => $report_cash_advance_id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
     
             return new JsonResponse([
