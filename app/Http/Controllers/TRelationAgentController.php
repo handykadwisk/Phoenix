@@ -121,7 +121,7 @@ class TRelationAgentController extends Controller
                 "module"      => "Agent",
                 "id"          => $agent->RELATION_AGENT_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -204,7 +204,7 @@ class TRelationAgentController extends Controller
                     "module"      => "M Relation Agent",
                     "id"          => $mRelationAgent->M_RELATION_AGENT_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([
@@ -322,7 +322,7 @@ class TRelationAgentController extends Controller
                     "module"      => "M Relation BAA",
                     "id"          => $mRelationBaa->M_RELATION_BAA_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([

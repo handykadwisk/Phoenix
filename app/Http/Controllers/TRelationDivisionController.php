@@ -72,7 +72,7 @@ class TRelationDivisionController extends Controller
                 "module"      => "Division",
                 "id"          => $division->RELATION_DIVISION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -120,7 +120,7 @@ class TRelationDivisionController extends Controller
                 "module"      => "Division",
                 "id"          => $request->RELATION_DIVISION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 

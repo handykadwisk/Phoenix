@@ -162,7 +162,7 @@ class TPersonController extends Controller
                 "module"      => "Person",
                 "id"          => $request->PERSON_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -275,7 +275,7 @@ class TPersonController extends Controller
                 "module"      => "Person",
                 "id"          => $person
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -323,7 +323,7 @@ class TPersonController extends Controller
                 "module"      => "Person",
                 "id"          => $request->PERSON_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -364,7 +364,7 @@ class TPersonController extends Controller
                 "module"      => "Person",
                 "id"          => $request->PERSON_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -433,7 +433,7 @@ class TPersonController extends Controller
                 "module"      => "Person",
                 "id"          => $request->PERSON_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -543,7 +543,7 @@ class TPersonController extends Controller
             "module"      => "Person",
             "id"          => $request->id
         ]),
-        'action_by'  => Auth::user()->email
+        'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -609,7 +609,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->BANK_ACCOUNT[0]["idPerson"]
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -706,7 +706,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->BANK_ACCOUNT[0]["PERSON_ID"]
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -849,7 +849,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->address_ktp[0]['idPerson']
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -937,7 +937,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->ADDRESS_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -978,7 +978,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->dataEducations[0]['PERSON_ID']
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1022,7 +1022,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->person_education[0]['PERSON_ID']
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1072,7 +1072,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->dataCertificates[0]['PERSON_ID']
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1131,7 +1131,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->person_certificate[0]['PERSON_ID']
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1260,7 +1260,7 @@ class TPersonController extends Controller
             "module"      => "Person",
                 "id"          => $request->PERSON_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1295,7 +1295,7 @@ class TPersonController extends Controller
             "module"      => "Person",
             "id"          => $request->idPerson
         ]),
-        'action_by'  => Auth::user()->email
+        'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1368,7 +1368,7 @@ class TPersonController extends Controller
                     "module"      => "Person PIC",
                     "id"          => $idLog
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([
