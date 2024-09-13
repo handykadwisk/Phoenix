@@ -30,7 +30,6 @@ export default function ModalToAction({
     data: any | null;
     method: string;
     onSuccess: any;
-    onSuccess: any;
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
