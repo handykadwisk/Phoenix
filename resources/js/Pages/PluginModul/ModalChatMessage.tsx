@@ -155,19 +155,19 @@ export default function ModalChatMessage({
                     initialFocus={modalRef}
                 >
                     <div className="fixed inset-0 z-10">
-                        <div className="flex min-h-full">
+                        <div className="flex min-h-full items-center justify-center">
                             <Transition.Child
                                 as={Fragment}
                                 enter="transition ease-in-out duration-300 transform"
-                                enterFrom="translate-x-full"
-                                enterTo="translate-x-0"
+                                enterFrom="translate-x-full sm:scale-95"
+                                enterTo="translate-x-0 sm:scale-100"
                                 leave="transition ease-in-out duration-400 transform"
-                                leaveFrom="translate-x-0"
-                                leaveTo="translate-x-full"
+                                leaveFrom="translate-x-0 sm:scale-100"
+                                leaveTo="translate-x-full sm:scale-95"
                             >
                                 {/* For Chat */}
 
-                                <div className="chatBalon">
+                                <div className="fixed bottom-0 right-0 mr-6 border border-red-500 mb-3 rounded-r-md rounded-l-md bg-white w-[25%] h-[70%] xs:w-[90%] lg:w-[25%]">
                                     <div className="bg-red-500 p-3 rounded-tr-sm rounded-tl-sm h-10 flex justify-between items-center text-white">
                                         {flagPlugin === false ? (
                                             <span
@@ -211,6 +211,7 @@ export default function ModalChatMessage({
                                                                 key={dMessage}
                                                                 className=""
                                                             >
+                                                                {/* TANGGAL CHAT */}
                                                                 <div className="text-center text-xs text-gray-400 mt-2 mb-1">
                                                                     {formattedDate ===
                                                                     dateFormat(
@@ -223,6 +224,7 @@ export default function ModalChatMessage({
                                                                               "dd mmmm yyyy"
                                                                           )}
                                                                 </div>
+                                                                {/* END TANGGAL CHAT */}
                                                                 {reversedObj[
                                                                     dMessage
                                                                 ]?.map(
@@ -231,6 +233,7 @@ export default function ModalChatMessage({
                                                                         a: number
                                                                     ) => {
                                                                         return (
+                                                                            // CHAT BALON
                                                                             <div
                                                                                 className="ml-4 mr-4"
                                                                                 key={
@@ -273,6 +276,7 @@ export default function ModalChatMessage({
                                                                                     </p>
                                                                                 </div>
                                                                             </div>
+                                                                            // END CHAT BALON
                                                                         );
                                                                     }
                                                                 )}
@@ -282,6 +286,7 @@ export default function ModalChatMessage({
                                                 )}
                                             </div>
                                             <hr />
+                                            {/* INPUT CHAT MESSAGE */}
                                             <form onSubmit={action}>
                                                 <div className="m-2 flex items-center gap-1">
                                                     <TextInput
@@ -325,9 +330,11 @@ export default function ModalChatMessage({
                                                     </PrimaryButton>
                                                 </div>
                                             </form>
+                                            {/* END INPUT CHAT MESSAGE */}
                                         </>
                                     ) : (
                                         <>
+                                            {/* LIST CHAT */}
                                             <div>
                                                 <div className="m-2 bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-300 text-xs">
                                                     <span>Add Chat</span>
@@ -397,6 +404,7 @@ export default function ModalChatMessage({
                                                     </fieldset>
                                                 </div>
                                             </div>
+                                            {/* END LIST CHAT */}
                                         </>
                                     )}
                                 </div>
