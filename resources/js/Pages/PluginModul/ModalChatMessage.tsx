@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PropsWithChildren } from "react";
 // import PrimaryButton from "../Button/PrimaryButton";
@@ -13,6 +13,11 @@ import TextInput from "@/Components/TextInput";
 import dateFormat from "dateformat";
 import { format } from "date-fns";
 import PrimaryButton from "@/Components/Button/PrimaryButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbtack } from "@fortawesome/free-solid-svg-icons";
+import { faReply } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function ModalChatMessage({
     show = false,
@@ -44,6 +49,7 @@ export default function ModalChatMessage({
         getTypeChatByTagId(tagIdChat.TAG_ID);
     }, [tagIdChat]);
 
+    const [isSuccessChat, setIsSuccessChat] = useState<string>("");
     const today = new Date();
 
     // Format tanggal dengan date-fns
@@ -68,6 +74,7 @@ export default function ModalChatMessage({
             .post(`/getMessageChatByTypeId`, { typeChatId })
             .then((res) => {
                 setDetailMessage(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -145,6 +152,62 @@ export default function ModalChatMessage({
                 console.log(err);
             });
     };
+
+    const [showContext, setShowContext] = useState<any>({
+        visible: false,
+    });
+    const [chatId, setChatId] = useState<any>("");
+    const handleContextMenu = (e: any, idChat: any) => {
+        e.preventDefault();
+        setChatId(idChat);
+        setShowContext({
+            ...showContext,
+            visible: true,
+        });
+    };
+
+    const alertPin = async (
+        e: FormEvent,
+        idChatDetail: any,
+        typeChatId: any
+    ) => {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't Pin Message?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                pinMessage(idChatDetail, typeChatId);
+            }
+        });
+    };
+
+    const pinMessage = async (idChatDetail: string, typeChatId: any) => {
+        setIsSuccessChat("");
+        await axios
+            .post(`/pinMessage`, { idChatDetail, typeChatId })
+            .then((res) => {
+                setIsSuccessChat(res.data[0]);
+                getMessageChatByTypeId(res.data[1]);
+                setShowContext({
+                    ...showContext,
+                    visible: false,
+                });
+
+                setTimeout(() => {
+                    setIsSuccessChat("");
+                }, 5000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <>
             <Transition.Root show={showChatMessage.chatModal} as={Fragment}>
@@ -170,30 +233,88 @@ export default function ModalChatMessage({
                                 <div className="fixed bottom-0 right-0 mr-6 border border-red-500 mb-3 rounded-r-md rounded-l-md bg-white w-[25%] h-[70%] xs:w-[90%] lg:w-[25%]">
                                     <div className="bg-red-500 p-3 rounded-tr-sm rounded-tl-sm h-10 flex justify-between items-center text-white">
                                         {flagPlugin === false ? (
-                                            <span
-                                                className="hover:cursor-pointer"
-                                                onClick={() => {
-                                                    setFlagPlugin(true);
-                                                }}
-                                            >
-                                                <ArrowLeftIcon className="w-6" />
-                                            </span>
+                                            showContext.visible !== true ? (
+                                                <span
+                                                    className="hover:cursor-pointer"
+                                                    onClick={() => {
+                                                        setFlagPlugin(true);
+                                                    }}
+                                                >
+                                                    <ArrowLeftIcon className="w-6" />
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <span
+                                                        onClick={(e: any) => {
+                                                            e.preventDefault();
+                                                            setShowContext({
+                                                                ...showContext,
+                                                                visible: false,
+                                                            });
+                                                            setChatId("");
+                                                        }}
+                                                        className="hover:cursor-pointer"
+                                                    >
+                                                        <XMarkIcon className="w-6" />
+                                                    </span>
+                                                </>
+                                            )
                                         ) : null}
                                         {flagPlugin === false ? (
-                                            <span>Chat</span>
+                                            showContext.visible !== true ? (
+                                                <span>Chat</span>
+                                            ) : (
+                                                <>
+                                                    <div className="flex gap-2">
+                                                        <span
+                                                            className="cursor-pointer"
+                                                            title="Pin Message"
+                                                            onClick={(e: any) =>
+                                                                alertPin(
+                                                                    e,
+                                                                    chatId,
+                                                                    data.CHAT_ID
+                                                                )
+                                                            }
+                                                        >
+                                                            <FontAwesomeIcon
+                                                                icon={
+                                                                    faThumbtack
+                                                                }
+                                                            />
+                                                        </span>
+                                                        <span
+                                                            className="cursor-pointer"
+                                                            title="Reply Message"
+                                                        >
+                                                            <FontAwesomeIcon
+                                                                icon={faReply}
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </>
+                                            )
                                         ) : (
                                             <span>List Chat</span>
                                         )}
-
-                                        <span
-                                            onClick={close}
-                                            className="hover:cursor-pointer"
-                                        >
-                                            <XMarkIcon className="w-6" />
-                                        </span>
+                                        {showContext.visible !== true ? (
+                                            <span
+                                                onClick={close}
+                                                className="hover:cursor-pointer"
+                                            >
+                                                <XMarkIcon className="w-6" />
+                                            </span>
+                                        ) : null}
                                     </div>
                                     {flagPlugin === false ? (
                                         <>
+                                            {isSuccessChat && (
+                                                <ToastMessage
+                                                    message={isSuccessChat}
+                                                    isShow={true}
+                                                    type={"success"}
+                                                />
+                                            )}
                                             <div
                                                 className="messageChat chat-height overflow-y-auto custom-scrollbar"
                                                 id="messageChat"
@@ -259,21 +380,59 @@ export default function ModalChatMessage({
                                                                                                 ? "bg-blue-500 text-white rounded-lg py-2 px-2 inline-block text-xs"
                                                                                                 : "bg-gray-200 text-gray-700 rounded-lg py-2 px-2 inline-block text-xs"
                                                                                         }
+                                                                                        onClick={(
+                                                                                            e: any
+                                                                                        ) =>
+                                                                                            handleContextMenu(
+                                                                                                e,
+                                                                                                items.CHAT_DETAIL_ID
+                                                                                            )
+                                                                                        }
                                                                                     >
                                                                                         {
                                                                                             items.CHAT_DETAIL_TEXT
                                                                                         }
                                                                                     </p>
-                                                                                    <p className="text-[10px]">
-                                                                                        {items
-                                                                                            ?.t_user
-                                                                                            .name +
-                                                                                            " - " +
-                                                                                            format(
-                                                                                                items.CREATED_CHAT_DETAIL_DATE,
-                                                                                                "HH:mm"
-                                                                                            )}
-                                                                                    </p>
+                                                                                    <div
+                                                                                        className={
+                                                                                            auth
+                                                                                                .user
+                                                                                                .id ===
+                                                                                            items.CREATED_CHAT_DETAIL_BY
+                                                                                                ? "flex gap-1 justify-end"
+                                                                                                : "flex gap-1 justify-start"
+                                                                                        }
+                                                                                    >
+                                                                                        <span className="text-[10px] rotate-45">
+                                                                                            {items?.pin_chat.find(
+                                                                                                (
+                                                                                                    f: any
+                                                                                                ) =>
+                                                                                                    f.CREATED_PIN_CHAT_BY ===
+                                                                                                    auth
+                                                                                                        .user
+                                                                                                        .id
+                                                                                            ) ? (
+                                                                                                <>
+                                                                                                    <FontAwesomeIcon
+                                                                                                        icon={
+                                                                                                            faThumbtack
+                                                                                                        }
+                                                                                                    />
+                                                                                                </>
+                                                                                            ) : null}
+                                                                                        </span>
+                                                                                        <p className="text-[10px]">
+                                                                                            {items
+                                                                                                ?.t_user
+                                                                                                .name +
+                                                                                                " - " +
+                                                                                                format(
+                                                                                                    items.CREATED_CHAT_DETAIL_DATE,
+                                                                                                    "HH:mm"
+                                                                                                )}
+                                                                                        </p>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                             // END CHAT BALON

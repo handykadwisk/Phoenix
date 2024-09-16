@@ -473,6 +473,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
     Route::post('/addChatMessage', [TDetailChatController::class, 'store'])->name('addChatMessage.store');
     Route::post('/getTypeChatByTagId', [TDetailChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
+    Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
+
     
     
     

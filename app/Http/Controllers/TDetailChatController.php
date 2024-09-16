@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MPinChatDetail;
 use App\Models\TChat;
-use App\Models\TChatDetail;                                     
+use App\Models\TChatDetail;
+use App\Models\TPinChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -44,5 +46,32 @@ class TDetailChatController extends Controller
     public function getTypeChatByTagId(Request $request){
         $data = TChat::where('TAG_ID', $request->tagIdChat)->with('tUser')->get();
         return response()->json($data);
+    }
+
+
+    public function pin_message(Request $request) {
+        // save t_pin_chat
+        $pinChat = TPinChat::create([
+            "PIN_CHAT"                      => 1,
+            "CHAT_DETAIL_ID"                => $request->idChatDetail,
+            "CREATED_PIN_CHAT_DATE"         => now(),
+            "CREATED_PIN_CHAT_BY"           => Auth::user()->id,
+        ]);
+
+        if ($pinChat) {
+            // save m_pin_chat_detail
+            $pinChat = MPinChatDetail::create([
+                "PIN_CHAT_DETAIL"        => $pinChat->PIN_CHAT_ID,
+                "CHAT_DETAIL_ID"         => $request->idChatDetail,
+            ]);
+        }
+
+
+        return new JsonResponse([
+            "Pin Message Success",
+            $request->typeChatId
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

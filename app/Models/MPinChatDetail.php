@@ -16,6 +16,12 @@ class MPinChatDetail extends Model
     protected $guarded = [
         'PIN_CHAT_DETAIL_ID',
     ];
-
+    public $with = ['pinChat'];
+    
     public $timestamps = false;
+
+    public function pinChat()
+    {
+        return $this->hasOne(TPinChat::class, 'PIN_CHAT_ID', 'PIN_CHAT_DETAIL');
+    }
 }
