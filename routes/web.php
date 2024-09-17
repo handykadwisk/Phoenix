@@ -242,6 +242,7 @@ Route::middleware('auth')->group(function () {
 
     //Menu
     Route::get('/setting/menu', [MenuController::class, 'index'])->name('setting/menu');
+    Route::get('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
     Route::post('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
     Route::post('/setting/addMenu', [MenuController::class, 'store'])->name('addMenu.store');
     Route::post('/getMenuCombo', [MenuController::class, 'getMenuCombo'])->name('getMenuCombo.getMenuCombo');

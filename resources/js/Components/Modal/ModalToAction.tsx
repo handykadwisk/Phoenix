@@ -156,12 +156,7 @@ export default function ModalToAction({
                                             </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            <PrimaryButton
-                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
-                                                disabled={isProcessing}
-                                            >
-                                                Submit
-                                            </PrimaryButton>{submitButtonName && (
+                                            {submitButtonName && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
                                                     disabled={isProcessing}
