@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
+use App\Http\Controllers\ExchangeRateBIController;
+use App\Http\Controllers\ExchangeRateTaxController;
 use App\Http\Controllers\InsurancePanelController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MRelationFBIPKSController;
 use App\Http\Controllers\OtherExpensesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
@@ -29,12 +33,26 @@ use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\RoleAccesMenuController;
+use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\RUserTypeController;
+use App\Http\Controllers\TCompanyController;
+use App\Http\Controllers\TCompanyDivisionController;
+use App\Http\Controllers\TCompanyOfficeController;
+use App\Http\Controllers\TCompanyStructureController;
+use App\Http\Controllers\TEmployeeController;
+use App\Http\Controllers\TJobDescCompanyController;
+use App\Http\Controllers\TDetailChatController;
+use App\Http\Controllers\TTagPluginProcessController;
+use App\Http\Controllers\UserManagementController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
+use App\Models\TCompanyDivision;
+use App\Models\TEmployee;
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
@@ -56,6 +74,7 @@ Route::middleware('auth')->group(function () {
 
     // BR
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
+    Route::get('/getAllRelations',[RelationController::class,'getAllRelations'])->name('getAllRelations');
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
     Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
@@ -66,6 +85,21 @@ Route::middleware('auth')->group(function () {
     Route::get('relation/detailRelation/{id}', [RelationController::class, 'detail'])->name('relation.detailRelation.detail');
     Route::post('/getRelationDetail', [RelationController::class, 'get_detail'])->name('getRelationDetail.get_detail');
     Route::post('/getCekAbbreviation', [RelationController::class, 'getCekAbbreviation'])->name('getCekAbbreviation.getCekAbbreviation');
+    Route::post('/getRelationAll', [RelationController::class, 'getRelationAll'])->name('getRelationAll.getRelationAll');
+    Route::post('/getCorporatePIC', [RelationController::class, 'get_corporate'])->name('getCorporatePIC.get_corporate');
+    Route::post('/editCorporatePIC', [RelationController::class, 'edit_corporate'])->name('editCorporatePIC.edit_corporate');
+    Route::post('/getIndividuAKA', [RelationController::class, 'get_individu_aka'])->name('getIndividuAKA.get_individu_aka');
+    Route::post('/editBankRelation', [RelationController::class, 'edit_bank'])->name('editBankRelation.edit_bank');
+    Route::get('/getDocumentPKSAgent', [RelationController::class, 'getPKSAgentJson'])->name('getDocumentPKSAgent.getPKSAgentJson');
+    Route::get('/getDocumentPKSFbi', [RelationController::class, 'getPKSFbiJson'])->name('getDocumentPKSFbi.getPKSFbiJson');
+    Route::post('/editDocumentPks', [RelationController::class, 'edit_document_pks'])->name('editDocumentPks.edit_document_pks');
+
+
+
+
+
+
+
 
 
 
@@ -108,11 +142,24 @@ Route::middleware('auth')->group(function () {
 
     // BAA
     Route::get('/relation/baa', [TRelationAgentController::class, 'index_baa'])->name('relation/baa');
-    Route::get('/getRelationBAA', [TRelationAgentController::class, 'getRelationBAA'])->name('getRelationBAA.getRelationBAA');
+    Route::get('/getBAA', [TRelationAgentController::class, 'getBAA'])->name('getBAA.getBAA');
     Route::get('/getMRelationBAA', [TRelationAgentController::class, 'getMRelationBAA'])->name('getMRelationBAA.getMRelationBAA');
     Route::post('/addMRelationBaa', [TRelationAgentController::class, 'addMRelationBaa'])->name('addMRelationBaa.addMRelationBaa');
     Route::post('/getRelationBaaSelect', [TRelationAgentController::class, 'relationBaa'])->name('getRelationBaaSelect.relationBaa');
     Route::post('/deleteBaa', [TRelationAgentController::class, 'deleteBaa'])->name('deleteBaa.deleteBaa');
+    Route::post('/getRelationByIdPerson', [TRelationAgentController::class, 'getRelationByIdPerson'])->name('getRelationByIdPerson.getRelationByIdPerson');
+    Route::get('/getPolicyByRelationId', [TRelationAgentController::class, 'getPolicyByRelationId'])->name('getPolicyByRelationId.getPolicyByRelationId');
+
+    // FBI by PKS
+
+    Route::get('/relation/fbipks', [MRelationFBIPKSController::class, 'index'])->name('relation/fbipks');
+    Route::get('/getRelationFBI', [MRelationFBIPKSController::class, 'getRelationFBI'])->name('getRelationFBI.getRelationFBI');
+    Route::get('/getMRelationFBI', [MRelationFBIPKSController::class, 'getMRelationFBI'])->name('getMRelationFBI.getMRelationFBI');
+    Route::post('/getRelationFBISelect', [MRelationFBIPKSController::class, 'relationFbi'])->name('getRelationFBISelect.relationFbi');
+    Route::post('/addMRelationFBI', [MRelationFBIPKSController::class, 'addMRelationFBI'])->name('addMRelationFBI.addMRelationFBI');
+    Route::post('/deleteFBI', [MRelationFBIPKSController::class, 'deleteFBI'])->name('deleteFBI.deleteFBI');
+
+
 
 
 
@@ -133,27 +180,37 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRBank', [TPersonController::class, 'getRBank'])->name('getRBank.getRBank');
     Route::post('/personStructureDivision', [TPersonController::class, 'addPersonStructureDivision'])->name('peronStructureDivision.addPersonStructureDivision');
     Route::post('/uploadFile', [TPersonController::class, 'uploadFile'])->name('uploadFile.uploadFile');
-    Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
+    // Route::post('/addBankAccount', [TPersonController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
     Route::post('/getDistrict', [TPersonController::class, 'get_district'])->name('getDistrict.get_district');
     Route::post('/getVillage', [TPersonController::class, 'get_village'])->name('getVillage.get_village');
     Route::post('/get_regency', [TPersonController::class, 'get_regency'])->name('get_regency.get_regency');
     Route::post('/getAddressStatus', [TPersonController::class, 'get_address_status'])->name('getAddressStatus.get_address_status');
-    Route::post('/addAddressPerson', [TPersonController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
+    // Route::post('/addAddressPerson', [TPersonController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
     Route::post('/getPersonAddress', [TPersonController::class, 'getPersonAddress'])->name('getPersonAddress.getPersonAddress');
     Route::post('/detailAddress', [TPersonController::class, 'getDetailAddress'])->name('detailAddress.getDetailAddress');
-    Route::post('/editAddress', [TPersonController::class, 'editAddress'])->name('editAddress.geteditAddress');
+    // Route::post('/editAddress', [TPersonController::class, 'editAddress'])->name('editAddress.geteditAddress');
     Route::post('/getEducationDegree', [TPersonController::class, 'getEducationDegree'])->name('getEducationDegree.getEducationDegree');
-    Route::post('/addEducationPerson', [TPersonController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
-    Route::post('/editEducationPerson', [TPersonController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
+    // Route::post('/addEducationPerson', [TPersonController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
+    // Route::post('/editEducationPerson', [TPersonController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
     Route::post('/getQualification', [TPersonController::class, 'getQualification'])->name('getQualification.getQualification');
-    Route::post('/addCertificate', [TPersonController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
-    Route::post('/EditCertificate', [TPersonController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
-    Route::post('/addDocumentPerson', [TPersonController::class, 'add_document'])->name('addDocumentPerson.add_document');
-    Route::post('/deleteDocument', [TPersonController::class, 'delete_document'])->name('deleteDocument.delete_document');
+    // Route::post('/addCertificate', [TPersonController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
+    // Route::post('/EditCertificate', [TPersonController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
+    // Route::post('/addDocumentPerson', [TPersonController::class, 'add_document'])->name('addDocumentPerson.add_document');
+    // Route::post('/deleteDocument', [TPersonController::class, 'delete_document'])->name('deleteDocument.delete_document');
     Route::get('/downloadImage/{id}', [TPersonController::class, 'download_document'])->name('downloadImage.download_document');
     Route::post('/getForBankAccount', [TPersonController::class, 'getForBankAccount'])->name('getForBankAccount.getForBankAccount');
     Route::post('/getTPersonBank', [TPersonController::class, 'getTPersonBank'])->name('getTPersonBank.getTPersonBank');
-    Route::post('/editBankAccount', [TPersonController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+    // Route::post('/editBankAccount', [TPersonController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+    // Route::get('/downloadPersonDocument/{id}', [TPersonController::class, 'person_document_download'])->name('downloadPersonDocument.person_document_download');
+    Route::post('/getIndividuRelation', [TPersonController::class, 'get_individu_relation'])->name('getIndividuRelation.get_individu_relation');
+    Route::post('/addPic', [TPersonController::class, 'add_pic'])->name('addPic.add_pic');
+    Route::post('/deletePerson', [TPersonController::class, 'delete_person'])->name('deletePerson.delete_person');
+
+
+
+
+
+
 
     // Structure
     Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');
@@ -194,6 +251,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMenuCombo', [MenuController::class, 'getMenuCombo'])->name('getMenuCombo.getMenuCombo');
     Route::post('/getMenuById', [MenuController::class, 'getMenuById'])->name('getMenuById.getMenuById');
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
+    Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
+    Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
 
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
@@ -206,6 +265,40 @@ Route::middleware('auth')->group(function () {
     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
+    Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
+
+     // Role
+     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
+     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
+     Route::post('/getAllRole', [RoleController::class, 'getRole'])->name('/getAllRole');
+     Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
+     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
+
+    // access role menu
+    Route::get('/getRoleAccessMenuByRoleId/{role_id}', [RoleAccesMenuController::class, 'getAccessMenuByRoleId'])->name('getRoleAccessMenuByRoleId.getMenuByRole');
+    Route::post('/roleAccessMenu', [RoleAccesMenuController::class, 'store'])->name('roleAccessMenu.store');
+
+
+    //role permission
+    Route::get('/rolePermission/{role_id}', [RolePermissionController::class, 'getPermissionByRoleId'])->name('rolePermission.getPermissionByRoleId');
+    Route::post('/rolePermission', [RolePermissionController::class, 'store'])->name('rolePermission.store');
+
+    //settings/userManagement
+    Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUerJson');
+    Route::get('/settings/user', [UserManagementController::class, 'index'])->name('settings/user');
+    Route::post('/settings/addUser', [UserManagementController::class, 'store'])->name('settings/addUser.store');
+    Route::get('/settings/getUserJson', [UserManagementController::class, 'getUserDataByMRole'])->name('settings/getUserJson.getUserJson');
+    Route::post('/settings/getUserId/{id}', [UserManagementController::class, 'getUserDataById'])->name('settings/getUserId.getUserId');
+    Route::post('/settings/UserId/{id}', [UserManagementController::class, 'dataById'])->name('settings/UserId.getUserId');
+    Route::patch('/settings/userEdit/{id}', [UserManagementController::class, 'update'])->name('settings/userEdit.update');
+    Route::patch('/settings/userResetPassword/{id}', [UserManagementController::class, 'resetPassword'])->name('settings/userResetPassword.resetPassword');
+
+
+
+    //setting/usertype
+    Route::get('/settings/type',[RUserTypeController::class, 'index' ])->name('type');
+    // Route::get('/getType', [RUserTypeController::class, 'getTypeJson'])->name('getType');
+    Route::post('/getType', [RUserTypeController::class, 'getTypeJson'])->name('getType.getTypeJson');
 
     // Finance > Operasional
 
@@ -213,6 +306,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCARequestStatus', [CashAdvanceController::class, 'getCountCARequestStatus'])->name('getCountCARequestStatus');
     Route::get('/getCountCAApprove1Status', [CashAdvanceController::class, 'getCountCAApprove1Status'])->name('getCountCAApprove1Status');
     Route::get('/getCountCAApprove2Status', [CashAdvanceController::class, 'getCountCAApprove2Status'])->name('getCountCAApprove2Status');
+    Route::get('/getCountCAApprove3Status', [CashAdvanceController::class, 'getCountCAApprove3Status'])->name('getCountCAApprove3Status');
     Route::get('/getCountCAPendingReportStatus', [CashAdvanceController::class, 'getCountCAPendingReportStatus'])->name('getCountCAPendingReportStatus');
     Route::get('/getCountCANeedRevisionStatus', [CashAdvanceController::class, 'getCountCANeedRevisionStatus'])->name('getCountCANeedRevisionStatus');
     Route::get('/getCountCARejectStatus', [CashAdvanceController::class, 'getCountCARejectStatus'])->name('getCountCARejectStatus');
@@ -221,10 +315,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCountCAReportRequestStatus', [CashAdvanceReportController::class, 'getCountCAReportRequestStatus'])->name('getCountCAReportRequestStatus');
     Route::get('/getCountCAReportApprove1Status', [CashAdvanceReportController::class, 'getCountCAReportApprove1Status'])->name('getCountCAReportApprove1Status');
     Route::get('/getCountCAReportApprove2Status', [CashAdvanceReportController::class, 'getCountCAReportApprove2Status'])->name('getCountCAReportApprove2Status');
-    Route::get('/getCountCAReportPendingReportStatus', [CashAdvanceReportController::class, 'getCountCAReportPendingReportStatus'])->name('getCountCAReportPendingReportStatus');
+    Route::get('/getCountCAReportApprove3Status', [CashAdvanceReportController::class, 'getCountCAReportApprove3Status'])->name('getCountCAReportApprove3Status');
     Route::get('/getCountCAReportNeedRevisionStatus', [CashAdvanceReportController::class, 'getCountCAReportNeedRevisionStatus'])->name('getCountCAReportNeedRevisionStatus');
     Route::get('/getCountCAReportRejectStatus', [CashAdvanceReportController::class, 'getCountCAReportRejectStatus'])->name('getCountCARejectStatus');
     Route::get('/getCountCAReportComplitedStatus', [CashAdvanceReportController::class, 'getCountCAReportComplitedStatus'])->name('getCountCAReportComplitedStatus');
+
+    Route::get('/getEmployeeBankAccount', [CashAdvanceController::class, 'getEmployeeBankAccount'])->name('cashAdvance.getEmployeeBankAccount');
+    Route::get('/getCompanies', [CashAdvanceController::class, 'getCompanies'])->name('cashAdvance.getCompanies');
 
     // Cash Advance
     Route::post('/getCA', [CashAdvanceController::class, 'getCA'])->name('cashAdvance.getCA');
@@ -233,10 +330,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/cashAdvance', [CashAdvanceController::class, 'index'])->name('cashAdvance');
     Route::post('/cashAdvance', [CashAdvanceController::class, 'store'])->name('cashAdvance.store');
     Route::post('/cashAdvanceAddFiles', [CashAdvanceController::class, 'cash_advance_add_files'])->name('cashAdvance.report_cash_advance');
-    Route::patch('/cashAdvanceApprove/{id}', [CashAdvanceController::class, 'cash_advance_approve'])->name('cashAdvance.approve');
+    Route::patch('/cashAdvanceApprove', [CashAdvanceController::class, 'cash_advance_approve'])->name('cashAdvance.approve');
     Route::post('/cashAdvanceRevised/{id}', [CashAdvanceController::class, 'cash_advance_revised'])->name('cashAdvance.revised');
     Route::patch('/cashAdvanceExecute/{id}', [CashAdvanceController::class, 'cash_advance_execute'])->name('cashAdvance.execute');
     Route::get('/cashAdvanceDownload/{id}/{key}', [CashAdvanceController::class, 'cash_advance_download'])->name('cashAdvance.download');
+    Route::get('/cashAdvanceDocReader/{id}/{key}', [CashAdvanceController::class, 'cash_advance_doc_reader'])->name('cashAdvanceDocReader.cash_advance_doc_reader');
 
     // Cash Advance Report
     Route::post('/getCAReport', [CashAdvanceReportController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
@@ -245,20 +343,39 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCashAdvanceApproval', [CashAdvanceReportController::class, 'getCashAdvanceApproval'])->name('getCashAdvanceApproval');
     Route::get('/getCashAdvanceMethod', [CashAdvanceReportController::class, 'getCashAdvanceMethod'])->name('getCashAdvanceMethod');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
-    Route::patch('/cashAdvanceReportApprove/{id}', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
-    Route::patch('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
+    Route::patch('/cashAdvanceReportApprove', [CashAdvanceReportController::class, 'cash_advance_report_approve'])->name('cashAdvanceReport.approve');
+    Route::post('/cashAdvanceReportRevised/{id}', [CashAdvanceReportController::class, 'cash_advance_report_revised'])->name('cashAdvanceReport.revised');
     Route::post('/cashAdvanceReportExecute', [CashAdvanceReportController::class, 'cash_advance_report_execute'])->name('cashAdvanceReport.execute');
     Route::get('/cashAdvanceReportDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_download'])->name('cashAdvanceReport.download');
+    Route::get('/cashAdvanceReportProofOfDocumentDownload/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_download'])->name('cashAdvanceReportProofOfDocument.download');
+    Route::get('/cashAdvanceReportDocReader/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_doc_reader'])->name('cashAdvanceReport.cash_advance_doc_reader');
+    Route::get('/cashAdvanceReportProofOfDocumentDocReader/{id}/{key}', [CashAdvanceReportController::class, 'cash_advance_report_proof_of_document_doc_reader'])->name('cashAdvanceReport.cash_advance_doc_reader');
+
+    // Get Count Reimburse Status
+    Route::get('/getCountReimburseRequestStatus', [ReimburseController::class, 'getCountReimburseRequestStatus'])->name('getCountReimburseRequestStatus');
+    Route::get('/getCountReimburseApprove1Status', [ReimburseController::class, 'getCountReimburseApprove1Status'])->name('getCountReimburseApprove1Status');
+    Route::get('/getCountReimburseApprove2Status', [ReimburseController::class, 'getCountReimburseApprove2Status'])->name('getCountReimburseApprove2Status');
+    Route::get('/getCountReimburseApprove3Status', [ReimburseController::class, 'getCountReimburseApprove3Status'])->name('getCountReimburseApprove3Status');
+    Route::get('/getCountReimburseNeedRevisionStatus', [ReimburseController::class, 'getCountReimburseNeedRevisionStatus'])->name('getCountReimburseNeedRevisionStatus');
+    Route::get('/getCountReimburseRejectStatus', [ReimburseController::class, 'getCountReimburseRejectStatus'])->name('getCountReimburseRejectStatus');
+    Route::get('/getCountReimburseComplitedStatus', [ReimburseController::class, 'getCountReimburseComplitedStatus'])->name('getCountReimburseComplitedStatus');
 
     // Reimburse
     Route::post('/getReimburse', [ReimburseController::class, 'getReimburse'])->name('cashAdvance.getReimburse');
     Route::get('/getReimburseNumber', [ReimburseController::class, 'getReimburseNumber'])->name('getReimburseNumber');
     Route::get('/getReimburseById/{id}', [ReimburseController::class, 'getReimburseById'])->name('getReimburseById');
+    Route::get('/getReimburseApproval', [ReimburseController::class, 'getReimburseApproval'])->name('getReimburseApproval');
+    Route::get('/getReimburseNotes', [ReimburseController::class, 'getReimburseNotes'])->name('getReimburseNotes');
+    Route::get('/getReimburseMethod', [ReimburseController::class, 'getReimburseMethod'])->name('getReimburseMethod');
     Route::get('/reimburse', [ReimburseController::class, 'index'])->name('reimburse');
     Route::post('/reimburse', [ReimburseController::class, 'store'])->name('reimburse.store');
-    Route::patch('/reimburseApprove/{id}', [ReimburseController::class, 'approve'])->name('reimburse.approve');
-    Route::patch('/reimburseRevised/{id}', [ReimburseController::class, 'revised'])->name('reimburse.revised');
-    Route::get('/reimburseDownload/{id}', [ReimburseController::class, 'download'])->name('reimburse.download');
+    Route::patch('/reimburseApprove', [ReimburseController::class, 'approve'])->name('reimburse.approve');
+    Route::post('/reimburseRevised', [ReimburseController::class, 'revised'])->name('reimburse.revised');
+    Route::post('/reimburseExecute', [ReimburseController::class, 'execute'])->name('reimburse.execute');
+    Route::get('/reimburseDownload/{id}/{key}', [ReimburseController::class, 'download'])->name('reimburse.download');
+    Route::get('/reimburseProofOfDocumentDownload/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_download'])->name('reimburseProofOfDocument.download');
+    Route::get('/reimburseDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_doc_reader'])->name('reimburseDocReader.reimburse_doc_reader');
+    Route::get('/reimburseProofOfDocumentDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_doc_reader'])->name('reimburseProofOfDocumentDocReader.reimburse_proof_of_document_doc_reader');
 
     // Other Expenses
     Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');
@@ -273,8 +390,30 @@ Route::middleware('auth')->group(function () {
     // Approval Limit
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
 
-    // Group
-    Route::get('/group', [GroupRelationController::class, 'index'])->name('group');
+    // Exchange Rate Tax
+    Route::get('/getCurrenciesRateTax', [ExchangeRateTaxController::class, 'getCurrenciesRateTax'])->name('getCurrenciesRateTax');
+    Route::post('/getExchangeRateTax', [ExchangeRateTaxController::class, 'getExchangeRateTax'])->name('getExchangeRateTax');
+    Route::get('/getExchangeRateTaxById/{id}', [ExchangeRateTaxController::class, 'getExchangeRateTaxById'])->name('getExchangeRateTaxById');
+    Route::get('/getExchangeRateTaxByDate/{date}', [ExchangeRateTaxController::class, 'getExchangeRateTaxByDate'])->name('getExchangeRateTaxByDate');
+    Route::get('/getExchangeRateTaxDetailById/{id}', [ExchangeRateTaxController::class, 'getExchangeRateTaxDetailById'])->name('getExchangeRateTaxDetailById');
+    Route::get('/exchangeRateTax', [ExchangeRateTaxController::class, 'index'])->name('exchangeRateTax');
+    Route::post('/exchangeRateTaxAdd', [ExchangeRateTaxController::class, 'exchange_rate_tax_add'])->name('exchangeRateTax.add');
+    Route::patch('/exchangeRateTaxEdit', [ExchangeRateTaxController::class, 'exchange_rate_tax_edit'])->name('exchangeRateTax.edit');
+    Route::get('/exchangeRateTaxDownloadTemplate', [ExchangeRateTaxController::class, 'exchange_rate_tax_download_template'])->name('exchangeRateTaxDownloadTemplate');
+
+    // Exchange Rate BI
+    Route::get('/getCurrencies', [ExchangeRateBIController::class, 'getCurrencies'])->name('getCurrencies');
+    Route::post('/getExchangeRateBI', [ExchangeRateBIController::class, 'getExchangeRateBI'])->name('getExchangeRateBI');
+    Route::get('/getExchangeRateBIById/{id}', [ExchangeRateBIController::class, 'getExchangeRateBIById'])->name('getExchangeRateBIById');
+    Route::get('/getExchangeRateBIByDate/{date}', [ExchangeRateBIController::class, 'getExchangeRateBIByDate'])->name('getExchangeRateBIByDate');
+    Route::get('/getExchangeRateBIDetailById/{id}', [ExchangeRateBIController::class, 'getExchangeRateBIDetailById'])->name('getExchangeRateBIDetailById');
+    Route::get('/exchangeRateBI', [ExchangeRateBIController::class, 'index'])->name('exchangeRateBI');
+    Route::post('/exchangeRateBIAdd', [ExchangeRateBIController::class, 'exchange_rate_bi_add'])->name('exchangeRateBI.add');
+    Route::patch('/exchangeRateBIEdit', [ExchangeRateBIController::class, 'exchange_rate_bi_edit'])->name('exchangeRateBI.edit');
+    Route::get('/exchangeRateBIDownloadTemplate', [ExchangeRateBIController::class, 'exchange_rate_bi_download_template'])->name('exchangeRateBIDownloadTemplate');
+
+    // Receipt
+    Route::get('/receipt', [ExchangeRateBIController::class, 'index'])->name('receipt');
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
@@ -365,6 +504,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertManyInsured', [PolicyInsuredController::class, 'store'])->name('policyInsured.store');
     Route::get('/getDataInsured/{id}', [PolicyInsuredController::class, 'getDataInsured'])->name('policyInsured.getDataInsured');
     Route::get('/getInsuredById/{id}', [PolicyInsuredController::class, 'getInsuredById'])->name('policyCoverage.getInsuredById');
+    Route::post('/getSummaryInsured', [PolicyInsuredController::class, 'getSummaryInsured'])->name('policyCoverage.getSummaryInsured');
     Route::post('/editInsured', [PolicyInsuredController::class, 'editInsured'])->name('policyCoverage.editInsured');
     Route::post('/getInsurerNettPremi', [PolicyInsuredController::class, 'getInsurerNettPremi'])->name('policyCoverage.getInsurerNettPremi');
 
@@ -373,6 +513,101 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertPartners', [PolicyPartnerController::class, 'store'])->name('policyPartner.store');
     Route::post('/editPartners', [PolicyPartnerController::class, 'editPartners'])->name('policyPartner.editPartners');
     Route::get('/getDataPartner/{id}', [PolicyPartnerController::class, 'getDataPartner'])->name('policyPartner.getDataPartner');
+    Route::get('/getPolicyExchangeRate/{id}', [PolicyPartnerController::class, 'getPolicyExchangeRate'])->name('policyPartner.getPolicyExchangeRate');
+    Route::get('/getRelationByType/{id}', [PolicyPartnerController::class, 'getRelationByType'])->name('policyPartner.getRelationByType');
+    Route::get('/getPersonBaa/{id}', [PolicyPartnerController::class, 'getPersonBaa'])->name('policyPartner.getPersonBaa');
+    Route::get('/getCoa', [PolicyPartnerController::class, 'getCoa'])->name('policyPartner.getCoa');
+
+    Route::get('/getSummary/{id}', [PolicyPartnerController::class, 'getSummary'])->name('policyPartner.getSummary');
+    Route::get('/getPksNumber/{id}', [PolicyPartnerController::class, 'getPksNumber'])->name('policyPartner.getPksNumber');
+    Route::get('/getDefaultPayable/{id}', [PolicyPartnerController::class, 'getDefaultPayable'])->name('policyPartner.getDefaultPayable');
+
+    // HR
+    Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
+    Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
+    Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
+    Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
+    Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
+
+    // Employee
+    Route::get('/getAllEmployee',[TEmployeeController::class,'getAllEmployeeJson'])->name('getAllEmployee.');
+    Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
+    Route::post('/addEmployee', [TEmployeeController::class, 'store'])->name('addEmployee.store');
+    Route::post('/getDetailEmployee', [TEmployeeController::class, 'get_employeeById'])->name('getDetailEmployee.get_employeeById');
+    Route::post('/editEmployee', [TEmployeeController::class, 'edit_Employee'])->name('editEmployee.edit_Employee');
+    Route::post('/employmentEdit', [TEmployeeController::class, 'employmentEdit'])->name('employmentEdit.employmentEdit');
+    Route::post('/getEmployeeDetail', [TEmployeeController::class, 'get_detail'])->name('getEmployeeDetail.get_detail');
+    Route::post('/editEmployeeDetail', [TEmployeeController::class, 'editEmployeeDetail'])->name('editEmployeeDetail.editEmployeeDetail');
+    Route::post('/addEducationPerson', [TEmployeeController::class, 'add_education_degree'])->name('addEducationPerson.add_education_degree');
+    Route::post('/editEducationPerson', [TEmployeeController::class, 'edit_education_degree'])->name('editEducationPerson.add_education_degree');
+    Route::post('/addCertificate', [TEmployeeController::class, 'add_Certificate'])->name('addCertificate.add_Certificate');
+    Route::post('/EditCertificate', [TEmployeeController::class, 'edit_Certificate'])->name('EditCertificate.edit_Certificate');
+    Route::post('/addDocumentPerson', [TEmployeeController::class, 'add_document'])->name('addDocumentPerson.add_document');
+    Route::get('/downloadPersonDocument/{id}', [TEmployeeController::class, 'person_document_download'])->name('downloadPersonDocument.person_document_download');
+    Route::post('/deleteDocument', [TEmployeeController::class, 'delete_document'])->name('deleteDocument.delete_document');
+    Route::post('/addAddressPerson', [TEmployeeController::class, 'add_address_person'])->name('addAddressPerson.add_address_person');
+    Route::post('/getEmployeeAddress', [TEmployeeController::class, 'getEmployeeAddress'])->name('getEmployeeAddress.getEmployeeAddress');
+    Route::post('/editAddress', [TEmployeeController::class, 'editAddress'])->name('editAddress.editAddress');
+    Route::post('/addBankAccount', [TEmployeeController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
+    Route::post('/editBankAccount', [TEmployeeController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
+    Route::post('/uploadProfile', [TEmployeeController::class, 'uploadProfile'])->name('uploadProfile.uploadProfile');
+
+
+
+
+
+    // Company Structure
+    Route::post('/getCompanyStructureCombo', [TCompanyStructureController::class, 'get_StructureCombo'])->name('getCompanyStructureCombo.get_StructureCombo');
+    Route::post('/addCompanyStructure', [TCompanyStructureController::class, 'store'])->name('addCompanyStructure.store');
+    Route::get('/getCompanyStructure', [TCompanyStructureController::class, 'getCompanyStructureJson'])->name('getCompanyStructure.getCompanyStructureJson');
+    Route::post('/getCompanyStructureDetail', [TCompanyStructureController::class, 'get_CompanyStructureDetail'])->name('getCompanyStructureDetail.get_CompanyStructureDetail');
+    Route::post('/editStructureCompany', [TCompanyStructureController::class, 'edit'])->name('editStructureCompany.edit');
+    Route::post('/getStructureCompany', [TCompanyStructureController::class, 'getStructure'])->name('getStructureCompany.getStructure');
+
+
+    // Company Division
+    Route::get('/getDivisionCompany', [TCompanyDivisionController::class, 'getCompanyDivisionJson'])->name('getDivisionCompany.getCompanyDivisionJson');
+    Route::post('/addDivisionCompany', [TCompanyDivisionController::class, 'store'])->name('addDivisionCompany.store');
+    Route::post('/getDivisionComboCompany', [TCompanyDivisionController::class, 'getDivisionComboCompany'])->name('getDivisionComboCompany.getDivisionComboCompany');
+    Route::post('/getDivisionDetailCompany', [TCompanyDivisionController::class, 'get_detail'])->name('getDivisionDetailCompany.get_detail');
+    Route::post('/editDivisionCompany', [TCompanyDivisionController::class, 'edit'])->name('editDivisionCompany.edit');
+    Route::post('/getComboDivision', [TCompanyDivisionController::class, 'getDivision'])->name('getComboDivision.getDivision');
+
+    Route::post('/getComboDivision', [TCompanyDivisionController::class, 'getDivision'])->name('getComboDivision.getDivision');
+
+    // Office
+    Route::get('/getOfficeCompany', [TCompanyOfficeController::class, 'getOfficeCompanyJson'])->name('getOfficeCompany.getOfficeCompanyJson');
+    // Route::post('/getLocationType', [TCompanyOfficeController::class, 'getLocationType'])->name('getLocationType.getLocationType');
+    Route::post('/getOfficeComboCompany', [TCompanyOfficeController::class, 'getOfficeComboCompany'])->name('getOfficeComboCompany.getOfficeComboCompany');
+    // Route::post('/getWilayah', [TCompanyOfficeController::class, 'get_wilayah'])->name('getWilayah.get_wilayah');
+    // Route::post('/getRegency', [TCompanyOfficeController::class, 'get_regency'])->name('getRegency.get_regency');
+    Route::post('/addAddressCompany', [TCompanyOfficeController::class, 'store'])->name('addAddressCompany.store');
+    Route::post('/getOfficeCompanyDetail', [TCompanyOfficeController::class, 'get_detail'])->name('getOfficeCompanyDetail.get_detail');
+    Route::post('/editOfficeCompany', [TCompanyOfficeController::class, 'edit'])->name('editOfficeCompany.edit');
+    Route::post('/getComboOffice', [TCompanyOfficeController::class, 'getOffice'])->name('getComboOffice.getOffice');
+
+    // Job Desc
+    Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
+    Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
+    Route::post('/getJobDescCompanyCombo', [TJobDescCompanyController::class, 'getJobDescCompanyCombo'])->name('getJobDescCompanyCombo.getJobDescCompanyCombo');
+    Route::post('/addJobDescCompany', [TJobDescCompanyController::class, 'store'])->name('addJobDescCompany.store');
+    Route::post('/getJobDescCompanyDetail', [TJobDescCompanyController::class, 'get_detail'])->name('getJobDescCompanyDetail.get_detail');
+    Route::post('/editJobDescCompany', [TJobDescCompanyController::class, 'edit'])->name('editJobDescCompany.edit');
+
+    // Plugin Process
+    Route::post('/getRPluginProcess', [TTagPluginProcessController::class, 'getPlugin'])->name('getRPluginProcess.getPlugin');
+    Route::post('/addPluginProcess', [TTagPluginProcessController::class, 'store'])->name('addPluginProcess.store');
+    Route::post('/getTPluginProcess', [TTagPluginProcessController::class, 'getTPlugin'])->name('getTPluginProcess.getTPlugin');
+
+    // Attendance
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+    Route::post('/saveClockIn', [AttendanceController::class, 'saveClockIn'])->name('attendance.saveClockIn');
+    Route::post('/saveClockOut', [AttendanceController::class, 'saveClockOut'])->name('attendance.saveClockOut');
+    Route::post('/getAttendanceByEmployeeIdAndDate', [AttendanceController::class, 'getAttendanceByEmployeeIdAndDate'])->name('attendance.getAttendanceByEmployeeIdAndDate');
+    Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
+    Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
+    Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
+
 
 
 });

@@ -12,16 +12,23 @@ import {
 } from "react";
 import { spawn } from "child_process";
 import axios from "axios";
-import { PencilIcon, PencilSquareIcon } from "@heroicons/react/20/solid";
+import {
+    PencilIcon,
+    PencilSquareIcon,
+    XMarkIcon,
+} from "@heroicons/react/20/solid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
-import Switch from "@/Components/Switch";
 import Checkbox from "@/Components/Checkbox";
 import TextArea from "@/Components/TextArea";
 import Swal from "sweetalert2";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import SelectTailwind from "react-tailwindcss-select";
+import Input from "@/Components/Input";
+import Select from "react-tailwindcss-select";
+import DatePicker from "react-datepicker";
+import SwitchPage from "@/Components/Switch";
 
 export default function AddRelation({
     idGroupRelation,
@@ -33,12 +40,12 @@ export default function AddRelation({
     show,
     modal,
     handleSuccess,
+    relation,
     data,
     setData,
     switchPage,
+    bank,
     setSwitchPage,
-    switchPageTBK,
-    setSwitchPageTBK,
 }: PropsWithChildren<{
     idGroupRelation: string;
     relationStatus: any;
@@ -46,17 +53,16 @@ export default function AddRelation({
     relationType: any;
     profession: any;
     relationLOB: any;
+    relation: any;
     show: any;
     modal: any;
     handleSuccess: any;
     data: any;
+    bank: any;
     setData: any;
     switchPage: any;
     setSwitchPage: any;
-    switchPageTBK: any;
-    setSwitchPageTBK: any;
 }>) {
-    // console.log("xx", relationGroup);
     const [salutations, setSalutations] = useState<any>([]);
     const [postSalutations, setPostSalutation] = useState<any>([]);
     // const [switchPage, setSwitchPage] = useState(false);
@@ -96,11 +102,26 @@ export default function AddRelation({
 
         if (id == "1") {
             // jika corporate
-            document.getElementById("relationLob").style.display = "";
-            document.getElementById("relationJobs").style.display = "none";
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "none";
         } else if (id == "2") {
-            document.getElementById("relationLob").style.display = "none";
-            document.getElementById("relationJobs").style.display = "";
+            // jika corporate
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "none";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "";
         }
     };
 
@@ -120,11 +141,26 @@ export default function AddRelation({
     const disableLob = async (id: string) => {
         if (id == "1") {
             // jika corporate
-            document.getElementById("relationLob").style.display = "";
-            document.getElementById("relationJobs").style.display = "none";
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "none";
         } else if (id == "2") {
-            document.getElementById("relationLob").style.display = "none";
-            document.getElementById("relationJobs").style.display = "";
+            // jika corporate
+            const relationLOB = document.getElementById(
+                "relationLob"
+            ) as HTMLElement;
+            relationLOB.style.display = "none";
+            // jika corporate
+            const relationJobs = document.getElementById(
+                "relationJobs"
+            ) as HTMLElement;
+            relationJobs.style.display = "";
         }
     };
     const inputRef = useRef<HTMLInputElement>(null);
@@ -137,15 +173,7 @@ export default function AddRelation({
                 item.name_aka?.toLocaleLowerCase()?.trim() ===
                 query?.toLocaleLowerCase()?.trim()
         )?.length;
-    const handleCheckboxHR = (e: any) => {
-        if (e == true) {
-            setSwitchPage(true);
-            setData("is_managed", "1");
-        } else {
-            setSwitchPage(false);
-            setData("is_managed", "0");
-        }
-    };
+
     const getMappingParent = async (name: string, column: string) => {
         // setIsLoading(true)
 
@@ -161,13 +189,13 @@ export default function AddRelation({
                 console.log(err);
             });
     };
-    const handleCheckboxTBK = (e: any) => {
+    const handleSwitchPKS = (e: any) => {
         if (e == true) {
-            setSwitchPageTBK(true);
-            setData("mark_tbk_relation", "1");
+            setSwitchPage(true);
+            setData("DEFAULT_PAYABLE", "1");
         } else {
-            setSwitchPageTBK(false);
-            setData("mark_tbk_relation", "0");
+            setSwitchPage(false);
+            setData("DEFAULT_PAYABLE", "0");
         }
     };
     const handleCheckbox = (e: any) => {
@@ -209,6 +237,13 @@ export default function AddRelation({
         };
     });
 
+    const relationSelect = relation?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
+    });
+
     const [existingAbb, setExistingAbb] = useState<any>([]);
 
     const cekAbbreviationRelation = async (name: any) => {
@@ -222,9 +257,7 @@ export default function AddRelation({
                         title: "Warning",
                         text: "Abbreviation already exists",
                         icon: "warning",
-                    }).then((result: any) => {
-                        // console.log(result);
-                    });
+                    }).then((result: any) => {});
                 }
                 // cekAbbreviation(existingAbb);
             })
@@ -233,21 +266,122 @@ export default function AddRelation({
             });
     };
 
-    // const cekAbbreviation = (result: any) => {
-    //     console.log(result.length);
-    //     if (result.length === 1) {
-    //         alert("ADA");
-    //     } else {
-    //         alert("gaada");
-    //     }
-    // };
+    const bankSelect = bank?.map((query: any) => {
+        return {
+            value: query.BANK_ID,
+            label: query.BANK_ABBREVIATION,
+        };
+    });
+
+    const dataFor = [
+        {
+            value: "1",
+            label: "Agent",
+        },
+        {
+            value: "2",
+            label: "FBI By PKS",
+        },
+    ];
+
+    const pksSelect = dataFor?.map((query: any) => {
+        return {
+            value: query.value,
+            label: query.label,
+        };
+    });
+
+    const deleteRowNoPKS = (i: number) => {
+        const val = [...data.no_pks];
+        val.splice(i, 1);
+        setData("no_pks", val);
+    };
+    const deleteRowBankAccount = (i: number) => {
+        const val = [...data.bank_account];
+        val.splice(i, 1);
+        setData("bank_account", val);
+    };
+
+    const addRowPKS = (e: FormEvent) => {
+        e.preventDefault();
+
+        setData("no_pks", [
+            ...data.no_pks,
+            {
+                FOR_PKS: "",
+                NO_PKS: "",
+                STAR_DATE_PKS: "",
+                END_DATE_PKS: "",
+                DOCUMENT_PKS_ID: "",
+                STATUS_PKS: 0,
+                REMARKS_PKS: "",
+                ENDING_BY_CANCEL: 0,
+            },
+        ]);
+    };
+
+    const addRowBankAccount = (e: FormEvent) => {
+        e.preventDefault();
+
+        setData("bank_account", [
+            ...data.bank_account,
+            {
+                BANK_ID: "",
+                ACCOUNT_NAME: "",
+                ACCOUNT_NUMBER: "",
+                NPWP_NAME: "",
+            },
+        ]);
+    };
+
+    const inputDataPKS = (
+        name: string,
+        value: string | undefined | File,
+        i: number
+    ) => {
+        const changeVal: any = [...data.no_pks];
+        changeVal[i][name] = value;
+        setData("no_pks", changeVal);
+    };
+
+    const handleCheckboxEnding = (e: any, i: number) => {
+        if (e.target.checked) {
+            const changeVal: any = [...data.no_pks];
+            changeVal[i]["ENDING_BY_CANCEL"] = 0;
+            setData("no_pks", changeVal);
+        } else {
+            const changeVal: any = [...data.no_pks];
+            changeVal[i]["ENDING_BY_CANCEL"] = 1;
+            setData("no_pks", changeVal);
+        }
+    };
+
+    const inputDataSwitchPKS = (e: any, i: number) => {
+        if (e.target.checked) {
+            const changeVal: any = [...data.no_pks];
+            changeVal[i]["STATUS_PKS"] = 0;
+            setData("no_pks", changeVal);
+        } else {
+            const changeVal: any = [...data.no_pks];
+            changeVal[i]["STATUS_PKS"] = 1;
+            setData("no_pks", changeVal);
+        }
+    };
+
+    const inputDataBank = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...data.bank_account];
+        changeVal[i][name] = value;
+        setData("bank_account", changeVal);
+    };
+
     return (
-        // <AuthenticatedLayout user={auth.user} header={"Detail Relation"}>
-        // <Head title="Detail Relation" />
-        // { detailRelation?.map((data:, i: number) => {
-        // })}
         <>
             <ModalToAdd
+                buttonAddOns={""}
                 show={show}
                 onClose={modal}
                 title={"Add Relation"}
@@ -255,7 +389,7 @@ export default function AddRelation({
                 data={data}
                 onSuccess={handleSuccess}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[100%]"
                 }
                 body={
                     <>
@@ -559,91 +693,40 @@ export default function AddRelation({
                                     + Add
                                 </button>
                             </div>
-                            <div className="mt-4 hidden">
-                                {/* <InputLabel
-                                    htmlFor="is_managed"
-                                    value="HR MANAGED BY APP"
-                                /> */}
-                                <ul role="list" className="">
-                                    <li className="col-span-1 flex rounded-md shadow-sm">
-                                        <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                            <span className="mt-1 ml-2">
-                                                <Switch
-                                                    enabled={switchPage}
-                                                    onChangeButton={(e: any) =>
-                                                        handleCheckboxHR(e)
-                                                    }
-                                                />
-                                            </span>
-                                            <span className="ml-2 text-sm">
-                                                HR MANAGED BY APP
-                                            </span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
-                        {/* <div className="mt-4">
-                            <InputLabel
-                                htmlFor="group_id"
-                                value="Group"
-                                className="block"
-                            />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.group_id}
-                                onChange={(e) => {
-                                    setData("group_id", e.target.value);
-                                    getMappingParent(
-                                        e.target.value,
-                                        "group_id"
-                                    );
-                                }}
-                            >
-                                <option value={""}>-- Choose Group --</option>
-                                {relationGroup?.map(
-                                    (groups: any, i: number) => {
-                                        return (
-                                            <option
-                                                key={i}
-                                                value={groups.RELATION_GROUP_ID}
-                                            >
-                                                {groups.RELATION_GROUP_NAME}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div> */}
-                        {/* <div className="mt-4">
-                            <InputLabel htmlFor="parent_id" value="Parent" />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.parent_id}
-                                onChange={(e) =>
-                                    setData("parent_id", e.target.value)
-                                }
-                            >
-                                <option value={""} className="text-white">
-                                    -- Choose Parent --
-                                </option>
-                                {mappingParent.mapping_parent.map(
-                                    (parents: any, i: number) => {
-                                        return (
-                                            <option
-                                                key={i}
-                                                value={
-                                                    parents.RELATION_ORGANIZATION_ID
-                                                }
-                                            >
-                                                {parents.text_combo}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div> */}
-                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4">
+                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-3 lg:grid lg:gap-4">
+                            <div className="mt-4">
+                                <InputLabel
+                                    htmlFor="date_of_birth"
+                                    value="Date Of Birth"
+                                />
+                                <div className="relative grid grid-cols-1">
+                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                        <svg
+                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </div>
+                                    <DatePicker
+                                        popperPlacement="top-end"
+                                        selected={data.date_of_birth}
+                                        onChange={(date: any) => {
+                                            setData(
+                                                "date_of_birth",
+                                                date.toLocaleDateString("en-CA")
+                                            );
+                                        }}
+                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyy"
+                                    />
+                                </div>
+                            </div>
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="relation_email"
@@ -714,11 +797,16 @@ export default function AddRelation({
                                                             // defaultChecked={
                                                             //     data.relation_type_id
                                                             // }
-                                                            onChange={(e) =>
+                                                            onChange={(e) => {
                                                                 handleCheckbox(
                                                                     e
-                                                                )
-                                                            }
+                                                                );
+                                                                // checkFBIAndAgent();
+                                                                // checkBAA(
+                                                                //     e.target
+                                                                //         .value
+                                                                // );
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
@@ -737,6 +825,549 @@ export default function AddRelation({
                                 </ul>
                             </div>
                         </div>
+                        {/* field for agent dan fbi pks */}
+
+                        {(data.relation_status_id === "2" &&
+                            data.relation_type_id.find(
+                                (f: any) => f.id === "3"
+                            )) ||
+                        data.relation_type_id.find((f: any) => f.id === "13") ||
+                        (data.relation_status_id === "1" &&
+                            data.relation_type_id.find(
+                                (f: any) => f.id === "3"
+                            )) ||
+                        data.relation_type_id.find(
+                            (f: any) => f.id === "13"
+                        ) ? (
+                            <>
+                                <div className="grid grid-cols-2 gap-1 mt-2 relative">
+                                    <div>
+                                        <InputLabel
+                                            value="NPWP"
+                                            className="absolute"
+                                        />
+                                        <div className="ml-[2.7rem] text-red-600">
+                                            *
+                                        </div>
+                                        <TextInput
+                                            type="text"
+                                            value={data.NPWP_RELATION}
+                                            className="mt-2"
+                                            onChange={(e) =>
+                                                setData(
+                                                    "NPWP_RELATION",
+                                                    e.target.value
+                                                )
+                                            }
+                                            placeholder="NPWP"
+                                        />
+                                    </div>
+                                    <div className="text-sm mt-8 flex">
+                                        <div className="rotate-90 -ml-3">
+                                            <SwitchPage
+                                                enabled={switchPage}
+                                                onChangeButton={handleSwitchPKS}
+                                            />
+                                        </div>
+                                        <div className="">
+                                            <div className="text-xs mb-1">
+                                                <span>
+                                                    Default Payable By Relation
+                                                </span>
+                                            </div>
+                                            <div className="text-xs">
+                                                <span>
+                                                    Default Payable By Fresnel
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* <div className="mt-2">
+                                    <InputLabel value="PKS" required={false} />
+                                </div> */}
+                                {data.no_pks?.map((noPKS: any, i: number) => {
+                                    return (
+                                        <div
+                                            className="grid grid-cols-6 gap-3 mt-2"
+                                            key={i}
+                                        >
+                                            <div className="col-span-5">
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div className="relative">
+                                                        <InputLabel
+                                                            value="PKS For"
+                                                            required={true}
+                                                        />
+                                                        <SelectTailwind
+                                                            classNames={{
+                                                                menuButton:
+                                                                    () =>
+                                                                        `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                listItem: ({
+                                                                    isSelected,
+                                                                }: any) =>
+                                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                        isSelected
+                                                                            ? `text-white bg-red-500`
+                                                                            : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                                                    }`,
+                                                            }}
+                                                            options={pksSelect}
+                                                            isSearchable={true}
+                                                            placeholder={
+                                                                "--Choose Type--"
+                                                            }
+                                                            value={
+                                                                noPKS.FOR_PKS
+                                                            }
+                                                            // onChange={(e) =>
+                                                            //     inputDataBank(
+                                                            //         "BANK_ID",
+                                                            //         e.target.value,
+                                                            //         i
+                                                            //     )
+                                                            // }
+                                                            onChange={(
+                                                                val: any
+                                                            ) => {
+                                                                inputDataPKS(
+                                                                    "FOR_PKS",
+                                                                    val,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            primaryColor={
+                                                                "bg-red-500"
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputLabel
+                                                            value="No PKS"
+                                                            required={true}
+                                                        />
+                                                        <TextInput
+                                                            type="text"
+                                                            value={noPKS.NO_PKS}
+                                                            className="mt-1"
+                                                            onChange={(e) =>
+                                                                inputDataPKS(
+                                                                    "NO_PKS",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                            placeholder="No. PKS"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputLabel
+                                                            value="Document PKS"
+                                                            required={true}
+                                                        />
+                                                        <Input
+                                                            type="file"
+                                                            onChange={(
+                                                                e: any
+                                                            ) => {
+                                                                inputDataPKS(
+                                                                    "DOCUMENT_PKS_ID",
+                                                                    e.target
+                                                                        .files[0],
+                                                                    i
+                                                                );
+                                                            }}
+                                                            className="mt-1 bg-white ring-white shadow-xl"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-3 mt-2">
+                                                    <div className="col-span-2">
+                                                        <InputLabel
+                                                            value="Remarks"
+                                                            required={false}
+                                                        />
+                                                        <TextArea
+                                                            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 h-[179px]"
+                                                            id="relation_description"
+                                                            name="relation_description"
+                                                            defaultValue={
+                                                                noPKS.REMARKS_PKS
+                                                            }
+                                                            onChange={(
+                                                                e: any
+                                                            ) =>
+                                                                inputDataPKS(
+                                                                    "REMARKS_PKS",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputLabel
+                                                            value="Date"
+                                                            required={false}
+                                                        />
+                                                        <div className="mt-1">
+                                                            <div className="relative max-w-sm grid grid-cols-1">
+                                                                <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                                    <svg
+                                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                        aria-hidden="true"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="currentColor"
+                                                                        viewBox="0 0 20 20"
+                                                                    >
+                                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <DatePicker
+                                                                    popperPlacement="top-end"
+                                                                    selected={
+                                                                        noPKS.STAR_DATE_PKS
+                                                                    }
+                                                                    onChange={(
+                                                                        date: any
+                                                                    ) => {
+                                                                        inputDataPKS(
+                                                                            "STAR_DATE_PKS",
+                                                                            date.toLocaleDateString(
+                                                                                "en-CA"
+                                                                            ),
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                    className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                                    dateFormat={
+                                                                        "dd-MM-yyyy"
+                                                                    }
+                                                                    placeholderText="Star Date ( dd-mm-yyyy )"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="">
+                                                            <div>
+                                                                <ul
+                                                                    role="list"
+                                                                    className="mt-2 mb-1 w-full"
+                                                                >
+                                                                    <li className="col-span-1 flex rounded-md shadow-sm">
+                                                                        <div className="flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white">
+                                                                            <Checkbox
+                                                                                // className={
+                                                                                //     noPKS.ENDING_BY_CANCEL ===
+                                                                                //     0
+                                                                                //         ? "checked"
+                                                                                //         : ""
+                                                                                // }
+                                                                                defaultChecked={
+                                                                                    noPKS.ENDING_BY_CANCEL ===
+                                                                                    0
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    handleCheckboxEnding(
+                                                                                        e,
+                                                                                        i
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
+                                                                            <div className="flex-1 truncate px-1 py-2 text-xs">
+                                                                                <span className="text-gray-900">
+                                                                                    {
+                                                                                        "Ending By Cancel"
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        {noPKS.ENDING_BY_CANCEL ===
+                                                        0 ? null : (
+                                                            <div className="">
+                                                                <div className="relative max-w-sm grid grid-cols-1">
+                                                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-1 pointer-events-none">
+                                                                        <svg
+                                                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                                            aria-hidden="true"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            fill="currentColor"
+                                                                            viewBox="0 0 20 20"
+                                                                        >
+                                                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <DatePicker
+                                                                        popperPlacement="top-end"
+                                                                        selected={
+                                                                            noPKS.END_DATE_PKS
+                                                                        }
+                                                                        onChange={(
+                                                                            date: any
+                                                                        ) => {
+                                                                            inputDataPKS(
+                                                                                "END_DATE_PKS",
+                                                                                date.toLocaleDateString(
+                                                                                    "en-CA"
+                                                                                ),
+                                                                                i
+                                                                            );
+                                                                        }}
+                                                                        className="border-0 rounded-md shadow-md text-sm mt-1 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                                                        dateFormat={
+                                                                            "dd-MM-yyyy"
+                                                                        }
+                                                                        placeholderText="End Date ( dd-mm-yyyy )"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="text-sm mt-4 flex">
+                                                            <div className="-rotate-90">
+                                                                <label className="switch">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        defaultChecked={
+                                                                            noPKS.STATUS_PKS ===
+                                                                            0
+                                                                        }
+                                                                        id={i.toString()}
+                                                                        onChange={(
+                                                                            e: any
+                                                                        ) => {
+                                                                            inputDataSwitchPKS(
+                                                                                e,
+                                                                                i
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                    <span className="slider round"></span>
+                                                                </label>
+                                                            </div>
+                                                            <div className="-ml-3">
+                                                                <div className="text-sm mb-1">
+                                                                    <span>
+                                                                        Current
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-sm">
+                                                                    <span>
+                                                                        Lapse
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className="col-span-1 flex justify-start items-center hover:cursor-pointer"
+                                                title="Delete Row PKS"
+                                                onClick={(e: any) => {
+                                                    deleteRowNoPKS(e);
+                                                }}
+                                            >
+                                                <span>
+                                                    <XMarkIcon className="w-7 text-red-600" />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <div
+                                    className="w-fit text-sm mt-1 text-gray-600 hover:cursor-pointer hover:underline"
+                                    onClick={(e: any) => {
+                                        addRowPKS(e);
+                                    }}
+                                >
+                                    + Add Row PKS
+                                </div>
+                                {/* Bank Account */}
+                                <div className="mt-2">
+                                    <InputLabel
+                                        value="Bank Account"
+                                        className=""
+                                    />
+                                    {data.bank_account?.map(
+                                        (bankAccount: any, i: number) => {
+                                            return (
+                                                <div
+                                                    className="grid grid-cols-4 gap-2"
+                                                    key={i}
+                                                >
+                                                    <div className="mt-1 shadow-lg">
+                                                        <Select
+                                                            classNames={{
+                                                                menuButton:
+                                                                    () =>
+                                                                        `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                listItem: ({
+                                                                    isSelected,
+                                                                }: any) =>
+                                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                        isSelected
+                                                                            ? `text-white bg-red-600`
+                                                                            : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                    }`,
+                                                            }}
+                                                            options={bankSelect}
+                                                            isSearchable={true}
+                                                            placeholder={
+                                                                "Bank Name *"
+                                                            }
+                                                            value={
+                                                                bankAccount.BANK_ID
+                                                            }
+                                                            // onChange={(e) =>
+                                                            //     inputDataBank(
+                                                            //         "BANK_ID",
+                                                            //         e.target.value,
+                                                            //         i
+                                                            //     )
+                                                            // }
+                                                            onChange={(
+                                                                val: any
+                                                            ) => {
+                                                                inputDataBank(
+                                                                    "BANK_ID",
+                                                                    val,
+                                                                    i
+                                                                );
+                                                            }}
+                                                            primaryColor={
+                                                                "bg-red-500"
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="">
+                                                        <TextInput
+                                                            type="text"
+                                                            value={
+                                                                bankAccount.ACCOUNT_NAME
+                                                            }
+                                                            className="mt-2"
+                                                            onChange={(e) =>
+                                                                inputDataBank(
+                                                                    "ACCOUNT_NAME",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                            placeholder="Account Name"
+                                                        />
+                                                    </div>
+                                                    <div className="">
+                                                        <TextInput
+                                                            type="text"
+                                                            value={
+                                                                bankAccount.ACCOUNT_NUMBER
+                                                            }
+                                                            className="mt-2"
+                                                            onChange={(e) =>
+                                                                inputDataBank(
+                                                                    "ACCOUNT_NUMBER",
+                                                                    e.target
+                                                                        .value,
+                                                                    i
+                                                                )
+                                                            }
+                                                            placeholder="Account Number"
+                                                        />
+                                                    </div>
+                                                    <div className="">
+                                                        <div className="flex items-center">
+                                                            <TextInput
+                                                                type="text"
+                                                                value={
+                                                                    bankAccount.NPWP_NAME ===
+                                                                    ""
+                                                                        ? data.NPWP_RELATION
+                                                                        : bankAccount.NPWP_NAME
+                                                                }
+                                                                className="mt-2"
+                                                                onChange={(e) =>
+                                                                    inputDataBank(
+                                                                        "NPWP_NAME",
+                                                                        e.target
+                                                                            .value,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                placeholder="NPWP"
+                                                            />
+                                                            <span
+                                                                className="mt-2"
+                                                                onClick={() => {
+                                                                    deleteRowBankAccount(
+                                                                        i
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <XMarkIcon className="w-7 text-red-600 cursor-pointer" />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+                                    <div
+                                        className="text-sm text-gray-500 hover:underline hover:text-black hover:cursor-pointer w-fit mt-2"
+                                        onClick={(e) => addRowBankAccount(e)}
+                                    >
+                                        <span>+ Add Bank Account</span>
+                                    </div>
+                                </div>
+                            </>
+                        ) : null}
+
+                        {/* end field for agent dan fbi pks */}
+                        {data.relation_status_id === "2" ? (
+                            <div className="mt-4">
+                                <InputLabel
+                                    htmlFor="corporate_pic_for"
+                                    value="Corporate PIC For"
+                                />
+                                <SelectTailwind
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={relationSelect}
+                                    isSearchable={true}
+                                    isMultiple={true}
+                                    isClearable={true}
+                                    placeholder={"--Select Relation--"}
+                                    value={data.corporate_pic_for}
+                                    onChange={(val: any) => {
+                                        setData("corporate_pic_for", val);
+                                    }}
+                                    primaryColor={"bg-red-500"}
+                                />
+                            </div>
+                        ) : null}
+
                         <div className="mt-4" id="relationJobs">
                             <InputLabel
                                 htmlFor="profession_id"
@@ -770,27 +1401,6 @@ export default function AddRelation({
                                 }}
                                 primaryColor={"bg-red-500"}
                             />
-                            {/* <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.profession_id}
-                                onChange={(e) =>
-                                    setData("profession_id", e.target.value)
-                                }
-                            >
-                                <option>
-                                    -- Choose Relation Profession --
-                                </option>
-                                {profession?.map((rProf: any, i: number) => {
-                                    return (
-                                        <option
-                                            key={i}
-                                            value={rProf.RELATION_PROFESSION_ID}
-                                        >
-                                            {rProf.RELATION_PROFESSION_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select> */}
                         </div>
                         <div className="mt-4" id="relationLob">
                             <InputLabel
@@ -825,25 +1435,6 @@ export default function AddRelation({
                                 }}
                                 primaryColor={"bg-red-500"}
                             />
-                            {/* <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.relation_lob_id}
-                                onChange={(e) =>
-                                    setData("relation_lob_id", e.target.value)
-                                }
-                            >
-                                <option>-- Choose Relation Lob --</option>
-                                {relationLOB.map((rLob: any, i: number) => {
-                                    return (
-                                        <option
-                                            key={i}
-                                            value={rLob.RELATION_LOB_ID}
-                                        >
-                                            {rLob.RELATION_LOB_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select> */}
                         </div>
                         <div className="mt-4">
                             <InputLabel
@@ -981,7 +1572,5 @@ export default function AddRelation({
                 }
             />
         </>
-
-        // </AuthenticatedLayout>
     );
 }

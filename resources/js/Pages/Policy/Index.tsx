@@ -28,6 +28,7 @@ import Alert from "@/Components/Alert";
 import Select from "react-tailwindcss-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DetailPolicy from "./DetailPolicy";
 // import DatePicker from "react-date-picker";
 // import { Datepicker } from "flowbite-react";
 
@@ -106,6 +107,11 @@ export default function PolicyIndex({ auth }: PageProps) {
             });
     };
 
+     const policyType = [
+         { ID: "1", NAME: "Full Policy" },
+         { ID: "2", NAME: "Master Policy/Certificate" }
+     ];
+
     const client = [
         { id: "1", stat: "CHUBB" },
         { id: "2", stat: "BRINS" },
@@ -145,6 +151,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         policy_inception_date: "",
         policy_due_date: "",
         policy_status_id: 1,
+        policy_type:"",
         self_insured: "",
         policyPremium: [
             {
@@ -180,6 +187,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         POLICY_INCEPTION_DATE: "",
         POLICY_DUE_DATE: "",
         POLICY_STATUS_ID: "",
+        POLICY_TYPE: "",
         SELF_INSURED: "",
         policy_premium: [
             {
@@ -237,6 +245,7 @@ export default function PolicyIndex({ auth }: PageProps) {
             policy_inception_date: "",
             policy_due_date: "",
             policy_status_id: 1,
+            policy_type: "",
             self_insured: "",
             policyPremium: [
                 {
@@ -269,9 +278,8 @@ export default function PolicyIndex({ auth }: PageProps) {
 
 
     }
-console.log('searchPolicy: ', searchPolicy)
-    const handleSuccess = (message: number) => {
-        // console.log("message: ", message);
+
+    const handleSuccess = (message: any) => {
         setIsSuccess("");
         reset();
         setData({
@@ -282,6 +290,7 @@ console.log('searchPolicy: ', searchPolicy)
             policy_inception_date: "",
             policy_due_date: "",
             policy_status_id: 1,
+            policy_type: "",
             self_insured: "",
             policyPremium: [
                 {
@@ -309,7 +318,7 @@ console.log('searchPolicy: ', searchPolicy)
                 },
             ],
         });
-        getData(message);
+        getData(message.id);
 
         Swal.fire({
             title: "Success",
@@ -719,15 +728,9 @@ console.log('searchPolicy: ', searchPolicy)
         }
     }, [data.policyPremium]);
 
-    // console.log("sumByCurrency: ", sumByCurrency);
     // Start fungsi hitung initial premium
     const inputCalculate = (i: number) => {
         const changeVal: any = [...data.policyPremium];
-        // const si = changeVal[i]["sum_insured"];
-        // const rate = changeVal[i]["rate"];
-        // if (si && rate) {
-        //     changeVal[i]["initial_premium"] = (si * rate) / 100;
-        // } else [(changeVal[i]["initial_premium"] = 0)];
         const gross_premi = changeVal[i]["gross_premi"];
         const admin_cost = changeVal[i]["admin_cost"];
         const disc_broker = changeVal[i]["disc_broker"];
@@ -874,6 +877,30 @@ console.log('searchPolicy: ', searchPolicy)
                                             );
                                         }
                                     )}
+                                </select>
+                            </div>
+                            <div>
+                                <InputLabel
+                                    htmlFor="policy_type"
+                                    value="Policy Type"
+                                />
+                                <select
+                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={data.policy_type}
+                                    onChange={(e) =>
+                                        setData("policy_type", e.target.value)
+                                    }
+                                >
+                                    <option value={""}>
+                                        -- <i>Choose Policy Type</i> --
+                                    </option>
+                                    {policyType.map((type: any, i: number) => {
+                                        return (
+                                            <option key={i} value={type.ID}>
+                                                {type.NAME}
+                                            </option>
+                                        );
+                                    })}
                                 </select>
                             </div>
                         </div>
@@ -1133,7 +1160,7 @@ console.log('searchPolicy: ', searchPolicy)
                         search: false,
                     })
                 }
-                title={"Detail Policy"}
+                title={"Detail Policy - " + dataById.POLICY_NUMBER}
                 url={""}
                 data={""}
                 onSuccess={""}
@@ -1145,7 +1172,16 @@ console.log('searchPolicy: ', searchPolicy)
                 submitButtonName={""}
                 body={
                     <>
-                        <ModalDetailPolicy
+                        {/* <ModalDetailPolicy
+                            onDeleteSuccess={handleSuccessDelete}
+                            policy={dataById}
+                            insurance={insurance}
+                            clients={clients}
+                            insuranceType={insuranceType}
+                            policyStatus={policyStatus}
+                            currency={currency}
+                        /> */}
+                        <DetailPolicy
                             onDeleteSuccess={handleSuccessDelete}
                             policy={dataById}
                             insurance={insurance}
@@ -1244,13 +1280,22 @@ console.log('searchPolicy: ', searchPolicy)
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
                                         className={"max-w-[20px] text-center"}
-                                        label={"No"} colSpan={undefined} rowSpan={undefined}                                    />
+                                        label={"No"}
+                                        colSpan={undefined}
+                                        rowSpan={undefined}
+                                    />
                                     <TableTH
                                         className={"min-w-[50px]"}
-                                        label={"Policy Number"} colSpan={undefined} rowSpan={undefined}                                    />
+                                        label={"Policy Number"}
+                                        colSpan={undefined}
+                                        rowSpan={undefined}
+                                    />
                                     <TableTH
                                         className={"min-w-[50px]"}
-                                        label={"Client Name"} colSpan={undefined} rowSpan={undefined}                                    />
+                                        label={"Client Name"}
+                                        colSpan={undefined}
+                                        rowSpan={undefined}
+                                    />
                                 </tr>
                             </thead>
                             <tbody>

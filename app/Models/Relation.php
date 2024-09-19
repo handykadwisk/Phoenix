@@ -13,7 +13,7 @@ class Relation extends Model
 
     protected $table = 't_relation';
 
-    public $with = ['mTagging','mRelationType','mRelationAka', 'children'];
+    public $with = ['mTagging','mRelationType','mRelationAka', 'children','MBankRelation', ];
 
     protected $guarded = [
         'RELATION_ORGANIZATION_ID',
@@ -56,5 +56,21 @@ class Relation extends Model
 
     public function MRelationBaa(){
         return $this->hasOne(MRelationBaa::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function MRelationFbi(){
+        return $this->hasOne(MRelationFBIPKS::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function TPerson(){
+        return $this->hasMany(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function MBankRelation(){
+        return $this->hasMany(MBankAccountRelation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function pksNumber(){
+        return $this->hasMany(MPksRelation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 }

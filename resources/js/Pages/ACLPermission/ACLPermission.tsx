@@ -69,15 +69,12 @@ export default function ACLPermission({ auth }: PageProps) {
         PERMISSION_NAME: "",
     });
     const getPermissionById = async (idPermission: string) => {
-        // const idPermission = detailPermission.PERMISSION_ID;
-        // console.log("aa :", idPermission);
         await axios
             .post(`/getPermissionById`, {
                 idPermission,
             })
             .then((res) => {
                 setDataById(res.data);
-                // console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -400,16 +397,22 @@ export default function ACLPermission({ auth }: PageProps) {
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Name Permission"}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Class Name"}
                                     />

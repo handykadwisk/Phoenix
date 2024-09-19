@@ -79,13 +79,14 @@ class TRelationStructureController extends Controller
                 "module"      => "Structure",
                 "id"          => $structure->RELATION_STRUCTURE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $structure->RELATION_STRUCTURE_ID,
-            $structure->RELATION_STRUCTURE_ALIAS
+            $structure->RELATION_STRUCTURE_ALIAS,
+            "Relation Structure Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -127,13 +128,14 @@ class TRelationStructureController extends Controller
                 "module"      => "Structure",
                 "id"          => $request->RELATION_STRUCTURE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $request->RELATION_STRUCTURE_ID,
-            $request->RELATION_STRUCTURE_ALIAS
+            $request->RELATION_STRUCTURE_ALIAS,
+            "Relation Structure Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

@@ -73,13 +73,14 @@ class TJobDescController extends Controller
                 "module"      => "Job Desc",
                 "id"          => $jobDesc->RELATION_JOBDESC_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $jobDesc->RELATION_JOBDESC_ID,
-            $jobDesc->RELATION_JOBDESC_ALIAS
+            $jobDesc->RELATION_JOBDESC_ALIAS,
+            "Relation Job Desc Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -124,13 +125,14 @@ class TJobDescController extends Controller
                 "module"      => "Job Desc",
                 "id"          => $request->RELATION_JOBDESC_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $request->RELATION_JOBDESC_ID,
-            $request->RELATION_JOBDESC_ALIAS
+            $request->RELATION_JOBDESC_ALIAS,
+            "Relation Job Desc Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

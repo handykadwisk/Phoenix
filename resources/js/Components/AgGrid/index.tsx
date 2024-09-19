@@ -16,6 +16,7 @@ export default function AGGrid({
     url,
     // loading,
     withParam,
+    searchParam,
     triggeringRefreshData,
     doubleClickEvent = () => {},
     addButtonModalState = () => {},
@@ -24,13 +25,13 @@ export default function AGGrid({
     url: string;
     addButtonLabel: string | null | undefined;
     // loading: boolean;
-    withParam: number | string | null;
+    withParam: string | null;
+    searchParam: any | string | null;
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
 }>) {
     const gridRef = useRef<AgGridReact>(null);
-
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
             getRows: (params) => {
@@ -72,7 +73,7 @@ export default function AGGrid({
                             endRow - startRow
                         }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
-                        )}`
+                        )}&newFilter=${JSON.stringify(searchParam)}`
                     )
                     .then((res) => {
                         params.success({
@@ -102,7 +103,8 @@ export default function AGGrid({
     }, [triggeringRefreshData, gridRef]);
 
     return (
-        <div className="rounded-md border border-stroke bg-white px-5 py-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        // <div className="rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+        <div className="flex flex-row items-center h-[100%]">
             {addButtonLabel && (
                 <div className="w-96">
                     <Button
@@ -113,10 +115,7 @@ export default function AGGrid({
                     </Button>
                 </div>
             )}
-            <div
-                className="ag-theme-quartz"
-                style={{ height: 400, width: "100%" }}
-            >
+            <div className="w-full h-[100%] overflow-x-auto ag-grid-table custom-scrollbar overflow-visible ag-theme-quartz">
                 <AgGridReact
                     ref={gridRef}
                     columnDefs={colDefs}
@@ -127,8 +126,10 @@ export default function AGGrid({
                             };
                         }
                     }}
+                    suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={10}
+                    paginationAutoPageSize={true}
                     cacheBlockSize={10}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}
@@ -137,5 +138,6 @@ export default function AGGrid({
                 />
             </div>
         </div>
+        // </div>
     );
 }

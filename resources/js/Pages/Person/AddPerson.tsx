@@ -43,6 +43,10 @@ export default function AddPerson({
     handleSuccess: any;
     dataPersonRelationship: any;
 }>) {
+    // for switch baa
+    const [switchPageBAA, setSwitchPageBAA] = useState(false);
+    // for switch vip
+    const [switchPageVIP, setSwitchPageVIP] = useState(false);
     const [isSuccess, setIsSuccess] = useState<string>("");
     // for data from
 
@@ -79,70 +83,26 @@ export default function AddPerson({
         setData("CONTACT_EMERGENCY", changeVal);
     };
 
-    // const handleSuccess = (message: string) => {
-    //     // setIsSuccess("");
-    //     if (message !== "") {
-    //         setData({
-    //             PERSON_FIRST_NAME: "",
-    //             PERSON_MIDDLE_NAME: "",
-    //             PERSON_LAST_NAME: "",
-    //             PERSON_NICKNAME: "",
-    //             PERSON_GENDER: "",
-    //             PERSON_BIRTH_PLACE: "",
-    //             PERSON_BIRTH_DATE: "",
-    //             PERSON_EMAIL: "",
-    //             PERSON_CONTACT: "",
-    //             PERSON_PARENT: "",
-    //             PERSON_MAPPING: "",
-    //             RELATION_ORGANIZATION_ID: "",
-    //             STRUCTURE_ID: "",
-    //             DIVISION_ID: "",
-    //             OFFICE_ID: "",
-    //             PERSON_IS_DELETED: "",
-    //             PERSON_CREATED_BY: "",
-    //             PERSON_CREATED_DATE: "",
-    //             PERSON_UPDATED_BY: "",
-    //             PERSON_UPDATED_DATE: "",
-    //             PERSON_CATEGORY: "",
-    //             PERSON_HIRE_DATE: "",
-    //             PERSON_END_DATE: "",
-    //             PERSON_KTP: "",
-    //             PERSON_NPWP: "",
-    //             PERSON_BANK_ACCOUNT_ID: "",
-    //             PERSON_IMAGE_ID: "",
-    //             PERSON_KK: "",
-    //             PERSON_BLOOD_TYPE: "",
-    //             PERSON_BLOOD_RHESUS: "",
-    //             PERSON_MARITAL_STATUS: "",
-    //             TEXT_STATUS_ID: "",
-    //             PERSON_RECRUITMENT_LOCATION: "",
-    //             PERSON_LOCK_UPDATE: "",
-    //             PERSON_LOCK_UPDATED_DATE: "",
-    //             PERSON_SALARY_ADJUSTMENT1: "",
-    //             PERSON_SALARY_ADJUSTMENT2: "",
-    //             CONTACT_EMERGENCY: [],
-    //         });
+    const handleCheckboxBAA = (e: any) => {
+        if (e == true) {
+            setSwitchPageBAA(true);
+            setData("PERSON_IS_BAA", "1");
+        } else {
+            setSwitchPageBAA(false);
+            setData("PERSON_IS_BAA", "0");
+        }
+    };
 
-    //         Swal.fire({
-    //             title: "Success",
-    //             text: "New Relation Added",
-    //             icon: "success",
-    //         }).then((result: any) => {
-    //             // console.log(result);
-    //             if (result.value) {
-    //                 // setGetDetailRelation(message);
-    //                 // setModal({
-    //                 //     add: false,
-    //                 //     delete: false,
-    //                 //     edit: false,
-    //                 //     view: true,
-    //                 //     document: false,
-    //                 //     search: false,
-    //                 // });
-    //             }
-    //         });
-    //     }
-    // };
+    const handleCheckboxVIP = (e: any) => {
+        if (e == true) {
+            setSwitchPageVIP(true);
+            setData("PERSON_IS_VIP", "1");
+        } else {
+            setSwitchPageVIP(false);
+            setData("PERSON_IS_VIP", "0");
+        }
+    };
+
     const inputDataPersonContact = (
         name: string,
         value: string | undefined,
@@ -152,8 +112,6 @@ export default function AddPerson({
         changeVal[i][name] = value;
         setData({ ...data, PERSON_CONTACT: changeVal });
     };
-
-    console.log(data);
 
     return (
         <>
@@ -416,6 +374,53 @@ export default function AddPerson({
                                         }}
                                         placeholder="Person KK"
                                     />
+                                </div>
+                            </div>
+                            <div
+                                className="grid grid-cols-2 gap-2"
+                                title="BAA (Business Acquisition Assistant)"
+                            >
+                                <div className="mt-4 ">
+                                    <ul role="list" className="">
+                                        <li className="col-span-1 flex rounded-md shadow-sm">
+                                            <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
+                                                <span className="mt-1 ml-2">
+                                                    <Switch
+                                                        enabled={switchPageBAA}
+                                                        onChangeButton={(
+                                                            e: any
+                                                        ) =>
+                                                            handleCheckboxBAA(e)
+                                                        }
+                                                    />
+                                                </span>
+                                                <span className="ml-2 text-sm">
+                                                    PERSON IS BAA
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="mt-4 ">
+                                    <ul role="list" className="">
+                                        <li className="col-span-1 flex rounded-md shadow-sm">
+                                            <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
+                                                <span className="mt-1 ml-2">
+                                                    <Switch
+                                                        enabled={switchPageVIP}
+                                                        onChangeButton={(
+                                                            e: any
+                                                        ) =>
+                                                            handleCheckboxVIP(e)
+                                                        }
+                                                    />
+                                                </span>
+                                                <span className="ml-2 text-sm">
+                                                    PERSON IS VIP
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                             <div className="mt-6">

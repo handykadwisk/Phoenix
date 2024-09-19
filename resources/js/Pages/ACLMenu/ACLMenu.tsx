@@ -28,11 +28,16 @@ import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import Swal from "sweetalert2";
 import DetailMenu from "./DetailMenu";
+import SequenceEdit from "@/Components/sequenceEdit";
 
-export default function ACLMenu({ auth }: PageProps) {
+export default function ACLMenu({ auth, custom_menu }: PageProps) {
+
     useEffect(() => {
         getMenu();
     }, []);
+
+    const [seqMenu, setSeqMenu] = useState<any>([]);
+
 
     const [menuData, setMenuData] = useState<any>([]);
     const [searchMenu, setSearchMenu] = useState<any>({
@@ -45,6 +50,7 @@ export default function ACLMenu({ auth }: PageProps) {
         menu_name: "",
     });
 
+    //getMenus
     const getMenu = async (pageNumber = "page=1") => {
         await axios
             .post(`/getMenus?${pageNumber}`, {
@@ -59,20 +65,18 @@ export default function ACLMenu({ auth }: PageProps) {
             });
     };
 
+    // getComboMenu
     const getComboMenu = async () => {
-        await axios
-            .post(`/getMenuCombo`, {
-                // idRelation,
-                // menu_name: searchMenu.menu_name,
-            })
-            .then((res) => {
-                setComboMenu(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        try {
+            const res = await axios.post(`/getMenuCombo`);
+            setComboMenu(res.data);
+        } catch (error) {
+            console.log(error);
+
+        }
     };
 
+    //clearSearchMenu
     const clearSearchMenu = async (pageNumber = "page=1") => {
         await axios
             .post(`/getMenus?${pageNumber}`, {})
@@ -88,6 +92,8 @@ export default function ACLMenu({ auth }: PageProps) {
         add: false,
         edit: false,
         detail: false,
+        sequence: false,
+
     });
 
     const addMenuPopup = async (e: FormEvent) => {
@@ -98,6 +104,19 @@ export default function ACLMenu({ auth }: PageProps) {
             add: !modal.add,
             edit: false,
             detail: false,
+            sequence: false,
+        });
+    };
+
+    const addSequencePopup = async (e: FormEvent) => {
+        e.preventDefault();
+
+        getComboMenu();
+        setModal({
+            add: false,
+            edit: false,
+            detail: false,
+            sequence: !modal.sequence,
         });
     };
 
@@ -109,14 +128,10 @@ export default function ACLMenu({ auth }: PageProps) {
         menu_is_deleted: "",
     });
 
-    const handleSuccess = (message: string) => {
-        // setData({
-        //     RELATION_JOBDESC_ALIAS: "",
-        //     RELATION_JOBDESC_DESCRIPTION: "",
-        //     RELATION_JOBDESC_PARENT_ID: "",
-        //     RELATION_ORGANIZATION_ID: idRelation,
-        //     RELATION_ORGANIZATION_ALIAS: nameRelation,
-        // });
+    // handleSuccess
+    const handleSuccess = ({ message }: any) => {
+        console.log("message", message);
+
         if (modal.add) {
             Swal.fire({
                 title: "Success",
@@ -125,18 +140,6 @@ export default function ACLMenu({ auth }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getMenu();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
         } else if (modal.edit) {
@@ -147,21 +150,23 @@ export default function ACLMenu({ auth }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getMenu();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
+                }
+            });
+        } else if (modal.sequence) {
+            Swal.fire({
+                title: "Success",
+                text: message,
+                icon: "success",
+            }).then((result: any) => {
+                if (result.value) {
+                    getMenu();
                 }
             });
         }
+    };
+
+    const handleItemsChange = (updatedItems: any) => {
+        setSeqMenu(updatedItems);
     };
 
     return (
@@ -170,13 +175,23 @@ export default function ACLMenu({ auth }: PageProps) {
 
             {/* modal Add */}
             <ModalToAdd
+                buttonAddOns={''}
                 show={modal.add}
-                onClose={() =>
-                    setModal({
-                        add: false,
-                        edit: false,
-                        detail: false,
-                    })
+                onClose={
+                    () => {
+
+                        setModal({
+                            add: false,
+                            edit: false,
+                            detail: false,
+                            sequence: false,
+                        })
+
+                        setData({
+                            menu_name: "",
+                            menu_url: "",
+                        })
+                    }
                 }
                 title={"Add Menu"}
                 url={`/setting/addMenu`}
@@ -238,13 +253,11 @@ export default function ACLMenu({ auth }: PageProps) {
                             </div>
                             <div className="mt-2">
                                 <InputLabel
-                                    className="absolute"
+                                    className=""
                                     htmlFor="menu_url"
                                     value={"Menu URL"}
                                 />
-                                <div className="ml-[4.3rem] text-red-600">
-                                    *
-                                </div>
+
                                 <TextInput
                                     id="menu_url"
                                     type="text"
@@ -254,30 +267,7 @@ export default function ACLMenu({ auth }: PageProps) {
                                     onChange={(e) =>
                                         setData("menu_url", e.target.value)
                                     }
-                                    required
                                     placeholder="Menu URL"
-                                />
-                            </div>
-                            <div className="mt-2">
-                                <InputLabel
-                                    className="absolute"
-                                    htmlFor="menu_sequence"
-                                    value={"Menu Sequence"}
-                                />
-                                <div className="ml-[7.3rem] text-red-600">
-                                    *
-                                </div>
-                                <TextInput
-                                    id="menu_sequence"
-                                    type="text"
-                                    name="menu_sequence"
-                                    value={data.menu_sequence}
-                                    className="mt-2"
-                                    onChange={(e) =>
-                                        setData("menu_sequence", e.target.value)
-                                    }
-                                    required
-                                    placeholder="Menu Sequence"
                                 />
                             </div>
                         </div>
@@ -285,6 +275,35 @@ export default function ACLMenu({ auth }: PageProps) {
                 }
             />
             {/* modal end add */}
+
+            {/* modal sequence */}
+            <ModalToAdd
+                buttonAddOns={''}
+                show={modal.sequence}
+                onClose={
+                    () =>
+                        setModal({
+                            add: false,
+                            edit: false,
+                            detail: false,
+                            sequence: false,
+                        })
+
+                }
+                title={"Sort Sequence"}
+                url={`/setting/changeSeqMenu`}
+                data={seqMenu}
+                onSuccess={handleSuccess}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
+                }
+                body={
+                    <SequenceEdit initialItems={comboMenu as any}
+                        onItemsChange={handleItemsChange}
+                    />
+                }
+            />
+            {/* modal end sequence */}
 
             {/* Modal detail */}
             <DetailMenu
@@ -296,54 +315,27 @@ export default function ACLMenu({ auth }: PageProps) {
                         add: false,
                         edit: false,
                         detail: false,
+                        sequence: false
                     })
                 }
                 handleSuccess={handleSuccess}
             />
-            {/* <ModalToAction
-                show={modal.edit}
-                onClose={() => {
-                    getMenu();
-                    setModal({
-                        add: false,
-                        edit: false,
-                        detail: false,
-                    });
-                }}
-                title={detailMenu.menu_name}
-                url={""}
-                data={""}
-                onSuccess={""}
-                method={""}
-                headers={""}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[50%]"
-                }
-                submitButtonName={""}
-                body={
-                    <>
-                        {/* <span>Detail Menu</span> */}
-            {/* <DetailMenu
-                            idMenu={detailMenu.id}
-                            auth={auth}
-                            comboMenu={comboMenu}
-                            handleSuccess={handleSuccess}
-                            modal={!modal.edit}
-                            setModal={setModal}
-                        />
-                    </>
-                } */}
-            {/* /> */}
             {/* modal end detail */}
 
             <div className="grid grid-cols-4 py-4 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
-                    <div className="bg-white mb-4 rounded-md p-4">
+                    <div className="flex bg-white mb-4 rounded-md p-4 gap-2">
                         <div
                             className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
                             onClick={(e) => addMenuPopup(e)}
                         >
                             <span>Add Menu</span>
+                        </div>
+                        <div
+                            className="ml-auto bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
+                            onClick={(e) => addSequencePopup(e)}
+                        >
+                            <span>Change Sequence</span>
                         </div>
                     </div>
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[293px]">
@@ -388,9 +380,9 @@ export default function ACLMenu({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0">
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0" style={{}}>
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
-                        <table className="w-full table-auto divide-y divide-gray-300">
+                        <table className=" w-full table-auto divide-y divide-gray-300">
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
@@ -398,20 +390,37 @@ export default function ACLMenu({ auth }: PageProps) {
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
+                                        colSpan={''}
+                                        rowSpan={''}
                                     />
                                     <TableTH
                                         className={"min-w-[50px] bg-gray-200"}
-                                        label={"Name Menu"}
+                                        label={"Name"}
+                                        colSpan={''}
+                                        rowSpan={''}
                                     />
                                     <TableTH
                                         className={"min-w-[50px] bg-gray-200"}
-                                        label={"Menu URL"}
+                                        label={" URL"}
+                                        colSpan={''}
+                                        rowSpan={''}
+                                    />
+                                    <TableTH
+
+                                        className={"min-w-[50px] bg-gray-200"}
+
+
+                                        label={"Parent"}
+                                        colSpan={''}
+                                        rowSpan={''}
                                     />
                                     <TableTH
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg"
                                         }
-                                        label={"Menu Parent"}
+                                        label={"Sequence"}
+                                        colSpan={''}
+                                        rowSpan={''}
                                     />
                                 </tr>
                             </thead>
@@ -419,7 +428,8 @@ export default function ACLMenu({ auth }: PageProps) {
                                 {menuData.data?.map((dMenu: any, i: number) => {
                                     return (
                                         <tr
-                                            onDoubleClick={() => {
+                                            onDoubleClick={(event) => {
+                                                event.stopPropagation();
                                                 getComboMenu();
                                                 setDetailMenu({
                                                     id: dMenu.id,
@@ -429,6 +439,7 @@ export default function ACLMenu({ auth }: PageProps) {
                                                     add: false,
                                                     edit: !modal.edit,
                                                     detail: false,
+                                                    sequence: false,
                                                 });
                                             }}
                                             key={i}
@@ -443,19 +454,42 @@ export default function ACLMenu({ auth }: PageProps) {
                                                 className={"text-center"}
                                             />
                                             <TableTD
-                                                value={<>{dMenu.menu_name}</>}
-                                                className={""}
+                                                value={
+                                                    <>
+                                                        {dMenu?.menu_is_deleted === 1
+                                                            ? <span className="text-red-600">{dMenu.menu_name} (Deleted)</span>
+                                                            : <span className="text-black-600">{dMenu.menu_name}</span>
+                                                        }
+                                                    </>
+                                                }
+                                                className={dMenu?.menu_is_deleted
+                                                    === 0 ? "text-black-600" : "text-red-600"}
+
                                             />
+
+
+
                                             <TableTD
                                                 value={<>{dMenu.menu_url}</>}
                                                 className={""}
                                             />
+
                                             <TableTD
                                                 value={
                                                     <>
                                                         {
                                                             dMenu.parent
                                                                 ?.menu_name
+                                                        }
+                                                    </>
+                                                }
+                                                className={""}
+                                            />
+                                            <TableTD
+                                                value={
+                                                    <>
+                                                        {
+                                                            dMenu.menu_sequence
                                                         }
                                                     </>
                                                 }

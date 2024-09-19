@@ -27,6 +27,7 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import SelectTailwind from "react-tailwindcss-select";
 import DetailSubGroup from "./DetailSubGroup";
+import SummaryGroup from "./SummaryGroup";
 
 export default function DetailGroup({
     idGroup,
@@ -46,10 +47,20 @@ export default function DetailGroup({
     setIdGroup: any;
 }>) {
     const [dataRelationGroupNew, setDataRelationGroupNew] = useState<any>([]);
+    const [getDetailRelation, setGetDetailRelation] = useState<any>({
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
+        RELATION_SALUTATION_PRE: "",
+        RELATION_SALUTATION_POST: "",
+    });
     const [relationGroupNew, setRelationGroupNew] = useState<any>([]);
     const [relationId, setRelationId] = useState<any>({
         idRelation: "",
         nameRelation: "",
+    });
+    const [groupName, setGroupName] = useState<any>({
+        RELATION_GROUP_NAME: "",
+        RELATION_GROUP_ID: "",
     });
 
     // variable for modal
@@ -90,7 +101,6 @@ export default function DetailGroup({
             .post(`/getGroup`, { idGroup })
             .then((res: any) => {
                 setRelationGroupNew(res.data);
-                // console.log("xxx", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -105,7 +115,6 @@ export default function DetailGroup({
             text: "New Sub Group Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -143,7 +152,6 @@ export default function DetailGroup({
             text: "New Relation Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -237,6 +245,11 @@ export default function DetailGroup({
         edit: false,
     });
 
+    const [modalSummaryGroup, setModalSummaryGroup] = useState({
+        view: false,
+        edit: false,
+    });
+
     const [modalChangeParent, setModalChangeParent] = useState<any>({
         edit: false,
     });
@@ -316,7 +329,6 @@ export default function DetailGroup({
     // remove Relation From Group
     const removeRelation = async (e: FormEvent, idRelation: any) => {
         e.preventDefault();
-        // console.log(data);
         await axios
             .post(`/removeRelation`, { idRelation })
             .then((res) => {
@@ -325,7 +337,6 @@ export default function DetailGroup({
                     text: "Remove Relation From Group",
                     icon: "success",
                 }).then((result: any) => {
-                    // console.log(result);
                     if (result.value) {
                         getDetailGroup(idGroup);
                         getGroupName(idGroup);
@@ -341,7 +352,7 @@ export default function DetailGroup({
         return (
             <>
                 {dataChildrenNew?.length !== 0
-                    ? dataChildrenNew?.map((dChild: any, a: number) => (
+                    ? dataChildrenNew?.map((dChilds: any, a: number) => (
                           <div className="pt-1 pl-[0.32rem]" key={a}>
                               <ul className="flex flex-col pl-4 font-semibold text-black border-l border-red-700 hover:cursor-pointer">
                                   <li>
@@ -349,7 +360,7 @@ export default function DetailGroup({
                                           className="relative flex justify-between hover:text-red-600 w-fit"
                                           onClick={() => {
                                               handleClick(
-                                                  dChild.RELATION_GROUP_ID
+                                                  dChilds.RELATION_GROUP_ID
                                               );
                                           }}
                                       >
@@ -364,7 +375,7 @@ export default function DetailGroup({
                                               <div className="text-sm">
                                                   <span>
                                                       {
-                                                          dChild.RELATION_GROUP_NAME
+                                                          dChilds.RELATION_GROUP_NAME
                                                       }
                                                   </span>
                                               </div>
@@ -376,7 +387,9 @@ export default function DetailGroup({
                                       <div
                                           className="hidden"
                                           key={a}
-                                          id={"item" + dChild.RELATION_GROUP_ID}
+                                          id={
+                                              "item" + dChilds.RELATION_GROUP_ID
+                                          }
                                       >
                                           <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
                                               <li>
@@ -386,7 +399,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickChangeParent(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -399,7 +412,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickAddSubGroup(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -412,7 +425,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickAddRelation(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -425,7 +438,7 @@ export default function DetailGroup({
                                                           onClick={(e) =>
                                                               handleClickDetailGroup(
                                                                   e,
-                                                                  dChild.RELATION_GROUP_ID
+                                                                  dChilds.RELATION_GROUP_ID
                                                               )
                                                           }
                                                       >
@@ -435,15 +448,15 @@ export default function DetailGroup({
                                               </li>
                                           </ul>
                                       </div>
-                                      {dChild.r_group?.length !== 0
-                                          ? dChild.r_group?.map(
+                                      {dChilds.r_group?.length !== 0
+                                          ? dChilds.r_group?.map(
                                                 (
                                                     dataRelationsNew: any,
-                                                    z: number
+                                                    b: number
                                                 ) => (
                                                     <div
                                                         className="pt-1 pl-[0.32rem]"
-                                                        key={z}
+                                                        key={b}
                                                     >
                                                         <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                             <li>
@@ -451,7 +464,7 @@ export default function DetailGroup({
                                                                     className="relative flex justify-between hover:text-red-600 w-fit"
                                                                     onClick={() => {
                                                                         handleClickRelation(
-                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                            dataRelationsNew.RELATION_ORGANIZATION_NAME
                                                                         );
                                                                     }}
                                                                 >
@@ -478,10 +491,10 @@ export default function DetailGroup({
                                                                 </div>
                                                                 <div
                                                                     className="hidden"
-                                                                    key={z}
+                                                                    key={b}
                                                                     id={
                                                                         "item" +
-                                                                        dataRelationsNew.RELATION_ORGANIZATION_ID
+                                                                        dataRelationsNew.RELATION_ORGANIZATION_NAME
                                                                     }
                                                                 >
                                                                     <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">
@@ -546,7 +559,7 @@ export default function DetailGroup({
                                                 )
                                             )
                                           : null}
-                                      {BasicInfo(dChild.children)}
+                                      {BasicInfo(dChilds.children)}
                                   </li>
                               </ul>
                           </div>
@@ -605,6 +618,30 @@ export default function DetailGroup({
     };
     // end Add Detail Group
 
+    // Onclick summary group
+    const handleClickSummary = async (
+        e: FormEvent,
+        idGroup: string,
+        name_group: string
+    ) => {
+        e.preventDefault();
+        // getRelationNoGroup();
+        // getDetailSubGroupParent(idGroup);
+        // setDataRelation({
+        //     ...dataRelation,
+        //     RELATION_ORGANIZATION_GROUP: idGroup,
+        // });
+        setGroupName({
+            RELATION_GROUP_NAME: name_group,
+            RELATION_GROUP_ID: idGroup,
+        });
+        setModalSummaryGroup({
+            view: !modalSummaryGroup.view,
+            edit: false,
+        });
+    };
+    // end Add summary Group
+
     const inputRefTag = useRef<HTMLInputElement>(null);
     const [query, setQuery] = useState("");
     const [menuOpen, setMenuOpen] = useState(true);
@@ -645,7 +682,6 @@ export default function DetailGroup({
             text: "Change Sub Group Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -677,7 +713,6 @@ export default function DetailGroup({
             text: "Change Parent",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -705,7 +740,6 @@ export default function DetailGroup({
             text: "Edit Group",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 getDetailGroup(idGroup);
                 getGroupName(idGroup);
@@ -791,6 +825,34 @@ export default function DetailGroup({
     };
     return (
         <>
+            {/* modal detail  */}
+            <ModalToAction
+                show={modalSummaryGroup.view}
+                onClose={() => {
+                    setModalSummaryGroup({
+                        view: false,
+                        edit: false,
+                    });
+                    getDetailGroup(idGroup);
+                    getGroupName(idGroup);
+                }}
+                title={groupName.RELATION_GROUP_NAME}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <SummaryGroup idGroup={idGroup} />
+                    </>
+                }
+            />
+
             {/* modal detail group */}
             <DetailSubGroup
                 show={modalDetailGroup.edit}
@@ -1225,7 +1287,7 @@ export default function DetailGroup({
             {/* end modal relation existing */}
 
             {/* modal add relation */}
-            <AddRelationPopup
+            {/* <AddRelationPopup
                 show={modal.add}
                 modal={() =>
                     setModal({
@@ -1250,7 +1312,7 @@ export default function DetailGroup({
                 setSwitchPage={setSwitchPage}
                 switchPageTBK={switchPageTBK}
                 setSwitchPageTBK={setSwitchPageTBK}
-            />
+            /> */}
             {/* end modal add relation */}
 
             {/* modal detail  */}
@@ -1281,9 +1343,9 @@ export default function DetailGroup({
                 body={
                     <>
                         <DetailRelationPopup
+                            setGetDetailRelation={setGetDetailRelation}
                             detailRelation={relationId.idRelation}
                             relationStatus={relationStatus}
-                            relationGroup={relationGroup}
                             relationType={relationType}
                             profession={profession}
                             relationLOB={relationLOB}
@@ -1292,7 +1354,7 @@ export default function DetailGroup({
                 }
             />
 
-            <div className="grid grid-cols-1">
+            <div className="grid grid-cols-1 mb-96">
                 <div className="col-span-2 bg-white rounded-lg shadow-md pb-10 mb-5">
                     {/* <div className="flex justify-between items-center mt-4 mb-4"> */}
                     {/* <div className="w-fit px-4 text-md font-semibold">
@@ -1421,6 +1483,22 @@ export default function DetailGroup({
                                                                         Edit
                                                                     </span>
                                                                 </div>
+                                                                <div
+                                                                    className="text-sm bg-amber-400 p-2 rounded-md text-white cursor-pointer hover:bg-amber-200"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleClickSummary(
+                                                                            e,
+                                                                            item.RELATION_GROUP_ID,
+                                                                            item.RELATION_GROUP_NAME
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <span>
+                                                                        Summary
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         </li>
                                                     </ul>
@@ -1429,11 +1507,11 @@ export default function DetailGroup({
                                                     ? item.r_group?.map(
                                                           (
                                                               dataRelation: any,
-                                                              z: number
+                                                              c: number
                                                           ) => (
                                                               <div
                                                                   className="pt-1 pl-[0.32rem]"
-                                                                  key={z}
+                                                                  key={c}
                                                               >
                                                                   <ul className="flex flex-col pl-4 text-gray-500 border-l border-red-700">
                                                                       <li>
@@ -1441,7 +1519,7 @@ export default function DetailGroup({
                                                                               className="relative flex justify-between hover:text-red-600 w-fit"
                                                                               onClick={() => {
                                                                                   handleClickRelation(
-                                                                                      dataRelation.RELATION_ORGANIZATION_ID
+                                                                                      dataRelation.RELATION_ORGANIZATION_NAME
                                                                                   );
                                                                               }}
                                                                           >
@@ -1469,11 +1547,11 @@ export default function DetailGroup({
                                                                           <div
                                                                               className="hidden"
                                                                               key={
-                                                                                  z
+                                                                                  c
                                                                               }
                                                                               id={
                                                                                   "item" +
-                                                                                  dataRelation.RELATION_ORGANIZATION_ID
+                                                                                  dataRelation.RELATION_ORGANIZATION_NAME
                                                                               }
                                                                           >
                                                                               <ul className="flex flex-col pl-4 ml-[0.30rem] text-gray-500 border-l border-red-700">

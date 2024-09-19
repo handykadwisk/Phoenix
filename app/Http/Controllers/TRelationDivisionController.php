@@ -72,13 +72,14 @@ class TRelationDivisionController extends Controller
                 "module"      => "Division",
                 "id"          => $division->RELATION_DIVISION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $division->RELATION_DIVISION_ID,
-            $division->RELATION_DIVISION_NAME
+            $division->RELATION_DIVISION_NAME,
+            "Relation Division Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -119,13 +120,14 @@ class TRelationDivisionController extends Controller
                 "module"      => "Division",
                 "id"          => $request->RELATION_DIVISION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $request->RELATION_DIVISION_ID,
-            $request->RELATION_DIVISION_ALIAS
+            $request->RELATION_DIVISION_ALIAS,
+            "Relation Division Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

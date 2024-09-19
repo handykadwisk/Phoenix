@@ -237,9 +237,9 @@ export default function Agent({ auth }: PageProps) {
                 title={"Agent " + detailAgent.RELATION_ORGANIZATION_NAME}
                 url={""}
                 data={""}
-                onSuccess={""}
+                onSuccess={null}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
                 }
@@ -247,8 +247,6 @@ export default function Agent({ auth }: PageProps) {
                 body={
                     <>
                         <DetailAgentPopup
-                            isSuccess={isSuccess}
-                            setIsSuccess={setIsSuccess}
                             auth={auth}
                             idAgent={detailAgent.RELATION_ORGANIZATION_ID}
                         />
@@ -257,7 +255,7 @@ export default function Agent({ auth }: PageProps) {
             />
             {/* end detail modal */}
 
-            <div className="grid grid-cols-4 gap-4 p-4">
+            <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 hidden rounded-md shadow-md p-4">
                         <div
@@ -267,7 +265,7 @@ export default function Agent({ auth }: PageProps) {
                             <span>Add Agent</span>
                         </div>
                     </div>
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100%] h-[100%]">
+                    <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
                         <TextInput
                             type="text"
                             value={searchAgent.RELATION_ORGANIZATION_NAME}
@@ -306,109 +304,31 @@ export default function Agent({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100%]">
-                    <AGGrid
-                        addButtonLabel={null}
-                        addButtonModalState={undefined}
-                        withParam={null}
-                        // loading={isLoading.get_policy}
-                        url={"getRelationAgent"}
-                        doubleClickEvent={handleDetailAgent}
-                        triggeringRefreshData={isSuccess}
-                        colDefs={[
-                            {
-                                headerName: "No.",
-                                valueGetter: "node.rowIndex + 1",
-                                flex: 1,
-                            },
-                            {
-                                headerName: "Relation Agent",
-                                field: "RELATION_ORGANIZATION_ALIAS",
-                                flex: 7,
-                            },
-                        ]}
-                    />
-                    {/* <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                        <table className="w-full table-auto divide-y divide-gray-300">
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg "
-                                        }
-                                        label={"No"}
-                                    />
-                                    <TableTH
-                                        className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg "
-                                        }
-                                        label={"Name Relation Agent"}
-                                    />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dataAgent.data?.map(
-                                    (dAgent: any, i: number) => {
-                                        return (
-                                            <tr
-                                                onDoubleClick={() => {
-                                                    // getDivisionCombo(
-                                                    //     idRelation
-                                                    // );
-                                                    setDetailAgent({
-                                                        RELATION_ORGANIZATION_ID:
-                                                            dAgent.RELATION_ORGANIZATION_ID,
-                                                        RELATION_ORGANIZATION_NAME:
-                                                            dAgent.RELATION_ORGANIZATION_NAME,
-                                                    });
-                                                    setModal({
-                                                        add: false,
-                                                        delete: false,
-                                                        edit: false,
-                                                        view: true,
-                                                    });
-                                                }}
-                                                key={i}
-                                                className={
-                                                    i % 2 === 0
-                                                        ? "cursor-pointer"
-                                                        : "bg-gray-100 cursor-pointer"
-                                                }
-                                            >
-                                                <TableTD
-                                                    value={
-                                                        dataAgent.from + i + "."
-                                                    }
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dAgent.RELATION_ORGANIZATION_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </tbody>
-                        </table>
-                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                            <Pagination
-                                links={dataAgent.links}
-                                fromData={dataAgent.from}
-                                toData={dataAgent.to}
-                                totalData={dataAgent.total}
-                                clickHref={(url: string) =>
-                                    getAgent(url.split("?").pop())
-                                }
-                            />
-                        </div>
-                    </div> */}
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            searchParam={""}
+                            addButtonLabel={null}
+                            addButtonModalState={undefined}
+                            withParam={null}
+                            // loading={isLoading.get_policy}
+                            url={"getRelationAgent"}
+                            doubleClickEvent={handleDetailAgent}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Relation Agent",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                },
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

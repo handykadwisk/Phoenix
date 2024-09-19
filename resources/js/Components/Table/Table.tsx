@@ -14,7 +14,7 @@ export default function Table({
     addButtonLabel: string | null | undefined;
     addButtonModalState: CallableFunction | undefined;
     searchButtonModalState: CallableFunction | undefined;
-    clearSearchButtonAction: CallableFunction;
+    clearSearchButtonAction: CallableFunction | undefined;
     tableHead: any;
     tableBody: any;
     pagination: any;

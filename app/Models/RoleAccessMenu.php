@@ -21,6 +21,7 @@ class RoleAccessMenu extends Model
 
     public function menu()
     {
-        return $this->hasMany(Menu::class, 'role_id');
+        return $this->hasMany(Menu::class, 'id', 'menu_id');
+        // dd($aaa->toSql());
     }
 }

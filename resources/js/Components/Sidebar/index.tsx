@@ -71,6 +71,8 @@ const Sidebar = ({
         }
     }, [sidebarExpanded]);
 
+    
+
     return (
         <div>
             <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -177,24 +179,59 @@ const Sidebar = ({
                                                                             index
                                                                         }
                                                                     >
-                                                                        <NavLink
-                                                                            href={route(
-                                                                                `${menu.menu_url}`
-                                                                            )}
-                                                                            active={
-                                                                                route().current(
-                                                                                    `${menu.menu_url}.*`
-                                                                                ) ||
-                                                                                route().current(
-                                                                                    `${menu.menu_url}`
-                                                                                )
-                                                                            }
-                                                                            className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
-                                                                        >
-                                                                            {
-                                                                                menu.menu_name
-                                                                            }
-                                                                        </NavLink>
+                                                                        {
+                                                                            route().has(menu.menu_name) ?
+                                                                                <NavLink
+                                                                                    href={route(
+                                                                                        `${menu.menu_url}`
+                                                                                    )}
+                                                                                    active={
+                                                                                        route().current(
+                                                                                            `${menu.menu_url}.*`
+                                                                                        ) ||
+                                                                                        route().current(
+                                                                                            `${menu.menu_url}`
+                                                                                        )
+                                                                                    }
+                                                                                    className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
+                                                                                >
+                                                                                    {
+                                                                                        menu.menu_name
+                                                                                    }
+                                                                                </NavLink> :
+                                                                                <span className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold ">
+                                                                                    {
+                                                                                        menu.menu_url
+                                                                                    }
+                                                                                </span>
+
+                                                                        }
+                                                                        {
+                                                                            route().has(menu.name) ?
+                                                                                <NavLink
+                                                                                    href={route(
+                                                                                        `${menu.menu_url}`
+                                                                                    )}
+                                                                                    active={
+                                                                                        route().current(
+                                                                                            `${menu.menu_url}.*`
+                                                                                        ) ||
+                                                                                        route().current(
+                                                                                            `${menu.menu_url}`
+                                                                                        )
+                                                                                    }
+                                                                                    className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
+                                                                                >
+                                                                                    {
+                                                                                        menu.menu_name
+                                                                                    }
+                                                                                </NavLink> :
+                                                                                <span className=" group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold opacity-25 ">
+                                                                                    {
+                                                                                        menu.menu_url
+                                                                                    }
+                                                                                </span>
+                                                                        }
                                                                     </li>
                                                                 ) : (
                                                                     <SidebarLinkGroup
@@ -224,18 +261,17 @@ const Sidebar = ({
                                                                                             sidebarExpanded
                                                                                                 ? handleClick()
                                                                                                 : setSidebarExpanded(
-                                                                                                      true
-                                                                                                  );
+                                                                                                    true
+                                                                                                );
                                                                                         }}
                                                                                     >
                                                                                         {
                                                                                             menu.menu_name
                                                                                         }
                                                                                         <svg
-                                                                                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                                                                                open &&
+                                                                                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open &&
                                                                                                 "rotate-180"
-                                                                                            }`}
+                                                                                                }`}
                                                                                             width="20"
                                                                                             height="20"
                                                                                             viewBox="0 0 20 20"
@@ -252,25 +288,21 @@ const Sidebar = ({
                                                                                     </NavLink>
                                                                                     {/* <!-- Dropdown Menu Start --> */}
                                                                                     <div
-                                                                                        className={`translate transform overflow-hidden ${
-                                                                                            !open &&
+                                                                                        className={`translate transform overflow-hidden ${!open &&
                                                                                             "hidden"
-                                                                                        }`}
+                                                                                            }`}
                                                                                     >
                                                                                         <ul className="mt-2 flex flex-col pl-6">
                                                                                             {menu.children
-                                                                                                ?.filter(
-                                                                                                    (
-                                                                                                        children: any
-                                                                                                    ) => {
-                                                                                                        return (
-                                                                                                            children
-                                                                                                                .access
-                                                                                                                .length >
-                                                                                                            0
-                                                                                                        );
+                                                                                                ?.filter((children: any) => {
+                                                                                                    // Jika user type adalah 1 (admin), tampilkan semua children tanpa filter access
+                                                                                                    if (auth.user.user_type_id === 1) {
+                                                                                                        return children // Tampilkan semua children
                                                                                                     }
-                                                                                                )
+
+                                                                                                    // Jika bukan admin, filter children berdasarkan access
+                                                                                                    return children.access.length > 0;
+                                                                                                })
                                                                                                 .map(
                                                                                                     (
                                                                                                         filteredChildren: any,
@@ -281,19 +313,28 @@ const Sidebar = ({
                                                                                                                 index
                                                                                                             }
                                                                                                         >
-                                                                                                            <NavLink
-                                                                                                                href={route(
-                                                                                                                    filteredChildren.menu_url
-                                                                                                                )}
-                                                                                                                active={route().current(
-                                                                                                                    filteredChildren.menu_url
-                                                                                                                )}
-                                                                                                                className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold  hover:text-red-700`}
-                                                                                                            >
-                                                                                                                {
-                                                                                                                    filteredChildren.menu_name
-                                                                                                                }
-                                                                                                            </NavLink>
+                                                                                                            {
+                                                                                                                route().has(filteredChildren.menu_url) ?
+                                                                                                                    <NavLink
+                                                                                                                        href={route(
+                                                                                                                            filteredChildren.menu_url
+                                                                                                                        )}
+                                                                                                                        active={route().current(
+                                                                                                                            filteredChildren.menu_url
+                                                                                                                        )}
+                                                                                                                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold  hover:text-red-700`}
+                                                                                                                    >
+                                                                                                                        {
+                                                                                                                            filteredChildren.menu_name
+                                                                                                                        }
+                                                                                                                    </NavLink> :
+                                                                                                                    <span className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold opacity-25">
+                                                                                                                        {
+                                                                                                                            filteredChildren.menu_name
+                                                                                                                        }
+                                                                                                                    </span>
+                                                                                                            }
+
                                                                                                         </li>
                                                                                                     )
                                                                                                 )}
@@ -329,9 +370,8 @@ const Sidebar = ({
 
             {/* Static sidebar for desktop */}
             <div
-                className={`hidden lg:fixed lg:inset-y-0 lg:z-50 ${
-                    !sidebarDesktopOpen ? "lg:flex lg:w-72 lg:flex-col" : ""
-                }`}
+                className={`hidden lg:fixed lg:inset-y-0 lg:z-50 ${!sidebarDesktopOpen ? "lg:flex lg:w-72 lg:flex-col" : ""
+                    }`}
             >
                 {/* Sidebar component, swap this element with another sidebar if you like */}
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
@@ -361,22 +401,32 @@ const Sidebar = ({
                                         .map((menu: any, index: number) =>
                                             menu.menu_url !== null ? (
                                                 <li key={index}>
-                                                    <NavLink
-                                                        href={route(
-                                                            `${menu.menu_url}`
-                                                        )}
-                                                        active={
-                                                            route().current(
-                                                                `${menu.menu_url}.*`
-                                                            ) ||
-                                                            route().current(
-                                                                `${menu.menu_url}`
-                                                            )
-                                                        }
-                                                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
-                                                    >
-                                                        {menu.menu_name}
-                                                    </NavLink>
+                                                    {
+                                                        route().has(menu.menu_url)
+                                                            ?
+                                                            <NavLink
+                                                                href={route(
+                                                                    `${menu.menu_url}`
+                                                                )}
+                                                                active={
+                                                                    route().current(
+                                                                        `${menu.menu_url}.*`
+                                                                    ) ||
+                                                                    route().current(
+                                                                        `${menu.menu_url}`
+                                                                    )
+                                                                }
+                                                                className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white`}
+                                                            >
+                                                                {menu.menu_name}
+                                                            </NavLink>
+                                                            :
+                                                            <span className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold opacity-25">
+                                                                {
+                                                                    menu.menu_name
+                                                                }
+                                                            </span>
+                                                    }
                                                 </li>
                                             ) : (
                                                 <SidebarLinkGroup
@@ -401,18 +451,17 @@ const Sidebar = ({
                                                                         sidebarExpanded
                                                                             ? handleClick()
                                                                             : setSidebarExpanded(
-                                                                                  true
-                                                                              );
+                                                                                true
+                                                                            );
                                                                     }}
                                                                 >
                                                                     {
                                                                         menu.menu_name
                                                                     }
                                                                     <svg
-                                                                        className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                                                            open &&
+                                                                        className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open &&
                                                                             "rotate-180"
-                                                                        }`}
+                                                                            }`}
                                                                         width="20"
                                                                         height="20"
                                                                         viewBox="0 0 20 20"
@@ -429,36 +478,23 @@ const Sidebar = ({
                                                                 </NavLink>
                                                                 {/* <!-- Dropdown Menu Start --> */}
                                                                 <div
-                                                                    className={`translate transform overflow-hidden ${
-                                                                        !open &&
+                                                                    className={`translate transform overflow-hidden ${!open &&
                                                                         "hidden"
-                                                                    }`}
+                                                                        }`}
                                                                 >
                                                                     <ul className="mt-2 flex flex-col pl-6 space-y-1">
-                                                                        {menu.children
-                                                                            ?.filter(
-                                                                                (
-                                                                                    children: any
-                                                                                ) => {
-                                                                                    return (
-                                                                                        children
-                                                                                            .access
-                                                                                            .length >
-                                                                                        0
-                                                                                    );
-                                                                                }
-                                                                            )
-                                                                            .map(
-                                                                                (
-                                                                                    filteredChildren: any,
-                                                                                    index: number
-                                                                                ) => (
-                                                                                    <li
-                                                                                        key={
-                                                                                            index
-                                                                                        }
-                                                                                    >
-                                                                                        {/* menu dropdown */}
+                                                                        {menu.children?.filter((children: any) => {
+                                                                            if (auth.user.user_type_id === 1) {
+                                                                                return children // Tampilkan semua children
+                                                                            }
+
+                                                                            // Jika bukan admin, filter children berdasarkan access
+                                                                            return children.access?.length > 0;
+                                                                        }).map((filteredChildren: any, index: number) => (
+                                                                            <li key={index}>
+                                                                                {/* menu dropdown */}
+                                                                                {
+                                                                                    route().has(filteredChildren.menu_url) ?
                                                                                         <NavLink
                                                                                             href={route(
                                                                                                 filteredChildren.menu_url
@@ -472,10 +508,18 @@ const Sidebar = ({
                                                                                                 filteredChildren.menu_name
                                                                                             }
                                                                                         </NavLink>
-                                                                                        {/* end menu dropdown */}
-                                                                                    </li>
-                                                                                )
-                                                                            )}
+                                                                                        :
+                                                                                        <span className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold opacity-25">
+                                                                                            {
+                                                                                                filteredChildren.menu_name
+                                                                                            }
+                                                                                        </span>
+                                                                                }
+
+                                                                                {/* end menu dropdown */}
+                                                                            </li>
+                                                                        )
+                                                                        )}
                                                                     </ul>
                                                                 </div>
                                                                 {/* <!-- Dropdown Menu End --> */}

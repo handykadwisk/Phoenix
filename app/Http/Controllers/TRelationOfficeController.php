@@ -123,13 +123,14 @@ class TRelationOfficeController extends Controller
                 "module"      => "Office",
                 "id"          => $office->RELATION_OFFICE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $office->RELATION_OFFICE_ID,
-            $office->RELATION_OFFICE_ALIAS
+            $office->RELATION_OFFICE_ALIAS,
+            "Relation Structure Office Added"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -195,13 +196,14 @@ class TRelationOfficeController extends Controller
                 "module"      => "Office",
                 "id"          => $request->RELATION_OFFICE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
             $request->RELATION_OFFICE_ID,
-            $request->RELATION_OFFICE_ALIAS
+            $request->RELATION_OFFICE_ALIAS,
+            "Relation Office Edited"
         ], 201, [
             'X-Inertia' => true
         ]);

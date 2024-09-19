@@ -23,6 +23,7 @@ import TextInput from "@/Components/TextInput";
 import SelectTailwind from "react-tailwindcss-select";
 import Checkbox from "@/Components/Checkbox";
 import BeatLoader from "react-spinners/BeatLoader";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function DetailJobDesc({
     idAddress,
@@ -93,37 +94,33 @@ export default function DetailJobDesc({
     };
 
     const handleSuccess = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Edit Relation Job Desc",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setDetailJobDesc({
-                    RELATION_JOBDESC_ID: message[0],
-                    RELATION_JOBDESC_ALIAS: message[1],
-                });
-                getJobDescDetail(message[0]);
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[2]);
+            setDetailJobDesc({
+                RELATION_JOBDESC_ID: message[0],
+                RELATION_JOBDESC_ALIAS: message[1],
+            });
+            getJobDescDetail(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
+    const [isSuccess, setIsSuccess] = useState<string>("");
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* <span>Detail Division</span> */}
             {/* modal edit*/}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.edit}
                 onClose={() =>
                     setModal({

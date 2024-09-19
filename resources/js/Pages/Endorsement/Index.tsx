@@ -494,6 +494,7 @@ export default function PolicyIndex({ auth }: PageProps) {
 
             {/* modal add Endorsement */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() => {
                     setModal({
@@ -1469,16 +1470,22 @@ export default function PolicyIndex({ auth }: PageProps) {
                                         <thead className="bg-gray-100">
                                             <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                                 <TableTH
+                                                colSpan={""}
+                                                    rowSpan={""}
                                                     className={
                                                         "max-w-[0px] text-center"
                                                     }
                                                     label={"No"}
                                                 />
                                                 <TableTH
+                                                colSpan={""}
+                                                    rowSpan={""}
                                                     className={"min-w-[50px]"}
                                                     label={"Policy Number"}
                                                 />
                                                 <TableTH
+                                                colSpan={""}
+                                                    rowSpan={""}
                                                     className={"min-w-[50px]"}
                                                     label={"Endorsement Number"}
                                                 />

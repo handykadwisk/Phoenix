@@ -21,44 +21,32 @@ import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
 import AGGrid from "@/Components/AgGrid";
 import { BeatLoader } from "react-spinners";
+import DetailRelation from "./DetailRelation";
 
 export default function DetailBaa({
     auth,
-    // isSuccessNew,
-    // setIsSuccessNew,
-    idAgent,
+    // isSuccessBAA,
+    // setIsSuccessBAA,
+    idBaa,
 }: PropsWithChildren<{
     auth: any;
-    // isSuccessNew: any;
-    idAgent: any;
-    // setIsSuccessNew: any;
+    // isSuccessBAA: any;
+    idBaa: any;
+    // setIsSuccessBAA: any;
 }>) {
-    const [detailAgentNew, setDetailAgentNew] = useState<any>([]);
-    const [relationBaa, setRelationBaa] = useState<any>([]);
-    // console.log(dataAgent);
-    // useEffect(() => {
-    //     getMRelationBaa(idAgent);
-    // }, [idAgent]);
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
     });
-    const [isSuccessNew, setIsSuccessNew] = useState<any>("");
+
+    const [relationAgent, setRelationBAA] = useState<any>([]);
+    const [isSuccessBAA, setIsSuccessBAA] = useState<any>("");
+    const [dataRelation, setDataRelation] = useState<any>({
+        idBaa: idBaa,
+        name_relation: [],
+    });
 
     // get detail agent
-    const getMRelationBaa = async (id: string) => {
-        await axios
-            .post(`/getMRelationBaa`, { id })
-            .then((res) => {
-                setDetailAgentNew(res.data);
-                // setDataRelationById(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    // get detail agent
-    const getRelationBaa = async () => {
+    const getRelationBAA = async () => {
         setIsLoading({
             ...isLoading,
             get_detail: true,
@@ -66,7 +54,7 @@ export default function DetailBaa({
         await axios
             .post(`/getRelationBaaSelect`)
             .then((res) => {
-                setRelationBaa(res.data);
+                setRelationBAA(res.data);
                 setIsLoading({
                     ...isLoading,
                     get_detail: false,
@@ -77,67 +65,38 @@ export default function DetailBaa({
             });
     };
 
-    const [modalBaa, setModalBaa] = useState<any>({
+    const [modalBAA, setModalBAA] = useState<any>({
         add: false,
+        relation: false,
     });
 
     // handle modal add relation agent
-    const handleClickAddRelationBaa = async (
+    const handleClickAddRelationBAA = async (
         // e: FormEvent,
         idRelationOrganization: string
     ) => {
         // e.preventDefault();
-        getRelationBaa();
-        setModalBaa({
-            add: !modalBaa.false,
+        getRelationBAA();
+        setModalBAA({
+            add: !modalBAA.false,
         });
     };
 
-    const [dataRelation, setDataRelation] = useState<any>({
-        idAgent: idAgent,
-        name_relation: [],
+    const [detailRelation, setDetailRelation] = useState<any>({
+        RELATION_ORGANIZATION_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
     });
-    const inputRefTag = useRef<HTMLInputElement>(null);
-    const [query, setQuery] = useState("");
-    const [menuOpen, setMenuOpen] = useState(true);
 
-    const filteredTags = relationBaa.filter(
-        (item: any) =>
-            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
-                query.toLocaleLowerCase()?.trim()
-            ) &&
-            !dataRelation.name_relation?.includes(
-                item.RELATION_ORGANIZATION_NAME
-            )
-    );
-
-    const isDisableTag =
-        !query?.trim() ||
-        dataRelation.name_relation.filter(
-            (item: any) =>
-                item.name_relation?.toLocaleLowerCase()?.trim() ===
-                query?.toLocaleLowerCase()?.trim()
-        )?.length;
-    // console.log(dataRelation.name_relation);
-
-    const handleSuccess = (message: string) => {
-        // if (modal.add) {
-        setDataRelation({
-            idAgent: idAgent,
-            name_relation: [],
+    // handle detail relation
+    const handleDetailRelation = async (data: any) => {
+        // getDivisionCombo(idRelation);
+        setDetailRelation({
+            RELATION_ORGANIZATION_ID: data.RELATION_ORGANIZATION_ID,
+            RELATION_ORGANIZATION_NAME: data.RELATION_ORGANIZATION_NAME,
         });
-        Swal.fire({
-            title: "Success",
-            text: "Relation Add",
-            icon: "success",
-        }).then((result: any) => {
-            // console.log(message);
-            if (result.value) {
-                // getMRelationBaa(message[0]);
-                setIsSuccessNew({
-                    isSuccessNew: "success",
-                });
-            }
+        setModalBAA({
+            add: false,
+            relation: true,
         });
     };
 
@@ -145,11 +104,9 @@ export default function DetailBaa({
         await axios
             .post(`/deleteBaa`, { id })
             .then((res) => {
-                setIsSuccessNew({
-                    isSuccessNew: "success",
+                setIsSuccessBAA({
+                    isSuccessBAA: "success",
                 });
-                // console.log(id);
-                // getMRelationBaa(idAgent);
             })
             .catch((err) => {
                 console.log(err);
@@ -157,7 +114,6 @@ export default function DetailBaa({
     };
 
     const deleteRelation = async (id: string) => {
-        // console.log(data);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't delete this!",
@@ -171,17 +127,8 @@ export default function DetailBaa({
                 deleteProcess(id);
             }
         });
-        // Swal.fire({
-        //     title: "Success",
-        //     text: "Images Change",
-        //     icon: "success",
-        // }).then((result: any) => {
-        //     // console.log(result);
-        //     if (result.value) {
-        //         deleteProcess(id);
-        //     }
-        // });
     };
+
     const CustomButtonComponent = (props: any) => {
         return (
             <span>
@@ -194,17 +141,46 @@ export default function DetailBaa({
             </span>
         );
     };
+
+    const handleSuccess = async (message: string) => {
+        // if (modal.add) {
+        setDataRelation({
+            idBaa: idBaa,
+            name_relation: [],
+        });
+        Swal.fire({
+            title: "Success",
+            text: "Relation Add",
+            icon: "success",
+        }).then((result: any) => {
+            if (result.value) {
+                setIsSuccessBAA({
+                    isSuccessBAA: "success",
+                });
+            }
+        });
+    };
+
+    const inputRefTag = useRef<HTMLInputElement>(null);
+    const [query, setQuery] = useState("");
+    const [menuOpen, setMenuOpen] = useState(true);
+    const filteredTags = relationAgent.filter(
+        (item: any) =>
+            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+                query.toLocaleLowerCase()?.trim()
+            ) &&
+            !dataRelation.name_relation?.includes(
+                item.RELATION_ORGANIZATION_NAME
+            )
+    );
+
     return (
         <>
-            {/* daftar list agent */}
-            {/* <div className="p-2 bg-red-600 w-fit mb-3 text-white rounded-md cursor-pointer">
-                <span>+ Add</span>
-            </div> */}
             {/* modal agent */}
             <ModalToAdd
-                show={modalBaa.add}
+                show={modalBAA.add}
                 onClose={() =>
-                    setModalBaa({
+                    setModalBAA({
                         add: false,
                     })
                 }
@@ -400,17 +376,46 @@ export default function DetailBaa({
             />
             {/* end modal agent */}
 
+            {/* modal relation */}
+            <ModalToAction
+                show={modalBAA.relation}
+                onClose={() =>
+                    setModalBAA({
+                        add: false,
+                        relation: false,
+                    })
+                }
+                title={detailRelation.RELATION_ORGANIZATION_NAME}
+                url={""}
+                data={""}
+                onSuccess={null}
+                method={""}
+                headers={null}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[80%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DetailRelation
+                            auth={auth}
+                            idRelation={detailRelation.RELATION_ORGANIZATION_ID}
+                        />
+                    </>
+                }
+            />
+            {/* end modal relation */}
+
             <div className="max-w-full h-[100%] mt-2">
                 <AGGrid
+                    searchParam={""}
                     // loading={isLoading.get_policy}
                     url={"getMRelationBAA"}
                     addButtonLabel={"Add Relation"}
-                    withParam={idAgent}
-                    addButtonModalState={() =>
-                        handleClickAddRelationBaa(idAgent)
-                    }
-                    doubleClickEvent={undefined}
-                    triggeringRefreshData={isSuccessNew}
+                    withParam={idBaa}
+                    addButtonModalState={() => handleClickAddRelationBAA(idBaa)}
+                    doubleClickEvent={handleDetailRelation}
+                    triggeringRefreshData={isSuccessBAA}
                     colDefs={[
                         {
                             headerName: "No.",
@@ -428,96 +433,11 @@ export default function DetailBaa({
                             floatingFilter: true,
                         },
                         {
-                            field: "button",
+                            field: "Action",
                             cellRenderer: CustomButtonComponent,
                         },
                     ]}
                 />
-                {/* <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                    <table className="w-full table-auto divide-y divide-gray-300">
-                        <thead className="">
-                            <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                <TableTH
-                                    className={
-                                        "w-[10px] text-center bg-gray-200 rounded-tl-lg rounded-bl-lg"
-                                    }
-                                    label={"No"}
-                                />
-                                <TableTH
-                                    className={"min-w-[50px] bg-gray-200"}
-                                    label={"Name Relation Agent"}
-                                />
-                                <th className="flex justify-end items-center bg-gray-200 p-2 font-semibold">
-                                    <div
-                                        className="p-2 bg-red-600 w-fit text-white rounded-md cursor-pointer"
-                                        onClick={(e) =>
-                                            handleClickAddRelationBaa(
-                                                e,
-                                                idAgent
-                                            )
-                                        }
-                                    >
-                                        <span>+ Add</span>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {detailAgentNew?.length !== 0 ? (
-                                detailAgentNew?.map(
-                                    (dAgent: any, i: number) => {
-                                        return (
-                                            <tr
-                                                key={i}
-                                                className={
-                                                    i % 2 === 0
-                                                        ? ""
-                                                        : "bg-gray-100"
-                                                }
-                                            >
-                                                <TableTD
-                                                    onButton={() => {}}
-                                                    value={i + 1 + "."}
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    onButton={() => {}}
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dAgent.relation
-                                                                    .RELATION_ORGANIZATION_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                                <td
-                                                    className="flex justify-center items-center"
-                                                    colSpan={2}
-                                                    onClick={(e) =>
-                                                        deleteRelation(
-                                                            dAgent.M_RELATION_AGENT_ID
-                                                        )
-                                                    }
-                                                >
-                                                    <XMarkIcon className="w-7 text-red-600" />
-                                                </td>
-                                            </tr>
-                                        );
-                                    }
-                                )
-                            ) : (
-                                <></>
-                            )}
-                        </tbody>
-                    </table>
-                    {detailAgentNew?.length === 0 && (
-                        <div className="flex justify-center items-center">
-                            No data result!
-                        </div>
-                    )}
-                </div> */}
             </div>
         </>
     );

@@ -162,6 +162,7 @@ class InsurancePanelController extends Controller
                 'IP_POLICY_SHARE'   => $value['IP_POLICY_SHARE'],
                 'IP_POLICY_LEADER'  => $value['IP_POLICY_LEADER'],
                 'POLICY_COST'       => $value['POLICY_COST'],
+                'IP_CURRENCY_ID'    => $value['IP_CURRENCY_ID'],
                 'IP_CREATED_BY'     => Auth::user()->id
             ]);
 
@@ -172,6 +173,10 @@ class InsurancePanelController extends Controller
                     'REMARKS'  => $cover['REMARKS'],
                     'BROKERAGE_FEE_PERCENTAGE'  => $cover['BROKERAGE_FEE_PERCENTAGE'],
                     'BROKERAGE_FEE'  => $cover['BROKERAGE_FEE'],
+                    'BROKERAGE_FEE_VAT' => $cover['BROKERAGE_FEE_VAT'],
+                    'BROKERAGE_FEE_PPN' => $cover['BROKERAGE_FEE_PPN'],
+                    'BROKERAGE_FEE_PPH' => $cover['BROKERAGE_FEE_PPH'],
+                    'BROKERAGE_FEE_NETT_AMOUNT' => $cover['BROKERAGE_FEE_NETT_AMOUNT'],
                     // 'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
                     'COVERAGE_NAME'  => $cover['COVERAGE_NAME'],
                     'CURRENCY_ID'  => $cover['CURRENCY_ID'],
@@ -179,7 +184,15 @@ class InsurancePanelController extends Controller
                     // 'DISC_BROKER'  => $cover['DISC_BROKER'],
                     'ENGINEERING_FEE_PERCENTAGE'  => $cover['ENGINEERING_FEE_PERCENTAGE'],
                     'ENGINEERING_FEE'  => $cover['ENGINEERING_FEE'],
+                    'ENGINEERING_FEE_VAT' => $cover['ENGINEERING_FEE_VAT'],
+                    'ENGINEERING_FEE_PPN' => $cover['ENGINEERING_FEE_PPN'],
+                    'ENGINEERING_FEE_PPH' => $cover['ENGINEERING_FEE_PPH'],
+                    'ENGINEERING_FEE_NETT_AMOUNT' => $cover['ENGINEERING_FEE_NETT_AMOUNT'],
                     'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
+                    'CONSULTANCY_FEE_VAT' => $cover['CONSULTANCY_FEE_VAT'],
+                    'CONSULTANCY_FEE_PPN' => $cover['CONSULTANCY_FEE_PPN'],
+                    'CONSULTANCY_FEE_PPH' => $cover['CONSULTANCY_FEE_PPH'],
+                    'CONSULTANCY_FEE_NETT_AMOUNT' => $cover['CONSULTANCY_FEE_NETT_AMOUNT'],
                     'GROSS_PREMI'  => $cover['GROSS_PREMI'],
                     'NETT_PREMI'  => $cover['NETT_PREMI'],
                     'POLICY_COVERAGE_ID'  => $cover['POLICY_COVERAGE_ID']
@@ -195,11 +208,12 @@ class InsurancePanelController extends Controller
                 "module"      => "Add Insurer",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
-            'Create Insurer Succeed.'
+            "msg" => "Success Add Insurer",
+            "id" => $request->id
         ], 200, [
             'X-Inertia' => true
         ]);
@@ -216,23 +230,42 @@ class InsurancePanelController extends Controller
                             'IP_POLICY_SHARE'   => $value['IP_POLICY_SHARE'],
                             'IP_POLICY_LEADER'  => $value['IP_POLICY_LEADER'],
                             'POLICY_COST'       => $value['POLICY_COST'],
+                            'IP_CURRENCY_ID'    => $value['IP_CURRENCY_ID'],
                             'IP_UPDATED_BY'     => Auth::user()->id,
                             'IP_UPDATED_DATE'   => now()
                         ]);
             foreach ($value['premium'] as $key => $cover) {
                 $insurerCoverage = MInsurerCoverage::where('INSURER_COVERAGE_ID', $cover['INSURER_COVERAGE_ID'])
                         ->update([
+
                             // 'ACQUISITION_COST'  => $cover['ACQUISITION_COST'], 
                             // 'ADMIN_COST'  => $cover['ADMIN_COST'],
                             // 'AGENT_COMMISION'  => $cover['AGENT_COMMISION'],
+                            'INTEREST_INSURED_ID'  => $cover['INTEREST_INSURED_ID'], // Belum ada isi
+                            'REMARKS'  => $cover['REMARKS'],
+                            'BROKERAGE_FEE_PERCENTAGE'  => $cover['BROKERAGE_FEE_PERCENTAGE'],
                             'BROKERAGE_FEE'  => $cover['BROKERAGE_FEE'],
+                            'BROKERAGE_FEE_VAT' => $cover['BROKERAGE_FEE_VAT'],
+                            'BROKERAGE_FEE_PPN' => $cover['BROKERAGE_FEE_PPN'],
+                            'BROKERAGE_FEE_PPH' => $cover['BROKERAGE_FEE_PPH'],
+                            'BROKERAGE_FEE_NETT_AMOUNT' => $cover['BROKERAGE_FEE_NETT_AMOUNT'],
                             // 'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
                             'COVERAGE_NAME'  => $cover['COVERAGE_NAME'],
                             'CURRENCY_ID'  => $cover['CURRENCY_ID'],
                             // 'DISC_ADMIN'  => $cover['DISC_ADMIN'],
                             // 'DISC_BROKER'  => $cover['DISC_BROKER'],
                             // 'DISC_CONSULTATION'  => $cover['DISC_CONSULTATION'],
+                            'ENGINEERING_FEE_PERCENTAGE'  => $cover['ENGINEERING_FEE_PERCENTAGE'],
                             'ENGINEERING_FEE'  => $cover['ENGINEERING_FEE'],
+                            'ENGINEERING_FEE_VAT' => $cover['ENGINEERING_FEE_VAT'],
+                            'ENGINEERING_FEE_PPN' => $cover['ENGINEERING_FEE_PPN'],
+                            'ENGINEERING_FEE_PPH' => $cover['ENGINEERING_FEE_PPH'],
+                            'ENGINEERING_FEE_NETT_AMOUNT' => $cover['ENGINEERING_FEE_NETT_AMOUNT'],
+                            'CONSULTANCY_FEE'  => $cover['CONSULTANCY_FEE'],
+                            'CONSULTANCY_FEE_VAT' => $cover['CONSULTANCY_FEE_VAT'],
+                            'CONSULTANCY_FEE_PPN' => $cover['CONSULTANCY_FEE_PPN'],
+                            'CONSULTANCY_FEE_PPH' => $cover['CONSULTANCY_FEE_PPH'],
+                            'CONSULTANCY_FEE_NETT_AMOUNT' => $cover['CONSULTANCY_FEE_NETT_AMOUNT'],
                             // 'FEE_BASED_INCOME'  => $cover['FEE_BASED_INCOME'],
                             'GROSS_PREMI'  => $cover['GROSS_PREMI'],
                             'NETT_PREMI'  => $cover['NETT_PREMI'],
@@ -249,11 +282,12 @@ class InsurancePanelController extends Controller
                 "module"      => "Edit Insurer",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
-            'Edit Insurer Succeed.'
+            "msg" => "Success Edit Insurer",
+            "id" => $request->id
         ], 200, [
             'X-Inertia' => true
         ]);
@@ -321,7 +355,7 @@ class InsurancePanelController extends Controller
                 "module"      => "Insurance Panel",
                 "id"          => $insurancePanel
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -454,7 +488,7 @@ class InsurancePanelController extends Controller
                 "module"      => "Insurance Panel",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -484,7 +518,7 @@ class InsurancePanelController extends Controller
                     "module"      => "Insurer",
                     "id"          => $request->id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
             
             return new JsonResponse([

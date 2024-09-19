@@ -21,12 +21,13 @@ class CashAdvanceReport extends Model
     public $timestamps = false;
 
     protected $with = [
+        'm_cash_advance_proof_of_document',
         'cash_advance_detail_report',
         'cash_advance_differents',
         'cash_advance_method',
-        'person',
-        'person_used_by',
-        'person_approval',
+        'employee',
+        'employee_used_by',
+        'employee_approval',
         'user',
         'user_used_by',
         'user_approval',
@@ -36,6 +37,11 @@ class CashAdvanceReport extends Model
     public function cash_advance(): BelongsTo
     {
         return $this->belongsTo(CashAdvance::class, 'REPORT_CASH_ADVANCE_CASH_ADVANCE_ID');
+    }
+
+    public function m_cash_advance_proof_of_document(): HasMany
+    {
+        return $this->hasMany(MCashAdvanceProofOfDocument::class, 'CASH_ADVANCE_PROOF_OF_DOCUMENT_REPORT_CASH_ADVANCE_ID');
     }
 
     public function cash_advance_detail_report(): HasMany
@@ -53,19 +59,19 @@ class CashAdvanceReport extends Model
         return $this->belongsTo(RCashAdvanceMethod::class, 'REPORT_CASH_ADVANCE_METHOD');
     }
 
-    public function person(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'REPORT_CASH_ADVANCE_REQUESTED_BY');
+        return $this->belongsTo(TEmployee::class, 'REPORT_CASH_ADVANCE_REQUESTED_BY');
     }
 
-    public function person_used_by(): BelongsTo
+    public function employee_used_by(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'REPORT_CASH_ADVANCE_USED_BY');
+        return $this->belongsTo(TEmployee::class, 'REPORT_CASH_ADVANCE_USED_BY');
     }
 
-    public function person_approval(): BelongsTo
+    public function employee_approval(): BelongsTo
     {
-        return $this->belongsTo(TPerson::class, 'REPORT_CASH_ADVANCE_FIRST_APPROVAL_BY');
+        return $this->belongsTo(TEmployee::class, 'REPORT_CASH_ADVANCE_FIRST_APPROVAL_BY');
     }
 
     public function user(): BelongsTo

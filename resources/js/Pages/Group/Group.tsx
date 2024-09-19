@@ -56,7 +56,6 @@ export default function Group({ auth }: PageProps) {
             .post(`/getMappingParentGroup`)
             .then((res: any) => {
                 setMappingGroup(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -126,7 +125,6 @@ export default function Group({ auth }: PageProps) {
             text: "New Group Added",
             icon: "success",
         }).then((result: any) => {
-            // console.log(result);
             if (result.value) {
                 setIdGroup({
                     RELATION_GROUP_ID: message[0],
@@ -381,12 +379,16 @@ export default function Group({ auth }: PageProps) {
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg rounded-bl-lg"
                                         }
                                         label={"No"}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg rounded-br-lg"
                                         }

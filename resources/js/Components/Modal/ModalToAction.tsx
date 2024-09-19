@@ -10,7 +10,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 export default function ModalToAction({
     show = false,
     closeable = true,
-    onClose = () => {},
+    onClose = () => { },
     title,
     body,
     url,
@@ -35,6 +35,7 @@ export default function ModalToAction({
     submitButtonName: string | null;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [isValidationError, setIsValidationError] = useState<string>("");
     const [isError, setIsError] = useState<string>("");
     const modalRef = useRef(null);
 
@@ -46,35 +47,54 @@ export default function ModalToAction({
     };
 
     const callAxios = axios.create({
-        headers,
-    });
+        headers
+    })
 
     const action = async (e: any) => {
-        e.preventDefault();
+        e.preventDefault()
 
         setIsProcessing(true);
-        // onSuccess("");
+        onSuccess("");
+        try {
+            const response = await callAxios({ url, data, method });
+            if (response) {
+                setIsProcessing(false);
+                setIsValidationError("");
+                onSuccess(response.data);
+            }
+            close();
+        } catch (error: any) {
+            setIsProcessing(false);
+            if (error.response.status === 422) {
+                setIsValidationError(error.response.data[0]);
+                setIsError(error.response.data[0]);
+            }
+            setIsError(error.response.data[0]);
+            console.log(error.response.data[0], "error");
+        }
 
-        await callAxios({ url, data, method })
-            .then((res) => {
-                setIsProcessing(false);
-                setIsError("");
-                onSuccess(res.data);
-                close();
-            })
-            .catch((err) => {
-                setIsProcessing(false);
-                // setIsError(err.response.data);
-                console.log(err);
-            });
+        // await callAxios({url, data, method})
+        // .then((res) => {
+        //     setIsProcessing(false)
+        //     setIsValidationError('')
+        //     onSuccess(res.data[0])
+        //     closeAllModal()
+        // })
+        // .catch(function (error) {
+        //     setIsProcessing(false)
+        //     if (error.response.status === 500) {
+        //         setIsErrorMessage('There is something wrong. Please try again later.')
+        //     }
+        // })
     };
 
     return (
         <>
+            {/* Edited Haris */}
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-9999"
+                    className="relative z-50"
                     onClose={close}
                     initialFocus={modalRef}
                 >
@@ -101,7 +121,11 @@ export default function ModalToAction({
                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
-                                <Dialog.Panel className={classPanel}>
+                                <Dialog.Panel
+                                    className={
+                                        classPanel + " modal-action-container"
+                                    }
+                                >
                                     <form onSubmit={action}>
                                         <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                             <div className="flex justify-between">
@@ -126,14 +150,22 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div
-                                                className="max-h-full overflow-y-auto custom-scrollbar px-2"
-                                                ref={modalRef}
-                                            >
-                                                {body}
+                                            <div className="max-h-full">
+                                                <div
+                                                    className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
+                                                    ref={modalRef}
+                                                >
+                                                    {body}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                            {/* <PrimaryButton
+                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                disabled={isProcessing}
+                                            >
+                                                Submit
+                                            </PrimaryButton> */}
                                             {submitButtonName && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"

@@ -1,16 +1,20 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import KillianLogo from '@/Images/phoenix.png'
-import { Link } from '@inertiajs/react';
-import { PropsWithChildren } from 'react';
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import KillianLogo from "@/Images/phoenix.png";
+import { Link } from "@inertiajs/react";
+import { PropsWithChildren } from "react";
 
 export default function Guest({ children }: PropsWithChildren) {
     return (
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex flex-wrap items-center min-h-screen">
+            <div className="flex flex-wrap items-center login-layout">
                 <div className="hidden w-full xl:block xl:w-1/2 items-center">
                     <div className="py-17.5 px-26 text-center">
                         <Link className="mb-2 inline-block" href="/">
-                            <img src={KillianLogo} alt="Logo" className='w-90' />
+                            <img
+                                src={KillianLogo}
+                                alt="Logo"
+                                className="w-90"
+                            />
                         </Link>
                         {/* <p className="2xl:px-20">
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit
@@ -142,6 +146,11 @@ export default function Guest({ children }: PropsWithChildren) {
                     </div>
                 </div>
                 {children}
+            </div>
+            <div className="bottom-0 z-40 flex h-16 shrink-0 items-center justify-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                <p className="text-sm opacity-80">
+                    Copyright &copy; PT. Killian Teknologi Indonesia
+                </p>
             </div>
         </div>
     );

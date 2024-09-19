@@ -6,7 +6,7 @@ import axios from "axios";
 import Alert from "../Alert";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
-export default function ModalToAdd({
+export default function ModalAttendance({
     show = false,
     closeable = true,
     onClose = () => {},
@@ -17,6 +17,7 @@ export default function ModalToAdd({
     onSuccess,
     classPanel = "",
     buttonAddOns,
+    disableSubmit = false,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -27,7 +28,8 @@ export default function ModalToAdd({
     data: any;
     classPanel: any;
     onSuccess: any;
-    buttonAddOns: any;
+    buttonAddOns: any | undefined | null;
+    disableSubmit?: boolean;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -40,8 +42,6 @@ export default function ModalToAdd({
     };
 
     const action = async (e: any) => {
-        // console.log(data);
-        // return false;
         e.preventDefault();
 
         setIsProcessing(true);
@@ -52,7 +52,6 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
-                console.log(res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);
@@ -61,12 +60,13 @@ export default function ModalToAdd({
             .catch((err) => {
                 setIsProcessing(false);
                 setIsError(err.response.data[0]);
-                console.log(err);
+                console.log(err.response, "ini");
             });
     };
 
     return (
         <>
+            {/* Edited Haris */}
             <Transition.Root show={show} as={Fragment}>
                 <Dialog
                     as="div"
@@ -86,7 +86,7 @@ export default function ModalToAdd({
                         <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" />
                     </Transition.Child>
 
-                    <div className="fixed inset-0 z-999 w-screen overflow-y-auto">
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                             <Transition.Child
                                 as={Fragment}
@@ -98,7 +98,9 @@ export default function ModalToAdd({
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={classPanel}
+                                    className={
+                                        "modal-action-container " + classPanel
+                                    }
                                     // style={{ maxWidth: "65%" }}
                                 >
                                     <form onSubmit={action}>
@@ -125,20 +127,25 @@ export default function ModalToAdd({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                                <div
-                                                    className="max-h-full overflow-y-auto custom-scrollbar px-1"
-                                                    ref={modalRef}
-                                                >
-                                                    {body}
-                                                </div>
+                                            <div
+                                                className="overflow-y-auto custom-scrollbar px-2 modal-action"
+                                                ref={modalRef}
+                                            >
+                                                {body}
+                                            </div>
                                         </div>
                                         <div className="bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            <PrimaryButton
-                                                className="inline-flex w-full sm:ml-3 sm:w-auto"
-                                                disabled={isProcessing}
-                                            >
-                                                Submit
-                                            </PrimaryButton>
+                                            {disableSubmit ? (
+                                                true
+                                            ) : (
+                                                <PrimaryButton
+                                                    className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                    disabled={isProcessing}
+                                                >
+                                                    Submit
+                                                </PrimaryButton>
+                                            )}
+
                                             {buttonAddOns && (
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"

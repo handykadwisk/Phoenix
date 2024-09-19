@@ -75,7 +75,6 @@ export default function DetailPersonAddress({
     });
 
     const getDistrict = async (id: any) => {
-        // console.log(id);
         const valueKode = id;
         await axios
             .post(`/getDistrict`, { valueKode })
@@ -88,7 +87,6 @@ export default function DetailPersonAddress({
     };
 
     const getDistrictOther = async (id: any) => {
-        // console.log(id);
         const valueKode = id;
         await axios
             .post(`/getDistrict`, { valueKode })
@@ -222,7 +220,6 @@ export default function DetailPersonAddress({
         getDistrict(idRegency);
         getVillage(idDistrict);
     };
-    // console.log(editAddressNew);
     const getProvinceLabel = (value: any) => {
         if (value) {
             const selected = wilayahSelect.filter(
@@ -234,48 +231,28 @@ export default function DetailPersonAddress({
 
     const getRegencyLabel = (value: any) => {
         if (value) {
-            const selectedRegency = regencySelect.filter(
-                (optionRegency: any) => optionRegency.value === value
+            const selected = regencySelect.filter(
+                (option: any) => option.value === value
             );
-            if (selectedRegency?.length === 0) {
-                editAddressNew.ADDRESS_REGENCY;
-            } else {
-                return {
-                    label: selectedRegency[0].label,
-                    value: editAddressNew.ADDRESS_REGENCY,
-                };
-            }
+            return selected[0]?.label;
         }
     };
 
     const getDistrictLabel = (value: any) => {
         if (value) {
-            const selectedDistrict = districtSelect.filter(
-                (optionDistrict: any) => optionDistrict.value === value
+            const selected = districtSelect.filter(
+                (option: any) => option.value === value
             );
-            if (selectedDistrict?.length === 0) {
-                editAddressNew.ADDRESS_DISTRICT;
-            } else {
-                return {
-                    label: selectedDistrict[0].label,
-                    value: editAddressNew.ADDRESS_DISTRICT,
-                };
-            }
+            return selected[0]?.label;
         }
     };
+
     const getVillageLabel = (value: any) => {
         if (value) {
-            const selectedVillage = villageSelect.filter(
-                (optionVillage: any) => optionVillage.value === value
+            const selected = villageSelect.filter(
+                (option: any) => option.value === value
             );
-            if (selectedVillage?.length === 0) {
-                editAddressNew.ADDRESS_VILLAGE;
-            } else {
-                return {
-                    label: selectedVillage[0].label,
-                    value: editAddressNew.ADDRESS_VILLAGE,
-                };
-            }
+            return selected[0]?.label;
         }
     };
 
@@ -314,7 +291,6 @@ export default function DetailPersonAddress({
                 text: "Person Address Edited",
                 icon: "success",
             }).then((result: any) => {
-                // console.log(result);
                 if (result.value) {
                     getPersonAddress(idPerson);
                     // getPersons();
@@ -339,7 +315,6 @@ export default function DetailPersonAddress({
     ) => {
         const changeVal: any = [...editAddressNew.other_address];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setEditAddressNew({
             ...editAddressNew,
             other_address: changeVal,
@@ -353,7 +328,6 @@ export default function DetailPersonAddress({
     ) => {
         const changeVal: any = [...editAddressNew.dataEdit];
         changeVal[i][name] = value;
-        // console.log("zzzz", changeVal);
         setEditAddressNew({
             ...editAddressNew,
             dataEdit: changeVal,
@@ -662,9 +636,15 @@ export default function DetailPersonAddress({
                                                             placeholder={
                                                                 "--Select Regency--"
                                                             }
-                                                            value={getRegencyLabel(
-                                                                dE.ADDRESS_REGENCY
-                                                            )}
+                                                            value={{
+                                                                label: getRegencyLabel(
+                                                                    dE.ADDRESS_REGENCY
+                                                                ),
+                                                                value: dE.ADDRESS_REGENCY,
+                                                            }}
+                                                            // value={getRegencyLabel(
+                                                            //     dE.ADDRESS_REGENCY
+                                                            // )}
                                                             // onChange={(e) =>
                                                             //     inputDataBank(
                                                             //         "BANK_ID",
@@ -718,9 +698,12 @@ export default function DetailPersonAddress({
                                                             placeholder={
                                                                 "--Select Regency--"
                                                             }
-                                                            value={getDistrictLabel(
-                                                                dE.ADDRESS_DISTRICT
-                                                            )}
+                                                            value={{
+                                                                label: getDistrictLabel(
+                                                                    dE.ADDRESS_DISTRICT
+                                                                ),
+                                                                value: dE.ADDRESS_DISTRICT,
+                                                            }}
                                                             // onChange={(e) =>
                                                             //     inputDataBank(
                                                             //         "BANK_ID",
@@ -772,9 +755,12 @@ export default function DetailPersonAddress({
                                                             placeholder={
                                                                 "--Select Province--"
                                                             }
-                                                            value={getVillageLabel(
-                                                                dE.ADDRESS_VILLAGE
-                                                            )}
+                                                            value={{
+                                                                label: getVillageLabel(
+                                                                    dE.ADDRESS_VILLAGE
+                                                                ),
+                                                                value: dE.ADDRESS_VILLAGE,
+                                                            }}
                                                             // onChange={(e) =>
                                                             //     inputDataBank(
                                                             //         "BANK_ID",
@@ -917,7 +903,9 @@ export default function DetailPersonAddress({
                                                             //         ],
                                                             //     });
                                                             // }}
-                                                            onChange={(e) =>
+                                                            onChange={(
+                                                                e: any
+                                                            ) =>
                                                                 inputAddressOther(
                                                                     "ADDRESS_DETAIL",
                                                                     e.target

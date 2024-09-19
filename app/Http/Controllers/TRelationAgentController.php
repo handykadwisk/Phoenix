@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\MRelationAgent;
 use App\Models\MRelationBaa;
+use App\Models\Policy;
 use App\Models\Relation;
+use App\Models\TPerson;
 use App\Models\TRelationAgent;
 use App\Models\UserLog;
 use Illuminate\Database\Eloquent\Builder;
@@ -119,7 +121,7 @@ class TRelationAgentController extends Controller
                 "module"      => "Agent",
                 "id"          => $agent->RELATION_AGENT_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -139,7 +141,7 @@ class TRelationAgentController extends Controller
         $query = MRelationAgent::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
-        $query->leftJoin('t_relation', 'm_relation_agents.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('RELATION_AGENT_ID', $request->idAgent);
+        $query->leftJoin('t_relation', 'm_relation_agents.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('RELATION_AGENT_ID', $request->id);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -202,7 +204,7 @@ class TRelationAgentController extends Controller
                     "module"      => "M Relation Agent",
                     "id"          => $mRelationAgent->M_RELATION_AGENT_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([
@@ -225,7 +227,7 @@ class TRelationAgentController extends Controller
 
 
     // for BAA
-    public function getRelationBAA(Request $request){
+    public function getBAA(Request $request){
         // $data = MRelationAgent::with('relation')->where('RELATION_AGENT_ID', $request->id)->get();
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -233,7 +235,8 @@ class TRelationAgentController extends Controller
         $query = Relation::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
-        $query->where('relation_status_id', "2");
+        $newSearch = json_decode($request->newFilter, true);
+        $query->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')->where('RELATION_TYPE_ID', "12");
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -243,18 +246,18 @@ class TRelationAgentController extends Controller
             }
         }
 
-        // if ($filterModel) {
-        //     foreach ($filterModel as $colId => $filterValue) {
-        //         if ($colId === 'RELATION_ORGANIZATION_ALIAS') {
-        //             $query->where('RELATION_ORGANIZATION_ALIAS', 'LIKE', '%' . $filterValue . '%');
-        //         } 
-        //         // elseif ($colId === 'policy_inception_date') {
-        //         //     $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
-        //         //           ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
-        //         // }
-        //     }
-        // }
-
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'RELATION_ORGANIZATION_NAME') {
+                        $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json($data);
@@ -307,7 +310,7 @@ class TRelationAgentController extends Controller
 
             // add Store M Relation Agent
             $mRelationBaa = MRelationBaa::create([
-                "RELATION_BAA_ID" =>  $request->idAgent,
+                "RELATION_BAA_ID" =>  $request->idBaa,
                 "RELATION_ORGANIZATION_ID" => $idRelationNew,
             ]);
 
@@ -319,11 +322,11 @@ class TRelationAgentController extends Controller
                     "module"      => "M Relation BAA",
                     "id"          => $mRelationBaa->M_RELATION_BAA_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([
-            $request->idAgent,
+            $request->idBaa,
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -349,5 +352,47 @@ class TRelationAgentController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function getRelationByIdPerson(Request $request){
+        $data = TPerson::leftJoin('t_relation', 't_person.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('PERSON_ID', $request->idPerson)->first();
+
+        return response()->json($data);
+    }
+
+    public function getPolicyByRelationId(Request $request){
+
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = Policy::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $query->leftJoin('t_relation', 't_policy.RELATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('t_policy.RELATION_ID', $request->id)->first();
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
+            }
+        }
+
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                if ($colId === 'POLICY_NUMBER') {
+                    $query->where('POLICY_NUMBER', 'LIKE', '%' . $filterValue . '%');
+                } 
+                // elseif ($colId === 'policy_inception_date') {
+                //     $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
+                //           ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
+                // }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        // $data = Policy::leftJoin('t_relation', 't_policy.RELATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('t_policy.RELATION_ID', $request->id)->first();
+
+        return response()->json($data);
     }
 }

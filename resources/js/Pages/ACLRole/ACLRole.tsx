@@ -4,6 +4,7 @@ import { PageProps } from "@/types";
 import Button from "@/Components/Button/Button";
 import defaultImage from "../../Images/user/default.jpg";
 import {
+    Cog6ToothIcon,
     EllipsisHorizontalIcon,
     EnvelopeIcon,
     EyeIcon,
@@ -14,7 +15,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react/jsx-runtime";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import Pagination from "@/Components/Pagination";
 import ToastMessage from "@/Components/ToastMessage";
@@ -27,83 +28,133 @@ import TableTH from "@/Components/Table/TableTH";
 import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import Swal from "sweetalert2";
-// import DetailMenu from "./DetailMenu";
+import Checkbox from "@/Components/Checkbox";
+import { get } from "http";
+import { Console, log } from "console";
+import ModalToDetail from "@/Components/Modal/ModalToDetail";
+import ModalToActions from "@/Components/Modal/ModalToActions";
 
-export default function ACLRole({ auth }: PageProps) {
+export default function ACLRole({ auth, custom_menu, language, permission, newRole, menu }: any) {
+
     useEffect(() => {
         getRole();
     }, []);
 
-    // // state for permission
+
+    // // state for role
     const [dataRole, setDataRole] = useState<any>([]);
     const [searchRole, setSearchRole] = useState<any>([]);
-    // const [dataById, setDataById] = useState<any>({
-    //     PERMISSION_ID: "",
-    //     PERMISSION_NAME: "",
-    //     PERMISSION_CLASS_NAME: "",
-    //     PERMISSION_CREATED_BY: "",
-    //     PERMISSION_CREATED_DATE: "",
-    //     PERMISSION_DELETED_BY: "",
-    //     PERMISSION_DELETED_DATE: "",
-    //     PERMISSION_FLAG: "",
-    //     PERMISSION_UPDATED_BY: "",
-    //     PERMISSION_UPDATED_DATE: "",
-    // });
+    const [dataById, setDataById] = useState<any>([])
 
+
+    const [isLoading, setIsLoading] = useState<any>({
+        get_role_permission: false,
+        get_data_by_id: false
+    })
+    const [accessMenu, setAccessMenu] = useState<any>([])
+
+    const [isSuccess, setIsSuccess] = useState<string>('')
+
+    //fetch data role
     const getRole = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRole?${pageNumber}`, {
-                // idRelation,
+            try {
+            const res = await axios.post(`/getRole?${pageNumber}`, {
                 role_name: searchRole.role_name,
             })
-            .then((res) => {
-                setDataRole(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+            setDataRole(res.data);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
-    // const [detailPermission, setDetailPermission] = useState<any>({
-    //     PERMISSION_ID: "",
-    //     PERMISSION_NAME: "",
-    // });
-    // const getPermissionById = async (idPermission: string) => {
-    //     // const idPermission = detailPermission.PERMISSION_ID;
-    //     // console.log("aa :", idPermission);
-    //     await axios
-    //         .post(`/getPermissionById`, {
-    //             idPermission,
-    //         })
-    //         .then((res) => {
-    //             setDataById(res.data);
-    //             // console.log(res.data);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
+    const editMenuMapping = (e: any, item: any, parent: any = null) => {
+        const { value, checked } = e.target;
+        const parsedValue = parseInt(value);
+        let updatedAccessMenu = [...accessMenu];
 
-    const clearSearchRole = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRole?${pageNumber}`)
-            .then((res) => {
-                setDataRole(res.data);
-                setSearchRole({
-                    ...searchRole,
-                    role_name: "",
+        if (checked) {
+            // Tambahkan item saat ini jika belum ada di accessMenu
+            if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+                updatedAccessMenu.push({ menu_id: parsedValue, role_id: roleId });
+            }
+            // Jika ini adalah parent, tambahkan semua anak
+            if (item.children) {
+                item.children.forEach((child: any) => {
+                    if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+                        updatedAccessMenu.push({ menu_id: child.id, role_id: roleId });
+                    }
                 });
+            }
+            // Jika ada parent, tambahkan parent
+            if (parent && !updatedAccessMenu.some((data: any) => data.menu_id === parent.id)) {
+                updatedAccessMenu.push({ menu_id: parent.id, role_id: roleId });
+            }
+        } else {
+            // Hapus item saat ini
+            updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+
+            // Jika ini adalah parent, hapus semua anak
+            if (item.children) {
+                updatedAccessMenu = updatedAccessMenu.filter((data: any) => !item.children.some((child: any) => child.id === data.menu_id));
+            }
+            // Jika ada parent, cek apakah semua anak sudah tidak dicentang
+            if (parent) {
+                const allChildrenUnchecked = !parent.children.some((child: any) => checkChecked(child.id));
+                if (allChildrenUnchecked) {
+                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+                }
+            }
+        }
+        // Pastikan role_id tetap ada dalam updatedAccessMenu meskipun kosong
+        if (updatedAccessMenu.length === 0) {
+            updatedAccessMenu.push({ role_id: roleId });
+        }
+        setAccessMenu(updatedAccessMenu);
+    }
+
+    const checkChecked = (id: number) => {
+        return accessMenu.some((f: any) => f.menu_id === id);
+    }
+
+    //fetch data by id
+    const getRoleById = async (idRole: number) => {
+        setIsLoading({ ...isLoading, get_data_by_id: true })
+        setRoleId(idRole)
+        await axios
+            .post(`/getRoleById`, {
+                idRole,
+            })
+            .then((res) => {
+                setDataById(res.data);
             })
             .catch((err) => {
                 console.log(err);
             });
+        setIsLoading({ ...isLoading, get_data_by_id: false })
+
     };
 
-    // // for modal
+    // clear search role
+    const clearSearchRole = async (pageNumber = "page=1") => {
+        try {
+            const res = await axios.post(`/getRole?${pageNumber}`)
+            setDataRole(res.data);
+            setSearchRole({
+                ...searchRole,
+                role_name: "",
+            });
+        } catch (error) {
+            console.log('Fetch error:', error);
+        }
+    }
+
+    // for modal
     const [modal, setModal] = useState({
         add: false,
         edit: false,
         detail: false,
+        menu: false,
+        permission: false,
     });
 
     // handle popup add permission
@@ -114,6 +165,8 @@ export default function ACLRole({ auth }: PageProps) {
             add: !modal.add,
             edit: false,
             detail: false,
+            menu: false,
+            permission: false,
         });
     };
 
@@ -122,23 +175,7 @@ export default function ACLRole({ auth }: PageProps) {
         role_name: "",
     });
 
-    // const permissionObject = (e: any) => {
-    //     e.preventDefault();
-
-    //     if (modal.add) {
-    //         setData(
-    //             "PERMISSION_CLASS_NAME",
-    //             "clsf_" + e.target.value.split(" ").join("_").toLowerCase()
-    //         );
-    //     } else if (modal.edit) {
-    //         setDataById({
-    //             ...dataById,
-    //             PERMISSION_CLASS_NAME:
-    //                 "clsf_" + e.target.value.split(" ").join("_").toLowerCase(),
-    //         });
-    //     }
-    // };
-
+    // handle success
     const handleSuccess = (message: string) => {
         if (modal.add) {
             setData({
@@ -151,21 +188,9 @@ export default function ACLRole({ auth }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getRole();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
-        } else if (modal.edit) {
+        } else if (modal.menu) {
             Swal.fire({
                 title: "Success",
                 text: "New Role Edit",
@@ -173,26 +198,238 @@ export default function ACLRole({ auth }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getRole();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
+                }
+            });
+        } else if (modal.permission) {
+            Swal.fire({
+                title: "Success",
+                text: "New permission Edit",
+                icon: "success",
+            }).then((result: any) => {
+                if (result.value) {
+                    getRole();
                 }
             });
         }
     };
 
+    const [roleId, setRoleId] = useState<number>()
+
+    const handleDetail = async (id: number) => {
+        setRoleId(id)
+        await axios.get(`/getRoleAccessMenuByRoleId/${id}`)
+            .then((res) => {
+                setAccessMenu(res.data)
+            })
+            .catch((err) => console.log(err))
+        setModal({ ...modal, detail: true })
+
+    }
+
+    //handle modal Edit Menu
+    const handleSetEditMenuModal = async (id: number) => {
+        setRoleId(id)
+
+        await axios.get(`/getRoleAccessMenuByRoleId/${id}`)
+            .then((res) => {
+                setAccessMenu(res.data)
+            })
+            .catch((err) => console.log(err))
+        setModal({ ...modal, menu: true, detail: false })
+
+    }
+
+    //role Object
+    const roleObject = (e: any) => {
+        e.preventDefault();
+        if (modal.add) {
+            setData("role_name", e.target.value);
+        } else if (modal.edit) {
+            setDataById({
+                ...dataById,
+                role_name: e.target.value,
+            });
+        }
+    }
+
+    //=======================================================================
+    //component tab
+    interface TabProps {
+        label: string;
+        onClick: () => void;
+        active: boolean;
+    }
+
+    const Tab: React.FC<TabProps> = ({ label, onClick, active }) => {
+        return (
+            <button
+                className={`px-4 py-2 focus:outline-none ${active ? 'border-b-2 border-blue-500' : 'border-b-2 border-transparent'}`}
+                onClick={onClick}
+            >
+                {label}
+            </button>
+        );
+    };
+
+    const TabMenu = () => {
+        return (
+            <div className="w-full max-w-md mx-auto">
+                <div>
+                    <div className="">
+                        {
+                            custom_menu?.map((cm: any) => (
+                                <div key={cm.menu_id}>
+                                    <div className="flex items-center">
+                                        <Checkbox value={cm.menu_id} defaultChecked={checkChecked(cm.id)} disabled />
+                                        <label className="text-gray-900 ml-3">{cm.menu_name}</label>
+                                    </div>
+                                    {
+                                        cm.children?.map((children: any) => (
+                                            <div className="ml-7 flex items-center" key={children.menu_id}>
+                                                <Checkbox value={children.menu_id} defaultChecked={checkChecked(children.id)} disabled />
+                                                <label className="text-gray-900 ml-3">{children.menu_name}</label>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const [accessPermission, setAccessPermission] = useState<any>([])
+
+    const getPermissionId = async (id: number) => {
+        try {
+            const data = await axios.get(`/rolePermission/${id}`)
+            setAccessPermission(data.data)
+            console.log(data.data);
+
+
+        } catch (error) {
+            console.log('Fetch error:', error);
+        }
+    }
+
+    const handlePermissionModal = async (id: number) => {
+        setModal({
+            ...modal,
+            permission: true,
+            detail: false
+        })
+    }
+    const editPermissionMapping = (e: any) => {
+        // destructuring
+        const { value, checked } = e.target
+
+        if (checked) {
+            setAccessPermission([...accessPermission, { permission_id: parseInt(value), role_id: roleId }])
+        } else {
+            const updatedData = accessPermission.filter((data: any) => data.permission_id !== parseInt(value))
+            setAccessPermission(updatedData)
+        }
+    }
+
+    const checkPermissionChecked = (id: number) => {
+        if (accessPermission?.find((f: any) => f.permission_id === id)) {
+            return true
+        }
+    }
+
+    const TabPermission = () => {
+        return (
+            <div className="w-full max-w-md mx-auto">
+                <div>
+                    <div className="">
+                        {
+                            permission?.map((permission: any, i: number) => (
+                                <div key={i}>
+                                    <div className="flex items-center">
+                                        <Checkbox value={permission.PERMISSION_ID} defaultChecked={checkPermissionChecked(permission.PERMISSION_ID)} onChange={(e) => editPermissionMapping(e)} disabled />
+                                        <label className="text-gray-900 ml-3">{permission.PERMISSION_NAME}</label>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const [activeTab, setActiveTab] = useState<string>('menu');
+
+    //end component tab
+    //=======================================================================
+
     return (
         <AuthenticatedLayout user={auth.user} header={"Role"}>
             <Head title="Role" />
+
+            {/* modal edit mapping permission */}
+            <ModalToActions
+                show={modal.permission}
+                onClose={() => setModal({ ...modal, permission: false, detail: true })}
+                title={"Set Permissions"}
+                method={"post"}
+                url={`/rolePermission`}
+                data={accessPermission}
+                headers={null}
+                submitButtonName={''}
+                onSuccess={handleSuccess}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
+                }
+                body={
+                    permission?.map((permission: any, i: number) => (
+                        <>
+                            <div className="flex items-center" key={i}>
+                                <Checkbox value={permission.PERMISSION_ID} defaultChecked={checkPermissionChecked(permission.PERMISSION_ID)} onChange={(e) => editPermissionMapping(e)} />
+                                <label className="text-gray-900 ml-3">{permission.PERMISSION_NAME}</label>
+                            </div>
+                        </>
+                    ))
+                }
+            />
+            {/* end modal mapping menu */}
+
+            {/* modal edit mapping menu */}
+            <ModalToAction
+                show={modal.menu}
+                onClose={() => setModal({ ...modal, menu: false, detail: true })}
+                title={"Set Mapping"}
+                method={"post"}
+                url={`/roleAccessMenu`}
+                data={accessMenu}
+                headers={null}
+                submitButtonName={''}
+                onSuccess={handleSuccess}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
+                }
+                body={
+                    custom_menu?.map((cm: any, i: number) => (
+                        <React.Fragment key={i}>
+                            <div className="flex items-center">
+                                <Checkbox value={cm.id} checked={checkChecked(cm.id)} onChange={(e) => editMenuMapping(e, cm)} />
+                                <label className="text-gray-900 ml-3">{cm.menu_name}</label>
+                            </div>
+                            {
+                                cm.children?.map((children: any, j: number) => (
+                                    <div className="ml-7 flex items-center" key={j}>
+                                        <Checkbox value={children.id} checked={checkChecked(children.id)} onChange={(e) => editMenuMapping(e, children, cm)} />
+                                        <label className="text-gray-900 ml-3">{children.menu_name}</label>
+                                    </div>
+                                ))
+                            }
+                        </React.Fragment>
+                    ))
+                }
+            />
+            {/* end modal mapping menu */}
 
             {/* modal Add */}
             <ModalToAdd
@@ -202,6 +439,8 @@ export default function ACLRole({ auth }: PageProps) {
                         add: false,
                         edit: false,
                         detail: false,
+                        menu: false,
+                        permission: false,
                     })
                 }
                 title={"Add Role"}
@@ -239,18 +478,20 @@ export default function ACLRole({ auth }: PageProps) {
             />
             {/* modal end add */}
 
-            {/* Modal Edit */}
-            {/* <ModalToAdd
-                show={modal.edit}
+            {/* Modal Edit role */}
+            <ModalToDetail
+                show={modal.detail}
                 onClose={() =>
                     setModal({
                         add: false,
                         edit: false,
                         detail: false,
+                        menu: false,
+                        permission: false
                     })
                 }
-                title={"Edit Permission"}
-                url={`/setting/editPermission`}
+                title={"Detail Role"}
+                url={``}
                 data={dataById}
                 onSuccess={handleSuccess}
                 buttonAddOns={""}
@@ -260,58 +501,63 @@ export default function ACLRole({ auth }: PageProps) {
                 body={
                     <>
                         <div>
-                            <InputLabel
-                                className="absolute"
-                                htmlFor="PERMISSION_NAME"
-                                value={"Permission Name"}
-                            />
-                            <div className="ml-[7.9rem] text-red-600">*</div>
                             <TextInput
-                                id="PERMISSION_NAME"
+                                id="ROLE_NAME"
                                 type="text"
-                                name="PERMISSION_NAME"
-                                value={dataById.PERMISSION_NAME}
+                                name="ROLE_NAME"
+                                value={dataById.role_name}
                                 className="mt-2"
                                 onChange={(e) => {
                                     setDataById({
                                         ...dataById,
-                                        PERMISSION_NAME: e.target.value,
+                                        role_name: e.target.value,
                                     });
                                 }}
                                 onKeyUp={(e) => {
-                                    permissionObject(e);
+                                    roleObject(e);
                                 }}
                                 required
-                                placeholder="Permission Name"
+                                placeholder="Role Name"
+                                disabled
                             />
                         </div>
                         <div className="mt-2">
-                            <InputLabel
-                                className="absolute"
-                                htmlFor="PERMISSION_CLASS_NAME"
-                                value={"Class Name"}
-                            />
-                            <div className="ml-[5.4rem] text-red-600">*</div>
-                            <TextInput
-                                id="PERMISSION_CLASS_NAME"
-                                type="text"
-                                name="PERMISSION_CLASS_NAME"
-                                value={dataById.PERMISSION_CLASS_NAME}
-                                className="mt-2"
-                                onChange={(e) => {
-                                    setDataById({
-                                        ...dataById,
-                                        PERMISSION_CLASS_NAME: e.target.value,
-                                    });
-                                }}
-                                required
-                                placeholder="Class Name"
-                            />
+                            <div className="w-full max-w-md mx-auto">
+                                <div className="flex border-b mb-4">
+                                    <div className="flex border-r">
+                                        <Tab
+                                            label="Menu"
+                                            onClick={() => setActiveTab('menu')}
+                                            active={activeTab === 'menu'}
+                                        />
+                                        <PencilSquareIcon className="w-5 -ml-3 mr-2 hover:text-blue-500 cursor-pointer"
+                                            onClick={() => {
+                                                handleSetEditMenuModal(dataById.id);
+                                            }}>a</PencilSquareIcon>
+                                    </div>
+
+                                    <Tab
+                                        label="Permission"
+                                        onClick={() => setActiveTab('permission')}
+                                        active={activeTab === 'permission'}
+                                    />
+                                    <PencilSquareIcon className="w-5 -ml-3 mr-2 hover:text-blue-500 cursor-pointer"
+                                        onClick={() => {
+                                            handlePermissionModal(dataById.id);
+                                        }}>a</PencilSquareIcon>
+                                </div>
+                                <div>
+                                    {activeTab === 'menu' && <TabMenu />}
+                                    {activeTab === 'permission' && <TabPermission />}
+                                </div>
+                            </div>
+
                         </div>
                     </>
                 }
-            /> */}
+            />
             {/* End Modal Edit */}
+
             <div className="grid grid-cols-4 py-4 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="bg-white mb-4 rounded-md p-4">
@@ -374,33 +620,39 @@ export default function ACLRole({ auth }: PageProps) {
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No."}
+                                        colSpan={''}
+                                        rowSpan={''}
                                     />
                                     <TableTH
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Name Role"}
+                                        colSpan={''}
+                                        rowSpan={''}
                                     />
                                 </tr>
                             </thead>
                             <tbody>
                                 {dataRole.data?.map(
-                                    (dPermission: any, i: number) => {
+                                    (dRole: any, i: number) => {
                                         return (
                                             <tr
                                                 onDoubleClick={() => {
-                                                    setDetailPermission({
-                                                        PERMISSION_ID:
-                                                            dPermission.PERMISSION_ID,
-                                                        PERMISSION_NAME:
-                                                            dPermission.PERMISSION_NAME,
+                                                    setDataRole({
+                                                        ...dataRole
                                                     });
                                                     setModal({
                                                         add: false,
                                                         edit: !modal.edit,
                                                         detail: false,
+                                                        menu: false,
+                                                        permission: false,
                                                     });
-                                                    getPermissionById(
-                                                        dPermission.PERMISSION_ID
+                                                    getRoleById(
+                                                        dRole.id
                                                     );
+                                                    getPermissionId(dRole.id);
+                                                    handleDetail(dRole.id);
+
                                                 }}
                                                 key={i}
                                                 className={
@@ -417,7 +669,7 @@ export default function ACLRole({ auth }: PageProps) {
                                                     value={
                                                         <>
                                                             {
-                                                                dPermission.role_name
+                                                                dRole.role_name
                                                             }
                                                         </>
                                                     }

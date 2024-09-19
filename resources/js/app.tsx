@@ -1,5 +1,7 @@
 // import './bootstrap';
 import "../css/app.css";
+import "../css/style.css";
+import "../css/renderChat.css";
 
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
@@ -23,5 +25,6 @@ createInertiaApp({
         color: "#4B5563",
     },
 }).then(() => {
-    document.getElementById("app").removeAttribute("data-page");
+    const getDocumentId = document.getElementById("app");
+    getDocumentId?.removeAttribute("data-page");
 });

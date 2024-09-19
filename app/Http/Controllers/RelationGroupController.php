@@ -110,7 +110,7 @@ class RelationGroupController extends Controller
                 "module"      => "Group",
                 "id"          => $group->RELATION_GROUP_NAME
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -210,7 +210,7 @@ class RelationGroupController extends Controller
                 "module"      => "Group",
                 "id"          => $group->RELATION_GROUP_NAME
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -255,7 +255,7 @@ class RelationGroupController extends Controller
                     "module"      => "Group",
                     "id"          => $idRelationNew
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
         return new JsonResponse([
@@ -290,7 +290,7 @@ class RelationGroupController extends Controller
                 "module"      => "Group",
                 "id"          => $request->RELATION_ORGANIZATION_GROUP
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -330,7 +330,7 @@ class RelationGroupController extends Controller
                     "module"      => "Group",
                     "id"          => $request->RELATION_GROUP_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
 
@@ -386,7 +386,7 @@ class RelationGroupController extends Controller
                     "module"      => "Group",
                     "id"          => $request->RELATION_GROUP_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
         }
 

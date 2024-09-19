@@ -55,8 +55,13 @@ export default function Relation({ auth }: PageProps) {
     const [relations, setRelations] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
     const [searchRelation, setSearchRelation] = useState<any>({
-        RELATION_ORGANIZATION_NAME: "",
-        RELATION_TYPE_ID: "",
+        relation_search: [
+            {
+                RELATION_ORGANIZATION_NAME: "",
+                RELATION_TYPE_ID: "",
+                flag: "flag",
+            },
+        ],
     });
 
     const getRelation = async (pageNumber = "page=1") => {
@@ -97,11 +102,11 @@ export default function Relation({ auth }: PageProps) {
         custom_menu,
     }: any = usePage().props;
 
-    const [isSuccess, setIsSuccess] = useState<string>("");
+    const [isSuccess, setIsSuccess] = useState<any>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [mRelation, setMRelation] = useState<any>([]);
-    const [switchPage, setSwitchPage] = useState(false);
-    const [switchPageTBK, setSwitchPageTBK] = useState(false);
+    const [switchPage, setSwitchPage] = useState(true);
+    const [switchPagePKS, setSwitchPagePKS] = useState({});
 
     const getMappingParent = async (name: string, column: string) => {
         // setIsLoading(true)
@@ -157,6 +162,12 @@ export default function Relation({ auth }: PageProps) {
         mark_tbk_relation: "",
         profession_id: "",
         relation_type_id: [],
+        corporate_pic_for: null,
+        NPWP_RELATION: "",
+        date_of_birth: "",
+        DEFAULT_PAYABLE: 0,
+        no_pks: [],
+        bank_account: [],
     });
 
     const [dataById, setDataById] = useState<any>({
@@ -229,6 +240,12 @@ export default function Relation({ auth }: PageProps) {
                 mark_tbk_relation: "",
                 profession_id: "",
                 relation_type_id: [],
+                corporate_pic_for: null,
+                NPWP_RELATION: "",
+                date_of_birth: "",
+                DEFAULT_PAYABLE: 0,
+                no_pks: [],
+                bank_account: [],
             });
             Swal.fire({
                 title: "Success",
@@ -253,7 +270,7 @@ export default function Relation({ auth }: PageProps) {
                 }
             });
             setSwitchPage(false);
-            setSwitchPageTBK(false);
+            setSwitchPagePKS(false);
             setIsSuccess(message);
         }
     };
@@ -317,10 +334,10 @@ export default function Relation({ auth }: PageProps) {
 
     const handleCheckboxTBKEdit = (e: any) => {
         if (e == true) {
-            setSwitchPageTBK(true);
+            setSwitchPagePKS(true);
             setDataById({ ...dataById, MARK_TBK_RELATION: "1" });
         } else {
-            setSwitchPageTBK(false);
+            setSwitchPagePKS(false);
             setDataById({ ...dataById, MARK_TBK_RELATION: "0" });
         }
     };
@@ -396,20 +413,14 @@ export default function Relation({ auth }: PageProps) {
         )?.length;
 
     // search
-    const clearSearchRelation = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRelation?${pageNumber}`)
-            .then((res) => {
-                setRelations([]);
-                setSearchRelation({
-                    ...searchRelation,
-                    RELATION_ORGANIZATION_NAME: "",
-                    RELATION_TYPE: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchRelation = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("RELATION_ORGANIZATION_NAME", "", 0);
+        inputDataSearch("RELATION_TYPE_ID", "", 0);
+        inputDataSearch("flag", "flag", 0);
+        setIsSuccess({
+            isSuccess: "success",
+        });
     };
 
     const selectRType = relationType?.map((query: any) => {
@@ -461,6 +472,28 @@ export default function Relation({ auth }: PageProps) {
             });
         }
     };
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchRelation.relation_search];
+        changeVal[i][name] = value;
+        setSearchRelation({ ...searchRelation, relation_search: changeVal });
+    };
+
+    const [bank, setBank] = useState<any>([]);
+    const getRBank = async () => {
+        await axios
+            .post(`/getRBank`)
+            .then((res) => {
+                setBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -486,6 +519,7 @@ export default function Relation({ auth }: PageProps) {
                         search: false,
                     })
                 }
+                bank={bank}
                 idGroupRelation={""}
                 handleSuccess={handleSuccess}
                 relationStatus={relationStatus}
@@ -493,12 +527,11 @@ export default function Relation({ auth }: PageProps) {
                 relationType={relationType}
                 profession={profession}
                 relationLOB={relationLOB}
+                relation={relation}
                 data={data}
                 setData={setData}
                 switchPage={switchPage}
                 setSwitchPage={setSwitchPage}
-                switchPageTBK={switchPageTBK}
-                setSwitchPageTBK={setSwitchPageTBK}
             />
             {/* end modal add relation */}
 
@@ -526,11 +559,11 @@ export default function Relation({ auth }: PageProps) {
                 }
                 url={""}
                 data={""}
-                onSuccess={""}
+                onSuccess={undefined}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
                 }
                 submitButtonName={""}
                 body={
@@ -540,12 +573,11 @@ export default function Relation({ auth }: PageProps) {
                                 getDetailRelation.RELATION_ORGANIZATION_ID
                             }
                             relationStatus={relationStatus}
-                            relationGroup={relationGroup}
                             relationType={relationType}
                             profession={profession}
                             relationLOB={relationLOB}
-                            getDetailMap={getDetailRelation}
                             setGetDetailRelation={setGetDetailRelation}
+                            auth={auth}
                         />
                     </>
                 }
@@ -559,6 +591,7 @@ export default function Relation({ auth }: PageProps) {
                         <Button
                             className="p-2"
                             onClick={() => {
+                                getRBank();
                                 setSwitchPage(false);
                                 setModal({
                                     add: true,
@@ -573,90 +606,150 @@ export default function Relation({ auth }: PageProps) {
                             {"Add Relation"}
                         </Button>
                     </div>
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
+                    <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
                         <TextInput
                             type="text"
-                            value={searchRelation.RELATION_ORGANIZATION_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchRelation({
-                                    ...searchRelation,
-                                    RELATION_ORGANIZATION_NAME: e.target.value,
-                                })
+                            value={
+                                searchRelation.relation_search[0]
+                                    .RELATION_ORGANIZATION_NAME === ""
+                                    ? ""
+                                    : searchRelation.relation_search[0]
+                                          .RELATION_ORGANIZATION_NAME
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (
-                                        searchRelation.RELATION_ORGANIZATION_NAME !==
-                                        ""
-                                    ) {
-                                        getRelation();
-                                    }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "RELATION_ORGANIZATION_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchRelation.relation_search[0]
+                                        .RELATION_ORGANIZATION_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
+
+                                // setSearchRelation([
+                                //     ...searchRelation,
+                                //     {
+                                //         RELATION_ORGANIZATION_NAME:
+                                //             e.target.value,
+                                //     },
+                                // ])
                             }}
+                            // onKeyDown={(e) => {
+                            //     if (e.key === "Enter") {
+                            //         if (
+                            //             searchRelation.relation_search[0]
+                            //                 .RELATION_ORGANIZATION_NAME === ""
+                            //         ) {
+                            //             inputDataSearch(
+                            //                 "RELATION_ORGANIZATION_NAME",
+                            //                 "flag",
+                            //                 0
+                            //             );
+                            //         }
+
+                            //         setIsSuccess({
+                            //             isSuccess: "success",
+                            //         });
+                            //     }
+                            // }}
                             placeholder="Search Relation Name"
                         />
                         <Select
                             classNames={{
                                 menuButton: () =>
                                     `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
-                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                 listItem: ({ isSelected }: any) =>
                                     `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
                                         isSelected
-                                            ? `text-white bg-primary-pelindo`
-                                            : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                            ? `text-white bg-red-600`
+                                            : `text-gray-500 hover:bg-red-200 hover:text-black-500`
                                     }`,
                             }}
                             options={selectRType}
                             isSearchable={true}
                             placeholder={"Search Relation Type"}
-                            value={searchRelation.RELATION_TYPE_ID}
-                            onChange={(val: any) =>
-                                setSearchRelation({
-                                    ...searchRelation,
-                                    RELATION_TYPE_ID: val,
-                                })
+                            value={
+                                searchRelation.relation_search[0]
+                                    .RELATION_TYPE_ID === ""
+                                    ? ""
+                                    : searchRelation.relation_search[0]
+                                          .RELATION_TYPE_ID
                             }
+                            onChange={(val: any) => {
+                                inputDataSearch("RELATION_TYPE_ID", val, 0);
+                                if (
+                                    searchRelation.relation_search[0]
+                                        .RELATION_TYPE_ID === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                            }}
                             primaryColor={"bg-red-500"}
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
-                                    getRelation();
+                                    if (
+                                        searchRelation.relation_search[0]
+                                            .RELATION_TYPE_ID === "" &&
+                                        searchRelation.relation_search[0]
+                                            .RELATION_ORGANIZATION_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setIsSuccess({
+                                        isSuccess: "success",
+                                    });
                                 }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRelation()}
+                                onClick={(e) => clearSearchRelation(e)}
                             >
                                 Clear Search
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
-                    <AGGrid
-                        // loading={isLoading.get_policy}
-                        url={"getRelation"}
-                        doubleClickEvent={handleDetailRelation}
-                        triggeringRefreshData={isSuccess}
-                        colDefs={[
-                            {
-                                headerName: "No.",
-                                valueGetter: "node.rowIndex + 1",
-                                flex: 1,
-                            },
-                            {
-                                headerName: "Relation Name",
-                                field: "RELATION_ORGANIZATION_ALIAS",
-                                flex: 7,
-                            },
-                        ]}
-                    />
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={searchRelation.relation_search}
+                            // loading={isLoading.get_policy}
+                            url={"getRelation"}
+                            doubleClickEvent={handleDetailRelation}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Relation Name",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                },
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

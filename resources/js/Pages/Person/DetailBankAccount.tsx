@@ -51,10 +51,9 @@ export default function DetailBankAccount({
         idPerson: "",
         BANK_ACCOUNT: [
             {
-                idPerson: idPerson,
+                PERSON_ID: idPerson,
                 PERSON_BANK_ACCOUNT_NAME: "",
                 PERSON_BANK_ACCOUNT_NUMBER: "",
-                PERSON_BANK_ACCOUNT_FOR: null,
                 BANK_ID: "",
             },
         ],
@@ -74,10 +73,9 @@ export default function DetailBankAccount({
             BANK_ACCOUNT: [
                 ...dataEditBankAccount.BANK_ACCOUNT,
                 {
-                    idPerson: idPerson,
+                    PERSON_ID: idPerson,
                     PERSON_BANK_ACCOUNT_NAME: "",
                     PERSON_BANK_ACCOUNT_NUMBER: "",
-                    PERSON_BANK_ACCOUNT_FOR: null,
                     BANK_ID: null,
                     m_for_bank: null,
                 },
@@ -97,13 +95,10 @@ export default function DetailBankAccount({
 
     const getNameBank = (value: any) => {
         if (value) {
-            const selected = bank.filter(
-                (option: any) => option.BANK_ID === parseInt(value)
+            const selected = bankSelect.filter(
+                (option: any) => option.value === value
             );
-            const nameBank = selected[0];
-            if (nameBank !== undefined) {
-                return nameBank.BANK_ABBREVIATION;
-            }
+            return selected[0]?.label;
         }
     };
 
@@ -157,7 +152,6 @@ export default function DetailBankAccount({
     ) => {
         const changeVal: any = [...dataEditBankAccount.BANK_ACCOUNT];
         changeVal[i].m_for_bank = value;
-        // console.log(changeVal);
         setDataEditBankAccount({
             ...dataEditBankAccount,
             BANK_ACCOUNT: changeVal,
@@ -187,8 +181,6 @@ export default function DetailBankAccount({
         };
     });
 
-    console.log("hasil", dataEditBankAccount.BANK_ACCOUNT);
-
     const close = () => {
         modal();
         // setDataEditBankAccount({
@@ -197,7 +189,7 @@ export default function DetailBankAccount({
         //             idPerson: idPerson,
         //             PERSON_BANK_ACCOUNT_NAME: "",
         //             PERSON_BANK_ACCOUNT_NUMBER: "",
-        //             PERSON_BANK_ACCOUNT_FOR: null,
+        //
         //             BANK_ID: "",
         //         },
         //     ],
@@ -258,6 +250,7 @@ export default function DetailBankAccount({
                                                     ),
                                                     value: dB.BANK_ID,
                                                 }}
+                                                // value={getNameBank(dB.BANK_ID)}
                                                 // onChange={(e) =>
                                                 //     inputDataBank(
                                                 //         "BANK_ID",
@@ -289,13 +282,18 @@ export default function DetailBankAccount({
                                                     dB.PERSON_BANK_ACCOUNT_NUMBER
                                                 }
                                                 className="mt-9"
-                                                onChange={(e) =>
+                                                onChange={(e) => {
                                                     inputDataBank(
                                                         "PERSON_BANK_ACCOUNT_NUMBER",
                                                         e.target.value,
                                                         i
-                                                    )
-                                                }
+                                                    );
+                                                    inputDataBank(
+                                                        "PERSON_BANK_ACCOUNT_FOR",
+                                                        "flag",
+                                                        i
+                                                    );
+                                                }}
                                                 placeholder="Bank Account Number *"
                                             />
                                         </div>

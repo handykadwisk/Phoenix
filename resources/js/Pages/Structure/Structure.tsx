@@ -14,6 +14,7 @@ import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
 import DetailStructure from "./DetailStructure";
+import ToastMessage from "@/Components/ToastMessage";
 
 export default function Structure({
     auth,
@@ -27,6 +28,7 @@ export default function Structure({
     useEffect(() => {
         getStructure();
     }, []);
+    const [isSuccess, setIsSuccess] = useState<string>("");
 
     const [dataStructure, setDataStructure] = useState<any>([]);
     const [grade, setGrade] = useState<any>([]);
@@ -111,36 +113,43 @@ export default function Structure({
     });
 
     const handleSuccess = (message: string) => {
-        setData({
-            RELATION_STRUCTURE_NAME: "",
-            RELATION_STRUCTURE_ALIAS: "",
-            RELATION_STRUCTURE_DESCRIPTION: "",
-            RELATION_STRUCTURE_PARENT_ID: "",
-            RELATION_ORGANIZATION_ID: idRelation,
-            RELATION_STRUCTURE_MAPPING: "",
-            RELATION_GRADE_ID: "",
-        });
-        Swal.fire({
-            title: "Success",
-            text: "New Relation Structure",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                getStructure();
-                // setGetDetailRelation({
-                //     RELATION_ORGANIZATION_NAME: message[1],
-                //     RELATION_ORGANIZATION_ID: message[0],
-                // });
-                // setModal({
-                //     add: false,
-                //     delete: false,
-                //     edit: false,
-                //     view: true,
-                //     document: false,
-                //     search: false,
-                // });
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[2]);
+            setData({
+                RELATION_STRUCTURE_NAME: "",
+                RELATION_STRUCTURE_ALIAS: "",
+                RELATION_STRUCTURE_DESCRIPTION: "",
+                RELATION_STRUCTURE_PARENT_ID: "",
+                RELATION_ORGANIZATION_ID: idRelation,
+                RELATION_STRUCTURE_MAPPING: "",
+                RELATION_GRADE_ID: "",
+            });
+            getStructure();
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        // Swal.fire({
+        //     title: "Success",
+        //     text: "New Relation Structure",
+        //     icon: "success",
+        // }).then((result: any) => {
+        //     if (result.value) {
+        //         // setGetDetailRelation({
+        //         //     RELATION_ORGANIZATION_NAME: message[1],
+        //         //     RELATION_ORGANIZATION_ID: message[0],
+        //         // });
+        //         // setModal({
+        //         //     add: false,
+        //         //     delete: false,
+        //         //     edit: false,
+        //         //     view: true,
+        //         //     document: false,
+        //         //     search: false,
+        //         // });
+        //     }
+        // });
     };
 
     // search
@@ -173,8 +182,16 @@ export default function Structure({
 
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
             {/* modal add */}
             <ModalToAdd
+                buttonAddOns={""}
                 show={modal.add}
                 onClose={() =>
                     setModal({
@@ -399,7 +416,7 @@ export default function Structure({
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchStructurer()}
+                                // onClick={() => clearSearchStructurer()}
                             >
                                 Search
                             </div>
@@ -418,16 +435,22 @@ export default function Structure({
                             <thead className="">
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "w-[10px] text-center bg-gray-200 rounded-tl-lg"
                                         }
                                         label={"No"}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200"}
                                         label={"Name Structure"}
                                     />
                                     <TableTH
+                                        colSpan={""}
+                                        rowSpan={""}
                                         className={
                                             "min-w-[50px] bg-gray-200 rounded-tr-lg text-center"
                                         }

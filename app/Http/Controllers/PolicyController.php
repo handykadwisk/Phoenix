@@ -130,10 +130,12 @@ class PolicyController extends Controller
             'POLICY_INCEPTION_DATE' => $request->policy_inception_date,
             'POLICY_DUE_DATE'       => $request->policy_due_date,
             'POLICY_STATUS_ID'      => $request->policy_status_id,
+            'POLICY_TYPE'           => $request->policy_type,
             'SELF_INSURED'          => $request->self_insured,
             'POLICY_CREATED_BY'      => Auth::user()->id
         ]);
 
+        // print_r(Auth::user());
         
         // Created Log
         UserLog::create([
@@ -143,12 +145,13 @@ class PolicyController extends Controller
                 "module"      => "Policy",
                 "id"          => $policy
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
-            $policy
+            "msg" => "Success Registered Policy",
+            "id" => $policy
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -223,8 +226,9 @@ class PolicyController extends Controller
                             'POLICY_INCEPTION_DATE' => $request->POLICY_INCEPTION_DATE,
                             'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
                             'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
+                            'POLICY_TYPE'           => $request->POLICY_TYPE,
                             'SELF_INSURED'          => $request->SELF_INSURED,
-                            'POLICY_UPDATED_BY'      => Auth::user()->id,
+                            'POLICY_UPDATED_BY'     => Auth::user()->id,
                             'POLICY_UPDATED_DATE'   => now()
                         ]);
                         
@@ -286,11 +290,12 @@ class PolicyController extends Controller
                 "module"      => "Policy",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
-            $request->id
+            "msg" => "Success Edit Policy",
+            "id" => $request->id            
         ], 200, [
             'X-Inertia' => true
         ]);
@@ -315,7 +320,7 @@ class PolicyController extends Controller
                     "module"      => "Policy",
                     "id"          => $request->id
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->user_login
             ]);
             
             return new JsonResponse([

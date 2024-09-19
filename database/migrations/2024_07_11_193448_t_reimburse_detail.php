@@ -17,13 +17,16 @@ return new class extends Migration
             $table->date('REIMBURSE_DETAIL_DATE')->nullable();
             $table->text('REIMBURSE_DETAIL_PURPOSE')->nullable();
             $table->text('REIMBURSE_DETAIL_LOCATION')->nullable();
+            $table->text('REIMBURSE_DETAIL_ADDRESS')->nullable();
+            $table->smallInteger('REIMBURSE_DETAIL_TYPE')->nullable();
             $table->smallInteger('REIMBURSE_DETAIL_RELATION_ORGANIZATION_ID')->nullable();
             $table->string('REIMBURSE_DETAIL_RELATION_NAME')->nullable();
             $table->string('REIMBURSE_DETAIL_RELATION_POSITION')->nullable();
             $table->decimal('REIMBURSE_DETAIL_AMOUNT', 16, 2)->nullable();
-            $table->boolean('REIMBURSE_DETAIL_STATUS')->nullable();
-            $table->string('REIMBURSE_DETAIL_DOCUMENT_ID')->nullable();
-            $table->text('REIMBURSE_DETAIL_NOTE')->nullable();
+            $table->smallInteger('REIMBURSE_DETAIL_APPROVAL')->nullable();
+            $table->smallInteger('REIMBURSE_DETAIL_COST_CLASSIFICATION')->nullable();
+            $table->decimal('REIMBURSE_DETAIL_AMOUNT_APPROVE', 16, 2)->nullable();
+            $table->text('REIMBURSE_DETAIL_REMARKS')->nullable();
             $table->timestamps();
         });
     }

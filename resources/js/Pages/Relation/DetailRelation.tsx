@@ -1,19 +1,15 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, usePage } from "@inertiajs/react";
-import defaultImage from "../../Images/user/default.jpg";
-import BreadcrumbPage from "@/Components/Breadcrumbs/BreadcrumbPage";
-import { PageProps } from "@/types";
 import {
     FormEvent,
+    HTMLAttributes,
     PropsWithChildren,
     useEffect,
     useRef,
     useState,
 } from "react";
-import { spawn } from "child_process";
 import axios from "axios";
 import {
-    PencilIcon,
+    ChatBubbleLeftRightIcon,
+    PaperAirplaneIcon,
     PencilSquareIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
@@ -30,34 +26,41 @@ import Division from "../Division/Division";
 import AddressPopup from "../Address/Address";
 import JobDesk from "../Job/JobDesk";
 import SelectTailwind from "react-tailwindcss-select";
+import ToastMessage from "@/Components/ToastMessage";
+import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import { BeatLoader } from "react-spinners";
+import PIC from "../Person/Pic";
+import DatePicker from "react-datepicker";
+import SwitchPage from "@/Components/Switch";
+import Select from "react-tailwindcss-select";
+import DetailDocumentRelation from "./DetailDocument";
+// import { MyProvider } from "@/Utility/GlobalContext";
+import PhoenixComponent from "@/Utility/PhoenixComponent";
+import { MyProvider } from "@/Utility/GlobalContext";
+import AppPlugin from "@/Utility/AppPlugin";
 
 export default function DetailRelation({
     detailRelation,
     relationStatus,
-    relationGroup,
     relationType,
     profession,
     relationLOB,
     setGetDetailRelation,
+    auth,
 }: PropsWithChildren<{
     detailRelation: any;
     relationStatus: any;
-    relationGroup: any;
     relationType: any;
     profession: any;
     relationLOB: any;
     setGetDetailRelation: any;
+    auth?: any;
 }>) {
     // const { success, detailRelation }: any = usePage().props;
     const [dataRelationNew, setDataRelationNew] = useState<any>([]);
-    const [mRelation, setMRelation] = useState<any>([]);
     const [salutations, setSalutations] = useState<any>([]);
     const [postSalutations, setPostSalutations] = useState<any>([]);
     const [switchPage, setSwitchPage] = useState(false);
-    const [switchPageTBK, setSwitchPageTBK] = useState(false);
-    const [mappingParent, setMappingParent] = useState<any>({
-        mapping_parent: [],
-    });
 
     const [isSuccess, setIsSuccess] = useState<string>("");
 
@@ -72,6 +75,16 @@ export default function DetailRelation({
 
     // Structure Modal
     const [structureModal, setStructureModal] = useState({
+        add: false,
+        delete: false,
+        edit: false,
+        view: false,
+        document: false,
+        search: false,
+    });
+
+    // Structure Edit Corporate PIC
+    const [modalCorporatePIC, setModalCorporatePIC] = useState({
         add: false,
         delete: false,
         edit: false,
@@ -105,16 +118,28 @@ export default function DetailRelation({
         getDetailRelation(detailRelation);
     }, [detailRelation]);
 
-    const getMappingParent = async (name: string, column: string) => {
-        // setIsLoading(true)
+    useEffect(() => {
+        getTPluginProcess();
+    }, [detailRelation]);
 
+    const [dataTPlugin, setDataTPlugin] = useState<any>([]);
+
+    const getTPluginProcess = async () => {
+        await axios
+            .post(`/getTPluginProcess`)
+            .then((res) => {
+                // getPlugin(res.data);
+                setDataTPlugin(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getMappingParent = async (name: string, column: string) => {
         await axios
             .post(`/getMappingParent`, { name, column })
-            .then((res: any) => {
-                setMappingParent({
-                    mapping_parent: res.data,
-                });
-            })
+            .then((res: any) => {})
             .catch((err) => {
                 console.log(err);
             });
@@ -125,6 +150,19 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getCorporatePIC = async (id: string) => {
+        await axios
+            .post(`/getCorporatePIC`, { id })
+            .then((res) => {
+                setDetailCorporatePIC({
+                    detail_corporate: res.data,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -172,6 +210,9 @@ export default function DetailRelation({
         TAG_NAME: "",
         HR_MANAGED_BY_APP: "",
         MARK_TBK_RELATION: "",
+        RELATION_ORGANIZATION_DATE_OF_BIRTH: "",
+        RELATION_ORGANIZATION_NPWP: "",
+        DEFAULT_PAYABLE: "",
         m_relation_type: [
             {
                 RELATION_ORGANIZATION_TYPE_ID: "",
@@ -191,8 +232,6 @@ export default function DetailRelation({
         e.preventDefault();
 
         setDataById(dataRelationNew);
-        // console.log();
-        setMRelation(dataRelationNew.m_relation_type);
         getSalutationById(
             dataRelationNew.relation_status_id,
             "relation_status_id"
@@ -208,15 +247,10 @@ export default function DetailRelation({
             );
         }
 
-        if (dataRelationNew.HR_MANAGED_BY_APP == "1") {
+        if (dataRelationNew.DEFAULT_PAYABLE === 1) {
             setSwitchPage(true);
         } else {
             setSwitchPage(false);
-        }
-        if (dataRelationNew.MARK_TBK_RELATION == "1") {
-            setSwitchPageTBK(true);
-        } else {
-            setSwitchPageTBK(false);
         }
 
         setModal({
@@ -231,9 +265,55 @@ export default function DetailRelation({
 
     const inputRef = useRef<HTMLInputElement>(null);
     const inputRefTag = useRef<HTMLInputElement>(null);
+    const inputRefCorporate = useRef<HTMLInputElement>(null);
 
     const [query, setQuery] = useState("");
     const [queryTag, setQueryTag] = useState("");
+    const [queryCorporate, setQueryCorporate] = useState("");
+    const [menuOpen, setMenuOpen] = useState(true);
+    const [isLoading, setIsLoading] = useState<any>({
+        get_detail: false,
+    });
+
+    const [relationAll, setRelationAll] = useState<any>([]);
+    const getRelationAll = async () => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
+        await axios
+            .post(`/getRelationAll`)
+            .then((res) => {
+                setRelationAll(res.data);
+                setIsLoading({
+                    ...isLoading,
+                    get_detail: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const [detailCorporatePIC, setDetailCorporatePIC] = useState<any>({
+        INDIVIDU_RELATION_ID: detailRelation,
+        detail_corporate: [
+            {
+                RELATION_ORGANIZATION_NAME: "",
+            },
+        ],
+    });
+    const filteredAllRelation = relationAll.filter(
+        (item: any) =>
+            item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+                queryCorporate.toLocaleLowerCase()?.trim()
+            ) &&
+            !detailCorporatePIC.detail_corporate?.find(
+                (f: any) =>
+                    f.RELATION_ORGANIZATION_NAME ===
+                    item.RELATION_ORGANIZATION_NAME
+            )
+    );
+
     const isDisableEdit =
         !query?.trim() ||
         dataById.m_relation_aka.filter(
@@ -259,13 +339,13 @@ export default function DetailRelation({
         }
     };
 
-    const handleCheckboxTBKEdit = (e: any) => {
+    const handleCheckboxDefault = (e: any) => {
         if (e == true) {
-            setSwitchPageTBK(true);
-            setDataById({ ...dataById, MARK_TBK_RELATION: "1" });
+            setSwitchPage(true);
+            setDataById({ ...dataById, DEFAULT_PAYABLE: "1" });
         } else {
-            setSwitchPageTBK(false);
-            setDataById({ ...dataById, MARK_TBK_RELATION: "0" });
+            setSwitchPage(false);
+            setDataById({ ...dataById, DEFAULT_PAYABLE: "0" });
         }
     };
 
@@ -292,7 +372,7 @@ export default function DetailRelation({
                         RELATION_ORGANIZATION_TYPE_ID: "",
                         RELATION_ORGANIZATION_ID:
                             dataById.RELATION_ORGANIZATION_ID,
-                        RELATION_TYPE_ID: value,
+                        RELATION_TYPE_ID: parseInt(value),
                     },
                 ],
             });
@@ -305,21 +385,41 @@ export default function DetailRelation({
     };
 
     const handleSuccessEdit = (message: string) => {
-        Swal.fire({
-            title: "Success",
-            text: "Relation Edit",
-            icon: "success",
-        }).then((result: any) => {
-            if (result.value) {
-                setGetDetailRelation({
-                    RELATION_ORGANIZATION_NAME: message[1],
-                    RELATION_ORGANIZATION_ID: message[0],
-                    RELATION_SALUTATION_PRE: message[2],
-                    RELATION_SALUTATION_POST: message[3],
-                });
-                getDetailRelation(message[0]);
-            }
-        });
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[4]);
+            setGetDetailRelation({
+                RELATION_ORGANIZATION_NAME: message[1],
+                RELATION_ORGANIZATION_ID: message[0],
+                RELATION_SALUTATION_PRE: message[2],
+                RELATION_SALUTATION_POST: message[3],
+            });
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+    const handleSuccessEditCorporate = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[1]);
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
+    const handleSuccessEditDocument = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[1]);
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
     };
 
     // Onclick Structure
@@ -402,6 +502,41 @@ export default function DetailRelation({
         });
     };
 
+    const [modalPIC, setModalPIC] = useState<any>({
+        view: false,
+    });
+
+    const handleClickPIC = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setModalPIC({
+            add: false,
+            delete: false,
+            edit: false,
+            view: !modalPIC.view,
+            document: false,
+            search: false,
+        });
+    };
+
+    const [modalDocuemnt, setModalDocument] = useState<any>({
+        view: false,
+    });
+
+    const handleClickDocument = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        setModalDocument({
+            view: !modalDocuemnt.view,
+        });
+    };
+
     const professionSelect = profession?.map((query: any) => {
         return {
             value: query.RELATION_PROFESSION_ID,
@@ -455,6 +590,24 @@ export default function DetailRelation({
             });
     };
 
+    const handleClickEditCorporate = async (
+        e: FormEvent,
+        idRelationOrganization: string
+    ) => {
+        e.preventDefault();
+
+        getCorporatePIC(idRelationOrganization);
+        getRelationAll();
+        setModalCorporatePIC({
+            add: false,
+            delete: false,
+            edit: !modalCorporatePIC.edit,
+            view: false,
+            document: false,
+            search: false,
+        });
+    };
+
     let valueEmail;
     if (dataById.RELATION_ORGANIZATION_EMAIL === null) {
         valueEmail = "";
@@ -468,8 +621,531 @@ export default function DetailRelation({
     } else {
         valueWebsite = dataById.RELATION_ORGANIZATION_WEBSITE;
     }
+
+    // modal edit bank account
+    const [modalEditBankRelation, setModalEditBankRelation] = useState<any>({
+        edit: false,
+    });
+
+    const [editBankRelation, setEditBankRelation] = useState<any>({
+        RELATION_ORGANIZATION_ID: detailRelation,
+        bank_account: [
+            {
+                BANK_ID: "",
+                ACCOUNT_NAME: "",
+                ACCOUNT_NUMBER: "",
+                NPWP_NAME: "",
+                RELATION_ORGANIZATION_ID: detailRelation,
+            },
+        ],
+    });
+
+    const handleEditBankRelation = async (e: FormEvent, relationId: number) => {
+        e.preventDefault();
+
+        getRBank();
+        setEditBankRelation({
+            RELATION_ORGANIZATION_ID: detailRelation,
+            bank_account: dataRelationNew.m_bank_relation,
+        });
+        setModalEditBankRelation({
+            edit: !modalEditBankRelation.edit,
+        });
+    };
+
+    const [bank, setBank] = useState<any>([]);
+    const getRBank = async () => {
+        await axios
+            .post(`/getRBank`)
+            .then((res) => {
+                setBank(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const bankSelect = bank?.map((query: any) => {
+        return {
+            value: query.BANK_ID,
+            label: query.BANK_ABBREVIATION,
+        };
+    });
+
+    const getNameBank = (value: any) => {
+        if (value) {
+            const selected = bankSelect.filter(
+                (option: any) => option.value === value
+            );
+            // console.log("aaa", selected);
+            return selected[0]?.label;
+        }
+    };
+
+    const addRowBankAccount = (e: FormEvent) => {
+        e.preventDefault();
+
+        setEditBankRelation({
+            ...editBankRelation,
+            bank_account: [
+                ...editBankRelation.bank_account,
+                {
+                    BANK_ID: "",
+                    ACCOUNT_NAME: "",
+                    ACCOUNT_NUMBER: "",
+                    NPWP_NAME: "",
+                    RELATION_ORGANIZATION_ID: detailRelation,
+                },
+            ],
+        });
+    };
+
+    const inputDataBank = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...editBankRelation.bank_account];
+        changeVal[i][name] = value;
+        setEditBankRelation({
+            ...editBankRelation,
+            bank_account: changeVal,
+        });
+    };
+
+    const handleSuccessEditBankRelation = (message: string) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message[1]);
+            getDetailRelation(message[0]);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+    };
+
     return (
         <>
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
+
+            <ModalToAction
+                show={modalDocuemnt.view}
+                onClose={() =>
+                    setModalDocument({
+                        view: false,
+                    })
+                }
+                title={"Document"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={null}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[90%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DetailDocumentRelation
+                            idRelation={detailRelation}
+                            dataRelationNew={dataRelationNew}
+                            handleSuccessEditDocument={
+                                handleSuccessEditDocument
+                            }
+                            setIsSuccess={setIsSuccess}
+                            isSuccess={isSuccess}
+                        />
+                    </>
+                }
+            />
+
+            {/* edit bank account relation */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modalEditBankRelation.edit}
+                onClose={() =>
+                    setModalEditBankRelation({
+                        edit: false,
+                    })
+                }
+                title={"Edit Bank Relation"}
+                url={`/editBankRelation`}
+                data={editBankRelation}
+                onSuccess={handleSuccessEditBankRelation}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                }
+                body={
+                    <>
+                        <div className="h-[100vh]">
+                            <div>
+                                <div className="grid grid-cols-4 gap-2">
+                                    <div>
+                                        <div className="text-md font-semibold">
+                                            <span>Bank Name</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-md font-semibold">
+                                            <span>Account Name</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-md font-semibold">
+                                            <span>Account Number</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-md font-semibold">
+                                            <span>NPWP</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {editBankRelation.bank_account?.length !== 0
+                                ? editBankRelation.bank_account?.map(
+                                      (bankAccount: any, i: number) => {
+                                          return (
+                                              <div
+                                                  className="grid grid-cols-4 gap-2"
+                                                  key={i}
+                                              >
+                                                  <div className="mt-1 shadow-lg">
+                                                      <Select
+                                                          classNames={{
+                                                              menuButton: () =>
+                                                                  `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                              menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                              listItem: ({
+                                                                  isSelected,
+                                                              }: any) =>
+                                                                  `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                      isSelected
+                                                                          ? `text-white bg-red-600`
+                                                                          : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                  }`,
+                                                          }}
+                                                          options={bankSelect}
+                                                          isSearchable={true}
+                                                          placeholder={
+                                                              "Bank Name *"
+                                                          }
+                                                          value={
+                                                              bankAccount.BANK_ID ===
+                                                              ""
+                                                                  ? null
+                                                                  : {
+                                                                        label: getNameBank(
+                                                                            bankAccount.BANK_ID
+                                                                        ),
+                                                                        value: bankAccount.BANK_ID,
+                                                                    }
+                                                          }
+                                                          onChange={(
+                                                              val: any
+                                                          ) => {
+                                                              inputDataBank(
+                                                                  "BANK_ID",
+                                                                  val.value,
+                                                                  i
+                                                              );
+                                                          }}
+                                                          primaryColor={
+                                                              "bg-red-500"
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <div className="">
+                                                      <TextInput
+                                                          type="text"
+                                                          value={
+                                                              bankAccount.ACCOUNT_NAME
+                                                          }
+                                                          className="mt-2"
+                                                          onChange={(e) =>
+                                                              inputDataBank(
+                                                                  "ACCOUNT_NAME",
+                                                                  e.target
+                                                                      .value,
+                                                                  i
+                                                              )
+                                                          }
+                                                          placeholder="Account Name"
+                                                      />
+                                                  </div>
+                                                  <div className="">
+                                                      <TextInput
+                                                          type="text"
+                                                          value={
+                                                              bankAccount.ACCOUNT_NUMBER
+                                                          }
+                                                          className="mt-2"
+                                                          onChange={(e) =>
+                                                              inputDataBank(
+                                                                  "ACCOUNT_NUMBER",
+                                                                  e.target
+                                                                      .value,
+                                                                  i
+                                                              )
+                                                          }
+                                                          placeholder="Account Number"
+                                                      />
+                                                  </div>
+                                                  <div className="">
+                                                      <div className="flex items-center">
+                                                          <TextInput
+                                                              type="text"
+                                                              value={
+                                                                  bankAccount.NPWP_NAME
+                                                              }
+                                                              className="mt-2"
+                                                              onChange={(e) =>
+                                                                  inputDataBank(
+                                                                      "NPWP_NAME",
+                                                                      e.target
+                                                                          .value,
+                                                                      i
+                                                                  )
+                                                              }
+                                                              placeholder="NPWP"
+                                                          />
+                                                          <span
+                                                              className="mt-2"
+                                                              onClick={() => {
+                                                                  const updatedData =
+                                                                      editBankRelation.bank_account.filter(
+                                                                          (
+                                                                              data: any,
+                                                                              a: number
+                                                                          ) =>
+                                                                              a !==
+                                                                              i
+                                                                      );
+                                                                  setEditBankRelation(
+                                                                      {
+                                                                          ...editBankRelation,
+                                                                          bank_account:
+                                                                              updatedData,
+                                                                      }
+                                                                  );
+                                                              }}
+                                                          >
+                                                              <XMarkIcon className="w-7 text-red-600 cursor-pointer" />
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          );
+                                      }
+                                  )
+                                : null}
+                            <div
+                                className="text-sm text-gray-500 mt-2 hover:cursor-pointer hover:underline"
+                                onClick={(e) => addRowBankAccount(e)}
+                            >
+                                <span>+ Add Row Bank Account</span>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* edit bank account relation */}
+
+            {/* edit corporate PIC */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modalCorporatePIC.edit}
+                onClose={() =>
+                    setModalCorporatePIC({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"Edit Corporate PIC"}
+                url={`/editCorporatePIC`}
+                data={detailCorporatePIC}
+                onSuccess={handleSuccessEditCorporate}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                }
+                body={
+                    <>
+                        <div className="mt-4">
+                            {detailCorporatePIC.detail_corporate?.length ? (
+                                <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
+                                    {detailCorporatePIC.detail_corporate
+                                        ?.filter(
+                                            (m: any) =>
+                                                m.PERSON_IS_DELETED === 0
+                                        )
+                                        .map((tag: any, i: number) => {
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className="rounded-full w-fit py-1.5 px-3 border border-red-600 bg-gray-50 text-gray-500 flex items-center gap-2"
+                                                >
+                                                    {
+                                                        tag?.RELATION_ORGANIZATION_NAME
+                                                    }
+                                                    <div className="cursor-pointer">
+                                                        {/* <a href=""> */}
+                                                        <div
+                                                            className="text-red-600"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                const updatedData =
+                                                                    detailCorporatePIC.detail_corporate.filter(
+                                                                        (
+                                                                            data: any
+                                                                        ) =>
+                                                                            data.RELATION_ORGANIZATION_NAME !==
+                                                                            tag.RELATION_ORGANIZATION_NAME
+                                                                    );
+                                                                setDetailCorporatePIC(
+                                                                    {
+                                                                        ...detailCorporatePIC,
+                                                                        detail_corporate:
+                                                                            updatedData,
+                                                                    }
+                                                                );
+                                                            }}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={
+                                                                    1.5
+                                                                }
+                                                                stroke="currentColor"
+                                                                className="w-6 h-6"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    <div className="w-full text-right">
+                                        <span
+                                            className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
+                                            onClick={() => {
+                                                setDetailCorporatePIC({
+                                                    ...detailCorporatePIC,
+                                                    INDIVIDU_RELATION_ID:
+                                                        detailRelation,
+                                                    detail_corporate: [],
+                                                });
+                                                inputRefCorporate.current?.focus();
+                                            }}
+                                        >
+                                            Clear all
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : null}
+                            <TextInput
+                                ref={inputRefCorporate}
+                                type="text"
+                                value={queryCorporate}
+                                onChange={(e) =>
+                                    setQueryCorporate(
+                                        e.target.value.trimStart()
+                                    )
+                                }
+                                placeholder="Search Relations"
+                                className=""
+                                onFocus={() => setMenuOpen(true)}
+                            />
+                            {menuOpen ? (
+                                <div className="bg-white rounded-md shadow-md w-full max-h-72 mt-2 p-1 flex overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-200">
+                                    {isLoading.get_detail ? (
+                                        <div className="m-auto py-20 sweet-loading h-[199px]">
+                                            <BeatLoader
+                                                // cssOverride={override}
+                                                size={10}
+                                                color={"#ff4242"}
+                                                loading={true}
+                                                speedMultiplier={1.5}
+                                                aria-label="Loading Spinner"
+                                                data-testid="loader"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <ul className="w-full">
+                                            {filteredAllRelation?.length ? (
+                                                filteredAllRelation?.map(
+                                                    (tag: any, i: number) => (
+                                                        <li
+                                                            key={i}
+                                                            className="p-2 cursor-pointer hover:bg-rose-50 hover:text-rose-500 rounded-md w-full"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                setMenuOpen(
+                                                                    true
+                                                                );
+                                                                setDetailCorporatePIC(
+                                                                    {
+                                                                        ...detailCorporatePIC,
+                                                                        detail_corporate:
+                                                                            [
+                                                                                ...detailCorporatePIC.detail_corporate,
+                                                                                {
+                                                                                    INDIVIDU_RELATION_ID:
+                                                                                        detailRelation,
+                                                                                    PERSON_IS_DELETED: 0,
+                                                                                    RELATION_ORGANIZATION_NAME:
+                                                                                        tag.RELATION_ORGANIZATION_NAME,
+                                                                                },
+                                                                            ],
+                                                                    }
+                                                                );
+                                                                setQueryCorporate(
+                                                                    ""
+                                                                );
+                                                            }}
+                                                        >
+                                                            {
+                                                                tag.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </li>
+                                                    )
+                                                )
+                                            ) : (
+                                                <li className="p-2 text-gray-500">
+                                                    No options available
+                                                </li>
+                                            )}
+                                        </ul>
+                                    )}
+                                </div>
+                            ) : null}
+                        </div>
+                    </>
+                }
+            />
+            {/* End Edit Corporate PIC */}
+
             <ModalToAction
                 show={modal.edit}
                 onClose={() =>
@@ -489,7 +1165,7 @@ export default function DetailRelation({
                 method={"patch"}
                 headers={null}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-5xl"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[100%]"
                 }
                 submitButtonName={"Submit"}
                 body={
@@ -510,7 +1186,9 @@ export default function DetailRelation({
                                     onChange={(e) => {
                                         setDataById({
                                             ...dataById,
-                                            relation_status_id: e.target.value,
+                                            relation_status_id: parseInt(
+                                                e.target.value
+                                            ),
                                         });
                                         getSalutationById(
                                             e.target.value,
@@ -846,7 +1524,44 @@ export default function DetailRelation({
                                 </ul>
                             </div>
                         </div>
-                        <div className="xs:grid xs:gap-4 xs:grid-cols-1 lg:grid lg:gap-4 lg:grid-cols-2">
+                        <div className="xs:grid xs:gap-4 xs:grid-cols-1 lg:grid lg:gap-4 lg:grid-cols-3">
+                            <div className="mt-4">
+                                <InputLabel
+                                    htmlFor="RELATION_ORGANIZATION_DATE_OF_BIRTH"
+                                    value="Date Of Birth"
+                                />
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 mt-2 pointer-events-none">
+                                        <svg
+                                            className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </div>
+                                    <DatePicker
+                                        popperPlacement="top-end"
+                                        selected={
+                                            dataById.RELATION_ORGANIZATION_DATE_OF_BIRTH
+                                        }
+                                        onChange={(date: any) => {
+                                            setDataById({
+                                                ...dataById,
+                                                RELATION_ORGANIZATION_DATE_OF_BIRTH:
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    ),
+                                            });
+                                        }}
+                                        className="border-0 rounded-md shadow-md text-sm mt-2 h-9 xs:w-[118%] lg:w-[130%] focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyy"
+                                    />
+                                </div>
+                            </div>
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="RELATION_ORGANIZATION_EMAIL"
@@ -937,6 +1652,71 @@ export default function DetailRelation({
                                 </ul>
                             </div>
                         </div>
+                        {(dataById.relation_status_id === 2 &&
+                            dataById.m_relation_type.find(
+                                (f: any) => f.RELATION_TYPE_ID === 3
+                            )) ||
+                        dataById.m_relation_type.find(
+                            (f: any) => f.RELATION_TYPE_ID === 13
+                        ) ||
+                        (dataById.relation_status_id === 1 &&
+                            dataById.m_relation_type.find(
+                                (f: any) => f.RELATION_TYPE_ID === 3
+                            )) ||
+                        dataById.m_relation_type.find(
+                            (f: any) => f.RELATION_TYPE_ID === 13
+                        ) ? (
+                            <>
+                                <div className="grid grid-cols-2 gap-1 mt-2 relative">
+                                    <div>
+                                        <InputLabel
+                                            value="NPWP"
+                                            className="absolute"
+                                        />
+                                        <div className="ml-[2.7rem] text-red-600">
+                                            *
+                                        </div>
+                                        <TextInput
+                                            type="text"
+                                            value={
+                                                dataById.RELATION_ORGANIZATION_NPWP
+                                            }
+                                            className="mt-2"
+                                            onChange={(e) =>
+                                                setDataById({
+                                                    ...dataById,
+                                                    RELATION_ORGANIZATION_NPWP:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            placeholder="NPWP"
+                                        />
+                                    </div>
+                                    <div className="text-sm mt-8 flex">
+                                        <div className="rotate-90 -ml-3">
+                                            <SwitchPage
+                                                enabled={switchPage}
+                                                onChangeButton={
+                                                    handleCheckboxDefault
+                                                }
+                                            />
+                                        </div>
+                                        <div className="">
+                                            <div className="text-xs mb-1">
+                                                <span>
+                                                    Default Payable By Relation
+                                                </span>
+                                            </div>
+                                            <div className="text-xs">
+                                                <span>
+                                                    Default Payable By Fresnel
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : null}
                         {dataById.relation_status_id === 1 ||
                         dataById.relation_status_id === "1" ? (
                             <div className="mt-4" id="relationLob">
@@ -1339,7 +2119,7 @@ export default function DetailRelation({
                 data={""}
                 onSuccess={""}
                 method={""}
-                headers={""}
+                headers={null}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
                 }
@@ -1352,14 +2132,49 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
 
-            {/* Detail Relation*/}
-            {/* Top */}
-            <div className="bg-white p-4 rounded-md shadow-md">
+            {/* modal for person */}
+            <ModalToAction
+                show={modalPIC.view}
+                onClose={() =>
+                    setModalPIC({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: false,
+                        document: false,
+                        search: false,
+                    })
+                }
+                title={"PIC"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <PIC auth={""} idRelation={detailRelation} />
+                    </>
+                }
+            />
+            {/* end modal for person */}
+            {/* modal end chat */}
+            <AppPlugin parameterID={detailRelation} />
+
+            {/* <MyProvider>
+                <PhoenixComponent otherId={detailRelation} />
+            </MyProvider> */}
+            <div className="bg-white p-4 rounded-md shadow-md mb-3">
                 {/* Official Information */}
                 <div className="flex justify-between">
-                    <div className="text-md font-semibold w-fit">
-                        <span className="border-b-2 border-red-600">
+                    <div className="font-semibold text-md">
+                        <span className="border-b-2 border-red-600 ">
                             Relation Information
+                            {/* <div className="chatPlugin float-right mt-2 ml-2"></div> */}
                         </span>
                     </div>
                     <a
@@ -1372,7 +2187,7 @@ export default function DetailRelation({
                         className="cursor-pointer"
                         title="Edit Relation"
                     >
-                        <div className="bg-red-600 p-2 rounded-md text-white">
+                        <div className="bg-red-600 p-1 rounded-md text-white">
                             <PencilSquareIcon className="w-5" />
                         </div>
                     </a>
@@ -1439,7 +2254,7 @@ export default function DetailRelation({
                             </div>
                         )}
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2 hidden">
                         <div className="font-semibold">
                             <span>Address & Location</span>
                         </div>
@@ -1451,10 +2266,14 @@ export default function DetailRelation({
                 {/* End Official Information */}
 
                 {/* Relation Type And */}
-                <div className="text-md font-semibold border-b-2 w-fit border-red-600 mt-4">
-                    <span>Relation Type</span>
+                <div>
+                    <div className="text-md font-semibold mt-4 w-fit">
+                        <span className="border-b-2 border-red-600 ">
+                            Relation Type
+                        </span>
+                    </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="grid grid-cols-1 gap-4 mt-2">
                         <div className="mb-2 relative flex flex-wrap gap-3">
                             {dataRelationNew.m_relation_type?.map(
@@ -1471,18 +2290,6 @@ export default function DetailRelation({
                                                         .RELATION_TYPE_NAME
                                                 }
                                             </span>
-                                            <div>
-                                                {/* <a href=""> */}
-                                                <div
-                                                    className="text-white cursor-pointer"
-                                                    onMouseDown={(e) =>
-                                                        e.preventDefault()
-                                                    }
-                                                >
-                                                    <XMarkIcon className="w-5" />
-                                                </div>
-                                                {/* </a> */}
-                                            </div>
                                         </div>
                                         // </>
                                     );
@@ -1493,78 +2300,298 @@ export default function DetailRelation({
                     <div></div>
                 </div>
                 {/* END Relation Type And */}
+
+                {/* bank account relation */}
+                <div className="">
+                    <div className="flex justify-between items-center">
+                        <div className="text-md font-semibold mt-4 w-fit">
+                            <span className="border-b-2 border-red-600">
+                                Bank Account Relation
+                            </span>
+                        </div>
+                        <a
+                            onClick={(e) =>
+                                handleEditBankRelation(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_ID
+                                )
+                            }
+                            className="cursor-pointer"
+                            title="Edit Bank Account Relation"
+                        >
+                            <div className="bg-red-600 p-1 rounded-md text-white">
+                                <PencilSquareIcon className="w-5" />
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                    <div>
+                        <div className="text-sm font-semibold">
+                            <span className="cls_can_attach_process">
+                                Bank Name
+                            </span>
+                            {/* <div
+                                className="chatPlugin float-right mt-2 ml-2"
+                                id="2d8d70c14c03d1b22f7445fa7cea69b41664709c6a0208e21af8c7110d898423"
+                            ></div> */}
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-sm font-semibold">
+                            <span className="cls_can_attach_process w-fit">
+                                Account Name
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-sm font-semibold">
+                            <span className="cls_can_attach_process">
+                                Account Number
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-sm font-semibold">
+                            <span>NPWP</span>
+                        </div>
+                    </div>
+                </div>
+                {dataRelationNew.m_bank_relation?.length === 0 ? (
+                    <>
+                        <div className="grid grid-cols-4 gap-2">
+                            <div>
+                                <div className="text-sm text-gray-500">
+                                    <span>-</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-sm text-gray-500">
+                                    <span>-</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-sm text-gray-500">
+                                    <span>-</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-sm text-gray-500">
+                                    <span>-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    dataRelationNew.m_bank_relation?.map(
+                        (bAR: any, i: number) => {
+                            return (
+                                <div className="grid grid-cols-4 gap-2" key={i}>
+                                    <div>
+                                        <div className="text-sm text-gray-500 ">
+                                            <span className="">
+                                                {bAR.r_bank?.BANK_ABBREVIATION}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500">
+                                            <span>{bAR.ACCOUNT_NAME}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500">
+                                            <span>{bAR.ACCOUNT_NUMBER}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500">
+                                            <span>{bAR.NPWP_NAME}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        }
+                    )
+                )}
+
+                {/* end bank account relation */}
+
+                {dataRelationNew.relation_status_id !== 2 ? null : (
+                    <>
+                        {/* Corporate Pic For */}
+                        <div className="mt-4 flex gap-2">
+                            <div className="text-md font-semibold border-b-2 w-fit border-red-600">
+                                <span>Corporate PIC For</span>
+                            </div>
+                            <div
+                                className="gap-2 text-sm bg-red-600 text-white px-2 flex items-center rounded-md cursor-pointer hover:bg-red-500"
+                                title="Edit Corporate PIC"
+                                onClick={(e) =>
+                                    handleClickEditCorporate(
+                                        e,
+                                        dataRelationNew.RELATION_ORGANIZATION_ID
+                                    )
+                                }
+                            >
+                                <span>
+                                    <PencilSquareIcon className="w-4" />
+                                </span>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                            <div className="grid grid-cols-1 gap-4 mt-2">
+                                <div className="mb-2 relative flex flex-wrap gap-3">
+                                    {dataRelationNew.t_person
+                                        ?.filter(
+                                            (m: any) =>
+                                                m.PERSON_IS_DELETED === 0
+                                        )
+                                        .map((dCorporate: any, i: number) => {
+                                            return (
+                                                // <>
+                                                <div
+                                                    key={i}
+                                                    className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm text-white"
+                                                >
+                                                    <span>
+                                                        {
+                                                            dCorporate
+                                                                .corporate_p_i_c
+                                                                .RELATION_ORGANIZATION_ALIAS
+                                                        }
+                                                    </span>
+                                                </div>
+                                                // </>
+                                            );
+                                        })}
+                                </div>
+                            </div>
+                            <div></div>
+                        </div>
+                        {/* End Corporate PIC For */}
+                    </>
+                )}
             </div>
             {/* End Top */}
 
-            {/* Button */}
-            <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
+            {dataRelationNew.relation_status_id !== 2 ? (
+                <>
+                    {/* Button */}
+                    <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
+                        <div className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500">
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <div>
+                                    <span
+                                        className=""
+                                        onClick={(e) =>
+                                            handleClickStructure(
+                                                e,
+                                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                                            )
+                                        }
+                                    >
+                                        Structure
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickDivision(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Division</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickAddressLocation(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Address & Location</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickJobDesk(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Job Desc</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500 hidden"
+                            onClick={(e) =>
+                                handleClickPerson(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Person & User</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickPIC(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>PIC</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickDocument(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Document</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* End Button */}
+                </>
+            ) : (
                 <div
                     className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
                     onClick={(e) =>
-                        handleClickStructure(
+                        handleClickDocument(
                             e,
                             dataRelationNew.RELATION_ORGANIZATION_NAME
                         )
                     }
                 >
                     <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Structure</span>
+                        <span>Document</span>
                     </div>
                 </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickDivision(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Division</span>
-                    </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickAddressLocation(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Address & Location</span>
-                    </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickJobDesk(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Job Desc</span>
-                    </div>
-                </div>
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickPerson(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Person & User</span>
-                    </div>
-                </div>
-            </div>
-            {/* End Button */}
+            )}
         </>
     );
 }
