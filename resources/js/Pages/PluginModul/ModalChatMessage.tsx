@@ -24,6 +24,7 @@ import {
     AccordionPanel,
     AccordionTitle,
 } from "flowbite-react";
+import TextArea from "@/Components/TextArea";
 
 export default function ModalChatMessage({
     show = false,
@@ -54,6 +55,9 @@ export default function ModalChatMessage({
     useEffect(() => {
         getTypeChatByTagId(tagIdChat.TAG_ID);
     }, [tagIdChat]);
+    useEffect(() => {
+        getChatPin(tagIdChat.TAG_ID);
+    }, [tagIdChat]);
 
     const [isSuccessChat, setIsSuccessChat] = useState<string>("");
     const today = new Date();
@@ -64,6 +68,7 @@ export default function ModalChatMessage({
     // state for data message
     const [detailMessage, setDetailMessage] = useState<any>([]);
     const [detailTypeChat, setDetailTypeChat] = useState<any>([]);
+    const [pinChatDetail, setPinChatDetail] = useState<any>([]);
 
     // Ambil kunci dan urutkan secara terbalik
     const sortedKeys = Object.keys(detailMessage).reverse();
@@ -92,7 +97,18 @@ export default function ModalChatMessage({
             .post(`/getTypeChatByTagId`, { tagIdChat })
             .then((res) => {
                 setDetailTypeChat(res.data);
-                console.log(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // Get Type Chat Pin Detail
+    const getChatPin = async (tagIdChat: any) => {
+        await axios
+            .post(`/getChatPin`, { tagIdChat })
+            .then((res) => {
+                setPinChatDetail(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -244,6 +260,7 @@ export default function ModalChatMessage({
             .then((res) => {
                 setIsSuccessChat(res.data[0]);
                 getTypeChatByTagId(res.data[1]);
+                getChatPin(res.data[1]);
                 setShowContext({
                     ...showContext,
                     visible: false,
@@ -260,6 +277,74 @@ export default function ModalChatMessage({
 
     // show text replay
     const [textReply, setTextReply] = useState<any>(false);
+
+    const [showMentions, setShowMentions] = useState<any>(false);
+    const [filteredUsers, setFilteredUsers] = useState<any>([]);
+
+    const users = ["Alice", "Bob", "Charlie", "David", "Eva"]; // Contoh daftar pengguna
+    // onchange chat
+    const onchangeChatText = async (e: any) => {
+        if (typeChatId !== "") {
+            setData({
+                ...data,
+                INITIATE_YOUR_CHAT: e.target.value,
+                CHAT_ID: typeChatId,
+            });
+        } else {
+            setData({
+                ...data,
+                INITIATE_YOUR_CHAT: e.target.value,
+            });
+        }
+
+        // Cek apakah karakter terakhir adalah '@'
+        const lastChar = e.target.value;
+        const parts = lastChar.split("@");
+
+        if (parts.length > 1) {
+            // Jika ada lebih dari satu '@'
+            let allValid = true;
+
+            // Periksa setiap bagian setelah '@'
+            for (let i = 1; i < parts.length; i++) {
+                if (parts[i].trim() === "") {
+                    allValid = false; // Jika ada bagian kosong setelah '@'
+                    break;
+                }
+            }
+
+            if (allValid) {
+                setShowMentions(false); // Sembunyikan dropdown jika '@' tidak ada
+            } else {
+                setShowMentions(true); // Tampilkan dropdown mention
+            }
+        } else {
+            setShowMentions(false); // Sembunyikan dropdown jika '@' tidak ada
+        }
+
+        // Filter pengguna yang sesuai dengan input setelah '@'
+        const lastWord = e.target.value.split(" ").pop(); // Ambil kata terakhir setelah '@'
+        if (lastWord.startsWith("@")) {
+            const searchQuery = lastWord.slice(1).toLowerCase();
+            const filtered = users.filter((user: any) =>
+                user.toLowerCase().startsWith(searchQuery)
+            );
+            setFilteredUsers(filtered);
+        }
+    };
+
+    // Event handler untuk memilih mention dari dropdown
+    const handleMentionClick = (e: FormEvent, usersParticipant: any) => {
+        e.preventDefault();
+        const words = data?.INITIATE_YOUR_CHAT.split(" ");
+        words[words.length - 1] = "@" + usersParticipant; // Ganti kata terakhir dengan mention yang dipilih
+        setData({
+            ...data,
+            INITIATE_YOUR_CHAT: words.join(" ") + " ", // Tambahkan spasi setelah mention
+        });
+        document.getElementById("textInput")?.focus();
+        setShowMentions(false); // Sembunyikan dropdown
+    };
 
     return (
         <>
@@ -298,6 +383,11 @@ export default function ModalChatMessage({
                                                     className="hover:cursor-pointer"
                                                     onClick={() => {
                                                         setFlagPlugin(true);
+                                                        setData({
+                                                            ...data,
+                                                            INITIATE_YOUR_CHAT:
+                                                                "",
+                                                        });
                                                     }}
                                                 >
                                                     <ArrowLeftIcon className="w-6" />
@@ -488,14 +578,14 @@ export default function ModalChatMessage({
                                                                                                 ? "bg-blue-500 text-white rounded-lg py-2 px-2 inline-block text-xs w-fit "
                                                                                                 : "bg-gray-200 text-gray-700 rounded-lg py-2 px-2 inline-block text-xs w-fit"
                                                                                         }
-                                                                                        onClick={(
-                                                                                            e: any
-                                                                                        ) =>
-                                                                                            handleContextMenu(
-                                                                                                e,
-                                                                                                items.CHAT_DETAIL_ID
-                                                                                            )
-                                                                                        }
+                                                                                        // onClick={(
+                                                                                        //     e: any
+                                                                                        // ) =>
+                                                                                        //     handleContextMenu(
+                                                                                        //         e,
+                                                                                        //         items.CHAT_DETAIL_ID
+                                                                                        //     )
+                                                                                        // }
                                                                                     >
                                                                                         {
                                                                                             items.CHAT_DETAIL_TEXT
@@ -556,7 +646,38 @@ export default function ModalChatMessage({
                                             <div className="">
                                                 <form onSubmit={action}>
                                                     <hr />
-
+                                                    {showMentions && (
+                                                        <div className="m-2">
+                                                            {filteredUsers?.map(
+                                                                (
+                                                                    dataParticipant: any,
+                                                                    a: number
+                                                                ) => {
+                                                                    return (
+                                                                        <div
+                                                                            key={
+                                                                                a
+                                                                            }
+                                                                            onClick={(
+                                                                                e: any
+                                                                            ) =>
+                                                                                handleMentionClick(
+                                                                                    e,
+                                                                                    dataParticipant
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <span>
+                                                                                {
+                                                                                    dataParticipant
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </div>
+                                                    )}
                                                     {textReply && (
                                                         <>
                                                             <div className="m-2 border border-red-500 rounded-md py-1 px-2 relative">
@@ -606,35 +727,29 @@ export default function ModalChatMessage({
                                                         </>
                                                     )}
                                                     <div className="m-2 flex items-center gap-1">
-                                                        <TextInput
+                                                        <TextArea
+                                                            id="textInput"
                                                             type="text"
                                                             value={
                                                                 data.INITIATE_YOUR_CHAT
                                                             }
-                                                            className="w-full ring-1 ring-red-500"
-                                                            onChange={(e) => {
-                                                                if (
-                                                                    typeChatId !==
-                                                                    ""
-                                                                ) {
-                                                                    setData({
-                                                                        ...data,
-                                                                        INITIATE_YOUR_CHAT:
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                        CHAT_ID:
-                                                                            typeChatId,
-                                                                    });
-                                                                } else {
-                                                                    setData({
-                                                                        ...data,
-                                                                        INITIATE_YOUR_CHAT:
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                    });
-                                                                }
+                                                            className="w-full ring-1 ring-red-500 h-10"
+                                                            onChange={(
+                                                                e: any
+                                                            ) => {
+                                                                onchangeChatText(
+                                                                    e
+                                                                );
+                                                            }}
+                                                            onInput={(
+                                                                e: any
+                                                            ) => {
+                                                                e.target.style.height =
+                                                                    "40px"; // Reset tinggi setiap kali input berubah
+                                                                e.target.style.height =
+                                                                    e.target
+                                                                        .scrollHeight +
+                                                                    "px"; // Atur tinggi sesuai dengan scrollHeight
                                                             }}
                                                             // onChange={(e) => permissionObject(e)}
                                                             placeholder="Your Chat"
@@ -752,15 +867,10 @@ export default function ModalChatMessage({
                                                                                                     faThumbtack
                                                                                                 }
                                                                                             /> */}
-                                                                                            {dTypeChat?.pin_chat.find(
-                                                                                                (
-                                                                                                    f: any
-                                                                                                ) =>
-                                                                                                    f.CREATED_PIN_CHAT_BY ===
-                                                                                                    auth
-                                                                                                        .user
-                                                                                                        .id
-                                                                                            ) ? (
+                                                                                            {dTypeChat?.CREATED_PIN_CHAT_BY ===
+                                                                                            auth
+                                                                                                .user
+                                                                                                .id ? (
                                                                                                 <>
                                                                                                     <FontAwesomeIcon
                                                                                                         icon={
@@ -784,36 +894,99 @@ export default function ModalChatMessage({
                                                             Pinned By You
                                                         </AccordionTitle>
                                                         <AccordionContent>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                Flowbite is
-                                                                first
-                                                                conceptualized
-                                                                and designed
-                                                                using the Figma
-                                                                software so
-                                                                everything you
-                                                                see in the
-                                                                library has a
-                                                                design
-                                                                equivalent in
-                                                                our Figma file.
-                                                            </p>
-                                                            <p className="text-gray-500 dark:text-gray-400">
-                                                                Check out the
-                                                                <a
-                                                                    href="https://flowbite.com/figma/"
-                                                                    className="text-cyan-600 hover:underline dark:text-cyan-500"
-                                                                >
-                                                                    Figma design
-                                                                    system
-                                                                </a>
-                                                                based on the
-                                                                utility classes
-                                                                from Tailwind
-                                                                CSS and
-                                                                components from
-                                                                Flowbite.
-                                                            </p>
+                                                            <div className="">
+                                                                {pinChatDetail?.map(
+                                                                    (
+                                                                        dTypeChat: any,
+                                                                        i: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                className={
+                                                                                    showContext.visible ===
+                                                                                        true &&
+                                                                                    activeIndex ===
+                                                                                        i
+                                                                                        ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                        : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
+                                                                                }
+                                                                            >
+                                                                                <div
+                                                                                    className="flex justify-between items-center"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        if (
+                                                                                            showContext.visible !==
+                                                                                            true
+                                                                                        ) {
+                                                                                            getMessageChatByTypeId(
+                                                                                                dTypeChat.CHAT_ID
+                                                                                            );
+                                                                                            setFlagPlugin(
+                                                                                                false
+                                                                                            );
+                                                                                            setData(
+                                                                                                {
+                                                                                                    ...data,
+                                                                                                    CHAT_ID:
+                                                                                                        dTypeChat.CHAT_ID,
+                                                                                                }
+                                                                                            );
+                                                                                        }
+                                                                                    }}
+                                                                                >
+                                                                                    <div>
+                                                                                        <div className="">
+                                                                                            <span>
+                                                                                                {
+                                                                                                    dTypeChat.CHAT_TITLE
+                                                                                                }
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div className="text-[10px]">
+                                                                                            <span>
+                                                                                                {dTypeChat
+                                                                                                    ?.t_user
+                                                                                                    .name +
+                                                                                                    " - " +
+                                                                                                    format(
+                                                                                                        dTypeChat.CREATED_CHAT_DATE,
+                                                                                                        "dd-MM-yyyy"
+                                                                                                    )}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="flex">
+                                                                                        <span className="text-[15px] rotate-45">
+                                                                                            {/* <FontAwesomeIcon
+                                                                                                icon={
+                                                                                                    faThumbtack
+                                                                                                }
+                                                                                            /> */}
+                                                                                            {dTypeChat?.CREATED_PIN_CHAT_BY ===
+                                                                                            auth
+                                                                                                .user
+                                                                                                .id ? (
+                                                                                                <>
+                                                                                                    <FontAwesomeIcon
+                                                                                                        icon={
+                                                                                                            faThumbtack
+                                                                                                        }
+                                                                                                    />
+                                                                                                </>
+                                                                                            ) : null}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </div>
                                                         </AccordionContent>
                                                     </AccordionPanel>
                                                     <AccordionPanel>
