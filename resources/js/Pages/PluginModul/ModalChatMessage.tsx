@@ -92,6 +92,7 @@ export default function ModalChatMessage({
             .post(`/getTypeChatByTagId`, { tagIdChat })
             .then((res) => {
                 setDetailTypeChat(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -161,6 +162,8 @@ export default function ModalChatMessage({
     const [showContext, setShowContext] = useState<any>({
         visible: false,
     });
+
+    const [activeIndex, setActiveIndex] = useState<any>(null);
     const [chatId, setChatId] = useState<any>("");
     const handleContextMenu = (e: any, idChat: any) => {
         e.preventDefault();
@@ -213,6 +216,48 @@ export default function ModalChatMessage({
             });
     };
 
+    const alertPinMessageObject = async (
+        e: FormEvent,
+        idChatDetail: any,
+        typeChatId: any
+    ) => {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't Pin Message?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                pinMessageObject(idChatDetail, typeChatId);
+            }
+        });
+    };
+
+    const pinMessageObject = async (idChatDetail: string, typeChatId: any) => {
+        setIsSuccessChat("");
+        await axios
+            .post(`/pinMessageObject`, { idChatDetail, typeChatId })
+            .then((res) => {
+                setIsSuccessChat(res.data[0]);
+                getTypeChatByTagId(res.data[1]);
+                setShowContext({
+                    ...showContext,
+                    visible: false,
+                });
+
+                setTimeout(() => {
+                    setIsSuccessChat("");
+                }, 5000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     // show text replay
     const [textReply, setTextReply] = useState<any>(false);
 
@@ -240,6 +285,13 @@ export default function ModalChatMessage({
 
                                 <div className="absolute bottom-0 right-0 mr-6 border border-red-500 mb-3 rounded-r-md rounded-l-md bg-white w-[25%] h-[29rem] flex flex-col xs:w-[90%] lg:w-[25%]">
                                     <div className="bg-red-500 p-3 rounded-tr-sm rounded-tl-sm h-10 flex justify-between items-center text-white">
+                                        {isSuccessChat && (
+                                            <ToastMessage
+                                                message={isSuccessChat}
+                                                isShow={true}
+                                                type={"success"}
+                                            />
+                                        )}
                                         {flagPlugin === false ? (
                                             showContext.visible !== true ? (
                                                 <span
@@ -310,8 +362,40 @@ export default function ModalChatMessage({
                                                     </div>
                                                 </>
                                             )
-                                        ) : (
+                                        ) : showContext.visible !== true ? (
                                             <span>List Chat</span>
+                                        ) : (
+                                            <>
+                                                <div className="flex gap-2">
+                                                    <span
+                                                        className="cursor-pointer"
+                                                        title="Pin Message"
+                                                        onClick={(e: any) =>
+                                                            alertPinMessageObject(
+                                                                e,
+                                                                chatId,
+                                                                data.CHAT_ID
+                                                            )
+                                                        }
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faThumbtack}
+                                                        />
+                                                    </span>
+                                                    {/* <span
+                                                        className="cursor-pointer"
+                                                        title="Reply Message"
+                                                        onClick={(e: any) => {
+                                                            e.preventDefault;
+                                                            setTextReply(true);
+                                                        }}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faReply}
+                                                        />
+                                                    </span> */}
+                                                </div>
+                                            </>
                                         )}
                                         {showContext.visible !== true ? (
                                             <span
@@ -320,17 +404,24 @@ export default function ModalChatMessage({
                                             >
                                                 <XMarkIcon className="w-6" />
                                             </span>
-                                        ) : null}
+                                        ) : (
+                                            <span
+                                                onClick={(e: any) => {
+                                                    e.preventDefault();
+                                                    setShowContext({
+                                                        ...showContext,
+                                                        visible: false,
+                                                    });
+                                                    setChatId("");
+                                                }}
+                                                className="hover:cursor-pointer"
+                                            >
+                                                <XMarkIcon className="w-6" />
+                                            </span>
+                                        )}
                                     </div>
                                     {flagPlugin === false ? (
                                         <>
-                                            {isSuccessChat && (
-                                                <ToastMessage
-                                                    message={isSuccessChat}
-                                                    isShow={true}
-                                                    type={"success"}
-                                                />
-                                            )}
                                             {/* <div className="flex flex-col h-auto"> */}
                                             <div
                                                 className="messageChat chat-height overflow-y-auto custom-scrollbar flex-grow"
@@ -570,51 +661,127 @@ export default function ModalChatMessage({
                                             {/* LIST CHAT */}
                                             {/* Global Chat */}
 
-                                            <div className="m-2 flex-grow overflow-y-auto custom-scrollbar">
+                                            <div className="m-1 flex-grow overflow-y-auto custom-scrollbar">
                                                 <Accordion collapseAll>
                                                     <AccordionPanel>
                                                         <AccordionTitle className="text-xs">
-                                                            Global Chat
+                                                            All Chat
                                                         </AccordionTitle>
                                                         <AccordionContent>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                Flowbite is an
-                                                                open-source
-                                                                library of
-                                                                interactive
-                                                                components built
-                                                                on top of
-                                                                Tailwind CSS
-                                                                including
-                                                                buttons,
-                                                                dropdowns,
-                                                                modals, navbars,
-                                                                and more.
-                                                            </p>
-                                                            <p className="text-gray-500 dark:text-gray-400">
-                                                                Check out this
-                                                                guide to learn
-                                                                how to&nbsp;
-                                                                <a
-                                                                    href="https://flowbite.com/docs/getting-started/introduction/"
-                                                                    className="text-cyan-600 hover:underline dark:text-cyan-500"
-                                                                >
-                                                                    get
-                                                                    started&nbsp;
-                                                                </a>
-                                                                and start
-                                                                developing
-                                                                websites even
-                                                                faster with
-                                                                components on
-                                                                top of Tailwind
-                                                                CSS.
-                                                            </p>
+                                                            <div className="">
+                                                                {detailTypeChat?.map(
+                                                                    (
+                                                                        dTypeChat: any,
+                                                                        i: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                className={
+                                                                                    showContext.visible ===
+                                                                                        true &&
+                                                                                    activeIndex ===
+                                                                                        i
+                                                                                        ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                        : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
+                                                                                }
+                                                                            >
+                                                                                <div
+                                                                                    className="flex justify-between items-center"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        if (
+                                                                                            showContext.visible !==
+                                                                                            true
+                                                                                        ) {
+                                                                                            getMessageChatByTypeId(
+                                                                                                dTypeChat.CHAT_ID
+                                                                                            );
+                                                                                            setFlagPlugin(
+                                                                                                false
+                                                                                            );
+                                                                                            setData(
+                                                                                                {
+                                                                                                    ...data,
+                                                                                                    CHAT_ID:
+                                                                                                        dTypeChat.CHAT_ID,
+                                                                                                }
+                                                                                            );
+                                                                                        }
+                                                                                    }}
+                                                                                    onContextMenu={(
+                                                                                        e: any
+                                                                                    ) => {
+                                                                                        handleContextMenu(
+                                                                                            e,
+                                                                                            dTypeChat.CHAT_ID
+                                                                                        );
+                                                                                        setActiveIndex(
+                                                                                            i
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    <div>
+                                                                                        <div className="">
+                                                                                            <span>
+                                                                                                {
+                                                                                                    dTypeChat.CHAT_TITLE
+                                                                                                }
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div className="text-[10px]">
+                                                                                            <span>
+                                                                                                {dTypeChat
+                                                                                                    ?.t_user
+                                                                                                    .name +
+                                                                                                    " - " +
+                                                                                                    format(
+                                                                                                        dTypeChat.CREATED_CHAT_DATE,
+                                                                                                        "dd-MM-yyyy"
+                                                                                                    )}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="flex">
+                                                                                        <span className="text-[15px] rotate-45">
+                                                                                            {/* <FontAwesomeIcon
+                                                                                                icon={
+                                                                                                    faThumbtack
+                                                                                                }
+                                                                                            /> */}
+                                                                                            {dTypeChat?.pin_chat.find(
+                                                                                                (
+                                                                                                    f: any
+                                                                                                ) =>
+                                                                                                    f.CREATED_PIN_CHAT_BY ===
+                                                                                                    auth
+                                                                                                        .user
+                                                                                                        .id
+                                                                                            ) ? (
+                                                                                                <>
+                                                                                                    <FontAwesomeIcon
+                                                                                                        icon={
+                                                                                                            faThumbtack
+                                                                                                        }
+                                                                                                    />
+                                                                                                </>
+                                                                                            ) : null}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </div>
                                                         </AccordionContent>
                                                     </AccordionPanel>
                                                     <AccordionPanel>
                                                         <AccordionTitle className="text-xs">
-                                                            Pin Chat
+                                                            Pinned By You
                                                         </AccordionTitle>
                                                         <AccordionContent>
                                                             <p className="mb-2 text-gray-500 dark:text-gray-400">
@@ -651,7 +818,78 @@ export default function ModalChatMessage({
                                                     </AccordionPanel>
                                                     <AccordionPanel>
                                                         <AccordionTitle className="text-xs">
-                                                            Mantion Chat
+                                                            Mentioned To You
+                                                        </AccordionTitle>
+                                                        <AccordionContent>
+                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
+                                                                The main
+                                                                difference is
+                                                                that the core
+                                                                components from
+                                                                Flowbite are
+                                                                open source
+                                                                under the MIT
+                                                                license, whereas
+                                                                Tailwind UI is a
+                                                                paid product.
+                                                                Another
+                                                                difference is
+                                                                that Flowbite
+                                                                relies on
+                                                                smaller and
+                                                                standalone
+                                                                components,
+                                                                whereas Tailwind
+                                                                UI offers
+                                                                sections of
+                                                                pages.
+                                                            </p>
+                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
+                                                                However, we
+                                                                actually
+                                                                recommend using
+                                                                both Flowbite,
+                                                                Flowbite Pro,
+                                                                and even
+                                                                Tailwind UI as
+                                                                there is no
+                                                                technical reason
+                                                                stopping you
+                                                                from using the
+                                                                best of two
+                                                                worlds.
+                                                            </p>
+                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
+                                                                Learn more about
+                                                                these
+                                                                technologies:
+                                                            </p>
+                                                            <ul className="list-disc pl-5 text-gray-500 dark:text-gray-400">
+                                                                <li>
+                                                                    <a
+                                                                        href="https://flowbite.com/pro/"
+                                                                        className="text-cyan-600 hover:underline dark:text-cyan-500"
+                                                                    >
+                                                                        Flowbite
+                                                                        Pro
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a
+                                                                        href="https://tailwindui.com/"
+                                                                        rel="nofollow"
+                                                                        className="text-cyan-600 hover:underline dark:text-cyan-500"
+                                                                    >
+                                                                        Tailwind
+                                                                        UI
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </AccordionContent>
+                                                    </AccordionPanel>
+                                                    <AccordionPanel>
+                                                        <AccordionTitle className="text-xs">
+                                                            Inactive Chat
                                                         </AccordionTitle>
                                                         <AccordionContent>
                                                             <p className="mb-2 text-gray-500 dark:text-gray-400">

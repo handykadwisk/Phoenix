@@ -44,10 +44,39 @@ class TDetailChatController extends Controller
     }
 
     public function getTypeChatByTagId(Request $request){
-        $data = TChat::where('TAG_ID', $request->tagIdChat)->with('tUser')->get();
+        $data = TChat::where('TAG_ID', $request->tagIdChat)->with('tUser')->with('pinChat')->get();
         return response()->json($data);
     }
 
+
+    public function pinMessageObject(Request $request) {
+        // save t_pin_chat
+        $pinChat = TPinChat::create([
+            "PIN_CHAT"                      => 1,
+            "CHAT_ID"                => $request->idChatDetail,
+            "CREATED_PIN_CHAT_DATE"         => now(),
+            "CREATED_PIN_CHAT_BY"           => Auth::user()->id,
+        ]);
+
+        if ($pinChat) {
+            // save m_pin_chat_detail
+            $pinChat = MPinChatDetail::create([
+                "PIN_CHAT_DETAIL"        => $pinChat->PIN_CHAT_ID,
+                "CHAT_ID"         => $request->idChatDetail,
+            ]);
+        }
+
+        // get TAG_ID chat_id 
+        $getTagID = TChat::where('CHAT_ID', $request->idChatDetail)->first();
+
+
+        return new JsonResponse([
+            "Pin Message Success",
+            $getTagID->TAG_ID
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
 
     public function pin_message(Request $request) {
         // save t_pin_chat
