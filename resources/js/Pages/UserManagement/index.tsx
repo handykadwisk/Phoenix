@@ -370,6 +370,8 @@ export default function UserManagement({ auth, type }: any) {
         setDataInputEdit({ ...dataInputEdit, user_status: userStatus });
     };
 
+        console.log(dataInputEdit, '<<<<<inputDataEdit');
+        
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
 
@@ -598,7 +600,7 @@ export default function UserManagement({ auth, type }: any) {
             {/* modal Edit */}
             <ModalToAction
                 headers={null}
-                submitButtonName={""}
+                submitButtonName={"Submit"}
                 show={modal.edit}
                 onClose={() => setModal({
                     add: false,

@@ -74,7 +74,6 @@ extends Controller
             "name" => $request->user_login,  // Tambahkan name di sini
             'employee_id'=>$request->employee_id,
             'individual_relation_id'=>$request->individual_relation_id,
-            // "email" => $request->user_login,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
             "password" => bcrypt($request->password),
@@ -155,6 +154,8 @@ extends Controller
         $typeInput = collect($request->input('type'))->first();
 
         $User->update([
+            'individual_relation_id'=>$request->individual_relation_id,
+            "user_status" => $request->user_status,
             "name" => $request->name,
             "email" => $request->email,
             "user_login" => $request->user_login,
