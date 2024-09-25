@@ -19,8 +19,15 @@ class TChatDetail extends Model
 
     public $timestamps = false;
 
+    public $with = ['pinChat'];
+
     public function tUser()
     {
         return $this->hasOne(User::class, 'id', 'CREATED_CHAT_DETAIL_BY');
+    }
+
+    public function pinChat()
+    {
+        return $this->hasMany(TPinChat::class, 'CHAT_DETAIL_ID', 'CHAT_DETAIL_ID');
     }
 }

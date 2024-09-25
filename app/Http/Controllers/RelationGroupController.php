@@ -108,7 +108,7 @@ class RelationGroupController extends Controller
             'action'     => json_encode([
                 "description" => "Created (Group).",
                 "module"      => "Group",
-                "id"          => $group->RELATION_GROUP_NAME
+                "id"          => $group->RELATION_GROUP_ID
             ]),
             'action_by'  => Auth::user()->user_login
         ]);
