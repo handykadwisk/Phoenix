@@ -405,7 +405,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 url={`/roleAccessMenu`}
                 data={accessMenu}
                 headers={null}
-                submitButtonName={''}
+                submitButtonName={'Submit'}
                 onSuccess={handleSuccess}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
@@ -479,7 +479,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             {/* modal end add */}
 
             {/* Modal Edit role */}
-            <ModalToDetail
+            <ModalToAction
+            headers={''}
                 show={modal.detail}
                 onClose={() =>
                     setModal({
@@ -494,7 +495,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 url={``}
                 data={dataById}
                 onSuccess={handleSuccess}
-                buttonAddOns={""}
+                submitButtonName={''}
+                method=""
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }

@@ -23,4 +23,9 @@ class TChat extends Model
     {
         return $this->hasOne(User::class, 'id', 'CREATED_CHAT_BY');
     }
+
+    public function pinChat()
+    {
+        return $this->hasMany(TPinChat::class, 'CHAT_ID', 'CHAT_ID');
+    }
 }

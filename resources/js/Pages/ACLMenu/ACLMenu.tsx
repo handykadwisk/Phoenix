@@ -29,6 +29,7 @@ import ModalSearch from "@/Components/Modal/ModalSearch";
 import Swal from "sweetalert2";
 import DetailMenu from "./DetailMenu";
 import SequenceEdit from "@/Components/sequenceEdit";
+import AGGrid from "@/Components/AgGrid";
 
 export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
@@ -322,6 +323,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             />
             {/* modal end detail */}
 
+                
             <div className="grid grid-cols-4 py-4 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="flex bg-white mb-4 rounded-md p-4 gap-2">
@@ -338,7 +340,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                             <span>Change Sequence</span>
                         </div>
                     </div>
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[293px]">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[100%]">
                         <TextInput
                             id="menu_name"
                             type="text"
@@ -380,7 +382,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0" style={{}}>
+                {/* <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0" style={{}}>
                     <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
                         <table className=" w-full table-auto divide-y divide-gray-300">
                             <thead className="">
@@ -510,6 +512,33 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                             clickHref={(url: string) =>
                                 getMenu(url.split("?").pop())
                             }
+                        />
+                    </div>
+                </div> */}
+                {/* AGGrid */}
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={''}
+                            // loading={isLoading.get_policy}
+                            url={"getMenus"}
+                            doubleClickEvent={undefined}
+                            triggeringRefreshData={''}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Menu Name",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                },
+                            ]}
                         />
                     </div>
                 </div>

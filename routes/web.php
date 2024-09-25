@@ -246,6 +246,7 @@ Route::middleware('auth')->group(function () {
 
     //Menu
     Route::get('/setting/menu', [MenuController::class, 'index'])->name('setting/menu');
+    Route::get('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
     Route::post('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
     Route::post('/setting/addMenu', [MenuController::class, 'store'])->name('addMenu.store');
     Route::post('/getMenuCombo', [MenuController::class, 'getMenuCombo'])->name('getMenuCombo.getMenuCombo');
@@ -606,6 +607,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/getAttendanceByEmployeeIdAndDate', [AttendanceController::class, 'getAttendanceByEmployeeIdAndDate'])->name('attendance.getAttendanceByEmployeeIdAndDate');
     Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
     Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
+    Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
+    Route::post('/pinMessageObject', [TDetailChatController::class, 'pinMessageObject'])->name('pinMessageObject.pinMessageObject');
+    Route::post('/getChatPin', [TDetailChatController::class, 'getChatPin'])->name('getChatPin.getChatPin');
+
+
+
     Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
 
 

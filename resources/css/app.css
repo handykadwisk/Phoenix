@@ -49,9 +49,9 @@
         height: calc(100vh - 4.1rem - 0rem - 0rem - 0rem);
     }
 
-    .chat-height {
-        height: calc(100vh - 0rem - 0px - 0px - 18.1rem);
-    }
+    /* .chat-height {
+        height: calc(100vh - 0rem - 0px - 0px - 19rem);
+    } */
 
     .switch {
         position: relative;
