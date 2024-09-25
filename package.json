@@ -52,7 +52,6 @@
         "react-beautiful-dnd": "^13.1.1",
         "react-collapsible": "^2.10.0",
         "react-currency-input-field": "^3.8.0",
-        "react-date-picker": "^11.0.0",
         "react-datepicker": "^7.3.0",
         "react-doc-viewer": "^0.1.14",
         "react-loader-spinner": "^6.1.6",
