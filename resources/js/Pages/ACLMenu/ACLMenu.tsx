@@ -33,16 +33,22 @@ import AGGrid from "@/Components/AgGrid";
 
 export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
-    useEffect(() => {
-        getMenu();
-    }, []);
+    // useEffect(() => {
+    //     getMenu();
+    // }, []);
 
     const [seqMenu, setSeqMenu] = useState<any>([]);
 
 
     const [menuData, setMenuData] = useState<any>([]);
     const [searchMenu, setSearchMenu] = useState<any>({
-        menu_name: "",
+        menu_search: [
+            {
+                menu_name: "",
+                id: "",
+                flag: "flag",
+            }
+        ]
     });
     const [comboMenu, setComboMenu] = useState<any>([]);
 
@@ -51,21 +57,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
         menu_name: "",
     });
 
-    //getMenus
-    const getMenu = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getMenus?${pageNumber}`, {
-                // idRelation,
-                menu_name: searchMenu.menu_name,
-            })
-            .then((res) => {
-                setMenuData(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     // getComboMenu
     const getComboMenu = async () => {
         try {
@@ -73,7 +64,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             setComboMenu(res.data);
         } catch (error) {
             console.log(error);
-
         }
     };
 
@@ -129,50 +119,69 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
         menu_is_deleted: "",
     });
 
-    // handleSuccess
-    const handleSuccess = ({ message }: any) => {
-        console.log("message", message);
-
-        if (modal.add) {
-            Swal.fire({
-                title: "Success",
-                text: "New Menu Added",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getMenu();
-                }
-            });
-        } else if (modal.edit) {
-            Swal.fire({
-                title: "Success",
-                text: "New Menu Edit",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getMenu();
-                }
-            });
-        } else if (modal.sequence) {
-            Swal.fire({
-                title: "Success",
-                text: message,
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getMenu();
-                }
-            });
-        }
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchMenu.menu_search];
+        changeVal[i][name] = value;
+        setSearchMenu({ ...searchMenu, menu_search: changeVal });
     };
+
+    // Fungsi untuk menghapus input pencarian dan menampilkan semua data
+    const clearSearch = (e: React.MouseEvent) => {
+        // Kosongkan input pencarian
+        inputDataSearch("jobpost_title", "", 0);
+        // Reset flag untuk menampilkan semua data
+        inputDataSearch("flag", "", 0);
+        setIsSuccess("Cleared");
+    };
+
+
+
+    const [isSuccess, setIsSuccess] = useState<any>("");
+    const handleSuccessMenu = (message: string) => {
+        setIsSuccess('')
+        // getMenu()
+        if (message !== '') {
+            setIsSuccess(message[0])
+            setTimeout(() => {
+                setIsSuccess('')
+            }, 5000)
+        }
+    }
+
 
     const handleItemsChange = (updatedItems: any) => {
         setSeqMenu(updatedItems);
     };
 
+    const handleDetailMenu = async (data: any) => {
+        setDetailMenu({
+            id: data.id,
+            menu_name: data.menu_name,
+        });
+        setModal({
+            add: false,
+            edit: !modal.edit,
+            detail: false,
+            sequence: false,
+        });
+
+    }
+
+
     return (
         <AuthenticatedLayout user={auth.user} header={"Menu"}>
             <Head title="Menu" />
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
 
             {/* modal Add */}
             <ModalToAdd
@@ -197,7 +206,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 title={"Add Menu"}
                 url={`/setting/addMenu`}
                 data={data}
-                onSuccess={handleSuccess}
+                onSuccess={handleSuccessMenu}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
@@ -294,7 +303,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 title={"Sort Sequence"}
                 url={`/setting/changeSeqMenu`}
                 data={seqMenu}
-                onSuccess={handleSuccess}
+                onSuccess={handleSuccessMenu}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
@@ -319,11 +328,11 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                         sequence: false
                     })
                 }
-                handleSuccess={handleSuccess}
+                handleSuccess={handleSuccessMenu}
             />
             {/* modal end detail */}
 
-                
+
             <div className="grid grid-cols-4 py-4 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
                     <div className="flex bg-white mb-4 rounded-md p-4 gap-2">
@@ -345,22 +354,22 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                             id="menu_name"
                             type="text"
                             name="menu_name"
-                            value={searchMenu.menu_name}
+                            value={searchMenu.menu_search[0].menu_name}
                             className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchMenu({
-                                    ...searchMenu,
-                                    menu_name: e.target.value,
-                                })
+                            onChange={(e) => {
+                                inputDataSearch("menu_name", e.target.value, 0)
+                            }
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                    if (searchMenu.menu_name !== "") {
-                                        getMenu();
-                                        setSearchMenu({
-                                            ...searchMenu,
-                                            menu_name: "",
-                                        });
+                                    const name = searchMenu.menu_search[0].menu_name;
+                                    const id = searchMenu.menu_search[0].id;
+                                    if (name || id) {
+                                        inputDataSearch("flag", name || id, 0);
+                                        setIsSuccess("success");
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Menu");
                                     }
                                 }
                             }}
@@ -368,175 +377,84 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchMenu()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchMenu.menu_search[0]
+                                            .id === "" &&
+                                        searchMenu.menu_search[0]
+                                            .menu_name === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setIsSuccess("Search");
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchMenu()}
+                                onClick={(e) => clearSearch(e)}
                             >
                                 Clear Search
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0" style={{}}>
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
-                        <table className=" w-full table-auto divide-y divide-gray-300">
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg"
-                                        }
-                                        label={"No."}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Name"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={" URL"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-
-                                        className={"min-w-[50px] bg-gray-200"}
 
 
-                                        label={"Parent"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-                                        className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg"
-                                        }
-                                        label={"Sequence"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {menuData.data?.map((dMenu: any, i: number) => {
-                                    return (
-                                        <tr
-                                            onDoubleClick={(event) => {
-                                                event.stopPropagation();
-                                                getComboMenu();
-                                                setDetailMenu({
-                                                    id: dMenu.id,
-                                                    menu_name: dMenu.menu_name,
-                                                });
-                                                setModal({
-                                                    add: false,
-                                                    edit: !modal.edit,
-                                                    detail: false,
-                                                    sequence: false,
-                                                });
-                                            }}
-                                            key={i}
-                                            className={
-                                                i % 2 === 0
-                                                    ? "cursor-pointer"
-                                                    : "bg-gray-100 cursor-pointer"
-                                            }
-                                        >
-                                            <TableTD
-                                                value={menuData.from + i}
-                                                className={"text-center"}
-                                            />
-                                            <TableTD
-                                                value={
-                                                    <>
-                                                        {dMenu?.menu_is_deleted === 1
-                                                            ? <span className="text-red-600">{dMenu.menu_name} (Deleted)</span>
-                                                            : <span className="text-black-600">{dMenu.menu_name}</span>
-                                                        }
-                                                    </>
-                                                }
-                                                className={dMenu?.menu_is_deleted
-                                                    === 0 ? "text-black-600" : "text-red-600"}
-
-                                            />
-
-
-
-                                            <TableTD
-                                                value={<>{dMenu.menu_url}</>}
-                                                className={""}
-                                            />
-
-                                            <TableTD
-                                                value={
-                                                    <>
-                                                        {
-                                                            dMenu.parent
-                                                                ?.menu_name
-                                                        }
-                                                    </>
-                                                }
-                                                className={""}
-                                            />
-                                            <TableTD
-                                                value={
-                                                    <>
-                                                        {
-                                                            dMenu.menu_sequence
-                                                        }
-                                                    </>
-                                                }
-                                                className={""}
-                                            />
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                        <Pagination
-                            links={menuData.links}
-                            fromData={menuData.from}
-                            toData={menuData.to}
-                            totalData={menuData.total}
-                            clickHref={(url: string) =>
-                                getMenu(url.split("?").pop())
-                            }
-                        />
-                    </div>
-                </div> */}
                 {/* AGGrid */}
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid
-                            addButtonLabel={undefined}
+                            addButtonLabel={null}
                             addButtonModalState={undefined}
-                            withParam={""}
-                            searchParam={''}
+                            withParam={null}
+                            searchParam={searchMenu.menu_search}
                             // loading={isLoading.get_policy}
-                            url={"getMenus"}
-                            doubleClickEvent={undefined}
-                            triggeringRefreshData={''}
+                            url={"getMenusJson"}
+                            doubleClickEvent={handleDetailMenu}
+                            triggeringRefreshData={isSuccess}
                             colDefs={[
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
-                                    flex: 1,
+                                    flex: 1.5,
                                 },
                                 {
                                     headerName: "Menu Name",
-                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    field: "menu_name",
                                     flex: 7,
+                                    cellStyle: (params: any) => {
+                                        if (params.data && params.data.menu_is_deleted === 1) {
+                                            return { color: 'red' };
+                                        }
+                                        return null;
+                                    },
+                                    // Tambahkan cellRenderer di sini untuk menambahkan teks (delete)
+                                    cellRenderer: (params: any) => {
+                                        if (params.data && params.data.menu_is_deleted === 1) {
+                                            return `${params.value} (delete)`;
+                                        }
+                                        return params.value;
+                                    }
+                                },
+                                {
+                                    headerName: "URL",
+                                    field: "menu_url",
+                                    flex: 4,
+                                },
+                                {
+                                    headerName: "Parent",
+                                    field: "parent.menu_name",
+                                    flex: 3,
+                                },
+                                {
+                                    headerName: "Sequence",
+                                    field: "menu_sequence",
+                                    flex: 3,
                                 },
                             ]}
                         />

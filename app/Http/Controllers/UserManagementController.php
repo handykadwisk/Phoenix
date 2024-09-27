@@ -25,24 +25,59 @@ extends Controller
         ]);
     }
 
-    public function getUserData($dataPerPage = 5, $searchQuery = null)
+    public function getUserData($request)
     {
-        // Mulai query
-        $dataQuery = User::with('roles', 'type')
-            ->orderBy('id', 'DESC');
+        // dd($request);
 
-        // Jika ada search query, tambahkan kondisi where
-        if ($searchQuery && $searchQuery->input('name')) {
-            $dataQuery->where('name', 'like', '%' . $searchQuery->input('name') . '%');
+       
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = User::with('roles', 'type');
+
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newFilter = $request->input('newFilter', '');
+        $newSearch = json_decode($request->newFilter, true);
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
+            }
         }
 
-        // Gunakan paginate untuk mendapatkan hasil dalam bentuk paginated data
-        return $dataQuery->paginate($dataPerPage);
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                if ($colId === 'name') {
+                    $query->where('first_name', 'LIKE', '%' . $filterValue . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $filterValue . '%');
+                } else {
+                    $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+                }
+            }
+        }
+         // Jika ada filter 'newFilter' dan tidak kosong
+         if ($newFilter !== "") {
+            foreach ($newSearch as $search) {
+            foreach ($search as $keyId => $searchValue) {
+                // Pencarian berdasarkan nama menu
+                if ($keyId === 'name') {
+                $query->where('name', 'LIKE', '%' . $searchValue . '%');
+                }
+            }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
     public function getUserJson(Request $request)
     {
-        $data = $this->getUserData(5, $request);
+        $data = $this->getUserData($request);
         return response()->json($data);
     }
 
@@ -105,8 +140,8 @@ extends Controller
         ]);
 
         return new JsonResponse([
-            $request->id
-        ], 200, [
+            'New user added.'
+        ], 201, [
             'X-Inertia' => true
         ]);
     }
@@ -181,6 +216,11 @@ extends Controller
                 ]);
             }
         }
+        return new JsonResponse([
+            'User has been updated.'
+        ], 200, [
+            'X-Inertia' => true
+        ]);
     }
 
 
@@ -196,7 +236,7 @@ extends Controller
         ]);
         return new JsonResponse([
             // 'Policy updated.'
-            $id
+            'Password has been reset.'
         ], 200, [
             'X-Inertia' => true
         ]);

@@ -38,10 +38,12 @@ import Select from "react-tailwindcss-select";
 import { set } from "react-datepicker/dist/date_utils";
 import ModalToEdit from "@/Components/Modal/ModalToEdit";
 import ModalToResetPassword from "@/Components/Modal/ModalToResetPassword";
+import AGGrid from "@/Components/AgGrid";
 
 export default function UserManagement({ auth, type }: any) {
-    console.log('auth',auth);
-    
+    // console.log('auth', auth);
+
+
     useEffect(() => {
         getUser()
     }, []);
@@ -77,7 +79,15 @@ export default function UserManagement({ auth, type }: any) {
     })
     const [dataUserId, setDataUserId] = useState<any>([])
     const [dataUser, setDataUser] = useState<any>([]);
-    const [searchUser, setSearchRole] = useState<any>([]);
+    const [searchUser, setSearchUser] = useState<any>({
+       user_search:[
+              {
+                name: "",
+                id:"",
+                flag:'flag'
+              }
+       ]
+    });
     const [dataType, setDataType] = useState<any>([])
     const [dataRole, setDataRole] = useState<any>([])
     const [resetPassword, setResetPassword] = useState<any>({
@@ -87,6 +97,15 @@ export default function UserManagement({ auth, type }: any) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     // console.log(isError, '<<<<<isError');
 
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchUser.user_search];
+        changeVal[i][name] = value;
+        setSearchUser({ ...searchUser, user_search: changeVal });
+    };
     //modal state
     const [modal, setModal] = useState({
         add: false,
@@ -198,7 +217,7 @@ export default function UserManagement({ auth, type }: any) {
             .post(`/getUser?${pageNumber}`)
             .then((res) => {
                 setDataUser(res.data);
-                setSearchRole({
+                setSearchUser({
                     ...searchUser,
                     name: "",
                 });
@@ -252,58 +271,6 @@ export default function UserManagement({ auth, type }: any) {
     }
 
     // handle success
-    const handleSuccess = (message: string) => {
-        if (modal.add) {
-            Swal.fire({
-                title: "Success",
-                text: "New User Added",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getUser();
-                    setDataInput({
-                        name: "",
-                        email: "",
-                        user_login: "",
-                        password: "",
-                        employee_id: 0,
-                        individual_relations_id: 0,
-                        type: 0,
-                        role: []
-                    });
-                }
-            })
-                .catch((error) => {
-                    console.error('Fetch error:', error);
-                });
-        }
-        else if (modal.edit) {
-            Swal.fire({
-                title: "Success",
-                text: "New User Edit",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getUser();
-                }
-            })
-                .catch((error) => {
-                    console.error('Fetch error:', error);
-                });
-        }
-        else if (modal.reset) {
-            Swal.fire({
-                title: "Success",
-                text: "Reset Password",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    getUser();
-                }
-            });
-        }
-    };
-
     const getDataRoleSelect = (dataRole: any) => {
         const roleFor = dataRole?.map((role: any) => {
             // console.log("aaab",role.role_name);
@@ -370,12 +337,82 @@ export default function UserManagement({ auth, type }: any) {
         setDataInputEdit({ ...dataInputEdit, user_status: userStatus });
     };
 
-        console.log(dataInputEdit, '<<<<<inputDataEdit');
-        
+    // console.log(dataInputEdit, '<<<<<inputDataEdit');
+
+    const handleDetailUser = async (e: any) => {
+        setModal({
+            add: false,
+            edit: !modal.edit,
+            reset: false
+        });
+        getUserById(e.id);
+        getTypeTest()
+        getRole()
+        getEmployee()
+        getAllRelations()
+    }
+
+    const [isSuccess, setIsSuccess] = useState<any>("");
+    const handleSuccessUser = (message: string) => {
+        setIsSuccess('')
+        // getMenu()
+        if (message !== '') {
+            setIsSuccess(message[0])
+            setTimeout(() => {
+                setIsSuccess('')
+            }, 5000)
+        }
+    }
+
+
+
+    const handleSearch = () => {
+        if (searchUser.name !== "") {
+            setSearchUser((prevState: any) => ({
+                ...prevState,
+                searchParam: searchUser.name, 
+            }));
+            setIsSuccess("success");
+        } else {
+            setIsSuccess("success"); 
+        }
+    };
+
+    // // This useEffect will trigger AGGrid refresh when    changes
+    // useEffect(() => {
+    //     if (searchUser.searchParam !== "") {
+    //         console.log("Search Param Updated: ", searchUser.searchParam);
+    //         // Call AGGrid or API with the updated search param
+    //         setIsSuccess("success");
+    //     }
+    // }, [searchUser.searchParam]);
+
+
+    const clearSearchUser = async (e: FormEvent) => {
+         // Kosongkan input pencarian
+         inputDataSearch("name", "", 0);
+         // Reset flag untuk menampilkan semua data
+         inputDataSearch("flag", "", 0);
+         setIsSuccess("Cleared");
+    };
+
+    console.log(searchUser.searchParam, '<<<<<searchUser');
+    
+
+
+    // console.log(searchUser.searchParam, '<<<<<searchUser');
+
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
 
             <Head title="User Management" />
+            {isSuccess && (
+                <ToastMessage
+                    message={isSuccess}
+                    isShow={true}
+                    type={"success"}
+                />
+            )}
 
             {/* modal add */}
             <ModalToAdd
@@ -403,7 +440,7 @@ export default function UserManagement({ auth, type }: any) {
                 title={'Add User'}
                 url={'/settings/addUser'}
                 data={dataInput}
-                onSuccess={handleSuccess}
+                onSuccess={handleSuccessUser}
                 buttonAddOns={""}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
@@ -612,7 +649,7 @@ export default function UserManagement({ auth, type }: any) {
                 title={'Edit User'}
                 url={`/settings/userEdit/${dataUserId.id}`}
                 data={dataInputEdit}
-                onSuccess={handleSuccess}
+                onSuccess={handleSuccessUser}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
@@ -805,8 +842,8 @@ export default function UserManagement({ auth, type }: any) {
 
 
                             {/* Reset Password */}
-                            <div className="flex text-sm mt-4">            
-                              Click
+                            <div className="flex text-sm mt-4">
+                                Click
                                 <div className="ml-1 hover:text-blue-400 text-sm cursor-pointer" onClick={() => {
                                     setModal({
                                         add: false,
@@ -815,7 +852,7 @@ export default function UserManagement({ auth, type }: any) {
                                     })
                                 }}>
 
-                                 Here for Reset Password
+                                    Here for Reset Password
                                 </div>
                             </div>
                             {/* Switch for User Status */}
@@ -840,7 +877,7 @@ export default function UserManagement({ auth, type }: any) {
                 title={'Reset Password'}
                 url={`/settings/userResetPassword/${dataUserId.id}`}
                 data={resetPassword}
-                onSuccess={handleSuccess}
+                onSuccess={handleSuccessUser}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
@@ -878,42 +915,56 @@ export default function UserManagement({ auth, type }: any) {
 
                     </div>
 
-                    <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[293px]">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[100%]">
                         <TextInput
-                            id="role_name"
                             type="text"
-                            name="role_name"
-                            value={searchUser.name}
                             className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchRole({
-                                    ...searchUser,
-                                    name: e.target.value,
-                                })
+
+                            value={searchUser.user_search[0].name}
+
+                            onChange={(e)=>{
+                                inputDataSearch("name", e.target.value, 0)
+                            }
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                    if (searchUser.name !== "") {
-                                        getUser();
-                                        setSearchRole({
-                                            ...searchUser,
-                                            name: "",
-                                        });
-                                    }
+                                  const title = searchUser.user_search[0].name;
+                                  const id = searchUser.user_search[0].id;
+                                  if (title || id) {
+                                    inputDataSearch("flag", title || id, 0);
+                                    setIsSuccess("success");
+                                  } else {
+                                    inputDataSearch("flag", "", 0);
+                                    setIsSuccess("Get All Job Post");
+                                  }
                                 }
-                            }}
-                            placeholder="Search Role Name"
+                              }}
+                            placeholder="Search User Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchRole()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchUser.user_search[0]
+                                            .id === "" &&
+                                        searchUser.user_search[0]
+                                            .name === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setIsSuccess("Search");
+                                }
+                                }
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchRole()}
+                                onClick={(e) => clearSearchUser(e)}
+
                             >
                                 Clear Search
                             </div>
@@ -921,119 +972,45 @@ export default function UserManagement({ auth, type }: any) {
                     </div>
 
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0">
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
+                {/* AGGrid */}
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={null}
+                            addButtonModalState={undefined}
+                            withParam={null}
+                            searchParam={searchUser.user_search}
+                            // loading={isLoading.get_policy}
+                            url={"getUser"}
+                            doubleClickEvent={handleDetailUser}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1.5,
+                                },
+                                {
+                                    headerName: "Login User",
+                                    field: "user_login",
+                                    flex: 7,
 
-                        <table className="w-full table-auto divide-y divide-gray-300">
+                                },
+                                {
+                                    headerName: "Name",
+                                    field: "name",
+                                    flex: 7,
 
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg"
-                                        }
-                                        label={"No."}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Login User"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Name"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
-                                    <TableTH
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Type"}
-                                        colSpan={''}
-                                        rowSpan={''}
-                                    />
+                                },
+                                {
+                                    headerName: "Type",
+                                    field: "type.user_type_name",
+                                    flex: 7,
 
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {dataUser?.data?.map(
-                                    (dUser: any, i: number) => {
-                                        return (
-                                            <tr
-                                                key={i}
-                                                onDoubleClick={
-                                                    () => {
-                                                        setModal({
-                                                            add: false,
-                                                            edit: !modal.edit,
-                                                            reset: false
-                                                        });
-                                                        getUserById(dUser.id);
-                                                        getTypeTest()
-                                                        getRole()
-                                                        getEmployee()
-                                                        getAllRelations()
-                                                    }
-
-                                                }
-                                            >
-                                                <TableTD
-                                                    value={dataUser.from + i}
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dUser?.user_login
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dUser?.name
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dUser?.type?.user_type_name
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                        <Pagination
-                            links={dataUser.links}
-                            fromData={dataUser.from}
-                            toData={dataUser.to}
-                            totalData={dataUser.total}
-                            clickHref={(url: string) =>
-                                getUser(url.split("?").pop())
-                            }
+                                }
+                            ]}
                         />
                     </div>
-
                 </div>
             </div>
 

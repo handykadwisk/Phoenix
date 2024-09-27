@@ -631,33 +631,7 @@ export default function Relation({ auth }: PageProps) {
                                 } else {
                                     inputDataSearch("flag", "", 0);
                                 }
-
-                                // setSearchRelation([
-                                //     ...searchRelation,
-                                //     {
-                                //         RELATION_ORGANIZATION_NAME:
-                                //             e.target.value,
-                                //     },
-                                // ])
                             }}
-                            // onKeyDown={(e) => {
-                            //     if (e.key === "Enter") {
-                            //         if (
-                            //             searchRelation.relation_search[0]
-                            //                 .RELATION_ORGANIZATION_NAME === ""
-                            //         ) {
-                            //             inputDataSearch(
-                            //                 "RELATION_ORGANIZATION_NAME",
-                            //                 "flag",
-                            //                 0
-                            //             );
-                            //         }
-
-                            //         setIsSuccess({
-                            //             isSuccess: "success",
-                            //         });
-                            //     }
-                            // }}
                             placeholder="Search Relation Name"
                         />
                         <Select
@@ -704,7 +678,8 @@ export default function Relation({ auth }: PageProps) {
                                             .RELATION_TYPE_ID === "" &&
                                         searchRelation.relation_search[0]
                                             .RELATION_ORGANIZATION_NAME === ""
-                                    ) {
+                                    ) 
+                                    {
                                         inputDataSearch("flag", "", 0);
                                     } else {
                                         inputDataSearch("flag", "", 0);
