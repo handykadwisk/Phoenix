@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
+use App\Http\Controllers\CoBrokingController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\InsurancePanelController;
@@ -44,6 +46,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
+use App\Models\MPolicyCoBroking;
 use App\Models\TCompanyDivision;
 
 Route::get('/', function () {
@@ -536,6 +539,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
     Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
     Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
+    
+
+    // Attendance Setting
+    Route::get('hr/attendanceSetting', [AttendanceSettingController::class, 'index'])->name('hr/attendanceSetting');
+    Route::post('/addWorkAttendance', [AttendanceSettingController::class, 'store'])->name('attendanceSetting.store');
+    Route::get('/getAttendanceSetting', [AttendanceSettingController::class, 'getAttendanceSetting'])->name('getAttendanceSetting.getAttendanceSetting');
+    Route::post('/getAttendanceSettingById', [AttendanceSettingController::class, 'getAttendanceSettingById'])->name('getAttendanceSettingById.getAttendanceSettingById');
+    Route::post('/editAttendanceSetting', [AttendanceSettingController::class, 'editAttendanceSetting'])->name('editAttendanceSetting.editAttendanceSetting');
+    Route::post('/mappingEmployeeToSettingAttendance', [AttendanceSettingController::class, 'mappingEmployeeToSettingAttendance'])->name('mappingEmployeeToSettingAttendance.mappingEmployeeToSettingAttendance');
+    Route::post('/addPersonAttendance', [AttendanceSettingController::class, 'addPersonAttendance'])->name('attendanceSetting.addPersonAttendance');
+    
+    
+    // Co Broking
+    Route::post('/insertCoBroking', [CoBrokingController::class, 'store'])->name('policyCoBroking.store');
+    Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
 
 
 

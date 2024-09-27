@@ -202,6 +202,90 @@ export default function FormGeneral({
         return result ? result.PERSON_FIRST_NAME : null;
     };
 
+    
+    // Add Co Broking
+    const [modalCoBroking, setModalCoBroking] = useState({
+        addCoBroking: false,
+    });
+
+    const [dataCoBroking, setDataCoBroking] = useState<any>([]);
+    const fieldCoBroking: any = {
+        CO_BROKING_ID: "",
+        POLICY_ID: "",
+        RELATION_ID: "", // yg pertama Default Fresnel
+        CO_BROKING_PERCENTAGE: "",
+        CO_BROKING_IS_LEADER: 0,
+    };
+
+    const [switchCoBroking, setSwitchCoBroking] = useState<boolean>(false);
+
+    // const handleAddInsurer = async () => {
+    //     setSwitchCoBroking(policy.CO_BROKING ? true : false);
+    // };
+
+    const handleSwitchCoBroking = () => {
+        setSwitchCoBroking(!switchCoBroking);
+    };
+
+    const mappingCoBroking = (policy_id: number) => {
+        axios
+            .post(`/mappingCoBroking?`, {
+                policy_id: policy_id,
+            })
+            .then((res) => setDataCoBroking(res.data))
+            .catch((err) => console.log(err));
+    };
+    
+    const handleAddCoBroking = async (policy_id: any) => {
+        // getInterestInsured();
+        getBroker(9);
+        mappingCoBroking(policy_id)
+        setModalCoBroking({
+            addCoBroking: !modalCoBroking.addCoBroking,
+        });
+    };
+
+    const inputCoBroking = (
+        name: string,
+        value: any,
+        i: number
+    ) => {
+        const changeVal: any = [...dataCoBroking];
+        changeVal[i][name] = value;
+        
+        setDataCoBroking(changeVal);
+    };
+
+    const addRowCoBroking = (e: FormEvent, policy_id:any) => {
+        e.preventDefault();
+
+        setDataCoBroking([...dataCoBroking, { ...fieldCoBroking, POLICY_ID: policy_id }]);
+
+    };
+
+    const deleteRowCoBroking = (i: number) => {
+        const items = [...dataCoBroking];
+        items.splice(i, 1);
+        setDataCoBroking(items);
+    };
+
+    console.log("dataCoBroking: ", dataCoBroking);
+
+    const handleSuccessCoBroking = (message: any) => {
+        setIsSuccess("");
+        if (message != "") {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+        }
+        setModalCoBroking({
+            addCoBroking: !modalCoBroking.addCoBroking,
+        });
+        setDataCoBroking([]);
+    };
+    // End Add Co Broking
+
     // Add Policy Coverage
     const fieldDataCoverage: any = {
         POLICY_ID: "",
@@ -2278,6 +2362,20 @@ export default function FormGeneral({
     const [listAgent, setListAgent] = useState<any>([]);
     const [listBAA, setListBAA] = useState<any>([]);
     const [listFbiPks, setListFbiPks] = useState<any>([]);
+    const [listBroker, setListBroker] = useState<any>([]);
+
+    const getBroker = async (relation_type: number) => {
+        setIsLoading({
+            ...isLoading,
+            get_detail: true,
+        });
+        await axios
+            .get(`/getRelationByType/${relation_type}`)
+            .then((res) => {
+                setListBroker(res.data);
+            })
+            .catch((err) => console.log(err));
+    };
 
     const getAgent = async (relation_type: number) => {
         setIsLoading({
@@ -3493,6 +3591,224 @@ export default function FormGeneral({
             />
             {/* end modal edit */}
 
+            {/* Modal Add Co Broking */}
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modalCoBroking.addCoBroking}
+                onClose={() => {
+                    setModalCoBroking({
+                        addCoBroking: false,
+                    });
+                    setDataCoBroking([]);
+                }}
+                title={"Update Co Broking"}
+                url={`/insertCoBroking`}
+                data={dataCoBroking}
+                onSuccess={handleSuccessCoBroking}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-6xl"
+                }
+                body={
+                    <>
+                        <div className="mt-4 mb-4 ml-4 mr-4">
+                            <div className="relative overflow-x-auto shadow-md sm:rounded-lg  mb-4 mt-4 ">
+                                <table className="table-auto w-full">
+                                    <thead className="border-b bg-gray-50">
+                                        <tr className="text-sm font-semibold text-gray-900">
+                                            <th className="text-center md:p-4 p-0 md:w-20 w-10 border-r border-gray-300">
+                                                No.
+                                            </th>
+                                            <th className="text-center md:p-4 p-0 md:w-38  border-r border-gray-300">
+                                                Participant
+                                            </th>
+                                            <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
+                                                Proporsional Co Broking %
+                                            </th>
+                                            <th className="text-center md:p-4 p-0 md:w-28  border-r border-gray-300">
+                                                Is Leader
+                                            </th>
+                                            <th className="text-center md:p-4 p-0 md:w-20  border-r border-gray-300">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {dataCoBroking?.map(
+                                            (detail: any, m: number) => {
+                                                return (
+                                                    <tr key={m}>
+                                                        <td className="p-2 border text-center">
+                                                            {m + 1}
+                                                        </td>
+                                                        <td className="p-2 border">
+                                                            <select
+                                                                className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                value={
+                                                                    detail.RELATION_ID
+                                                                }
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    inputCoBroking(
+                                                                        "RELATION_ID",
+                                                                        e.target
+                                                                            .value,
+                                                                        m
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <option
+                                                                    value={""}
+                                                                >
+                                                                    --{" "}
+                                                                    <i>
+                                                                        Choose
+                                                                    </i>{" "}
+                                                                    --
+                                                                </option>
+                                                                {listBroker.map(
+                                                                    (
+                                                                        item: any,
+                                                                        i: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <option
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                value={
+                                                                                    item.RELATION_ORGANIZATION_ID
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    item.RELATION_ORGANIZATION_NAME
+                                                                                }
+                                                                            </option>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </select>
+                                                        </td>
+                                                        <td className="p-2 border">
+                                                            <div className="block w-full mx-auto text-left">
+                                                                <CurrencyInput
+                                                                    id="co_broking_percentage"
+                                                                    name="CO_BROKING_PERCENTAGE"
+                                                                    value={
+                                                                        detail.CO_BROKING_PERCENTAGE
+                                                                    }
+                                                                    decimalScale={
+                                                                        2
+                                                                    }
+                                                                    decimalsLimit={
+                                                                        2
+                                                                    }
+                                                                    onValueChange={(
+                                                                        values
+                                                                    ) => {
+                                                                        inputCoBroking(
+                                                                            "CO_BROKING_PERCENTAGE",
+                                                                            values,
+                                                                            m
+                                                                        );
+                                                                    }}
+                                                                    className="block w-56 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                                    required
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                        <td className="p-2 border">
+                                                            <div className="text-center ">
+                                                                <Checkbox
+                                                                    defaultChecked={
+                                                                        detail.CO_BROKING_IS_LEADER
+                                                                    }
+                                                                    name={
+                                                                        "co_broking_is_leader-" +
+                                                                        m
+                                                                    }
+                                                                    id={
+                                                                        detail.CO_BROKING_IS_LEADER
+                                                                    }
+                                                                    value={
+                                                                        detail.CO_BROKING_IS_LEADER
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputCoBroking(
+                                                                            "CO_BROKING_IS_LEADER",
+                                                                            e
+                                                                                .target
+                                                                                .checked ==
+                                                                                true
+                                                                                ? 1
+                                                                                : 0,
+                                                                            m
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            {m > 0 ? (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    strokeWidth={
+                                                                        1.5
+                                                                    }
+                                                                    stroke="currentColor"
+                                                                    className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        deleteRowCoBroking(
+                                                                            m
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <path
+                                                                        fill="#AB7C94"
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M6 18 18 6M6 6l12 12"
+                                                                    />
+                                                                </svg>
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            }
+                                        )}
+                                        <tr>
+                                            <td
+                                                colSpan={2}
+                                                className=" h-10 w-40 mb-2 mt-2"
+                                            >
+                                                <a
+                                                    href=""
+                                                    className="pl-2 text-xs mt-1 text-primary-pelindo ms-1"
+                                                    onClick={(e) =>
+                                                        addRowCoBroking(
+                                                            e,
+                                                            policy.POLICY_ID
+                                                        )
+                                                    }
+                                                >
+                                                    + Add Participant
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* End Modal Add Co Broking  */}
+
             {/* Modal Add Coverage */}
             <ModalToAdd
                 buttonAddOns={""}
@@ -4486,7 +4802,6 @@ export default function FormGeneral({
                                                                                     j
                                                                                 );
                                                                             }}
-                                                                            
                                                                             autoComplete="off"
                                                                         />
                                                                     </div>
@@ -11245,6 +11560,40 @@ export default function FormGeneral({
                     <div className="grid grid-cols-1 xs:grid-cols-1 md:grid-cols-1">
                         {/* All Information */}
                         <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
+                            <div className="w-60">
+                                <InputLabel value="Self Insured" />
+
+                                <div className="grid grid-cols-5">
+                                    <div className="">
+                                        <SwitchPage
+                                            enabled={switchCoBroking}
+                                            onChangeButton={handleSwitchCoBroking}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4 mb-8">
+                                <div className="border-b-2 w-fit font-semibold text-lg">
+                                    <span>Co Broking Participant</span>
+                                </div>
+                                <div className="flex gap-2 mt-4">
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
+                                            onClick={() => {
+                                                handleAddCoBroking(
+                                                    policy.POLICY_ID
+                                                );
+                                            }}
+                                        >
+                                            Update Co Broking
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="w-full mt-4 align-middle"></div>
+                            </div>
+
                             <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4">
                                 <div className="border-b-2 w-fit font-semibold text-lg">
                                     <span>Coverage</span>

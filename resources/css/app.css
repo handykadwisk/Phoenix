@@ -145,4 +145,22 @@
         -ms-border-radius: 50%;
         -o-border-radius: 50%;
     }
+    
+    .inputfield{
+        position: relative;
+        width: 100px;
+    }
+      
+    input[type=time]::-webkit-calendar-picker-indicator {
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        opacity: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%
+    }
 }

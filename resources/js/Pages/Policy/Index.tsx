@@ -29,8 +29,6 @@ import Select from "react-tailwindcss-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DetailPolicy from "./DetailPolicy";
-// import DatePicker from "react-date-picker";
-// import { Datepicker } from "flowbite-react";
 
 export default function PolicyIndex({ auth }: PageProps) {
 
