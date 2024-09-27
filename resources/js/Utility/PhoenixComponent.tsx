@@ -8,19 +8,6 @@ import ModalChatMessage from "@/Pages/PluginModul/ModalChatMessage";
 import { usePage } from "@inertiajs/react";
 import ToastMessage from "@/Components/ToastMessage";
 
-// const MyComponent: React.FC = () => {
-//     const { value, setValue } = useMyContext();
-
-//     return (
-//         <div>
-//             <p>Context Value: {value}</p>
-//             <button onClick={() => setValue("new value")}>Change Value</button>
-//         </div>
-//     );
-// };
-
-// export default MyComponent;
-
 export default function PhoenixComponent({
     otherId,
 }: PropsWithChildren<{ otherId?: any }>) {
@@ -110,6 +97,7 @@ export default function PhoenixComponent({
         TITLE_CHAT: "",
         OBJECT_CHAT: "",
         INITIATE_YOUR_CHAT: "",
+        PARTICIPANT: null,
     });
     // end state for data plugin chat
 
@@ -192,6 +180,14 @@ export default function PhoenixComponent({
     const handleSuccessPlugin = async (message: string) => {
         setIsSuccess("");
         if (message != "") {
+            setDataPluginProcess({
+                TAG_ID: "",
+                PLUGIN_PROCESS_ID: "",
+                TITLE_CHAT: "",
+                OBJECT_CHAT: "",
+                INITIATE_YOUR_CHAT: "",
+                PARTICIPANT: null,
+            });
             setIsSuccess(message[2]);
             // getDetailRelation(message[0]);
             getTPluginProcess();
@@ -232,37 +228,38 @@ export default function PhoenixComponent({
                 // Tambah Class
                 element?.classList.add("cursor-help");
                 element?.classList.add("tooltip");
+                element?.classList.add("italic");
                 // element?.classList.add("bg-yellow-100/35");
                 // End Tambah Class
 
                 // Get element class Buttom
-                const elements = element?.getElementsByClassName("bottom");
-                // Cek Ada apa tidak Class "Bottom"
-                if (elements.length > 0) {
-                } else {
-                    // Jika tidak ada bikin element div yang classnya bottom untuk munculin tooltip
+                // const elements = element?.getElementsByClassName("bottom");
+                // // Cek Ada apa tidak Class "Bottom"
+                // if (elements.length > 0) {
+                // } else {
+                //     // Jika tidak ada bikin element div yang classnya bottom untuk munculin tooltip
 
-                    // create div tooltip
-                    const newElementDiv = document.createElement("div");
-                    newElementDiv.classList.add("bottom");
-                    newElementDiv.classList.add("z-999999");
+                //     // create div tooltip
+                //     const newElementDiv = document.createElement("div");
+                //     newElementDiv.classList.add("bottom");
+                //     newElementDiv.classList.add("z-999999");
 
-                    // Tambahkan div baru ke dalam container yang sesuai
-                    element?.appendChild(newElementDiv);
+                //     // Tambahkan div baru ke dalam container yang sesuai
+                //     element?.appendChild(newElementDiv);
 
-                    // create p for text
-                    const newElementP = document.createElement("p");
-                    newElementP.textContent =
-                        "Attach, Chat, Task, etc For This";
+                //     // create p for text
+                //     const newElementP = document.createElement("p");
+                //     newElementP.textContent =
+                //         "Attach, Chat, Task, etc For This";
 
-                    // Tambahkan div baru ke dalam container yang sesuai
-                    newElementDiv?.appendChild(newElementP);
+                //     // Tambahkan div baru ke dalam container yang sesuai
+                //     newElementDiv?.appendChild(newElementP);
 
-                    const newElementI = document.createElement("i");
+                //     const newElementI = document.createElement("i");
 
-                    // Tambahkan div baru ke dalam container yang sesuai
-                    newElementDiv?.appendChild(newElementI);
-                }
+                //     // Tambahkan div baru ke dalam container yang sesuai
+                //     newElementDiv?.appendChild(newElementI);
+                // }
                 // End Cek Ada apa tidak Class "Bottom"
 
                 // Create ID div "cls_can_attach_process"
@@ -329,7 +326,6 @@ export default function PhoenixComponent({
             // event: FormEvent
         ) => {
             // event.preventDefault();
-
             if (PLUGIN_PROCESS_ID === "1" || PLUGIN_PROCESS_ID === 1) {
                 setShowChatMessage({
                     chatModal: true,

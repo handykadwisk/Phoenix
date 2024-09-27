@@ -18,7 +18,6 @@ import {
     XMarkIcon,
 } from "@heroicons/react/20/solid";
 import axios from "axios";
-import { get } from "jquery";
 import { FormEvent, PropsWithChildren, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

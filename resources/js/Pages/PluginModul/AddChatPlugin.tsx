@@ -1,8 +1,3 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm, usePage } from "@inertiajs/react";
-import defaultImage from "../../Images/user/default.jpg";
-import BreadcrumbPage from "@/Components/Breadcrumbs/BreadcrumbPage";
-import { PageProps } from "@/types";
 import {
     FormEvent,
     PropsWithChildren,
@@ -10,25 +5,12 @@ import {
     useRef,
     useState,
 } from "react";
-import { spawn } from "child_process";
-import axios from "axios";
-import {
-    PencilIcon,
-    PencilSquareIcon,
-    XMarkIcon,
-} from "@heroicons/react/20/solid";
-import ModalToAction from "@/Components/Modal/ModalToAction";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
-import Checkbox from "@/Components/Checkbox";
 import TextArea from "@/Components/TextArea";
-import Swal from "sweetalert2";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import SelectTailwind from "react-tailwindcss-select";
-import Input from "@/Components/Input";
-import Select from "react-tailwindcss-select";
-import DatePicker from "react-datepicker";
-import SwitchPage from "@/Components/Switch";
+import axios from "axios";
 
 export default function AddChatPlugin({
     modalPlugin,
@@ -43,11 +25,9 @@ export default function AddChatPlugin({
     setDataPluginProcess: any;
     handleSuccessPlugin: any;
 }>) {
-    // const { data, setData } = useForm<any>({
-    //     PERMISSION_NAME: "",
-    //     UID_CHAT: "clsf_",
-    // });
-
+    useEffect(() => {
+        getDataParticipant();
+    }, [dataPluginProcess]);
     const permissionObject = (e: any) => {
         // e.preventDefault();
 
@@ -58,11 +38,26 @@ export default function AddChatPlugin({
             ...dataPluginProcess,
             OBJECT_CHAT: "chat_" + changeString,
         });
-        // setDataPluginProcess(
-        //     "UID_CHAT",
-        //     "chat_" + e.target.value.split(" ").join("_").toLowerCase()
-        // );
     };
+
+    const [optionsParticipant, setOptionsParticipant] = useState<any>([]);
+    const getDataParticipant = async () => {
+        await axios
+            .post(`/getDataParticipant`)
+            .then((res) => {
+                setOptionsParticipant(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const dataParticipant = optionsParticipant?.map((query: any) => {
+        return {
+            value: query.PARTICIPANT_NAME + "+" + query.PARTICIPANT_ID,
+            label: query.PARTICIPANT_NAME,
+        };
+    });
     return (
         <>
             <ModalToAdd
@@ -110,6 +105,35 @@ export default function AddChatPlugin({
                                     placeholder="Title Chat"
                                 />
                             </div>
+                            <div className="cursor-pointer">
+                                <InputLabel value="Add Participant" />
+                                <SelectTailwind
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-600`
+                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                            }`,
+                                    }}
+                                    options={dataParticipant}
+                                    isSearchable={true}
+                                    isMultiple={true}
+                                    placeholder={"Select to Add Participant"}
+                                    isClearable={true}
+                                    value={dataPluginProcess.PARTICIPANT}
+                                    onChange={(val: any) => {
+                                        setDataPluginProcess({
+                                            ...dataPluginProcess,
+                                            PARTICIPANT: val,
+                                        });
+                                    }}
+                                    primaryColor={"bg-red-500"}
+                                />
+                            </div>
                             <div className="mb-2 hidden">
                                 <InputLabel
                                     htmlFor="Object_Chat"
@@ -132,7 +156,7 @@ export default function AddChatPlugin({
                                     placeholder=""
                                 />
                             </div>
-                            <div>
+                            <div className="mt-4">
                                 <InputLabel
                                     htmlFor="Initiate_Your_Chat"
                                     value="Initiate Your Chat"

@@ -17,6 +17,8 @@ class TChat extends Model
         'CHAT_ID',
     ];
 
+    // public $with = ['pinChat'];
+
     public $timestamps = false;
 
     public function tUser()
@@ -26,6 +28,6 @@ class TChat extends Model
 
     public function pinChat()
     {
-        return $this->hasMany(TPinChat::class, 'CHAT_ID', 'CHAT_ID');
+        return $this->hasMany(TPinChat::class, "CHAT_ID", "CHAT_ID");
     }
 }
