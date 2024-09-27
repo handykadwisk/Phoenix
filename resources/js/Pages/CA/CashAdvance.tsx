@@ -47,7 +47,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAReportRejectStatus();
         getEmployeeBankAccount();
         getCompanies();
-        getCADifferents();
+        getCADifference();
         getCAApproval();
         getCAMethod();
     }, []);
@@ -70,7 +70,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAReportRejectStatus();
         getEmployeeBankAccount();
         getCompanies();
-        getCADifferents();
+        getCADifference();
         getCAApproval();
         getCAMethod();
     };
@@ -285,7 +285,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAReportRejectStatus();
         getEmployeeBankAccount();
         getCompanies();
-        getCADifferents();
+        getCADifference();
         getCAApproval();
         getCAMethod();
     };
@@ -1450,12 +1450,12 @@ export default function CashAdvance({ auth }: PageProps) {
             });
     };
 
-    const [getCashAdvanceDifferents, setCashAdvanceDifferents] = useState<any>(
+    const [getCashAdvanceDifference, setCashAdvanceDifferents] = useState<any>(
         []
     );
-    const getCADifferents = async () => {
+    const getCADifference = async () => {
         await axios
-            .get(`/getCashAdvanceDifferents`)
+            .get(`/getCashAdvanceDifference`)
             .then((res) => {
                 setCashAdvanceDifferents(res.data);
             })
@@ -2130,56 +2130,88 @@ export default function CashAdvance({ auth }: PageProps) {
 
     const [checkedTransfer, setCheckedTransfer] = useState(true);
     const handleCheckedTransfer = (e: any) => {
-        if (checkedTransfer === true) {
-            setData("cash_advance_transfer_amount", 0);
+        if (e.target.checked) {
+            setData({
+                ...data,
+                cash_advance_delivery_method_transfer: 1,
+            });
+        } else {
+            setData({
+                ...data,
+                cash_advance_delivery_method_transfer: 0,
+                cash_advance_transfer_amount: 0,
+            });
         }
 
         setCheckedTransfer(!checkedTransfer);
 
-        setDataById({
-            ...dataById,
-            CASH_ADVANCE_DELIVERY_METHOD_TRANSFER: e.target.value,
-        });
+        // setDataById({
+        //     ...dataById,
+        //     CASH_ADVANCE_DELIVERY_METHOD_TRANSFER: e.target.value,
+        // });
     };
 
     const [checkedCash, setCheckedCash] = useState(false);
     const handleCheckedCash = (e: any) => {
-        if (checkedTransfer === true) {
-            setData("cash_advance_cash_amount", 0);
+        if (e.target.checked) {
+            setData({
+                ...data,
+                cash_advance_delivery_method_cash: 1,
+            });
+        } else {
+            setData({
+                ...data,
+                cash_advance_delivery_method_cash: 0,
+                cash_advance_cash_amount: 0,
+            });
         }
 
-        setDataById({
-            ...dataById,
-            CASH_ADVANCE_DELIVERY_METHOD_CASH: e.target.value,
-        });
         setCheckedCash(!checkedCash);
+
+        // setDataById({
+        //     ...dataById,
+        //     CASH_ADVANCE_DELIVERY_METHOD_CASH: e.target.value,
+        // });
     };
 
     const [checkedTransferEdit, setCheckedTransferEdit] = useState(false);
     const handleCheckedTransferEdit = (e: any) => {
         if (e.target.checked) {
-            setCheckedTransferEdit(e.target.checked);
-            console.log(checkedTransferEdit);
-        } else {
-            setCheckedTransferEdit(e.target.checked);
             setDataById({
                 ...dataById,
+                CASH_ADVANCE_DELIVERY_METHOD_TRANSFER: 1,
+            });
+            console.log("Checked Transfer Kena", checkedTransferEdit);
+        } else {
+            setDataById({
+                ...dataById,
+                CASH_ADVANCE_DELIVERY_METHOD_TRANSFER: 0,
                 CASH_ADVANCE_TRANSFER_AMOUNT: 0,
             });
+            console.log("Checked Transfer Gakena", checkedTransferEdit);
         }
+
+        setCheckedTransferEdit(!checkedTransferEdit);
     };
 
     const [checkedCashEdit, setCheckedCashEdit] = useState(false);
     const handleCheckedCashEdit = (e: any) => {
         if (e.target.checked) {
-            setCheckedCashEdit(e.target.checked);
-        } else {
-            setCheckedCashEdit(e.target.checked);
             setDataById({
                 ...dataById,
+                CASH_ADVANCE_DELIVERY_METHOD_CASH: 1,
+            });
+            console.log("Checked Cash Kena", checkedCashEdit);
+        } else {
+            setDataById({
+                ...dataById,
+                CASH_ADVANCE_DELIVERY_METHOD_CASH: 0,
                 CASH_ADVANCE_CASH_AMOUNT: 0,
             });
+            console.log("Checked Cash Gakena", checkedCashEdit);
         }
+
+        setCheckedCashEdit(!checkedCashEdit);
     };
 
     const selectDivision = division
@@ -2249,9 +2281,9 @@ export default function CashAdvance({ auth }: PageProps) {
         };
     });
 
-    console.log("Data Cash Advance", data);
-    // console.log("Cash Advance", cashAdvance.data);
-    console.log("Data CA By Id", dataById);
+    // console.log("Data Cash Advance", data);
+    console.log("Cash Advance", cashAdvance.data);
+    // console.log("Data CA By Id", dataById);
     // console.log("Data CA Report", dataCAReport);
     // console.log("Data CA Report By Id", dataReportById);
     // console.log("Auth", auth.user);
@@ -2888,7 +2920,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD>
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 total_amount
                                             )}
@@ -2913,11 +2945,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="transfer-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={
-                                                    checkedTransfer === true
-                                                        ? 0
-                                                        : 1
-                                                }
                                                 defaultChecked={true}
                                                 onChange={(e) =>
                                                     handleCheckedTransfer(e)
@@ -2933,37 +2960,26 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     Transfer
                                                 </label>
                                             </div>
-                                            {checkedTransfer === true ? (
-                                                <CurrencyInput
-                                                    id="cash_advance_transfer_amount"
-                                                    name="cash_advance_transfer_amount"
-                                                    value={
-                                                        data.cash_advance_transfer_amount
-                                                    }
-                                                    defaultValue={0}
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    onValueChange={(val: any) =>
-                                                        setData(
-                                                            "cash_advance_transfer_amount",
-                                                            val
-                                                        )
-                                                    }
-                                                    className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                    placeholder="0.00"
-                                                    autoComplete="off"
-                                                />
-                                            ) : (
-                                                <CurrencyInput
-                                                    id="cash_advance_transfer_amount"
-                                                    name="cash_advance_transfer_amount"
-                                                    value="0"
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                    disabled
-                                                />
-                                            )}
+                                            <CurrencyInput
+                                                id="cash_advance_transfer_amount"
+                                                name="cash_advance_transfer_amount"
+                                                value={
+                                                    data.cash_advance_transfer_amount
+                                                }
+                                                defaultValue={0}
+                                                decimalScale={2}
+                                                decimalsLimit={2}
+                                                onValueChange={(val: any) =>
+                                                    setData(
+                                                        "cash_advance_transfer_amount",
+                                                        val
+                                                    )
+                                                }
+                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                placeholder="0.00"
+                                                autoComplete="off"
+                                                disabled={!checkedTransfer}
+                                            />
                                             <select
                                                 id="cash_advance_to_bank_account"
                                                 name="cash_advance_to_bank_account"
@@ -3027,36 +3043,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     Cash
                                                 </label>
                                             </div>
-                                            {checkedCash === true ? (
-                                                <CurrencyInput
-                                                    id="cash_advance_cash_amount"
-                                                    name="cash_advance_cash_amount"
-                                                    value={
-                                                        data.cash_advance_cash_amount
-                                                    }
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    onValueChange={(val: any) =>
-                                                        setData(
-                                                            "cash_advance_cash_amount",
-                                                            val
-                                                        )
-                                                    }
-                                                    className="block w-1/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ml-9"
-                                                    placeholder="0.00"
-                                                    autoComplete="off"
-                                                />
-                                            ) : (
-                                                <CurrencyInput
-                                                    id="cash_advance_cash_amount"
-                                                    name="cash_advance_cash_amount"
-                                                    value="0"
-                                                    decimalScale={2}
-                                                    decimalsLimit={2}
-                                                    className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                    disabled
-                                                />
-                                            )}
+                                            <CurrencyInput
+                                                id="cash_advance_cash_amount"
+                                                name="cash_advance_cash_amount"
+                                                value={
+                                                    data.cash_advance_cash_amount
+                                                }
+                                                decimalScale={2}
+                                                decimalsLimit={2}
+                                                onValueChange={(val: any) =>
+                                                    setData(
+                                                        "cash_advance_cash_amount",
+                                                        val
+                                                    )
+                                                }
+                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                placeholder="0.00"
+                                                autoComplete="off"
+                                                disabled={!checkedCash}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -3535,12 +3540,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={8}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border py-2">
+                                        <TD className="border py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataById.CASH_ADVANCE_TOTAL_AMOUNT
                                             )}
@@ -3565,15 +3570,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="transfer-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={1}
                                                 checked={
-                                                    dataById?.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                        0 && true
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
                                                 }
-                                                onChange={(e) =>
-                                                    handleCheckedTransfer(e)
-                                                }
-                                                required
+                                                readOnly
                                             />
                                         </div>
                                         <div className="block md:flex w-full gap-4">
@@ -3616,14 +3617,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="cash-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={2}
                                                 checked={
-                                                    dataById?.CASH_ADVANCE_CASH_AMOUNT >
-                                                        0 && true
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        1 && true
                                                 }
-                                                onChange={(e) =>
-                                                    handleCheckedCash(e)
-                                                }
+                                                readOnly
                                             />
                                         </div>
                                         <div className="block md:flex w-full">
@@ -4185,12 +4183,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={8}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border text-center py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataById.CASH_ADVANCE_TOTAL_AMOUNT
                                             )}
@@ -4215,12 +4213,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="transfer-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={1}
                                                 defaultChecked={
-                                                    dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                    0
-                                                        ? !checkedTransferEdit
-                                                        : checkedTransferEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
                                                 }
                                                 onChange={(e) =>
                                                     handleCheckedTransferEdit(e)
@@ -4255,10 +4250,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                        0 ===
-                                                        false &&
-                                                    !checkedTransferEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        0 && true
                                                 }
                                             />
                                             <select
@@ -4316,17 +4309,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="cash-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={2}
                                                 defaultChecked={
-                                                    dataById?.CASH_ADVANCE_CASH_AMOUNT >
-                                                    0
-                                                        ? !checkedCashEdit
-                                                        : checkedCashEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        1 && true
                                                 }
                                                 onChange={(e) =>
                                                     handleCheckedCashEdit(e)
                                                 }
-                                                // required
                                             />
                                         </div>
                                         <div className="block md:flex w-full">
@@ -4357,10 +4346,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById.CASH_ADVANCE_CASH_AMOUNT >
-                                                        0 ===
-                                                        false &&
-                                                    !checkedCashEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        0 && true
                                                 }
                                             />
                                         </div>
@@ -5196,12 +5183,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </Button>
                                         </TD>
                                         <TD
-                                            className="text-right pr-5 py-2"
+                                            className="text-right pr-5 py-2 font-bold"
                                             colSpan={6}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="py-2">
+                                        <TD className="py-2 font-bold">
                                             {formatCurrency.format(
                                                 revised_total_amount
                                             )}
@@ -5226,12 +5213,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="transfer-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={1}
                                                 defaultChecked={
-                                                    dataById?.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                    0
-                                                        ? !checkedTransferEdit
-                                                        : checkedTransferEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
                                                 }
                                                 onChange={(e) =>
                                                     handleCheckedTransferEdit(e)
@@ -5266,10 +5250,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById?.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                        0 ===
-                                                        false &&
-                                                    !checkedTransferEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        0 && true
                                                 }
                                             />
                                             <select
@@ -5327,17 +5309,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="cash-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={2}
                                                 defaultChecked={
-                                                    dataById?.CASH_ADVANCE_CASH_AMOUNT >
-                                                    0
-                                                        ? !checkedCashEdit
-                                                        : checkedCashEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        1 && true
                                                 }
                                                 onChange={(e) =>
                                                     handleCheckedCashEdit(e)
                                                 }
-                                                // required
                                             />
                                         </div>
                                         <div className="block md:flex w-full">
@@ -5368,10 +5346,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById?.CASH_ADVANCE_CASH_AMOUNT >
-                                                        0 ===
-                                                        false &&
-                                                    !checkedCashEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        0 && true
                                                 }
                                             />
                                         </div>
@@ -5797,12 +5773,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={8}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border text-center py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataById.CASH_ADVANCE_TOTAL_AMOUNT
                                             )}
@@ -5827,15 +5803,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="transfer-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={1}
                                                 onChange={(e) =>
                                                     handleCheckedTransferEdit(e)
                                                 }
                                                 defaultChecked={
-                                                    dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                    0
-                                                        ? !checkedTransferEdit
-                                                        : checkedTransferEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
                                                 }
                                             />
                                         </div>
@@ -5852,8 +5825,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 id="CASH_ADVANCE_TRANSFER_AMOUNT"
                                                 name="CASH_ADVANCE_TRANSFER_AMOUNT"
                                                 value={
-                                                    dataById.CASH_ADVANCE_TRANSFER_AMOUNT ||
-                                                    ""
+                                                    dataById.CASH_ADVANCE_TRANSFER_AMOUNT
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
@@ -5868,10 +5840,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                        0 ===
-                                                        false &&
-                                                    !checkedTransferEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        0 && true
                                                 }
                                             />
                                             <select
@@ -5925,12 +5895,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <div
                                         className="ml-7"
                                         hidden={
-                                            dataById.CASH_ADVANCE_TRANSFER_AMOUNT >
-                                                0 ===
-                                                false && !checkedTransferEdit
+                                            dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                0 && true
                                         }
                                     >
-                                        <div className="grid grid-cols-1 mb-5">
+                                        <div className="w-full sm:w-[30%] mb-5">
                                             <InputLabel
                                                 htmlFor="cash_advance_transfer_date"
                                                 className="mb-2"
@@ -5938,26 +5907,28 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 Transfer Date
                                                 {/* <span className="text-red-600">*</span> */}
                                             </InputLabel>
-                                            <DatePicker
-                                                name="CASH_ADVANCE_TRANSFER_DATE"
-                                                selected={
-                                                    dataById.CASH_ADVANCE_TRANSFER_DATE ||
-                                                    ""
-                                                }
-                                                onChange={(date: any) =>
-                                                    setDataById({
-                                                        ...dataById,
-                                                        CASH_ADVANCE_TRANSFER_DATE:
-                                                            date.toLocaleDateString(
-                                                                "en-CA"
-                                                            ),
-                                                    })
-                                                }
-                                                dateFormat={"dd-MM-yyyy"}
-                                                placeholderText="dd-mm-yyyyy"
-                                                className="w-full sm:w-[30%] border-0 rounded-md shadow-md text-sm h-9 focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                                autoComplete="off"
-                                            />
+                                            <div className="grid grid-cols-1">
+                                                <DatePicker
+                                                    name="CASH_ADVANCE_TRANSFER_DATE"
+                                                    selected={
+                                                        dataById.CASH_ADVANCE_TRANSFER_DATE ||
+                                                        ""
+                                                    }
+                                                    onChange={(date: any) =>
+                                                        setDataById({
+                                                            ...dataById,
+                                                            CASH_ADVANCE_TRANSFER_DATE:
+                                                                date.toLocaleDateString(
+                                                                    "en-CA"
+                                                                ),
+                                                        })
+                                                    }
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd-mm-yyyyy"
+                                                    className="w-full border-0 rounded-md shadow-md text-sm h-9 focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                    autoComplete="off"
+                                                />
+                                            </div>
                                         </div>
                                         <div className="mb-5">
                                             <InputLabel
@@ -6008,15 +5979,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 type="checkbox"
                                                 aria-describedby="cash-description"
                                                 className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-600"
-                                                value={2}
                                                 onChange={(e) =>
                                                     handleCheckedCashEdit(e)
                                                 }
                                                 defaultChecked={
-                                                    dataById.CASH_ADVANCE_CASH_AMOUNT >
-                                                    0
-                                                        ? !checkedCashEdit
-                                                        : checkedCashEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        1 && true
                                                 }
                                             />
                                         </div>
@@ -6048,10 +6016,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={
-                                                    dataById.CASH_ADVANCE_CASH_AMOUNT >
-                                                        0 ===
-                                                        false &&
-                                                    !checkedCashEdit
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        0 && true
                                                 }
                                             />
                                         </div>
@@ -6060,9 +6026,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <div
                                         className="ml-7"
                                         hidden={
-                                            dataById?.CASH_ADVANCE_CASH_AMOUNT >
-                                                0 ===
-                                                false && !checkedCashEdit
+                                            dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                0 && true
                                         }
                                     >
                                         <div className="grid grid-cols-1 mb-5">
@@ -6769,7 +6734,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD>
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 total_amount_report
                                             )}
@@ -6782,7 +6747,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             ADVANCED AMOUNT
                                         </TD>
-                                        <TD>
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 dataById.CASH_ADVANCE_TOTAL_AMOUNT
                                             )}
@@ -6795,7 +6760,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             SURPLUS / DEFICIT
                                         </TD>
-                                        <TD>
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 dataById.CASH_ADVANCE_TOTAL_AMOUNT -
                                                     total_amount_report
@@ -7340,12 +7305,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={8}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border py-2">
+                                        <TD className="border py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT
                                             )}
@@ -7353,12 +7318,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={8}
                                         >
                                             ADVANCED AMOUNT
                                         </TD>
-                                        <TD className="border py-2">
+                                        <TD className="border py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST
                                             )}
@@ -7366,12 +7331,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={8}
                                         >
                                             SURPLUS / DEFICIT
                                         </TD>
-                                        <TD className="border py-2">
+                                        <TD className="border py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST -
                                                     dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT
@@ -7391,8 +7356,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                 </InputLabel>
                                 <TextInput
                                     value={
-                                        dataReportById?.cash_advance_differents
-                                            .CASH_ADVANCE_DIFFERENTS_NAME
+                                        dataReportById?.cash_advance_difference
+                                            .CASH_ADVANCE_DIFFERENCE_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -8064,12 +8029,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={12}
                                         >
                                             ADVANCED AMOUNT
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border text-center py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST
                                             )}
@@ -8077,12 +8042,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={12}
                                         >
                                             UTILIZATION
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border text-center py-2 font-bold">
                                             {formatCurrency.format(
                                                 total_amount_approve
                                             )}
@@ -8090,12 +8055,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </tr>
                                     <tr className="text-center text-black text-sm leading-7">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={12}
                                         >
                                             SURPLUS / DEFICIT
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border text-center py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST -
                                                     total_amount_approve
@@ -8135,18 +8100,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <option value="">
                                         -- Choose Difference --
                                     </option>
-                                    {getCashAdvanceDifferents.map(
-                                        (different: any) => (
+                                    {getCashAdvanceDifference.map(
+                                        (difference: any) => (
                                             <option
                                                 key={
-                                                    different.CASH_ADVANCE_DIFFERENTS_ID
+                                                    difference.CASH_ADVANCE_DIFFERENCE_ID
                                                 }
                                                 value={
-                                                    different.CASH_ADVANCE_DIFFERENTS_ID
+                                                    difference.CASH_ADVANCE_DIFFERENCE_ID
                                                 }
                                             >
                                                 {
-                                                    different.CASH_ADVANCE_DIFFERENTS_NAME
+                                                    difference.CASH_ADVANCE_DIFFERENCE_NAME
                                                 }
                                             </option>
                                         )
@@ -8897,11 +8862,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                     )}
                                 </tbody>
                                 <tfoot>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD></TD>
                                         <TD>
                                             <Button
-                                                className="mt-5 px-2 py-1 text-black bg-none shadow-none hover:underline"
+                                                className="py-2 px-2 text-black bg-none shadow-none hover:underline"
                                                 onClick={(e) =>
                                                     handleAddRowRevisedReport(e)
                                                 }
@@ -8911,38 +8876,38 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </Button>
                                         </TD>
                                         <TD
-                                            className="text-right pr-5 py-2"
+                                            className="text-right pr-5 font-bold"
                                             colSpan={6}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="py-2">
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 revised_total_amount_report
                                             )}
                                         </TD>
                                     </tr>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD
-                                            className="text-right pr-5 py-2"
+                                            className="py-2 text-right pr-5 font-bold"
                                             colSpan={8}
                                         >
                                             ADVANCED AMOUNT
                                         </TD>
-                                        <TD className="py-2">
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST
                                             )}
                                         </TD>
                                     </tr>
-                                    <tr className="text-center text-black text-sm leading-7">
+                                    <tr className="text-center text-black text-sm">
                                         <TD
-                                            className="text-right pr-5 py-2"
+                                            className="py-2 text-right pr-5 font-bold"
                                             colSpan={8}
                                         >
                                             SURPLUS / DEFICIT
                                         </TD>
-                                        <TD className="py-2">
+                                        <TD className="font-bold">
                                             {formatCurrency.format(
                                                 dataReportById?.REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST -
                                                     revised_total_amount_report
@@ -8974,12 +8939,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <option value="">
                                         -- Choose Difference --
                                     </option>
-                                    {getCashAdvanceDifferents.map((different: any) => (
+                                    {getCashAdvanceDifference.map((difference: any) => (
                                         <option
-                                            key={different.CASH_ADVANCE_DIFFERENTS_ID}
-                                            value={different.CASH_ADVANCE_DIFFERENTS_ID}
+                                            key={difference.CASH_ADVANCE_DIFFERENCE_ID}
+                                            value={difference.CASH_ADVANCE_DIFFERENCE_ID}
                                         >
-                                            {different.CASH_ADVANCE_DIFFERENTS_NAME}
+                                            {difference.CASH_ADVANCE_DIFFERENCE_NAME}
                                         </option>
                                     ))}
                                 </select>
@@ -9207,8 +9172,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                 </InputLabel>
                                 <TextInput
                                     value={
-                                        dataReportById?.cash_advance_differents
-                                            .CASH_ADVANCE_DIFFERENTS_NAME
+                                        dataReportById?.cash_advance_difference
+                                            .CASH_ADVANCE_DIFFERENCE_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly

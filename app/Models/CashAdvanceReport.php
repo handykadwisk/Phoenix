@@ -23,7 +23,7 @@ class CashAdvanceReport extends Model
     protected $with = [
         'm_cash_advance_proof_of_document',
         'cash_advance_detail_report',
-        'cash_advance_differents',
+        'cash_advance_difference',
         'cash_advance_method',
         'employee',
         'employee_used_by',
@@ -49,9 +49,9 @@ class CashAdvanceReport extends Model
         return $this->hasMany(CashAdvanceDetailReport::class, 'REPORT_CASH_ADVANCE_ID');
     }
 
-    public function cash_advance_differents(): BelongsTo
+    public function cash_advance_difference(): BelongsTo
     {
-        return $this->belongsTo(RCashAdvanceDifferent::class, 'REPORT_CASH_ADVANCE_TYPE');
+        return $this->belongsTo(RCashAdvanceDifference::class, 'REPORT_CASH_ADVANCE_TYPE');
     }
 
     public function cash_advance_method(): BelongsTo

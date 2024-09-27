@@ -14,6 +14,7 @@ use App\Models\RelationStatus;
 use App\Models\RelationType;
 use App\Models\Role;
 use App\Models\RoleAccessMenu;
+use App\Models\RReimburseNotes;
 use App\Models\Salutation;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,6 +27,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            RBankTransactionSeeder::class,
+            RCashAdvanceApprovalSeeder::class,
+            RCashAdvanceDifferenceSeeder::class,
+            RCashAdvanceMethodSeeder::class,
+            RCashAdvancePurposeSeeder::class,
+            RCashAdvanceStatusSeeder::class,
+            RCurrencySeeder::class,
+            RJournalTypeSeeder::class,
+            RReimburseNotesSeeder::class
+        ]);
+        
         // create menu
         // $dashboard = Menu::create(
         //     [
@@ -470,13 +483,7 @@ class DatabaseSeeder extends Seeder
         DB::unprepared(
             file_get_contents($file_path12)
         );
-
-        // create 2024_16_05_r_currency
-        $file_path13 = resource_path('../database/LogDB/2024_16_05_r_currency.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path13)
-        );
+        
 
         // create 2024_08_07_r_interest_insured
         $r_interest_insured = resource_path('../database/LogDB/2024_08_07_r_interest_insured.sql');
@@ -488,24 +495,6 @@ class DatabaseSeeder extends Seeder
         RelationStatus::create([
             'relation_status_name' => 'Individu',
         ]);
-
-        $file_path12 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_status.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path12)
-        );
-
-        $file_path13 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_purpose.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path13)
-        );
-
-        $file_path14 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_approval.sql');
-
-        DB::unprepared(
-            file_get_contents($file_path14)
-        );
 
         $file_path15 = resource_path('../database/LogDB/2024_07_31_r_coa.sql');
 

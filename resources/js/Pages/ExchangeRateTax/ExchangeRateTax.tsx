@@ -89,7 +89,13 @@ export default function ExchangeRateController({ auth }: PageProps) {
         axios
             .get(`/getCurrenciesRateTax`)
             .then((res) => {
-                const parseData = cleanDataRecursively(res.data);
+                let parseData = cleanDataRecursively(res.data);
+
+                parseData = parseData.map((currency: any) => ({
+                    ...currency,
+                    EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE:
+                        currency.CURRENCY_SYMBOL === "IDR" ? 1 : 0,
+                }));
 
                 if (selectedDate !== "") {
                     const next7Days = new Date(selectedDate);
@@ -157,14 +163,11 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         setData((prevData: any) => {
                             const updatedData = { ...prevData };
 
-                            // Simpan hasil request berdasarkan tanggal
                             updatedData.exchange_rate_tax_detail =
                                 exchangeRateTaxDetail;
 
-                            // Simpan nilai yang dipilih pada field
                             updatedData[name] = selectedDate;
 
-                            // Tambahkan 6 hari ke tanggal yang dipilih
                             const futureDate = new Date(date);
                             futureDate.setDate(futureDate.getDate() + 6);
                             updatedData["exchange_rate_tax_end_date"] =
@@ -185,19 +188,21 @@ export default function ExchangeRateController({ auth }: PageProps) {
         const reader = new FileReader();
 
         reader.onload = (e: any) => {
-            const today = new Date();
-
-            const next7Days = new Date(today);
-            next7Days.setDate(today.getDate() + 6);
-
-            const currentDate = today.toLocaleDateString("en-CA");
-            const futureDate = next7Days.toLocaleDateString("en-CA");
-
             const excel = new Uint8Array(e.target.result);
             const workbook = XLSX.read(excel, { type: "array" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            let jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            jsonData = jsonData.map((currency: any) => {
+                if (currency.CURRENCY_SYMBOL === "IDR") {
+                    return {
+                        ...currency,
+                        EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE: 1,
+                    };
+                }
+                return currency;
+            });
 
             console.log("Data Upload", jsonData);
             setData({
@@ -305,17 +310,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
     const [exchangeRateTax, setExchangeRateTax] = useState<any>([]);
 
     const [searchExchangeRateTax, setSearchExchangeRateTax] = useState<any>({
-        exchange_rate_tax_start_date: "",
-        exchange_rate_tax_end_date: "",
+        exchange_rate_tax_search_date: "",
     });
 
     const getExchangeRateTax = async (pageNumber = "page=1") => {
         await axios
             .post(`/getExchangeRateTax?${pageNumber}`, {
-                exchange_rate_tax_start_date:
-                    searchExchangeRateTax.exchange_rate_tax_start_date,
-                exchange_rate_tax_end_date:
-                    searchExchangeRateTax.exchange_rate_tax_end_date,
+                exchange_rate_tax_search_date:
+                    searchExchangeRateTax.exchange_rate_tax_search_date,
             })
             .then((res) => {
                 setExchangeRateTax(res.data);
@@ -333,8 +335,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
             .then((res) => {
                 setExchangeRateTax(res.data);
                 setSearchExchangeRateTax({
-                    exchange_rate_tax_start_date: "",
-                    exchange_rate_tax_end_date: "",
+                    exchange_rate_tax_search_date: "",
                 });
             })
             .catch((err) => {
@@ -505,8 +506,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                         decimalScale={2}
                                                         decimalsLimit={2}
                                                         value={
-                                                            currency.EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE ||
-                                                            ""
+                                                            currency.EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE
                                                         }
                                                         onValueChange={(val) =>
                                                             handleChangeUploadFile(
@@ -515,9 +515,26 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                                 i
                                                             )
                                                         }
-                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right`}
+                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right ${
+                                                            (currency.CURRENCY_SYMBOL ===
+                                                                "IDR" ||
+                                                                currency
+                                                                    .currency
+                                                                    ?.CURRENCY_SYMBOL ===
+                                                                    "IDR") &&
+                                                            "bg-gray-100"
+                                                        }`}
                                                         placeholder="0.00"
                                                         autoComplete="off"
+                                                        readOnly={
+                                                            (currency.CURRENCY_SYMBOL ===
+                                                                "IDR" ||
+                                                                currency
+                                                                    .currency
+                                                                    ?.CURRENCY_SYMBOL ===
+                                                                    "IDR") &&
+                                                            true
+                                                        }
                                                         required
                                                     />
                                                 </TD>
@@ -675,14 +692,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                 <tr
                                                     key={i}
                                                     className={`
-                                                    hover:bg-gray-200 text-center cursor-pointer`}
+                                                    hover:bg-gray-200 cursor-pointer`}
                                                     onDoubleClick={() =>
                                                         handleEditModal(
                                                             data.EXCHANGE_RATE_TAX_DETAIL_ID
                                                         )
                                                     }
                                                 >
-                                                    <TD className="border p-2">
+                                                    <TD className="border text-center p-2">
                                                         {i + 1}
                                                     </TD>
                                                     <TD className="border p-2">
@@ -691,14 +708,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                                 ?.CURRENCY_NAME
                                                         }
                                                     </TD>
-                                                    <TD className="border p-2">
+                                                    <TD className="border text-center p-2">
                                                         <span className="bg-orange-500 text-white px-2 py-1 rounded-md inline-block text-center w-14">
                                                             {data.currency
                                                                 ?.CURRENCY_SYMBOL ||
                                                                 "No Currency"}
                                                         </span>
                                                     </TD>
-                                                    <TD className="border p-2">
+                                                    <TD className="border text-right p-2">
                                                         {formatCurrency.format(
                                                             data.EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE
                                                         )}
@@ -723,7 +740,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                             onClick={handleAddModal}
                         >
-                            {"Upload"}
+                            {"Add Exchange Rate Tax"}
                         </Button>
                     </>
                 }
@@ -732,24 +749,24 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         <div className="grid grid-cols-1 mb-5 relative">
                             <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                             <DatePicker
-                                name="exchange_rate_tax_start_date"
+                                name="exchange_rate_tax_search_date"
                                 selected={
-                                    searchExchangeRateTax.exchange_rate_tax_start_date
+                                    searchExchangeRateTax.exchange_rate_tax_search_date
                                 }
                                 onChange={(date: any) =>
                                     setSearchExchangeRateTax({
                                         ...searchExchangeRateTax,
-                                        exchange_rate_tax_start_date:
+                                        exchange_rate_tax_search_date:
                                             date.toLocaleDateString("en-CA"),
                                     })
                                 }
                                 dateFormat={"dd-MM-yyyy"}
-                                placeholderText="dd-mm-yyyyy (Start Date)"
+                                placeholderText="dd-mm-yyyyy"
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
                                 autoComplete="off"
                             />
                         </div>
-                        <div className="grid grid-cols-1 mb-5 relative">
+                        {/* <div className="grid grid-cols-1 mb-5 relative">
                             <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                             <DatePicker
                                 name="exchange_rate_tax_end_date"
@@ -768,7 +785,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
                                 autoComplete="off"
                             />
-                        </div>
+                        </div> */}
                         <div className="flex flex-col md:flex-row justify-end gap-2">
                             <Button
                                 className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"

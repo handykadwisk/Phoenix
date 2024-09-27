@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\BankTransactionController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\ExchangeRateBIController;
@@ -9,7 +11,7 @@ use App\Http\Controllers\ExchangeRateTaxController;
 use App\Http\Controllers\InsurancePanelController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
-use App\Http\Controllers\OtherExpensesController;
+use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
@@ -31,6 +33,7 @@ use App\Models\TRelationStructure;
 use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
+use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\TCompanyController;
 use App\Http\Controllers\TCompanyDivisionController;
@@ -295,7 +298,7 @@ Route::middleware('auth')->group(function () {
     // Cash Advance Report
     Route::post('/getCAReport', [CashAdvanceReportController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
     Route::get('/getCAReportById/{id}', [CashAdvanceReportController::class, 'getCAReportById'])->name('getCAReportById');
-    Route::get('/getCashAdvanceDifferents', [CashAdvanceReportController::class, 'getCashAdvanceDifferents'])->name('getCashAdvanceDifferents');
+    Route::get('/getCashAdvanceDifference', [CashAdvanceReportController::class, 'getCashAdvanceDifference'])->name('getCashAdvanceDifference');
     Route::get('/getCashAdvanceApproval', [CashAdvanceReportController::class, 'getCashAdvanceApproval'])->name('getCashAdvanceApproval');
     Route::get('/getCashAdvanceMethod', [CashAdvanceReportController::class, 'getCashAdvanceMethod'])->name('getCashAdvanceMethod');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
@@ -333,15 +336,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/reimburseDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_doc_reader'])->name('reimburseDocReader.reimburse_doc_reader');
     Route::get('/reimburseProofOfDocumentDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_doc_reader'])->name('reimburseProofOfDocumentDocReader.reimburse_proof_of_document_doc_reader');
 
-    // Other Expenses
-    Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');
-    Route::get('/getOtherExpensesNumber', [OtherExpensesController::class, 'getOtherExpensesNumber'])->name('getOtherExpensesNumber');
-    Route::get('/getOtherExpensesById/{id}', [OtherExpensesController::class, 'getOtherExpensesById'])->name('getOtherExpensesById');
-    Route::get('/otherExpenses', [OtherExpensesController::class, 'index'])->name('otherExpenses');
-    Route::post('/otherExpenses', [OtherExpensesController::class, 'store'])->name('otherExpenses.store');
-    Route::patch('/otherExpensesApprove/{id}', [OtherExpensesController::class, 'approve'])->name('otherExpenses.approve');
-    Route::patch('/otherExpensesRevised/{id}', [OtherExpensesController::class, 'revised'])->name('otherExpenses.revised');
-    Route::get('/otherExpensesDownload/{id}', [OtherExpensesController::class, 'download'])->name('otherExpenses.download');
+    // Expenses
+    Route::post('/getExpenses', [ExpensesController::class, 'getExpenses'])->name('cashAdvance.getExpenses');
+    Route::get('/getExpensesNumber', [ExpensesController::class, 'getExpensesNumber'])->name('getExpensesNumber');
+    Route::get('/getExpensesById/{id}', [ExpensesController::class, 'getExpensesById'])->name('getExpensesById');
+    Route::get('/getExpensesApproval', [ExpensesController::class, 'getExpensesApproval'])->name('getExpensesApproval');
+    Route::get('/getExpensesNotes', [ExpensesController::class, 'getExpensesNotes'])->name('getExpensesNotes');
+    Route::get('/getExpensesMethod', [ExpensesController::class, 'getExpensesMethod'])->name('getExpensesMethod');
+    Route::get('/expenses', [ExpensesController::class, 'index'])->name('expenses');
+    Route::post('/expensesAdd', [ExpensesController::class, 'expenses_add'])->name('otherExpenses.add');
+    Route::patch('/expensesApprove', [ExpensesController::class, 'approve'])->name('expenses.approve');
+    Route::patch('/expensesRevised', [ExpensesController::class, 'revised'])->name('expenses.revised');
+    Route::patch('/expensesExecute', [ExpensesController::class, 'execute'])->name('expenses.execute');
+    Route::get('/expensesDownload/{id}/{key}', [ExpensesController::class, 'download'])->name('expenses.download');
 
     // Approval Limit
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
@@ -368,8 +375,22 @@ Route::middleware('auth')->group(function () {
     Route::patch('/exchangeRateBIEdit', [ExchangeRateBIController::class, 'exchange_rate_bi_edit'])->name('exchangeRateBI.edit');
     Route::get('/exchangeRateBIDownloadTemplate', [ExchangeRateBIController::class, 'exchange_rate_bi_download_template'])->name('exchangeRateBIDownloadTemplate');
 
+    // Currency
+    Route::get('/getCurrency', [CurrencyController::class, 'getCurrency'])->name('getCurrency');
+
     // Receipt
-    Route::get('/receipt', [ExchangeRateBIController::class, 'index'])->name('receipt');
+    Route::get('/getClient', [ReceiptController::class, 'getClient'])->name('getClient');
+    // Route::get('/getCurrency', [ReceiptController::class, 'getCurrency'])->name('getCurrency');
+    Route::get('/getBankAccount', [ReceiptController::class, 'getBankAccount'])->name('getBankAccount');
+    Route::post('/getReceipt', [ReceiptController::class, 'getReceipt'])->name('receipt.getReceipt');
+    Route::get('/getReceiptById/{id}', [ReceiptController::class, 'getReceiptById'])->name('receipt.getReceiptById');
+    Route::get('/receipt', [ReceiptController::class, 'index'])->name('receipt');
+    Route::post('/receiptAdd', [ReceiptController::class, 'receipt_add'])->name('receipt.add');
+    Route::patch('/receiptDraft', [ReceiptController::class, 'receipt_draft'])->name('receipt.draft');
+
+    // Bank Transaction 
+    Route::post('/getBankTransaction', [BankTransactionController::class, 'getBankTransaction'])->name('getBankTransaction');
+    Route::get('/bankTransaction', [BankTransactionController::class, 'index'])->name('bankTransaction');
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
