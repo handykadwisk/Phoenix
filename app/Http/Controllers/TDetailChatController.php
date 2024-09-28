@@ -254,4 +254,29 @@ class TDetailChatController extends Controller
             'X-Inertia' => true
         ]);
     }
+
+    public function remove_participant(Request $request){
+        if ($request) {
+            $deleteParticipant = TChatParticipant::where('CHAT_PARTICIPANT_ID', $request->idParticipant)->delete();
+
+            if ($deleteParticipant) {
+                // Created Log
+                UserLog::create([
+                    'created_by' => Auth::user()->id,
+                    'action'     => json_encode([
+                        "description" => "Remove Participant Chat (Plugin).",
+                        "module"      => "Plugin",
+                        "id"          => $request->CHAT_ID
+                    ]),
+                    'action_by'  => Auth::user()->user_login
+                ]);
+            }
+            return new JsonResponse([
+                "Participant Success Removed",
+                $request->CHAT_ID
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
+    }
 }

@@ -411,7 +411,6 @@ export default function ModalChatMessage({
                     searchQuery
                 )
             );
-            console.log("data", filtered);
             setFilteredUsers(filtered);
         }
     };
@@ -423,7 +422,6 @@ export default function ModalChatMessage({
         idParticipant: any
     ) => {
         e.preventDefault();
-        console.log("idPar:", idParticipant);
 
         const words = data?.INITIATE_YOUR_CHAT.split(" ");
         words[words.length - 1] = "@" + usersParticipant; // Ganti kata terakhir dengan mention yang dipilih
@@ -466,13 +464,6 @@ export default function ModalChatMessage({
             });
     };
 
-    const commonElements = optionsParticipant.filter((item1: any) => {
-        return dataParticipant.some(
-            (item2: any) =>
-                item1.PARTICIPANT_NAME !== item2.CHAT_PARTICIPANT_NAME
-        );
-    });
-
     const selectParticipant = optionsParticipant
         ?.filter(
             (m: any) =>
@@ -487,7 +478,6 @@ export default function ModalChatMessage({
                 label: query.PARTICIPANT_NAME,
             };
         });
-    console.log("asda", commonElements);
     // handle click add participant
     const handleClickShowParticipant = async (e: FormEvent) => {
         e.preventDefault();
@@ -538,7 +528,45 @@ export default function ModalChatMessage({
             });
     };
 
-    console.log(showAddParticipant);
+    // remove participant
+    const removeParticipant = async (idParticipant: any, idChat: any) => {
+        setIsSuccessChat("");
+        await axios
+            .post(`/removeParticipant`, { idParticipant, idChat })
+            .then((res) => {
+                setIsSuccessChat(res.data[0]);
+                getDataParticipantById(idChat);
+
+                setTimeout(() => {
+                    setIsSuccessChat("");
+                }, 5000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // alert remove participant
+    const alertRemoveParticipant = async (
+        e: FormEvent,
+        idParticipant: any,
+        idChat: any
+    ) => {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't Remove Participant?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                removeParticipant(idParticipant, idChat);
+            }
+        });
+    };
 
     return (
         <>
@@ -749,12 +777,12 @@ export default function ModalChatMessage({
                                     </div>
                                     {flagPlugin === false ? (
                                         <>
-                                            {/* <div className="flex flex-col h-auto"> */}
                                             <div
                                                 className="messageChat chat-height overflow-y-auto custom-scrollbar flex-grow"
                                                 id="messageChat"
                                                 ref={messagesEndRef}
                                             >
+                                                {/* Participant */}
                                                 {showParticipant && (
                                                     <>
                                                         <div className="absolute p-2 bg-white w-full shadow-md rounded-br-md rounded-bl-md">
@@ -795,8 +823,20 @@ export default function ModalChatMessage({
                                                                                                 dParticipant.CHAT_PARTICIPANT_NAME
                                                                                             }
                                                                                         </span>
-                                                                                        <span>
-                                                                                            <XMarkIcon className="w-4 " />
+                                                                                        <span
+                                                                                            className="cursor-pointer"
+                                                                                            title="Remove Participant"
+                                                                                            onClick={(
+                                                                                                e: any
+                                                                                            ) => {
+                                                                                                alertRemoveParticipant(
+                                                                                                    e,
+                                                                                                    dParticipant.CHAT_PARTICIPANT_ID,
+                                                                                                    data.CHAT_ID
+                                                                                                );
+                                                                                            }}
+                                                                                        >
+                                                                                            <XMarkIcon className="w-5" />
                                                                                         </span>
                                                                                     </div>
                                                                                 </div>
@@ -944,14 +984,6 @@ export default function ModalChatMessage({
                                                                                                 ? "bg-blue-500 text-white rounded-lg py-2 px-2 inline-block text-xs w-fit "
                                                                                                 : "bg-gray-200 text-gray-700 rounded-lg py-2 px-2 inline-block text-xs w-fit"
                                                                                         }
-                                                                                        // onClick={(
-                                                                                        //     e: any
-                                                                                        // ) =>
-                                                                                        //     handleContextMenu(
-                                                                                        //         e,
-                                                                                        //         items.CHAT_DETAIL_ID
-                                                                                        //     )
-                                                                                        // }
                                                                                     >
                                                                                         {
                                                                                             items.CHAT_DETAIL_TEXT
@@ -1119,7 +1151,6 @@ export default function ModalChatMessage({
                                                                         .scrollHeight +
                                                                     "px"; // Atur tinggi sesuai dengan scrollHeight
                                                             }}
-                                                            // onChange={(e) => permissionObject(e)}
                                                             placeholder="Your Chat"
                                                         />
                                                         <PrimaryButton
@@ -1135,7 +1166,6 @@ export default function ModalChatMessage({
                                                     </div>
                                                 </form>
                                             </div>
-                                            {/* </div> */}
 
                                             {/* END INPUT CHAT MESSAGE */}
                                         </>
@@ -1339,42 +1369,7 @@ export default function ModalChatMessage({
                                                                                             : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
                                                                                     }
                                                                                 >
-                                                                                    <div
-                                                                                        className="flex justify-between items-center"
-                                                                                        // onClick={(
-                                                                                        //     e
-                                                                                        // ) => {
-                                                                                        //     if (
-                                                                                        //         showContext.visible !==
-                                                                                        //         true
-                                                                                        //     ) {
-                                                                                        //         getMessageChatByTypeId(
-                                                                                        //             dTypeChat.CHAT_ID
-                                                                                        //         );
-                                                                                        //         setFlagPlugin(
-                                                                                        //             false
-                                                                                        //         );
-                                                                                        //         setData(
-                                                                                        //             {
-                                                                                        //                 ...data,
-                                                                                        //                 CHAT_ID:
-                                                                                        //                     dTypeChat.CHAT_ID,
-                                                                                        //             }
-                                                                                        //         );
-                                                                                        //     }
-                                                                                        // }}
-                                                                                        // onContextMenu={(
-                                                                                        //     e: any
-                                                                                        // ) => {
-                                                                                        //     handleContextMenu(
-                                                                                        //         e,
-                                                                                        //         dTypeChat.CHAT_ID
-                                                                                        //     );
-                                                                                        //     setActiveIndex(
-                                                                                        //         i
-                                                                                        //     );
-                                                                                        // }}
-                                                                                    >
+                                                                                    <div className="flex justify-between items-center">
                                                                                         <div>
                                                                                             <div className="">
                                                                                                 <span>
@@ -1398,11 +1393,6 @@ export default function ModalChatMessage({
                                                                                         </div>
                                                                                         <div className="flex">
                                                                                             <span className="text-[15px] rotate-45">
-                                                                                                {/* <FontAwesomeIcon
-                                                                                                    icon={
-                                                                                                        faThumbtack
-                                                                                                    }
-                                                                                                /> */}
                                                                                                 {pinChat?.CREATED_PIN_CHAT_BY ===
                                                                                                 auth
                                                                                                     .user
@@ -1571,76 +1561,6 @@ export default function ModalChatMessage({
                                                     </AccordionPanel>
                                                 </Accordion>
                                             </div>
-
-                                            {/* <div>
-                                                <div className="m-2 bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-300 text-xs">
-                                                    <span>Add Chat</span>
-                                                </div>
-                                                <div className="p-2">
-                                                    <fieldset className="pb-2 pt-2 rounded-lg border-slate-100 border-2 p2">
-                                                        <legend className="ml-2 px-3 text-sm">
-                                                            List Chat
-                                                        </legend>
-                                                        <div className="">
-                                                            {detailTypeChat?.map(
-                                                                (
-                                                                    dTypeChat: any,
-                                                                    i: number
-                                                                ) => {
-                                                                    return (
-                                                                        <div
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                        >
-                                                                            <div
-                                                                                className="hover:bg-red-600 cursor-pointer m-2 p-2 rounded-md shadow-md mb-2 hover:text-white text-sm"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) => {
-                                                                                    getMessageChatByTypeId(
-                                                                                        dTypeChat.CHAT_ID
-                                                                                    );
-                                                                                    setFlagPlugin(
-                                                                                        false
-                                                                                    );
-                                                                                    setData(
-                                                                                        {
-                                                                                            ...data,
-                                                                                            CHAT_ID:
-                                                                                                dTypeChat.CHAT_ID,
-                                                                                        }
-                                                                                    );
-                                                                                }}
-                                                                            >
-                                                                                <div className="flex">
-                                                                                    <span>
-                                                                                        {
-                                                                                            dTypeChat.CHAT_TITLE
-                                                                                        }
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div className="flex justify-end text-[10px]">
-                                                                                    <span>
-                                                                                        {dTypeChat
-                                                                                            ?.t_user
-                                                                                            .name +
-                                                                                            " - " +
-                                                                                            format(
-                                                                                                dTypeChat.CREATED_CHAT_DATE,
-                                                                                                "dd-MM-yyyy"
-                                                                                            )}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </div>
-                                                    </fieldset>
-                                                </div>
-                                            </div> */}
                                             {/* END LIST CHAT */}
                                         </>
                                     )}

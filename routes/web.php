@@ -480,6 +480,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/unPinMessageObject', [TDetailChatController::class, 'unPinMessageObject'])->name('unPinMessageObject.unPinMessageObject');
     Route::post('/getDataParticipantById', [TDetailChatController::class, 'getDataParticipantById'])->name('getDataParticipantById.getDataParticipantById');
     Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
+    Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
+    
     
     
 
