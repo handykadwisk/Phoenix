@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('CHAT_DETAIL_USER_ID')->primary()->unique();
             $table->bigInteger('CHAT_ID')->nullable();
             $table->bigInteger('CHAT_DETAIL_ID')->nullable();
-            $table->bigInteger('CHAT _DETAIL_USER_TO')->nullable();
+            $table->bigInteger('CHAT_DETAIL_USER_TO')->nullable();
             $table->bigInteger('CHAT_DETAIL_USER_FROM')->nullable();
             $table->bigInteger('CHAT_DETAIL_USER_STATUS_READ')->nullable()->comment('0 = unread, 1 = read');
             $table->dateTime('CHAT_DETAIL_USER_READ_DATE')->nullable();

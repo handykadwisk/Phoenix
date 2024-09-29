@@ -18,4 +18,14 @@ class TChatDetailUser extends Model
     ];
 
     public $timestamps = false;
+
+    public function tChatDetail()
+    {
+        return $this->hasOne(TChatDetail::class, "CHAT_DETAIL_ID", "CHAT_DETAIL_ID");
+    }
+
+    public function tChat()
+    {
+        return $this->hasOne(TChat::class, "CHAT_ID", "CHAT_ID");
+    }
 }

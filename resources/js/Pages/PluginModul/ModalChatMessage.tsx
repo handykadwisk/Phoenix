@@ -57,7 +57,7 @@ export default function ModalChatMessage({
         getMessageChatByTypeId(typeChatId);
     }, [typeChatId]);
     useEffect(() => {
-        // getDataParticipant();
+        getDataChatDetailUser(auth.user.id);
         getTypeChatByTagId(tagIdChat.TAG_ID);
     }, [tagIdChat]);
     useEffect(() => {
@@ -127,6 +127,19 @@ export default function ModalChatMessage({
             .post(`/getChatPin`, { tagIdChat, idAuthUser })
             .then((res) => {
                 setPinChatDetail(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [dataChatDetailUser, setDataChatDetailUser] = useState<any>([]);
+    const getDataChatDetailUser = async (idAuthUser: any) => {
+        await axios
+            .post(`/getDataChatDetailUser`, { idAuthUser })
+            .then((res) => {
+                setDataChatDetailUser(res.data);
+                console.log("chatdetailuser", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -431,7 +444,7 @@ export default function ModalChatMessage({
             PARTICIPANT: [
                 ...data.PARTICIPANT,
                 {
-                    id: usersParticipant,
+                    id: idParticipant,
                 },
             ], // Tambahkan spasi setelah mention
         });
@@ -1045,7 +1058,7 @@ export default function ModalChatMessage({
                                                 <form onSubmit={action}>
                                                     <hr />
                                                     {showMentions && (
-                                                        <div className="m-2 text-xs cursor-pointer w-fit">
+                                                        <div className="m-2 text-xs cursor-pointer overflow-y-auto custom-scrollbar h-24">
                                                             {filteredUsers?.map(
                                                                 (
                                                                     dataParticipant: any,
@@ -1369,7 +1382,70 @@ export default function ModalChatMessage({
                                                                                             : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
                                                                                     }
                                                                                 >
-                                                                                    <div className="flex justify-between items-center">
+                                                                                    <div
+                                                                                        className="flex justify-between items-center"
+                                                                                        onClick={(
+                                                                                            e
+                                                                                        ) => {
+                                                                                            e.preventDefault();
+                                                                                            if (
+                                                                                                showContext.visible !==
+                                                                                                true
+                                                                                            ) {
+                                                                                                getMessageChatByTypeId(
+                                                                                                    pinChat.CHAT_ID
+                                                                                                );
+                                                                                                getDataParticipantById(
+                                                                                                    pinChat.CHAT_ID
+                                                                                                );
+                                                                                                setFlagPlugin(
+                                                                                                    false
+                                                                                                );
+                                                                                                setData(
+                                                                                                    {
+                                                                                                        ...data,
+                                                                                                        CHAT_ID:
+                                                                                                            pinChat.CHAT_ID,
+                                                                                                    }
+                                                                                                );
+                                                                                                setDataAddParticipant(
+                                                                                                    {
+                                                                                                        ...dataAddParticipant,
+                                                                                                        CHAT_ID:
+                                                                                                            pinChat.CHAT_ID,
+                                                                                                    }
+                                                                                                );
+                                                                                            }
+                                                                                        }}
+                                                                                        onContextMenu={(
+                                                                                            e: any
+                                                                                        ) => {
+                                                                                            if (
+                                                                                                pinChat?.CREATED_PIN_CHAT_BY ===
+                                                                                                auth
+                                                                                                    .user
+                                                                                                    .id
+                                                                                            ) {
+                                                                                                handleContextMenu(
+                                                                                                    e,
+                                                                                                    pinChat.CHAT_ID,
+                                                                                                    "unpin"
+                                                                                                );
+                                                                                                setActiveIndex(
+                                                                                                    i
+                                                                                                );
+                                                                                            } else {
+                                                                                                handleContextMenu(
+                                                                                                    e,
+                                                                                                    pinChat.CHAT_ID,
+                                                                                                    "pin"
+                                                                                                );
+                                                                                                setActiveIndex(
+                                                                                                    i
+                                                                                                );
+                                                                                            }
+                                                                                        }}
+                                                                                    >
                                                                                         <div>
                                                                                             <div className="">
                                                                                                 <span>
@@ -1422,70 +1498,145 @@ export default function ModalChatMessage({
                                                             You
                                                         </AccordionTitle>
                                                         <AccordionContent>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                The main
-                                                                difference is
-                                                                that the core
-                                                                components from
-                                                                Flowbite are
-                                                                open source
-                                                                under the MIT
-                                                                license, whereas
-                                                                Tailwind UI is a
-                                                                paid product.
-                                                                Another
-                                                                difference is
-                                                                that Flowbite
-                                                                relies on
-                                                                smaller and
-                                                                standalone
-                                                                components,
-                                                                whereas Tailwind
-                                                                UI offers
-                                                                sections of
-                                                                pages.
-                                                            </p>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                However, we
-                                                                actually
-                                                                recommend using
-                                                                both Flowbite,
-                                                                Flowbite Pro,
-                                                                and even
-                                                                Tailwind UI as
-                                                                there is no
-                                                                technical reason
-                                                                stopping you
-                                                                from using the
-                                                                best of two
-                                                                worlds.
-                                                            </p>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                Learn more about
-                                                                these
-                                                                technologies:
-                                                            </p>
-                                                            <ul className="list-disc pl-5 text-gray-500 dark:text-gray-400">
-                                                                <li>
-                                                                    <a
-                                                                        href="https://flowbite.com/pro/"
-                                                                        className="text-cyan-600 hover:underline dark:text-cyan-500"
-                                                                    >
-                                                                        Flowbite
-                                                                        Pro
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a
-                                                                        href="https://tailwindui.com/"
-                                                                        rel="nofollow"
-                                                                        className="text-cyan-600 hover:underline dark:text-cyan-500"
-                                                                    >
-                                                                        Tailwind
-                                                                        UI
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
+                                                            <div>
+                                                                {dataChatDetailUser?.length ===
+                                                                0 ? (
+                                                                    <>
+                                                                        <div className="text-xs text-red-500">
+                                                                            <span>
+                                                                                There
+                                                                                are
+                                                                                no
+                                                                                chats
+                                                                                mention
+                                                                                you
+                                                                            </span>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    dataChatDetailUser?.map(
+                                                                        (
+                                                                            chatDetailUser: any,
+                                                                            i: number
+                                                                        ) => {
+                                                                            return (
+                                                                                <div
+                                                                                    key={
+                                                                                        i
+                                                                                    }
+                                                                                    className={
+                                                                                        showContext.visible ===
+                                                                                            true &&
+                                                                                        activeIndex ===
+                                                                                            i
+                                                                                            ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                            : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
+                                                                                    }
+                                                                                >
+                                                                                    <div
+                                                                                        className="flex justify-between items-center"
+                                                                                        // onClick={(
+                                                                                        //     e
+                                                                                        // ) => {
+                                                                                        //     e.preventDefault();
+                                                                                        //     if (
+                                                                                        //         showContext.visible !==
+                                                                                        //         true
+                                                                                        //     ) {
+                                                                                        //         getMessageChatByTypeId(
+                                                                                        //             pinChat.CHAT_ID
+                                                                                        //         );
+                                                                                        //         getDataParticipantById(
+                                                                                        //             pinChat.CHAT_ID
+                                                                                        //         );
+                                                                                        //         setFlagPlugin(
+                                                                                        //             false
+                                                                                        //         );
+                                                                                        //         setData(
+                                                                                        //             {
+                                                                                        //                 ...data,
+                                                                                        //                 CHAT_ID:
+                                                                                        //                     pinChat.CHAT_ID,
+                                                                                        //             }
+                                                                                        //         );
+                                                                                        //         setDataAddParticipant(
+                                                                                        //             {
+                                                                                        //                 ...dataAddParticipant,
+                                                                                        //                 CHAT_ID:
+                                                                                        //                     pinChat.CHAT_ID,
+                                                                                        //             }
+                                                                                        //         );
+                                                                                        //     }
+                                                                                        // }}
+                                                                                        // onContextMenu={(
+                                                                                        //     e: any
+                                                                                        // ) => {
+                                                                                        //     if (
+                                                                                        //         pinChat?.CREATED_PIN_CHAT_BY ===
+                                                                                        //         auth
+                                                                                        //             .user
+                                                                                        //             .id
+                                                                                        //     ) {
+                                                                                        //         handleContextMenu(
+                                                                                        //             e,
+                                                                                        //             pinChat.CHAT_ID,
+                                                                                        //             "unpin"
+                                                                                        //         );
+                                                                                        //         setActiveIndex(
+                                                                                        //             i
+                                                                                        //         );
+                                                                                        //     } else {
+                                                                                        //         handleContextMenu(
+                                                                                        //             e,
+                                                                                        //             pinChat.CHAT_ID,
+                                                                                        //             "pin"
+                                                                                        //         );
+                                                                                        //         setActiveIndex(
+                                                                                        //             i
+                                                                                        //         );
+                                                                                        //     }
+                                                                                        // }}
+                                                                                    >
+                                                                                        <div>
+                                                                                            <div className="">
+                                                                                                <span>
+                                                                                                    {
+                                                                                                        chatDetailUser
+                                                                                                            ?.t_chat
+                                                                                                            .CHAT_TITLE
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            <div className="text-xs text-gray-400">
+                                                                                                <span>
+                                                                                                    Message
+                                                                                                    mention:
+                                                                                                    {" " +
+                                                                                                        chatDetailUser
+                                                                                                            ?.t_chat_detail
+                                                                                                            .CHAT_DETAIL_TEXT}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            {/* <div className="text-[10px]">
+                                                                                                <span>
+                                                                                                    {chatDetailUser
+                                                                                                        ?.t_user
+                                                                                                        .name +
+                                                                                                        " - " +
+                                                                                                        format(
+                                                                                                            chatDetailUser.CREATED_CHAT_DATE,
+                                                                                                            "dd-MM-yyyy"
+                                                                                                        )}
+                                                                                                </span>
+                                                                                            </div> */}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                )}
+                                                            </div>
                                                         </AccordionContent>
                                                     </AccordionPanel>
                                                     <AccordionPanel>
