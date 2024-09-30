@@ -234,13 +234,39 @@ export default function FormGeneral({
             .catch((err) => console.log(err));
     };
 
+    // const handleSwitchCoBroking = () => {
+    //     const response = updatePolicyCoBroking({
+    //         policyId: policy.POLICY_ID,
+    //         coBroking: !switchCoBroking,
+    //     });
+    //     // console.log('msg: ',response);
+    //     setSwitchCoBroking(!switchCoBroking);
+    // };
     const handleSwitchCoBroking = () => {
-        const response = updatePolicyCoBroking({
-            policyId: policy.POLICY_ID,
-            coBroking: !switchCoBroking,
-        });
-        // console.log('msg: ',response);
-        setSwitchCoBroking(!switchCoBroking);
+        !switchCoBroking == false
+            ? Swal.fire({
+                  title: "Are you sure to Delete Co Broking?",
+                  text: "You won't be able to revert this!",
+                  width: 400,
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#3085d6",
+                  cancelButtonColor: "#d33",
+                  confirmButtonText: "Yes, delete it!",
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      const response = updatePolicyCoBroking({
+                          policyId: policy.POLICY_ID,
+                          coBroking: !switchCoBroking,
+                      });
+                      setSwitchCoBroking(!switchCoBroking);
+                  }
+              })
+            : (updatePolicyCoBroking({
+                  policyId: policy.POLICY_ID,
+                  coBroking: !switchCoBroking,
+              }),
+              setSwitchCoBroking(!switchCoBroking));
     };
 
     const mappingCoBroking = (policy_id: number) => {

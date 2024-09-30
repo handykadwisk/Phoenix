@@ -106,31 +106,12 @@ class CoBrokingController extends Controller
         if ($updateCoBroking) {
             if (!$request->input('coBroking')) {
                 // jika false maka update Delete data di MPolicyCoBroking berdasarkan POLICY_ID
-                echo "harusnya false ";
                 MPolicyCoBroking::where('POLICY_ID', $request->input('policyId'))->delete();
             }
         }
-
-        // dd($request);
-        
-        // Created Log
-        // UserLog::create([
-        //     'created_by' => Auth::user()->id,
-        //     'action'     => json_encode([
-        //         "description" => "Created/Update (Co Broking).",
-        //         "module"      => "Co Broking",
-        //         "id"          => $arrCoBrokingId
-        //     ]),
-        //     'action_by'  => Auth::user()->id
-        // ]);
         return response()->json([
             "Success Updated Co Broking"
         ]);
 
-        // return new JsonResponse([
-        //     "msg" => "Success Updated Co Broking"
-        // ], 201, [
-        //     'X-Inertia' => true
-        // ]);
     }
 }
