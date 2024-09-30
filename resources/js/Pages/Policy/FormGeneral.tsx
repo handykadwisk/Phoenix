@@ -95,6 +95,7 @@ export default function FormGeneral({
         getDataForSummary();
         getSummaryFinancial(policy.POLICY_ID);
         getCoa();
+        setSwitchCoBroking(policy.CO_BROKING);
     }, [policy.POLICY_ID]);
 
     const getDetailPolicy = async (id: number) => {
@@ -223,7 +224,22 @@ export default function FormGeneral({
     //     setSwitchCoBroking(policy.CO_BROKING ? true : false);
     // };
 
+    const updatePolicyCoBroking = (data: any) => {
+        axios
+            .post(`/updatePolicyCoBroking?`, data)
+            .then((res) => {
+                // console.log('msg: ',res);
+                return res;
+            })
+            .catch((err) => console.log(err));
+    };
+
     const handleSwitchCoBroking = () => {
+        const response = updatePolicyCoBroking({
+            policyId: policy.POLICY_ID,
+            coBroking: !switchCoBroking,
+        });
+        // console.log('msg: ',response);
         setSwitchCoBroking(!switchCoBroking);
     };
 
@@ -263,16 +279,34 @@ export default function FormGeneral({
 
     };
 
+    const [deletedCoBroking, setDeletedCoBroking] = useState<any>([]);
+
     const deleteRowCoBroking = (i: number) => {
         const items = [...dataCoBroking];
         items.splice(i, 1);
+        if (dataCoBroking[i].CO_BROKING_ID != "") {
+            if (dataCoBroking.deletedCoBroking) {
+                setDeletedCoBroking([
+                    ...deletedCoBroking,
+                    { CO_BROKING_ID: dataCoBroking[i].CO_BROKING_ID },
+                ]);
+            } else {
+                setDeletedCoBroking([
+                    ...deletedCoBroking,
+                    { CO_BROKING_ID: dataCoBroking[i].CO_BROKING_ID },
+                ]);
+            }
+        }
+
         setDataCoBroking(items);
     };
 
-    console.log("dataCoBroking: ", dataCoBroking);
+    // console.log("deletedCoBroking: ", deletedCoBroking);
+
 
     const handleSuccessCoBroking = (message: any) => {
         setIsSuccess("");
+        // console.log("message.msg: ", message.msg);
         if (message != "") {
             setIsSuccess(message.msg);
             setTimeout(() => {
@@ -283,6 +317,7 @@ export default function FormGeneral({
             addCoBroking: !modalCoBroking.addCoBroking,
         });
         setDataCoBroking([]);
+        setDeletedCoBroking([]);
     };
     // End Add Co Broking
 
@@ -3599,11 +3634,15 @@ export default function FormGeneral({
                     setModalCoBroking({
                         addCoBroking: false,
                     });
-                    setDataCoBroking([]);
+                    setDataCoBroking([]), setDeletedCoBroking([]);
                 }}
-                title={"Update Co Broking"}
+                title={"Co Broking"}
                 url={`/insertCoBroking`}
-                data={dataCoBroking}
+                // data={dataCoBroking}
+                data={[
+                    { dataCoBroking: dataCoBroking },
+                    { deletedCoBroking: deletedCoBroking },
+                ]}
                 onSuccess={handleSuccessCoBroking}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-4 sm:w-full sm:max-w-lg lg:max-w-6xl"
@@ -3622,7 +3661,7 @@ export default function FormGeneral({
                                                 Participant
                                             </th>
                                             <th className="text-center md:p-4 p-0 md:w-52  border-r border-gray-300">
-                                                Proporsional Co Broking %
+                                                Proporsional (%)
                                             </th>
                                             <th className="text-center md:p-4 p-0 md:w-28  border-r border-gray-300">
                                                 Is Leader
@@ -11561,38 +11600,47 @@ export default function FormGeneral({
                         {/* All Information */}
                         <div className="rounded-lg bg-white px-4 py-5 shadow-md col-span-2 sm:p-6 xs:col-span-1 md:col-span-2">
                             <div className="w-60">
-                                <InputLabel value="Self Insured" />
-
                                 <div className="grid grid-cols-5">
+                                    <div className="col-span-2">
+                                        <InputLabel value="Co Broking" />
+                                    </div>
                                     <div className="">
                                         <SwitchPage
                                             enabled={switchCoBroking}
-                                            onChangeButton={handleSwitchCoBroking}
+                                            onChangeButton={
+                                                handleSwitchCoBroking
+                                            }
                                         />
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4 mb-8">
-                                <div className="border-b-2 w-fit font-semibold text-lg">
-                                    <span>Co Broking Participant</span>
-                                </div>
-                                <div className="flex gap-2 mt-4">
-                                    <div>
-                                        <button
-                                            type="button"
-                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
-                                            onClick={() => {
-                                                handleAddCoBroking(
-                                                    policy.POLICY_ID
-                                                );
-                                            }}
-                                        >
-                                            Update Co Broking
-                                        </button>
+                            {switchCoBroking ? (
+                                <>
+                                    <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4 mb-8">
+                                        <div className="border-b-2 w-fit font-semibold text-lg">
+                                            <span>Co Broking Participant</span>
+                                        </div>
+                                        <div className="flex gap-2 mt-4">
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-sm text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-opacity-90 sm:mt-0 sm:w-auto "
+                                                    onClick={() => {
+                                                        handleAddCoBroking(
+                                                            policy.POLICY_ID
+                                                        );
+                                                    }}
+                                                >
+                                                    Co Broking
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="w-full mt-4 align-middle"></div>
                                     </div>
-                                </div>
-                                <div className="w-full mt-4 align-middle"></div>
-                            </div>
+                                </>
+                            ) : (
+                                ""
+                            )}
 
                             <div className="bg-white shadow-md rounded-md p-4 max-w-full ml-4">
                                 <div className="border-b-2 w-fit font-semibold text-lg">

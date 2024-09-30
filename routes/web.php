@@ -46,7 +46,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
-use App\Models\MPolicyCoBroking;
 use App\Models\TCompanyDivision;
 
 Route::get('/', function () {
@@ -554,6 +553,7 @@ Route::middleware('auth')->group(function () {
     // Co Broking
     Route::post('/insertCoBroking', [CoBrokingController::class, 'store'])->name('policyCoBroking.store');
     Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
+    Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
 
 
 

@@ -53,6 +53,21 @@ export default function Index({ auth }: PageProps) {
          axios
              .get(`/getAttendanceSetting`)
              .then((res) => {
+                //  {
+                //     //  res.data.data
+                //     //      ?.filter((list: any) => list.ATTENDANCE_TYPE != null)
+                //     //      .map((result: any, i: number) => {
+                //     //          console.log("list: ", i, " : ", list);
+                //     //          console.log("ddddmmm: ", i, " : ", result);
+                //     //      });
+                //      console.log(
+                //          "list: ",
+                //          res.data.data?.filter(
+                //              (list: any) => list.ATTENDANCE_TYPE != null
+                //          )
+                //      );
+                 
+                //  }
                  setDataAttendanceSetting(res.data.data);
              })
              .catch((err) => {
@@ -345,7 +360,7 @@ export default function Index({ auth }: PageProps) {
                                         />
                                     </div>
                                 </div>
-                                <div className="relative">
+                                <div className="relative hidden">
                                     <InputLabel
                                         className="absolute"
                                         value={"Effective Last"}
@@ -660,9 +675,7 @@ export default function Index({ auth }: PageProps) {
                                         className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         // value={data.ATTENDANCE_TYPE}
                                         onChange={(e) => {
-                                            handleSelectCompany(
-                                                e.target.value
-                                            );
+                                            handleSelectCompany(e.target.value);
                                         }}
                                     >
                                         <option value={""}>
@@ -759,24 +772,23 @@ export default function Index({ auth }: PageProps) {
                                                                     </i>{" "}
                                                                     --
                                                                 </option>
-                                                                {dataAttendanceSetting.map(
+                                                                {attendanceType.map(
                                                                     (
-                                                                        item: any,
-                                                                        k: number
+                                                                        type: any,
+                                                                        i: number
                                                                     ) => {
                                                                         return (
                                                                             <option
                                                                                 key={
-                                                                                    k
+                                                                                    i
                                                                                 }
                                                                                 value={
-                                                                                    item.ATTENDANCE_TYPE
+                                                                                    type.ID
                                                                                 }
                                                                             >
-                                                                                {item.ATTENDANCE_TYPE ==
-                                                                                0
-                                                                                    ? "Fix Work Schedule"
-                                                                                    : "Shift Work Schedule"}
+                                                                                {
+                                                                                    type.NAME
+                                                                                }
                                                                             </option>
                                                                         );
                                                                     }
@@ -809,27 +821,39 @@ export default function Index({ auth }: PageProps) {
                                                                     </i>{" "}
                                                                     --
                                                                 </option>
-                                                                {dataAttendanceSetting.map(
-                                                                    (
-                                                                        item: any,
-                                                                        k: number
-                                                                    ) => {
-                                                                        return (
-                                                                            <option
-                                                                                key={
-                                                                                    k
-                                                                                }
-                                                                                value={
-                                                                                    item.ATTENDANCE_SETTING_ID
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    item.ATTENDANCE_NAME
-                                                                                }
-                                                                            </option>
-                                                                        );
-                                                                    }
-                                                                )}
+                                                                {data.ATTENDANCE_TYPE ==
+                                                                    0 ||
+                                                                data.ATTENDANCE_TYPE == 1
+                                                                    ? dataAttendanceSetting
+                                                                          ?.filter(
+                                                                              (
+                                                                                  list: any
+                                                                              ) =>
+                                                                                  list.ATTENDANCE_TYPE ==
+                                                                                  data.ATTENDANCE_TYPE
+                                                                          )
+                                                                          .map(
+                                                                              (
+                                                                                  result: any,
+                                                                                  i: number
+                                                                              ) => {
+                                                                                  return (
+                                                                                      <option
+                                                                                          key={
+                                                                                              i
+                                                                                          }
+                                                                                          value={
+                                                                                              result?.ATTENDANCE_SETTING_ID
+                                                                                          }
+                                                                                      >
+                                                                                          {
+                                                                                              result?.ATTENDANCE_NAME
+                                                                                          }
+                                                                                      </option>
+                                                                                  );
+                                                                              }
+                                                                          )
+                                                                    : ""}
                                                             </select>
                                                         </td>
                                                     </tr>

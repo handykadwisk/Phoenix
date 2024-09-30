@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MPolicyCoBroking;
+use App\Models\Policy;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,9 +46,11 @@ class CoBrokingController extends Controller
 
     public function store(Request $request)
     {        
-        // dd($request->input());
+        // dd($request);
+        $dataCoBroking = $request[0]['dataCoBroking'];
+        $deletedCoBroking = array_key_exists("1", $request->input()) ? $request[1]["deletedCoBroking"] : null;
         $arrCoBrokingId = [];
-        foreach ($request->input() as $key => $value) {
+        foreach ($dataCoBroking as $key => $value) {
             $data = [
                 'POLICY_ID' => $value["POLICY_ID"],
                 'RELATION_ID' => $value["RELATION_ID"],
@@ -63,17 +66,16 @@ class CoBrokingController extends Controller
                 echo "insert";
                 $id = MPolicyCoBroking::insertGetId($data);
             }
-            // $coBroking = $this->getCoBrokingByCoBrokingId($value['CO_BROKING_ID']);
-            // if ($coBroking) {
-            //     MPolicyCoBroking::where('CO_BROKING_ID', $value['CO_BROKING_ID'])->update($data);
-            //     $id = $value['CO_BROKING_ID'];
-            //     // ->delete();
-            // } else {
-            //     $id = MPolicyCoBroking::insertGetId($data);
-            // }
 
             array_push($arrCoBrokingId, $id);
-        }  
+        }
+        
+         // Deleted Co Broking By Id
+        if ($deletedCoBroking) {
+            foreach ($deletedCoBroking as $dels => $del) {
+                 MPolicyCoBroking::where('CO_BROKING_ID', $del['CO_BROKING_ID'])->delete();
+            }
+        }
       
         // Created Log
         UserLog::create([
@@ -87,10 +89,48 @@ class CoBrokingController extends Controller
         ]);
 
         return new JsonResponse([
-            // $attendanceSetting
             "msg" => "Success Updated Co Broking"
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+
+    public function updatePolicyCoBroking(Request $request)
+    {        
+        // dd($request);
+        // Update tabel t_policy
+        $updateCoBroking = Policy::where('POLICY_ID', $request->input('policyId'))
+                        ->update(['CO_BROKING' => $request->input('coBroking')]);
+
+        if ($updateCoBroking) {
+            if (!$request->input('coBroking')) {
+                // jika false maka update Delete data di MPolicyCoBroking berdasarkan POLICY_ID
+                echo "harusnya false ";
+                MPolicyCoBroking::where('POLICY_ID', $request->input('policyId'))->delete();
+            }
+        }
+
+        // dd($request);
+        
+        // Created Log
+        // UserLog::create([
+        //     'created_by' => Auth::user()->id,
+        //     'action'     => json_encode([
+        //         "description" => "Created/Update (Co Broking).",
+        //         "module"      => "Co Broking",
+        //         "id"          => $arrCoBrokingId
+        //     ]),
+        //     'action_by'  => Auth::user()->id
+        // ]);
+        return response()->json([
+            "Success Updated Co Broking"
+        ]);
+
+        // return new JsonResponse([
+        //     "msg" => "Success Updated Co Broking"
+        // ], 201, [
+        //     'X-Inertia' => true
+        // ]);
     }
 }
