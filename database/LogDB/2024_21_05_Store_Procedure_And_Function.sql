@@ -2,7 +2,8 @@
 SQLyog Ultimate v11.33 (64 bit)
 MySQL - 8.2.0 : Database - phoenix
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -1473,6 +1474,7 @@ UPDATE t_relation_structure SET RELATION_STRUCTURE_MAPPING=f_get_path_relation_s
 END IF;
 END */$$
 DELIMITER ;
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

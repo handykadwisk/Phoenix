@@ -39,6 +39,19 @@ import { set } from "react-datepicker/dist/date_utils";
 import ModalToEdit from "@/Components/Modal/ModalToEdit";
 import ModalToResetPassword from "@/Components/Modal/ModalToResetPassword";
 import AGGrid from "@/Components/AgGrid";
+import { Label } from "flowbite-react";
+
+type DataInputType = {
+    name: string;
+    email: string;
+    user_login: string;
+    password: string;
+    employee_id: number;
+    individual_relations_id: number;
+    type: number;
+    role: any[];
+    jobpost: any[]; // Add this line to define the jobpost property
+};
 
 export default function UserManagement({ auth, type }: any) {
     // console.log('auth', auth);
@@ -46,7 +59,54 @@ export default function UserManagement({ auth, type }: any) {
 
     useEffect(() => {
         getUser()
+        getAllUser()
+        getJobPost()
+        getEmployee()
     }, []);
+
+    const InitialData = {
+        name: "",
+        email: "",
+        user_login: "",
+        password: "",
+        employee_id: 0,
+        individual_relations_id: 0,
+        type: 0,
+        role: [],
+        Jobpost: 0
+    }
+
+    const [allData, setAllData] = useState<any>([InitialData]);
+    const getAllUser = async () => {
+        try {
+            const result = await axios.get('/user');
+            setAllData(result.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+
+    }
+    console.log(allData, '<<<<<allData');
+
+    const [jobpost, setJobpost] = useState<any>([])
+    const getJobPost = async () => {
+        try {
+            const res = await axios.get('/getAllJobpost')
+            setJobpost(res.data)
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+    // console.log('jobpost',jobpost);
+    const jobpostSelect = jobpost.map((el: any) => {
+        return {
+            value: el.jobpost_id,  // Ganti dengan properti yang sesuai
+            label: el.jobpost_name   // Ganti dengan properti yang sesuai
+        };
+    });
+    console.log(jobpostSelect, 'jobpostttt');
+
 
     //type DataInput
     interface DataInputType {
@@ -57,6 +117,7 @@ export default function UserManagement({ auth, type }: any) {
         employee_id: number,
         individual_relations_id: number,
         type: any,
+        jobpost: number,
         role: number[]
     }
 
@@ -75,18 +136,20 @@ export default function UserManagement({ auth, type }: any) {
         employee_id: 0,
         individual_relations_id: 0,
         type: 2,
+        jobpost: 0,
         role: []
+
     })
     const [dataUserId, setDataUserId] = useState<any>([])
     const [dataUser, setDataUser] = useState<any>([]);
     const [searchUser, setSearchUser] = useState<any>({
-       user_search:[
-              {
+        user_search: [
+            {
                 name: "",
-                id:"",
-                flag:'flag'
-              }
-       ]
+                id: "",
+                flag: 'flag'
+            }
+        ]
     });
     const [dataType, setDataType] = useState<any>([])
     const [dataRole, setDataRole] = useState<any>([])
@@ -137,6 +200,15 @@ export default function UserManagement({ auth, type }: any) {
         }));
     };
 
+    //handlechangejobpost
+    const handleJobpostChange = (selectedOption: any) => {
+        setDataInput((prevState) => ({
+            ...prevState,
+            jobpost: selectedOption ? selectedOption.value : null // Jika tidak ada pilihan, set null
+        }));
+    };
+
+
     //handle change email
     const handleUserLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const user_login = e.target.value;
@@ -155,7 +227,8 @@ export default function UserManagement({ auth, type }: any) {
         setDataInputEdit({ ...dataInputEdit, user_login, name });
     };
 
-
+    console.log('dataInputEdit',dataInputEdit);
+    
     //fetch data user
     const getUser = async (pageNumber = "page=1") => {
         await axios
@@ -185,6 +258,7 @@ export default function UserManagement({ auth, type }: any) {
                 type: result.data.type,
                 user_status: result.data.user_status,
                 role: result.data.roles,
+                jobpost:result.data.jobpost_id
             });
         } catch (error) {
             console.log(error);
@@ -258,6 +332,8 @@ export default function UserManagement({ auth, type }: any) {
             console.error('Fetch error:', error);
         }
     }
+    console.log(employee, '<<<<<employee');
+    
 
     //get company  
     const [relation, setRelation] = useState<any>([]);
@@ -370,11 +446,11 @@ export default function UserManagement({ auth, type }: any) {
         if (searchUser.name !== "") {
             setSearchUser((prevState: any) => ({
                 ...prevState,
-                searchParam: searchUser.name, 
+                searchParam: searchUser.name,
             }));
             setIsSuccess("success");
         } else {
-            setIsSuccess("success"); 
+            setIsSuccess("success");
         }
     };
 
@@ -389,15 +465,16 @@ export default function UserManagement({ auth, type }: any) {
 
 
     const clearSearchUser = async (e: FormEvent) => {
-         // Kosongkan input pencarian
-         inputDataSearch("name", "", 0);
-         // Reset flag untuk menampilkan semua data
-         inputDataSearch("flag", "", 0);
-         setIsSuccess("Cleared");
+        // Kosongkan input pencarian
+        inputDataSearch("name", "", 0);
+        // Reset flag untuk menampilkan semua data
+        inputDataSearch("flag", "", 0);
+        setIsSuccess("Cleared");
     };
 
-    console.log(searchUser.searchParam, '<<<<<searchUser');
-    
+    // console.log(searchUser.searchParam, '<<<<<searchUser');
+
+    console.log('dataInput', dataInput);
 
 
     // console.log(searchUser.searchParam, '<<<<<searchUser');
@@ -432,6 +509,7 @@ export default function UserManagement({ auth, type }: any) {
                             employee_id: 0,
                             individual_relations_id: 0,
                             type: 2,
+                            jobpost: 0,
                             role: []
 
                         });
@@ -620,13 +698,44 @@ export default function UserManagement({ auth, type }: any) {
                                             isMultiple={true}
                                             placeholder={"Select"}
                                             isClearable={true}
-                                            value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id))}
+                                            value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id))||null}
                                             onChange={handleRoleChange}
                                             primaryColor={"red"}
 
                                         />
                                     </div>
                                 </div>
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="type"
+                                        value={'Job Post'}
+                                    />
+                                    <div className="ml-[4rem] text-red-600">*</div>
+                                    <div className="mb-2">
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-primary-pelindo`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={jobpostSelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select"}
+                                            isClearable={true}
+                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInput.jobpost) || null}
+                                            onChange={handleJobpostChange}
+                                            primaryColor={"red"}
+                                        />
+                                    </div>
+                                </div>
+
                             </>
                         )}
                         {/* role */}
@@ -718,6 +827,7 @@ export default function UserManagement({ auth, type }: any) {
                                         </select>
                                     </div>
                                     {/* Employee */}
+                                    
                                 </>
                             )}
 
@@ -825,10 +935,47 @@ export default function UserManagement({ auth, type }: any) {
 
                                         </div>
                                     </div>
+                                    <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="type"
+                                        value={'Job Post'}
+                                    />
+                                    <div className="ml-[4rem] text-red-600">*</div>
+                                    <div className="mb-2">
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-primary-pelindo`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={jobpostSelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select"}
+                                            isClearable={true}
+                                            onChange={(val: any) => {
+                                                const selectedJobpost = val ? val.value : null;
+                                                setDataInputEdit({
+                                                    ...dataInputEdit,
+                                                    jobpost: selectedJobpost,
+                                                });
+                                            }}
+                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInputEdit.jobpost) || null}
+                                            primaryColor={"red"}
+                                        />
+                                    </div>
+                                </div>
                                 </>
                             )}
+
                             <div className="flex items-center mt-4 ">
-                                <span className="mr-2 text-sm">User Status</span>
+                                <span className="mr-2 text-sm">Is Active</span>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -922,23 +1069,23 @@ export default function UserManagement({ auth, type }: any) {
 
                             value={searchUser.user_search[0].name}
 
-                            onChange={(e)=>{
+                            onChange={(e) => {
                                 inputDataSearch("name", e.target.value, 0)
                             }
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                  const title = searchUser.user_search[0].name;
-                                  const id = searchUser.user_search[0].id;
-                                  if (title || id) {
-                                    inputDataSearch("flag", title || id, 0);
-                                    setIsSuccess("success");
-                                  } else {
-                                    inputDataSearch("flag", "", 0);
-                                    setIsSuccess("Get All Job Post");
-                                  }
+                                    const title = searchUser.user_search[0].name;
+                                    const id = searchUser.user_search[0].id;
+                                    if (title || id) {
+                                        inputDataSearch("flag", title || id, 0);
+                                        setIsSuccess("success");
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Job Post");
+                                    }
                                 }
-                              }}
+                            }}
                             placeholder="Search User Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">

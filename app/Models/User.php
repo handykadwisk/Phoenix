@@ -47,7 +47,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected $with = ['employee'];
+    protected $with = ['employee','jobpost'];
 
     public function employee(): BelongsTo
     {
@@ -63,7 +63,6 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Menu::class, 'role_menu', 'role_id', 'menu_id');
     }
-
     
     public function type()
     {
@@ -72,5 +71,9 @@ class User extends Authenticatable
     
     public function additional() {
         return $this->hasOne(UserAdditional::class, 'user_id');
+    }
+
+    public function jobpost(){
+        return $this->belongsTo(TJobpost::class, 'jobpost_id');
     }
 }

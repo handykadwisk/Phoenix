@@ -142,7 +142,7 @@ export default function Jobpost({ auth }: PageProps) {
       console.log(error);
     }
   }
-  
+
 
   // end function get
 
@@ -347,89 +347,93 @@ export default function Jobpost({ auth }: PageProps) {
 
     return (
       <>
-      <li className="mb-2">
-        {/* Parent/Child Node */}
-        <div
-          className="flex items-center shadow-md p-2 rounded-md hover:bg-gray-300 cursor-pointer"
-          onClick={() => onJobpostClick(jobpost.jobpost_id)}
-        >
-          <span className="w-3 h-3 bg-red-400 rounded-full inline-block mr-2"></span>
-          <span>{jobpost?.jobpost_name}</span>
-          <div className="text-sm text-gray-500">
-            / Job Post
-          </div>
-        </div>
+        <li className="mb-2">
+          {/* Parent/Child Node */}
+          <div
+            className="flex items-center shadow-md p-2 rounded-md hover:bg-gray-300 cursor-pointer"
+            onClick={() => onJobpostClick(jobpost.jobpost_id)}
+          >
+            <span className="w-3 h-3 bg-red-400 rounded-full inline-block mr-2"></span>
+            {/* Teks Jobpost Name dengan conditional rendering */}
+            <span className={jobpost.jobpost_status === 0 ? "line-through" : ""}>
+              {jobpost?.jobpost_name}
+            </span>
 
-        {/* action button */}
-        {isSelected && (
+            <div className='text-sm text-gray-500'>
+              / Job Post
+            </div>
+          </div>
+
+          {/* action button */}
+          {isSelected && (
             <div className="ml-6 mt-2 flex gap-2">
 
-            <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
-              onClick={
-              () => {
-              setModal({ ...modal, edit: true, view: false });
-              setData({
-              ...data,
-              jobpost_id: jobpost.jobpost_id,
-              company_division_id: jobpost.company_division_id,
-              jobpost_parent: jobpost.jobpost_parent,
-              jobpost_name: jobpost.jobpost_name,
-              jobpost_description: jobpost.jobpost_description,
-              })
-              }
-              }>Edit</button>
+              <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
+                onClick={
+                  () => {
+                    setModal({ ...modal, edit: true, view: false });
+                    setData({
+                      ...data,
+                      jobpost_id: jobpost.jobpost_id,
+                      company_division_id: jobpost.company_division_id,
+                      jobpost_parent: jobpost.jobpost_parent,
+                      jobpost_name: jobpost.jobpost_name,
+                      jobpost_description: jobpost.jobpost_description,
+                    })
+                  }
+                }>Edit</button>
 
-            <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-700"
-              onClick={
-              () => {
-              setModal({ ...modal, detail: true, view: false });
-              setData({
-              ...data,
-              company_division_id: jobpost.company_division_id,
-              jobpost_parent: jobpost.jobpost_parent,
-              jobpost_name: jobpost.jobpost_name,
-              jobpost_description: jobpost.jobpost_description,
-              })
-              getJobpostDevId(jobpost.jobpost_id);
-              }
-              }>Detail</button>
+              <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-700"
+                onClick={
+                  () => {
+                    setModal({ ...modal, detail: true, view: false });
+                    setData({
+                      ...data,
+                      company_division_id: jobpost.company_division_id,
+                      jobpost_parent: jobpost.jobpost_parent,
+                      jobpost_name: jobpost.jobpost_name,
+                      jobpost_description: jobpost.jobpost_description,
+                    })
+                    getJobpostDevId(jobpost.jobpost_id);
+                  }
+                }>Detail</button>
 
-            {
-              jobpost.jobpost_status === 1 ? (
-              <button className=" bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-700" onClick={
-              () => {
-                setModal({ ...modal, status: true, view: false });
-                setData({
-                ...data,
-                jobpost_id: jobpost.jobpost_id,
-                jobpost_status: 0,
-                jobpost_name: jobpost.jobpost_name,
-                });
+              {
+                jobpost.jobpost_status === 1 ? (
+                  <button className=" bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-700" onClick={
+                    () => {
+                      setModal({ ...modal, status: true, view: false });
+                      setData({
+                        ...data,
+                        jobpost_id: jobpost.jobpost_id,
+                        jobpost_status: 0,
+                        jobpost_name: jobpost.jobpost_name,
+                      });
+                    }
+                  }>Set Inactive</button>
+                ) : (
+                  <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700"
+                    onClick={
+                      () => {
+                        setModal({ ...modal, status: true, view: false });
+                        setData({
+                          ...data,
+                          jobpost_id: jobpost.jobpost_id,
+                          jobpost_status: 1,
+                          jobpost_name: jobpost.jobpost_name,
+                        });
+                      }
+                    }>Set Active</button>
+                )
               }
-              }>Set Inactive</button>
-              ) : (
-              <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700"
-              onClick={
-              () => {
-                setModal({ ...modal, status: true, view: false });
-                setData({
-                ...data,
-                jobpost_id: jobpost.jobpost_id,
-                jobpost_status: 1,
-                jobpost_name: jobpost.jobpost_name,
-                });
-              }
-              }>Set Active</button>
-              )
-            }
 
             </div>
 
-         
-        )}
-      </li>
-          
-    </>
+
+          )}
+        </li>
+
+      </>
     );
   };
   // show jobpost
@@ -447,29 +451,29 @@ export default function Jobpost({ auth }: PageProps) {
         />
       )}
 
-       {/* Modal for status change confirmation */}
-       <ModalToAction
-              headers={'Content-Type: application/json'}
-              submitButtonName={'Confirm'}
-              method="POST"
-              show={modal.status}
-              onClose={() => {
-              setModal({ ...modal, status: false, view: true });
-              setData(InitalData);
-              }}
-              title={"Confirm Status Change"}
-              url={`/setJobpostStatus/${data.jobpost_id}/${data.jobpost_status}`}
-              onSuccess={handleSuccess}
-              classPanel={
-              "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
-              }
-              data={data}
-              body={
-              <div className="mt-4">
-                <p>Are you sure you want to {data.jobpost_status === 1 ? 'activate' : 'deactivate'} <b>{data.jobpost_name}</b>?</p>
-              </div>
-              }
-            />
+      {/* Modal for status change confirmation */}
+      <ModalToAction
+        headers={'Content-Type: application/json'}
+        submitButtonName={'Confirm'}
+        method="POST"
+        show={modal.status}
+        onClose={() => {
+          setModal({ ...modal, status: false, view: true });
+          setData(InitalData);
+        }}
+        title={"Confirm Status Change"}
+        url={`/setJobpostStatus/${data.jobpost_id}/${data.jobpost_status}`}
+        onSuccess={handleSuccess}
+        classPanel={
+          "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-2xl"
+        }
+        data={data}
+        body={
+          <div className="mt-4">
+            <p>Are you sure you want to {data.jobpost_status === 1 ? 'activate' : 'deactivate'} <b>{data.jobpost_name}</b>?</p>
+          </div>
+        }
+      />
 
       {/* Modal Add Job Post */}
       <ModalToAction
@@ -513,7 +517,7 @@ export default function Jobpost({ auth }: PageProps) {
                 htmlFor="Job Post Detail"
                 value="Job Post Detail"
               />
-              <TextInput
+              <TextArea
                 className="mt-2"
                 type="text"
                 id="Job Post Detail"
@@ -555,68 +559,6 @@ export default function Jobpost({ auth }: PageProps) {
         data={data}
         body={
           <>
-            {/* <div className="mt-4">
-              <InputLabel
-                className=""
-                htmlFor="company_division_id"
-                value="Company Division"
-              />
-
-              <SelectTailwind
-                classNames={{
-                  menuButton: () =>
-                    `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                  menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                  listItem: ({ isSelected }: any) =>
-                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                      ? `text-white bg-red-500`
-                      : `text-gray-500 hover:bg-red-500 hover:text-white`
-                    }`,
-                }}
-                options={mappingDivision}
-                isSearchable={true}
-                placeholder={"--Select Parent--"}
-                value={mappingDivision.find((option: { label: string; value: number }) => option.value === data.company_division_id) || null}
-                onChange={(option: any) =>
-                  setData({
-                    ...data,
-                    company_division_id: option.value,
-                  })
-                }
-                primaryColor={"bg-red-500"}
-              />
-
-            </div>
-            <div className="mt-4">
-              <InputLabel
-                className=""
-                htmlFor="jobpost_parent"
-                value="Parent Job Post"
-              />
-              <SelectTailwind
-                classNames={{
-                  menuButton: () =>
-                    `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                  menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                  listItem: ({ isSelected }: any) =>
-                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                      ? `text-white bg-red-500`
-                      : `text-gray-500 hover:bg-red-500 hover:text-white`
-                    }`,
-                }}
-                options={mappingParentJobpost}
-                isSearchable={true}
-                placeholder={"--Select Parent--"}
-                value={mappingParentJobpost?.find((option: { label: string; value: number }) => option.value === data.jobpost_parent) || null}
-                onChange={(option: any) =>
-                  setData({
-                    ...data,
-                    jobpost_parent: option.value,
-                  })
-                }
-                primaryColor={"bg-red-500"}
-              />
-            </div> */}
             {/* jobpost_name */}
             <div className="mt-4">
               <InputLabel
@@ -640,7 +582,7 @@ export default function Jobpost({ auth }: PageProps) {
                 htmlFor="Job Post Detail"
                 value="Job Post Description"
               />
-              <TextInput
+              <TextArea
                 className="mt-2"
                 id="Job Post Detail"
                 name="Job Post Description"
@@ -692,10 +634,10 @@ export default function Jobpost({ auth }: PageProps) {
           <>
             <div className="mt-4">
               <InputLabel
-                className=""
+                className="font-bold italic"
                 value="Company Division"
               />
-              <TextInput
+              {/* <TextInput
                 type="text"
                 value={jobpostDevId.company_division?.COMPANY_DIVISION_NAME}
                 className="mt-2"
@@ -703,33 +645,36 @@ export default function Jobpost({ auth }: PageProps) {
                 disabled
                 placeholder="Company Division"
 
-              />
+              /> */}
+              <span>{jobpostDevId.company_division?.COMPANY_DIVISION_NAME}</span>
             </div>
             {/* jobpost_name */}
             <div className="mt-4">
               <InputLabel
-                className="absolute"
+                className="font-bold italic"
                 value="Job Post Name"
               />
-              <div className="ml-[6.7rem] text-red-600">
+              {/* <div className="ml-[6.7rem] text-red-600">
                 *
-              </div>
-              <TextInput
+              </div> */}
+              {/* <TextInput
                 type="text"
                 value={data.jobpost_name}
                 className="mt-2"
                 onChange={(e) => setData({ ...data, jobpost_name: e.target.value })}
                 disabled
                 placeholder="Job Post Name"
-              />
+              /> */}
+              <span>{data.jobpost_name}</span>
             </div>
             <div className="mt-4">
               <InputLabel
                 htmlFor="Job Post Detail"
                 value="Job Post Description"
+                className="font-bold italic"
 
               />
-              <TextInput
+              {/* <TextInput
                 className="mt-2"
                 id="Job Post Detail"
                 name="Job Post Description"
@@ -752,7 +697,8 @@ export default function Jobpost({ auth }: PageProps) {
                 //     })
                 // }
                 placeholder="Description"
-              />
+              /> */}
+              <span>{data.jobpost_description}</span>
             </div>
 
 
@@ -778,25 +724,6 @@ export default function Jobpost({ auth }: PageProps) {
           <>
             <div className="mb-3">
               <ul>
-                {/* {detailJobpost.length > 0 ? (
-                  Array.from(
-                    new Set(
-                      detailJobpost
-                        .filter((jobpost: any) => jobpost.company_division?.COMPANY_DIVISION_NAME)
-                        .map((jobpost: any) => jobpost.company_division.COMPANY_DIVISION_NAME)
-                    )
-                  ).map((divisionName: any) => (
-                    <TreeDivision
-                      key={divisionName}
-                      divisionName={divisionName}
-                      jobposts={detailJobpost.filter(
-                        (jobpost: any) => jobpost.company_division?.COMPANY_DIVISION_NAME === divisionName
-                      )}
-                    />
-                  ))
-                ) : (
-                  <li>Tidak ada jobpost yang ditemukan.</li>
-                )} */}
                 {devJobpost.length > 0 ? (
                   Array.from(
                     new Set(

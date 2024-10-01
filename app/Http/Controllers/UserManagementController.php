@@ -196,6 +196,7 @@ extends Controller
             "user_login" => $request->user_login,
             "employee_id" => $request->employee_id,
             "user_type_id" => $typeInput,
+            'jobpost_id'=>$request->jobpost,
             "USER_UPDATED_BY" => Auth::user()->id,
             "USER_UPDATED_DATE" => now()
         ]);
@@ -240,5 +241,11 @@ extends Controller
         ], 200, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function getAllUser()
+    {
+        $users = User::all();
+        return response()->json($users);
     }
 }
