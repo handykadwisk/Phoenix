@@ -17,7 +17,7 @@ class TCompanyDivision extends Model
         'COMPANY_DIVISION_ID',
     ];
     
-    protected $with = ['toCompany','jobposts'];
+    protected $with = ['toCompany'];
 
     public $timestamps = false;
 

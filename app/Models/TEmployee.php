@@ -20,11 +20,11 @@ class TEmployee extends Model
 
     public $timestamps = false;
 
-    protected $with = ['division','jobpost'];
+    protected $with = ['division'];
 
-    public function jobpost(){
-        return $this->belongsTo(TJobpost::class,);
-    }
+    // public function jobpost(){
+    //     return $this->belongsTo(TJobpost::class,);
+    // }
     public function division(): BelongsTo
     {
         return $this->belongsTo(TCompanyDivision::class, 'DIVISION_ID');

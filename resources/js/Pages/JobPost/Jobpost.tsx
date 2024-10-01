@@ -32,6 +32,7 @@ import SelectTailwind from "react-tailwindcss-select";
 import AGGrid from "@/Components/AgGrid";
 import { set } from "react-datepicker/dist/date_utils";
 import { get } from "jquery";
+import { log } from "node:console";
 
 export default function Jobpost({ auth }: PageProps) {
 
@@ -50,12 +51,8 @@ export default function Jobpost({ auth }: PageProps) {
     jobpost_description: "",
   }
 
-  const [division, setDivision] = useState<any>([]);
-  const [detailJobpost, setDetailJobpost] = useState<any>([InitalData]);
   const [data, setData] = useState<any>(InitalData);
-  const [dataEdit, setDataEdit] = useState<any>(InitalData);
   const [isSuccess, setIsSuccess] = useState<any>("");
-  const [parentJobpost, setParentJobpost] = useState<any>([]);
   const [devJobpost, setDevJobpost] = useState<any>([]);
   const [company, setCompany] = useState<any>([]);
 
@@ -69,7 +66,8 @@ export default function Jobpost({ auth }: PageProps) {
       },
     ],
   });
-
+  console.log(data ,'inputttt');
+  
   const [modal, setModal] = useState<any>({
     add: false,
     addJob: false,
@@ -81,62 +79,27 @@ export default function Jobpost({ auth }: PageProps) {
 
   // function get
 
-  const getDivision = async () => {
-    try {
-      const res = await axios.get("/getAllDivisionCompany");
-      const data = res.data;
-      // console.log('dataDevision', data);
-
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const jobpostId = async (id: any) => {
-    try {
-      const res = await axios.get(`getjobpost/${id}`);
-      const data = res.data;
-      setDetailJobpost(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  const jobByCom = async (id: any) => {
-    try {
-      const res = await axios.get(`getJobpostByCom/${id}`);
-      const data = res.data;
-      setDetailJobpost(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const getParentJobpost = async () => {
-    try {
-      const res = await axios.get("/getAllJobpost");
-      const data = res.data;
-      setParentJobpost(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   //get jobpost with division
   const getJobpostDev = async () => {
     try {
       const res = await axios.get("/getJobpostByDiv");
       const data = res.data;
+      // console.log('dataaaaaa', data);
       setDevJobpost(data);
+      
     } catch (error) {
-      console.log(error);
+      console.log(error,'ini erorr');
     }
   }
+
   //get jobpost with division by id
   const [jobpostDevId, setJobpostDevId] = useState<any>({});
   const getJobpostDevId = async (id: number) => {
     try {
       const res = await axios.get(`/JobpostByDiv/${id}`);
       const data = res.data;
+      console.log(data[0],'<<<<<<<<<');
+      
       setJobpostDevId(data[0]);
     } catch (error) {
       console.log(error);
@@ -144,35 +107,6 @@ export default function Jobpost({ auth }: PageProps) {
   }
 
 
-  // end function get
-
-  const mappingDivision = division?.map((item: any) => {
-    if (item.COMPANY_DIVISION_NAME !== undefined) {
-      return {
-        label: item.COMPANY_DIVISION_NAME,
-        value: item.COMPANY_DIVISION_ID
-      }
-    } else {
-      return {
-        label: item.label,
-        value: item.value
-      }
-    }
-  })
-
-  const mappingParentJobpost = parentJobpost?.map((item: any) => {
-    if (item.jobpost_parent !== undefined) {
-      return {
-        label: item.jobpost_name,
-        value: item.jobpost_id
-      }
-    } else {
-      return {
-        label: item.label,
-        value: item.value
-      }
-    }
-  });
 
   const inputDataSearch = (
     name: string,
@@ -185,7 +119,6 @@ export default function Jobpost({ auth }: PageProps) {
   };
 
   const handleSuccess = (message: string) => {
-
     setIsSuccess('')
     if (message !== '') {
       setIsSuccess(message[0])
@@ -195,19 +128,6 @@ export default function Jobpost({ auth }: PageProps) {
     }
     getJobpostDev()
   }
-  // Fungsi yang dijalankan saat tombol Search ditekan atau Enter
-  const handleSearch = () => {
-    if (searchJobpost.jobpost_search[0].jobpost_title === "") {
-      // Jika input kosong, tampilkan semua data
-      inputDataSearch("flag", "", 0);
-    } else {
-      // Lakukan pencarian berdasarkan teks input
-      inputDataSearch("flag", searchJobpost.jobpost_search[0].jobpost_title, 0);
-      setIsSuccess("Search");
-
-    }
-    setIsSuccess("Search");
-  };
 
   // Fungsi untuk menghapus input pencarian dan menampilkan semua data
   const clearSearch = (e: React.MouseEvent) => {
@@ -221,56 +141,9 @@ export default function Jobpost({ auth }: PageProps) {
 
   const handleDetailJobpost = (data: any) => {
     setCompany(data);
-    // jobpostById(data.company_division.COMPANY_DIVISION_ID);
-    // setDetailJobpost(data.company_division);
-    jobByCom(data.COMPANY_ID);
     setModal({ ...modal, view: true });
     getJobpostDev()
   }
-
-
-  const [jobpost, setJobpost] = useState<any>([]);
-  const jobpostById = async (id: any) => {
-    try {
-      const res = await axios.get(`getjobpost/${id}`);
-      const data = res.data;
-      // console.log('data', data);
-      setJobpost(data);
-      // setDetailJobpost(response.data.data);
-    } catch (error) {
-      console.log(error);
-
-    }
-  }
-
-  const editJobpost = async (data: any) => {
-    // console.log('data', data);
-
-    // try {
-    //   const res = await axios.get(`getjobpost/${data}`);
-    //   const response = res.data;
-    //   setDetailJobpost(response.data);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  const handleStatusChange = async (id: number, status: number) => {
-    try {
-      const res = await axios.post(`/setJobpostStatus/${id}/${status}`);
-      const data = res.data;
-      if (data.message !== '') {
-        setIsSuccess(data.message)
-        setTimeout(() => {
-          setIsSuccess('')
-        }, 5000)
-      }
-      getJobpostDev()
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
 
   // Komponen utama yang menampilkan divisi dan jobpost-nya
   const TreeDivision: React.FC<{ divisionName: string; jobposts: any[] }> = ({ divisionName, jobposts }) => {
@@ -593,21 +466,9 @@ export default function Jobpost({ auth }: PageProps) {
                     jobpost_description: e.target.value,
                   })
                 }
-                // defaultValue={
-                //     data.RELATION_GROUP_DESCRIPTION
-                // }
-                // onChange={(e: any) =>
-                //     setData({
-                //         ...data,
-                //         RELATION_GROUP_DESCRIPTION:
-                //             e.target.value,
-                //     })
-                // }
                 placeholder="Description"
               />
             </div>
-
-
           </>
         }
       />
@@ -637,15 +498,6 @@ export default function Jobpost({ auth }: PageProps) {
                 className="font-bold italic"
                 value="Company Division"
               />
-              {/* <TextInput
-                type="text"
-                value={jobpostDevId.company_division?.COMPANY_DIVISION_NAME}
-                className="mt-2"
-                onChange={(e) => setData({ ...data, company_division_id: e.target.value })}
-                disabled
-                placeholder="Company Division"
-
-              /> */}
               <span>{jobpostDevId.company_division?.COMPANY_DIVISION_NAME}</span>
             </div>
             {/* jobpost_name */}
@@ -654,17 +506,6 @@ export default function Jobpost({ auth }: PageProps) {
                 className="font-bold italic"
                 value="Job Post Name"
               />
-              {/* <div className="ml-[6.7rem] text-red-600">
-                *
-              </div> */}
-              {/* <TextInput
-                type="text"
-                value={data.jobpost_name}
-                className="mt-2"
-                onChange={(e) => setData({ ...data, jobpost_name: e.target.value })}
-                disabled
-                placeholder="Job Post Name"
-              /> */}
               <span>{data.jobpost_name}</span>
             </div>
             <div className="mt-4">
@@ -672,36 +513,9 @@ export default function Jobpost({ auth }: PageProps) {
                 htmlFor="Job Post Detail"
                 value="Job Post Description"
                 className="font-bold italic"
-
               />
-              {/* <TextInput
-                className="mt-2"
-                id="Job Post Detail"
-                name="Job Post Description"
-                value={data.jobpost_description}
-                onChange={(e: any) =>
-                  setData({
-                    ...data,
-                    jobpost_description: e.target.value,
-                  })
-                }
-                disabled
-                // defaultValue={
-                //     data.RELATION_GROUP_DESCRIPTION
-                // }
-                // onChange={(e: any) =>
-                //     setData({
-                //         ...data,
-                //         RELATION_GROUP_DESCRIPTION:
-                //             e.target.value,
-                //     })
-                // }
-                placeholder="Description"
-              /> */}
               <span>{data.jobpost_description}</span>
             </div>
-
-
           </>
         }
       />
@@ -755,13 +569,11 @@ export default function Jobpost({ auth }: PageProps) {
 
       <div className="grid grid-cols-4 py-4 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
         <div className="flex flex-col">
-          <div className="bg-white mb-4 rounded-md p-4">
+          <div className="bg-white mb-4 rounded-md p-4 hidden">
             <div
               className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer hidden"
               onClick={() => {
                 setModal({ ...modal, add: true });
-                getDivision();
-                getParentJobpost();
               }}
             >
               <span>Add Job Post</span>
@@ -831,11 +643,11 @@ export default function Jobpost({ auth }: PageProps) {
               addButtonLabel={null}
               addButtonModalState={undefined}
               withParam={null}
-              searchParam={searchJobpost.jobpost_search}
+              searchParam={null}
               // loading={isLoading.get_policy}
-              url={"getjobpost"}
+              url={"getCompany"}
               doubleClickEvent={handleDetailJobpost}
-              triggeringRefreshData={isSuccess}
+              triggeringRefreshData={''}
               colDefs={[
                 {
                   headerName: "No.",

@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.33 (64 bit)
-MySQL - 8.2.0 : Database - phoenix
+MySQL - 8.2.0 : Database - phoenixtest
 *********************************************************************
 */
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('t_job_posts', function (Blueprint $table) {
-            $table->increments('jobpost_id')->primary()->unique();
+            $table->increments('jobpost_id');
             $table->unsignedBigInteger('company_division_id')->nullable();
             $table->string('jobpost_name', 255)->nullable();
             $table->text('jobpost_description')->nullable();
@@ -21,8 +21,7 @@ return new class extends Migration
             $table->bigInteger('jobpost_created_by')->nullable();
             $table->timestamp('jobpost_created_date')->default(\DB::raw('CURRENT_TIMESTAMP'));
             $table->bigInteger('jobpost_updated_by')->nullable();
-            $table->timestamp('jobpost_updated_date')->default(\DB::raw('CURRENT_TIMESTAMP'));
-            $table->foreign('company_division_id')->references('COMPANY_DIVISION_NAME')->on('t_company_division')->onDelete('set null');
+            $table->timestamp('jobpost_updated_date')->default(\DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
     }
 

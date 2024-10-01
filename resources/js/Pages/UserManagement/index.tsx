@@ -61,7 +61,7 @@ export default function UserManagement({ auth, type }: any) {
         getUser()
         getAllUser()
         getJobPost()
-        getEmployee()
+        // getEmployee()
     }, []);
 
     const InitialData = {
