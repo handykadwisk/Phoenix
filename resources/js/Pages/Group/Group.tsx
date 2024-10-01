@@ -67,7 +67,7 @@ export default function Group({ auth }: PageProps) {
             value: query.RELATION_GROUP_ID,
             label: query.text_combo,
         };
-    });
+    }); 
 
     // Get Relation Group
     const getRelationGroup = async (pageNumber = "page=1") => {

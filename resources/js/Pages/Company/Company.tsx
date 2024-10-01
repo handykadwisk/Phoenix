@@ -398,6 +398,7 @@ export default function Company({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
+                
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid

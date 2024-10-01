@@ -54,6 +54,11 @@ class TCompanyDivisionController extends Controller
         $data = $this->getCompanyDivisionData($request);
         return response()->json($data);
     }
+    
+    public function getAllDivisionCompanyJson(){
+        $data = TCompanyDivision::with('toCompany')->with('parent')->get();
+        return response()->json($data);
+    }
 
     public function getDivisionComboCompany(Request $request){
         $data = DB::select('call sp_combo_company_division(?)', [$request->id]);

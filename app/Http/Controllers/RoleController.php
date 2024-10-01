@@ -27,23 +27,62 @@ class RoleController extends Controller
         return response()->json($data);
     }
 
-    public function getRoleData($dataPerPage = 5, $searchQuery = null)
+    public function getRoleData($request)
     {
 
-        $data = Role::orderBy('id', 'DESC');
-        if ($searchQuery) {
-            if ($searchQuery->input('role_name')) {
-                $data->where('role_name', 'like', '%' . $searchQuery->role_name . '%');
+        // $data = Role::orderBy('id', 'DESC');
+        // if ($searchQuery) {
+        //     if ($searchQuery->input('role_name')) {
+        //         $data->where('role_name', 'like', '%' . $searchQuery->role_name . '%');
+        //     }
+        // }
+        // // dd($data->toSql());
+        // return $data->paginate($dataPerPage);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = Role::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newFilter = $request->input('newFilter', '');
+        $newSearch = json_decode($request->newFilter, true);
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
         }
-        // dd($data->toSql());
-        return $data->paginate($dataPerPage);
+
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+            }
+        }
+        // Jika ada filter 'newFilter' dan tidak kosong
+        if ($newFilter !== "") {
+            foreach ($newSearch as $search) {
+            foreach ($search as $keyId => $searchValue) {
+                // Pencarian berdasarkan nama menu
+                if ($keyId === 'role_name') {
+                $query->where('role_name', 'LIKE', '%' . $searchValue . '%');
+                }
+            }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
     public function getRoleJson(Request $request)
     {
-        $data = $this->getRoleData(5, $request);
+        // $data = $this->getRoleData(5, $request);
 
+        // return response()->json($data);
+        $data = $this->getRoleData($request);
         return response()->json($data);
     }
 
@@ -65,13 +104,12 @@ class RoleController extends Controller
                 "module"      => "Role",
                 "id"          => $Role->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
-            $Role->id,
-            $Role->role_name
+            'New role added.'
         ], 201, [
             'X-Inertia' => true
         ]);

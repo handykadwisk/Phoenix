@@ -78,6 +78,7 @@ class RelationController extends Controller
 
     public function getRelationData($request)
     {
+        // dd($request);
         // dd(json_decode($request->newFilter, true));
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -122,39 +123,11 @@ class RelationController extends Controller
             }
         }
 
-        // if ($filterModel) {
-        //     foreach ($filterModel as $colId => $filterValue) {
-        //         if ($colId === 'policy_number') {
-        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
-        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
-        //         } elseif ($colId === 'policy_inception_date') {
-        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
-        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
-        //         }
-        //     }
-        // }
-        // dd($query->toSql());
+      
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
 
-        // $RType = $searchQuery->RELATION_TYPE_ID;
-        // $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->with('PreSalutation')->with('PostSalutation');
-        // // print_r($data);
-        // if ($searchQuery) {
-        //     if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
-        //         $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
-        //     }
-        //     if ($searchQuery->input('RELATION_TYPE_ID')) {
-        //         $data->whereHas('mRelationType', function($q) use($RType) {
-        //             // Query the name field in status table
-        //             $q->where('RELATION_TYPE_ID', 'like', '%'.$RType.'%');
-        //      });
-        //     }
-        // }
-        //     // dd($data->get());
-
-        //     return $data->paginate($dataPerPage);
     }
 
     // Get All Relation Type

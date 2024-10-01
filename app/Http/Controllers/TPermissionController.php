@@ -18,22 +18,48 @@ class TPermissionController extends Controller
     }
 
     // Get Data Paginate and Search
-    public function getPermissionData($dataPerPage = 5, $searchQuery = null){
+    public function getPermissionData($request){
 
-        $data = TPermission::orderBy('PERMISSION_ID', 'DESC');
-        if ($searchQuery) {
-            if ($searchQuery->input('PERMISSION_NAME')) {
-                    $data->where('PERMISSION_NAME', 'like', '%'.$searchQuery->PERMISSION_NAME.'%');
+        // $data = TPermission::orderBy('PERMISSION_ID', 'DESC');
+        // if ($searchQuery) {
+        //     if ($searchQuery->input('PERMISSION_NAME')) {
+        //             $data->where('PERMISSION_NAME', 'like', '%'.$searchQuery->PERMISSION_NAME.'%');
+        //     }
+        // } 
+        // // dd($data->toSql());
+        // return $data->paginate($dataPerPage);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = TPermission::orderBy('PERMISSION_ID', 'DESC');
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
-        } 
-        // dd($data->toSql());
-        return $data->paginate($dataPerPage);
+        }
+
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
     // Get Data Permission
     public function getPermissionJson(Request $request){
-        $data = $this->getPermissionData(5, $request);
+        // $data = $this->getPermissionData(5, $request);
         
+        // return response()->json($data);
+        $data = $this->getPermissionData($request);
         return response()->json($data);
     }
 
@@ -62,8 +88,7 @@ class TPermissionController extends Controller
 
 
         return new JsonResponse([
-            $permission->PERMISSION_ID,
-            $permission->PERMISSION_NAME
+            'New permission added.'
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -98,9 +123,8 @@ class TPermissionController extends Controller
 
 
         return new JsonResponse([
-            $request->PERMISSION_ID,
-            $request->PERMISSION_NAME
-        ], 201, [
+            'Permission has been updated.'
+        ], 200, [
             'X-Inertia' => true
         ]);
     }

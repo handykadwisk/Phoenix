@@ -823,6 +823,9 @@ export default function DetailGroup({
             edit: !modalChangeSubGroup.edit,
         });
     };
+
+    console.log('dataRelationGroupNew',dataRelationGroupNew);
+    
     return (
         <>
             {/* modal detail  */}
@@ -865,7 +868,7 @@ export default function DetailGroup({
                 dataDetailGroups={dataDetailSubGroupParent}
                 handleSuccessEdit={handleSuccessEdit}
             />
-
+            
             <ModalToAdd
                 show={modalChangeParent.edit}
                 buttonAddOns={""}

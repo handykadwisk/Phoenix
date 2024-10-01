@@ -27,4 +27,9 @@ class TCompanyDivision extends Model
     {
         return $this->belongsTo(TCompanyDivision::class, 'COMPANY_DIVISION_PARENT_ID');
     }
+
+    public function jobposts()
+    {
+        return $this->hasMany(TJobpost::class, 'company_division_id');
+    }
 }

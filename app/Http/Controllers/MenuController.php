@@ -57,27 +57,60 @@ class MenuController extends Controller
         ]);
     }
 
-    public function getMenuData($dataPerPage = 5, $searchQuery = null)
+    public function getMenuData($request)
     {
+        // dd($request);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        // dd($searchQuery->RELATION_ORGANIZATION_NAME);
-        $data = Menu::orderBy('menu_sequence', 'asc')->with('parent');
-        if ($searchQuery) {
-            if ($searchQuery->input('menu_name')) {
-                $data->where('menu_name', 'like', '%' . $searchQuery->menu_name . '%');
+        $query = Menu::query()->with('parent');
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newFilter = $request->input('newFilter', '');
+        $newSearch = json_decode($request->newFilter, true);
+
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
         }
-        // dd($data->toSql());
-        return $data->paginate($dataPerPage);
+
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+            }
+        }
+        
+        // Jika ada filter 'newFilter' dan tidak kosong
+        if ($newFilter !== "") {
+            foreach ($newSearch as $search) {
+            foreach ($search as $keyId => $searchValue) {
+                // Pencarian berdasarkan nama menu
+                if ($keyId === 'menu_name') {
+                $query->where('menu_name', 'LIKE', '%' . $searchValue . '%');
+                }
+            }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
 
     public function getMenusJson(Request $request)
     {
-        $data = $this->getMenuData(5, $request);
-        // print_r($data);
-        // die;
+        // $data = $this->getMenuData(30, $request);
+        // // print_r($data);
+        // // die;
+        // return response()->json($data);
+        $data = $this->getMenuData($request);
         return response()->json($data);
+
     }
 
     // get menu for combo
@@ -116,13 +149,12 @@ class MenuController extends Controller
                 "module"      => "Menu",
                 "id"          => $Menu->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
         return new JsonResponse([
-            $Menu->id,
-            $Menu->menu_name
+            'New menu added.'
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -158,14 +190,14 @@ class MenuController extends Controller
                 "module"      => "Menu",
                 "id"          => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
+        // set message then return
         return new JsonResponse([
-            $request->id,
-            $request->menu_name
-        ], 201, [
+            $request->menu_is_deleted === 1 ? 'Menu has been deactivated' : 'Menu has been reactivated.'
+        ], 200, [
             'X-Inertia' => true
         ]);
     }
@@ -187,7 +219,11 @@ class MenuController extends Controller
 
         }
 
-        return response()->json(['message' => 'Menu sequence updated successfully']);
+        return new JsonResponse([
+            'Menu sequence updated successfully'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     private function updateItemSequence($item)
