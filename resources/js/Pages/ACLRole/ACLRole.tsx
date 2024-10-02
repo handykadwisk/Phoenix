@@ -49,7 +49,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             {
                 id: "",
                 role_name: "",
-                flag:"flag"
+                flag: "flag"
             },
         ],
     });
@@ -76,22 +76,68 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         }
     };
 
+    // const editMenuMapping = (e: any, item: any, parent: any = null) => {
+    //     const { value, checked } = e.target;
+    //     const parsedValue = parseInt(value);
+    //     let updatedAccessMenu = [...accessMenu];
+
+    //     if (checked) {
+    //         // Tambahkan item saat ini jika belum ada di accessMenu
+    //         if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+    //             updatedAccessMenu.push({ menu_id: parsedValue, role_id: roleId });
+    //         }
+    //         // Jika ini adalah parent, tambahkan semua anak
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+    //                 if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+    //                     updatedAccessMenu.push({ menu_id: child.id, role_id: roleId });
+    //                 }
+    //             });
+    //         }
+    //         // Jika ada parent, tambahkan parent
+    //         if (parent && !updatedAccessMenu.some((data: any) => data.menu_id === parent.id)) {
+    //             updatedAccessMenu.push({ menu_id: parent.id, role_id: roleId });
+    //         }
+    //     } else {
+    //         // Hapus item saat ini
+    //         updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+
+    //         // Jika ini adalah parent, hapus semua anak
+    //         if (item.children) {
+    //             updatedAccessMenu = updatedAccessMenu.filter((data: any) => !item.children.some((child: any) => child.id === data.menu_id));
+    //         }
+    //         // Jika ada parent, cek apakah semua anak sudah tidak dicentang
+    //         if (parent) {
+    //             const allChildrenUnchecked = !parent.children.some((child: any) => checkChecked(child.id));
+    //             if (allChildrenUnchecked) {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+    //             }
+    //         }
+    //     }
+    //     // Pastikan role_id tetap ada dalam updatedAccessMenu meskipun kosong
+    //     if (updatedAccessMenu.length === 0) {
+    //         updatedAccessMenu.push({ role_id: roleId });
+    //     }
+    //     setAccessMenu(updatedAccessMenu);
+    // }
     const editMenuMapping = (e: any, item: any, parent: any = null) => {
         const { value, checked } = e.target;
         const parsedValue = parseInt(value);
         let updatedAccessMenu = [...accessMenu];
-
+    
         if (checked) {
             // Tambahkan item saat ini jika belum ada di accessMenu
             if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
                 updatedAccessMenu.push({ menu_id: parsedValue, role_id: roleId });
             }
-            // Jika ini adalah parent, tambahkan semua anak
+            // Jika ini adalah parent, tambahkan semua anak secara rekursif
             if (item.children) {
                 item.children.forEach((child: any) => {
                     if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
                         updatedAccessMenu.push({ menu_id: child.id, role_id: roleId });
                     }
+                    // Panggil fungsi ini lagi untuk menangani children dari child
+                    editMenuMapping({ target: { value: child.id, checked: true } }, child, item);
                 });
             }
             // Jika ada parent, tambahkan parent
@@ -101,10 +147,14 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         } else {
             // Hapus item saat ini
             updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
-
-            // Jika ini adalah parent, hapus semua anak
+    
+            // Jika ini adalah parent, hapus semua anak secara rekursif
             if (item.children) {
-                updatedAccessMenu = updatedAccessMenu.filter((data: any) => !item.children.some((child: any) => child.id === data.menu_id));
+                item.children.forEach((child: any) => {
+                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+                    // Panggil fungsi ini lagi untuk menangani penghapusan children dari child
+                    editMenuMapping({ target: { value: child.id, checked: false } }, child, item);
+                });
             }
             // Jika ada parent, cek apakah semua anak sudah tidak dicentang
             if (parent) {
@@ -114,13 +164,16 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 }
             }
         }
+    
         // Pastikan role_id tetap ada dalam updatedAccessMenu meskipun kosong
         if (updatedAccessMenu.length === 0) {
             updatedAccessMenu.push({ role_id: roleId });
         }
+    
+        // Perbarui state accessMenu
         setAccessMenu(updatedAccessMenu);
-    }
-
+    };
+    
     const checkChecked = (id: number) => {
         return accessMenu.some((f: any) => f.menu_id === id);
     }
@@ -142,20 +195,6 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         setIsLoading({ ...isLoading, get_data_by_id: false })
 
     };
-
-    // clear search role
-    const clearSearchRole = async (pageNumber = "page=1") => {
-        try {
-            const res = await axios.post(`/getRole?${pageNumber}`)
-            setDataRole(res.data);
-            setSearchRole({
-                ...searchRole,
-                role_name: "",
-            });
-        } catch (error) {
-            console.log('Fetch error:', error);
-        }
-    }
 
     const inputDataSearch = (
         name: string,
@@ -297,29 +336,36 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         );
     };
 
+    const renderMenu = (menu: any) => {
+        return (
+            <div key={menu.menu_id}>
+                {/* Parent Menu */}
+                <div className="flex items-center">
+                    <Checkbox value={menu.menu_id} defaultChecked={checkChecked(menu.id)} disabled />
+                    <label className="text-gray-900 ml-3 ">{menu.menu_name}</label>
+                </div>
+    
+                {/* Cek apakah menu memiliki children */}
+                {menu.children?.map((child: any) => (
+                    <div className="ml-7 pl-4 border-l-2 border-red-400" key={child.menu_id}>
+                        {/* Render ulang secara rekursif */}
+                        {renderMenu(child)}
+                    </div>
+                ))}
+            </div>
+        );
+    };
+    
+
+
     const TabMenu = () => {
         return (
             <div className="w-full max-w-md mx-auto">
                 <div>
                     <div className="">
-                        {
-                            custom_menu?.map((cm: any) => (
-                                <div key={cm.menu_id}>
-                                    <div className="flex items-center">
-                                        <Checkbox value={cm.menu_id} defaultChecked={checkChecked(cm.id)} disabled />
-                                        <label className="text-gray-900 ml-3">{cm.menu_name}</label>
-                                    </div>
-                                    {
-                                        cm.children?.map((children: any) => (
-                                            <div className="ml-7 flex items-center" key={children.menu_id}>
-                                                <Checkbox value={children.menu_id} defaultChecked={checkChecked(children.id)} disabled />
-                                                <label className="text-gray-900 ml-3">{children.menu_name}</label>
-                                            </div>
-                                        ))
-                                    }
-                                </div>
-                            ))
-                        }
+                        {custom_menu?.map((menu: any) => (
+                            renderMenu(menu)
+                        ))}
                     </div>
                 </div>
             </div>
@@ -418,7 +464,93 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         getPermissionId(data.id);
         handleDetail(data.id);
     }
-
+    const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
+        const { value, checked } = e.target;
+        const parsedValue = parseInt(value);
+        let updatedAccessMenu = [...accessMenu];
+    
+        if (checked) {
+            // Tambahkan item saat ini jika belum ada di accessMenu
+            if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+                updatedAccessMenu.push({ menu_id: parsedValue, role_id: roleId });
+            }
+            // Jika ini adalah parent, tambahkan semua anak secara rekursif
+            if (item.children) {
+                item.children.forEach((child: any) => {
+                    if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+                        updatedAccessMenu.push({ menu_id: child.id, role_id: roleId });
+                    }
+                    // Panggil fungsi ini lagi untuk menangani children dari child
+                    handleCheckboxChange({ target: { value: child.id, checked: true } }, child, item);
+                });
+            }
+            // Jika ada parent, tambahkan parent
+            if (parent && !updatedAccessMenu.some((data: any) => data.menu_id === parent.id)) {
+                updatedAccessMenu.push({ menu_id: parent.id, role_id: roleId });
+            }
+        } else {
+            // Hapus item saat ini
+            updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+    
+            // Jika ini adalah parent, hapus semua anak secara rekursif
+            if (item.children) {
+                item.children.forEach((child: any) => {
+                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+                    // Panggil fungsi ini lagi untuk menangani penghapusan children dari child
+                    handleCheckboxChange({ target: { value: child.id, checked: false } }, child, item);
+                });
+            }
+            // Jika ada parent, cek apakah semua anak sudah tidak dicentang
+            if (parent) {
+                const allChildrenUnchecked = !parent.children.some((child: any) => checkChecked(child.id));
+                if (allChildrenUnchecked) {
+                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+                }
+            }
+        }
+    
+        // Pastikan role_id tetap ada dalam updatedAccessMenu meskipun kosong
+        if (updatedAccessMenu.length === 0) {
+            updatedAccessMenu.push({ role_id: roleId });
+        }
+    
+        // Perbarui state accessMenu
+        setAccessMenu(updatedAccessMenu);
+    };
+    
+    const renderMenuEdit = (menu: any) => {
+        return (
+            <div key={menu.id}>
+                <div className="flex items-center">
+                    {/* Checkbox untuk parent */}
+                    <Checkbox 
+                        value={menu.id} 
+                        checked={checkChecked(menu.id)} 
+                        onChange={(e) => handleCheckboxChange(e, menu)}  // Memastikan onChange berfungsi
+                    />
+                    <label className="text-gray-900 ml-3">{menu.menu_name}</label>
+                </div>
+                {/* Cek jika menu ini memiliki children */}
+                {menu.children?.map((child: any) => (
+                    <div className="ml-7 flex items-center" key={child.id}>
+                        {/* Checkbox untuk setiap child */}
+                        <Checkbox 
+                            value={child.id} 
+                            checked={checkChecked(child.id)}  // Memastikan status checkbox untuk child
+                            onChange={(e) => handleCheckboxChange(e, child, menu)}  // Memanggil handleCheckboxChange dengan parent sebagai argumen
+                        />
+                        <label className="text-gray-900 ml-3">{child.menu_name}</label>
+                    </div>
+                ))}
+                {/* Jika child memiliki children, panggil renderMenuEdit secara rekursif */}
+                {menu.children?.map((child: any) => (
+                    child.children && renderMenuEdit(child)  // Rekursif jika child memiliki children
+                ))}
+            </div>
+        );
+    };
+    
+    
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Role"}>
@@ -473,21 +605,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
                 body={
-                    custom_menu?.map((cm: any, i: number) => (
-                        <React.Fragment key={i}>
-                            <div className="flex items-center">
-                                <Checkbox value={cm.id} checked={checkChecked(cm.id)} onChange={(e) => editMenuMapping(e, cm)} />
-                                <label className="text-gray-900 ml-3">{cm.menu_name}</label>
-                            </div>
-                            {
-                                cm.children?.map((children: any, j: number) => (
-                                    <div className="ml-7 flex items-center" key={j}>
-                                        <Checkbox value={children.id} checked={checkChecked(children.id)} onChange={(e) => editMenuMapping(e, children, cm)} />
-                                        <label className="text-gray-900 ml-3">{children.menu_name}</label>
-                                    </div>
-                                ))
-                            }
-                        </React.Fragment>
+                    custom_menu?.map((menu: any) => (
+                        renderMenuEdit(menu)
                     ))
                 }
             />
@@ -639,23 +758,23 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                             name="role_name"
                             value={searchRole.role_name}
                             className="mt-2 ring-1 ring-red-600"
-                            onChange={(e)=>{
+                            onChange={(e) => {
                                 inputDataSearch("role_name", e.target.value, 0);
                             }
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                  const title = searchRole.role_search[0].role_name;
-                                  const id = searchRole.role_search[0].id;
-                                  if (title || id) {
-                                    inputDataSearch("flag", title || id, 0);
-                                    setIsSuccess("success");
-                                  } else {
-                                    inputDataSearch("flag", "", 0);
-                                    setIsSuccess("Get All Job Post");
-                                  }
+                                    const title = searchRole.role_search[0].role_name;
+                                    const id = searchRole.role_search[0].id;
+                                    if (title || id) {
+                                        inputDataSearch("flag", title || id, 0);
+                                        setIsSuccess("success");
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Job Post");
+                                    }
                                 }
-                              }}
+                            }}
                             placeholder="Search Role Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">

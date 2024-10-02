@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('t_user', function (Blueprint $table) {
-            $table->unsignedBigInteger('jobpost_id')->nullable();
-        
+        //
+        Schema::table('r_menu', function (Blueprint $table) {
+            $table->string('menu_mapping')->nullable();
         });
     }
 
@@ -23,9 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         //
-        Schema::table('t_user', function (Blueprint $table) {
-            // $table->dropForeign(['jobpost_id']);
-            $table->dropColumn(['jobpost_id']);
+        Schema::table('r_menu', function (Blueprint $table) {
+            $table->dropColumn('manu_mapping');
         });
     }
 };

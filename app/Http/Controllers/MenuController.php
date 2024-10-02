@@ -57,6 +57,12 @@ class MenuController extends Controller
         ]);
     }
 
+    // get menu data
+    public function showMenu(){
+        $menu=DB::select('CALL sp_combo_menu()');
+        return $menu;
+    }
+
     public function getMenuData($request)
     {
         // dd($request);
@@ -151,6 +157,9 @@ class MenuController extends Controller
             ]),
             'action_by'  => Auth::user()->user_login
         ]);
+
+        // $name = NULL;
+        DB::select('call sp_set_mapping_menu');
 
 
         return new JsonResponse([

@@ -107,7 +107,7 @@ class TEmployeeController extends Controller
     }
 
     public function getAllEmployeeJson(){
-        $data = TEmployee::get();
+        $data = TEmployee::all();
         return response()->json($data);
     }
 

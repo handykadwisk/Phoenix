@@ -30,12 +30,24 @@ import Swal from "sweetalert2";
 import DetailMenu from "./DetailMenu";
 import SequenceEdit from "@/Components/sequenceEdit";
 import AGGrid from "@/Components/AgGrid";
+import { get } from "jquery";
 
 export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
     // useEffect(() => {
     //     getMenu();
     // }, []);
+
+
+    const [show, setShow] = useState<any>([]);
+    const getmenusShow = async () => {
+        try {
+            const res = await axios.get(`/showMenu`);
+            setShow(res.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const [seqMenu, setSeqMenu] = useState<any>([]);
 
@@ -89,7 +101,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
     const addMenuPopup = async (e: FormEvent) => {
         e.preventDefault();
-
+        getmenusShow()
         getComboMenu();
         setModal({
             add: !modal.add,
@@ -230,10 +242,10 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     <option value={""}>
                                         -- Choose Parent --
                                     </option>
-                                    {comboMenu.map((mData: any, i: number) => {
+                                    {show.map((mData: any, i: number) => {
                                         return (
                                             <option value={mData.id} key={i}>
-                                                {mData.menu_name}
+                                                {mData.text_combo}
                                             </option>
                                         );
                                     })}

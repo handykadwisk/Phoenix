@@ -77,6 +77,8 @@ export default function Group({ auth }: PageProps) {
             })
             .then((res) => {
                 setRelationsGroup(res.data);
+                console.log('data group', res.data);
+                
                 if (modal.search) {
                     setModal({
                         add: false,

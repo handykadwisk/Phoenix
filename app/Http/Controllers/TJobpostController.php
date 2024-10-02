@@ -21,82 +21,80 @@ class TJobpostController extends Controller
     public function index()
     {
         //
-        return Inertia::render('JobPost/Jobpost', [
-            'jobposts' => TJobpost::with('children')->whereNull('jobpost_parent')->get()
-        ]);
+        return Inertia::render('JobPost/Jobpost');
     }
 
-    public function getJobpostJson(Request $request)
-    {
-        $data = $this->getJobpostData($request);
-        return response()->json($data);
-    }
+    // public function getJobpostJson(Request $request)
+    // {
+    //     $data = $this->getJobpostData($request);
+    //     return response()->json($data);
+    // }
 
-    public function getJobpostData($request)
-    {
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
+    // public function getJobpostData($request)
+    // {
+    //     $page = $request->input('page', 1);
+    //     $perPage = $request->input('perPage', 10);
 
-        // Join ke tabel t_company_division dan t_company untuk mendapatkan data sesuai divisi dan perusahaan
-        $query = TJobpost::query()
-            ->join('t_company_division', 't_company_division.COMPANY_DIVISION_ID', '=', 't_job_posts.company_division_id')
-            ->join('t_company', 't_company.COMPANY_ID', '=', 't_company_division.COMPANY_ID')
-            ->orderBy('t_company.COMPANY_NAME', 'asc') // Mengurutkan berdasarkan COMPANY_NAME
-            ->groupBy('t_company.COMPANY_ID') // Mengelompokkan berdasarkan COMPANY_ID
-            ->select(
-                't_company.COMPANY_ID',
-                't_company.COMPANY_NAME',
-                DB::raw('COUNT(t_job_posts.jobpost_id) as total_jobposts') // Menghitung jumlah jobpost per perusahaan
-            );
+    //     // Join ke tabel t_company_division dan t_company untuk mendapatkan data sesuai divisi dan perusahaan
+    //     $query = TJobpost::query()
+    //         ->join('t_company_division', 't_company_division.COMPANY_DIVISION_ID', '=', 't_job_posts.company_division_id')
+    //         ->join('t_company', 't_company.COMPANY_ID', '=', 't_company_division.COMPANY_ID')
+    //         ->orderBy('t_company.COMPANY_NAME', 'asc') // Mengurutkan berdasarkan COMPANY_NAME
+    //         ->groupBy('t_company.COMPANY_ID') // Mengelompokkan berdasarkan COMPANY_ID
+    //         ->select(
+    //             't_company.COMPANY_ID',
+    //             't_company.COMPANY_NAME',
+    //             DB::raw('COUNT(t_job_posts.jobpost_id) as total_jobposts') // Menghitung jumlah jobpost per perusahaan
+    //         );
 
-        // dd($query);
+    //     // dd($query);
 
-        // Ambil nilai sort dan filter dari request
-        $sortModel = $request->input('sort');
-        $filterModel = json_decode($request->input('filter'), true);
-        $newFilter = $request->input('newFilter', '');
-        $newSearch = json_decode($request->newFilter, true);
+    //     // Ambil nilai sort dan filter dari request
+    //     $sortModel = $request->input('sort');
+    //     $filterModel = json_decode($request->input('filter'), true);
+    //     $newFilter = $request->input('newFilter', '');
+    //     $newSearch = json_decode($request->newFilter, true);
 
-        // Penanganan sorting
-        if ($sortModel) {
-            $sortModel = explode(';', $sortModel);
-            foreach ($sortModel as $sortItem) {
-                list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection);
-            }
-        }
+    //     // Penanganan sorting
+    //     if ($sortModel) {
+    //         $sortModel = explode(';', $sortModel);
+    //         foreach ($sortModel as $sortItem) {
+    //             list($colId, $sortDirection) = explode(',', $sortItem);
+    //             $query->orderBy($colId, $sortDirection);
+    //         }
+    //     }
 
-        // Jika ada filter 'newFilter' dan tidak kosong
-        if ($newFilter !== "") {
-            foreach ($newSearch as $search) {
-                foreach ($search as $keyId => $searchValue) {
-                    // Pencarian berdasarkan nama divisi
-                    if ($keyId === 'COMPANY_DIVISION_NAME') {
-                        $query->where('t_company_division.COMPANY_DIVISION_NAME', 'LIKE', '%' . $searchValue . '%');
-                    }
-                    // Pencarian berdasarkan nama perusahaan
-                    elseif ($keyId === 'COMPANY_NAME') {
-                        $query->where('t_company.COMPANY_NAME', 'LIKE', '%' . $searchValue . '%');
-                    }
-                    // Pencarian berdasarkan ID jobpost
-                    elseif ($keyId === 'jobpost_id') {
-                        if (!isset($searchValue['value'])) {
-                            $valueTypeId = $searchValue;
-                        } else {
-                            $valueTypeId = $searchValue['value'];
-                        }
-                        $query->where('t_job_posts.jobpost_id', 'LIKE', '%' . $valueTypeId . '%');
-                    }
-                }
-            }
-        }
+    //     // Jika ada filter 'newFilter' dan tidak kosong
+    //     if ($newFilter !== "") {
+    //         foreach ($newSearch as $search) {
+    //             foreach ($search as $keyId => $searchValue) {
+    //                 // Pencarian berdasarkan nama divisi
+    //                 if ($keyId === 'COMPANY_DIVISION_NAME') {
+    //                     $query->where('t_company_division.COMPANY_DIVISION_NAME', 'LIKE', '%' . $searchValue . '%');
+    //                 }
+    //                 // Pencarian berdasarkan nama perusahaan
+    //                 elseif ($keyId === 'COMPANY_NAME') {
+    //                     $query->where('t_company.COMPANY_NAME', 'LIKE', '%' . $searchValue . '%');
+    //                 }
+    //                 // Pencarian berdasarkan ID jobpost
+    //                 elseif ($keyId === 'jobpost_id') {
+    //                     if (!isset($searchValue['value'])) {
+    //                         $valueTypeId = $searchValue;
+    //                     } else {
+    //                         $valueTypeId = $searchValue['value'];
+    //                     }
+    //                     $query->where('t_job_posts.jobpost_id', 'LIKE', '%' . $valueTypeId . '%');
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        // Pagination dan pengambilan data
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+    //     // Pagination dan pengambilan data
+    //     $data = $query->paginate($perPage, ['*'], 'page', $page);
 
-        // Return hasilnya
-        return $data;
-    }
+    //     // Return hasilnya
+    //     return $data;
+    // }
 
 
     public function getJobpostById($id)
@@ -146,30 +144,9 @@ class TJobpostController extends Controller
     public function getJobpostsByCompany($companyId)
     {
         $jobposts = TJobpost::with('company_division')->has('company_division')->get();
-        // query()
-        // ->join('t_company_division', 't_company_division.COMPANY_DIVISION_ID', '=', 't_job_posts.company_division_id')
-        // ->join('t_company', 't_company.COMPANY_ID', '=', 't_company_division.COMPANY_ID')
-        // ->where('t_company.COMPANY_ID', $companyId) // Filter berdasarkan COMPANY_ID
-        // // ->groupBy('t_job_posts.company_division_id') // Mengelompokkan berdasarkan company_division_id
-        // ->select('t_job_posts.*') // Memilih semua kolom dari jobpost
-        // ->get(); // Mengambil semua data jobpost yang sesuai
-
-        // dd($jobposts);
-
         return response()->json($jobposts);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
@@ -212,11 +189,6 @@ class TJobpostController extends Controller
         return response()->json($jobposts);
     }
 
-    public function getJobpostByDivision($id)
-    {
-        $data = TJobpost::with('company_division')->where('jobpost_id', $id)->get();
-        return response()->json($data);
-    }
 
     public function setJobpostStatus($id, $status)
     {
@@ -324,19 +296,5 @@ class TJobpostController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, TJobpost $tJobpost)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(TJobpost $tJobpost)
-    {
-        //
-    }
+  
 }

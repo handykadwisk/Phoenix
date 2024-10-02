@@ -267,7 +267,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
-
+    Route::get('/showMenu', [MenuController::class, 'showMenu'])->name('showMenu.showMenu');
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
     Route::get('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
@@ -309,7 +309,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/UserId/{id}', [UserManagementController::class, 'dataById'])->name('settings/UserId.getUserId');
     Route::patch('/settings/userEdit/{id}', [UserManagementController::class, 'update'])->name('settings/userEdit.update');
     Route::patch('/settings/userResetPassword/{id}', [UserManagementController::class, 'resetPassword'])->name('settings/userResetPassword.resetPassword');
-
+    Route::get('/user', [UserManagementController::class, 'getAllUser'])->name('user.getAllUser');
 
 
     //setting/usertype
