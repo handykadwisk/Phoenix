@@ -52,7 +52,7 @@ export default function ModalToAdd({
                 },
             })
             .then((res) => {
-                console.log("ada", res.data);
+                // console.log("ada", res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);

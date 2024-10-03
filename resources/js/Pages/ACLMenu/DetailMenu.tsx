@@ -63,6 +63,20 @@ export default function DetailGroup({
                 console.log(err);
             });
     };
+    
+    const [show, setShow] = useState<any>([]);
+    useEffect(() => {
+        const getmenusShow = async () => {
+            try {
+                const res = await axios.get(`/showMenu`);
+                setShow(res.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getmenusShow();
+    }, []);
 
     const [dataById, setDataById] = useState<any>({
         menu_parent_id: "",
@@ -79,8 +93,8 @@ export default function DetailGroup({
             menu_is_deleted: dataById.menu_is_deleted === 1 ? 0 : 1
         });
     };
-    // console.log(dataById.menu_is_deleted, `<<<<<<<<<<<<`);
-
+    
+    
 
     return (
         <>
@@ -108,7 +122,7 @@ export default function DetailGroup({
                                 />
                                 <select
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={dataById.menu_parent_id}
+                                    value={dataById.menu_parent_id ||''}
                                     onChange={(e) => {
                                         setDataById({
                                             ...dataById,
@@ -116,13 +130,13 @@ export default function DetailGroup({
                                         });
                                     }}
                                 >
-                                    <option value={""}>
-                                        -- Choose Parent --
+                                    <option value={dataById.menu_id}>
+                                        {dataById.menu_name}
                                     </option>
-                                    {comboMenu.map((mData: any, i: number) => {
+                                    {show.map((mData: any, i: number) => {
                                         return (
                                             <option value={mData.id} key={i}>
-                                                {mData.menu_name}
+                                                {mData.text_combo}
                                             </option>
                                         );
                                     })}
@@ -141,7 +155,7 @@ export default function DetailGroup({
                                     id="menu_name"
                                     type="text"
                                     name="menu_name"
-                                    value={dataById.menu_name}
+                                    value={dataById.menu_name || ''}
                                     className="mt-2"
                                     onChange={(e) => {
                                         setDataById({
@@ -166,7 +180,7 @@ export default function DetailGroup({
                                     id="menu_url"
                                     type="text"
                                     name="menu_url"
-                                    value={dataById.menu_url}
+                                    value={dataById.menu_url||''}
                                     className="mt-2"
                                     onChange={(e) => {
                                         setDataById({
@@ -178,21 +192,6 @@ export default function DetailGroup({
                                     placeholder="Menu URL"
                                 />
                             </div>
-                            {/* <button className="border mt-5 bg-red-300 shadow">
-                                    Reactivate
-                            </button> */}
-                            {/* <div className="mt-5 bg-gray-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                <button
-                                    type="button"
-                                    className={
-                                        `inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 `
-                                    }
-                                    onClick={() => toggleMenuDeleteStatus(dataById.id)}
-                                >
-                                     {dataById.menu_is_deleted === 1 ? "Reactivate" : "Delete"}
-                                </button>
-                                
-                            </div> */}
                         </div>
                     </>
                 }

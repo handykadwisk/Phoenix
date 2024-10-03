@@ -186,6 +186,7 @@ class TJobpostController extends Controller
     public function getDevJobpost()
     {
         $jobposts = TCompanyDivision::with('jobposts')->get();
+
         return response()->json($jobposts);
     }
 

@@ -1,6 +1,6 @@
 DELIMITER $$
 
-USE `phoenixx`$$
+USE `phoenix`$$
 
 DROP PROCEDURE IF EXISTS `sp_combo_menu`$$
 

@@ -40,6 +40,8 @@ import ModalToEdit from "@/Components/Modal/ModalToEdit";
 import ModalToResetPassword from "@/Components/Modal/ModalToResetPassword";
 import AGGrid from "@/Components/AgGrid";
 import { Label } from "flowbite-react";
+import { data } from "jquery";
+import ModalToActions from "@/Components/Modal/ModalToActions";
 
 type DataInputType = {
     name: string;
@@ -54,14 +56,10 @@ type DataInputType = {
 };
 
 export default function UserManagement({ auth, type }: any) {
-    // console.log('auth', auth);
-
 
     useEffect(() => {
         getUser()
         getAllUser()
-        getJobPost()
-        // getEmployee()
     }, []);
 
     const InitialData = {
@@ -86,26 +84,8 @@ export default function UserManagement({ auth, type }: any) {
         }
 
     }
-    console.log(allData, '<<<<<allData');
 
-    const [jobpost, setJobpost] = useState<any>([])
-    const getJobPost = async () => {
-        try {
-            const res = await axios.get('/getAllJobpost')
-            setJobpost(res.data)
-        } catch (error) {
-            console.log(error);
 
-        }
-    }
-    // console.log('jobpost',jobpost);
-    const jobpostSelect = jobpost.map((el: any) => {
-        return {
-            value: el.jobpost_id,  // Ganti dengan properti yang sesuai
-            label: el.jobpost_name   // Ganti dengan properti yang sesuai
-        };
-    });
-    console.log(jobpostSelect, 'jobpostttt');
 
 
     //type DataInput
@@ -116,6 +96,7 @@ export default function UserManagement({ auth, type }: any) {
         password: string,
         employee_id: number,
         individual_relations_id: number,
+        company_division_id: number,
         type: any,
         jobpost: number,
         role: number[]
@@ -136,6 +117,7 @@ export default function UserManagement({ auth, type }: any) {
         employee_id: 0,
         individual_relations_id: 0,
         type: 2,
+        company_division_id: 0,
         jobpost: 0,
         role: []
 
@@ -200,6 +182,9 @@ export default function UserManagement({ auth, type }: any) {
         }));
     };
 
+
+
+
     //handlechangejobpost
     const handleJobpostChange = (selectedOption: any) => {
         setDataInput((prevState) => ({
@@ -227,8 +212,7 @@ export default function UserManagement({ auth, type }: any) {
         setDataInputEdit({ ...dataInputEdit, user_login, name });
     };
 
-    console.log('dataInputEdit',dataInputEdit);
-    
+
     //fetch data user
     const getUser = async (pageNumber = "page=1") => {
         await axios
@@ -249,6 +233,9 @@ export default function UserManagement({ auth, type }: any) {
         try {
             const result = await axios.post(`/settings/getUserId/${userId}`);
             setDataUserId(result.data);
+            // console.log(result.data, '<<<<<result.data');
+            setDataInput(result.data);
+            // set
             setDataInputEdit({
                 name: result.data.name,
                 email: result.data.email,
@@ -258,12 +245,13 @@ export default function UserManagement({ auth, type }: any) {
                 type: result.data.type,
                 user_status: result.data.user_status,
                 role: result.data.roles,
-                jobpost:result.data.jobpost_id
+                jobpost: result.data.jobpost_id
             });
         } catch (error) {
             console.log(error);
         }
     }
+
 
     //get role
     const getRole = async () => {
@@ -312,7 +300,9 @@ export default function UserManagement({ auth, type }: any) {
     const addRolePopup = async (e: FormEvent) => {
         e.preventDefault();
         getTypeTest()
+        getDiv()
         getRole()
+        getJobPost()
         getAllRelations()
         getEmployee()
         setModal({
@@ -332,8 +322,7 @@ export default function UserManagement({ auth, type }: any) {
             console.error('Fetch error:', error);
         }
     }
-    console.log(employee, '<<<<<employee');
-    
+
 
     //get company  
     const [relation, setRelation] = useState<any>([]);
@@ -370,8 +359,10 @@ export default function UserManagement({ auth, type }: any) {
     }
 
     // Fungsi untuk menangani perubahan saat employee dipilih
-    const handleEmployeeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedEmployeeId = Number(e.target.value);
+    const handleEmployeeChange = (e: any) => {
+        console.log(e, '<<<<<e');
+
+        const selectedEmployeeId = Number(e.value);
         const selectedEmployee = employee.find((emp: any) => emp.EMPLOYEE_ID === selectedEmployeeId);
 
         // Update state dengan employee_id dan email yang terkait
@@ -413,8 +404,6 @@ export default function UserManagement({ auth, type }: any) {
         setDataInputEdit({ ...dataInputEdit, user_status: userStatus });
     };
 
-    // console.log(dataInputEdit, '<<<<<inputDataEdit');
-
     const handleDetailUser = async (e: any) => {
         setModal({
             add: false,
@@ -426,6 +415,7 @@ export default function UserManagement({ auth, type }: any) {
         getRole()
         getEmployee()
         getAllRelations()
+        getDiv()
     }
 
     const [isSuccess, setIsSuccess] = useState<any>("");
@@ -440,30 +430,6 @@ export default function UserManagement({ auth, type }: any) {
         }
     }
 
-
-
-    const handleSearch = () => {
-        if (searchUser.name !== "") {
-            setSearchUser((prevState: any) => ({
-                ...prevState,
-                searchParam: searchUser.name,
-            }));
-            setIsSuccess("success");
-        } else {
-            setIsSuccess("success");
-        }
-    };
-
-    // // This useEffect will trigger AGGrid refresh when    changes
-    // useEffect(() => {
-    //     if (searchUser.searchParam !== "") {
-    //         console.log("Search Param Updated: ", searchUser.searchParam);
-    //         // Call AGGrid or API with the updated search param
-    //         setIsSuccess("success");
-    //     }
-    // }, [searchUser.searchParam]);
-
-
     const clearSearchUser = async (e: FormEvent) => {
         // Kosongkan input pencarian
         inputDataSearch("name", "", 0);
@@ -472,12 +438,81 @@ export default function UserManagement({ auth, type }: any) {
         setIsSuccess("Cleared");
     };
 
-    // console.log(searchUser.searchParam, '<<<<<searchUser');
 
-    console.log('dataInput', dataInput);
+    const [div, setDiv] = useState<any>([]);
+    const getDiv = async () => {
+        try {
+            const result = await axios.get('/getAllDivisionCompany');
+            setDiv(result.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    }
+
+    const employeeDiv = employee.find((el: any) => dataInput.employee_id === el.EMPLOYEE_ID)?.division;
+
+    useEffect(() => {
+        if (employeeDiv) {
+            setDataInput((prevState) => ({
+                ...prevState,
+                company_division_id: employeeDiv.COMPANY_DIVISION_ID
+            }));
+        }
+    }, [employeeDiv]);
+
+    const selectDiv = div
+        .filter((el: any) => el.COMPANY_DIVISION_ID === employeeDiv?.COMPANY_DIVISION_ID)
+        .map((el: any) => {
+            return {
+                value: el?.COMPANY_DIVISION_ID,
+                label: el?.COMPANY_DIVISION_NAME
+            };
+        });
+
+    const divSelect = div.map((el: any) => {
+        return {
+            value: el?.COMPANY_DIVISION_ID,
+            label: el?.COMPANY_DIVISION_NAME
+        }
+
+    });
+
+    const selectEmployee = employee.map((el: any) => {
+        return {
+            value: el.EMPLOYEE_ID,
+            label: el.EMPLOYEE_FIRST_NAME
+        };
+    })
+
+    const [jobpost, setJobpost] = useState<any>([])
+    const getJobPost = async () => {
+        try {
+            const res = await axios.get('/getAllJobpost')
+            setJobpost(res.data)
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    // const jobpostDiv = jobpost.find((el: any) => dataInput.jobpost === el.jobpost_id)?.company_division_id;
+    const filteredJobPosts = jobpost.filter((el: any) => el.company_division_id === dataInput.company_division_id);
+    const filteredJobPostsEdit = jobpost.filter((el: any) => el.company_division_id === dataInputEdit.company_division_id);
+
+    const jobpostSelect = filteredJobPosts.map((el: any) => {
+        return {
+            value: el.jobpost_id,
+            label: el.jobpost_name
+        };
+    });
 
 
-    // console.log(searchUser.searchParam, '<<<<<searchUser');
+
+    // console.log(filteredJobPosts, '<<<<<filteredJobPosts');
+    // console.log(dataInput, '<<<<<dataInput');
+    // console.log(dataInputEdit.jobpost.jobpost_name, '<<<<<dataInputEdit.jobpost_name');
+
+
 
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
@@ -492,7 +527,9 @@ export default function UserManagement({ auth, type }: any) {
             )}
 
             {/* modal add */}
-            <ModalToAdd
+            <ModalToAction
+                submitButtonName={"Submit"}
+                headers={"Add User"}
                 show={modal.add}
                 onClose={
                     () => {
@@ -507,6 +544,8 @@ export default function UserManagement({ auth, type }: any) {
                             user_login: "",
                             password: "",
                             employee_id: 0,
+                            company_division_id: 0,
+
                             individual_relations_id: 0,
                             type: 2,
                             jobpost: 0,
@@ -515,11 +554,11 @@ export default function UserManagement({ auth, type }: any) {
                         });
                     }
                 }
+                method="POST"
                 title={'Add User'}
                 url={'/settings/addUser'}
                 data={dataInput}
                 onSuccess={handleSuccessUser}
-                buttonAddOns={""}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
@@ -565,115 +604,108 @@ export default function UserManagement({ auth, type }: any) {
                                     <div className="relative">
                                         <InputLabel
                                             className="absolute"
-                                            htmlFor="type"
+                                            htmlFor="employee"
                                             value={'Employee'}
                                         />
                                         <div className="ml-[4.6rem] text-red-600">*</div>
                                     </div>
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataInput.employee_id}
+                                    <Select
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                            menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                    ? `text-white bg-primary-pelindo`
+                                                    : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                }`,
+                                        }}
+                                        options={selectEmployee}
+                                        isSearchable={true}
+                                        isMultiple={false}
+                                        placeholder={"Select Employee"}
+                                        isClearable={true}
+                                        value={selectEmployee.find((emp: { value: any }) => emp.value === dataInput.employee_id) || null}
                                         onChange={handleEmployeeChange}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Employee --
-                                        </option>
-                                        {employee?.map((mEmp: any, i: number) => (
-                                            <option value={mEmp.EMPLOYEE_ID} key={i}>
-                                                {mEmp.EMPLOYEE_FIRST_NAME}
-                                            </option>
-                                        ))}
-                                    </select>
-
+                                        primaryColor={"red"}
+                                    />
                                 </div>
                                 {/* Employee */}
 
-                            </>
-                        )}
-
-                        {dataInput.type === 3 && (
-                            <>
-                                {/* company */}
-                                <div className="mb-2">
-                                    <div className="relative">
-                                        <InputLabel
-                                            className="absolute"
-                                            htmlFor="type"
-                                            value={'Relation Organization'}
+                                {/* division  */}
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="type"
+                                        value={'Division'}
+                                    />
+                                    <div className="ml-[3.8rem] text-red-600">*</div>
+                                    <div className="mb-2">
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-primary-pelindo`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={divSelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select Division"}
+                                            isClearable={true}
+                                            value={divSelect.find((div: { value: any }) => div.value === dataInput.company_division_id)}
+                                            onChange={
+                                                (val: any) => {
+                                                    setDataInput({
+                                                        ...dataInput,
+                                                        company_division_id: val.value
+                                                    });
+                                                }
+                                            }
+                                            primaryColor={"red"}
                                         />
-                                        <div className="ml-[9.7rem] text-red-600">*</div>
                                     </div>
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataInput.individual_relations_id}
-                                        onChange={handleRelationChange
-                                        }
-                                    >
-                                        <option value={""}>
-                                            -- Choose Type --
-                                        </option>
-                                        {
-                                            relation?.map((mRel: any, i: number) => {
-                                                return (
-                                                    <option value={mRel.RELATION_ORGANIZATION_ID} key={i}>
-                                                        {mRel.RELATION_ORGANIZATION_NAME}
-                                                    </option>
-                                                )
-                                            })
-                                        }
-
-                                    </select>
                                 </div>
-                                {/* company */}
-                            </>
-                        )}
+                                {/* end division  */}
 
-                        <div className="mb-2">
-                            <div className="relative">
-                                <InputLabel
-                                    className="absolute"
-                                    htmlFor="email"
-                                    value={'User Login'}
-                                />
-                                <div className="ml-[4.6rem] text-red-600">*</div>
-                            </div>
-                            <TextInput
-                                id="user_login"
-                                type="text"
-                                name="user_login"
-                                value={dataInput.user_login}
-                                className="mt-2"
-                                onChange={
-                                    (e) => setDataInput({
-                                        ...dataInput, user_login: e.target.value,
-                                    })}
-                                required
-                                placeholder="Email or Other unique id"
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <div className="relative">
-                                <InputLabel
-                                    className="absolute"
-                                    htmlFor="password"
-                                    value={'User Password'}
-                                />
-                                <div className="ml-[6.8rem] text-red-600">*</div>
-                            </div>
-                            <TextInput
-                                id="password"
-                                type="password"
-                                name="password"
-                                value={dataInput.password}
-                                className="mt-2"
-                                onChange={(e) => setDataInput({ ...dataInput, password: e.target.value })}
-                                required
-                                placeholder="Password"
-                            />
-                        </div>
-                        {/* role */}
-                        {dataInput.type === 2 && (
-                            <>
+                                {/* jobpost  */}
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="type"
+                                        value={'Job Post'}
+                                    />
+                                    <div className="ml-[4rem] text-red-600">*</div>
+                                    <div className="mb-2">
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-primary-pelindo`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={jobpostSelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select Jobpost"}
+                                            isClearable={true}
+                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInput.jobpost) || null}
+                                            onChange={handleJobpostChange}
+                                            primaryColor={"red"}
+                                        />
+                                    </div>
+                                </div>
+                                {/* end jobpost  */}
+
+                                {/* role  */}
                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
@@ -698,47 +730,105 @@ export default function UserManagement({ auth, type }: any) {
                                             isMultiple={true}
                                             placeholder={"Select"}
                                             isClearable={true}
-                                            value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id))||null}
+                                            value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id)) || null}
                                             onChange={handleRoleChange}
                                             primaryColor={"red"}
 
                                         />
                                     </div>
                                 </div>
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="type"
-                                        value={'Job Post'}
-                                    />
-                                    <div className="ml-[4rem] text-red-600">*</div>
-                                    <div className="mb-2">
-                                        <Select
-                                            classNames={{
-                                                menuButton: () =>
-                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                listItem: ({ isSelected }: any) =>
-                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                        ? `text-white bg-primary-pelindo`
-                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
-                                                    }`,
-                                            }}
-                                            options={jobpostSelect}
-                                            isSearchable={true}
-                                            isMultiple={false}
-                                            placeholder={"Select"}
-                                            isClearable={true}
-                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInput.jobpost) || null}
-                                            onChange={handleJobpostChange}
-                                            primaryColor={"red"}
-                                        />
-                                    </div>
-                                </div>
+                                {/* end role  */}
+
 
                             </>
                         )}
-                        {/* role */}
+
+                        {/* jika type nya 3 maka tampilkan company */}
+                        {dataInput.type === 3 && (
+                            <>
+                                {/* company */}
+                                <div className="mb-2">
+                                    <div className="relative">
+                                        <InputLabel
+                                            className="absolute"
+                                            htmlFor="type"
+                                            value={'Relation Organization'}
+                                        />
+                                        <div className="ml-[9.7rem] text-red-600">*</div>
+                                    </div>
+                                    <select
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataInput.individual_relations_id}
+                                        onChange={handleRelationChange}
+                                    >
+                                        <option value={""}>
+                                            -- Choose Type --
+                                        </option>
+                                        {
+                                            relation?.map((mRel: any, i: number) => {
+                                                return (
+                                                    <option value={mRel.RELATION_ORGANIZATION_ID} key={i}>
+                                                        {mRel.RELATION_ORGANIZATION_NAME}
+                                                    </option>
+                                                )
+                                            })
+                                        }
+
+                                    </select>
+                                </div>
+                                {/* company */}
+                            </>
+                        )}
+                        {/* end company */}
+
+                        {/* user_login */}
+                        <div className="mb-2">
+                            <div className="relative">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="email"
+                                    value={'User Login'}
+                                />
+                                <div className="ml-[4.6rem] text-red-600">*</div>
+                            </div>
+                            <TextInput
+                                id="user_login"
+                                type="text"
+                                name="user_login"
+                                value={dataInput.user_login}
+                                className="mt-2"
+                                onChange={
+                                    (e) => setDataInput({
+                                        ...dataInput, user_login: e.target.value,
+                                    })}
+                                required
+                                placeholder="Email or Other unique id"
+                            />
+                        </div>
+                        {/* end user_login  */}
+
+                        {/* password */}
+                        <div className="mb-2">
+                            <div className="relative">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="password"
+                                    value={'User Password'}
+                                />
+                                <div className="ml-[6.8rem] text-red-600">*</div>
+                            </div>
+                            <TextInput
+                                id="password"
+                                type="password"
+                                name="password"
+                                value={dataInput.password}
+                                className="mt-2"
+                                onChange={(e) => setDataInput({ ...dataInput, password: e.target.value })}
+                                required
+                                placeholder="Password"
+                            />
+                        </div>
+                        {/* end password */}
                     </>
                 }
             />
@@ -765,6 +855,31 @@ export default function UserManagement({ auth, type }: any) {
                 body={
                     <>
                         <div>
+                            {/* user_login */}
+                            <div className="relative">
+                                <div className="mb-2">
+                                    <div className="container">
+                                        <InputLabel
+                                            className="absolute"
+                                            htmlFor="name"
+                                            value={'Name'}
+                                        />
+                                        <div className="ml-[3rem] text-red-600">*</div>
+                                    </div>
+                                    <TextInput
+                                        id="name"
+                                        type="text"
+                                        name="name"
+                                        value={dataInputEdit?.name || ''}
+                                        className="mt-2"
+                                        onChange={(e) => setDataInputEdit({ ...dataInputEdit, name: e.target.value })}
+                                        required
+                                        placeholder="Name or unique id"
+                                    />
+                                </div>
+                            </div>
+                            {/* end user_login */}
+
                             <div className="relative">
                                 <div className="mb-2">
                                     <InputLabel
@@ -775,7 +890,7 @@ export default function UserManagement({ auth, type }: any) {
                                     <div className="ml-[2.3rem] text-red-600">*</div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataInputEdit?.type?.user_type_id}
+                                        value={dataInputEdit?.type?.user_type_id || ''}
                                         onChange={(e) => {
                                             const selectedType = Number(e.target.value);
                                             setDataInputEdit({
@@ -785,17 +900,14 @@ export default function UserManagement({ auth, type }: any) {
                                             });
                                         }}
                                     >
-                                        {
-                                            dataType?.map((mType: any, i: number) => {
-                                                return (
-                                                    <option value={mType.user_type_id}
-                                                        key={i}
-                                                        selected={dataInputEdit?.type?.user_type_id === mType.user_type_id}>
-                                                        {mType.user_type_name}
-                                                    </option>
-                                                )
-                                            })
-                                        }
+                                        <option value="" disabled>
+                                            -- Select Type --
+                                        </option>
+                                        {dataType?.map((mType: any, i: number) => (
+                                            <option value={mType.user_type_id} key={i}>
+                                                {mType.user_type_name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>
@@ -827,73 +939,7 @@ export default function UserManagement({ auth, type }: any) {
                                         </select>
                                     </div>
                                     {/* Employee */}
-                                    
-                                </>
-                            )}
-
-                            {(dataInputEdit?.type === 3 || dataInputEdit?.type?.user_type_id === 3) && (
-                                <>
-                                    {/* company */}
-                                    <div className="mb-2">
-                                        <div className="relative">
-                                            <InputLabel
-                                                className="absolute"
-                                                htmlFor="type"
-                                                value={'Relation Organization'}
-                                            />
-                                            <div className="ml-[9.7rem] text-red-600">*</div>
-                                        </div>
-                                        <select
-                                            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                            value={dataInputEdit?.individual_relations_id}
-                                            onChange={handleRelationChange
-                                            }
-                                        >
-                                            <option value={""}>
-                                                -- Choose Type --
-                                            </option>
-                                            {
-                                                relation?.map((mRel: any, i: number) => {
-                                                    return (
-                                                        <option value={mRel.RELATION_ORGANIZATION_ID} key={i}>
-                                                            {mRel.RELATION_ORGANIZATION_NAME}
-                                                        </option>
-                                                    )
-                                                })
-                                            }
-
-                                        </select>
-                                    </div>
-                                    {/* company */}
-                                </>
-                            )}
-
-                            <div className="relative">
-                                <div className="mb-2">
-                                    <div className="container">
-                                        <InputLabel
-                                            className="absolute"
-                                            htmlFor="user_login"
-                                            value={'User Login'}
-                                        />
-                                        <div className="ml-[4.6rem] text-red-600">*</div>
-                                    </div>
-                                    <TextInput
-                                        id="user_login"
-                                        type="text"
-                                        name="user_login"
-                                        value={dataInputEdit?.user_login}
-                                        className="mt-2"
-                                        onChange={handleUserLoginChange}
-                                        required
-                                        placeholder="user login or unique id"
-                                    />
-                                </div>
-                            </div>
-
-
-                            {(dataInputEdit?.type === 2 || dataInputEdit?.type?.user_type_id === 2) && (
-                                <>
+                                    {/* Role */}
                                     <div className="relative">
                                         <div className="mb-2">
                                             <InputLabel
@@ -935,7 +981,50 @@ export default function UserManagement({ auth, type }: any) {
 
                                         </div>
                                     </div>
-                                    <div className="relative">
+                                    {/* end Role */}
+
+                                {/* division  */}
+                                <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
+                                        htmlFor="type"
+                                        value={'Division'}
+                                    />
+                                    <div className="ml-[3.8rem] text-red-600">*</div>
+                                    <div className="mb-2">
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-primary-pelindo`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={divSelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select Division"}
+                                            isClearable={true}
+                                            value={divSelect.find((div: { value: any }) => div.value === dataInput.company_division_id)}
+                                            onChange={
+                                                (val: any) => {
+                                                    setDataInput({
+                                                        ...dataInput,
+                                                        company_division_id: val.value
+                                                    });
+                                                }
+                                            }
+                                            primaryColor={"red"}
+                                        />
+                                    </div>
+                                </div>
+                                {/* end division  */}
+
+                                {/* jobpost  */}
+                                <div className="relative">
                                     <InputLabel
                                         className="absolute"
                                         htmlFor="type"
@@ -957,20 +1046,86 @@ export default function UserManagement({ auth, type }: any) {
                                             options={jobpostSelect}
                                             isSearchable={true}
                                             isMultiple={false}
-                                            placeholder={"Select"}
+                                            placeholder={"Select Jobpost"}
                                             isClearable={true}
-                                            onChange={(val: any) => {
-                                                const selectedJobpost = val ? val.value : null;
-                                                setDataInputEdit({
-                                                    ...dataInputEdit,
-                                                    jobpost: selectedJobpost,
-                                                });
-                                            }}
-                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInputEdit.jobpost) || null}
+                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInput.jobpost) || null}
+                                            onChange={handleJobpostChange}
                                             primaryColor={"red"}
                                         />
                                     </div>
                                 </div>
+                                {/* end jobpost  */}
+
+                                </>
+                            )}
+
+                            {(dataInputEdit?.type === 3 || dataInputEdit?.type?.user_type_id === 3) && (
+                                <>
+                                    {/* company */}
+                                    <div className="mb-2">
+                                        <div className="relative">
+                                            <InputLabel
+                                                className="absolute"
+                                                htmlFor="type"
+                                                value={'Relation Organization'}
+                                            />
+                                            <div className="ml-[9.7rem] text-red-600">*</div>
+                                        </div>
+                                        <select
+                                            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={dataInputEdit?.individual_relations_id}
+                                            onChange={handleRelationChange
+                                            }
+                                        >
+                                            <option value={""}>
+                                                -- Choose Type --
+                                            </option>
+                                            {
+                                                relation?.map((mRel: any, i: number) => {
+                                                    return (
+                                                        <option value={mRel.RELATION_ORGANIZATION_ID} key={i}>
+                                                            {mRel.RELATION_ORGANIZATION_NAME}
+                                                        </option>
+                                                    )
+                                                })
+                                            }
+
+                                        </select>
+                                    </div>
+                                    {/* company */}
+                                </>
+                            )}
+
+                            {/* user_login */}
+                            <div className="relative">
+                                <div className="mb-2">
+                                    <div className="container">
+                                        <InputLabel
+                                            className="absolute"
+                                            htmlFor="user_login"
+                                            value={'User Login'}
+                                        />
+                                        <div className="ml-[4.6rem] text-red-600">*</div>
+                                    </div>
+                                    <TextInput
+                                        id="user_login"
+                                        type="text"
+                                        name="user_login"
+                                        value={dataInputEdit?.user_login}
+                                        className="mt-2"
+                                        onChange={handleUserLoginChange}
+                                        required
+                                        placeholder="user login or unique id"
+                                    />
+                                </div>
+                            </div>
+                            {/* end user_login */}
+
+
+
+                            {(dataInputEdit?.type === 2 || dataInputEdit?.type?.user_type_id === 2) && (
+                                <>
+
                                 </>
                             )}
 

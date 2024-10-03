@@ -32,7 +32,7 @@ const Sidebar = ({
   );
 
   // console.log(auth,'<<<<<<<<authhhhh');
-  
+
 
   // close on click outside
   useEffect(() => {
@@ -86,11 +86,11 @@ const Sidebar = ({
               }
               className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold hover:bg-red-600 hover:text-white"
             >
-              {menu.menu_name}
+              {menu.menu_name} 
             </NavLink>
           ) : (
             <span className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold opacity-25">
-              {menu.menu_name}
+              {menu.menu_name} 
             </span>
           )
         ) : (
@@ -109,7 +109,7 @@ const Sidebar = ({
                     sidebarExpanded ? handleClick() : setSidebarExpanded(true);
                   }}
                 >
-                  {menu.menu_name}
+                  {menu.menu_name} 
                   <svg
                     className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"}`}
                     width="20"
@@ -253,9 +253,10 @@ const Sidebar = ({
                   >
                     {"Dashboard"}
                   </NavLink>
-                  {auth.menu
-                    ?.filter((m: any) => m.menu_parent_id === null)
-                    .map((menu: any, index: number) => renderMenu(menu, index))}
+                  {
+                    auth.menu?.filter((m: any) => m.menu_parent_id === null)
+                      .map((menu: any, index: number) => renderMenu(menu, index))
+                  }
                 </ul>
               </li>
             </ul>

@@ -27,9 +27,6 @@ extends Controller
 
     public function getUserData($request)
     {
-        // dd($request);
-
-       
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
@@ -77,13 +74,13 @@ extends Controller
 
     public function getUserJson(Request $request)
     {
+        // dd($request);
         $data = $this->getUserData($request);
         return response()->json($data);
     }
 
     public function store(Request $request)
     {
-        // Log::info($request);
         // Define validation rules
         $rules = [
             'user_login' => 'required|string|unique:t_user,user_login',  // Validasi untuk user_login
@@ -103,14 +100,18 @@ extends Controller
         // Log::info(Auth::user()->id);
         // Auth::user()->id;
 
-        $name = $request->has('name') ? $request->input('name') : 'Default Name';
+        $name = $request->name;
+        if($name === null || $name === ''){
+            $name = $request->user_login;
+        }
         $User = User::create([  
             "role_id" => 0,
-            "name" => $request->user_login,  // Tambahkan name di sini
+            "name" => $name,  // Tambahkan name di sini
             'employee_id'=>$request->employee_id,
             'individual_relation_id'=>$request->individual_relation_id,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
+            'jobpost_id'=>$request->jobpost,
             "password" => bcrypt($request->password),
             "USER_CREATED_BY" => Auth::user()->id,
             "USER_CREATED_DATE" => now()
@@ -153,7 +154,7 @@ extends Controller
     }
     public function getUserDataById($id)
     {
-        $users = User::with('roles', 'type')->where('id', $id)->first();
+        $users = User::with('roles', 'type','jobpost')->where('id', $id)->first();
         return response()->json($users);
     }
 
@@ -167,24 +168,6 @@ extends Controller
     // Update User
     public function update(Request $request, $id)
     {
-         // Define validation rules
-        //  $rules = [
-        //     'user_login' => 'required|string|unique:t_user,user_login',  // Validasi untuk user_login
-        // ];
-
-        // // Create validator instance
-        // $validator = Validator::make($request->all(), $rules);
-
-        // // Check if validation fails
-        // if ($validator->fails()) {
-        //     return new JsonResponse([
-        //         $validator->errors()->all()
-        //     ], 422, [
-        //         'X-Inertia' => true
-        //     ]);
-        // }
-
-        Log::info($request);
         $User = User::find($id);
         $typeInput = collect($request->input('type'))->first();
 
@@ -228,8 +211,6 @@ extends Controller
     public function resetPassword(Request $request, $id)
     {
         $User = User::find($id);
-        // Log::info($request);
-        // Log::info($User);
         $User->update([
             "password" => bcrypt($request->password),
             "USER_UPDATED_BY" => Auth::user()->id,
