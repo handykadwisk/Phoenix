@@ -22,9 +22,6 @@ class TEmployee extends Model
 
     protected $with = ['division'];
 
-    // public function jobpost(){
-    //     return $this->belongsTo(TJobpost::class,);
-    // }
     public function division(): BelongsTo
     {
         return $this->belongsTo(TCompanyDivision::class, 'DIVISION_ID');

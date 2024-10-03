@@ -34,11 +34,6 @@ import { get } from "jquery";
 
 export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
-    // useEffect(() => {
-    //     getMenu();
-    // }, []);
-
-
     const [show, setShow] = useState<any>([]);
     const getmenusShow = async () => {
         try {
@@ -149,8 +144,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
         inputDataSearch("flag", "", 0);
         setIsSuccess("Cleared");
     };
-
-
 
     const [isSuccess, setIsSuccess] = useState<any>("");
     const handleSuccessMenu = (message: string) => {

@@ -1,6 +1,6 @@
 DELIMITER $$
 
-USE `phoenixx`$$
+USE `phoenix`$$
 
 DROP FUNCTION IF EXISTS `f_get_path_menu`$$
 

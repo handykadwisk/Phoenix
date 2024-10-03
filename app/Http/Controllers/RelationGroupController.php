@@ -342,59 +342,72 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function change_parent(Request $request){
-        // cek id yang ingin di ganti masuk mapping atau tidak?
+    public function change_parent(Request $request)
+    {
+        // Cari relasi parent berdasarkan ID grup relasi yang diterima dari request
         $relationParent = RelationGroup::find($request->RELATION_GROUP_ID);
+    
+        // Ambil ID parent dari relasi yang ditemukan
         $parentId = $relationParent->RELATION_GROUP_PARENT;
-        $concatID = ".".$request->RELATION_GROUP_ID.'.';
-        // dd($concatID);
-        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT['value'])->where('RELATION_GROUP_MAPPING', 'like', '%' . $concatID . '%')->get();
-        // dd($cekExisting->count());
+    
+        // Buat string untuk mengecek apakah ID sudah termasuk dalam mapping (concatenation ID)
+        $concatID = "." . $request->RELATION_GROUP_ID . '.';
+    
+        // Cek apakah parent baru yang diinginkan sudah ada dalam mapping
+        $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT['value'])
+            ->where('RELATION_GROUP_MAPPING', 'like', '%' . $concatID . '%')
+            ->get();
+    
+        // Jika parent ID yang baru ada di dalam mapping, lakukan pembaruan parent
         if ($cekExisting->count() > 0) {
-            // $idParent= $cekExisting[0]['RELATION_GROUP_PARENT'];
+            // Update parent ID untuk relasi grup yang baru
             $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT)
-            ->update([
-                'RELATION_GROUP_PARENT'         => $parentId,
-            ]);
-
-            
+                ->update([
+                    'RELATION_GROUP_PARENT' => $parentId,
+                ]);
+    
+            // Update parent ID untuk relasi grup yang diubah
             RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
-            ->update([
-                'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
-            ]);
-            // Mapping Parent Id and Update
+                ->update([
+                    'RELATION_GROUP_PARENT' => $request->RELATION_GROUP_PARENT['value'],
+                ]);
+    
+            // Jalankan stored procedure untuk memperbarui mapping relasi grup
             $name = NULL;
             DB::select('call sp_set_mapping_relation_group(?)', [$name]);
-        }else{
-            // dd($request->RELATION_GROUP_PARENT['value']);
+    
+        } else {
+            // Jika parent baru tidak ada dalam mapping, langsung update parent ID yang baru
             $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
-            ->update([
-                'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
-            ]);
-            // Mapping Parent Id and Update
+                ->update([
+                    'RELATION_GROUP_PARENT' => $request->RELATION_GROUP_PARENT['value'],
+                ]);
+    
+            // Jalankan stored procedure untuk memperbarui mapping relasi grup
             $name = NULL;
             DB::select('call sp_set_mapping_relation_group(?)', [$name]);
         }
-
-        
-
+    
+        // Jika pembaruan parent ID berhasil, log aktivitas user
         if ($updateGroup) {
             UserLog::create([
-                'created_by' => Auth::user()->id,
-                'action'     => json_encode([
+                'created_by' => Auth::user()->id,  // User yang melakukan perubahan
+                'action' => json_encode([          // Informasi aksi yang dilakukan
                     "description" => "Edit Group (Group).",
-                    "module"      => "Group",
-                    "id"          => $request->RELATION_GROUP_ID
+                    "module" => "Group",
+                    "id" => $request->RELATION_GROUP_ID
                 ]),
-                'action_by'  => Auth::user()->user_login
+                'action_by' => Auth::user()->user_login
             ]);
         }
-
+    
+        // Return response JSON dengan status 201 (Created) dan ID grup relasi yang diperbarui
         return new JsonResponse([
             $request->RELATION_GROUP_ID,
         ], 201, [
-            'X-Inertia' => true
+            'X-Inertia' => true // Set header X-Inertia untuk pengelolaan front-end
         ]);
     }
+    
     
 }

@@ -14,8 +14,8 @@ const SidebarLinkGroup = ({
   const handleClick = () => {
     setOpen(!open);
   };
-
-  return <li>{children(handleClick, open)}</li>;
+  // Remove the <li> wrapper
+  return <>{children(handleClick, open)}</>;
 };
 
 export default SidebarLinkGroup;
