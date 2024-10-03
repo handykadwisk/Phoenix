@@ -45,7 +45,7 @@ class CoBrokingController extends Controller
     }
 
     public function getCoBrokingByPolicyId($policy_id){
-        $coBroking = MPolicyCoBroking::where('POLICY_ID', $policy_id)->get();
+        $coBroking = getCoBrokingByPolicyId($policy_id);
         return response()->json($coBroking);
     }
 
