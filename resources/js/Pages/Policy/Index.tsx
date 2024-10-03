@@ -1347,8 +1347,9 @@ export default function PolicyIndex({ auth }: PageProps) {
                                                     value={
                                                         <>
                                                             {
+                                                                policy.relation ?
                                                                 policy.relation
-                                                                    .RELATION_ORGANIZATION_NAME
+                                                                    .RELATION_ORGANIZATION_NAME : "-"
                                                             }
                                                         </>
                                                     }

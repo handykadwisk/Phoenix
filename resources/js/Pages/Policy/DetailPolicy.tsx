@@ -579,8 +579,9 @@ export default function DetailPolicy({
                                         <div className=" col-span-3">
                                             <span className="font-normal text-gray-500">
                                                 {
+                                                    policyDetail.relation ?
                                                     policyDetail.relation
-                                                        .RELATION_ORGANIZATION_NAME
+                                                        .RELATION_ORGANIZATION_NAME : "-"
                                                 }
                                             </span>
                                         </div>
