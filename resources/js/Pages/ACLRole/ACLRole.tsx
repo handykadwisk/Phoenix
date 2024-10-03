@@ -356,21 +356,25 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         );
     };
     
-
-
     const TabMenu = () => {
         return (
             <div className="w-full max-w-md mx-auto">
                 <div>
                     <div className="">
                         {custom_menu?.map((menu: any) => (
-                            renderMenu(menu)
+                            <div key={menu.menu_id}>
+                                {renderMenu(menu)} 
+                            </div>
                         ))}
                     </div>
                 </div>
             </div>
         );
     };
+    
+    
+    
+    
 
     const [accessPermission, setAccessPermission] = useState<any>([])
 
@@ -378,7 +382,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         try {
             const data = await axios.get(`/rolePermission/${id}`)
             setAccessPermission(data.data)
-            console.log(data.data);
+            // console.log(data.data);
 
 
         } catch (error) {

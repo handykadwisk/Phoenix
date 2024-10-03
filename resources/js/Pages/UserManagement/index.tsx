@@ -43,50 +43,7 @@ import { Label } from "flowbite-react";
 import { data } from "jquery";
 import ModalToActions from "@/Components/Modal/ModalToActions";
 
-type DataInputType = {
-    name: string;
-    email: string;
-    user_login: string;
-    password: string;
-    employee_id: number;
-    individual_relations_id: number;
-    type: number;
-    role: any[];
-    jobpost: any[]; // Add this line to define the jobpost property
-};
-
 export default function UserManagement({ auth, type }: any) {
-
-    useEffect(() => {
-        getUser()
-        getAllUser()
-    }, []);
-
-    const InitialData = {
-        name: "",
-        email: "",
-        user_login: "",
-        password: "",
-        employee_id: 0,
-        individual_relations_id: 0,
-        type: 0,
-        role: [],
-        Jobpost: 0
-    }
-
-    const [allData, setAllData] = useState<any>([InitialData]);
-    const getAllUser = async () => {
-        try {
-            const result = await axios.get('/user');
-            setAllData(result.data);
-        } catch (error) {
-            console.error('Fetch error:', error);
-        }
-
-    }
-
-
-
 
     //type DataInput
     interface DataInputType {
@@ -138,9 +95,6 @@ export default function UserManagement({ auth, type }: any) {
     const [resetPassword, setResetPassword] = useState<any>({
         password: 'Phoenix123',
     })
-    const [isError, setIsError] = useState<string>("");
-    const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    // console.log(isError, '<<<<<isError');
 
     const inputDataSearch = (
         name: string,
@@ -151,6 +105,7 @@ export default function UserManagement({ auth, type }: any) {
         changeVal[i][name] = value;
         setSearchUser({ ...searchUser, user_search: changeVal });
     };
+
     //modal state
     const [modal, setModal] = useState({
         add: false,
@@ -169,6 +124,8 @@ export default function UserManagement({ auth, type }: any) {
         individual_relations_id: 0,
         type: 2,
         user_status: 0,
+        company_division_id: 0,
+        jobpost: 0,
         role: [],
         newRole: null
     });
@@ -182,9 +139,6 @@ export default function UserManagement({ auth, type }: any) {
         }));
     };
 
-
-
-
     //handlechangejobpost
     const handleJobpostChange = (selectedOption: any) => {
         setDataInput((prevState) => ({
@@ -192,7 +146,6 @@ export default function UserManagement({ auth, type }: any) {
             jobpost: selectedOption ? selectedOption.value : null // Jika tidak ada pilihan, set null
         }));
     };
-
 
     //handle change email
     const handleUserLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -212,40 +165,23 @@ export default function UserManagement({ auth, type }: any) {
         setDataInputEdit({ ...dataInputEdit, user_login, name });
     };
 
-
-    //fetch data user
-    const getUser = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getUser?${pageNumber}`, {
-                // idRelation,
-                name: searchUser.name,
-            })
-            .then((res) => {
-                setDataUser(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     //get user by id
     const getUserById = async (userId: number) => {
         try {
             const result = await axios.post(`/settings/getUserId/${userId}`);
             setDataUserId(result.data);
-            // console.log(result.data, '<<<<<result.data');
-            setDataInput(result.data);
             // set
             setDataInputEdit({
                 name: result.data.name,
                 email: result.data.email,
                 user_login: result.data.user_login,
                 employee_id: result.data.employee_id,
-                individual_relations_id: result.data.individual_relations_id,
+                individual_relations_id: result.data.individual_relation_id,
                 type: result.data.type,
                 user_status: result.data.user_status,
                 role: result.data.roles,
-                jobpost: result.data.jobpost_id
+                jobpost: result.data.jobpost_id,
+                company_division_id: result.data.company_division_id
             });
         } catch (error) {
             console.log(error);
@@ -298,7 +234,30 @@ export default function UserManagement({ auth, type }: any) {
 
     //modal add
     const addRolePopup = async (e: FormEvent) => {
-        e.preventDefault();
+        // e.preventDefault();
+        // try {
+        //     // Jalankan semua request secara paralel dan tunggu hingga semuanya selesai
+        //     await Promise.all([
+        //         getTypeTest(),
+        //         getDiv(),
+        //         getRole(),
+        //         getJobPost(),
+        //         getAllRelations(),
+        //         getEmployee()
+        //     ]);
+    
+        //     // Jika semua request selesai, baru buka modal
+        //     setModal({
+        //         add: true, // Ubah ke true, bukan toggle, karena kita pasti ingin membukanya
+        //         edit: false,
+        //         reset: false
+        //     });
+    
+        // } catch (error) {
+        //     console.error("Error loading data:", error);
+        //     // Anda bisa menambahkan penanganan error di sini, misalnya menampilkan pesan error di UI
+        // }
+
         getTypeTest()
         getDiv()
         getRole()
@@ -360,8 +319,6 @@ export default function UserManagement({ auth, type }: any) {
 
     // Fungsi untuk menangani perubahan saat employee dipilih
     const handleEmployeeChange = (e: any) => {
-        console.log(e, '<<<<<e');
-
         const selectedEmployeeId = Number(e.value);
         const selectedEmployee = employee.find((emp: any) => emp.EMPLOYEE_ID === selectedEmployeeId);
 
@@ -405,17 +362,37 @@ export default function UserManagement({ auth, type }: any) {
     };
 
     const handleDetailUser = async (e: any) => {
-        setModal({
-            add: false,
-            edit: !modal.edit,
-            reset: false
-        });
+        // try {
+        //     await Promise.all([
+        //         getUserById(e.id),
+        //         getTypeTest(),
+        //         getRole(),
+        //         getEmployee(),
+        //         getAllRelations(),
+        //         getJobPost(),
+        //         getDiv()
+        //     ])
+        //     setModal({
+        //         add: false,
+        //         edit: !modal.edit,
+        //         reset: false
+        //     });
+        // } catch (error) {
+        //     console.error("Error loading data:", error);
+        // }
+       
         getUserById(e.id);
         getTypeTest()
         getRole()
         getEmployee()
         getAllRelations()
+        getJobPost()
         getDiv()
+        setModal({
+                    add: false,
+                    edit: !modal.edit,
+                    reset: false
+                });
     }
 
     const [isSuccess, setIsSuccess] = useState<any>("");
@@ -498,7 +475,7 @@ export default function UserManagement({ auth, type }: any) {
     // const jobpostDiv = jobpost.find((el: any) => dataInput.jobpost === el.jobpost_id)?.company_division_id;
     const filteredJobPosts = jobpost.filter((el: any) => el.company_division_id === dataInput.company_division_id);
     const filteredJobPostsEdit = jobpost.filter((el: any) => el.company_division_id === dataInputEdit.company_division_id);
-
+    
     const jobpostSelect = filteredJobPosts.map((el: any) => {
         return {
             value: el.jobpost_id,
@@ -506,12 +483,12 @@ export default function UserManagement({ auth, type }: any) {
         };
     });
 
-
-
-    // console.log(filteredJobPosts, '<<<<<filteredJobPosts');
-    // console.log(dataInput, '<<<<<dataInput');
-    // console.log(dataInputEdit.jobpost.jobpost_name, '<<<<<dataInputEdit.jobpost_name');
-
+    const jobpostSelectEdit = filteredJobPostsEdit.map((el: any) => {
+        return {
+            value: el.jobpost_id,
+            label: el.jobpost_name
+        };
+    });
 
 
     return (
@@ -939,6 +916,7 @@ export default function UserManagement({ auth, type }: any) {
                                         </select>
                                     </div>
                                     {/* Employee */}
+
                                     {/* Role */}
                                     <div className="relative">
                                         <div className="mb-2">
@@ -983,78 +961,82 @@ export default function UserManagement({ auth, type }: any) {
                                     </div>
                                     {/* end Role */}
 
-                                {/* division  */}
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="type"
-                                        value={'Division'}
-                                    />
-                                    <div className="ml-[3.8rem] text-red-600">*</div>
-                                    <div className="mb-2">
-                                        <Select
-                                            classNames={{
-                                                menuButton: () =>
-                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                listItem: ({ isSelected }: any) =>
-                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                        ? `text-white bg-primary-pelindo`
-                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
-                                                    }`,
-                                            }}
-                                            options={divSelect}
-                                            isSearchable={true}
-                                            isMultiple={false}
-                                            placeholder={"Select Division"}
-                                            isClearable={true}
-                                            value={divSelect.find((div: { value: any }) => div.value === dataInput.company_division_id)}
-                                            onChange={
-                                                (val: any) => {
-                                                    setDataInput({
-                                                        ...dataInput,
-                                                        company_division_id: val.value
+                                    {/* division  */}
+                                    <div className="relative">
+                                        <InputLabel
+                                            className="absolute"
+                                            htmlFor="type"
+                                            value={'Division'}
+                                        />
+                                        <div className="ml-[3.8rem] text-red-600">*</div>
+                                        <div className="mb-2">
+                                            <Select
+                                                classNames={{
+                                                    menuButton: () =>
+                                                        `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                    menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    listItem: ({ isSelected }: any) =>
+                                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                            ? `text-white bg-primary-pelindo`
+                                                            : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                        }`,
+                                                }}
+                                                options={divSelect}
+                                                isSearchable={true}
+                                                isMultiple={false}
+                                                placeholder={"Select Division"}
+                                                isClearable={true}
+                                                value={divSelect.find((div: { value: any }) => div.value === dataInputEdit.company_division_id) || null}
+                                                onChange={(val: any) => {
+                                                    setDataInputEdit({
+                                                        ...dataInputEdit,
+                                                        company_division_id: val ? val.value : null
                                                     });
-                                                }
-                                            }
-                                            primaryColor={"red"}
-                                        />
+                                                }}
+                                                primaryColor={"red"}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                {/* end division  */}
+                                    {/* end division  */}
 
-                                {/* jobpost  */}
-                                <div className="relative">
-                                    <InputLabel
-                                        className="absolute"
-                                        htmlFor="type"
-                                        value={'Job Post'}
-                                    />
-                                    <div className="ml-[4rem] text-red-600">*</div>
-                                    <div className="mb-2">
-                                        <Select
-                                            classNames={{
-                                                menuButton: () =>
-                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                listItem: ({ isSelected }: any) =>
-                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                        ? `text-white bg-primary-pelindo`
-                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
-                                                    }`,
-                                            }}
-                                            options={jobpostSelect}
-                                            isSearchable={true}
-                                            isMultiple={false}
-                                            placeholder={"Select Jobpost"}
-                                            isClearable={true}
-                                            value={jobpostSelect.find((jobpost: { value: any }) => jobpost.value === dataInput.jobpost) || null}
-                                            onChange={handleJobpostChange}
-                                            primaryColor={"red"}
+                                    {/* jobpost  */}
+                                    <div className="relative">
+                                        <InputLabel
+                                            className="absolute"
+                                            htmlFor="type"
+                                            value={'Job Post'}
                                         />
+                                        <div className="ml-[4rem] text-red-600">*</div>
+                                        <div className="mb-2">
+                                            <Select
+                                                classNames={{
+                                                    menuButton: () =>
+                                                        `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                    menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    listItem: ({ isSelected }: any) =>
+                                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                            ? `text-white bg-primary-pelindo`
+                                                            : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                        }`,
+                                                }}
+                                                options={jobpostSelectEdit}
+                                                isSearchable={true}
+                                                isMultiple={false}
+                                                placeholder={"Select Jobpost"}
+                                                isClearable={true}
+                                                value={jobpostSelectEdit.find((jobpost: { value: any }) => jobpost.value === dataInputEdit.jobpost) || null}
+                                                // onChange={handleJobpostChange}
+                                                onChange={(val: any) => {
+                                                    setDataInputEdit({
+                                                        ...dataInputEdit,
+                                                        jobpost: val ? val.value : null
+                                                    });
+                                                }}
+                                                primaryColor={"red"}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                {/* end jobpost  */}
+                                    {/* end jobpost  */}
 
                                 </>
                             )}
@@ -1120,14 +1102,6 @@ export default function UserManagement({ auth, type }: any) {
                                 </div>
                             </div>
                             {/* end user_login */}
-
-
-
-                            {(dataInputEdit?.type === 2 || dataInputEdit?.type?.user_type_id === 2) && (
-                                <>
-
-                                </>
-                            )}
 
                             <div className="flex items-center mt-4 ">
                                 <span className="mr-2 text-sm">Is Active</span>

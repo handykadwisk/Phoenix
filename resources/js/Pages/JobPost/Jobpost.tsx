@@ -538,7 +538,7 @@ export default function Jobpost({ auth }: PageProps) {
           <>
             <div className="mb-3">
               <ul>
-                {devJobpost.length > 0 ? (
+                {
                   Array.from(
                     new Set(
                       devJobpost
@@ -554,9 +554,7 @@ export default function Jobpost({ auth }: PageProps) {
                       )}
                     />
                   ))
-                ) : (
-                  <li>No job posts found.</li>
-                )}
+               }
 
 
               </ul>

@@ -54,7 +54,7 @@ export default function ModalEdit({
                 },
             })
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setIsProcessing(false);
                 setIsError("");
                 onSuccess(res.data);

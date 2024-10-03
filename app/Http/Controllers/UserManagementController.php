@@ -81,6 +81,7 @@ extends Controller
 
     public function store(Request $request)
     {
+        // dd($request);
         // Define validation rules
         $rules = [
             'user_login' => 'required|string|unique:t_user,user_login',  // Validasi untuk user_login
@@ -108,7 +109,8 @@ extends Controller
             "role_id" => 0,
             "name" => $name,  // Tambahkan name di sini
             'employee_id'=>$request->employee_id,
-            'individual_relation_id'=>$request->individual_relation_id,
+            'company_division_id'=>$request->company_division_id,
+            'individual_relation_id'=>$request->individual_relations_id,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
             'jobpost_id'=>$request->jobpost,
@@ -174,6 +176,7 @@ extends Controller
         $User->update([
             'individual_relation_id'=>$request->individual_relation_id,
             "user_status" => $request->user_status,
+            'company_division_id'=>$request->company_division_id,
             "name" => $request->name,
             "email" => $request->email,
             "user_login" => $request->user_login,
