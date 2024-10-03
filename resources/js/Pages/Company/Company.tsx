@@ -11,8 +11,6 @@ import TextArea from "@/Components/TextArea";
 import ToastMessage from "@/Components/ToastMessage";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import DetailCompany from "./DetailCompany";
-import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
-import "@progress/kendo-theme-default/dist/all.css";
 
 export default function Company({ auth }: PageProps) {
     // modal for commpany
@@ -20,12 +18,6 @@ export default function Company({ auth }: PageProps) {
         add: false,
         view: false,
     });
-
-    const users = [
-        { id: 1, name: "Alice", age: 30 },
-        { id: 2, name: "Bob", age: 25 },
-        { id: 3, name: "Charlie", age: 35 },
-    ];
 
     // data Request Add Company
     const [dataCompany, setDataCompany] = useState<any>({
@@ -386,13 +378,6 @@ export default function Company({ auth }: PageProps) {
                     <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
                         <TextInput
                             type="text"
-                            // value={
-                            //     searchRelation.relation_search[0]
-                            //         .RELATION_ORGANIZATION_NAME === ""
-                            //         ? ""
-                            //         : searchRelation.relation_search[0]
-                            //               .RELATION_ORGANIZATION_NAME
-                            // }
                             className="mt-2 ring-1 ring-red-600"
                             placeholder="Search Company Name"
                         />
@@ -409,12 +394,11 @@ export default function Company({ auth }: PageProps) {
                 
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-                        {/* <AGGrid
+                        <AGGrid
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
                             withParam={""}
                             searchParam={null}
-                            // loading={isLoading.get_policy}
                             url={"getCompany"}
                             doubleClickEvent={handleDetailCompany}
                             triggeringRefreshData={isSuccess}
@@ -430,10 +414,7 @@ export default function Company({ auth }: PageProps) {
                                     flex: 7,
                                 },
                             ]}
-                        /> */}
-                        <Grid data={users}>
-                            <Column field="name" title="Name Relation" />
-                        </Grid>
+                        />
                     </div>
                 </div>
             </div>
