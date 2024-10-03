@@ -18,4 +18,19 @@ class TPinChat extends Model
     ];
 
     public $timestamps = false;
+
+    public function tUser()
+    {
+        return $this->hasOne(User::class, 'id', 'CREATED_PIN_CHAT_BY');
+    }
+
+    // public function tChat()
+    // {
+    //     return $this->hasMany(TChat::class, 'CHAT_ID', 'CHAT_ID');
+    // }
+
+    public function tChat()
+    {
+        return $this->belongsTo(TChat::class, 'CHAT_ID', 'CHAT_ID');
+    }
 }

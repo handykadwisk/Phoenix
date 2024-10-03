@@ -7,6 +7,8 @@ import axios from "axios";
 import {
     ArrowLeftIcon,
     PaperAirplaneIcon,
+    UserGroupIcon,
+    UserPlusIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
 import TextInput from "@/Components/TextInput";
@@ -15,6 +17,7 @@ import { format } from "date-fns";
 import PrimaryButton from "@/Components/Button/PrimaryButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbtack } from "@fortawesome/free-solid-svg-icons";
+import { faThumbtackSlash } from "@fortawesome/free-solid-svg-icons";
 import { faReply } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ToastMessage from "@/Components/ToastMessage";
@@ -25,6 +28,7 @@ import {
     AccordionTitle,
 } from "flowbite-react";
 import TextArea from "@/Components/TextArea";
+import SelectTailwind from "react-tailwindcss-select";
 
 export default function ModalChatMessage({
     show = false,
@@ -53,14 +57,16 @@ export default function ModalChatMessage({
         getMessageChatByTypeId(typeChatId);
     }, [typeChatId]);
     useEffect(() => {
+        getDataChatDetailUser(auth.user.id);
         getTypeChatByTagId(tagIdChat.TAG_ID);
     }, [tagIdChat]);
     useEffect(() => {
-        getChatPin(tagIdChat.TAG_ID);
+        getChatPin(tagIdChat.TAG_ID, auth.user.id);
     }, [tagIdChat]);
 
     const [isSuccessChat, setIsSuccessChat] = useState<string>("");
     const today = new Date();
+    const [dataParticipant, setDataParticipant] = useState<any>([]);
 
     // Format tanggal dengan date-fns
     const formattedDate = format(today, "dd MMMM yyyy");
@@ -103,12 +109,37 @@ export default function ModalChatMessage({
             });
     };
 
-    // Get Type Chat Pin Detail
-    const getChatPin = async (tagIdChat: any) => {
+    // get Data Participant dan Division
+    const getDataParticipantById = async (chatId: any) => {
         await axios
-            .post(`/getChatPin`, { tagIdChat })
+            .post(`/getDataParticipantById`, { chatId })
+            .then((res) => {
+                setDataParticipant(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // Get Type Chat Pin Detail
+    const getChatPin = async (tagIdChat: any, idAuthUser: any) => {
+        await axios
+            .post(`/getChatPin`, { tagIdChat, idAuthUser })
             .then((res) => {
                 setPinChatDetail(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [dataChatDetailUser, setDataChatDetailUser] = useState<any>([]);
+    const getDataChatDetailUser = async (idAuthUser: any) => {
+        await axios
+            .post(`/getDataChatDetailUser`, { idAuthUser })
+            .then((res) => {
+                setDataChatDetailUser(res.data);
+                console.log("chatdetailuser", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -129,6 +160,7 @@ export default function ModalChatMessage({
     const [data, setData] = useState<any>({
         INITIATE_YOUR_CHAT: "",
         CHAT_ID: "",
+        PARTICIPANT: [],
     });
 
     const messagesEndRef = useRef<any>(null);
@@ -148,11 +180,25 @@ export default function ModalChatMessage({
                 INITIATE_YOUR_CHAT: "",
                 CHAT_ID: message[0],
             });
+        }
+    };
 
-            // const fixedBottom = document.getElementById("messageChat");
-            // if (fixedBottom) {
-            //     fixedBottom.scrollTop = fixedBottom.scrollHeight;
-            // }
+    const handleSuccessAddParticipant = async (message: string) => {
+        setIsSuccessChat("");
+        if (message !== "") {
+            setIsSuccessChat(message[0]);
+            getDataParticipantById(message[1]);
+
+            setShowParticipant(false);
+            setShowAddParticipant("showParticipant");
+            setDataAddParticipant({
+                ...dataAddParticipant,
+                PARTICIPANT: null,
+            });
+
+            setTimeout(() => {
+                setIsSuccessChat("");
+            }, 5000);
         }
     };
 
@@ -180,10 +226,12 @@ export default function ModalChatMessage({
     });
 
     const [activeIndex, setActiveIndex] = useState<any>(null);
+    const [unpin, setUnpin] = useState<any>("");
     const [chatId, setChatId] = useState<any>("");
-    const handleContextMenu = (e: any, idChat: any) => {
+    const handleContextMenu = (e: any, idChat: any, flag: string) => {
         e.preventDefault();
         setChatId(idChat);
+        setUnpin(flag);
         setShowContext({
             ...showContext,
             visible: true,
@@ -235,12 +283,20 @@ export default function ModalChatMessage({
     const alertPinMessageObject = async (
         e: FormEvent,
         idChatDetail: any,
-        typeChatId: any
+        typeChatId: any,
+        flag: any
     ) => {
+        var textAlert = "";
+        if (flag === "pin") {
+            var textAlert = "You won't Pin Message?";
+        } else {
+            var textAlert = "You won't Upin Message?";
+        }
+
         e.preventDefault();
         Swal.fire({
             title: "Are you sure?",
-            text: "You won't Pin Message?",
+            text: textAlert,
             icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -248,9 +304,38 @@ export default function ModalChatMessage({
             confirmButtonText: "Yes!",
         }).then((result) => {
             if (result.isConfirmed) {
-                pinMessageObject(idChatDetail, typeChatId);
+                if (flag === "pin") {
+                    pinMessageObject(idChatDetail, typeChatId);
+                } else {
+                    unPinMessageObject(idChatDetail, typeChatId);
+                }
             }
         });
+    };
+
+    const unPinMessageObject = async (
+        idChatDetail: string,
+        typeChatId: any
+    ) => {
+        setIsSuccessChat("");
+        await axios
+            .post(`/unPinMessageObject`, { idChatDetail, typeChatId })
+            .then((res) => {
+                setIsSuccessChat(res.data[0]);
+                getTypeChatByTagId(res.data[1]);
+                getChatPin(res.data[1], res.data[2]);
+                setShowContext({
+                    ...showContext,
+                    visible: false,
+                });
+
+                setTimeout(() => {
+                    setIsSuccessChat("");
+                }, 5000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     const pinMessageObject = async (idChatDetail: string, typeChatId: any) => {
@@ -260,7 +345,7 @@ export default function ModalChatMessage({
             .then((res) => {
                 setIsSuccessChat(res.data[0]);
                 getTypeChatByTagId(res.data[1]);
-                getChatPin(res.data[1]);
+                getChatPin(res.data[1], res.data[2]);
                 setShowContext({
                     ...showContext,
                     visible: false,
@@ -282,8 +367,15 @@ export default function ModalChatMessage({
     const [filteredUsers, setFilteredUsers] = useState<any>([]);
 
     const users = ["Alice", "Bob", "Charlie", "David", "Eva"]; // Contoh daftar pengguna
+
     // onchange chat
     const onchangeChatText = async (e: any) => {
+        if (e.target.value === "") {
+            setData({
+                ...data,
+                PARTICIPANT: [],
+            });
+        }
         if (typeChatId !== "") {
             setData({
                 ...data,
@@ -314,11 +406,12 @@ export default function ModalChatMessage({
             }
 
             if (allValid) {
-                setShowMentions(false); // Sembunyikan dropdown jika '@' tidak ada
+                // setShowMentions(true); // Sembunyikan dropdown jika '@' tidak ada
             } else {
                 setShowMentions(true); // Tampilkan dropdown mention
             }
         } else {
+            // getDataParticipantById();
             setShowMentions(false); // Sembunyikan dropdown jika '@' tidak ada
         }
 
@@ -326,24 +419,166 @@ export default function ModalChatMessage({
         const lastWord = e.target.value.split(" ").pop(); // Ambil kata terakhir setelah '@'
         if (lastWord.startsWith("@")) {
             const searchQuery = lastWord.slice(1).toLowerCase();
-            const filtered = users.filter((user: any) =>
-                user.toLowerCase().startsWith(searchQuery)
+            const filtered = dataParticipant.filter((userP: any) =>
+                userP.CHAT_PARTICIPANT_NAME.toLowerCase().startsWith(
+                    searchQuery
+                )
             );
             setFilteredUsers(filtered);
         }
     };
 
     // Event handler untuk memilih mention dari dropdown
-    const handleMentionClick = (e: FormEvent, usersParticipant: any) => {
+    const handleMentionClick = (
+        e: FormEvent,
+        usersParticipant: any,
+        idParticipant: any
+    ) => {
         e.preventDefault();
+
         const words = data?.INITIATE_YOUR_CHAT.split(" ");
         words[words.length - 1] = "@" + usersParticipant; // Ganti kata terakhir dengan mention yang dipilih
         setData({
             ...data,
-            INITIATE_YOUR_CHAT: words.join(" ") + " ", // Tambahkan spasi setelah mention
+            INITIATE_YOUR_CHAT: words.join(" ") + " ",
+            PARTICIPANT: [
+                ...data.PARTICIPANT,
+                {
+                    id: idParticipant,
+                },
+            ], // Tambahkan spasi setelah mention
         });
+
+        // const updatedData = dataParticipant.filter(
+        //     (data: any) => data.PARTICIPANT_NAME !== usersParticipant
+        // );
+        // console.log("up", updatedData);
+        // setDataParticipant(updatedData);
         document.getElementById("textInput")?.focus();
         setShowMentions(false); // Sembunyikan dropdown
+    };
+
+    const [showAddParticipant, setShowAddParticipant] =
+        useState<any>("showParticipant");
+    const [showParticipant, setShowParticipant] = useState<boolean>(false);
+    const [dataAddParticipant, setDataAddParticipant] = useState<any>({
+        PARTICIPANT: null,
+        CHAT_ID: "",
+    });
+    const [optionsParticipant, setOptionsParticipant] = useState<any>([]);
+    const getDataParticipant = async () => {
+        await axios
+            .post(`/getDataParticipant`)
+            .then((res) => {
+                setOptionsParticipant(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const selectParticipant = optionsParticipant
+        ?.filter(
+            (m: any) =>
+                !dataParticipant.some(
+                    (item2: any) =>
+                        m.PARTICIPANT_NAME === item2.CHAT_PARTICIPANT_NAME
+                )
+        )
+        .map((query: any) => {
+            return {
+                value: query.PARTICIPANT_NAME + "+" + query.PARTICIPANT_ID,
+                label: query.PARTICIPANT_NAME,
+            };
+        });
+    // handle click add participant
+    const handleClickShowParticipant = async (e: FormEvent) => {
+        e.preventDefault();
+        if (showParticipant === false) {
+            setShowParticipant(true);
+            setShowAddParticipant("showParticipant");
+        } else {
+            setShowParticipant(false);
+            setShowAddParticipant("showParticipant");
+            setDataAddParticipant({
+                ...dataAddParticipant,
+                PARTICIPANT: null,
+            });
+        }
+        getDataParticipant();
+    };
+
+    const handleClickAddParticipant = async (e: FormEvent) => {
+        e.preventDefault();
+        if (showAddParticipant === "showParticipant") {
+            setShowAddParticipant("AddParticipant");
+        } else {
+            setShowAddParticipant("showParticipant");
+            setDataAddParticipant({
+                ...dataAddParticipant,
+                PARTICIPANT: null,
+            });
+        }
+        getDataParticipant();
+    };
+
+    const actionAddParticipant = async (e: any) => {
+        const url = "/addParticipant";
+        // return false;
+        e.preventDefault();
+        await axios
+            .post(url, dataAddParticipant, {
+                headers: {
+                    "Content-type": "multipart/form-data",
+                },
+            })
+            .then((res) => {
+                setIsProcessing(false);
+                handleSuccessAddParticipant(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // remove participant
+    const removeParticipant = async (idParticipant: any, idChat: any) => {
+        setIsSuccessChat("");
+        await axios
+            .post(`/removeParticipant`, { idParticipant, idChat })
+            .then((res) => {
+                setIsSuccessChat(res.data[0]);
+                getDataParticipantById(idChat);
+
+                setTimeout(() => {
+                    setIsSuccessChat("");
+                }, 5000);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // alert remove participant
+    const alertRemoveParticipant = async (
+        e: FormEvent,
+        idParticipant: any,
+        idChat: any
+    ) => {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't Remove Participant?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                removeParticipant(idParticipant, idChat);
+            }
+        });
     };
 
     return (
@@ -379,19 +614,47 @@ export default function ModalChatMessage({
                                         )}
                                         {flagPlugin === false ? (
                                             showContext.visible !== true ? (
-                                                <span
-                                                    className="hover:cursor-pointer"
-                                                    onClick={() => {
-                                                        setFlagPlugin(true);
-                                                        setData({
-                                                            ...data,
-                                                            INITIATE_YOUR_CHAT:
-                                                                "",
-                                                        });
-                                                    }}
-                                                >
-                                                    <ArrowLeftIcon className="w-6" />
-                                                </span>
+                                                <div className="flex">
+                                                    <span
+                                                        className="hover:cursor-pointer"
+                                                        onClick={(e: any) => {
+                                                            e.preventDefault();
+                                                            setFlagPlugin(true);
+                                                            setData({
+                                                                ...data,
+                                                                INITIATE_YOUR_CHAT:
+                                                                    "",
+                                                                PARTICIPANT: [],
+                                                            });
+                                                            setShowParticipant(
+                                                                false
+                                                            );
+                                                            setShowAddParticipant(
+                                                                "showParticipant"
+                                                            );
+                                                            setDataAddParticipant(
+                                                                {
+                                                                    ...dataAddParticipant,
+                                                                    PARTICIPANT:
+                                                                        null,
+                                                                }
+                                                            );
+                                                        }}
+                                                    >
+                                                        <ArrowLeftIcon className="w-6" />
+                                                    </span>
+                                                    <span
+                                                        className="cursor-pointer"
+                                                        title="Participant"
+                                                        onClick={(e: any) => {
+                                                            handleClickShowParticipant(
+                                                                e
+                                                            );
+                                                        }}
+                                                    >
+                                                        <UserGroupIcon className="w-6" />
+                                                    </span>
+                                                </div>
                                             ) : (
                                                 <>
                                                     <span
@@ -456,35 +719,50 @@ export default function ModalChatMessage({
                                             <span>List Chat</span>
                                         ) : (
                                             <>
-                                                <div className="flex gap-2">
-                                                    <span
-                                                        className="cursor-pointer"
-                                                        title="Pin Message"
-                                                        onClick={(e: any) =>
-                                                            alertPinMessageObject(
-                                                                e,
-                                                                chatId,
-                                                                data.CHAT_ID
-                                                            )
-                                                        }
-                                                    >
-                                                        <FontAwesomeIcon
-                                                            icon={faThumbtack}
-                                                        />
-                                                    </span>
-                                                    {/* <span
-                                                        className="cursor-pointer"
-                                                        title="Reply Message"
-                                                        onClick={(e: any) => {
-                                                            e.preventDefault;
-                                                            setTextReply(true);
-                                                        }}
-                                                    >
-                                                        <FontAwesomeIcon
-                                                            icon={faReply}
-                                                        />
-                                                    </span> */}
-                                                </div>
+                                                {unpin === "pin" ? (
+                                                    <div className="flex gap-2">
+                                                        <span
+                                                            className="cursor-pointer"
+                                                            title="Pin Message"
+                                                            onClick={(e: any) =>
+                                                                alertPinMessageObject(
+                                                                    e,
+                                                                    chatId,
+                                                                    data.CHAT_ID,
+                                                                    unpin
+                                                                )
+                                                            }
+                                                        >
+                                                            <FontAwesomeIcon
+                                                                icon={
+                                                                    faThumbtack
+                                                                }
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    // unpin
+                                                    <div className="flex gap-2">
+                                                        <span
+                                                            className="cursor-pointer"
+                                                            title="Pin Message"
+                                                            onClick={(e: any) =>
+                                                                alertPinMessageObject(
+                                                                    e,
+                                                                    chatId,
+                                                                    data.CHAT_ID,
+                                                                    unpin
+                                                                )
+                                                            }
+                                                        >
+                                                            <FontAwesomeIcon
+                                                                icon={
+                                                                    faThumbtackSlash
+                                                                }
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </>
                                         )}
                                         {showContext.visible !== true ? (
@@ -512,12 +790,153 @@ export default function ModalChatMessage({
                                     </div>
                                     {flagPlugin === false ? (
                                         <>
-                                            {/* <div className="flex flex-col h-auto"> */}
                                             <div
                                                 className="messageChat chat-height overflow-y-auto custom-scrollbar flex-grow"
                                                 id="messageChat"
                                                 ref={messagesEndRef}
                                             >
+                                                {/* Participant */}
+                                                {showParticipant && (
+                                                    <>
+                                                        <div className="absolute p-2 bg-white w-full shadow-md rounded-br-md rounded-bl-md">
+                                                            <div
+                                                                onClick={(
+                                                                    e: any
+                                                                ) => {
+                                                                    handleClickAddParticipant(
+                                                                        e
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <span>
+                                                                    <UserPlusIcon
+                                                                        className="w-5 text-red-600 cursor-pointer"
+                                                                        title="Add Participant"
+                                                                    />
+                                                                </span>
+                                                            </div>
+                                                            {showAddParticipant ===
+                                                            "showParticipant" ? (
+                                                                <div className="text-xs mt-2">
+                                                                    {dataParticipant?.map(
+                                                                        (
+                                                                            dParticipant: any,
+                                                                            i: number
+                                                                        ) => {
+                                                                            return (
+                                                                                <div
+                                                                                    key={
+                                                                                        i
+                                                                                    }
+                                                                                    className="mb-2 hover:bg-red-600 hover:text-white hover:p-2 hover:rounded-md"
+                                                                                >
+                                                                                    <div className="flex justify-between items-center">
+                                                                                        <span className="cursor-pointer">
+                                                                                            {
+                                                                                                dParticipant.CHAT_PARTICIPANT_NAME
+                                                                                            }
+                                                                                        </span>
+                                                                                        <span
+                                                                                            className="cursor-pointer"
+                                                                                            title="Remove Participant"
+                                                                                            onClick={(
+                                                                                                e: any
+                                                                                            ) => {
+                                                                                                alertRemoveParticipant(
+                                                                                                    e,
+                                                                                                    dParticipant.CHAT_PARTICIPANT_ID,
+                                                                                                    data.CHAT_ID
+                                                                                                );
+                                                                                            }}
+                                                                                        >
+                                                                                            <XMarkIcon className="w-5" />
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <form
+                                                                    onSubmit={
+                                                                        actionAddParticipant
+                                                                    }
+                                                                >
+                                                                    <div className="w-full">
+                                                                        <div className="hover:cursor-pointer">
+                                                                            <SelectTailwind
+                                                                                classNames={{
+                                                                                    menuButton:
+                                                                                        () =>
+                                                                                            `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                                                    menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                                    listItem:
+                                                                                        ({
+                                                                                            isSelected,
+                                                                                        }: any) =>
+                                                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                                                isSelected
+                                                                                                    ? `text-white bg-red-600`
+                                                                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                                            }`,
+                                                                                }}
+                                                                                options={
+                                                                                    selectParticipant
+                                                                                }
+                                                                                isSearchable={
+                                                                                    true
+                                                                                }
+                                                                                isMultiple={
+                                                                                    true
+                                                                                }
+                                                                                placeholder={
+                                                                                    "Select to Add Participant"
+                                                                                }
+                                                                                isClearable={
+                                                                                    true
+                                                                                }
+                                                                                value={
+                                                                                    dataAddParticipant.PARTICIPANT
+                                                                                }
+                                                                                onChange={(
+                                                                                    val: any
+                                                                                ) => {
+                                                                                    setDataAddParticipant(
+                                                                                        {
+                                                                                            ...dataAddParticipant,
+                                                                                            PARTICIPANT:
+                                                                                                val,
+                                                                                        }
+                                                                                    );
+                                                                                }}
+                                                                                primaryColor={
+                                                                                    "bg-red-500"
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                        {dataAddParticipant.PARTICIPANT !==
+                                                                        null ? (
+                                                                            <div className="mt-2">
+                                                                                <PrimaryButton
+                                                                                    className="w-full text-xs"
+                                                                                    disabled={
+                                                                                        isProcessing
+                                                                                    }
+                                                                                >
+                                                                                    <span>
+                                                                                        Add
+                                                                                        Participant
+                                                                                    </span>
+                                                                                </PrimaryButton>
+                                                                            </div>
+                                                                        ) : null}
+                                                                    </div>
+                                                                </form>
+                                                            )}
+                                                        </div>
+                                                    </>
+                                                )}
                                                 {Object.keys(
                                                     detailMessage
                                                 )?.map(
@@ -578,14 +997,6 @@ export default function ModalChatMessage({
                                                                                                 ? "bg-blue-500 text-white rounded-lg py-2 px-2 inline-block text-xs w-fit "
                                                                                                 : "bg-gray-200 text-gray-700 rounded-lg py-2 px-2 inline-block text-xs w-fit"
                                                                                         }
-                                                                                        // onClick={(
-                                                                                        //     e: any
-                                                                                        // ) =>
-                                                                                        //     handleContextMenu(
-                                                                                        //         e,
-                                                                                        //         items.CHAT_DETAIL_ID
-                                                                                        //     )
-                                                                                        // }
                                                                                     >
                                                                                         {
                                                                                             items.CHAT_DETAIL_TEXT
@@ -647,7 +1058,7 @@ export default function ModalChatMessage({
                                                 <form onSubmit={action}>
                                                     <hr />
                                                     {showMentions && (
-                                                        <div className="m-2">
+                                                        <div className="m-2 text-xs cursor-pointer overflow-y-auto custom-scrollbar h-24">
                                                             {filteredUsers?.map(
                                                                 (
                                                                     dataParticipant: any,
@@ -655,6 +1066,7 @@ export default function ModalChatMessage({
                                                                 ) => {
                                                                     return (
                                                                         <div
+                                                                            className="hover:bg-red-600 p-1 rounded-md hover:text-white"
                                                                             key={
                                                                                 a
                                                                             }
@@ -663,13 +1075,14 @@ export default function ModalChatMessage({
                                                                             ) =>
                                                                                 handleMentionClick(
                                                                                     e,
-                                                                                    dataParticipant
+                                                                                    dataParticipant.CHAT_PARTICIPANT_NAME,
+                                                                                    dataParticipant.CHAT_PARTICIPANT_ID
                                                                                 )
                                                                             }
                                                                         >
                                                                             <span>
                                                                                 {
-                                                                                    dataParticipant
+                                                                                    dataParticipant.CHAT_PARTICIPANT_NAME
                                                                                 }
                                                                             </span>
                                                                         </div>
@@ -751,7 +1164,6 @@ export default function ModalChatMessage({
                                                                         .scrollHeight +
                                                                     "px"; // Atur tinggi sesuai dengan scrollHeight
                                                             }}
-                                                            // onChange={(e) => permissionObject(e)}
                                                             placeholder="Your Chat"
                                                         />
                                                         <PrimaryButton
@@ -767,7 +1179,6 @@ export default function ModalChatMessage({
                                                     </div>
                                                 </form>
                                             </div>
-                                            {/* </div> */}
 
                                             {/* END INPUT CHAT MESSAGE */}
                                         </>
@@ -808,11 +1219,15 @@ export default function ModalChatMessage({
                                                                                     onClick={(
                                                                                         e
                                                                                     ) => {
+                                                                                        e.preventDefault();
                                                                                         if (
                                                                                             showContext.visible !==
                                                                                             true
                                                                                         ) {
                                                                                             getMessageChatByTypeId(
+                                                                                                dTypeChat.CHAT_ID
+                                                                                            );
+                                                                                            getDataParticipantById(
                                                                                                 dTypeChat.CHAT_ID
                                                                                             );
                                                                                             setFlagPlugin(
@@ -821,6 +1236,13 @@ export default function ModalChatMessage({
                                                                                             setData(
                                                                                                 {
                                                                                                     ...data,
+                                                                                                    CHAT_ID:
+                                                                                                        dTypeChat.CHAT_ID,
+                                                                                                }
+                                                                                            );
+                                                                                            setDataAddParticipant(
+                                                                                                {
+                                                                                                    ...dataAddParticipant,
                                                                                                     CHAT_ID:
                                                                                                         dTypeChat.CHAT_ID,
                                                                                                 }
@@ -830,111 +1252,37 @@ export default function ModalChatMessage({
                                                                                     onContextMenu={(
                                                                                         e: any
                                                                                     ) => {
-                                                                                        handleContextMenu(
-                                                                                            e,
-                                                                                            dTypeChat.CHAT_ID
-                                                                                        );
-                                                                                        setActiveIndex(
-                                                                                            i
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    <div>
-                                                                                        <div className="">
-                                                                                            <span>
-                                                                                                {
-                                                                                                    dTypeChat.CHAT_TITLE
-                                                                                                }
-                                                                                            </span>
-                                                                                        </div>
-                                                                                        <div className="text-[10px]">
-                                                                                            <span>
-                                                                                                {dTypeChat
-                                                                                                    ?.t_user
-                                                                                                    .name +
-                                                                                                    " - " +
-                                                                                                    format(
-                                                                                                        dTypeChat.CREATED_CHAT_DATE,
-                                                                                                        "dd-MM-yyyy"
-                                                                                                    )}
-                                                                                            </span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div className="flex">
-                                                                                        <span className="text-[15px] rotate-45">
-                                                                                            {/* <FontAwesomeIcon
-                                                                                                icon={
-                                                                                                    faThumbtack
-                                                                                                }
-                                                                                            /> */}
-                                                                                            {dTypeChat?.CREATED_PIN_CHAT_BY ===
-                                                                                            auth
-                                                                                                .user
-                                                                                                .id ? (
-                                                                                                <>
-                                                                                                    <FontAwesomeIcon
-                                                                                                        icon={
-                                                                                                            faThumbtack
-                                                                                                        }
-                                                                                                    />
-                                                                                                </>
-                                                                                            ) : null}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        );
-                                                                    }
-                                                                )}
-                                                            </div>
-                                                        </AccordionContent>
-                                                    </AccordionPanel>
-                                                    <AccordionPanel>
-                                                        <AccordionTitle className="text-xs">
-                                                            Pinned By You
-                                                        </AccordionTitle>
-                                                        <AccordionContent>
-                                                            <div className="">
-                                                                {pinChatDetail?.map(
-                                                                    (
-                                                                        dTypeChat: any,
-                                                                        i: number
-                                                                    ) => {
-                                                                        return (
-                                                                            <div
-                                                                                key={
-                                                                                    i
-                                                                                }
-                                                                                className={
-                                                                                    showContext.visible ===
-                                                                                        true &&
-                                                                                    activeIndex ===
-                                                                                        i
-                                                                                        ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
-                                                                                        : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
-                                                                                }
-                                                                            >
-                                                                                <div
-                                                                                    className="flex justify-between items-center"
-                                                                                    onClick={(
-                                                                                        e
-                                                                                    ) => {
                                                                                         if (
-                                                                                            showContext.visible !==
-                                                                                            true
+                                                                                            dTypeChat
+                                                                                                ?.pin_chat
+                                                                                                .length !==
+                                                                                                0 &&
+                                                                                            dTypeChat?.pin_chat.find(
+                                                                                                (
+                                                                                                    f: any
+                                                                                                ) =>
+                                                                                                    f.CREATED_PIN_CHAT_BY ===
+                                                                                                    auth
+                                                                                                        .user
+                                                                                                        .id
+                                                                                            )
                                                                                         ) {
-                                                                                            getMessageChatByTypeId(
-                                                                                                dTypeChat.CHAT_ID
+                                                                                            handleContextMenu(
+                                                                                                e,
+                                                                                                dTypeChat.CHAT_ID,
+                                                                                                "unpin"
                                                                                             );
-                                                                                            setFlagPlugin(
-                                                                                                false
+                                                                                            setActiveIndex(
+                                                                                                i
                                                                                             );
-                                                                                            setData(
-                                                                                                {
-                                                                                                    ...data,
-                                                                                                    CHAT_ID:
-                                                                                                        dTypeChat.CHAT_ID,
-                                                                                                }
+                                                                                        } else {
+                                                                                            handleContextMenu(
+                                                                                                e,
+                                                                                                dTypeChat.CHAT_ID,
+                                                                                                "pin"
+                                                                                            );
+                                                                                            setActiveIndex(
+                                                                                                i
                                                                                             );
                                                                                         }
                                                                                     }}
@@ -967,10 +1315,15 @@ export default function ModalChatMessage({
                                                                                                     faThumbtack
                                                                                                 }
                                                                                             /> */}
-                                                                                            {dTypeChat?.CREATED_PIN_CHAT_BY ===
-                                                                                            auth
-                                                                                                .user
-                                                                                                .id ? (
+                                                                                            {dTypeChat?.pin_chat.find(
+                                                                                                (
+                                                                                                    f: any
+                                                                                                ) =>
+                                                                                                    f.CREATED_PIN_CHAT_BY ===
+                                                                                                    auth
+                                                                                                        .user
+                                                                                                        .id
+                                                                                            ) ? (
                                                                                                 <>
                                                                                                     <FontAwesomeIcon
                                                                                                         icon={
@@ -991,73 +1344,299 @@ export default function ModalChatMessage({
                                                     </AccordionPanel>
                                                     <AccordionPanel>
                                                         <AccordionTitle className="text-xs">
-                                                            Mentioned To You
+                                                            Chats You Pin
                                                         </AccordionTitle>
                                                         <AccordionContent>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                The main
-                                                                difference is
-                                                                that the core
-                                                                components from
-                                                                Flowbite are
-                                                                open source
-                                                                under the MIT
-                                                                license, whereas
-                                                                Tailwind UI is a
-                                                                paid product.
-                                                                Another
-                                                                difference is
-                                                                that Flowbite
-                                                                relies on
-                                                                smaller and
-                                                                standalone
-                                                                components,
-                                                                whereas Tailwind
-                                                                UI offers
-                                                                sections of
-                                                                pages.
-                                                            </p>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                However, we
-                                                                actually
-                                                                recommend using
-                                                                both Flowbite,
-                                                                Flowbite Pro,
-                                                                and even
-                                                                Tailwind UI as
-                                                                there is no
-                                                                technical reason
-                                                                stopping you
-                                                                from using the
-                                                                best of two
-                                                                worlds.
-                                                            </p>
-                                                            <p className="mb-2 text-gray-500 dark:text-gray-400">
-                                                                Learn more about
-                                                                these
-                                                                technologies:
-                                                            </p>
-                                                            <ul className="list-disc pl-5 text-gray-500 dark:text-gray-400">
-                                                                <li>
-                                                                    <a
-                                                                        href="https://flowbite.com/pro/"
-                                                                        className="text-cyan-600 hover:underline dark:text-cyan-500"
-                                                                    >
-                                                                        Flowbite
-                                                                        Pro
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a
-                                                                        href="https://tailwindui.com/"
-                                                                        rel="nofollow"
-                                                                        className="text-cyan-600 hover:underline dark:text-cyan-500"
-                                                                    >
-                                                                        Tailwind
-                                                                        UI
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
+                                                            <div className="">
+                                                                {pinChatDetail?.length ===
+                                                                0 ? (
+                                                                    <>
+                                                                        <div className="text-xs text-red-500">
+                                                                            <span>
+                                                                                There
+                                                                                are
+                                                                                no
+                                                                                chats
+                                                                                pinned
+                                                                                yet
+                                                                            </span>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    pinChatDetail?.map(
+                                                                        (
+                                                                            pinChat: any,
+                                                                            i: number
+                                                                        ) => {
+                                                                            return (
+                                                                                <div
+                                                                                    key={
+                                                                                        i
+                                                                                    }
+                                                                                    className={
+                                                                                        showContext.visible ===
+                                                                                            true &&
+                                                                                        activeIndex ===
+                                                                                            i
+                                                                                            ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                            : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
+                                                                                    }
+                                                                                >
+                                                                                    <div
+                                                                                        className="flex justify-between items-center"
+                                                                                        onClick={(
+                                                                                            e
+                                                                                        ) => {
+                                                                                            e.preventDefault();
+                                                                                            if (
+                                                                                                showContext.visible !==
+                                                                                                true
+                                                                                            ) {
+                                                                                                getMessageChatByTypeId(
+                                                                                                    pinChat.CHAT_ID
+                                                                                                );
+                                                                                                getDataParticipantById(
+                                                                                                    pinChat.CHAT_ID
+                                                                                                );
+                                                                                                setFlagPlugin(
+                                                                                                    false
+                                                                                                );
+                                                                                                setData(
+                                                                                                    {
+                                                                                                        ...data,
+                                                                                                        CHAT_ID:
+                                                                                                            pinChat.CHAT_ID,
+                                                                                                    }
+                                                                                                );
+                                                                                                setDataAddParticipant(
+                                                                                                    {
+                                                                                                        ...dataAddParticipant,
+                                                                                                        CHAT_ID:
+                                                                                                            pinChat.CHAT_ID,
+                                                                                                    }
+                                                                                                );
+                                                                                            }
+                                                                                        }}
+                                                                                        onContextMenu={(
+                                                                                            e: any
+                                                                                        ) => {
+                                                                                            if (
+                                                                                                pinChat?.CREATED_PIN_CHAT_BY ===
+                                                                                                auth
+                                                                                                    .user
+                                                                                                    .id
+                                                                                            ) {
+                                                                                                handleContextMenu(
+                                                                                                    e,
+                                                                                                    pinChat.CHAT_ID,
+                                                                                                    "unpin"
+                                                                                                );
+                                                                                                setActiveIndex(
+                                                                                                    i
+                                                                                                );
+                                                                                            } else {
+                                                                                                handleContextMenu(
+                                                                                                    e,
+                                                                                                    pinChat.CHAT_ID,
+                                                                                                    "pin"
+                                                                                                );
+                                                                                                setActiveIndex(
+                                                                                                    i
+                                                                                                );
+                                                                                            }
+                                                                                        }}
+                                                                                    >
+                                                                                        <div>
+                                                                                            <div className="">
+                                                                                                <span>
+                                                                                                    {
+                                                                                                        pinChat.CHAT_TITLE
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            <div className="text-[10px]">
+                                                                                                <span>
+                                                                                                    {pinChat
+                                                                                                        ?.t_user
+                                                                                                        .name +
+                                                                                                        " - " +
+                                                                                                        format(
+                                                                                                            pinChat.CREATED_CHAT_DATE,
+                                                                                                            "dd-MM-yyyy"
+                                                                                                        )}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div className="flex">
+                                                                                            <span className="text-[15px] rotate-45">
+                                                                                                {pinChat?.CREATED_PIN_CHAT_BY ===
+                                                                                                auth
+                                                                                                    .user
+                                                                                                    .id ? (
+                                                                                                    <>
+                                                                                                        <FontAwesomeIcon
+                                                                                                            icon={
+                                                                                                                faThumbtack
+                                                                                                            }
+                                                                                                        />
+                                                                                                    </>
+                                                                                                ) : null}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </AccordionContent>
+                                                    </AccordionPanel>
+                                                    <AccordionPanel>
+                                                        <AccordionTitle className="text-xs">
+                                                            Chat That Mention
+                                                            You
+                                                        </AccordionTitle>
+                                                        <AccordionContent>
+                                                            <div>
+                                                                {dataChatDetailUser?.length ===
+                                                                0 ? (
+                                                                    <>
+                                                                        <div className="text-xs text-red-500">
+                                                                            <span>
+                                                                                There
+                                                                                are
+                                                                                no
+                                                                                chats
+                                                                                mention
+                                                                                you
+                                                                            </span>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    dataChatDetailUser?.map(
+                                                                        (
+                                                                            chatDetailUser: any,
+                                                                            i: number
+                                                                        ) => {
+                                                                            return (
+                                                                                <div
+                                                                                    key={
+                                                                                        i
+                                                                                    }
+                                                                                    className={
+                                                                                        showContext.visible ===
+                                                                                            true &&
+                                                                                        activeIndex ===
+                                                                                            i
+                                                                                            ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                            : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
+                                                                                    }
+                                                                                >
+                                                                                    <div
+                                                                                        className="flex justify-between items-center"
+                                                                                        // onClick={(
+                                                                                        //     e
+                                                                                        // ) => {
+                                                                                        //     e.preventDefault();
+                                                                                        //     if (
+                                                                                        //         showContext.visible !==
+                                                                                        //         true
+                                                                                        //     ) {
+                                                                                        //         getMessageChatByTypeId(
+                                                                                        //             pinChat.CHAT_ID
+                                                                                        //         );
+                                                                                        //         getDataParticipantById(
+                                                                                        //             pinChat.CHAT_ID
+                                                                                        //         );
+                                                                                        //         setFlagPlugin(
+                                                                                        //             false
+                                                                                        //         );
+                                                                                        //         setData(
+                                                                                        //             {
+                                                                                        //                 ...data,
+                                                                                        //                 CHAT_ID:
+                                                                                        //                     pinChat.CHAT_ID,
+                                                                                        //             }
+                                                                                        //         );
+                                                                                        //         setDataAddParticipant(
+                                                                                        //             {
+                                                                                        //                 ...dataAddParticipant,
+                                                                                        //                 CHAT_ID:
+                                                                                        //                     pinChat.CHAT_ID,
+                                                                                        //             }
+                                                                                        //         );
+                                                                                        //     }
+                                                                                        // }}
+                                                                                        // onContextMenu={(
+                                                                                        //     e: any
+                                                                                        // ) => {
+                                                                                        //     if (
+                                                                                        //         pinChat?.CREATED_PIN_CHAT_BY ===
+                                                                                        //         auth
+                                                                                        //             .user
+                                                                                        //             .id
+                                                                                        //     ) {
+                                                                                        //         handleContextMenu(
+                                                                                        //             e,
+                                                                                        //             pinChat.CHAT_ID,
+                                                                                        //             "unpin"
+                                                                                        //         );
+                                                                                        //         setActiveIndex(
+                                                                                        //             i
+                                                                                        //         );
+                                                                                        //     } else {
+                                                                                        //         handleContextMenu(
+                                                                                        //             e,
+                                                                                        //             pinChat.CHAT_ID,
+                                                                                        //             "pin"
+                                                                                        //         );
+                                                                                        //         setActiveIndex(
+                                                                                        //             i
+                                                                                        //         );
+                                                                                        //     }
+                                                                                        // }}
+                                                                                    >
+                                                                                        <div>
+                                                                                            <div className="">
+                                                                                                <span>
+                                                                                                    {
+                                                                                                        chatDetailUser
+                                                                                                            ?.t_chat
+                                                                                                            .CHAT_TITLE
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            <div className="text-xs text-gray-400">
+                                                                                                <span>
+                                                                                                    Message
+                                                                                                    mention:
+                                                                                                    {" " +
+                                                                                                        chatDetailUser
+                                                                                                            ?.t_chat_detail
+                                                                                                            .CHAT_DETAIL_TEXT}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            {/* <div className="text-[10px]">
+                                                                                                <span>
+                                                                                                    {chatDetailUser
+                                                                                                        ?.t_user
+                                                                                                        .name +
+                                                                                                        " - " +
+                                                                                                        format(
+                                                                                                            chatDetailUser.CREATED_CHAT_DATE,
+                                                                                                            "dd-MM-yyyy"
+                                                                                                        )}
+                                                                                                </span>
+                                                                                            </div> */}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                )}
+                                                            </div>
                                                         </AccordionContent>
                                                     </AccordionPanel>
                                                     <AccordionPanel>
@@ -1133,76 +1712,6 @@ export default function ModalChatMessage({
                                                     </AccordionPanel>
                                                 </Accordion>
                                             </div>
-
-                                            {/* <div>
-                                                <div className="m-2 bg-red-600 w-fit p-2 rounded-md text-white cursor-pointer hover:bg-red-300 text-xs">
-                                                    <span>Add Chat</span>
-                                                </div>
-                                                <div className="p-2">
-                                                    <fieldset className="pb-2 pt-2 rounded-lg border-slate-100 border-2 p2">
-                                                        <legend className="ml-2 px-3 text-sm">
-                                                            List Chat
-                                                        </legend>
-                                                        <div className="">
-                                                            {detailTypeChat?.map(
-                                                                (
-                                                                    dTypeChat: any,
-                                                                    i: number
-                                                                ) => {
-                                                                    return (
-                                                                        <div
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                        >
-                                                                            <div
-                                                                                className="hover:bg-red-600 cursor-pointer m-2 p-2 rounded-md shadow-md mb-2 hover:text-white text-sm"
-                                                                                onClick={(
-                                                                                    e
-                                                                                ) => {
-                                                                                    getMessageChatByTypeId(
-                                                                                        dTypeChat.CHAT_ID
-                                                                                    );
-                                                                                    setFlagPlugin(
-                                                                                        false
-                                                                                    );
-                                                                                    setData(
-                                                                                        {
-                                                                                            ...data,
-                                                                                            CHAT_ID:
-                                                                                                dTypeChat.CHAT_ID,
-                                                                                        }
-                                                                                    );
-                                                                                }}
-                                                                            >
-                                                                                <div className="flex">
-                                                                                    <span>
-                                                                                        {
-                                                                                            dTypeChat.CHAT_TITLE
-                                                                                        }
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div className="flex justify-end text-[10px]">
-                                                                                    <span>
-                                                                                        {dTypeChat
-                                                                                            ?.t_user
-                                                                                            .name +
-                                                                                            " - " +
-                                                                                            format(
-                                                                                                dTypeChat.CREATED_CHAT_DATE,
-                                                                                                "dd-MM-yyyy"
-                                                                                            )}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </div>
-                                                    </fieldset>
-                                                </div>
-                                            </div> */}
                                             {/* END LIST CHAT */}
                                         </>
                                     )}

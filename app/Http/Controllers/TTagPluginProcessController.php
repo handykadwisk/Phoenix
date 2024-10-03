@@ -6,6 +6,9 @@ use App\Models\RPluginProcess;
 use App\Models\TChatDetail;
 use App\Models\TTagPluginProcess;
 use App\Models\TChat;
+use App\Models\TChatParticipant;
+use App\Models\TCompanyDivision;
+use App\Models\TParticipantChat;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +22,7 @@ class TTagPluginProcessController extends Controller
     }
 
     public function store(Request $request){
-// dd($request);
+        // dd($request);
         // cek sudah ada apa belum di tplug
         $cekExisting = TTagPluginProcess::where('PLUGIN_PROCESS_ID', $request->PLUGIN_PROCESS_ID)->where('TAG_ID', $request->TAG_ID)->first();
         // dd($cekExisting);
@@ -44,8 +47,6 @@ class TTagPluginProcessController extends Controller
             ]);
 
             $idTTagRelation = $tTagRelation->TAG_PLUGIN_PROCESS_ID;
-    
-    
         }
 
         // register type chatnya apa?
@@ -59,6 +60,45 @@ class TTagPluginProcessController extends Controller
 
         // create message chat
         if ($createTypeChat) {
+
+            // add Participant
+            $arrayParticipant = is_countable($request->PARTICIPANT);
+            if ($arrayParticipant) {
+                for ($i=0; $i < sizeof($request->PARTICIPANT); $i++) { 
+                    $valueParticipant = trim($request->PARTICIPANT[$i]['value']);
+                    $nameParticipant = trim($request->PARTICIPANT[$i]['label']);
+
+                    // cek division or no
+                    $is_division = 0;
+                    $idDivision  = null;
+                    $userId = null;
+                    $isDivision = TCompanyDivision::where('COMPANY_DIVISION_ALIAS', $nameParticipant)->get();
+                    if ($isDivision->count()>0) {
+                        $is_division = "1";
+                        $idDivision = $isDivision[0]['COMPANY_DIVISION_ID'];
+                    }else{
+                        // User_id Participant
+                        $symbol = '+';
+                        $posisi = strpos($valueParticipant, $symbol);
+                        $userId = substr($valueParticipant, $posisi + 1);
+                    }
+
+                    // created add participant
+                    $addParticipant = TChatParticipant::create([
+                        'CHAT_ID'                       => $createTypeChat->CHAT_ID,
+                        'CHAT_PARTICIPANT_NAME'         => $nameParticipant,
+                        'USER_ID'                       => $userId,
+                        'DIVISION_ID'                   => $idDivision,
+                        'IS_DIVISION'                   => $is_division,
+                        'CREATED_CHAT_PARTICIPANT_BY'   => Auth::user()->id,
+                        'CREATED_CHAT_PARTICIPANT_DATE' => now()
+                    ]);
+                }
+            }
+            // end add Perticipant
+
+
+
             TChatDetail::create([
                 "CHAT_ID"                  => $createTypeChat->CHAT_ID,
                 "CHAT_DETAIL_TEXT"             => $request->INITIATE_YOUR_CHAT,
