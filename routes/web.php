@@ -554,6 +554,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertCoBroking', [CoBrokingController::class, 'store'])->name('policyCoBroking.store');
     Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
     Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
+    Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
 
 
 

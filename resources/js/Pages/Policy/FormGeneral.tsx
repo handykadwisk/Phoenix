@@ -81,6 +81,7 @@ export default function FormGeneral({
     useEffect(() => {
         getFbiPks(13);
         getAgent(3);
+        getBroker(9);
         getBAA(12);
         getInsurancePanel(policy.POLICY_ID);
         getCoverageNameByPolicyId(policy.POLICY_ID);
@@ -96,6 +97,7 @@ export default function FormGeneral({
         getSummaryFinancial(policy.POLICY_ID);
         getCoa();
         setSwitchCoBroking(policy.CO_BROKING);
+        getCoBrokingByPolicyId(policy.POLICY_ID);
     }, [policy.POLICY_ID]);
 
     const getDetailPolicy = async (id: number) => {
@@ -197,6 +199,14 @@ export default function FormGeneral({
         return result ? result.RELATION_ORGANIZATION_NAME : null;
     };
 
+    const getBrokerById = (brokerId: any) => {
+        const dataAgent = listBroker;
+        const result = dataAgent.find(
+            (id: any) => id.RELATION_ORGANIZATION_ID == brokerId
+        );
+        return result ? result.RELATION_ORGANIZATION_NAME : null;
+    };
+
     const getBaaById = (personId: any) => {
         const dataBaa = listBAA;
         const result = dataBaa.find((id: any) => id.PERSON_ID == personId);
@@ -234,14 +244,18 @@ export default function FormGeneral({
             .catch((err) => console.log(err));
     };
 
-    // const handleSwitchCoBroking = () => {
-    //     const response = updatePolicyCoBroking({
-    //         policyId: policy.POLICY_ID,
-    //         coBroking: !switchCoBroking,
-    //     });
-    //     // console.log('msg: ',response);
-    //     setSwitchCoBroking(!switchCoBroking);
-    // };
+    const [listDataCoBroking, setListDataCoBroking] = useState<any>([]);
+   const getCoBrokingByPolicyId = (policy_id: number) => {
+        axios
+            .get(`/getCoBrokingByPolicyId/${policy_id}`)
+            .then((res) => {
+                // console.log("res.data: ", res.data);
+                setListDataCoBroking(res.data);
+            })
+            .catch((err) => console.log(err));
+   };
+    
+    
     const handleSwitchCoBroking = () => {
         !switchCoBroking == false
             ? Swal.fire({
@@ -327,7 +341,6 @@ export default function FormGeneral({
         setDataCoBroking(items);
     };
 
-    // console.log("deletedCoBroking: ", deletedCoBroking);
 
 
     const handleSuccessCoBroking = (message: any) => {
@@ -2228,16 +2241,26 @@ export default function FormGeneral({
                                     BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
                                     BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
                                     BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
-                                    BROKERAGE_FEE_NETT_AMOUNT: val["BROKERAGE_FEE_NETT_AMOUNT"],
-                                    ENGINEERING_FEE_VAT: val["ENGINEERING_FEE_VAT"],
-                                    ENGINEERING_FEE_PPN: val["ENGINEERING_FEE_PPN"],
-                                    ENGINEERING_FEE_PPH: val["ENGINEERING_FEE_PPH"],
-                                    ENGINEERING_FEE_NETT_AMOUNT: val["ENGINEERING_FEE_NETT_AMOUNT"],
-                                    CONSULTANCY_FEE_VAT: val["CONSULTANCY_FEE_VAT"],
-                                    CONSULTANCY_FEE_PPN: val["CONSULTANCY_FEE_PPN"],
-                                    CONSULTANCY_FEE_PPH: val["CONSULTANCY_FEE_PPH"],
-                                    CONSULTANCY_FEE_NETT_AMOUNT: val["CONSULTANCY_FEE_NETT_AMOUNT"],
+                                    BROKERAGE_FEE_NETT_AMOUNT:
+                                        val["BROKERAGE_FEE_NETT_AMOUNT"],
+                                    ENGINEERING_FEE_VAT:
+                                        val["ENGINEERING_FEE_VAT"],
+                                    ENGINEERING_FEE_PPN:
+                                        val["ENGINEERING_FEE_PPN"],
+                                    ENGINEERING_FEE_PPH:
+                                        val["ENGINEERING_FEE_PPH"],
+                                    ENGINEERING_FEE_NETT_AMOUNT:
+                                        val["ENGINEERING_FEE_NETT_AMOUNT"],
+                                    CONSULTANCY_FEE_VAT:
+                                        val["CONSULTANCY_FEE_VAT"],
+                                    CONSULTANCY_FEE_PPN:
+                                        val["CONSULTANCY_FEE_PPN"],
+                                    CONSULTANCY_FEE_PPH:
+                                        val["CONSULTANCY_FEE_PPH"],
+                                    CONSULTANCY_FEE_NETT_AMOUNT:
+                                        val["CONSULTANCY_FEE_NETT_AMOUNT"],
                                     PAYABLE: val["PAYABLE"],
+                                    co_broking: listDataCoBroking ? listDataCoBroking : []
                                 },
                             ],
                         };
@@ -2280,6 +2303,7 @@ export default function FormGeneral({
                                     CONSULTANCY_FEE_PPH: val["CONSULTANCY_FEE_PPH"],
                                     CONSULTANCY_FEE_NETT_AMOUNT: val["CONSULTANCY_FEE_NETT_AMOUNT"],
                                     PAYABLE: val["PAYABLE"],
+                                    co_broking: listDataCoBroking ? listDataCoBroking : []
                                 },
                             ],
                         };
@@ -2337,6 +2361,7 @@ export default function FormGeneral({
             })
             .catch((err) => console.log(err));
     };
+
 
 
     const [dataSummaryInsured, setDataSummaryInsured] = useState<any>([]);
@@ -2426,10 +2451,7 @@ export default function FormGeneral({
     const [listBroker, setListBroker] = useState<any>([]);
 
     const getBroker = async (relation_type: number) => {
-        setIsLoading({
-            ...isLoading,
-            get_detail: true,
-        });
+        
         await axios
             .get(`/getRelationByType/${relation_type}`)
             .then((res) => {
@@ -2565,9 +2587,10 @@ export default function FormGeneral({
         setRelationIdForPayable([]);
         // getFbiPks(13);
         getAgent(3);
+        getBroker(9);
         // getBAA(12);
         getSummaryInsured(policy_id);
-        // getPolicyExchangeRate(policy_id);
+        getCoBrokingByPolicyId(policy_id);
         getDataPartner(policy_id);
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
         setTimeout(function () {
@@ -10244,7 +10267,7 @@ export default function FormGeneral({
                                         </th>
                                         <th
                                             scope="col"
-                                            colSpan={6}
+                                            colSpan={7}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             <div>Brokerage Fee</div>
@@ -10258,7 +10281,7 @@ export default function FormGeneral({
                                         </th>
                                         <th
                                             scope="col"
-                                            colSpan={6}
+                                            colSpan={7}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             <div>Engineering Fee</div>
@@ -10272,7 +10295,7 @@ export default function FormGeneral({
                                         </th>
                                         <th
                                             scope="col"
-                                            colSpan={6}
+                                            colSpan={7}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             <div>Consultancy Fee</div>
@@ -10334,40 +10357,11 @@ export default function FormGeneral({
                                             Nett Amount
                                         </th>
                                         <th
+                                            rowSpan={2}
                                             scope="col"
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
-                                            %
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Amount
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            VAT
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            PPn
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            PPh
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
-                                        >
-                                            Nett Amount
+                                            Co Broking
                                         </th>
                                         <th
                                             scope="col"
@@ -10404,6 +10398,56 @@ export default function FormGeneral({
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             Nett Amount
+                                        </th>
+                                        <th
+                                            rowSpan={2}
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Co Broking
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            %
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Amount
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            VAT
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            PPn
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            PPh
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Nett Amount
+                                        </th>
+                                        <th
+                                            rowSpan={2}
+                                            scope="col"
+                                            className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
+                                        >
+                                            Co Broking
                                         </th>
                                     </tr>
                                 </thead>
@@ -11029,6 +11073,82 @@ export default function FormGeneral({
                                                                     required
                                                                 />
                                                             </td>
+                                                            <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                <tr key={i}>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 text-left text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        Participant
+                                                                    </td>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 text-right text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        %
+                                                                    </td>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 text-right text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        Co
+                                                                        Broking
+                                                                        Amount
+                                                                    </td>
+                                                                </tr>
+                                                                {detail?.co_broking?.map(
+                                                                    (
+                                                                        coBroking: any,
+                                                                        i: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <tr
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                            >
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-left text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {getBrokerById(
+                                                                                        coBroking.RELATION_ID
+                                                                                    )}
+                                                                                </td>
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-right text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {new Intl.NumberFormat(
+                                                                                        "id",
+                                                                                        {
+                                                                                            style: "decimal",
+                                                                                        }
+                                                                                    ).format(
+                                                                                        coBroking.CO_BROKING_PERCENTAGE
+                                                                                    )}{" "}
+                                                                                    %
+                                                                                </td>
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-right text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {new Intl.NumberFormat(
+                                                                                        "id",
+                                                                                        {
+                                                                                            style: "decimal",
+                                                                                        }
+                                                                                    ).format(
+                                                                                        detail.BROKERAGE_FEE_NETT_AMOUNT *
+                                                                                            coBroking.CO_BROKING_PERCENTAGE /
+                                                                                            100
+                                                                                    )}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </td>
                                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
                                                                 <CurrencyInput
                                                                     id="engineering_fee_percentage"
@@ -11258,6 +11378,82 @@ export default function FormGeneral({
                                                                     required
                                                                 />
                                                             </td>
+                                                            <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                <tr key={i}>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        Participant
+                                                                    </td>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        %
+                                                                    </td>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        Co
+                                                                        Broking
+                                                                        Amount
+                                                                    </td>
+                                                                </tr>
+                                                                {detail?.co_broking?.map(
+                                                                    (
+                                                                        coBroking: any,
+                                                                        i: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <tr
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                            >
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-left text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {getBrokerById(
+                                                                                        coBroking.RELATION_ID
+                                                                                    )}
+                                                                                </td>
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-right text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {new Intl.NumberFormat(
+                                                                                        "id",
+                                                                                        {
+                                                                                            style: "decimal",
+                                                                                        }
+                                                                                    ).format(
+                                                                                        coBroking.CO_BROKING_PERCENTAGE
+                                                                                    )}{" "}
+                                                                                    %
+                                                                                </td>
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-right text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {new Intl.NumberFormat(
+                                                                                        "id",
+                                                                                        {
+                                                                                            style: "decimal",
+                                                                                        }
+                                                                                    ).format(
+                                                                                        (detail.ENGINEERING_FEE_NETT_AMOUNT *
+                                                                                            coBroking.CO_BROKING_PERCENTAGE) /
+                                                                                            100
+                                                                                    )}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </td>
                                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
                                                                 <CurrencyInput
                                                                     id="consultancy_fee_percentage"
@@ -11486,6 +11682,82 @@ export default function FormGeneral({
                                                                     className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
                                                                     required
                                                                 />
+                                                            </td>
+                                                            <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                <tr key={i}>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        Participant
+                                                                    </td>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        %
+                                                                    </td>
+                                                                    <td
+                                                                        scope="col"
+                                                                        className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900  border-[1px]"
+                                                                    >
+                                                                        Co
+                                                                        Broking
+                                                                        Amount
+                                                                    </td>
+                                                                </tr>
+                                                                {detail?.co_broking?.map(
+                                                                    (
+                                                                        coBroking: any,
+                                                                        i: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <tr
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                            >
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-left text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {getBrokerById(
+                                                                                        coBroking.RELATION_ID
+                                                                                    )}
+                                                                                </td>
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-center text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {new Intl.NumberFormat(
+                                                                                        "id",
+                                                                                        {
+                                                                                            style: "decimal",
+                                                                                        }
+                                                                                    ).format(
+                                                                                        coBroking.CO_BROKING_PERCENTAGE
+                                                                                    )}{" "}
+                                                                                    %
+                                                                                </td>
+                                                                                <td
+                                                                                    scope="col"
+                                                                                    className="px-3 py-1 text-right text-sm text-gray-900  border-[1px]"
+                                                                                >
+                                                                                    {new Intl.NumberFormat(
+                                                                                        "id",
+                                                                                        {
+                                                                                            style: "decimal",
+                                                                                        }
+                                                                                    ).format(
+                                                                                        (detail.CONSULTANCY_FEE_NETT_AMOUNT *
+                                                                                            coBroking.CO_BROKING_PERCENTAGE) /
+                                                                                            100
+                                                                                    )}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    }
+                                                                )}
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
                                                                 {detailIdx >

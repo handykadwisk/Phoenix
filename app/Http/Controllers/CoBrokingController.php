@@ -44,12 +44,18 @@ class CoBrokingController extends Controller
         return $coBroking; 
     }
 
+    public function getCoBrokingByPolicyId($policy_id){
+        $coBroking = MPolicyCoBroking::where('POLICY_ID', $policy_id)->get();
+        return response()->json($coBroking);
+    }
+
     public function store(Request $request)
     {        
         // dd($request);
         $dataCoBroking = $request[0]['dataCoBroking'];
         $deletedCoBroking = array_key_exists("1", $request->input()) ? $request[1]["deletedCoBroking"] : null;
         $arrCoBrokingId = [];
+        $arrLogData = [];
         foreach ($dataCoBroking as $key => $value) {
             $data = [
                 'POLICY_ID' => $value["POLICY_ID"],
@@ -58,16 +64,15 @@ class CoBrokingController extends Controller
                 'CO_BROKING_IS_LEADER' => $value["CO_BROKING_IS_LEADER"]
             ];
             if (array_key_exists('CO_BROKING_ID', $value) && $value['CO_BROKING_ID'] != "") {
-                echo "update";
                 $coBroking = $this->getCoBrokingByCoBrokingId($value['CO_BROKING_ID']);
                 MPolicyCoBroking::where('CO_BROKING_ID', $value['CO_BROKING_ID'])->update($data);
                 $id = $value['CO_BROKING_ID'];
             } else {
-                echo "insert";
                 $id = MPolicyCoBroking::insertGetId($data);
             }
 
             array_push($arrCoBrokingId, $id);
+            array_push($arrLogData, $data);
         }
         
          // Deleted Co Broking By Id
@@ -79,13 +84,13 @@ class CoBrokingController extends Controller
       
         // Created Log
         UserLog::create([
-            'created_by' => Auth::user()->id,
+            'created_by' => Auth::user()->user_login,
             'action'     => json_encode([
-                "description" => "Created/Update (Co Broking).",
-                "module"      => "Co Broking",
+                "description" => "Created/Update (Co Broking). Data: ". json_encode($arrLogData),
+                "module"      => "Policy (Co Broking)",
                 "id"          => $arrCoBrokingId
             ]),
-            'action_by'  => Auth::user()->id
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([

@@ -23,7 +23,9 @@ export default function Index({ auth }: PageProps) {
 
     const getEmployeeById = (employeeId: any) => {
         // const dataCurr = currency;
-        const result = employees.find((id: any) => id.EMPLOYEE_ID == employeeId);
+        const result = employees.find(
+            (id: any) => id.EMPLOYEE_ID == employeeId
+        );
         return result
             ? result.EMPLOYEE_MIDDLE_NAME != null
                 ? result.EMPLOYEE_FIRST_NAME +
@@ -38,42 +40,30 @@ export default function Index({ auth }: PageProps) {
     };
 
     const handleSelectCompany = (idCompany: string) => {
-        mappingEmployeeToSettingAttendance(idCompany)
-    }
+        mappingEmployeeToSettingAttendance(idCompany);
+    };
 
     const getDivisionByEmployeeId = (employeeId: any) => {
         // const dataCurr = currency;
-        const result = employees.find((id: any) => id.EMPLOYEE_ID == employeeId);
+        const result = employees.find(
+            (id: any) => id.EMPLOYEE_ID == employeeId
+        );
         return result ? result.division.COMPANY_DIVISION_NAME : null;
     };
 
     const [dataAttendanceSetting, setDataAttendanceSetting] = useState<any>([]);
 
     const getDataAttendanceSetting = () => {
-         axios
-             .get(`/getAttendanceSetting`)
-             .then((res) => {
-                //  {
-                //     //  res.data.data
-                //     //      ?.filter((list: any) => list.ATTENDANCE_TYPE != null)
-                //     //      .map((result: any, i: number) => {
-                //     //          console.log("list: ", i, " : ", list);
-                //     //          console.log("ddddmmm: ", i, " : ", result);
-                //     //      });
-                //      console.log(
-                //          "list: ",
-                //          res.data.data?.filter(
-                //              (list: any) => list.ATTENDANCE_TYPE != null
-                //          )
-                //      );
-                 
-                //  }
-                 setDataAttendanceSetting(res.data.data);
-             })
-             .catch((err) => {
-                 console.log(err);
-             });
-    }
+        axios
+            .get(`/getAttendanceSetting`)
+            .then((res) => {
+                
+                setDataAttendanceSetting(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     // Add Attendance Setting
     const [modal, setModal] = useState<any>({
@@ -131,25 +121,23 @@ export default function Index({ auth }: PageProps) {
     // Set Person Attendance
     const [dataPersonAttendance, setDataPersonAttendance] = useState<any>([]);
     // get M Employee Attendance
-    const mappingEmployeeToSettingAttendance = (idCompany:string) => {
-         axios
+    const mappingEmployeeToSettingAttendance = (idCompany: string) => {
+        axios
             //  .get(`/mappingEmployeeToSettingAttendance`)
-             .post(`/mappingEmployeeToSettingAttendance`, { idCompany })
-             .then((res) => {
-                 setDataPersonAttendance(res.data);
-             })
-             .catch((err) => {
-                 console.log(err);
-             });
+            .post(`/mappingEmployeeToSettingAttendance`, { idCompany })
+            .then((res) => {
+                setDataPersonAttendance(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
-    const inputDataPersonAttendance  = (name: string, value: any, i: number) => {
+    const inputDataPersonAttendance = (name: string, value: any, i: number) => {
         const changeVal: any = [...dataPersonAttendance];
 
         changeVal[i][name] = value;
-        setDataPersonAttendance(
-            changeVal
-        );
+        setDataPersonAttendance(changeVal);
     };
 
     const handleSetPersonAttendance = () => {
@@ -159,7 +147,7 @@ export default function Index({ auth }: PageProps) {
             modalSetPersonAttendce: !modal.modalSetPersonAttendce,
         });
     };
-    console.log("dsafsd: ", dataPersonAttendance);
+    
     // End Set Person Attendance
 
     const [isSuccess, setIsSuccess] = useState<string>("");
@@ -601,6 +589,7 @@ export default function Index({ auth }: PageProps) {
                                     />
                                 </div>
                             </div>
+                            
                         </div>
                     </>
                 }
@@ -823,7 +812,8 @@ export default function Index({ auth }: PageProps) {
                                                                 </option>
                                                                 {data.ATTENDANCE_TYPE ==
                                                                     0 ||
-                                                                data.ATTENDANCE_TYPE == 1
+                                                                data.ATTENDANCE_TYPE ==
+                                                                    1
                                                                     ? dataAttendanceSetting
                                                                           ?.filter(
                                                                               (

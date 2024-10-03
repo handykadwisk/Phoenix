@@ -21,6 +21,10 @@ class AttendanceSettingController extends Controller
             'companies' => TCompany::get(),
             'employees' => TEmployee::get()
         ]);
+        // untuk memanggil controller lain
+        //  $object = new CoBrokingController();
+        // $xx = $object->getCoBrokingByPolicyId(10);
+        // dd($xx);
     }
 
      public function store(Request $request)
