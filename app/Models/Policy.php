@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\MPolicyPremium;
+use App\Models\PolicyInstallment;
 
 class Policy extends Model
 {
@@ -41,7 +42,7 @@ class Policy extends Model
     }
 
     public function policyInstallment() {
-        return $this->hasMany(policyInstallment::class, 'POLICY_ID', 'POLICY_ID');
+        return $this->hasMany(PolicyInstallment::class, 'POLICY_ID', 'POLICY_ID');
     }
 
     public function insuranceType() {

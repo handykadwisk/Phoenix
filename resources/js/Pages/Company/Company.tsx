@@ -378,13 +378,6 @@ export default function Company({ auth }: PageProps) {
                     <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
                         <TextInput
                             type="text"
-                            // value={
-                            //     searchRelation.relation_search[0]
-                            //         .RELATION_ORGANIZATION_NAME === ""
-                            //         ? ""
-                            //         : searchRelation.relation_search[0]
-                            //               .RELATION_ORGANIZATION_NAME
-                            // }
                             className="mt-2 ring-1 ring-red-600"
                             placeholder="Search Company Name"
                         />
@@ -398,6 +391,7 @@ export default function Company({ auth }: PageProps) {
                         </div>
                     </div>
                 </div>
+                
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid
@@ -405,7 +399,6 @@ export default function Company({ auth }: PageProps) {
                             addButtonModalState={undefined}
                             withParam={""}
                             searchParam={null}
-                            // loading={isLoading.get_policy}
                             url={"getCompany"}
                             doubleClickEvent={handleDetailCompany}
                             triggeringRefreshData={isSuccess}

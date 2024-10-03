@@ -25,30 +25,62 @@ extends Controller
         ]);
     }
 
-    public function getUserData($dataPerPage = 5, $searchQuery = null)
+    public function getUserData($request)
     {
-        // Mulai query
-        $dataQuery = User::with('roles', 'type')
-            ->orderBy('id', 'DESC');
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        // Jika ada search query, tambahkan kondisi where
-        if ($searchQuery && $searchQuery->input('name')) {
-            $dataQuery->where('name', 'like', '%' . $searchQuery->input('name') . '%');
+        $query = User::with('roles', 'type');
+
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newFilter = $request->input('newFilter', '');
+        $newSearch = json_decode($request->newFilter, true);
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
+            }
         }
 
-        // Gunakan paginate untuk mendapatkan hasil dalam bentuk paginated data
-        return $dataQuery->paginate($dataPerPage);
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                if ($colId === 'name') {
+                    $query->where('first_name', 'LIKE', '%' . $filterValue . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $filterValue . '%');
+                } else {
+                    $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+                }
+            }
+        }
+         // Jika ada filter 'newFilter' dan tidak kosong
+         if ($newFilter !== "") {
+            foreach ($newSearch as $search) {
+            foreach ($search as $keyId => $searchValue) {
+                // Pencarian berdasarkan nama menu
+                if ($keyId === 'name') {
+                $query->where('name', 'LIKE', '%' . $searchValue . '%');
+                }
+            }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
     public function getUserJson(Request $request)
     {
-        $data = $this->getUserData(5, $request);
+        // dd($request);
+        $data = $this->getUserData($request);
         return response()->json($data);
     }
 
     public function store(Request $request)
     {
-        // Log::info($request);
         // Define validation rules
         $rules = [
             'user_login' => 'required|string|unique:t_user,user_login',  // Validasi untuk user_login
@@ -68,14 +100,18 @@ extends Controller
         // Log::info(Auth::user()->id);
         // Auth::user()->id;
 
-        $name = $request->has('name') ? $request->input('name') : 'Default Name';
+        $name = $request->name;
+        if($name === null || $name === ''){
+            $name = $request->user_login;
+        }
         $User = User::create([  
             "role_id" => 0,
-            "name" => $request->user_login,  // Tambahkan name di sini
+            "name" => $name,  // Tambahkan name di sini
             'employee_id'=>$request->employee_id,
             'individual_relation_id'=>$request->individual_relation_id,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
+            'jobpost_id'=>$request->jobpost,
             "password" => bcrypt($request->password),
             "USER_CREATED_BY" => Auth::user()->id,
             "USER_CREATED_DATE" => now()
@@ -105,8 +141,8 @@ extends Controller
         ]);
 
         return new JsonResponse([
-            $request->id
-        ], 200, [
+            'New user added.'
+        ], 201, [
             'X-Inertia' => true
         ]);
     }
@@ -118,7 +154,7 @@ extends Controller
     }
     public function getUserDataById($id)
     {
-        $users = User::with('roles', 'type')->where('id', $id)->first();
+        $users = User::with('roles', 'type','jobpost')->where('id', $id)->first();
         return response()->json($users);
     }
 
@@ -132,24 +168,6 @@ extends Controller
     // Update User
     public function update(Request $request, $id)
     {
-         // Define validation rules
-        //  $rules = [
-        //     'user_login' => 'required|string|unique:t_user,user_login',  // Validasi untuk user_login
-        // ];
-
-        // // Create validator instance
-        // $validator = Validator::make($request->all(), $rules);
-
-        // // Check if validation fails
-        // if ($validator->fails()) {
-        //     return new JsonResponse([
-        //         $validator->errors()->all()
-        //     ], 422, [
-        //         'X-Inertia' => true
-        //     ]);
-        // }
-
-        Log::info($request);
         $User = User::find($id);
         $typeInput = collect($request->input('type'))->first();
 
@@ -161,6 +179,7 @@ extends Controller
             "user_login" => $request->user_login,
             "employee_id" => $request->employee_id,
             "user_type_id" => $typeInput,
+            'jobpost_id'=>$request->jobpost,
             "USER_UPDATED_BY" => Auth::user()->id,
             "USER_UPDATED_DATE" => now()
         ]);
@@ -181,14 +200,17 @@ extends Controller
                 ]);
             }
         }
+        return new JsonResponse([
+            'User has been updated.'
+        ], 200, [
+            'X-Inertia' => true
+        ]);
     }
 
 
     public function resetPassword(Request $request, $id)
     {
         $User = User::find($id);
-        // Log::info($request);
-        // Log::info($User);
         $User->update([
             "password" => bcrypt($request->password),
             "USER_UPDATED_BY" => Auth::user()->id,
@@ -196,9 +218,15 @@ extends Controller
         ]);
         return new JsonResponse([
             // 'Policy updated.'
-            $id
+            'Password has been reset.'
         ], 200, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function getAllUser()
+    {
+        $users = User::all();
+        return response()->json($users);
     }
 }

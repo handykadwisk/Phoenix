@@ -57,26 +57,61 @@ class MenuController extends Controller
         ]);
     }
 
-    public function getMenuData($dataPerPage = 5, $searchQuery = null)
+    // get menu data
+    public function showMenu()
     {
+        $menu = DB::select('CALL sp_combo_menu()');
+        return $menu;
+    }
 
-        // dd($searchQuery->RELATION_ORGANIZATION_NAME);
-        $data = Menu::orderBy('menu_sequence', 'asc')->with('parent');
-        if ($searchQuery) {
-            if ($searchQuery->input('menu_name')) {
-                $data->where('menu_name', 'like', '%' . $searchQuery->menu_name . '%');
+    public function getMenuData($request)
+    {
+        // dd($request);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = Menu::query()->with('parent')->orderBy('menu_sequence', 'asc');
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newFilter = $request->input('newFilter', '');
+        $newSearch = json_decode($request->newFilter, true);
+
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel);
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection);
             }
         }
-        // dd($data->toSql());
-        return $data->paginate($dataPerPage);
+
+        if ($filterModel) {
+            foreach ($filterModel as $colId => $filterValue) {
+                $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+            }
+        }
+
+        // Jika ada filter 'newFilter' dan tidak kosong
+        if ($newFilter !== "") {
+            foreach ($newSearch as $search) {
+                foreach ($search as $keyId => $searchValue) {
+                    // Pencarian berdasarkan nama menu
+                    if ($keyId === 'menu_name') {
+                        $query->where('menu_name', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
 
     public function getMenusJson(Request $request)
     {
-        $data = $this->getMenuData(5, $request);
-        // print_r($data);
-        // die;
+        $data = $this->getMenuData($request);
         return response()->json($data);
     }
 
@@ -116,13 +151,15 @@ class MenuController extends Controller
                 "module"      => "Menu",
                 "id"          => $Menu->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
+
+        // $name = NULL;
+        DB::select('call sp_set_mapping_menu');
 
 
         return new JsonResponse([
-            $Menu->id,
-            $Menu->menu_name
+            'New menu added.'
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -138,38 +175,103 @@ class MenuController extends Controller
 
     // edit store r_menu
     public function edit(Request $request)
-    {
-        // dd($request);
-        $Menu = Menu::where('id', $request->id)->update([
-            "menu_parent_id"        => $request->menu_parent_id,
-            "menu_name"             => $request->menu_name,
-            "menu_url"              => $request->menu_url,
-            "menu_sequence"         => $request->menu_sequence,
-            "menu_is_deleted"       => $request->menu_is_deleted,
-            "menu_updated_by"       => Auth::user()->id,
-            "menu_updated_date"     => now()
-        ]);
+    // {
 
-        // Created Log
+    //     // dd($request);
+    //     $Menu = Menu::where('id', $request->id)->update([
+    //         "menu_parent_id"        => $request->menu_parent_id,
+    //         "menu_name"             => $request->menu_name,
+    //         "menu_url"              => $request->menu_url,
+    //         "menu_sequence"         => $request->menu_sequence,
+    //         "menu_is_deleted"       => $request->menu_is_deleted,
+    //         "menu_updated_by"       => Auth::user()->id,
+    //         "menu_updated_date"     => now()
+    //     ]);
+
+    //     // Created Log
+    //     UserLog::create([
+    //         'created_by' => Auth::user()->id,
+    //         'action'     => json_encode([
+    //             "description" => "Updated (Menu).",
+    //             "module"      => "Menu",
+    //             "id"          => $request->id
+    //         ]),
+    //         'action_by'  => Auth::user()->user_login
+    //     ]);
+
+
+    //     // set message then return
+    //     return new JsonResponse([
+    //         $request->menu_is_deleted === 1 ? 'Menu has been deactivated' : 'Menu has been reactivated.'
+    //     ], 200, [
+    //         'X-Inertia' => true
+    //     ]);
+    // }
+    {
+        // Cek parent menu di menu_mapping
+        $relationParent = Menu::find($request->menu_parent_id);
+        $concatID = "." . $request->id . '.';
+
+        // Cek apakah parent menu sudah ada dalam menu_mapping
+        $cekExisting = Menu::where('id', $request->menu_parent_id)
+            ->where('menu_mapping', 'like', '%' . $concatID . '%')->get();
+
+        if ($cekExisting->count() > 0) {
+            // Jika parent sudah ada dalam mapping, update parent dan detail menu
+            $updateParent = Menu::where('id', $request->menu_parent_id)
+                ->update(['menu_parent_id' => $relationParent->menu_parent_id]);
+
+            // Update menu
+            $Menu = Menu::where('id', $request->id)->update([
+                "menu_parent_id" => $request->menu_parent_id,
+                "menu_name" => $request->menu_name,
+                "menu_url" => $request->menu_url,
+                "menu_sequence" => $request->menu_sequence,
+                "menu_is_deleted" => $request->menu_is_deleted,
+                "menu_updated_by" => Auth::user()->id,
+                "menu_updated_date" => now()
+            ]);
+        DB::select('call sp_set_mapping_menu');
+
+        } else {
+            // Update langsung jika tidak ada relasi
+            $Menu = Menu::where('id', $request->id)->update([
+                "menu_parent_id" => $request->menu_parent_id,
+                "menu_name" => $request->menu_name,
+                "menu_url" => $request->menu_url,
+                "menu_sequence" => $request->menu_sequence,
+                "menu_is_deleted" => $request->menu_is_deleted,
+                "menu_updated_by" => Auth::user()->id,
+                "menu_updated_date" => now()
+            ]);
+        DB::select('call sp_set_mapping_menu');
+
+        }
+
+        // Logging
         UserLog::create([
             'created_by' => Auth::user()->id,
-            'action'     => json_encode([
+            'action' => json_encode([
                 "description" => "Updated (Menu).",
-                "module"      => "Menu",
-                "id"          => $request->id
+                "module" => "Menu",
+                "id" => $request->id
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by' => Auth::user()->user_login
         ]);
 
 
-        return new JsonResponse([
-            $request->id,
-            $request->menu_name
-        ], 201, [
-            'X-Inertia' => true
-        ]);
+
+        // Set message then return
+        if ($request->menu_is_deleted !== null) {
+            return new JsonResponse([
+            $request->menu_is_deleted === 1 ? 'Menu has been deactivated' : 'Menu has been reactivated.'
+            ], 200, ['X-Inertia' => true]);
+        } else {
+            return new JsonResponse([
+            'Success editing menu.'
+            ], 200, ['X-Inertia' => true]);
+        }
     }
-
     // get menu from role_id
     public function getMenuByRoleId(Request $request)
     {
@@ -187,7 +289,11 @@ class MenuController extends Controller
 
         }
 
-        return response()->json(['message' => 'Menu sequence updated successfully']);
+        return new JsonResponse([
+            'Menu sequence updated successfully'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     private function updateItemSequence($item)

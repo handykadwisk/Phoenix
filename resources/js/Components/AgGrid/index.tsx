@@ -31,6 +31,9 @@ export default function AGGrid({
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
 }>) {
+    // console.log("searchParamAGGRid", searchParam);
+    
+
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
@@ -77,7 +80,7 @@ export default function AGGrid({
                     )
                     .then((res) => {
                         params.success({
-                            rowData: res.data.data,
+                            rowData: res.data.data,                            
                             rowCount: res.data.total,
                         });
                     })
@@ -85,6 +88,7 @@ export default function AGGrid({
             },
         };
     };
+    
 
     const onGridReady = (params: GridReadyEvent<any, any>) => {
         var dataSource = getServerSideDatasource();
@@ -128,9 +132,9 @@ export default function AGGrid({
                     }}
                     suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
-                    paginationPageSize={10}
-                    paginationAutoPageSize={true}
-                    cacheBlockSize={10}
+                    paginationPageSize={25}
+                    // paginationAutoPageSize={true} 
+                    cacheBlockSize={25}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}
                     rowModelType="serverSide"

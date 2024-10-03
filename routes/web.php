@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
+use App\Http\Controllers\CoBrokingController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\ExchangeRateBIController;
@@ -43,6 +45,7 @@ use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
 use App\Http\Controllers\TJobDescCompanyController;
 use App\Http\Controllers\TDetailChatController;
+use App\Http\Controllers\TJobpostController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Http\Controllers\UserManagementController;
 use App\Models\Role;
@@ -101,6 +104,18 @@ Route::middleware('auth')->group(function () {
 
 
 
+    //Job Position
+    Route::get('/jobpost', [TJobpostController::class, 'index'])->name('jobpost');
+    Route::get('/getAllJobpost', [TJobpostController::class, 'getAllJobpost'])->name('getAllJobpost.getAllJobpost');
+    Route::get('/getjobpost', [TJobpostController::class, 'getJobpostJson'])->name('getjobpost.getJobpostJson');
+    Route::get('/getjobpost/{id}', [TJobpostController::class, 'getJobpostById'])->name('getJobpostById.getJobpostById');
+    Route::post('/addJobpost', [TJobpostController::class, 'store'])->name('addJobpost.store');
+    Route::get('/getJobpostById/{id}', [TJobpostController::class, 'getJobpostId'])->name('getJobpostById.getJobpostId');
+    Route::get('/getJobpostByCom/{id}', [TJobpostController::class, 'getJobpostsByCompany'])->name('getJobpostByCom.getJobpostsByCompany');
+    Route::get('/getJobpostByDiv', [TJobpostController::class, 'getDevJobpost'])->name('getJobpostByDiv.getDevJobpost');
+    Route::get('/JobpostByDiv/{id}', [TJobpostController::class, 'getDevJobpostById'])->name('JobpostByDiv.getDevJobpostById');
+    Route::post('/setJobpostStatus/{id}/{status}', [TJobpostController::class, 'setJobpostStatus'])->name('setJobpostStatus.setJobpostStatus');
+    Route::post('/editJobpost', [TJobpostController::class, 'edit'])->name('editJobpost.edit');
 
 
     //Policy
@@ -246,7 +261,7 @@ Route::middleware('auth')->group(function () {
 
     //Menu
     Route::get('/setting/menu', [MenuController::class, 'index'])->name('setting/menu');
-    Route::get('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
+    Route::get('/getMenusJson', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
     Route::post('/getMenus', [MenuController::class, 'getMenusJson'])->name('getMenus.getMenusJson');
     Route::post('/setting/addMenu', [MenuController::class, 'store'])->name('addMenu.store');
     Route::post('/getMenuCombo', [MenuController::class, 'getMenuCombo'])->name('getMenuCombo.getMenuCombo');
@@ -254,9 +269,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
-
+    Route::get('/showMenu', [MenuController::class, 'showMenu'])->name('showMenu.showMenu');
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
+    Route::get('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
     Route::post('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
     Route::post('/setting/addPermission', [TPermissionController::class, 'store'])->name('addPermission.store');
     Route::post('/getPermissionById',  [TPermissionController::class, 'get_detail'])->name('getPermissionById.get_detail');
@@ -264,6 +280,7 @@ Route::middleware('auth')->group(function () {
 
     // Role
     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
+    Route::get('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
     Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
@@ -286,6 +303,7 @@ Route::middleware('auth')->group(function () {
 
     //settings/userManagement
     Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUerJson');
+    Route::get('/getUser',[UserManagementController::class, 'getUserJson'])->name('getUser.getUserJson');
     Route::get('/settings/user', [UserManagementController::class, 'index'])->name('settings/user');
     Route::post('/settings/addUser', [UserManagementController::class, 'store'])->name('settings/addUser.store');
     Route::get('/settings/getUserJson', [UserManagementController::class, 'getUserDataByMRole'])->name('settings/getUserJson.getUserJson');
@@ -293,7 +311,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/UserId/{id}', [UserManagementController::class, 'dataById'])->name('settings/UserId.getUserId');
     Route::patch('/settings/userEdit/{id}', [UserManagementController::class, 'update'])->name('settings/userEdit.update');
     Route::patch('/settings/userResetPassword/{id}', [UserManagementController::class, 'resetPassword'])->name('settings/userResetPassword.resetPassword');
-
+    Route::get('/user', [UserManagementController::class, 'getAllUser'])->name('user.getAllUser');
 
 
     //setting/usertype
@@ -568,6 +586,7 @@ Route::middleware('auth')->group(function () {
 
     // Company Division
     Route::get('/getDivisionCompany', [TCompanyDivisionController::class, 'getCompanyDivisionJson'])->name('getDivisionCompany.getCompanyDivisionJson');
+    Route::get('/getAllDivisionCompany', [TCompanyDivisionController::class, 'getAllDivisionCompanyJson'])->name('getAllDivisionCompany.getAllDivisionCompanyJson');
     Route::post('/addDivisionCompany', [TCompanyDivisionController::class, 'store'])->name('addDivisionCompany.store');
     Route::post('/getDivisionComboCompany', [TCompanyDivisionController::class, 'getDivisionComboCompany'])->name('getDivisionComboCompany.getDivisionComboCompany');
     Route::post('/getDivisionDetailCompany', [TCompanyDivisionController::class, 'get_detail'])->name('getDivisionDetailCompany.get_detail');
@@ -610,10 +629,37 @@ Route::middleware('auth')->group(function () {
     Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
     Route::post('/pinMessageObject', [TDetailChatController::class, 'pinMessageObject'])->name('pinMessageObject.pinMessageObject');
     Route::post('/getChatPin', [TDetailChatController::class, 'getChatPin'])->name('getChatPin.getChatPin');
+    Route::post('/getDataParticipant', [TDetailChatController::class, 'get_participant'])->name('getDataParticipant.get_participant');
+    Route::post('/unPinMessageObject', [TDetailChatController::class, 'unPinMessageObject'])->name('unPinMessageObject.unPinMessageObject');
+    Route::post('/getDataParticipantById', [TDetailChatController::class, 'getDataParticipantById'])->name('getDataParticipantById.getDataParticipantById');
+    Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
+    Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
+    Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
+
+
+
+
 
 
 
     Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
+    
+
+    // Attendance Setting
+    Route::get('hr/attendanceSetting', [AttendanceSettingController::class, 'index'])->name('hr/attendanceSetting');
+    Route::post('/addWorkAttendance', [AttendanceSettingController::class, 'store'])->name('attendanceSetting.store');
+    Route::get('/getAttendanceSetting', [AttendanceSettingController::class, 'getAttendanceSetting'])->name('getAttendanceSetting.getAttendanceSetting');
+    Route::post('/getAttendanceSettingById', [AttendanceSettingController::class, 'getAttendanceSettingById'])->name('getAttendanceSettingById.getAttendanceSettingById');
+    Route::post('/editAttendanceSetting', [AttendanceSettingController::class, 'editAttendanceSetting'])->name('editAttendanceSetting.editAttendanceSetting');
+    Route::post('/mappingEmployeeToSettingAttendance', [AttendanceSettingController::class, 'mappingEmployeeToSettingAttendance'])->name('mappingEmployeeToSettingAttendance.mappingEmployeeToSettingAttendance');
+    Route::post('/addPersonAttendance', [AttendanceSettingController::class, 'addPersonAttendance'])->name('attendanceSetting.addPersonAttendance');
+    
+    
+    // Co Broking
+    Route::post('/insertCoBroking', [CoBrokingController::class, 'store'])->name('policyCoBroking.store');
+    Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
+    Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
+    Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
 
 
 

@@ -67,7 +67,7 @@ export default function Group({ auth }: PageProps) {
             value: query.RELATION_GROUP_ID,
             label: query.text_combo,
         };
-    });
+    }); 
 
     // Get Relation Group
     const getRelationGroup = async (pageNumber = "page=1") => {
@@ -77,6 +77,8 @@ export default function Group({ auth }: PageProps) {
             })
             .then((res) => {
                 setRelationsGroup(res.data);
+                console.log('data group', res.data);
+                
                 if (modal.search) {
                     setModal({
                         add: false,

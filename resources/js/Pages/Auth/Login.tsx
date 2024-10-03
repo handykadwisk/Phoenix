@@ -1,16 +1,13 @@
 import { useEffect, FormEventHandler } from "react";
-import Checkbox from "@/Components/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
 import KillianLogo from "@/Images/phoenix.png";
 import InputError from "@/Components/InputError";
-import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/Button/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 export default function Login({
     status,
-    canResetPassword,
 }: {
     status?: string;
     canResetPassword: boolean;
@@ -29,11 +26,9 @@ export default function Login({
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route("login"));
     };
-    console.log(errors);
-    
+
 
     return (
         <GuestLayout>
@@ -115,14 +110,7 @@ export default function Login({
                                     </div>
                                 </div>
 
-                                {/* <div className="flex items-center justify-between">
-
-                                <div className="text-sm leading-6">
-                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                    Forgot password?
-                                </a>
-                                </div>
-                            </div> */}
+                                {}
 
                                 <div>
                                     <PrimaryButton

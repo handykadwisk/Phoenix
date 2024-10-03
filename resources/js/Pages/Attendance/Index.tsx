@@ -139,7 +139,7 @@ export default function Index({ auth }: PageProps) {
         );
         
         items[name] = value;
-        items["EMPLOYEE_ATTENDANCE_CHECK_IN_TIME"] = dateFormat(new Date(), "HH:mm:ss");
+        items["EMPLOYEE_ATTENDANCE_CHECK_IN_TIME"] = dateFormat(new Date(), "HH:MM:ss");
         items["EMPLOYEE_ATTENDANCE_LOCATION_LATITUDE"] = userLocation?.latitude;
         items["EMPLOYEE_ATTENDANCE_LOCATION_LONGITUDE"] = userLocation?.longitude;
         items["LOCATION_DISTANCE"] = distance;
@@ -158,7 +158,7 @@ export default function Index({ auth }: PageProps) {
                 EMPLOYEE_ATTENDANCE_LOCATION_LATITUDE: userLocation?.latitude,
                 EMPLOYEE_ATTENDANCE_LOCATION_LONGITUDE: userLocation?.longitude,
                 EMPLOYEE_ATTENDANCE_CHECK_IN_DATE: dateFormat(new Date(), "yyyy-mm-dd"),
-                EMPLOYEE_ATTENDANCE_CHECK_IN_TIME: dateFormat(new Date(), "HH:mm:ss"),
+                EMPLOYEE_ATTENDANCE_CHECK_IN_TIME: dateFormat(new Date(), "HH:MM:ss"),
             });
         }
         
@@ -204,12 +204,13 @@ export default function Index({ auth }: PageProps) {
             });
     };
 
-    const getDataAttendanceSetting = (id:string) => {
-         axios
+    const getDataAttendanceSetting = (attendanceSettingId: string) => {
+        axios
             .post(`/getAttendanceSettingById`, {
-                id
+                attendanceSettingId,
             })
             .then((res) => {
+                console.log("asdfsad: ", res.data);
                 setDataAttendanceSetting(res.data);
             })
             .catch((err) => {
@@ -229,7 +230,7 @@ export default function Index({ auth }: PageProps) {
             ),
             EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME: dateFormat(
                 new Date(),
-                "HH:mm:ss"
+                "HH:MM:ss"
             ),
         });
     }
@@ -247,7 +248,7 @@ export default function Index({ auth }: PageProps) {
                 ...data,
                 EMPLOYEE_ID: employee.EMPLOYEE_ID,
                 EMPLOYEE_ATTENDANCE_CHECK_OUT_DATE: dateFormat(new Date(), "yyyy-mm-dd"),
-                EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME: dateFormat(new Date(), "HH:mm:ss"),
+                EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME: dateFormat(new Date(), "HH:MM:ss"),
             });
         }
         
