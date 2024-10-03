@@ -51,55 +51,49 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
         newItems.forEach(updateSequenceForItem);
     };
 
-    const onDragEnd = (result: DropResult, parentId: number | null = null): void => {
+    const onDragEnd = (result: DropResult): void => {
         if (!result.destination) return;
-
-        const updateItems = (items: MenuItem[]): MenuItem[] => {
+    
+        const updateItems = (items: MenuItem[], parentId: number | null = null): MenuItem[] => {
             if (parentId === null) {
                 const newItems = Array.from(items);
                 const [movedItem] = newItems.splice(result.source.index, 1);
-                if (result.destination) {
-                    newItems.splice(result.destination.index, 0, movedItem);
-                }
+                newItems.splice(result.destination!.index, 0, movedItem);
                 return newItems;
             } else {
                 return items.map(item => {
                     if (item.id === parentId) {
                         const newChildren = Array.from(item.children || []);
                         const [movedSubItem] = newChildren.splice(result.source.index, 1);
-                        if (result.destination) {
-                            newChildren.splice(result.destination.index, 0, movedSubItem);
-                        }
+                        newChildren.splice(result.destination!.index, 0, movedSubItem);
                         item.children = newChildren;
                     } else if (item.children) {
-                        item.children = updateItems(item.children);
+                        item.children = updateItems(item.children, item.id);
                     }
                     return item;
                 });
             }
         };
-
+    
         const newItems = updateItems(items);
         updateMenuSequenceWithChildren(newItems);
         setItems(newItems);
-            // Panggil onSave setelah perubahan disimpan
-            if (onSave) {
-                onSave();
-            }
+        if (onSave) {
+            onSave();
+        }
     };
-    // console.log("items",items);
-    
 
-    const renderItems = (items: MenuItem[], parentId: number | null = null) => (
+    const renderItems = (items: MenuItem[], parentId: number | null = null): JSX.Element => (
         <Droppable droppableId={`droppable-${parentId !== null ? parentId : 'main'}`}>
-            {(provided: any) => (
+            {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                     {items.map((item, index) => (
-                        <Draggable key={item.id.toString()} draggableId={item.id.toString()} index={index}>
-                            {(provided:any) => (
+                        <Draggable key={item.id.toString()} draggableId={`draggable-${item.id}`} index={index}>
+                            {(provided) => (
                                 <div
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
                                     style={{
                                         padding: '12px',
                                         margin: '0 0 4px 0',
@@ -111,15 +105,10 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
                                     }}
                                     className='shadow-md'
                                 >
-                                    <div {...provided.dragHandleProps}>
-                                    {item.menu_sequence}. {item.menu_name}
+                                    <div>
+                                        {item.menu_sequence}. {item.menu_name}
                                     </div>
-                                    {/* Render anak-anak secara rekursif */}
-                                    {item.children && item.children.length > 0 && (
-                                        <DragDropContext onDragEnd={(result: DropResult) => onDragEnd(result, item.id)}>
-                                            {renderItems(item.children, item.id)}
-                                        </DragDropContext>
-                                    )}
+                                    {item.children && item.children.length > 0 && renderItems(item.children, item.id)}
                                 </div>
                             )}
                         </Draggable>
@@ -129,9 +118,8 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
             )}
         </Droppable>
     );
-    
 
-    return <DragDropContext onDragEnd={(result) => onDragEnd(result)}>{renderItems(items)}</DragDropContext>;
+    return <DragDropContext onDragEnd={onDragEnd}>{renderItems(items)}</DragDropContext>;
 };
 
 export default SequenceEdit;
