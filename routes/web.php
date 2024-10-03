@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
+use App\Http\Controllers\CoBrokingController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\ExchangeRateBIController;
@@ -641,6 +643,23 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
+    
+
+    // Attendance Setting
+    Route::get('hr/attendanceSetting', [AttendanceSettingController::class, 'index'])->name('hr/attendanceSetting');
+    Route::post('/addWorkAttendance', [AttendanceSettingController::class, 'store'])->name('attendanceSetting.store');
+    Route::get('/getAttendanceSetting', [AttendanceSettingController::class, 'getAttendanceSetting'])->name('getAttendanceSetting.getAttendanceSetting');
+    Route::post('/getAttendanceSettingById', [AttendanceSettingController::class, 'getAttendanceSettingById'])->name('getAttendanceSettingById.getAttendanceSettingById');
+    Route::post('/editAttendanceSetting', [AttendanceSettingController::class, 'editAttendanceSetting'])->name('editAttendanceSetting.editAttendanceSetting');
+    Route::post('/mappingEmployeeToSettingAttendance', [AttendanceSettingController::class, 'mappingEmployeeToSettingAttendance'])->name('mappingEmployeeToSettingAttendance.mappingEmployeeToSettingAttendance');
+    Route::post('/addPersonAttendance', [AttendanceSettingController::class, 'addPersonAttendance'])->name('attendanceSetting.addPersonAttendance');
+    
+    
+    // Co Broking
+    Route::post('/insertCoBroking', [CoBrokingController::class, 'store'])->name('policyCoBroking.store');
+    Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
+    Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
+    Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
 
 
 
