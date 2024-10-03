@@ -2,7 +2,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite --host=ec2-18-140-68-47.ap-southeast-1.compute.amazonaws.com",
+        "dev": "vite --host=ec2-13-213-57-51.ap-southeast-1.compute.amazonaws.com",
         "build": "tsc && vite build"
     },
     "devDependencies": {
