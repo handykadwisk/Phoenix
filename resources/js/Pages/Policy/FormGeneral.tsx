@@ -5350,8 +5350,8 @@ export default function FormGeneral({
                                     <div className=" col-span-3">
                                         <span className="font-normal text-gray-500">
                                             {
-                                                policy.relation
-                                                    .RELATION_ORGANIZATION_NAME
+                                                policy.relation ? policy.relation
+                                                    .RELATION_ORGANIZATION_NAME : "-"
                                             }
                                         </span>
                                     </div>
@@ -6757,8 +6757,8 @@ export default function FormGeneral({
                                     <div className=" col-span-3">
                                         <span className="font-normal text-gray-500">
                                             {
-                                                policy.relation
-                                                    .RELATION_ORGANIZATION_NAME
+                                                policy.relation ? policy.relation
+                                                    .RELATION_ORGANIZATION_NAME : "-"
                                             }
                                         </span>
                                     </div>
@@ -12366,9 +12366,7 @@ export default function FormGeneral({
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border border-gray-30">
                                                                     {
-                                                                        val
-                                                                            .insurance
-                                                                            .RELATION_ORGANIZATION_NAME
+                                                                        val.insurance ? val.insurance.RELATION_ORGANIZATION_NAME : "-"
                                                                     }
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border border-gray-30 text-right">

@@ -47,7 +47,7 @@ class PolicyPartnerController extends Controller
         $dataGabung = [];
         $coveragePremium = DB::table('m_policy_coverage_detail AS pcd')
             ->leftJoin('m_policy_coverage AS pc', 'pcd.POLICY_COVERAGE_ID', '=', 'pc.POLICY_COVERAGE_ID')
-            ->select(DB::raw('1 AS URUTAN'), DB::raw('"Premium" AS TITLE'), 'pcd.CURRENCY_ID', DB::raw('SUM(pcd.PREMIUM) AS AMOUNT'), DB::raw('0 AS PPN'), DB::raw('0 AS PPH'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pc.POLICY_ID AND per.CURRENCY_ID = PCD.CURRENCY_ID), 1 ) AS EXCHANGE_RATE'))
+            ->select(DB::raw('1 AS URUTAN'), DB::raw('"Premium" AS TITLE'), 'pcd.CURRENCY_ID', DB::raw('SUM(pcd.PREMIUM) AS AMOUNT'), DB::raw('0 AS PPN'), DB::raw('0 AS PPH'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pc.POLICY_ID AND per.CURRENCY_ID = pcd.CURRENCY_ID), 1 ) AS EXCHANGE_RATE'))
             ->where('pc.POLICY_ID', $id)
             ->groupBy('pcd.CURRENCY_ID')->get();
         if ($coveragePremium) {
@@ -206,87 +206,6 @@ class PolicyPartnerController extends Controller
         }
         return response()->json($dataGabung);
         
-        
-
-        // $coveragePremium = DB::table('m_policy_coverage_detail AS pcd')
-        //         ->leftJoin('m_policy_coverage AS pc', 'pcd.POLICY_COVERAGE_ID', '=', 'pc.POLICY_COVERAGE_ID')
-        //         ->select(DB::raw('1 AS URUTAN'), DB::raw('"Premium" AS TITLE'), 'pcd.CURRENCY_ID', DB::raw('SUM(pcd.PREMIUM) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pc.POLICY_ID AND per.CURRENCY_ID = PCD.CURRENCY_ID), 1 ) AS EXCHANGE_RATE'))
-        //         ->where('pc.POLICY_ID', $id)
-        //         ->groupBy('pcd.CURRENCY_ID');
-                
-        // $insurerNettPremi = DB::table('m_insurer_coverage AS ipc')
-        //         ->leftJoin('t_insurance_panel AS ip', 'ipc.IP_ID', '=', 'ip.IP_ID')
-        //         ->select(DB::raw('2 AS URUTAN'), DB::raw('"Insurer Nett Premium" AS TITLE'), 'ipc.CURRENCY_ID', DB::raw('SUM(ipc.NETT_PREMI) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = ip.POLICY_ID AND per.CURRENCY_ID = ipc.CURRENCY_ID), 1 ) AS EXCHANGE_RATE') )
-        //         ->where('ip.POLICY_ID', $id)
-        //         ->unionAll($coveragePremium)
-        //         ->groupBy('ipc.CURRENCY_ID');
-                
-        // $adminCost = DB::table('m_policy_insured AS pi')
-        //         ->select(DB::raw('3 AS URUTAN'), DB::raw('"Admin Cost" AS TITLE'), DB::raw('"1" AS CURRENCY_ID'), 'pi.ADMIN_COST AS AMOUNT', DB::raw('1 AS EXCHANGE_RATE') )
-        //         ->where('pi.POLICY_ID', $id)
-        //         ->unionAll($insurerNettPremi);
-
-        // $brokerageFee = DB::table('m_policy_insured_detail AS pid')
-        //         ->leftJoin('m_policy_insured AS pi', 'pid.POLICY_INSURED_ID', '=', 'pi.POLICY_INSURED_ID')
-        //         ->select(DB::raw('4 AS URUTAN'), DB::raw('"Brokerage Fee" AS TITLE'), 'pid.CURRENCY_ID', DB::raw('SUM(pid.BF_NETT_AMOUNT) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pi.POLICY_ID AND per.CURRENCY_ID = pid.CURRENCY_ID), 1 ) AS EXCHANGE_RATE') )
-        //         ->where('pi.POLICY_ID', $id)
-        //         ->unionAll($adminCost)
-        //         ->groupBy('pid.CURRENCY_ID');
-        
-        // $engineeringFee = DB::table('m_policy_insured_detail AS pid')
-        //         ->leftJoin('m_policy_insured AS pi', 'pid.POLICY_INSURED_ID', '=', 'pi.POLICY_INSURED_ID')
-        //         ->select(DB::raw('5 AS URUTAN'), DB::raw('"Engineering Fee" AS TITLE'), 'pid.CURRENCY_ID', DB::raw('SUM(pid.EF_NETT_AMOUNT) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pi.POLICY_ID AND per.CURRENCY_ID = pid.CURRENCY_ID), 1 ) AS EXCHANGE_RATE') )
-        //         ->where('pi.POLICY_ID', $id)
-        //         ->unionAll($brokerageFee)
-        //         ->groupBy('pid.CURRENCY_ID');
-        
-        // $consultancyFee = DB::table('m_policy_insured_detail AS pid')
-        //         ->leftJoin('m_policy_insured AS pi', 'pid.POLICY_INSURED_ID', '=', 'pi.POLICY_INSURED_ID')
-        //         ->select(DB::raw('6 AS URUTAN'), DB::raw('"Consultancy Fee" AS TITLE'), 'pid.CURRENCY_ID', DB::raw('SUM(pid.CF_NETT_AMOUNT) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pi.POLICY_ID AND per.CURRENCY_ID = pid.CURRENCY_ID), 1 ) AS EXCHANGE_RATE') )
-        //         ->where('pi.POLICY_ID', $id)
-        //         ->unionAll($engineeringFee)
-        //         ->groupBy('pid.CURRENCY_ID');
-        
-        // $fresnelNettIncome = DB::table('m_policy_insured_detail AS pid')
-        //         ->leftJoin('m_policy_insured AS pi', 'pid.POLICY_INSURED_ID', '=', 'pi.POLICY_INSURED_ID')
-        //         ->select(DB::raw('7 AS URUTAN'), DB::raw('"Fresnel Income Amount" AS TITLE'), 'pid.CURRENCY_ID', DB::raw('SUM(pid.INCOME_NETT_AMOUNT) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pi.POLICY_ID AND per.CURRENCY_ID = pid.CURRENCY_ID), 1 ) AS EXCHANGE_RATE') )
-        //         ->where('pi.POLICY_ID', $id)
-        //         ->unionAll($consultancyFee)
-        //         ->groupBy('pid.CURRENCY_ID');
-        //         // ->get();
-        
-        // $nettPremiumToInsured = DB::table('m_policy_insured_detail AS pid')
-        //         ->leftJoin('m_policy_insured AS pi', 'pid.POLICY_INSURED_ID', '=', 'pi.POLICY_INSURED_ID')
-        //         ->select(DB::raw('8 AS URUTAN'), DB::raw('"Premium To Insured" AS TITLE'), 'pid.CURRENCY_ID', DB::raw('SUM(pid.PREMIUM_TO_INSURED) AS AMOUNT'), DB::raw('IFNULL( (SELECT POLICY_EXCHANGE_RATE_AMOUNT FROM m_policy_exchange_rate AS per WHERE per.POLICY_ID = pi.POLICY_ID AND per.CURRENCY_ID = pid.CURRENCY_ID), 1 ) AS EXCHANGE_RATE') )
-        //         ->where('pi.POLICY_ID', $id)
-        //         ->unionAll($fresnelNettIncome)
-        //         ->groupBy('pid.CURRENCY_ID');
-        //         // ->get();
-
-        // $fbiPks = DB::table('m_policy_partner AS pp')
-        //         ->select(DB::raw('9 AS URUTAN'), DB::raw('"FBI PKS" AS TITLE'), DB::raw('"1" AS CURRENCY_ID'), DB::raw('SUM(pp.BROKERAGE_FEE_AMOUNT) + SUM(pp.ENGINEERING_FEE_AMOUNT) +SUM(pp.CONSULTANCY_FEE_AMOUNT) AS AMOUNT'), DB::raw(' 1 AS EXCHANGE_RATE') )
-        //         ->where('pp.POLICY_ID', $id)
-        //         ->where('pp.INCOME_TYPE', 1)
-        //         ->unionAll($nettPremiumToInsured)
-        //         ->groupBy('pp.INCOME_TYPE');
-        
-        // $agent = DB::table('m_policy_partner AS pp')
-        //         ->select(DB::raw('10 AS URUTAN'), DB::raw('"Agent" AS TITLE'), DB::raw('"1" AS CURRENCY_ID'), DB::raw('SUM(pp.BROKERAGE_FEE_AMOUNT) + SUM(pp.ENGINEERING_FEE_AMOUNT) + SUM(pp.CONSULTANCY_FEE_AMOUNT) AS AMOUNT'), DB::raw(' 1 AS EXCHANGE_RATE') )
-        //         ->where('pp.POLICY_ID', $id)
-        //         ->where('pp.INCOME_TYPE', 2)
-        //         ->unionAll($fbiPks)
-        //         ->groupBy('pp.INCOME_TYPE');
-
-        // $baa = DB::table('m_policy_partner AS pp')
-        //         ->select(DB::raw('11 AS URUTAN'), DB::raw('"BAA" AS TITLE'), DB::raw('"1" AS CURRENCY_ID'), DB::raw('SUM(pp.BROKERAGE_FEE_AMOUNT) + SUM(pp.ENGINEERING_FEE_AMOUNT) + SUM(pp.CONSULTANCY_FEE_AMOUNT) AS AMOUNT'), DB::raw(' 1 AS EXCHANGE_RATE') )
-        //         ->where('pp.POLICY_ID', $id)
-        //         ->where('pp.INCOME_TYPE', 3)
-        //         ->unionAll($agent)
-        //         ->groupBy('pp.INCOME_TYPE')
-        //         ->orderBy('URUTAN')
-        //         ->get();
-        
-        // return response()->json($baa);
     }
 
 
