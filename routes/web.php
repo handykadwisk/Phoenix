@@ -482,6 +482,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
     Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
     Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
+    Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
+    
     
     
     

@@ -13,7 +13,7 @@ class Relation extends Model
 
     protected $table = 't_relation';
 
-    public $with = ['mTagging','mRelationType','mRelationAka', 'children','MBankRelation'];
+    public $with = ['mTagging', 'mRelationType', 'mRelationAka', 'children', 'MBankRelation'];
 
     protected $guarded = [
         'RELATION_ORGANIZATION_ID',
@@ -21,7 +21,8 @@ class Relation extends Model
 
     public $timestamps = false;
 
-    public function mTagging(){
+    public function mTagging()
+    {
         return $this->hasMany(MTag::class, 'RELATION_ORGANIZATION_ID');
     }
 
@@ -30,43 +31,53 @@ class Relation extends Model
         return $this->hasMany(MRelationType::class, 'RELATION_ORGANIZATION_ID');
     }
 
-    public function mRelationAka(){
+    public function mRelationAka()
+    {
         return $this->hasMany(MRelationAka::class, 'RELATION_ORGANIZATION_ID');
     }
 
-    public function children() {
+    public function children()
+    {
         return $this->hasMany(Relation::class, 'RELATION_ORGANIZATION_PARENT_ID');
     }
 
-    public function groupRelation(){
-        return $this->hasMany(RelationGroup::class, 'RELATION_GROUP_ID', 'RELATION_ORGANIZATION_GROUP');
+    public function groupRelation()
+    {
+        return $this->hasOne(RelationGroup::class, 'RELATION_GROUP_ID', 'RELATION_ORGANIZATION_GROUP');
     }
 
-    public function PreSalutation(){
+    public function PreSalutation()
+    {
         return $this->hasOne(Salutation::class, 'salutation_id', 'PRE_SALUTATION');
     }
 
-    public function PostSalutation(){
+    public function PostSalutation()
+    {
         return $this->hasOne(Salutation::class, 'salutation_id', 'POST_SALUTATION');
     }
 
-    public function MRelationAgent(){
+    public function MRelationAgent()
+    {
         return $this->hasOne(MRelationAgent::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
-    public function MRelationBaa(){
+    public function MRelationBaa()
+    {
         return $this->hasOne(MRelationBaa::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
-    public function MRelationFbi(){
+    public function MRelationFbi()
+    {
         return $this->hasOne(MRelationFBIPKS::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
-    public function TPerson(){
+    public function TPerson()
+    {
         return $this->hasMany(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
-    public function MBankRelation(){
+    public function MBankRelation()
+    {
         return $this->hasMany(MBankAccountRelation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 }

@@ -83,13 +83,13 @@ class RelationController extends Controller
         $newSearch = json_decode($request->newFilter, true);
 
         // dd($newSearch[0]);
-        
-        
+
+
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
         // dd($newSearch[0]['RELATION_TYPE_ID']['value']);
@@ -97,20 +97,20 @@ class RelationController extends Controller
         if ($request->newFilter !== "") {
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-            }else{
+            } else {
                 // dd("masuk sini");
                 foreach ($newSearch[0] as $keyId => $searchValue) {
                     if ($keyId === 'RELATION_ORGANIZATION_NAME') {
                         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-                    }elseif ($keyId === 'RELATION_TYPE_ID'){
+                    } elseif ($keyId === 'RELATION_TYPE_ID') {
                         if (!isset($searchValue['value'])) {
                             $valueTypeId = $searchValue;
-                        }else{
+                        } else {
                             $valueTypeId = $searchValue['value'];
                         }
-                        $query->whereHas('mRelationType', function($q) use($valueTypeId) {
+                        $query->whereHas('mRelationType', function ($q) use ($valueTypeId) {
                             // Query the name field in status table
-                            $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
+                            $q->where('RELATION_TYPE_ID', 'like', '%' . $valueTypeId . '%');
                         });
                     }
                 }
@@ -260,7 +260,7 @@ class RelationController extends Controller
 
         $addTBK = $nameRelationNew;
         if ($request->mark_tbk_relation == "1") {
-            $addTBK = $nameRelationNew." Tbk.";
+            $addTBK = $nameRelationNew . " Tbk.";
         }
 
         $professionId = $request->profession_id;
@@ -304,11 +304,11 @@ class RelationController extends Controller
             'RELATION_ORGANIZATION_DATE_OF_BIRTH'   => $request->date_of_birth
 
         ]);
-        
+
         if ($request->relation_status_id == "2") {
             // jika dia corporate pic dan milih corporate pic maka akan melakukan mapping ke t person
             if (is_countable($request->corporate_pic_for)) {
-                for ($i=0; $i < sizeof($request->corporate_pic_for); $i++) { 
+                for ($i = 0; $i < sizeof($request->corporate_pic_for); $i++) {
                     $idRelation = $request->corporate_pic_for[$i]['value'];
 
                     // simpan mapping ke t person
@@ -324,7 +324,7 @@ class RelationController extends Controller
 
         if (is_countable($request->relation_aka)) {
             // Created Mapping Relation AKA
-            for ($i=0; $i < sizeof($request->relation_aka); $i++) {
+            for ($i = 0; $i < sizeof($request->relation_aka); $i++) {
                 $nameRelationAka = $request->relation_aka[$i]["name_aka"];
                 MRelationAka::create([
                     "RELATION_ORGANIZATION_ID" => $relation->RELATION_ORGANIZATION_ID,
@@ -355,7 +355,7 @@ class RelationController extends Controller
 
         if (is_countable($request->tagging_name)) {
             // created tagging
-            for ($i=0; $i < sizeof($request->tagging_name); $i++) {
+            for ($i = 0; $i < sizeof($request->tagging_name); $i++) {
                 $tagName = $request->tagging_name[$i]["name_tag"];
                 $tagging = Tag::insertGetId([
                     'TAG_NAME' => $tagName,
@@ -379,16 +379,16 @@ class RelationController extends Controller
         $pksFor = "";
         if ($request->relation_status_id == "1" && $relationTypeAgent == "3") {
             $pksFor = "1";
-        }else if($request->relation_status_id == "2" && $relationTypeAgent == "3"){
+        } else if ($request->relation_status_id == "2" && $relationTypeAgent == "3") {
             $pksFor = "2";
-        }else if($request->relation_status_id == "1" && $relationTypeFBI == "13"){
+        } else if ($request->relation_status_id == "1" && $relationTypeFBI == "13") {
             $pksFor = "3";
         }
 
         // No PKS
         $pksDocument = is_countable($request->no_pks);
         if ($pksDocument) {
-            for ($i=0; $i < sizeof($request->no_pks); $i++) { 
+            for ($i = 0; $i < sizeof($request->no_pks); $i++) {
                 $varPKS = $request->no_pks[$i];
                 // $noPKS = $varPKS['NO_PKS'];
 
@@ -402,17 +402,17 @@ class RelationController extends Controller
                     "STATUS_PKS"                        => $varPKS['STATUS_PKS'],
                     "ENDING_BY_CANCEL"                  => $varPKS['ENDING_BY_CANCEL'],
                 ]);
-                
+
                 // create Document PKS
-                for ($a=0; $a < sizeof($request->file('no_pks')); $a++) { 
+                for ($a = 0; $a < sizeof($request->file('no_pks')); $a++) {
                     $file = $request->file('no_pks');
                     $varDocument = $file[$a]['DOCUMENT_PKS_ID'];
 
                     // Create Folder For Person Document
-                    $parentDir = ((floor(($relation->RELATION_ORGANIZATION_ID)/1000))*1000).'/';
+                    $parentDir = ((floor(($relation->RELATION_ORGANIZATION_ID) / 1000)) * 1000) . '/';
                     $personID = $relation->RELATION_ORGANIZATION_ID . '/';
                     $typeDir = "";
-                    $uploadPath = 'documents/' . 'PKS/'. $parentDir . $personID . $typeDir;
+                    $uploadPath = 'documents/' . 'PKS/' . $parentDir . $personID . $typeDir;
 
 
                     // get Data Document
@@ -432,10 +432,10 @@ class RelationController extends Controller
                         'DOCUMENT_CREATED_BY'           => Auth::user()->id
                     ])->DOCUMENT_ID;
 
-                    if($document){
+                    if ($document) {
                         // update file name "DOCUMENT_ID - FILENAME"
                         Document::where('DOCUMENT_ID', $document)->update([
-                            'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                            'DOCUMENT_FILENAME'             => $document . "-" . $documentOriginalName,
                         ]);
 
                         // create folder in directory laravel
@@ -444,22 +444,22 @@ class RelationController extends Controller
                     }
 
 
-                    if($document){
+                    if ($document) {
                         MPksRelation::where('M_PKS_RELATION_ID', $createMPksRelation->M_PKS_RELATION_ID)->update([
                             'DOCUMENT_PKS_ID'     => $document,
                         ]);
                     }
                 }
             }
-        }  
+        }
 
         // bank account relation
         $bankAccountRelation = is_countable($request->bank_account);
-        if($bankAccountRelation){
-            for ($i=0; $i < sizeof($request->bank_account); $i++) { 
+        if ($bankAccountRelation) {
+            for ($i = 0; $i < sizeof($request->bank_account); $i++) {
                 $varBankAccount = $request->bank_account[$i];
                 $npwpRelation = $varBankAccount['NPWP_NAME'];
-                if($varBankAccount['NPWP_NAME'] == "" || $varBankAccount['NPWP_NAME'] == null){
+                if ($varBankAccount['NPWP_NAME'] == "" || $varBankAccount['NPWP_NAME'] == null) {
                     $npwpRelation = $request->NPWP_RELATION;
                 }
 
@@ -472,7 +472,6 @@ class RelationController extends Controller
                     "NPWP_NAME"                         => $npwpRelation,
                 ]);
             }
-
         }
 
 
@@ -482,11 +481,11 @@ class RelationController extends Controller
         if ($relation->PRE_SALUTATION == null && $relation->POST_SALUTATION == null) {
             $preSalutation = "";
             $postSalutation = "";
-        }else{
+        } else {
             if ($relation->PRE_SALUTATION == "" || $relation->PRE_SALUTATION == null) {
                 $salutationPost = Salutation::find($relation->POST_SALUTATION);
                 $postSalutation = $salutationPost->salutation_name;
-            }else{
+            } else {
                 $salutationPre = Salutation::find($relation->PRE_SALUTATION);
                 $preSalutation = $salutationPre->salutation_name;
             }
@@ -519,8 +518,8 @@ class RelationController extends Controller
     public function getRelationById($id)
     {
         $data = Relation::leftJoin('m_tag_relation', 'm_tag_relation.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')
-        ->leftJoin('t_tag', 'm_tag_relation.TAG_ID', '=', 't_tag.TAG_ID')->where('t_relation.RELATION_ORGANIZATION_ID', $id)->first();
-            // print_r($data);die;
+            ->leftJoin('t_tag', 'm_tag_relation.TAG_ID', '=', 't_tag.TAG_ID')->where('t_relation.RELATION_ORGANIZATION_ID', $id)->first();
+        // print_r($data);die;
         return response()->json($data);
     }
 
@@ -558,7 +557,7 @@ class RelationController extends Controller
 
         $addTBK = $nameRelationNew;
         if ($request->MARK_TBK_RELATION == "1") {
-            $addTBK = $nameRelationNew." Tbk.";
+            $addTBK = $nameRelationNew . " Tbk.";
         }
 
         $professionId = $request->RELATION_PROFESSION_ID;
@@ -599,12 +598,12 @@ class RelationController extends Controller
 
         // check existing relation AKA
         $existingRelationAKA = MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
-        if ($existingRelationAKA->count()>0) {
+        if ($existingRelationAKA->count() > 0) {
             MRelationAka::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->delete();
         }
 
         // Created Mapping Relation AKA
-        for ($i=0; $i < sizeof($request->m_relation_aka); $i++) {
+        for ($i = 0; $i < sizeof($request->m_relation_aka); $i++) {
             $nameRelationAka = $request->m_relation_aka[$i]["RELATION_AKA_NAME"];
             MRelationAka::create([
                 "RELATION_ORGANIZATION_ID" => $request->RELATION_ORGANIZATION_ID,
@@ -636,7 +635,7 @@ class RelationController extends Controller
         }
 
         // created mtag
-        for ($i=0; $i < sizeof($request->m_tagging); $i++) {
+        for ($i = 0; $i < sizeof($request->m_tagging); $i++) {
             // cek existing tagging
             if ($request->m_tagging[$i]['tagging']['TAG_ID'] !== "") {
                 $existingDataTag = Tag::where('TAG_ID', $request->m_tagging[$i]['tagging']['TAG_ID'])->get();
@@ -669,11 +668,11 @@ class RelationController extends Controller
         if ($request->PRE_SALUTATION == null && $request->POST_SALUTATION == null) {
             $preSalutation = "";
             $postSalutation = "";
-        }else{
+        } else {
             if ($request->PRE_SALUTATION == "" || $request->PRE_SALUTATION == null) {
                 $salutationPost = Salutation::find($request->POST_SALUTATION);
                 $postSalutation = $salutationPost->salutation_name;
-            }else{
+            } else {
                 $salutationPre = Salutation::find($request->PRE_SALUTATION);
                 $preSalutation = $salutationPre->salutation_name;
             }
@@ -702,13 +701,15 @@ class RelationController extends Controller
         ]);
     }
 
-    public function get_detail(Request $request){
-        $detailRelation = Relation::with('TPerson')->find($request->id);
+    public function get_detail(Request $request)
+    {
+        $detailRelation = Relation::with('TPerson')->with('groupRelation')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
 
-    public function get_corporate(Request $request){
+    public function get_corporate(Request $request)
+    {
         $detailPerson = TPerson::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_person.RELATION_ORGANIZATION_ID')->where('INDIVIDU_RELATION_ID', $request->id)->where('PERSON_IS_DELETED', 0)->get();
 
         return response()->json($detailPerson);
@@ -726,7 +727,8 @@ class RelationController extends Controller
         ]);
     }
 
-    public function getCekAbbreviation(Request $request){
+    public function getCekAbbreviation(Request $request)
+    {
 
 
         if ($request->flag != "edit") {
@@ -734,7 +736,7 @@ class RelationController extends Controller
             $message = "Existing";
             $data = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->name)))->get();
             return response()->json($data);
-        }else{
+        } else {
             $abbre = Relation::find($request->id);
             $abbreOld = $abbre->RELATION_ORGANIZATION_ABBREVIATION;
             // dd($abbreOld);
@@ -748,25 +750,25 @@ class RelationController extends Controller
                 return response()->json($abbreviation);
             }
         }
-
-
     }
 
-    public function getRelationAll(){
+    public function getRelationAll()
+    {
         $clientId = 1;
-        $data = Relation::whereHas('mRelationType', function($q) use($clientId) {
+        $data = Relation::whereHas('mRelationType', function ($q) use ($clientId) {
             // Query the name field in status table
-            $q->where('RELATION_TYPE_ID', 'like', '%'.$clientId.'%');
+            $q->where('RELATION_TYPE_ID', 'like', '%' . $clientId . '%');
         })->get();
 
         return response()->json($data);
     }
 
-    public function edit_corporate(Request $request){
+    public function edit_corporate(Request $request)
+    {
 
         $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $request->detail_corporate[0]['INDIVIDU_RELATION_ID'])->get();
-        for ($i=0; $i < sizeof($arrayPerson); $i++) { 
-            for ($a=0; $a < sizeof($request->detail_corporate); $a++) { 
+        for ($i = 0; $i < sizeof($arrayPerson); $i++) {
+            for ($a = 0; $a < sizeof($request->detail_corporate); $a++) {
                 $personName = $request->detail_corporate[$a]['RELATION_ORGANIZATION_NAME'];
                 $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
                 if ($arrayPerson[$i]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
@@ -776,30 +778,28 @@ class RelationController extends Controller
                 }
             }
         }
-        for ($i=0; $i < sizeof($request->detail_corporate); $i++) {
+        for ($i = 0; $i < sizeof($request->detail_corporate); $i++) {
             $personName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
             $individuId = $request->detail_corporate[$i]['INDIVIDU_RELATION_ID'];
 
             $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
             $getName = Relation::select('RELATION_ORGANIZATION_NAME')->where('RELATION_ORGANIZATION_ID', $individuId)->first();
-            
+
             $dataPerson = TPerson::where('RELATION_ORGANIZATION_ID', $dataRelation->RELATION_ORGANIZATION_ID)->first();
             if ($dataPerson != null) {
                 $id = $dataPerson->PERSON_ID;
                 TPerson::where('PERSON_ID', $id)->update([
                     "PERSON_IS_DELETED"         => "0"
                 ]);
-                
-            }else{
+            } else {
                 $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->get();
-                for ($a=0; $a < sizeof($arrayPerson); $a++) { 
+                for ($a = 0; $a < sizeof($arrayPerson); $a++) {
                     if ($arrayPerson[$a]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
                         $idPerson = $arrayPerson[$a]['PERSON_ID'];
                         TPerson::where('PERSON_ID', $idPerson)->update([
                             "PERSON_IS_DELETED"         => "0"
                         ]);
                     }
-                    
                 }
 
                 TPerson::create([
@@ -820,27 +820,29 @@ class RelationController extends Controller
         ]);
     }
 
-    public function get_individu_aka(Request $request){
+    public function get_individu_aka(Request $request)
+    {
         $detailRelation = Relation::where('RELATION_ORGANIZATION_ID', $request->idIndividu)->first();
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
 
-    public function edit_bank(Request $request){
+    public function edit_bank(Request $request)
+    {
 
         // cek existing bank_relation
         $dataBankExisting = MBankAccountRelation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->get();
-        if ($dataBankExisting->count()>0) {
+        if ($dataBankExisting->count() > 0) {
             MBankAccountRelation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->delete();
         }
 
         // bank account relation
         $bankAccountRelation = is_countable($request->bank_account);
-        if($bankAccountRelation){
-            for ($i=0; $i < sizeof($request->bank_account); $i++) { 
+        if ($bankAccountRelation) {
+            for ($i = 0; $i < sizeof($request->bank_account); $i++) {
                 $varBankAccount = $request->bank_account[$i];
                 $npwpRelation = $varBankAccount['NPWP_NAME'];
-                if($varBankAccount['NPWP_NAME'] == "" || $varBankAccount['NPWP_NAME'] == null){
+                if ($varBankAccount['NPWP_NAME'] == "" || $varBankAccount['NPWP_NAME'] == null) {
                     $npwpRelation = $request->NPWP_RELATION;
                 }
 
@@ -853,7 +855,6 @@ class RelationController extends Controller
                     "NPWP_NAME"                         => $npwpRelation,
                 ]);
             }
-
         }
 
         return new JsonResponse([
@@ -864,7 +865,8 @@ class RelationController extends Controller
         ]);
     }
 
-    public function getPKSAgentJson(Request $request){
+    public function getPKSAgentJson(Request $request)
+    {
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
@@ -874,10 +876,10 @@ class RelationController extends Controller
         $query->leftJoin('t_document', 't_document.DOCUMENT_ID', '=', 'm_pks_relation.DOCUMENT_PKS_ID')->where('FOR_PKS', 1)->where('m_pks_relation.RELATION_ORGANIZATION_ID', $request->id);
 
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
 
@@ -898,7 +900,8 @@ class RelationController extends Controller
         return response()->json($data);
     }
 
-    public function getPKSFbiJson(Request $request){
+    public function getPKSFbiJson(Request $request)
+    {
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
@@ -908,10 +911,10 @@ class RelationController extends Controller
         $query->leftJoin('t_document', 't_document.DOCUMENT_ID', '=', 'm_pks_relation.DOCUMENT_PKS_ID')->where('FOR_PKS', 2)->where('m_pks_relation.RELATION_ORGANIZATION_ID', $request->id);
 
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
 
@@ -932,11 +935,12 @@ class RelationController extends Controller
         return response()->json($data);
     }
 
-    public function edit_document_pks(Request $request){
+    public function edit_document_pks(Request $request)
+    {
         // No PKS
         $pksDocument = is_countable($request->no_pks);
         if ($pksDocument) {
-            for ($i=0; $i < sizeof($request->no_pks); $i++) { 
+            for ($i = 0; $i < sizeof($request->no_pks); $i++) {
                 $varPKS = $request->no_pks[$i];
                 // $noPKS = $varPKS['NO_PKS'];
 
@@ -950,17 +954,17 @@ class RelationController extends Controller
                     "STATUS_PKS"                        => $varPKS['STATUS_PKS'],
                     "ENDING_BY_CANCEL"                  => $varPKS['ENDING_BY_CANCEL'],
                 ]);
-                
+
                 // create Document PKS
-                for ($a=0; $a < sizeof($request->file('no_pks')); $a++) { 
+                for ($a = 0; $a < sizeof($request->file('no_pks')); $a++) {
                     $file = $request->file('no_pks');
                     $varDocument = $file[$a]['DOCUMENT_PKS_ID'];
 
                     // Create Folder For Person Document
-                    $parentDir = ((floor(($varPKS['RELATION_ORGANIZATION_ID'])/1000))*1000).'/';
+                    $parentDir = ((floor(($varPKS['RELATION_ORGANIZATION_ID']) / 1000)) * 1000) . '/';
                     $personID = $varPKS['RELATION_ORGANIZATION_ID'] . '/';
                     $typeDir = "";
-                    $uploadPath = 'documents/' . 'PKS/'. $parentDir . $personID . $typeDir;
+                    $uploadPath = 'documents/' . 'PKS/' . $parentDir . $personID . $typeDir;
 
 
                     // get Data Document
@@ -980,10 +984,10 @@ class RelationController extends Controller
                         'DOCUMENT_CREATED_BY'           => Auth::user()->id
                     ])->DOCUMENT_ID;
 
-                    if($document){
+                    if ($document) {
                         // update file name "DOCUMENT_ID - FILENAME"
                         Document::where('DOCUMENT_ID', $document)->update([
-                            'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                            'DOCUMENT_FILENAME'             => $document . "-" . $documentOriginalName,
                         ]);
 
                         // create folder in directory laravel
@@ -992,14 +996,14 @@ class RelationController extends Controller
                     }
 
 
-                    if($document){
+                    if ($document) {
                         MPksRelation::where('M_PKS_RELATION_ID', $createMPksRelation->M_PKS_RELATION_ID)->update([
                             'DOCUMENT_PKS_ID'     => $document,
                         ]);
                     }
                 }
             }
-        }  
+        }
 
         return new JsonResponse([
             $request->no_pks[0]['RELATION_ORGANIZATION_ID'],

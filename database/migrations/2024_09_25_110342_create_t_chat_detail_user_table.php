@@ -21,7 +21,7 @@ return new class extends Migration
             $table->dateTime('CHAT_DETAIL_USER_READ_DATE')->nullable();
             $table->bigInteger('CHAT_DETAIL_USER_STATUS_MENTION')->nullable()->comment('0 = tidak di mention, 1 = mention');
             $table->dateTime('CHAT_DETAIL_USER_REPLY_DATE')->nullable();
-            $table->bigInteger('CHAT_DETAIL_USER_RELATE_CHAT_DETAIL_ID');
+            $table->bigInteger('CHAT_DETAIL_USER_RELATE_CHAT_DETAIL_ID')->nullable();
             $table->dateTime('CHAT_DETAIL_USER_CREATED_DATE')->nullable();
             $table->bigInteger('CHAT_DETAIL_USER_CREATED_ID')->nullable();
 

@@ -677,7 +677,6 @@ export default function DetailRelation({
             const selected = bankSelect.filter(
                 (option: any) => option.value === value
             );
-            // console.log("aaa", selected);
             return selected[0]?.label;
         }
     };
@@ -2197,24 +2196,18 @@ export default function DetailRelation({
                         <div className="font-semibold">
                             <span>Group</span>
                         </div>
-                        {dataRelationNew.group_relation?.length === 0 ? (
+                        {dataRelationNew.group_relation === null ? (
                             <>
                                 <div className="text-sm text-gray-400">-</div>
                             </>
                         ) : (
                             <>
-                                {dataRelationNew.group_relation?.map(
-                                    (gRelation: any, i: number) => {
-                                        return (
-                                            <div
-                                                className="text-sm text-gray-400"
-                                                key={i}
-                                            >
-                                                {gRelation.RELATION_GROUP_NAME}
-                                            </div>
-                                        );
+                                <div className="text-sm text-gray-400">
+                                    {
+                                        dataRelationNew.group_relation
+                                            ?.RELATION_GROUP_NAME
                                     }
-                                )}
+                                </div>
                             </>
                         )}
                     </div>
