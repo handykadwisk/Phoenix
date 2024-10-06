@@ -41,6 +41,8 @@ export default function ModalChatMessage({
     setShowChatMessage,
     tagIdChat,
     showChatMessage,
+    setFlagObject,
+    flagObject,
 }: PropsWithChildren<{
     show?: boolean;
     onClose?: CallableFunction;
@@ -52,14 +54,20 @@ export default function ModalChatMessage({
     setFlagPlugin?: any;
     setShowChatMessage: any;
     showChatMessage: any;
+    setFlagObject?: any;
+    flagObject?: any;
 }>) {
     useEffect(() => {
         getMessageChatByTypeId(typeChatId);
     }, [typeChatId]);
     useEffect(() => {
         getDataChatDetailUser(auth.user.id);
-        getTypeChatByTagId(tagIdChat.TAG_ID);
-    }, [tagIdChat]);
+        if (flagObject === "flagObject") {
+            getObjectChat();
+        } else {
+            getTypeChatByTagId(tagIdChat.TAG_ID);
+        }
+    }, [tagIdChat, flagObject]);
     useEffect(() => {
         getChatPin(tagIdChat.TAG_ID, auth.user.id);
     }, [tagIdChat]);
@@ -103,7 +111,6 @@ export default function ModalChatMessage({
             .post(`/getTypeChatByTagId`, { tagIdChat })
             .then((res) => {
                 setDetailTypeChat(res.data);
-                console.log("typeChat", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -116,6 +123,19 @@ export default function ModalChatMessage({
             .post(`/getDataParticipantById`, { chatId })
             .then((res) => {
                 setDataParticipant(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // for load data object chat
+    const [dataObjectChat, setDataObjectChat] = useState<any>([]);
+    const getObjectChat = async () => {
+        await axios
+            .post(`/getObjectChat`)
+            .then((res) => {
+                setDetailTypeChat(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -140,7 +160,6 @@ export default function ModalChatMessage({
             .post(`/getDataChatDetailUser`, { idAuthUser })
             .then((res) => {
                 setDataChatDetailUser(res.data);
-                console.log("chatdetailuser", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -363,7 +382,11 @@ export default function ModalChatMessage({
             .post(`/unPinMessageObject`, { idChatDetail, typeChatId })
             .then((res) => {
                 setIsSuccessChat(res.data[0]);
-                getTypeChatByTagId(res.data[1]);
+                if (flagObject === "flagObject") {
+                    getObjectChat();
+                } else {
+                    getTypeChatByTagId(res.data[1]);
+                }
                 getChatPin(res.data[1], res.data[2]);
                 setShowContext({
                     ...showContext,
@@ -385,7 +408,11 @@ export default function ModalChatMessage({
             .post(`/pinMessageObject`, { idChatDetail, typeChatId })
             .then((res) => {
                 setIsSuccessChat(res.data[0]);
-                getTypeChatByTagId(res.data[1]);
+                if (flagObject === "flagObject") {
+                    getObjectChat();
+                } else {
+                    getTypeChatByTagId(res.data[1]);
+                }
                 getChatPin(res.data[1], res.data[2]);
                 setShowContext({
                     ...showContext,
@@ -683,6 +710,12 @@ export default function ModalChatMessage({
         }
     };
 
+    // console.log(
+    //     detailTypeChat.find((f: any) => f.STATUS === "InActive")
+    //         ? "kosong"
+    //         : "ada"
+    // );
+
     return (
         <>
             <Transition.Root show={showChatMessage.chatModal} as={Fragment}>
@@ -699,13 +732,13 @@ export default function ModalChatMessage({
                                 enter="transition ease-in-out duration-300 transform"
                                 enterFrom="translate-x-full sm:scale-95"
                                 enterTo="translate-x-0 sm:scale-100"
-                                leave="transition ease-in-out duration-400 transform"
+                                leave="transition ease-in-out duration-300 transform"
                                 leaveFrom="translate-x-0 sm:scale-100"
                                 leaveTo="translate-x-full sm:scale-95"
                             >
                                 {/* For Chat */}
 
-                                <div className="absolute bottom-0 right-0 mr-6 border border-red-500 mb-3 rounded-r-md rounded-l-md bg-white w-[25%] h-[29rem] flex flex-col xs:w-[90%] lg:w-[25%]">
+                                <div className="absolute bottom-0 right-0 mr-3 border border-red-500 mb-3 rounded-r-md rounded-l-md bg-white w-[25%] h-[29rem] flex flex-col xs:w-[90%] lg:w-[25%]">
                                     <div className="bg-red-500 p-3 rounded-tr-sm rounded-tl-sm h-10 flex justify-between items-center text-white">
                                         {isSuccessChat && (
                                             <ToastMessage
@@ -1764,157 +1797,171 @@ export default function ModalChatMessage({
                                                             Inactive Chat
                                                         </AccordionTitle>
                                                         <AccordionContent>
-                                                            <div className="overflow-y-auto custom-scrollbar max-h-44">
-                                                                {detailTypeChat
-                                                                    ?.filter(
-                                                                        (
-                                                                            m: any
-                                                                        ) =>
-                                                                            m.STATUS ===
-                                                                            "InActive"
-                                                                    )
-                                                                    ?.map(
-                                                                        (
-                                                                            dTypeChat: any,
-                                                                            i: number
-                                                                        ) => {
-                                                                            return (
-                                                                                <div
-                                                                                    key={
-                                                                                        i
-                                                                                    }
-                                                                                    className={
-                                                                                        showContext.visible ===
-                                                                                            true &&
-                                                                                        activeIndex ===
-                                                                                            i
-                                                                                            ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
-                                                                                            : renderInActiveChat(
-                                                                                                  dTypeChat
-                                                                                              )
-                                                                                    }
-                                                                                >
+                                                            {detailTypeChat.find(
+                                                                (f: any) =>
+                                                                    f.STATUS ===
+                                                                    "Active"
+                                                            ) ? (
+                                                                <div className="text-xs text-red-500">
+                                                                    <span>
+                                                                        No Chats
+                                                                        Inactive
+                                                                        Now
+                                                                    </span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="overflow-y-auto custom-scrollbar max-h-44">
+                                                                    {detailTypeChat
+                                                                        ?.filter(
+                                                                            (
+                                                                                m: any
+                                                                            ) =>
+                                                                                m.STATUS ===
+                                                                                "InActive"
+                                                                        )
+                                                                        ?.map(
+                                                                            (
+                                                                                dTypeChat: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
                                                                                     <div
-                                                                                        className="flex justify-between items-center"
-                                                                                        onClick={(
-                                                                                            e
-                                                                                        ) => {
-                                                                                            e.preventDefault();
-                                                                                            if (
-                                                                                                showContext.visible !==
-                                                                                                true
-                                                                                            ) {
-                                                                                                getMessageChatByTypeId(
-                                                                                                    dTypeChat.CHAT_ID
-                                                                                                );
-                                                                                                getDataParticipantById(
-                                                                                                    dTypeChat.CHAT_ID
-                                                                                                );
-                                                                                                setFlagPlugin(
-                                                                                                    false
-                                                                                                );
-                                                                                                setData(
-                                                                                                    {
-                                                                                                        ...data,
-                                                                                                        CHAT_ID:
-                                                                                                            dTypeChat.CHAT_ID,
-                                                                                                    }
-                                                                                                );
-                                                                                                setDataAddParticipant(
-                                                                                                    {
-                                                                                                        ...dataAddParticipant,
-                                                                                                        CHAT_ID:
-                                                                                                            dTypeChat.CHAT_ID,
-                                                                                                    }
-                                                                                                );
-                                                                                            }
-                                                                                        }}
-                                                                                        onContextMenu={(
-                                                                                            e: any
-                                                                                        ) => {
-                                                                                            if (
-                                                                                                dTypeChat
-                                                                                                    ?.pin_chat
-                                                                                                    .length !==
-                                                                                                    0 &&
-                                                                                                dTypeChat?.pin_chat.find(
-                                                                                                    (
-                                                                                                        f: any
-                                                                                                    ) =>
-                                                                                                        f.CREATED_PIN_CHAT_BY ===
-                                                                                                        auth
-                                                                                                            .user
-                                                                                                            .id
-                                                                                                )
-                                                                                            ) {
-                                                                                                handleContextMenu(
-                                                                                                    e,
-                                                                                                    dTypeChat.CHAT_ID,
-                                                                                                    "unpin"
-                                                                                                );
-                                                                                                setActiveIndex(
-                                                                                                    i
-                                                                                                );
-                                                                                            } else {
-                                                                                                handleContextMenu(
-                                                                                                    e,
-                                                                                                    dTypeChat.CHAT_ID,
-                                                                                                    "pin"
-                                                                                                );
-                                                                                                setActiveIndex(
-                                                                                                    i
-                                                                                                );
-                                                                                            }
-                                                                                        }}
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        className={
+                                                                                            showContext.visible ===
+                                                                                                true &&
+                                                                                            activeIndex ===
+                                                                                                i
+                                                                                                ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                                : renderInActiveChat(
+                                                                                                      dTypeChat
+                                                                                                  )
+                                                                                        }
                                                                                     >
-                                                                                        <div>
-                                                                                            <div className="">
-                                                                                                <span>
-                                                                                                    {
-                                                                                                        dTypeChat.CHAT_TITLE
-                                                                                                    }
+                                                                                        <div
+                                                                                            className="flex justify-between items-center"
+                                                                                            onClick={(
+                                                                                                e
+                                                                                            ) => {
+                                                                                                e.preventDefault();
+                                                                                                if (
+                                                                                                    showContext.visible !==
+                                                                                                    true
+                                                                                                ) {
+                                                                                                    getMessageChatByTypeId(
+                                                                                                        dTypeChat.CHAT_ID
+                                                                                                    );
+                                                                                                    getDataParticipantById(
+                                                                                                        dTypeChat.CHAT_ID
+                                                                                                    );
+                                                                                                    setFlagPlugin(
+                                                                                                        false
+                                                                                                    );
+                                                                                                    setData(
+                                                                                                        {
+                                                                                                            ...data,
+                                                                                                            CHAT_ID:
+                                                                                                                dTypeChat.CHAT_ID,
+                                                                                                        }
+                                                                                                    );
+                                                                                                    setDataAddParticipant(
+                                                                                                        {
+                                                                                                            ...dataAddParticipant,
+                                                                                                            CHAT_ID:
+                                                                                                                dTypeChat.CHAT_ID,
+                                                                                                        }
+                                                                                                    );
+                                                                                                }
+                                                                                            }}
+                                                                                            onContextMenu={(
+                                                                                                e: any
+                                                                                            ) => {
+                                                                                                if (
+                                                                                                    dTypeChat
+                                                                                                        ?.pin_chat
+                                                                                                        .length !==
+                                                                                                        0 &&
+                                                                                                    dTypeChat?.pin_chat.find(
+                                                                                                        (
+                                                                                                            f: any
+                                                                                                        ) =>
+                                                                                                            f.CREATED_PIN_CHAT_BY ===
+                                                                                                            auth
+                                                                                                                .user
+                                                                                                                .id
+                                                                                                    )
+                                                                                                ) {
+                                                                                                    handleContextMenu(
+                                                                                                        e,
+                                                                                                        dTypeChat.CHAT_ID,
+                                                                                                        "unpin"
+                                                                                                    );
+                                                                                                    setActiveIndex(
+                                                                                                        i
+                                                                                                    );
+                                                                                                } else {
+                                                                                                    handleContextMenu(
+                                                                                                        e,
+                                                                                                        dTypeChat.CHAT_ID,
+                                                                                                        "pin"
+                                                                                                    );
+                                                                                                    setActiveIndex(
+                                                                                                        i
+                                                                                                    );
+                                                                                                }
+                                                                                            }}
+                                                                                        >
+                                                                                            <div>
+                                                                                                <div className="">
+                                                                                                    <span>
+                                                                                                        {
+                                                                                                            dTypeChat.CHAT_TITLE
+                                                                                                        }
+                                                                                                    </span>
+                                                                                                </div>
+                                                                                                <div className="text-[10px]">
+                                                                                                    <span>
+                                                                                                        {dTypeChat
+                                                                                                            ?.t_user
+                                                                                                            .name +
+                                                                                                            " - " +
+                                                                                                            format(
+                                                                                                                dTypeChat.CREATED_CHAT_DATE,
+                                                                                                                "dd-MM-yyyy"
+                                                                                                            )}
+                                                                                                    </span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div className="flex">
+                                                                                                <span className="text-[15px] rotate-45">
+                                                                                                    {dTypeChat?.pin_chat.find(
+                                                                                                        (
+                                                                                                            f: any
+                                                                                                        ) =>
+                                                                                                            f.CREATED_PIN_CHAT_BY ===
+                                                                                                            auth
+                                                                                                                .user
+                                                                                                                .id
+                                                                                                    ) ? (
+                                                                                                        <>
+                                                                                                            <FontAwesomeIcon
+                                                                                                                icon={
+                                                                                                                    faThumbtack
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </>
+                                                                                                    ) : null}
                                                                                                 </span>
                                                                                             </div>
-                                                                                            <div className="text-[10px]">
-                                                                                                <span>
-                                                                                                    {dTypeChat
-                                                                                                        ?.t_user
-                                                                                                        .name +
-                                                                                                        " - " +
-                                                                                                        format(
-                                                                                                            dTypeChat.CREATED_CHAT_DATE,
-                                                                                                            "dd-MM-yyyy"
-                                                                                                        )}
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div className="flex">
-                                                                                            <span className="text-[15px] rotate-45">
-                                                                                                {dTypeChat?.pin_chat.find(
-                                                                                                    (
-                                                                                                        f: any
-                                                                                                    ) =>
-                                                                                                        f.CREATED_PIN_CHAT_BY ===
-                                                                                                        auth
-                                                                                                            .user
-                                                                                                            .id
-                                                                                                ) ? (
-                                                                                                    <>
-                                                                                                        <FontAwesomeIcon
-                                                                                                            icon={
-                                                                                                                faThumbtack
-                                                                                                            }
-                                                                                                        />
-                                                                                                    </>
-                                                                                                ) : null}
-                                                                                            </span>
                                                                                         </div>
                                                                                     </div>
-                                                                                </div>
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                            </div>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                </div>
+                                                            )}
                                                         </AccordionContent>
                                                     </AccordionPanel>
                                                 </Accordion>

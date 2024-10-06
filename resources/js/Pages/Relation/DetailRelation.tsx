@@ -397,7 +397,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
     const handleSuccessEditCorporate = (message: string) => {
@@ -407,7 +407,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
 
@@ -418,7 +418,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
 
@@ -522,7 +522,7 @@ export default function DetailRelation({
         });
     };
 
-    const [modalDocuemnt, setModalDocument] = useState<any>({
+    const [modalDocument, setModalDocument] = useState<any>({
         view: false,
     });
 
@@ -533,7 +533,7 @@ export default function DetailRelation({
         e.preventDefault();
 
         setModalDocument({
-            view: !modalDocuemnt.view,
+            view: !modalDocument.view,
         });
     };
 
@@ -719,7 +719,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
 
@@ -734,7 +734,7 @@ export default function DetailRelation({
             )}
 
             <ModalToAction
-                show={modalDocuemnt.view}
+                show={modalDocument.view}
                 onClose={() =>
                     setModalDocument({
                         view: false,

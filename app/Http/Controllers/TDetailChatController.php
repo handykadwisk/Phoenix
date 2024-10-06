@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MPinChatDetail;
+use App\Models\RPluginProcess;
 use App\Models\TChat;
 use App\Models\TChatDetail;
 use App\Models\TChatDetailUser;
@@ -10,6 +11,7 @@ use App\Models\TChatParticipant;
 use App\Models\TCompanyDivision;
 use App\Models\TEmployee;
 use App\Models\TPinChat;
+use App\Models\TTagPluginProcess;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\Request;
@@ -380,5 +382,32 @@ class TDetailChatController extends Controller
                 ]);
             }
         }
+    }
+
+    public function get_plugin_chat(Request $request)
+    {
+        $data = RPluginProcess::get();
+
+        return response()->json($data);
+    }
+
+    public function get_object_chat(Request $request)
+    {
+        $data = TChat::where('CHAT_STATUS', 0)->with('tUser')->with('pinChat')
+            ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
+            ->orderBy('t_chat.CREATED_CHAT_DATE', 'DESC')
+            ->select('t_chat.*', 't_pin_chat.PIN_CHAT', DB::raw('f_get_active_chat(t_chat_detail.CREATED_CHAT_DETAIL_DATE) AS STATUS'))
+            ->leftJoin('t_pin_chat', 't_chat.CHAT_ID', '=', 't_pin_chat.CHAT_ID')
+            ->leftJoin('t_chat_detail', 't_chat.CHAT_ID', '=', 't_chat_detail.CHAT_ID')
+            ->distinct()
+            ->get();
+        // $data = TChat::select('t_chat.*','t_pin_chat.PIN_CHAT','t_pin_chat.CREATED_PIN_CHAT_BY')->where('TAG_ID', $request->tagIdChat)->with('tUser')
+        // ->leftJoin('t_pin_chat', 't_chat.CHAT_ID', '=', 't_pin_chat.CHAT_ID')
+        // ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
+        // ->distinct()
+        // ->toSql();
+        // dd($data);
+
+        return response()->json($data);
     }
 }

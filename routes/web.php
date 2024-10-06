@@ -84,14 +84,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/getDocumentPKSAgent', [RelationController::class, 'getPKSAgentJson'])->name('getDocumentPKSAgent.getPKSAgentJson');
     Route::get('/getDocumentPKSFbi', [RelationController::class, 'getPKSFbiJson'])->name('getDocumentPKSFbi.getPKSFbiJson');
     Route::post('/editDocumentPks', [RelationController::class, 'edit_document_pks'])->name('editDocumentPks.edit_document_pks');
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
 
 
     //Policy
@@ -117,9 +117,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/removeRelation', [RelationGroupController::class, 'remove_relation'])->name('removeRelation.remove_relation');
     Route::post('/editSubGroup', [RelationGroupController::class, 'edit_subgroup'])->name('editSubGroup.edit_subgroup');
     Route::post('/changeParent', [RelationGroupController::class, 'change_parent'])->name('changeParent.change_parent');
-    
-    
-    
+
+
+
 
 
     // Agent
@@ -139,7 +139,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRelationBaaSelect', [TRelationAgentController::class, 'relationBaa'])->name('getRelationBaaSelect.relationBaa');
     Route::post('/deleteBaa', [TRelationAgentController::class, 'deleteBaa'])->name('deleteBaa.deleteBaa');
     Route::post('/getRelationByIdPerson', [TRelationAgentController::class, 'getRelationByIdPerson'])->name('getRelationByIdPerson.getRelationByIdPerson');
-    Route::get('/getPolicyByRelationId', [TRelationAgentController::class, 'getPolicyByRelationId'])->name('getPolicyByRelationId.getPolicyByRelationId');    
+    Route::get('/getPolicyByRelationId', [TRelationAgentController::class, 'getPolicyByRelationId'])->name('getPolicyByRelationId.getPolicyByRelationId');
 
     // FBI by PKS
 
@@ -149,11 +149,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/getRelationFBISelect', [MRelationFBIPKSController::class, 'relationFbi'])->name('getRelationFBISelect.relationFbi');
     Route::post('/addMRelationFBI', [MRelationFBIPKSController::class, 'addMRelationFBI'])->name('addMRelationFBI.addMRelationFBI');
     Route::post('/deleteFBI', [MRelationFBIPKSController::class, 'deleteFBI'])->name('deleteFBI.deleteFBI');
-    
-    
-    
-    
-    
+
+
+
+
+
 
 
     // Person
@@ -196,12 +196,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/getIndividuRelation', [TPersonController::class, 'get_individu_relation'])->name('getIndividuRelation.get_individu_relation');
     Route::post('/addPic', [TPersonController::class, 'add_pic'])->name('addPic.add_pic');
     Route::post('/deletePerson', [TPersonController::class, 'delete_person'])->name('deletePerson.delete_person');
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 
     // Structure
     Route::post('/getStructure', [TRelationStructureController::class, 'getStructureJson'])->name('getStructure.getStructureJson');
@@ -403,7 +403,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
     Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
-    
+
     // Employee
     Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
     Route::post('/addEmployee', [TEmployeeController::class, 'store'])->name('addEmployee.store');
@@ -425,7 +425,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/addBankAccount', [TEmployeeController::class, 'addBankAccount'])->name('addBankAccount.addBankAccount');
     Route::post('/editBankAccount', [TEmployeeController::class, 'editBankAccount'])->name('editBankAccount.editBankAccount');
     Route::post('/uploadProfile', [TEmployeeController::class, 'uploadProfile'])->name('uploadProfile.uploadProfile');
-    
+
 
 
 
@@ -436,7 +436,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getCompanyStructureDetail', [TCompanyStructureController::class, 'get_CompanyStructureDetail'])->name('getCompanyStructureDetail.get_CompanyStructureDetail');
     Route::post('/editStructureCompany', [TCompanyStructureController::class, 'edit'])->name('editStructureCompany.edit');
     Route::post('/getStructureCompany', [TCompanyStructureController::class, 'getStructure'])->name('getStructureCompany.getStructure');
-    
+
 
     // Company Division
     Route::get('/getDivisionCompany', [TCompanyDivisionController::class, 'getCompanyDivisionJson'])->name('getDivisionCompany.getCompanyDivisionJson');
@@ -457,13 +457,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/editOfficeCompany', [TCompanyOfficeController::class, 'edit'])->name('editOfficeCompany.edit');
     Route::post('/getComboOffice', [TCompanyOfficeController::class, 'getOffice'])->name('getComboOffice.getOffice');
 
-     // Job Desc
+    // Job Desc
     Route::get('/getJobDescCompany', [TJobDescCompanyController::class, 'getJobDescCompanyJson'])->name('getJobDescCompany.getJobDescCompanyJson');
     Route::post('/getJobDescCompanyCombo', [TJobDescCompanyController::class, 'getJobDescCompanyCombo'])->name('getJobDescCompanyCombo.getJobDescCompanyCombo');
     Route::post('/addJobDescCompany', [TJobDescCompanyController::class, 'store'])->name('addJobDescCompany.store');
     Route::post('/getJobDescCompanyDetail', [TJobDescCompanyController::class, 'get_detail'])->name('getJobDescCompanyDetail.get_detail');
     Route::post('/editJobDescCompany', [TJobDescCompanyController::class, 'edit'])->name('editJobDescCompany.edit');
-    
+
     // Plugin Process
     Route::post('/getRPluginProcess', [TTagPluginProcessController::class, 'getPlugin'])->name('getRPluginProcess.getPlugin');
     Route::post('/addPluginProcess', [TTagPluginProcessController::class, 'store'])->name('addPluginProcess.store');
@@ -483,19 +483,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
     Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
     Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
-    
-    
-    
-    
-    
-
-    
-
-    
-    
-    
+    Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
+    Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
 
 
+
+    // Reminder
+    Route::get('reminder', [TCompanyController::class, 'reminder'])->name('reminder');
 });
 
 require __DIR__ . '/auth.php';
