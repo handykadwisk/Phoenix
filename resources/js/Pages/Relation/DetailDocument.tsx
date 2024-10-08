@@ -146,8 +146,6 @@ export default function DetailDocumentRelation({
             ],
         });
     };
-
-    console.log(dataDocumentPks);
     return (
         <>
             {" "}
@@ -167,7 +165,7 @@ export default function DetailDocumentRelation({
                         edit: false,
                     });
                 }}
-                title={"Add Certificate"}
+                title={"Add Document"}
                 url={`/editDocumentPks`}
                 data={dataDocumentPks}
                 classPanel={

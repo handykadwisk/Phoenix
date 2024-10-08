@@ -68,55 +68,59 @@ export default function DetailRelation({
                 <div className="font-semibold text-sm">
                     <span>Policy List:</span>
                 </div>
-                <div className="mt-2">
-                    <AGGrid
-                        searchParam={""}
-                        addButtonLabel={null}
-                        addButtonModalState={undefined}
-                        withParam={idRelation}
-                        // loading={isLoading.get_policy}
-                        url={"getPolicyByRelationId"}
-                        doubleClickEvent={undefined}
-                        triggeringRefreshData={""}
-                        colDefs={[
-                            {
-                                headerName: "No.",
-                                valueGetter: "node.rowIndex + 1",
-                                flex: 2,
-                            },
-                            {
-                                // headerName: "Policy Number",
-                                headerComponent: customHeader,
-                                field: "POLICY_NUMBER",
-                                flex: 11,
-                                filter: "agTextColumnFilter",
-                                filterParams: {
-                                    filterOptions: ["contains"],
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-employee rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            searchParam={""}
+                            addButtonLabel={null}
+                            addButtonModalState={undefined}
+                            withParam={idRelation}
+                            // loading={isLoading.get_policy}
+                            url={"getPolicyByRelationId"}
+                            doubleClickEvent={undefined}
+                            triggeringRefreshData={""}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 2,
                                 },
-                                floatingFilter: true,
-                                cellStyle: (props: any) => {
-                                    if (props.data?.POLICY_STATUS_ID === 0) {
-                                        //mark police cells as red
-                                        return {
-                                            color: "white",
-                                            backgroundColor: "green",
-                                        };
-                                    } else {
-                                        return {
-                                            color: "white",
-                                            backgroundColor: "red",
-                                        };
-                                    }
+                                {
+                                    // headerName: "Policy Number",
+                                    headerComponent: customHeader,
+                                    field: "POLICY_NUMBER",
+                                    flex: 11,
+                                    filter: "agTextColumnFilter",
+                                    filterParams: {
+                                        filterOptions: ["contains"],
+                                    },
+                                    floatingFilter: true,
+                                    cellStyle: (props: any) => {
+                                        if (
+                                            props.data?.POLICY_STATUS_ID === 0
+                                        ) {
+                                            //mark police cells as red
+                                            return {
+                                                color: "white",
+                                                backgroundColor: "green",
+                                            };
+                                        } else {
+                                            return {
+                                                color: "white",
+                                                backgroundColor: "red",
+                                            };
+                                        }
+                                    },
                                 },
-                            },
-                            {
-                                // headerName: "Fee Amount (IDR)",
-                                headerComponent: customHeaderAmount,
-                                field: "POLICY_SHARE",
-                                flex: 12,
-                            },
-                        ]}
-                    />
+                                {
+                                    // headerName: "Fee Amount (IDR)",
+                                    headerComponent: customHeaderAmount,
+                                    field: "POLICY_SHARE",
+                                    flex: 12,
+                                },
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </>

@@ -129,6 +129,7 @@ class RelationController extends Controller
         //     }
         // }
         // dd($query->toSql());
+        $query->orderBy('RELATION_ORGANIZATION_ID', "DESC");
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
