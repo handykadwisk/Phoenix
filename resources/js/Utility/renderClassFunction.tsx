@@ -52,7 +52,6 @@ const renderClassFunction = (detailRelation?: number, dataTPlugin?: any) => {
         // handle click context meny
         const handleContextMenu = (e: any) => {
             e.preventDefault();
-            console.log(e.currentTarget.id);
             setShowContext({
                 ...showContext,
                 visible: true,
@@ -78,7 +77,6 @@ const renderClassFunction = (detailRelation?: number, dataTPlugin?: any) => {
         // handleClick hilangkan menu
         const handleClick = (e: any) => {
             e.preventDefault();
-            console.log(e.currentTarget.id);
             setShowContext({
                 ...showContext,
                 visible: false,
@@ -135,7 +133,6 @@ const renderClassFunction = (detailRelation?: number, dataTPlugin?: any) => {
             ) as NodeListOf<any>;
             const handleContextMenu = (e: any) => {
                 e.preventDefault();
-                console.log(e.currentTarget.id);
                 setShowContext({
                     ...showContext,
                     visible: true,
@@ -160,7 +157,6 @@ const renderClassFunction = (detailRelation?: number, dataTPlugin?: any) => {
 
             const handleClick = (e: any) => {
                 e.preventDefault();
-                console.log(e.currentTarget.id);
                 setShowContext({
                     ...showContext,
                     visible: false,

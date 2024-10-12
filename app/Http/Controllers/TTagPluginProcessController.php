@@ -16,25 +16,27 @@ use Illuminate\Support\Facades\Auth;
 
 class TTagPluginProcessController extends Controller
 {
-    public function getPlugin(Request $request){
+    public function getPlugin(Request $request)
+    {
         $data = RPluginProcess::get();
         return response()->json($data);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         // dd($request);
         // cek sudah ada apa belum di tplug
         $cekExisting = TTagPluginProcess::where('PLUGIN_PROCESS_ID', $request->PLUGIN_PROCESS_ID)->where('TAG_ID', $request->TAG_ID)->first();
         // dd($cekExisting);
-        $idTTagRelation="";
+        $idTTagRelation = "";
         if ($cekExisting == null) {
             # code...
             $tTagRelation = TTagPluginProcess::create([
                 "TAG_ID" => $request->TAG_ID,
                 "PLUGIN_PROCESS_ID" => $request->PLUGIN_PROCESS_ID
             ]);
-    
-    
+
+
             // Created Log
             UserLog::create([
                 'created_by' => Auth::user()->id,
@@ -64,7 +66,7 @@ class TTagPluginProcessController extends Controller
             // add Participant
             $arrayParticipant = is_countable($request->PARTICIPANT);
             if ($arrayParticipant) {
-                for ($i=0; $i < sizeof($request->PARTICIPANT); $i++) { 
+                for ($i = 0; $i < sizeof($request->PARTICIPANT); $i++) {
                     $valueParticipant = trim($request->PARTICIPANT[$i]['value']);
                     $nameParticipant = trim($request->PARTICIPANT[$i]['label']);
 
@@ -73,10 +75,10 @@ class TTagPluginProcessController extends Controller
                     $idDivision  = null;
                     $userId = null;
                     $isDivision = TCompanyDivision::where('COMPANY_DIVISION_ALIAS', $nameParticipant)->get();
-                    if ($isDivision->count()>0) {
+                    if ($isDivision->count() > 0) {
                         $is_division = "1";
                         $idDivision = $isDivision[0]['COMPANY_DIVISION_ID'];
-                    }else{
+                    } else {
                         // User_id Participant
                         $symbol = '+';
                         $posisi = strpos($valueParticipant, $symbol);
@@ -114,13 +116,15 @@ class TTagPluginProcessController extends Controller
             $request->PLUGIN_PROCESS_ID,
             "Add Plugin Success",
             (string)$createTypeChat->CHAT_ID,
-            $request->TAG_ID
+            $request->TAG_ID,
+            "Add Chat Success"
         ], 201, [
             'X-Inertia' => true
         ]);
     }
 
-    public function getTPlugin(Request $request){
+    public function getTPlugin(Request $request)
+    {
         $data = TTagPluginProcess::get();
         return response()->json($data);
     }

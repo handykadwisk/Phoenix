@@ -7,6 +7,7 @@ import SelectTailwind from "react-tailwindcss-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Checkbox from "@/Components/Checkbox";
+import TextArea from "@/Components/TextArea";
 
 export default function AddReminder({
     data,
@@ -77,23 +78,22 @@ export default function AddReminder({
         }
     };
 
-    const checkboxes =
-        document.querySelectorAll<HTMLInputElement>(".checkParticipant");
+    // const checkboxes =
+    //     document.querySelectorAll<HTMLInputElement>(".checkParticipant");
 
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-            // Jika checkbox yang diklik dicentang
-            if (checkbox.checked) {
-                // Matikan semua checkbox lainnya
-                checkboxes.forEach((cb) => {
-                    if (cb !== checkbox) {
-                        cb.checked = false; // Set checkbox lain menjadi tidak tercentang
-                    }
-                });
-            }
-        });
-    });
-    console.log(data);
+    // checkboxes.forEach((checkbox) => {
+    //     checkbox.addEventListener("change", () => {
+    //         // Jika checkbox yang diklik dicentang
+    //         if (checkbox.checked) {
+    //             // Matikan semua checkbox lainnya
+    //             checkboxes.forEach((cb) => {
+    //                 if (cb !== checkbox) {
+    //                     cb.checked = false; // Set checkbox lain menjadi tidak tercentang
+    //                 }
+    //             });
+    //         }
+    //     });
+    // });
 
     return (
         <>
@@ -122,6 +122,23 @@ export default function AddReminder({
                             <div>
                                 <InputLabel
                                     className=""
+                                    value={"Title Reminder"}
+                                    required={true}
+                                />
+                                <TextInput
+                                    type="text"
+                                    value={data.EMPLOYEE_BANK_ACCOUNT_NUMBER}
+                                    className=""
+                                    onChange={(e) => {}}
+                                    required
+                                    placeholder="Title Reminder *"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                <InputLabel
+                                    className=""
                                     value={"Participant"}
                                     required={true}
                                 />
@@ -129,10 +146,7 @@ export default function AddReminder({
                             {data?.PARTICIPANT?.map(
                                 (items: any, index: number) => {
                                     return (
-                                        <div
-                                            className="grid grid-cols-1"
-                                            key={index}
-                                        >
+                                        <div className="" key={index}>
                                             <div className="text-sm italic">
                                                 <InputLabel
                                                     className=""
@@ -146,8 +160,8 @@ export default function AddReminder({
                                                     }
                                                 />
                                             </div>
-                                            <div className="grid grid-cols-12">
-                                                <div className="col-span-11">
+                                            <div className="grid-cols-1 grid">
+                                                <div className="relative flex">
                                                     <SelectTailwind
                                                         classNames={{
                                                             menuButton: () =>
@@ -187,41 +201,43 @@ export default function AddReminder({
                                                             "bg-red-500"
                                                         }
                                                     />
-                                                </div>
-                                                <div className="flex justify-center items-center">
-                                                    {data.PARTICIPANT
-                                                        ?.length !== 1 && (
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 24 24"
-                                                            strokeWidth={1.5}
-                                                            stroke="currentColor"
-                                                            className=" h-6 text-red-500 cursor-pointer font-semibold"
-                                                            onClick={() => {
-                                                                const updatedData =
-                                                                    data.PARTICIPANT.filter(
-                                                                        (
-                                                                            data: any,
-                                                                            a: number
-                                                                        ) =>
-                                                                            a !==
-                                                                            index
-                                                                    );
-                                                                setData({
-                                                                    ...data,
-                                                                    PARTICIPANT:
-                                                                        updatedData,
-                                                                });
-                                                            }}
-                                                        >
-                                                            <path
-                                                                fill="#AB7C94"
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                d="M6 18 18 6M6 6l12 12"
-                                                            />
-                                                        </svg>
-                                                    )}
+                                                    <div className="flex items-center">
+                                                        {data.PARTICIPANT
+                                                            ?.length !== 1 && (
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={
+                                                                    1.5
+                                                                }
+                                                                stroke="currentColor"
+                                                                className=" h-6 text-red-500 cursor-pointer font-semibold"
+                                                                onClick={() => {
+                                                                    const updatedData =
+                                                                        data.PARTICIPANT.filter(
+                                                                            (
+                                                                                data: any,
+                                                                                a: number
+                                                                            ) =>
+                                                                                a !==
+                                                                                index
+                                                                        );
+                                                                    setData({
+                                                                        ...data,
+                                                                        PARTICIPANT:
+                                                                            updatedData,
+                                                                    });
+                                                                }}
+                                                            >
+                                                                <path
+                                                                    fill="#AB7C94"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M6 18 18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -243,7 +259,7 @@ export default function AddReminder({
                             <div>
                                 <InputLabel
                                     className="text-lg"
-                                    value={"Dates"}
+                                    value={"Set Reminder"}
                                     required={true}
                                 />
                             </div>
@@ -269,12 +285,12 @@ export default function AddReminder({
                                         className=""
                                         onChange={(e) => {}}
                                         required
-                                        placeholder="How Many Days *"
+                                        placeholder="How Many Days Apart *"
                                     />
                                 </div>
                                 <div className="col-span-3">
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 pointer-events-none">
+                                        <div className="absolute inset-y-0 z-1 start-0 flex items-center px-3 pointer-events-none">
                                             <svg
                                                 className="w-3 h-3 text-gray-500 dark:text-gray-400"
                                                 aria-hidden="true"
@@ -302,7 +318,7 @@ export default function AddReminder({
                                                 dropdownMode="select"
                                                 className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
                                                 dateFormat={"dd-MM-yyyy"}
-                                                placeholderText="dd - mm - yyyy"
+                                                placeholderText="Start Form"
                                             />
                                         </div>
                                     </div>
@@ -331,7 +347,6 @@ export default function AddReminder({
                                                 >
                                                     <div className="flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white">
                                                         <Checkbox
-                                                            className="checkParticipant"
                                                             defaultChecked={checkCheckedMRelation(
                                                                 items.id
                                                             )}
@@ -370,6 +385,26 @@ export default function AddReminder({
                                     )}
                                 </ul>
                             </div>
+                        </div>
+                        <div className="mb-2">
+                            <div className="mt-1">
+                                <InputLabel
+                                    className="text-lg"
+                                    value={"Description"}
+                                    required={false}
+                                />
+                            </div>
+                            <TextArea
+                                className=""
+                                defaultValue={data.DESCRIPTION}
+                                onChange={(e: any) =>
+                                    setData({
+                                        ...data,
+                                        DESCRIPTION: e.target.value,
+                                    })
+                                }
+                                required
+                            />
                         </div>
                     </>
                 }

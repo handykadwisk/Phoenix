@@ -70,7 +70,7 @@ export default function AddChatPlugin({
                         add: false,
                     })
                 }
-                title={"Add Plugin"}
+                title={"Add Chat"}
                 url={`/addPluginProcess`}
                 data={dataPluginProcess}
                 onSuccess={handleSuccessPlugin}

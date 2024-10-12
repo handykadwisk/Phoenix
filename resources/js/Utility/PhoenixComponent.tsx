@@ -305,71 +305,81 @@ export default function PhoenixComponent({
         };
 
         dataTPlugin.forEach((item: any) => {
-            const className =
-                item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
-            // Temukan container berdasarkan ID dari data
-            const divElements = document.querySelectorAll(`.${className}`);
+            if (item.r_plugin_process !== null) {
+                const className =
+                    item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+                // Temukan container berdasarkan ID dari data
+                const divElements = document.querySelectorAll(`.${className}`);
 
-            divElements.forEach((div) => {
-                div.remove();
-            });
+                divElements.forEach((div) => {
+                    div.remove();
+                });
+            }
         });
 
         dataTPlugin.forEach((item: any) => {
-            const className =
-                item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
-            // Temukan container berdasarkan ID dari data
-            const container = document.querySelector(
-                `.chatPlugin[id="${item.TAG_ID}"]`
-            );
+            if (item.r_plugin_process !== null) {
+                const className =
+                    item.r_plugin_process.PLUG_PROCESS_CLASS.toString();
+                // Temukan container berdasarkan ID dari data
+                const container = document.querySelector(
+                    `.chatPlugin[id="${item.TAG_ID}"]`
+                );
 
-            // cek ada ga div yang idnya sama TAG_ID
+                // cek ada ga div yang idnya sama TAG_ID
 
-            if (container?.id === item.TAG_ID) {
-                // Buat elemen div baru
-                const divExists =
-                    document.querySelector(`.${className}`) !== null;
-
-                if (divExists === false) {
+                if (container?.id === item.TAG_ID) {
                     // Buat elemen div baru
-                    const newDiv = document.createElement("div");
-                    // hapus dulu cls yang lama
+                    const divExists =
+                        document.querySelector(`.${className}`) !== null;
 
-                    // newDiv.className = "";
-                    // newDiv.className = className;
-                    newDiv.classList.add(className);
-                    newDiv.addEventListener("click", function (event: any) {
-                        handleModalClick(item.PLUGIN_PROCESS_ID, item.TAG_ID);
-                    });
-                    // newDiv.addEventListener(
-                    //     "click",
-                    //     handleModalClick(item.PLUGIN_PROCESS_ID)
-                    // );
-                    newDiv.classList.add("hover:cursor-pointer");
-                    // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+                    if (divExists === false) {
+                        // Buat elemen div baru
+                        const newDiv = document.createElement("div");
+                        // hapus dulu cls yang lama
 
-                    // Tambahkan div baru ke dalam container yang sesuai
-                    container?.appendChild(newDiv);
-                } else {
-                    // Buat elemen div baru
-                    const newDiv = document.createElement("div");
-                    // hapus dulu cls yang lama
+                        // newDiv.className = "";
+                        // newDiv.className = className;
+                        newDiv.classList.add(className);
+                        newDiv.addEventListener("click", function (event: any) {
+                            handleModalClick(
+                                item.PLUGIN_PROCESS_ID,
+                                item.TAG_ID
+                            );
+                        });
+                        // newDiv.addEventListener(
+                        //     "click",
+                        //     handleModalClick(item.PLUGIN_PROCESS_ID)
+                        // );
+                        newDiv.classList.add("hover:cursor-pointer");
+                        // newDiv.textContent = item.PLUGIN_PROCESS_ID;
 
-                    // newDiv.className = "";
-                    // newDiv.className = className;
-                    newDiv.classList.add(className);
-                    newDiv.addEventListener("click", function (event: any) {
-                        handleModalClick(item.PLUGIN_PROCESS_ID, item.TAG_ID);
-                    });
-                    // newDiv.addEventListener(
-                    //     "click",
-                    //     handleModalClick(item.PLUGIN_PROCESS_ID)
-                    // );
-                    newDiv.classList.add("hover:cursor-pointer");
-                    // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+                        // Tambahkan div baru ke dalam container yang sesuai
+                        container?.appendChild(newDiv);
+                    } else {
+                        // Buat elemen div baru
+                        const newDiv = document.createElement("div");
+                        // hapus dulu cls yang lama
 
-                    // Tambahkan div baru ke dalam container yang sesuai
-                    container?.appendChild(newDiv);
+                        // newDiv.className = "";
+                        // newDiv.className = className;
+                        newDiv.classList.add(className);
+                        newDiv.addEventListener("click", function (event: any) {
+                            handleModalClick(
+                                item.PLUGIN_PROCESS_ID,
+                                item.TAG_ID
+                            );
+                        });
+                        // newDiv.addEventListener(
+                        //     "click",
+                        //     handleModalClick(item.PLUGIN_PROCESS_ID)
+                        // );
+                        newDiv.classList.add("hover:cursor-pointer");
+                        // newDiv.textContent = item.PLUGIN_PROCESS_ID;
+
+                        // Tambahkan div baru ke dalam container yang sesuai
+                        container?.appendChild(newDiv);
+                    }
                 }
             }
         });

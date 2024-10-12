@@ -85,6 +85,13 @@ class TCompanyController extends Controller
         return response()->json($data);
     }
 
+    // get company new
+    public function getCompany(Request $request)
+    {
+        $data = TCompany::get();
+        return response()->json($data);
+    }
+
     // add company to database
     public function store(Request $request)
     {

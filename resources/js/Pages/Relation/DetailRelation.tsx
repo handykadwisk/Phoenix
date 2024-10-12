@@ -725,6 +725,7 @@ export default function DetailRelation({
 
     return (
         <>
+            <AppPlugin parameterID={detailRelation} />
             {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
@@ -2162,7 +2163,6 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
             {/* modal end chat */}
-            <AppPlugin parameterID={detailRelation} />
 
             {/* <MyProvider>
                 <PhoenixComponent otherId={detailRelation} />

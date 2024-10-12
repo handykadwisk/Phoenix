@@ -25,14 +25,15 @@ class RelationGroupController extends Controller
         $data = RelationGroup::orderBy('RELATION_GROUP_ID', 'desc')->where('RELATION_GROUP_PARENT', 0);
         if ($searchQuery) {
             if ($searchQuery->input('RELATION_GROUP_NAME')) {
-                $data->where('RELATION_GROUP_NAME', 'like', '%'.$searchQuery->RELATION_GROUP_NAME.'%');
+                $data->where('RELATION_GROUP_NAME', 'like', '%' . $searchQuery->RELATION_GROUP_NAME . '%');
             }
-        } 
+        }
 
         return $data->paginate($dataPerPage);
     }
 
-    public function getRelationGroupJson(Request $request){
+    public function getRelationGroupJson(Request $request)
+    {
         $data = $this->getRelationGroupData(5, $request);
         return response()->json($data);
     }
@@ -74,7 +75,8 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         // dd($request);
         // toupper
         $nameGroup = strtoupper($request->RELATION_GROUP_NAME);
@@ -82,7 +84,7 @@ class RelationGroupController extends Controller
         // Cek Relation Perent Id
         if ($request->RELATION_GROUP_PARENT == '' || $request->RELATION_GROUP_PARENT == NULL) {
             $parentID = "0";
-        }else{
+        } else {
             $parentID = $request->RELATION_GROUP_PARENT['value'];
         }
 
@@ -128,7 +130,8 @@ class RelationGroupController extends Controller
         return response()->json($data);
     }
 
-    public function getGroupById($id){
+    public function getGroupById($id)
+    {
         $data = RelationGroup::find($id);
         return response()->json($data);
     }
@@ -146,21 +149,24 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function get_detail(Request $request){
+    public function get_detail(Request $request)
+    {
         $detailRelation = RelationGroup::where('RELATION_GROUP_ID', $request->id)->get();
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
 
-    public function get_detail_group_parent(Request $request){
+    public function get_detail_group_parent(Request $request)
+    {
         $detailRelation = RelationGroup::find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
 
-    public function get_group(Request $request){
-        
-        $getGroup = RelationGroup::where("RELATION_GROUP_ID",$request->idGroup)->get();
+    public function get_group(Request $request)
+    {
+
+        $getGroup = RelationGroup::where("RELATION_GROUP_ID", $request->idGroup)->get();
         // dd($getGroup);
         // print_r($detailRelation);die;
         return response()->json($getGroup);
@@ -174,7 +180,8 @@ class RelationGroupController extends Controller
     }
 
     // for add sub group parent
-    public function add_subGroup(Request $request){
+    public function add_subGroup(Request $request)
+    {
         // dd($request);
         // toupper
         $nameGroup = strtoupper($request->RELATION_GROUP_NAME);
@@ -222,19 +229,21 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function relation_nogroup(Request $request){
+    public function relation_nogroup(Request $request)
+    {
         $clientId = 1;
-        $data = Relation::where('RELATION_ORGANIZATION_GROUP', NULL)->whereHas('mRelationType', function($q) use($clientId) {
+        $data = Relation::where('RELATION_ORGANIZATION_GROUP', NULL)->whereHas('mRelationType', function ($q) use ($clientId) {
             // Query the name field in status table
-            $q->where('RELATION_TYPE_ID', 'like', '%'.$clientId.'%');
+            $q->where('RELATION_TYPE_ID', 'like', '%' . $clientId . '%');
         })->get();
 
         return response()->json($data);
     }
 
-    public function add_Relation(Request $request){
+    public function add_Relation(Request $request)
+    {
         // dd($request);
-        for ($i=0; $i < sizeof($request->name_relation); $i++) { 
+        for ($i = 0; $i < sizeof($request->name_relation); $i++) {
             $nameRelation = trim($request->name_relation[$i]);
             $idGroup = $request->RELATION_ORGANIZATION_GROUP;
 
@@ -265,19 +274,22 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function relation_change(Request $request){
+    public function relation_change(Request $request)
+    {
         $data = Relation::find($request->idRelation);
 
         return response()->json($data);
     }
 
-    public function subGroupById(Request $request){
-        $data = RelationGroup::where('RELATION_GROUP_MAPPING', 'like', '%' . $request->idGroup .".". '%')->get();
+    public function subGroupById(Request $request)
+    {
+        $data = RelationGroup::where('RELATION_GROUP_MAPPING', 'like', '%' . $request->idGroup . "." . '%')->get();
 
         return response()->json($data);
     }
 
-    public function changeSubGroup(Request $request){
+    public function changeSubGroup(Request $request)
+    {
         $changeSubgroup = Relation::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->update([
             "RELATION_ORGANIZATION_GROUP" => $request->RELATION_ORGANIZATION_GROUP['value'],
         ]);
@@ -300,7 +312,8 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function remove_relation(Request $request){
+    public function remove_relation(Request $request)
+    {
         $removeRelationFromGroup = Relation::where('RELATION_ORGANIZATION_ID', $request->idRelation)->update([
             "RELATION_ORGANIZATION_GROUP" => NULL,
         ]);
@@ -312,8 +325,9 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function edit_subgroup(Request $request){
-        
+    public function edit_subgroup(Request $request)
+    {
+
         $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)->update([
             "RELATION_GROUP_NAME"           => $request->RELATION_GROUP_NAME,
             "RELATION_GROUP_DESCRIPTION"    => $request->RELATION_GROUP_DESCRIPTION,
@@ -342,41 +356,42 @@ class RelationGroupController extends Controller
         ]);
     }
 
-    public function change_parent(Request $request){
+    public function change_parent(Request $request)
+    {
         // cek id yang ingin di ganti masuk mapping atau tidak?
         $relationParent = RelationGroup::find($request->RELATION_GROUP_ID);
         $parentId = $relationParent->RELATION_GROUP_PARENT;
-        $concatID = ".".$request->RELATION_GROUP_ID.'.';
+        $concatID = "." . $request->RELATION_GROUP_ID . '.';
         // dd($concatID);
         $cekExisting = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT['value'])->where('RELATION_GROUP_MAPPING', 'like', '%' . $concatID . '%')->get();
         // dd($cekExisting->count());
         if ($cekExisting->count() > 0) {
             // $idParent= $cekExisting[0]['RELATION_GROUP_PARENT'];
             $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_PARENT)
-            ->update([
-                'RELATION_GROUP_PARENT'         => $parentId,
-            ]);
+                ->update([
+                    'RELATION_GROUP_PARENT'         => $parentId,
+                ]);
 
-            
+
             RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
-            ->update([
-                'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
-            ]);
+                ->update([
+                    'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
+                ]);
             // Mapping Parent Id and Update
             $name = NULL;
             DB::select('call sp_set_mapping_relation_group(?)', [$name]);
-        }else{
+        } else {
             // dd($request->RELATION_GROUP_PARENT['value']);
             $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)
-            ->update([
-                'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
-            ]);
+                ->update([
+                    'RELATION_GROUP_PARENT'         => $request->RELATION_GROUP_PARENT['value'],
+                ]);
             // Mapping Parent Id and Update
             $name = NULL;
             DB::select('call sp_set_mapping_relation_group(?)', [$name]);
         }
 
-        
+
 
         if ($updateGroup) {
             UserLog::create([
@@ -396,5 +411,4 @@ class RelationGroupController extends Controller
             'X-Inertia' => true
         ]);
     }
-    
 }

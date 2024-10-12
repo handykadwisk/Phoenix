@@ -50,7 +50,7 @@ class TDetailChatController extends Controller
             "CHAT_DETAIL_PARENT_ID"        => $request->CHAT_DETAIL_PARENT_ID
         ]);
 
-        // update table t_Chat_detail_user
+        // update table t_Chat_detail_user jika di reply
         if ($request->CHAT_DETAIL_PARENT_ID != null) {
             $getDetailChat = TChatDetailUser::where('CHAT_DETAIL_ID', $request->CHAT_DETAIL_PARENT_ID)->where('CHAT_DETAIL_USER_TO', Auth::user()->id)->get();
             if ($getDetailChat->count() > 0) {
@@ -62,9 +62,7 @@ class TDetailChatController extends Controller
             }
         }
 
-        // $statusMention = 0;
-        // cek mention
-        // dd($request->PARTICIPANT);
+        // create message jika ada mention
         $dataParticipant = is_countable($request->PARTICIPANT);
         if ($dataParticipant) {
             for ($i = 0; $i < sizeof($request->PARTICIPANT); $i++) {
@@ -111,6 +109,27 @@ class TDetailChatController extends Controller
                         "CHAT_DETAIL_USER_CREATED_ID"               => Auth::user()->id,
                     ]);
                 }
+            }
+        }
+
+        // create message jika di reply akan muncul seperti di mention
+        // get created by from chat_detail_id by id chat detail id
+        if ($request->CHAT_DETAIL_PARENT_ID !== null) {
+            $getCreatedBy = TChatDetail::where('CHAT_DETAIL_ID', $request->CHAT_DETAIL_PARENT_ID)->first();
+            $createdById = $getCreatedBy->CREATED_CHAT_DETAIL_BY;
+            if ($createdById) {
+                $createMessage = TChatDetailUser::create([
+                    "CHAT_ID"                                   => $request->CHAT_ID,
+                    "CHAT_DETAIL_ID"                            => $createMessage->CHAT_DETAIL_ID,
+                    "CHAT_DETAIL_USER_TO"                       => $createdById,
+                    "CHAT_DETAIL_USER_FROM"                     => Auth::user()->id,
+                    "CHAT_DETAIL_USER_STATUS_READ"              => 0,
+                    "CHAT_DETAIL_USER_STATUS_MENTION"           => 1,
+                    "CHAT_DETAIL_USER_REPLY_DATE"               => null,
+                    "CHAT_DETAIL_USER_RELATE_CHAT_DETAIL_ID"    => null,
+                    "CHAT_DETAIL_USER_CREATED_DATE"             => now(),
+                    "CHAT_DETAIL_USER_CREATED_ID"               => Auth::user()->id,
+                ]);
             }
         }
 
@@ -358,6 +377,20 @@ class TDetailChatController extends Controller
     public function getDataChatDetailUser(Request $request)
     {
         $dataChatDetailUser = TChatDetailUser::where('CHAT_DETAIL_USER_TO', $request->idAuthUser)->whereNull('CHAT_DETAIL_USER_REPLY_DATE')
+            ->with('tChatDetail')
+            ->leftJoin('t_chat', 't_chat.CHAT_ID', '=', 't_chat_detail_user.CHAT_ID')
+            // ->with('tChat')
+            // ->with('tChatDetail')
+            // ->with('userFormTo')
+            ->get()
+            ->groupBy('CHAT_TITLE');
+
+        return response()->json($dataChatDetailUser);
+    }
+
+    public function getDataChatDetailMention(Request $request)
+    {
+        $dataChatDetailUser = TChatDetailUser::where('CHAT_DETAIL_USER_FROM', $request->idAuthUser)
             ->with('tChatDetail')
             ->leftJoin('t_chat', 't_chat.CHAT_ID', '=', 't_chat_detail_user.CHAT_ID')
             // ->with('tChat')

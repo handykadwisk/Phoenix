@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('t_chat_detail', function (Blueprint $table) {
             $table->bigIncrements('CHAT_DETAIL_ID')->unique()->primary();
             $table->bigInteger('CHAT_ID')->nullable();
+            $table->bigInteger('CHAT_DETAIL_PARENT_ID')->nullable();
             $table->text('CHAT_DETAIL_TEXT')->nullable();
             $table->bigInteger('CHAT_DETAIL_DOCUMENT_ID')->nullable();
             $table->dateTime('CREATED_CHAT_DETAIL_DATE')->nullable();

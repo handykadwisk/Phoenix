@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class TCompanyStructureController extends Controller
 {
-    public function getCompanyStructureData($request){
+    public function getCompanyStructureData($request)
+    {
         // dd(json_decode($request->newFilter, true));
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -22,13 +23,13 @@ class TCompanyStructureController extends Controller
         $newSearch = json_decode($request->newFilter, true);
         $query->leftJoin('r_grade', 't_company_structure.COMPANY_GRADE_ID', '=', 'r_grade.GRADE_ID')->where('COMPANY_ID', $request->id);
         // dd($newSearch[0]);
-        
-        
+
+
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
         // dd($newSearch[0]['COMPANY_TYPE_ID']['value']);
@@ -36,7 +37,7 @@ class TCompanyStructureController extends Controller
         if ($request->newFilter !== "") {
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('COMPANY_STRUCTURE_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-            }else{
+            } else {
                 // dd("masuk sini");
                 foreach ($newSearch[0] as $keyId => $searchValue) {
                     if ($keyId === 'COMPANY_STRUCTURE_NAME') {
@@ -49,19 +50,22 @@ class TCompanyStructureController extends Controller
 
         return $data;
     }
-    
-    public function getCompanyStructureJson(Request $request){
+
+    public function getCompanyStructureJson(Request $request)
+    {
         $data = $this->getCompanyStructureData($request);
         return response()->json($data);
     }
 
     // get Structure by relation id
-    public function get_StructureCombo(Request $request){
+    public function get_StructureCombo(Request $request)
+    {
         $data = DB::select('call sp_combo_company_structure(?)', [$request->id]);
         return response()->json($data);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         // jika tidak ada parent = 0
         $parentId = 0;
         if ($request->COMPANY_STRUCTURE_PARENT_ID != null || $request->COMPANY_STRUCTURE_PARENT_ID != "") {
@@ -104,13 +108,15 @@ class TCompanyStructureController extends Controller
         ]);
     }
 
-    public function get_CompanyStructureDetail(Request $request){
+    public function get_CompanyStructureDetail(Request $request)
+    {
         $data = TCompanyStructure::with('toCompany')->with('parent')->find($request->id);
 
         return response()->json($data);
     }
 
-    public function edit(Request $request){
+    public function edit(Request $request)
+    {
         $parentId = 0;
         if ($request->COMPANY_STRUCTURE_PARENT_ID !== null || $request->COMPANY_STRUCTURE_PARENT_ID !== "") {
             $parentId = $request->COMPANY_STRUCTURE_PARENT_ID;
@@ -151,8 +157,9 @@ class TCompanyStructureController extends Controller
     }
 
     // get Structure by relation id
-    public function getStructure(Request $request){
-        $data = DB::select('call sp_combo_company_structure(?)', [$request->id]);
+    public function getStructure(Request $request)
+    {
+        $data = DB::select('call sp_combo_company_structure(?)', [$request->idCompany]);
         return response()->json($data);
         // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
         // // dd($structure);
@@ -160,5 +167,4 @@ class TCompanyStructureController extends Controller
 
         // return response()->json($structure);
     }
-
 }

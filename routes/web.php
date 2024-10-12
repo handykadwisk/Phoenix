@@ -403,6 +403,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
     Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
+    Route::post('/getCompany', [TCompanyController::class, 'getCompany'])->name('getCompany.getCompany');
 
     // Employee
     Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
@@ -485,6 +486,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
     Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
     Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
+    Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
+
 
 
 

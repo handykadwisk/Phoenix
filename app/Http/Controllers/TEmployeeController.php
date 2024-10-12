@@ -71,13 +71,13 @@ class TEmployeeController extends Controller
         $newSearch = json_decode($request->newFilter, true);
         $query->where('COMPANY_ID', $request->id);
         // dd($newSearch[0]);
-        
-        
+
+
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
         // dd($newSearch[0]['RELATION_TYPE_ID']['value']);
@@ -85,7 +85,7 @@ class TEmployeeController extends Controller
         if ($request->newFilter !== "") {
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('EMPLOYEE_FIRST_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-            }else{
+            } else {
                 // dd("masuk sini");
                 foreach ($newSearch[0] as $keyId => $searchValue) {
                     if ($keyId === 'EMPLOYEE_FIRST_NAME') {
@@ -107,7 +107,8 @@ class TEmployeeController extends Controller
     }
 
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $STRUCTURE_ID = $request->STRUCTURE_ID;
         if ($request->STRUCTURE_ID != NULL || $request->STRUCTURE_ID != "") {
             $STRUCTURE_ID = $request->STRUCTURE_ID['value'];
@@ -143,7 +144,7 @@ class TEmployeeController extends Controller
 
         // created eMPLOYEE contact
         if (is_countable($request->employee_contact)) {
-            for ($i=0; $i < sizeof($request->employee_contact); $i++) { 
+            for ($i = 0; $i < sizeof($request->employee_contact); $i++) {
                 $phoneNumber = $request->employee_contact[$i]["EMPLOYEE_PHONE_NUMBER"];
                 $email = $request->employee_contact[$i]["EMPLOYEE_EMAIL"];
 
@@ -158,15 +159,13 @@ class TEmployeeController extends Controller
                         "EMPLOYEE_CONTACT_ID" => $createEmployeeContact->EMPLOYEE_CONTACT_ID
                     ]);
                 }
-                
-                
             }
         }
 
         // created emergency contact
         if (is_countable($request->emergency_contact)) {
             // Created Mapping Relation AKA
-            for ($i=0; $i < sizeof($request->emergency_contact); $i++) { 
+            for ($i = 0; $i < sizeof($request->emergency_contact); $i++) {
                 TEmployeeEmergencyContact::create([
                     "EMPLOYEE_ID" => $employee->EMPLOYEE_ID,
                     "EMPLOYEE_EMERGENCY_CONTACT_NAME" => $request->emergency_contact[$i]["NAME_CONTACT_EMERGENCY"],
@@ -178,8 +177,8 @@ class TEmployeeController extends Controller
 
         // Created Log
         UserLog::create([
-                "created_by" => Auth::user()->id,
-                "action"     => json_encode([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
                 "description" => "Created (Employee).",
                 "module"      => "Employee",
                 "id"          => $employee->EMPLOYEE_ID,
@@ -195,18 +194,21 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function get_employeeById(Request $request){
+    public function get_employeeById(Request $request)
+    {
         $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('divisionCompany')->where('EMPLOYEE_ID', $request->idEmployee)->first();
         return response()->json($data);
     }
 
-    public function get_detail(Request $request){
+    public function get_detail(Request $request)
+    {
         $data = TEmployee::with('taxStatus')->with('employeeEducation')->with('employeeCertificate')->with('MEmployeeDocument')->where('EMPLOYEE_ID', $request->id)->first();
         return response()->json($data);
     }
-    
 
-    public function edit_Employee(Request $request){
+
+    public function edit_Employee(Request $request)
+    {
         TEmployee::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->update([
             "EMPLOYEE_FIRST_NAME"               => $request->EMPLOYEE_FIRST_NAME,
             "EMPLOYEE_GENDER"                   => $request->EMPLOYEE_GENDER,
@@ -228,20 +230,20 @@ class TEmployeeController extends Controller
 
         // cek existing Employee Contact
         $employeeContact = MEmployeeContact::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->get();
-        for ($i=0; $i < sizeof($employeeContact); $i++) { 
+        for ($i = 0; $i < sizeof($employeeContact); $i++) {
             $idEmployeeContact = $employeeContact[$i]['EMPLOYEE_CONTACT_ID'];
             // delete person contact
             $deleteMPerson = TEmployeeContact::where('EMPLOYEE_CONTACT_ID', $idEmployeeContact)->delete();
         }
 
-        if ($employeeContact->count()>0) { //jika ada delete data sebelumnya
+        if ($employeeContact->count() > 0) { //jika ada delete data sebelumnya
             MEmployeeContact::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->delete();
         }
 
         // created eMPLOYEE contact
         if (is_countable($request->m_employment_contact)) {
             // Created Mapping Relation AKA
-            for ($i=0; $i < sizeof($request->m_employment_contact); $i++) { 
+            for ($i = 0; $i < sizeof($request->m_employment_contact); $i++) {
                 $phoneNumber = $request->m_employment_contact[$i]['t_employee_contact']['EMPLOYEE_PHONE_NUMBER'];
                 $email = $request->m_employment_contact[$i]['t_employee_contact']['EMPLOYEE_EMAIL'];
                 $createPersonContact = TEmployeeContact::create([
@@ -260,14 +262,14 @@ class TEmployeeController extends Controller
         }
 
         $contactEmergency = TEmployeeEmergencyContact::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->get();
-        if ($contactEmergency->count()>0) { //jika ada delete data sebelumnya
+        if ($contactEmergency->count() > 0) { //jika ada delete data sebelumnya
             TEmployeeEmergencyContact::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->delete();
         }
 
         // created emergency contact
         if (is_countable($request->t_employment_emergency)) {
             // Created Mapping Relation AKA
-            for ($i=0; $i < sizeof($request->t_employment_emergency); $i++) { 
+            for ($i = 0; $i < sizeof($request->t_employment_emergency); $i++) {
                 TEmployeeEmergencyContact::create([
                     "EMPLOYEE_ID" => $request->EMPLOYEE_ID,
                     "EMPLOYEE_EMERGENCY_CONTACT_NAME" => $request->t_employment_emergency[$i]["EMPLOYEE_EMERGENCY_CONTACT_NAME"],
@@ -279,8 +281,8 @@ class TEmployeeController extends Controller
 
         // Created Log
         UserLog::create([
-                "created_by" => Auth::user()->id,
-                "action"     => json_encode([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
                 "description" => "Edited (Employee).",
                 "module"      => "Employee",
                 "id"          =>  $request->EMPLOYEE_ID,
@@ -296,7 +298,8 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function employmentEdit(Request $request){
+    public function employmentEdit(Request $request)
+    {
         // dd($request);
         // print_r($request);die;
         $endDate = $request->EMPLOYEE_END_DATE;
@@ -321,8 +324,8 @@ class TEmployeeController extends Controller
 
         // Created Log
         UserLog::create([
-                "created_by" => Auth::user()->id,
-                "action"     => json_encode([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
                 "description" => "Updated (Employee).",
                 "module"      => "Employee",
                 "id"          => $request->EMPLOYEE_ID
@@ -338,7 +341,8 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function editEmployeeDetail(Request $request){
+    public function editEmployeeDetail(Request $request)
+    {
         // dd($request);
         // print_r($request);die;
         $endDate = $request->EMPLOYEE_END_DATE;
@@ -363,8 +367,8 @@ class TEmployeeController extends Controller
 
         // Created Log
         UserLog::create([
-                "created_by" => Auth::user()->id,
-                "action"     => json_encode([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
                 "description" => "Updated (Employee).",
                 "module"      => "Employee",
                 "id"          => $request->EMPLOYEE_ID
@@ -380,13 +384,14 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function add_education_degree(Request $request){
+    public function add_education_degree(Request $request)
+    {
         $educationDegree = is_countable($request->dataEducations);
         if ($educationDegree) {
-            for ($i=0; $i < sizeof($request->dataEducations); $i++) { 
+            for ($i = 0; $i < sizeof($request->dataEducations); $i++) {
                 $createEducationDegree = TEmployeeEducation::create([
                     "EMPLOYEE_ID"                             => $request->dataEducations[$i]['EMPLOYEE_ID'],
-                    "EMPLOYEE_EDUCATION_START"                => $request->dataEducations[$i]['EMPLOYEE_EDUCATION_START'], 
+                    "EMPLOYEE_EDUCATION_START"                => $request->dataEducations[$i]['EMPLOYEE_EDUCATION_START'],
                     "EMPLOYEE_EDUCATION_END"                  => $request->dataEducations[$i]['EMPLOYEE_EDUCATION_END'],
                     "EDUCATION_DEGREE_ID"                     => $request->dataEducations[$i]['EDUCATION_DEGREE_ID'],
                     "EMPLOYEE_EDUCATION_MAJOR"                => $request->dataEducations[$i]['EMPLOYEE_EDUCATION_MAJOR'],
@@ -401,8 +406,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Add Employee Education (Employee).",
-            "module"      => "Employee",
+                "description" => "Add Employee Education (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->dataEducations[0]['EMPLOYEE_ID']
             ]),
             'action_by'  => Auth::user()->user_login
@@ -416,20 +421,21 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function edit_education_degree(Request $request){
+    public function edit_education_degree(Request $request)
+    {
         // cek existing
         $dataExisting = TEmployeeEducation::where('EMPLOYEE_ID', $request->employee_education[0]['EMPLOYEE_ID'])->get();
-        if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+        if ($dataExisting->count() > 0) { //jika ada delete data sebelumnya
             TEmployeeEducation::where('EMPLOYEE_ID', $request->employee_education[0]['EMPLOYEE_ID'])->delete();
         }
 
 
         $educationDegree = is_countable($request->employee_education);
         if ($educationDegree) {
-            for ($i=0; $i < sizeof($request->employee_education); $i++) { 
+            for ($i = 0; $i < sizeof($request->employee_education); $i++) {
                 $createEducationDegree = TEmployeeEducation::create([
                     "EMPLOYEE_ID"                             => $request->employee_education[$i]['EMPLOYEE_ID'],
-                    "EMPLOYEE_EDUCATION_START"                => $request->employee_education[$i]['EMPLOYEE_EDUCATION_START'], 
+                    "EMPLOYEE_EDUCATION_START"                => $request->employee_education[$i]['EMPLOYEE_EDUCATION_START'],
                     "EMPLOYEE_EDUCATION_END"                  => $request->employee_education[$i]['EMPLOYEE_EDUCATION_END'],
                     "EDUCATION_DEGREE_ID"                     => $request->employee_education[$i]['EDUCATION_DEGREE_ID'],
                     "EMPLOYEE_EDUCATION_MAJOR"                => $request->employee_education[$i]['EMPLOYEE_EDUCATION_MAJOR'],
@@ -444,8 +450,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Edit Employee Education (Employee).",
-            "module"      => "Employee",
+                "description" => "Edit Employee Education (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->employee_education[0]['EMPLOYEE_ID']
             ]),
             'action_by'  => Auth::user()->user_login
@@ -459,20 +465,21 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function add_Certificate(Request $request){
+    public function add_Certificate(Request $request)
+    {
         $certificate = is_countable($request->dataCertificates);
         if ($certificate) {
-            for ($i=0; $i < sizeof($request->dataCertificates); $i++) { 
+            for ($i = 0; $i < sizeof($request->dataCertificates); $i++) {
                 $qualification = 0;
                 $isQualification = 0;
                 if ($request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'] != null && $request->dataCertificates[$i]['EMPLOYEE_CERTIFICATE_IS_QUALIFICATION'] != null) {
                     $qualification = $request->dataCertificates[$i]['CERTIFICATE_QUALIFICATION_ID'];
                     $isQualification = $request->dataCertificates[$i]['EMPLOYEE_CERTIFICATE_IS_QUALIFICATION'];
                 }
-                
+
                 $createCertificate = TEmployeeCertificate::create([
                     "EMPLOYEE_ID"                                 => $request->dataCertificates[$i]['EMPLOYEE_ID'],
-                    "EMPLOYEE_CERTIFICATE_NAME"                   => $request->dataCertificates[$i]['EMPLOYEE_CERTIFICATE_NAME'], 
+                    "EMPLOYEE_CERTIFICATE_NAME"                   => $request->dataCertificates[$i]['EMPLOYEE_CERTIFICATE_NAME'],
                     "EMPLOYEE_CERTIFICATE_IS_QUALIFICATION"       => $isQualification,
                     "CERTIFICATE_QUALIFICATION_ID"              => $qualification,
                     "EMPLOYEE_CERTIFICATE_POINT"                  => $request->dataCertificates[$i]['EMPLOYEE_CERTIFICATE_POINT'],
@@ -488,8 +495,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Add Employee Certificate (Employee).",
-            "module"      => "Employee",
+                "description" => "Add Employee Certificate (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->dataCertificates[0]['EMPLOYEE_ID']
             ]),
             'action_by'  => Auth::user()->user_login
@@ -503,15 +510,16 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function edit_Certificate(Request $request){
+    public function edit_Certificate(Request $request)
+    {
         $dataExisting = TEmployeeCertificate::where('EMPLOYEE_ID', $request->employee_certificate[0]['EMPLOYEE_ID'])->get();
-        if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
+        if ($dataExisting->count() > 0) { //jika ada delete data sebelumnya
             TEmployeeCertificate::where('EMPLOYEE_ID', $request->employee_certificate[0]['EMPLOYEE_ID'])->delete();
         }
 
         $certificate = is_countable($request->employee_certificate);
         if ($certificate) {
-            for ($i=0; $i < sizeof($request->employee_certificate); $i++) { 
+            for ($i = 0; $i < sizeof($request->employee_certificate); $i++) {
 
                 $pointNew = NULL;
                 $qualification = 0;
@@ -527,7 +535,7 @@ class TEmployeeController extends Controller
 
                 $createCertificate = TEmployeeCertificate::create([
                     "EMPLOYEE_ID"                                 => $request->employee_certificate[$i]['EMPLOYEE_ID'],
-                    "EMPLOYEE_CERTIFICATE_NAME"                   => $request->employee_certificate[$i]['EMPLOYEE_CERTIFICATE_NAME'], 
+                    "EMPLOYEE_CERTIFICATE_NAME"                   => $request->employee_certificate[$i]['EMPLOYEE_CERTIFICATE_NAME'],
                     "EMPLOYEE_CERTIFICATE_IS_QUALIFICATION"       => $request->employee_certificate[$i]['EMPLOYEE_CERTIFICATE_IS_QUALIFICATION'],
                     "CERTIFICATE_QUALIFICATION_ID"              => $qualification,
                     "EMPLOYEE_CERTIFICATE_POINT"                  => $pointNew,
@@ -543,8 +551,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Edit Employee Certificate (Employee).",
-            "module"      => "Employee",
+                "description" => "Edit Employee Certificate (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->employee_certificate[0]['EMPLOYEE_ID']
             ]),
             'action_by'  => Auth::user()->user_login
@@ -558,21 +566,22 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function add_document(Request $request){
+    public function add_document(Request $request)
+    {
         // add Document KTP
         $ktpDocument = is_countable($request->file('ktp_document'));
         $otherDocument = is_countable($request->file('other_document'));
-        
+
         //upload file ktp
         if ($ktpDocument) {
-            for ($i=0; $i < sizeof($request->file('ktp_document')); $i++) { 
+            for ($i = 0; $i < sizeof($request->file('ktp_document')); $i++) {
                 $uploadDocument = $request->file('ktp_document');
-                
+
                 // Create Folder For Person Document
-                $parentDir = ((floor(($request->EMPLOYEE_ID)/1000))*1000).'/';
+                $parentDir = ((floor(($request->EMPLOYEE_ID) / 1000)) * 1000) . '/';
                 $employeeID = $request->EMPLOYEE_ID . '/';
                 $typeDir = "";
-                $uploadPath = 'documents/' . 'Employee/'. $parentDir . $employeeID . $typeDir;
+                $uploadPath = 'documents/' . 'Employee/' . $parentDir . $employeeID . $typeDir;
 
 
                 // get Data Document
@@ -592,10 +601,10 @@ class TEmployeeController extends Controller
                     'DOCUMENT_CREATED_BY'           => Auth::user()->id
                 ])->DOCUMENT_ID;
 
-                if($document){
+                if ($document) {
                     // update file name "DOCUMENT_ID - FILENAME"
                     Document::where('DOCUMENT_ID', $document)->update([
-                        'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                        'DOCUMENT_FILENAME'             => $document . "-" . $documentOriginalName,
                     ]);
 
                     // create folder in directory laravel
@@ -604,7 +613,7 @@ class TEmployeeController extends Controller
                 }
 
 
-                if($document){
+                if ($document) {
                     MEmployeeDocument::create([
                         'EMPLOYEE_ID'     => $request->EMPLOYEE_ID,
                         'DOCUMENT_ID'   => $document,
@@ -617,14 +626,14 @@ class TEmployeeController extends Controller
 
         // upload file other document
         if ($otherDocument) {
-            for ($i=0; $i < sizeof($request->file('other_document')); $i++) { 
+            for ($i = 0; $i < sizeof($request->file('other_document')); $i++) {
                 $uploadDocument = $request->file('other_document');
-                
+
                 // Create Folder For Person Document
-                $parentDir = ((floor(($request->EMPLOYEE_ID)/1000))*1000).'/';
+                $parentDir = ((floor(($request->EMPLOYEE_ID) / 1000)) * 1000) . '/';
                 $employeeID = $request->EMPLOYEE_ID . '/';
                 $typeDir = "";
-                $uploadPath = 'documents/' . 'Employee/'. $parentDir . $employeeID . $typeDir;
+                $uploadPath = 'documents/' . 'Employee/' . $parentDir . $employeeID . $typeDir;
 
 
                 // get Data Document
@@ -645,10 +654,10 @@ class TEmployeeController extends Controller
                     'DOCUMENT_CREATED_BY'           => Auth::user()->id
                 ])->DOCUMENT_ID;
 
-                if($document){
+                if ($document) {
                     // update file name "DOCUMENT_ID - FILENAME"
                     Document::where('DOCUMENT_ID', $document)->update([
-                        'DOCUMENT_FILENAME'             => $document."-".$documentOriginalName,
+                        'DOCUMENT_FILENAME'             => $document . "-" . $documentOriginalName,
                     ]);
 
                     // create folder in directory laravel
@@ -656,7 +665,7 @@ class TEmployeeController extends Controller
                     Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $document . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
                 }
 
-                if($document){
+                if ($document) {
                     MEmployeeDocument::create([
                         'EMPLOYEE_ID'     => $request->EMPLOYEE_ID,
                         'DOCUMENT_ID'   => $document,
@@ -672,8 +681,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Add Employee Document (Employee).",
-            "module"      => "Employee",
+                "description" => "Add Employee Document (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->EMPLOYEE_ID
             ]),
             'action_by'  => Auth::user()->user_login
@@ -686,13 +695,13 @@ class TEmployeeController extends Controller
             'X-Inertia' => true
         ]);
     }
-    
+
     public function person_document_download($idDocument)
     {
         $detailDocument = Document::find($idDocument);
         // $filePath = public_path('/storage/documents/CA/0/11/11-List-Asuransi--2-Unit-Dumptruck.pdf');
         $filePath = public_path('/storage/' . $detailDocument->DOCUMENT_DIRNAME . $detailDocument->DOCUMENT_FILENAME);
-        
+
         $headers = [
             'filename' => $detailDocument->DOCUMENT_FILENAME
         ];
@@ -704,32 +713,32 @@ class TEmployeeController extends Controller
         }
     }
 
-    public function delete_document(Request $request){
+    public function delete_document(Request $request)
+    {
         // Delete Document 
         $idDocument = $request->idDocument;
         // delete MEmployeeDocument
-        if($idDocument){
+        if ($idDocument) {
             $mEmployeeDocument = MEmployeeDocument::where('DOCUMENT_ID', $request->idDocument)->delete();
 
-            if($mEmployeeDocument){
+            if ($mEmployeeDocument) {
                 // delete image from folder
                 $data = Document::find($request->idDocument);
-                Storage::disk('public')->delete($data->DOCUMENT_DIRNAME.$data->DOCUMENT_FILENAME);
+                Storage::disk('public')->delete($data->DOCUMENT_DIRNAME . $data->DOCUMENT_FILENAME);
 
                 // delete document from database
                 Document::where('DOCUMENT_ID', $request->idDocument)->delete();
-
             }
         }
 
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Employee Document Delete (Employee).",
-            "module"      => "Employee",
-            "id"          => $request->idEmployee
-        ]),
-        'action_by'  => Auth::user()->user_login
+                "description" => "Employee Document Delete (Employee).",
+                "module"      => "Employee",
+                "id"          => $request->idEmployee
+            ]),
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -739,7 +748,8 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function add_address_person(Request $request){
+    public function add_address_person(Request $request)
+    {
         // 1. address_ktp
         // 2. address_domicile
         // 3. other_address
@@ -750,10 +760,10 @@ class TEmployeeController extends Controller
 
         // jika other dan domisili gaada create ktp address dan domisili 
         if ($addressKtp) {
-            for ($i=0; $i < sizeof($request->address_ktp); $i++) { 
+            for ($i = 0; $i < sizeof($request->address_ktp); $i++) {
                 $createAddressKTP = TAddress::create([
                     "ADDRESS_LOCATION_TYPE"         => 1,
-                    "ADDRESS_DETAIL"                => $request->address_ktp[$i]['ADDRESS_DETAIL'], 
+                    "ADDRESS_DETAIL"                => $request->address_ktp[$i]['ADDRESS_DETAIL'],
                     "ADDRESS_RT_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RT_NUMBER'],
                     "ADDRESS_RW_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RW_NUMBER'],
                     "ADDRESS_VILLAGE"               => $request->address_ktp[$i]['ADDRESS_VILLAGE']['value'],
@@ -775,7 +785,7 @@ class TEmployeeController extends Controller
                 if (!$addressDomisili) {
                     $createDom = TAddress::create([
                         "ADDRESS_LOCATION_TYPE"         => 2,
-                        "ADDRESS_DETAIL"                => $request->address_ktp[$i]['ADDRESS_DETAIL'], 
+                        "ADDRESS_DETAIL"                => $request->address_ktp[$i]['ADDRESS_DETAIL'],
                         "ADDRESS_RT_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RT_NUMBER'],
                         "ADDRESS_RW_NUMBER"             => $request->address_ktp[$i]['ADDRESS_RW_NUMBER'],
                         "ADDRESS_VILLAGE"               => $request->address_ktp[$i]['ADDRESS_VILLAGE']['value'],
@@ -784,7 +794,7 @@ class TEmployeeController extends Controller
                         "ADDRESS_REGENCY"               => $request->address_ktp[$i]['ADDRESS_REGENCY']['value'],
                         "ADDRESS_STATUS"                => 1
                     ]);
-    
+
                     // create mapping
                     if ($createDom) {
                         MAddressEmployee::create([
@@ -792,12 +802,12 @@ class TEmployeeController extends Controller
                             "ADDRESS_ID"         => $createDom->ADDRESS_ID
                         ]);
                     }
-                }else{
+                } else {
                     // jika ada data dari dom address make data dom address
-                    for ($a=0; $a < sizeof($request->address_domicile); $a++) { 
+                    for ($a = 0; $a < sizeof($request->address_domicile); $a++) {
                         $createDom = TAddress::create([
                             "ADDRESS_LOCATION_TYPE"         => 2,
-                            "ADDRESS_DETAIL"                => $request->address_domicile[$a]['ADDRESS_DETAIL'], 
+                            "ADDRESS_DETAIL"                => $request->address_domicile[$a]['ADDRESS_DETAIL'],
                             "ADDRESS_RT_NUMBER"             => $request->address_domicile[$a]['ADDRESS_RT_NUMBER'],
                             "ADDRESS_RW_NUMBER"             => $request->address_domicile[$a]['ADDRESS_RW_NUMBER'],
                             "ADDRESS_VILLAGE"               => $request->address_domicile[$a]['ADDRESS_VILLAGE']['value'],
@@ -806,7 +816,7 @@ class TEmployeeController extends Controller
                             "ADDRESS_REGENCY"               => $request->address_domicile[$a]['ADDRESS_REGENCY']['value'],
                             "ADDRESS_STATUS"                => $request->address_domicile[$a]['ADDRESS_STATUS']
                         ]);
-        
+
                         // create mapping
                         if ($createDom) {
                             MAddressEmployee::create([
@@ -819,10 +829,10 @@ class TEmployeeController extends Controller
 
                 // jika ada other address
                 if ($addressOther) {
-                    for ($z=0; $z < sizeof($request->other_address); $z++) { 
+                    for ($z = 0; $z < sizeof($request->other_address); $z++) {
                         $createOther = TAddress::create([
                             "ADDRESS_LOCATION_TYPE"         => 3,
-                            "ADDRESS_DETAIL"                => $request->other_address[$z]['ADDRESS_DETAIL'], 
+                            "ADDRESS_DETAIL"                => $request->other_address[$z]['ADDRESS_DETAIL'],
                             "ADDRESS_RT_NUMBER"             => $request->other_address[$z]['ADDRESS_RT_NUMBER'],
                             "ADDRESS_RW_NUMBER"             => $request->other_address[$z]['ADDRESS_RW_NUMBER'],
                             "ADDRESS_VILLAGE"               => $request->other_address[$z]['ADDRESS_VILLAGE']['value'],
@@ -831,7 +841,7 @@ class TEmployeeController extends Controller
                             "ADDRESS_REGENCY"               => $request->other_address[$z]['ADDRESS_REGENCY']['value'],
                             "ADDRESS_STATUS"                => $request->other_address[$z]['ADDRESS_STATUS']
                         ]);
-        
+
                         // create mapping
                         if ($createOther) {
                             MAddressEmployee::create([
@@ -848,8 +858,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Add Address (Employee).",
-            "module"      => "Employee",
+                "description" => "Add Address (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->address_ktp[0]['idEmployee']
             ]),
             'action_by'  => Auth::user()->user_login
@@ -863,15 +873,17 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function getEmployeeAddress(Request $request){
+    public function getEmployeeAddress(Request $request)
+    {
         $data = MAddressEmployee::where('EMPLOYEE_ID', $request->id)->get();
 
         return response()->json($data);
     }
 
-    public function editAddress(Request $request){
+    public function editAddress(Request $request)
+    {
         // dd($request);
-        for ($i=0; $i < sizeof($request->dataEdit); $i++) { 
+        for ($i = 0; $i < sizeof($request->dataEdit); $i++) {
             if ($request->dataEdit[$i]['ADDRESS_LOCATION_TYPE'] != "1") {
                 $editAddress = TAddress::where('ADDRESS_ID', $request->dataEdit[$i]['ADDRESS_ID'])->update([
                     "ADDRESS_LOCATION_TYPE"         =>  $request->dataEdit[$i]['ADDRESS_LOCATION_TYPE'],
@@ -884,7 +896,7 @@ class TEmployeeController extends Controller
                     "ADDRESS_REGENCY"               =>  $request->dataEdit[$i]['ADDRESS_REGENCY'],
                     "ADDRESS_STATUS"                =>  $request->dataEdit[$i]['ADDRESS_STATUS'],
                 ]);
-            }else{
+            } else {
                 $editAddress = TAddress::where('ADDRESS_ID', $request->dataEdit[$i]['ADDRESS_ID'])->update([
                     "ADDRESS_LOCATION_TYPE"         =>  $request->dataEdit[$i]['ADDRESS_LOCATION_TYPE'],
                     "ADDRESS_DETAIL"                =>  $request->dataEdit[$i]['ADDRESS_DETAIL'],
@@ -903,10 +915,10 @@ class TEmployeeController extends Controller
         $addressOther = is_countable($request->other_address);
         // jika ada other address
         if ($addressOther) {
-            for ($z=0; $z < sizeof($request->other_address); $z++) { 
+            for ($z = 0; $z < sizeof($request->other_address); $z++) {
                 $createOther = TAddress::create([
                     "ADDRESS_LOCATION_TYPE"         => 3,
-                    "ADDRESS_DETAIL"                => $request->other_address[$z]['ADDRESS_DETAIL'], 
+                    "ADDRESS_DETAIL"                => $request->other_address[$z]['ADDRESS_DETAIL'],
                     "ADDRESS_RT_NUMBER"             => $request->other_address[$z]['ADDRESS_RT_NUMBER'],
                     "ADDRESS_RW_NUMBER"             => $request->other_address[$z]['ADDRESS_RW_NUMBER'],
                     "ADDRESS_VILLAGE"               => $request->other_address[$z]['ADDRESS_VILLAGE']['value'],
@@ -925,14 +937,14 @@ class TEmployeeController extends Controller
                 }
             }
         }
-        
+
 
         // Created Log
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Edit Address (Employee).",
-            "module"      => "Employee",
+                "description" => "Edit Address (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->ADDRESS_ID
             ]),
             'action_by'  => Auth::user()->user_login
@@ -946,13 +958,14 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function addBankAccount(Request $request){
+    public function addBankAccount(Request $request)
+    {
         // dd($request->BANK_ACCOUNT);
         // validasi bank account
-        $validateData = Validator::make($request->all() ,[
+        $validateData = Validator::make($request->all(), [
             'BANK_ACCOUNT.*.BANK_ID'                    => 'required',
             'BANK_ACCOUNT.*.EMPLOYEE_BANK_ACCOUNT_FOR'    => 'required'
-        ],[
+        ], [
             'BANK_ACCOUNT.*.BANK_ID'                    => 'Bank Name is required',
             'BANK_ACCOUNT.*.EMPLOYEE_BANK_ACCOUNT_FOR'    => 'For Bank Account is required'
         ]);
@@ -967,7 +980,7 @@ class TEmployeeController extends Controller
 
         // created bank account
         if (is_countable($request->BANK_ACCOUNT)) {
-            for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
+            for ($i = 0; $i < sizeof($request->BANK_ACCOUNT); $i++) {
                 $createEmployeeBank = TEmployeeBankAccount::create([
                     "EMPLOYEE_ID" => $request->BANK_ACCOUNT[$i]["idEmployee"],
                     "EMPLOYEE_BANK_ACCOUNT_NAME" => $request->BANK_ACCOUNT[$i]["EMPLOYEE_BANK_ACCOUNT_NAME"],
@@ -978,7 +991,7 @@ class TEmployeeController extends Controller
 
                 if ($createEmployeeBank) {
                     if (is_countable($request->BANK_ACCOUNT[$i]['EMPLOYEE_BANK_ACCOUNT_FOR'])) {
-                        for ($a=0; $a < sizeof($request->BANK_ACCOUNT[$i]['EMPLOYEE_BANK_ACCOUNT_FOR']); $a++) { 
+                        for ($a = 0; $a < sizeof($request->BANK_ACCOUNT[$i]['EMPLOYEE_BANK_ACCOUNT_FOR']); $a++) {
                             $dataBankAccount = $request->BANK_ACCOUNT[$i]['EMPLOYEE_BANK_ACCOUNT_FOR'];
 
                             MForEmployeeBankAccount::create([
@@ -995,8 +1008,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Add Bank Account (Employee).",
-            "module"      => "Employee",
+                "description" => "Add Bank Account (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->BANK_ACCOUNT[0]["idEmployee"]
             ]),
             'action_by'  => Auth::user()->user_login
@@ -1010,15 +1023,16 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function editBankAccount(Request $request){
+    public function editBankAccount(Request $request)
+    {
 
         // dd($request);
-        $validateData = Validator::make($request->all() ,[
+        $validateData = Validator::make($request->all(), [
             'BANK_ACCOUNT.*.BANK_ID'                        => 'required',
             'BANK_ACCOUNT.*.m_for_bank'                    => 'required',
             'BANK_ACCOUNT.*.EMPLOYEE_BANK_ACCOUNT_NUMBER'    => 'required'
-            
-        ],[
+
+        ], [
             'BANK_ACCOUNT.*.BANK_ID'                       => 'Bank Name is required',
             'BANK_ACCOUNT.*.m_for_bank'                    => 'For Bank Account is required',
             'BANK_ACCOUNT.*.EMPLOYEE_BANK_ACCOUNT_NUMBER'    => 'Account Number is required'
@@ -1034,28 +1048,28 @@ class TEmployeeController extends Controller
 
 
         // if (isset($request->BANK_ACCOUNT[0]['EMPLOYEE_BANK_ACCOUNT_ID'])) {
-            $dataTEmployee = TEmployeeBankAccount::where('EMPLOYEE_ID', $request->BANK_ACCOUNT[0]['EMPLOYEE_ID'])->get();
-            // dd($dataTEmployee);
-            // Delete M Bank Account Existing By Id
-            for ($i=0; $i < sizeof($dataTEmployee); $i++) { 
-                
-                $dataExisting = MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->get();
-                if ($dataExisting->count()>0) { //jika ada delete data sebelumnya
-                    MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->delete();
-                }
+        $dataTEmployee = TEmployeeBankAccount::where('EMPLOYEE_ID', $request->BANK_ACCOUNT[0]['EMPLOYEE_ID'])->get();
+        // dd($dataTEmployee);
+        // Delete M Bank Account Existing By Id
+        for ($i = 0; $i < sizeof($dataTEmployee); $i++) {
+
+            $dataExisting = MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->get();
+            if ($dataExisting->count() > 0) { //jika ada delete data sebelumnya
+                MForEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[$i]['EMPLOYEE_BANK_ACCOUNT_ID'])->delete();
             }
-            // Delete Data T Person Bank Account
-            // $dataExistingTPerson = TEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[0]['EMPLOYEE_ID'])->get();
-            if ($dataTEmployee->count()>0) { //jika ada delete data sebelumnya
-                TEmployeeBankAccount::where('EMPLOYEE_ID', $dataTEmployee[0]['EMPLOYEE_ID'])->delete();
-            }
-            
+        }
+        // Delete Data T Person Bank Account
+        // $dataExistingTPerson = TEmployeeBankAccount::where('EMPLOYEE_BANK_ACCOUNT_ID', $dataTEmployee[0]['EMPLOYEE_ID'])->get();
+        if ($dataTEmployee->count() > 0) { //jika ada delete data sebelumnya
+            TEmployeeBankAccount::where('EMPLOYEE_ID', $dataTEmployee[0]['EMPLOYEE_ID'])->delete();
+        }
+
         // }
 
 
         // created bank account
         if (is_countable($request->BANK_ACCOUNT)) {
-            for ($i=0; $i < sizeof($request->BANK_ACCOUNT); $i++) { 
+            for ($i = 0; $i < sizeof($request->BANK_ACCOUNT); $i++) {
 
 
                 // Add New Data T Person Bank Account and M Person Bank Account
@@ -1069,7 +1083,7 @@ class TEmployeeController extends Controller
 
                 if ($createPersonBank) {
                     if (is_countable($request->BANK_ACCOUNT[$i]['m_for_bank'])) {
-                        for ($a=0; $a < sizeof($request->BANK_ACCOUNT[$i]['m_for_bank']); $a++) { 
+                        for ($a = 0; $a < sizeof($request->BANK_ACCOUNT[$i]['m_for_bank']); $a++) {
                             $dataBankAccount = $request->BANK_ACCOUNT[$i]['m_for_bank'];
 
                             if (!isset($dataBankAccount[$a]["FOR_BANK_ACCOUNT_ID"])) {
@@ -1077,7 +1091,7 @@ class TEmployeeController extends Controller
                                     "FOR_BANK_ACCOUNT_ID"          => $dataBankAccount[$a]['value'],
                                     "EMPLOYEE_BANK_ACCOUNT_ID"         => $createPersonBank->EMPLOYEE_BANK_ACCOUNT_ID
                                 ]);
-                            }else{
+                            } else {
                                 MForEmployeeBankAccount::create([
                                     "FOR_BANK_ACCOUNT_ID"          => $dataBankAccount[$a]['FOR_BANK_ACCOUNT_ID'],
                                     "EMPLOYEE_BANK_ACCOUNT_ID"         => $createPersonBank->EMPLOYEE_BANK_ACCOUNT_ID
@@ -1093,8 +1107,8 @@ class TEmployeeController extends Controller
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Edit Bank Account (Employee).",
-            "module"      => "Employee",
+                "description" => "Edit Bank Account (Employee).",
+                "module"      => "Employee",
                 "id"          => $request->BANK_ACCOUNT[0]["EMPLOYEE_ID"]
             ]),
             'action_by'  => Auth::user()->user_login
@@ -1108,66 +1122,66 @@ class TEmployeeController extends Controller
         ]);
     }
 
-    public function uploadProfile(Request $request){
+    public function uploadProfile(Request $request)
+    {
         // dd($request);
         // document
         $imgProfile = $request->file('files');
         // print_r($imgProfile);die;
         if ($imgProfile) {
-                // $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
-                $documentImg = is_countable($request->file('files'));
-                if($documentImg){
-                    for ($i=0; $i < sizeof($request->file('files')); $i++) { 
-                        $uploadDocument = $request->file('files');
-                        
-                        // Create Folder For Person Document
-                        $parentDir = ((floor(($request->id)/1000))*1000).'/';
-                        $personID = $request->id . '/';
-                        $typeDir = "";
-                        $uploadPath = 'images/'. $parentDir . $personID . $typeDir;
-        
-        
-                        // get Data Document
-                        $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
-                        $documentFileName = $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
-                        $documentDirName = $uploadPath;
-                        $documentFileType = $uploadDocument[$i]->getMimeType();
-                        $documentFileSize = $uploadDocument[$i]->getSize();
-        
-                        // create folder in directory laravel
-                        Storage::makeDirectory($uploadPath, 0777, true, true);
-                        Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
-        
-                        // masukan data file ke database
-                        $document = Document::create([
-                            'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
-                            'DOCUMENT_FILENAME'             => $documentFileName,
-                            'DOCUMENT_DIRNAME'              => $documentDirName,
-                            'DOCUMENT_FILETYPE'             => $documentFileType,
-                            'DOCUMENT_FILESIZE'             => $documentFileSize,
-                            'DOCUMENT_CREATED_BY'           => Auth::user()->id
-                        ])->DOCUMENT_ID;
-        
-                        if ($document) {
-                            TEmployee::where('EMPLOYEE_ID', $request->id)
-                              ->update([
+            // $document = $this->handleDirectoryUploadedFile($imgProfile, $request->id, 'person/');
+            $documentImg = is_countable($request->file('files'));
+            if ($documentImg) {
+                for ($i = 0; $i < sizeof($request->file('files')); $i++) {
+                    $uploadDocument = $request->file('files');
+
+                    // Create Folder For Person Document
+                    $parentDir = ((floor(($request->id) / 1000)) * 1000) . '/';
+                    $personID = $request->id . '/';
+                    $typeDir = "";
+                    $uploadPath = 'images/' . $parentDir . $personID . $typeDir;
+
+
+                    // get Data Document
+                    $documentOriginalName = $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                    $documentFileName = $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName());
+                    $documentDirName = $uploadPath;
+                    $documentFileType = $uploadDocument[$i]->getMimeType();
+                    $documentFileSize = $uploadDocument[$i]->getSize();
+
+                    // create folder in directory laravel
+                    Storage::makeDirectory($uploadPath, 0777, true, true);
+                    Storage::disk('public')->putFileAs($uploadPath, $uploadDocument[$i], $request->id . "-" . $this->RemoveSpecialChar($uploadDocument[$i]->getClientOriginalName()));
+
+                    // masukan data file ke database
+                    $document = Document::create([
+                        'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                        'DOCUMENT_FILENAME'             => $documentFileName,
+                        'DOCUMENT_DIRNAME'              => $documentDirName,
+                        'DOCUMENT_FILETYPE'             => $documentFileType,
+                        'DOCUMENT_FILESIZE'             => $documentFileSize,
+                        'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                    ])->DOCUMENT_ID;
+
+                    if ($document) {
+                        TEmployee::where('EMPLOYEE_ID', $request->id)
+                            ->update([
                                 'EMPLOYEE_IMAGE_ID'    => $document
-                              ]);
-                        }
+                            ]);
                     }
                 }
-    
             }
+        }
 
-            // Created Log
+        // Created Log
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-            "description" => "Updated (Person).",
-            "module"      => "Person",
-            "id"          => $request->id
-        ]),
-        'action_by'  => Auth::user()->user_login
+                "description" => "Updated (Person).",
+                "module"      => "Person",
+                "id"          => $request->id
+            ]),
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -1176,6 +1190,5 @@ class TEmployeeController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
-
     }
 }

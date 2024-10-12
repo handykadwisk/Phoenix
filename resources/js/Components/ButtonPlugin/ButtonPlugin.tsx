@@ -8,6 +8,7 @@ import React, {
 import iconGrid from "@/Images/grid-icon.svg";
 import {
     ArrowUpIcon,
+    BellAlertIcon,
     ChatBubbleLeftRightIcon,
     ClockIcon,
 } from "@heroicons/react/20/solid";
@@ -15,6 +16,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import ModalChatMessage from "@/Pages/PluginModul/ModalChatMessage";
 import { usePage } from "@inertiajs/react";
+import ModalReminder from "@/Pages/Reminder/ModalReminder";
 
 export default function ButtonPlugin({}: PropsWithChildren<{}>) {
     const { auth }: any = usePage().props;
@@ -80,8 +82,25 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
         setShow(false);
     };
 
+    // for handle reminder modal
+    const [showReminder, setShowReminder] = useState<any>({
+        reminder: false,
+    });
+    const handleClickReminder = async (e: FormEvent) => {
+        e.preventDefault();
+        setShowReminder({
+            reminder: !showReminder.reminder,
+        });
+        setShow(false);
+    };
+
     return (
         <>
+            <ModalReminder
+                showReminder={showReminder}
+                setShowReminder={setShowReminder}
+            />
+
             <ModalChatMessage
                 showChatMessage={showChatMessage}
                 setShowChatMessage={setShowChatMessage}
@@ -108,15 +127,25 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="absolute z-99 bottom-0 right-0 mr-3 mb-[70px] cursor-pointer text-white">
+                    <div className="fixed z-99 bottom-0 right-0 mr-3 mb-[70px] cursor-pointer text-white">
+                        <div
+                            className="bg-red-600 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
+                            onClick={(e: any) => handleClickReminder(e)}
+                            title="Reminder"
+                        >
+                            <span>
+                                <BellAlertIcon className="w-5" />
+                            </span>
+                        </div>
                         {dataPluginProcess?.map((items: any, index: number) => {
                             return (
                                 <div
                                     key={index}
-                                    className="bg-red-500 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
+                                    className="bg-red-600 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
                                     onClick={(e: any) =>
                                         handleClickModalChatMessage(e)
                                     }
+                                    title={items.PLUGIN_PROCESS_NAME}
                                 >
                                     <span>
                                         {items.PLUGIN_PROCESS_NAME ===
@@ -136,7 +165,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
             ) : null} */}
 
             <div
-                className="absolute z-99 bg-red-500 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
+                className="fixed z-99 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
                 onClick={(e) => handleClickShow(e)}
             >
                 <span>
