@@ -38,6 +38,7 @@ use App\Http\Controllers\TCompanyDivisionController;
 use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
+use App\Http\Controllers\TimeOffController;
 use App\Http\Controllers\TJobDescCompanyController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Models\Role;
@@ -356,6 +357,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelation/{id}', [PolicyController::class, 'getRelationById'])->name('policy.getRelationById');
     Route::patch('/editPolicy/{id}', [PolicyController::class, 'edit'])->name('policy.edit');
     Route::patch('/deactivatePolicy/{id}', [PolicyController::class, 'deactivate'])->name('policy.deactivate');
+    Route::get('/getPolicyForAgGrid', [PolicyController::class, 'getPolicyForAgGrid'])->name('getPolicyForAgGrid.getPolicyForAgGrid');
 
     // Insurance Panel
     Route::get('/insurancePanel', [InsurancePanelController::class, 'index'])->name('insurancePanel');
@@ -555,6 +557,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
     Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
     Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
+
+
+    // Time Off
+    Route::get('/timeOff', [TimeOffController::class, 'index'])->name('timeOff');
+    Route::post('/getSubtitute', [TimeOffController::class, 'getSubtitute'])->name('timeOff.getSubtitute');
+    Route::post('/getRequestTo', [TimeOffController::class, 'getRequestTo'])->name('timeOff.getRequestTo');
+    // Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
+    // Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
 
 
 
