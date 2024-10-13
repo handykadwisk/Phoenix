@@ -19,13 +19,14 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
     const [sequenceMap, setSequenceMap] = useState<Record<number, number>>({});
 
     useEffect(() => {
-        setItems(initialItems);
-        initializeSequenceMap(initialItems);
+        setItems(initialItems); // Set items saat komponen pertama kali di-render
+        initializeSequenceMap(initialItems); // Initialize sequence map
+        updateMenuSequenceWithChildren(initialItems); // Urutkan sequence ketika komponen pertama kali di-render
     }, [initialItems]);
 
     useEffect(() => {
         if (onItemsChange) {
-            onItemsChange(items);
+            onItemsChange(items); // Trigger perubahan items jika onItemsChange ada
         }
     }, [items, onItemsChange]);
 
@@ -45,10 +46,11 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
         const updateSequenceForItem = (item: MenuItem) => {
             item.menu_sequence = sequenceCounter;
             sequenceCounter++;
-            item.children?.forEach(updateSequenceForItem);
+            item.children?.forEach(updateSequenceForItem); // Rekursif untuk anak-anak
         };
 
-        newItems.forEach(updateSequenceForItem);
+        newItems.forEach(updateSequenceForItem); // Urutkan sequence saat komponen dibuka
+        setItems(newItems); // Update state items setelah diurutkan
     };
 
     const onDragEnd = (result: DropResult, parentId: number | null = null): void => {
@@ -80,15 +82,12 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
         };
 
         const newItems = updateItems(items);
-        updateMenuSequenceWithChildren(newItems);
+        updateMenuSequenceWithChildren(newItems); // Update urutan sequence setelah drag-and-drop
         setItems(newItems);
-            // Panggil onSave setelah perubahan disimpan
-            if (onSave) {
-                onSave();
-            }
+        if (onSave) {
+            onSave(); // Simpan perubahan
+        }
     };
-    // console.log("items",items);
-    
 
     const renderItems = (items: MenuItem[], parentId: number | null = null) => (
         <Droppable droppableId={`droppable-${parentId !== null ? parentId : 'main'}`}>
@@ -112,7 +111,7 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
                                     className='shadow-md'
                                 >
                                     <div {...provided.dragHandleProps}>
-                                    {item.menu_sequence}. {item.menu_name}
+                                        {item.menu_sequence}. {item.menu_name}
                                     </div>
                                     {/* Render anak-anak secara rekursif */}
                                     {item.children && item.children.length > 0 && (
@@ -129,7 +128,6 @@ const SequenceEdit: React.FC<SequenceEditProps> = ({ initialItems, onItemsChange
             )}
         </Droppable>
     );
-    
 
     return <DragDropContext onDragEnd={(result) => onDragEnd(result)}>{renderItems(items)}</DragDropContext>;
 };

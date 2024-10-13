@@ -30,7 +30,8 @@ extends Controller
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
-        $query = User::with('roles', 'type');
+        // $query = User::with('roles', 'type');
+        $query = User::query()->with('roles', 'type');
 
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
@@ -65,6 +66,9 @@ extends Controller
                 }
             }
             }
+        }
+        if (!$sortModel && !$filterModel) {
+            $query->orderBy('id', 'desc');
         }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);

@@ -66,7 +66,7 @@ export default function Jobpost({ auth }: PageProps) {
       },
     ],
   });
-  console.log(data ,'inputttt');
+  // console.log(data ,'inputttt');
   
   const [modal, setModal] = useState<any>({
     add: false,
@@ -98,7 +98,7 @@ export default function Jobpost({ auth }: PageProps) {
     try {
       const res = await axios.get(`/JobpostByDiv/${id}`);
       const data = res.data;
-      console.log(data[0],'<<<<<<<<<');
+      // console.log(data[0],'<<<<<<<<<');
       
       setJobpostDevId(data[0]);
     } catch (error) {
@@ -216,7 +216,7 @@ export default function Jobpost({ auth }: PageProps) {
     isSelected,
     onJobpostClick,
   }) => {
-    console.log(data);
+    // console.log(data);
 
     return (
       <>
@@ -395,7 +395,7 @@ export default function Jobpost({ auth }: PageProps) {
                 type="text"
                 id="Job Post Detail"
                 name="Job Post Detail"
-                value={data.jobpost_description}
+                value={data.jobpost_description||''}
                 onChange={(e: any) =>
                   setData({
                     ...data,

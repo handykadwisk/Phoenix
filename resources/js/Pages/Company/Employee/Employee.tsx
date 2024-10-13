@@ -242,6 +242,8 @@ export default function Employee({
     ) => {
         const changeVal: any = [...searchEmployee.company_employee];
         changeVal[i][name] = value;
+        console.log("changeVal", changeVal);
+        
         setSearchEmployee({ ...searchEmployee, company_employee: changeVal });
     };
 

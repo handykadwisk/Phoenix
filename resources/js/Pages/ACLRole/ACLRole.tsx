@@ -124,7 +124,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         const { value, checked } = e.target;
         const parsedValue = parseInt(value);
         let updatedAccessMenu = [...accessMenu];
-    
+
         if (checked) {
             // Tambahkan item saat ini jika belum ada di accessMenu
             if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
@@ -147,7 +147,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         } else {
             // Hapus item saat ini
             updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
-    
+
             // Jika ini adalah parent, hapus semua anak secara rekursif
             if (item.children) {
                 item.children.forEach((child: any) => {
@@ -164,16 +164,16 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 }
             }
         }
-    
+
         // Pastikan role_id tetap ada dalam updatedAccessMenu meskipun kosong
         if (updatedAccessMenu.length === 0) {
             updatedAccessMenu.push({ role_id: roleId });
         }
-    
+
         // Perbarui state accessMenu
         setAccessMenu(updatedAccessMenu);
     };
-    
+
     const checkChecked = (id: number) => {
         return accessMenu.some((f: any) => f.menu_id === id);
     }
@@ -344,7 +344,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                     <Checkbox value={menu.menu_id} defaultChecked={checkChecked(menu.id)} disabled />
                     <label className="text-gray-900 ml-3 ">{menu.menu_name}</label>
                 </div>
-    
+
                 {/* Cek apakah menu memiliki children */}
                 {menu.children?.map((child: any) => (
                     <div className="ml-7 pl-4 border-l-2 border-red-400" key={child.menu_id}>
@@ -355,7 +355,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             </div>
         );
     };
-    
+
     const TabMenu = () => {
         return (
             <div className="w-full max-w-md mx-auto">
@@ -363,7 +363,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                     <div className="">
                         {custom_menu?.map((menu: any) => (
                             <div key={menu.menu_id}>
-                                {renderMenu(menu)} 
+                                {renderMenu(menu)}
                             </div>
                         ))}
                     </div>
@@ -371,10 +371,10 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             </div>
         );
     };
-    
-    
-    
-    
+
+
+
+
 
     const [accessPermission, setAccessPermission] = useState<any>([])
 
@@ -468,93 +468,344 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         getPermissionId(data.id);
         handleDetail(data.id);
     }
-    const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
-        const { value, checked } = e.target;
-        const parsedValue = parseInt(value);
-        let updatedAccessMenu = [...accessMenu];
     
-        if (checked) {
-            // Tambahkan item saat ini jika belum ada di accessMenu
-            if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
-                updatedAccessMenu.push({ menu_id: parsedValue, role_id: roleId });
-            }
-            // Jika ini adalah parent, tambahkan semua anak secara rekursif
-            if (item.children) {
-                item.children.forEach((child: any) => {
-                    if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
-                        updatedAccessMenu.push({ menu_id: child.id, role_id: roleId });
-                    }
-                    // Panggil fungsi ini lagi untuk menangani children dari child
-                    handleCheckboxChange({ target: { value: child.id, checked: true } }, child, item);
-                });
-            }
-            // Jika ada parent, tambahkan parent
-            if (parent && !updatedAccessMenu.some((data: any) => data.menu_id === parent.id)) {
-                updatedAccessMenu.push({ menu_id: parent.id, role_id: roleId });
-            }
-        } else {
-            // Hapus item saat ini
-            updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+    // const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
+    //     // console.log('item', item);
+    //     // console.log('parent', parent);
+        
+        
+    //     const { value, checked } = e.target;
+    //     // console.log('value',value,'checked',checked);
+        
+    //     const parsedValue = parseInt(value);
+    //     // console.log(parsedValue,'parsedValue');
+        
+    //     let updatedAccessMenu = [...accessMenu];
+    //     // console.log('updatedAccessMenu',updatedAccessMenu);
+        
     
-            // Jika ini adalah parent, hapus semua anak secara rekursif
-            if (item.children) {
-                item.children.forEach((child: any) => {
-                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
-                    // Panggil fungsi ini lagi untuk menangani penghapusan children dari child
-                    handleCheckboxChange({ target: { value: child.id, checked: false } }, child, item);
-                });
-            }
-            // Jika ada parent, cek apakah semua anak sudah tidak dicentang
-            if (parent) {
-                const allChildrenUnchecked = !parent.children.some((child: any) => checkChecked(child.id));
-                if (allChildrenUnchecked) {
-                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+    //     if (checked) {
+    //         // Tambahkan item saat ini jika belum ada di accessMenu
+    //         if (!updatedAccessMenu.some((data: any) => data.id === parsedValue)) {
+                
+    //             updatedAccessMenu.push({ menu_id: parsedValue });
+    //         }
+    
+    //         // Jika ada children, centang semua anaknya
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+                    
+    //                 if (!updatedAccessMenu.some((data: any) => data.id === child.id)) {
+    //                     updatedAccessMenu.push({ menu_id: child.id });
+    //                 }
+    //             });
+    //         }
+    
+    //         // Jika ada parent, centang parentnya
+    //         if (parent && !updatedAccessMenu.some((data: any) => data.id === parent.id)) {
+    //             updatedAccessMenu.push({ menu_id: parent.id });
+    //         }
+    //     } else {
+    //         // Hapus item saat ini
+    //         updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+    
+    //         // Jika ada children, uncheck semua anaknya
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+    //             });
+    //         }
+    
+    //         // Jika ada parent, cek apakah semua anak sudah tidak dicentang
+    //         if (parent) {
+    //             const allChildrenUnchecked = parent.children.every((child: any) => 
+    //                 !updatedAccessMenu.some((data: any) => data.menu_id === child.menu_id)
+    //             );
+    //             if (allChildrenUnchecked) {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+    //             }
+    //         }
+    //     }
+    
+    //     // Perbarui state accessMenu
+    //     setAccessMenu(updatedAccessMenu);
+    // };
+    
+    // const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
+    //     const { value, checked } = e.target;
+    //     const parsedValue = parseInt(value);
+    //     let updatedAccessMenu = [...accessMenu];
+    
+    //     if (checked) {
+    //         // Tambahkan item jika belum ada
+    //         if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+    //             updatedAccessMenu.push({ menu_id: parsedValue });
+    //         }
+    
+    //         // Centang semua children
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+    //                 if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+    //                     updatedAccessMenu.push({ menu_id: child.id });
+    //                 }
+    //             });
+    //         }
+    
+    //         // Centang semua parent hingga parent teratas
+    //         let currentParent = parent;
+    //         while (currentParent) {
+    //             if (!updatedAccessMenu.some((data: any) => data.menu_id === currentParent.id)) {
+    //                 updatedAccessMenu.push({ menu_id: currentParent.id });
+    //             }
+    //             currentParent = currentParent.parent;  // Check parent di atasnya (rekursif ke parent teratas)
+    //         }
+    
+    //     } else {
+    //         // Hapus item yang tidak dicentang
+    //         updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+    
+    //         // Uncheck semua children
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+    //             });
+    //         }
+    
+    //         // Uncheck parent hanya jika semua children tidak dicentang
+    //         if (parent) {
+    //             const allChildrenUnchecked = parent.children.every((child: any) =>
+    //                 !updatedAccessMenu.some((data: any) => data.menu_id === child.id)
+    //             );
+    //             if (allChildrenUnchecked) {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+    //             }
+    //         }
+    //     }
+    
+    //     // Perbarui state accessMenu
+    //     setAccessMenu(updatedAccessMenu);
+    // };
+    // const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
+    //     const { value, checked } = e.target;
+    //     const parsedValue = parseInt(value);
+    //     let updatedAccessMenu = [...accessMenu];
+    
+    //     if (checked) {
+    //         // Tambahkan item jika belum ada
+    //         if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+    //             updatedAccessMenu.push({ menu_id: parsedValue });
+    //         }
+    
+    //         // Centang semua children
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+    //                 if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+    //                     updatedAccessMenu.push({ menu_id: child.id });
+    //                 }
+    //             });
+    //         }
+    
+    //         // Centang semua parent hingga parent teratas
+    //         let currentParent = parent;
+    //         while (currentParent) {
+    //             console.log('currentParent',currentParent);
+    //             if (!updatedAccessMenu.some((data: any) => data.menu_id === currentParent.id)) {
+    //                 updatedAccessMenu.push({ menu_id: currentParent.id });
+    //             }
+    //             currentParent = currentParent.parent;  // Lanjut ke parent di atasnya
+    //         }
+    
+    //     } else {
+    //         // Hapus item yang tidak dicentang
+    //         updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+    
+    //         // Uncheck semua children
+    //         if (item.children) {
+    //             item.children.forEach((child: any) => {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+    //             });
+    //         }
+    
+    //         // Uncheck parent hanya jika semua children tidak dicentang
+    //         if (parent) {
+    //             const allChildrenUnchecked = parent.children.every((child: any) =>
+    //                 !updatedAccessMenu.some((data: any) => data.menu_id === child.id)
+    //             );
+    //             if (allChildrenUnchecked) {
+    //                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parent.id);
+    //             }
+    //         }
+    //     }
+    
+    //     // Perbarui state accessMenu
+    //     setAccessMenu(updatedAccessMenu);
+    // };
+
+//     const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
+//     const { value, checked } = e.target;
+//     const parsedValue = parseInt(value);
+//     let updatedAccessMenu = [...accessMenu];
+
+//     if (checked) {
+//         // Tambahkan item yang dicentang
+//         if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+//             updatedAccessMenu.push({ menu_id: parsedValue });
+//         }
+
+//         // Centang semua children dari item yang dicentang
+//         if (item.children) {
+//             item.children.forEach((child: any) => {
+//                 if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+//                     updatedAccessMenu.push({ menu_id: child.id });
+//                 }
+//             });
+//         }
+
+//         // Centang parent dan semua parent di atasnya secara rekursif
+//         const checkParentsRecursively = (parentItem: any) => {
+//             if (parentItem && !updatedAccessMenu.some((data: any) => data.menu_id === parentItem.id)) {
+//                 updatedAccessMenu.push({ menu_id: parentItem.id });
+//                 if (parentItem.parent) {
+//                     checkParentsRecursively(parentItem.parent);  // Panggil rekursif untuk parent di atasnya
+//                 }
+//             }
+//         };
+
+//         checkParentsRecursively(parent);
+//     } else {
+//         // Hapus item yang tidak dicentang
+//         updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+
+//         // Uncheck semua children dari item yang di-uncheck
+//         if (item.children) {
+//             item.children.forEach((child: any) => {
+//                 updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+//             });
+//         }
+
+//         // Uncheck parent jika semua children sudah tidak dicentang
+//         const uncheckParentIfNecessary = (parentItem: any) => {
+//             if (parentItem) {
+//                 const allChildrenUnchecked = parentItem.children.every((child: any) =>
+//                     !updatedAccessMenu.some((data: any) => data.menu_id === child.id)
+//                 );
+//                 if (allChildrenUnchecked) {
+//                     updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parentItem.id);
+//                     if (parentItem.parent) {
+//                         uncheckParentIfNecessary(parentItem.parent);  // Panggil rekursif untuk parent di atasnya
+//                     }
+//                 }
+//             }
+//         };
+
+//         uncheckParentIfNecessary(parent);
+//     }
+
+//     // Perbarui state accessMenu
+//     setAccessMenu(updatedAccessMenu);
+// };
+
+
+//ini udah aman sebenarnya
+const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
+    const { value, checked } = e.target;
+    const parsedValue = parseInt(value);
+    let updatedAccessMenu = [...accessMenu];
+
+    if (checked) {
+        // Tambahkan item yang dicentang
+        if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
+            updatedAccessMenu.push({ menu_id: parsedValue });
+        }
+
+        // Centang semua children dari item yang dicentang
+        if (item.children) {
+            item.children.forEach((child: any) => {
+                if (!updatedAccessMenu.some((data: any) => data.menu_id === child.id)) {
+                    updatedAccessMenu.push({ menu_id: child.id });
+                }
+            });
+        }
+
+        // Centang parent dan semua parent di atasnya secara rekursif
+        const checkParentsRecursively = (parentItem: any) => {
+            if (parentItem && !updatedAccessMenu.some((data: any) => data.menu_id === parentItem.id)) {
+                updatedAccessMenu.push({ menu_id: parentItem.id });
+                const parentData = custom_menu.find((menu: any) => menu.id === parentItem.menu_parent_id); // Cari parent berdasarkan menu_parent_id
+                if (parentData) {
+                    checkParentsRecursively(parentData);  // Panggil rekursif untuk parent di atasnya
                 }
             }
+        };
+
+        checkParentsRecursively(parent);
+    } else {
+        // Hapus item yang tidak dicentang
+        updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+
+        // Uncheck semua children dari item yang di-uncheck
+        if (item.children) {
+            item.children.forEach((child: any) => {
+                updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+            });
         }
-    
-        // Pastikan role_id tetap ada dalam updatedAccessMenu meskipun kosong
-        if (updatedAccessMenu.length === 0) {
-            updatedAccessMenu.push({ role_id: roleId });
-        }
-    
-        // Perbarui state accessMenu
-        setAccessMenu(updatedAccessMenu);
-    };
-    
-    const renderMenuEdit = (menu: any) => {
+
+        // Uncheck parent jika semua children sudah tidak dicentang
+        const uncheckParentIfNecessary = (parentItem: any) => {
+            if (parentItem) {
+                const allChildrenUnchecked = parentItem.children.every((child: any) =>
+                    !updatedAccessMenu.some((data: any) => data.menu_id === child.id)
+                );
+                if (allChildrenUnchecked) {
+                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parentItem.id);
+                    const parentData = custom_menu.find((menu: any) => menu.id === parentItem.menu_parent_id); // Cari parent berdasarkan menu_parent_id
+                    if (parentData) {
+                        uncheckParentIfNecessary(parentData);  // Panggil rekursif untuk parent di atasnya
+                    }
+                }
+            }
+        };
+
+        uncheckParentIfNecessary(parent);
+    }
+
+    // Perbarui state accessMenu
+    setAccessMenu(updatedAccessMenu);
+};
+
+
+
+
+       
+    const renderMenuEdit = (menu: any, parent: any = null) => {
         return (
             <div key={menu.id}>
+                {/* Parent Menu */}
                 <div className="flex items-center">
-                    {/* Checkbox untuk parent */}
-                    <Checkbox 
-                        value={menu.id} 
-                        checked={checkChecked(menu.id)} 
-                        onChange={(e) => handleCheckboxChange(e, menu)}  // Memastikan onChange berfungsi
+                    <Checkbox
+                        value={menu.id}
+                        checked={checkChecked(menu.id)}  // Cek status tercentang menggunakan checkChecked
+                        onChange={(e) => handleCheckboxChange(e, menu, parent)}  // Tambahkan parent sebagai argumen
                     />
                     <label className="text-gray-900 ml-3">{menu.menu_name}</label>
                 </div>
-                {/* Cek jika menu ini memiliki children */}
+    
+                {/* Jika menu memiliki children */}
                 {menu.children?.map((child: any) => (
-                    <div className="ml-7 flex items-center" key={child.id}>
-                        {/* Checkbox untuk setiap child */}
-                        <Checkbox 
-                            value={child.id} 
-                            checked={checkChecked(child.id)}  // Memastikan status checkbox untuk child
-                            onChange={(e) => handleCheckboxChange(e, child, menu)}  // Memanggil handleCheckboxChange dengan parent sebagai argumen
-                        />
-                        <label className="text-gray-900 ml-3">{child.menu_name}</label>
+                    <div className="ml-7 pl-4 border-l-2 border-red-400" key={child.id}>
+                        {/* Rekursif render untuk child */}
+                        {renderMenuEdit(child, menu)}
                     </div>
-                ))}
-                {/* Jika child memiliki children, panggil renderMenuEdit secara rekursif */}
-                {menu.children?.map((child: any) => (
-                    child.children && renderMenuEdit(child)  // Rekursif jika child memiliki children
                 ))}
             </div>
         );
     };
     
+
+    // console.log('accessMenu',accessMenu);
     
+    
+
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Role"}>
@@ -600,7 +851,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 onClose={() => setModal({ ...modal, menu: false, detail: true })}
                 title={"Set Mapping"}
                 method={"post"}
-                url={`/roleAccessMenu`}
+                url={`/addAccessMenu/${roleId}`}
                 data={accessMenu}
                 headers={null}
                 submitButtonName={'Submit'}

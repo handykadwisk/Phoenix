@@ -491,6 +491,16 @@ export default function UserManagement({ auth, type }: any) {
     });
 
 
+    const relationSelect = relation.map((el: any) => {
+        return {
+            value: el.RELATION_ORGANIZATION_ID,
+            label: el.RELATION_ORGANIZATION_NAME
+        };
+    })     
+    console.log("dataInputEdit",dataInputEdit);
+    
+
+
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
 
@@ -590,10 +600,10 @@ export default function UserManagement({ auth, type }: any) {
                                         classNames={{
                                             menuButton: () =>
                                                 `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                            menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                             listItem: ({ isSelected }: any) =>
                                                 `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                    ? `text-white bg-primary-pelindo`
+                                                    ? `text-white bg-red-500`
                                                     : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                 }`,
                                         }}
@@ -622,10 +632,10 @@ export default function UserManagement({ auth, type }: any) {
                                             classNames={{
                                                 menuButton: () =>
                                                     `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                 listItem: ({ isSelected }: any) =>
                                                     `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                        ? `text-white bg-primary-pelindo`
+                                                        ? `text-white bg-red-500`
                                                         : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                     }`,
                                             }}
@@ -665,7 +675,7 @@ export default function UserManagement({ auth, type }: any) {
                                                 menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                 listItem: ({ isSelected }: any) =>
                                                     `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                        ? `text-white bg-primary-pelindo`
+                                                        ? `text-white bg-red-500`
                                                         : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                     }`,
                                             }}
@@ -695,19 +705,25 @@ export default function UserManagement({ auth, type }: any) {
                                             classNames={{
                                                 menuButton: () =>
                                                     `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                 listItem: ({ isSelected }: any) =>
                                                     `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                        ? `text-white bg-primary-pelindo`
+                                                        ? `text-white bg-red-500`
                                                         : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                     }`,
                                             }}
                                             options={roleFor}
                                             isSearchable={true}
                                             isMultiple={true}
-                                            placeholder={"Select"}
+                                            placeholder={"Select Role"}
                                             isClearable={true}
-                                            value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id)) || null}
+                                            // value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id)) || null}
+                                            value={
+                                                dataInput.role.length > 0
+                                                    ? dataInput.role.map((id: any) => 
+                                                        roleFor.find((role: { value: any }) => role.value === id)) 
+                                                    : null // Set to null if no roles selected
+                                            }
                                             onChange={handleRoleChange}
                                             primaryColor={"red"}
 
@@ -901,7 +917,7 @@ export default function UserManagement({ auth, type }: any) {
                                             />
                                             <div className="ml-[4.6rem] text-red-600">*</div>
                                         </div>
-                                        <select
+                                        {/* <select
                                             className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={dataInputEdit?.employee_id || ''} // Pastikan value berasal dari dataInputEdit
                                             onChange={handleEmployeeChangeEdit} // Menggunakan function handleEmployeeChange
@@ -913,7 +929,27 @@ export default function UserManagement({ auth, type }: any) {
                                                     </option>
                                                 );
                                             })}
-                                        </select>
+                                        </select> */}
+                                        <Select
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                            menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                }`,
+                                        }}
+                                        options={selectEmployee}
+                                        isSearchable={true}
+                                        isMultiple={false}
+                                        placeholder={"Select Employee"}
+                                        isClearable={true}
+                                        value={selectEmployee.find((emp: { value: any }) => emp.value === dataInputEdit.employee_id) || null}
+                                        onChange={handleEmployeeChange}
+                                        primaryColor={"red"}
+                                    />
                                     </div>
                                     {/* Employee */}
 
@@ -931,10 +967,10 @@ export default function UserManagement({ auth, type }: any) {
                                                     classNames={{
                                                         menuButton: () =>
                                                             `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                        menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                         listItem: ({ isSelected }: any) =>
                                                             `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                                ? `text-white bg-primary-pelindo`
+                                                                ? `text-white bg-red-500`
                                                                 : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                             }`,
                                                     }}
@@ -974,10 +1010,10 @@ export default function UserManagement({ auth, type }: any) {
                                                 classNames={{
                                                     menuButton: () =>
                                                         `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                    menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                     listItem: ({ isSelected }: any) =>
                                                         `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                            ? `text-white bg-primary-pelindo`
+                                                            ? `text-white bg-red-500`
                                                             : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                         }`,
                                                 }}
@@ -1012,10 +1048,10 @@ export default function UserManagement({ auth, type }: any) {
                                                 classNames={{
                                                     menuButton: () =>
                                                         `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                    menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                     listItem: ({ isSelected }: any) =>
                                                         `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
-                                                            ? `text-white bg-primary-pelindo`
+                                                            ? `text-white bg-red-500`
                                                             : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
                                                         }`,
                                                 }}
@@ -1053,7 +1089,7 @@ export default function UserManagement({ auth, type }: any) {
                                             />
                                             <div className="ml-[9.7rem] text-red-600">*</div>
                                         </div>
-                                        <select
+                                        {/* <select
                                             className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={dataInputEdit?.individual_relations_id}
                                             onChange={handleRelationChange
@@ -1072,7 +1108,34 @@ export default function UserManagement({ auth, type }: any) {
                                                 })
                                             }
 
-                                        </select>
+                                        </select> */}
+                                        <Select
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                            menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                }`,
+                                        }}
+                                        options={relationSelect}
+                                        isSearchable={true}
+                                        isMultiple={false}
+                                        placeholder={"Select Relation Organization"}
+                                        isClearable={true}
+                                        value={relationSelect.find((emp: { value: any }) => emp.value === dataInputEdit.individual_relations_id) || null}
+                                        onChange={
+                                            (val: any) => {
+                                                setDataInputEdit({
+                                                    ...dataInputEdit,
+                                                    individual_relations_id: val.value
+                                                });
+                                            }
+                                        }
+                                        primaryColor={"red"}
+                                    />
                                     </div>
                                     {/* company */}
                                 </>
@@ -1264,7 +1327,7 @@ export default function UserManagement({ auth, type }: any) {
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
-                                    flex: 1.5,
+                                    flex: 4,
                                 },
                                 {
                                     headerName: "Login User",
@@ -1280,8 +1343,20 @@ export default function UserManagement({ auth, type }: any) {
                                 },
                                 {
                                     headerName: "Type",
-                                    field: "type.user_type_name",
+                                    field: "user_type_id",
                                     flex: 7,
+                                    valueGetter: (params: any) => {
+                                        // console.log(params.data.type.user_type_name,'<<<<');
+                                        
+                                        return params.data ? params.data.type.user_type_name : null;
+                                    },
+                                    cellRenderer: (params: any) => {
+                                        // Return type name for display purposes
+                                        if (params.data && params.data && params.data.type && params.data.type.user_type_name) {
+                                            return params.data.type.user_type_name;
+                                        }
+                                        return 'Unknown'; // Default display if no user type name
+                                    }
 
                                 }
                             ]}

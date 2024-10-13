@@ -26,12 +26,13 @@ class TPermissionController extends Controller
         //             $data->where('PERMISSION_NAME', 'like', '%'.$searchQuery->PERMISSION_NAME.'%');
         //     }
         // } 
-        // // dd($data->toSql());
+        // dd($data->toSql());
         // return $data->paginate($dataPerPage);
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
-        $query = TPermission::orderBy('PERMISSION_ID', 'DESC');
+        // $query = TPermission::orderBy('PERMISSION_ID', 'DESC');
+        $query = TPermission::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
         

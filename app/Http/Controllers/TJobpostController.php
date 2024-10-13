@@ -136,7 +136,7 @@ class TJobpostController extends Controller
 
     public function getAllJobpost()
     {
-        $data = TJobpost::with('children')->get();
+        $data = TJobpost::with('children')->where('jobpost_status', 1)->get();
         return response()->json($data);
     }
 

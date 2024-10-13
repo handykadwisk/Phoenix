@@ -47,7 +47,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected $with = ['employee','jobpost'];
+    protected $with = ['employee','jobpost','type'];
 
     public function employee(): BelongsTo
     {

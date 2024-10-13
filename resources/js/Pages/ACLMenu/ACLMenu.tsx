@@ -31,9 +31,13 @@ import DetailMenu from "./DetailMenu";
 import SequenceEdit from "@/Components/sequenceEdit";
 import AGGrid from "@/Components/AgGrid";
 import { get } from "jquery";
+import { set } from "react-datepicker/dist/date_utils";
+import Select from "react-tailwindcss-select";
 
 export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
+
+    const [refreshGrid, setRefreshGrid] = useState<any>("");
     const [show, setShow] = useState<any>([]);
     const getmenusShow = async () => {
         try {
@@ -137,16 +141,71 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
     };
 
     // Fungsi untuk menghapus input pencarian dan menampilkan semua data
-    const clearSearch = (e: React.MouseEvent) => {
-        // Kosongkan input pencarian
+    const clearSearch = async (e: FormEvent) => {
+        e.preventDefault();
         inputDataSearch("jobpost_title", "", 0);
-        // Reset flag untuk menampilkan semua data
         inputDataSearch("flag", "", 0);
-        setIsSuccess("Cleared");
+        setRefreshGrid("success");
+        setTimeout(() => {
+            setRefreshGrid("");
+        }, 1000);
     };
 
     const [isSuccess, setIsSuccess] = useState<any>("");
-    const handleSuccessMenu = (message: string) => {
+
+    // const handleSuccessMenu = (message: string) => {
+    //     setIsSuccess('');
+
+    //     if (message !== '') {
+    //         setIsSuccess(message[0]);
+    //         setTimeout(() => {
+    //             setIsSuccess('');
+    //         }, 5000);
+
+    //         getComboMenu();
+
+    //         setRefreshGrid("success");
+    //         setTimeout(() => {
+    //             setRefreshGrid("");
+    //         }, 1000);
+
+
+    //     }
+    // };
+
+    const handleSuccessMenu = (message: string, e: any) => {
+        setIsSuccess('');
+        if (message !== '') {
+            setIsSuccess(message[0])
+            setTimeout(() => {
+                setIsSuccess('')
+            }, 5000)
+            setRefreshGrid("success");
+            setTimeout(() => {
+                setRefreshGrid("");
+            }, 1000);
+        }
+        //get combo menu
+        getComboMenu();
+        Swal.fire({
+            title: `${message[0]} Please Arrange the Sequence`,
+            icon: 'info',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            willClose: () => {
+                setModal({
+                    add: false,
+                    edit: false,
+                    detail: false,
+                    sequence: true,
+                });
+            }
+        });
+    };
+
+
+    const handleSuccessMenuSeq = (message: string) => {
         setIsSuccess('')
         // getMenu()
         if (message !== '') {
@@ -155,6 +214,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 setIsSuccess('')
             }, 5000)
         }
+        window.location.reload();
     }
 
 
@@ -176,6 +236,13 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
     }
 
+    const optionsParent = show.map((mData: any, i: number) => {
+        return {
+            value: mData.id,
+            label: mData.text_combo,
+        };
+    });
+
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Menu"}>
@@ -189,23 +256,21 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             )}
 
             {/* modal Add */}
-            <ModalToAdd
-                buttonAddOns={''}
+            <ModalToAction
+                submitButtonName={'Submit'}
+                headers={"Add Menu"}
+                method="POST"
                 show={modal.add}
                 onClose={
                     () => {
 
-                        setModal({
-                            add: false,
-                            edit: false,
-                            detail: false,
-                            sequence: false,
-                        })
+                        setModal({ ...modal, add: false })
 
                         setData({
                             menu_name: "",
                             menu_url: "",
                         })
+
                     }
                 }
                 title={"Add Menu"}
@@ -225,7 +290,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     htmlFor="name_parent"
                                     value={"Parent"}
                                 />
-                                <select
+                                {/* <select
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={data.menu_parent}
                                     onChange={(e) => {
@@ -242,7 +307,30 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                             </option>
                                         );
                                     })}
-                                </select>
+                                </select> */}
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                ? `text-white bg-primary-pelindo`
+                                                : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                            }`,
+                                    }}
+                                    options={optionsParent}
+                                    isSearchable={true}
+                                    isMultiple={false}
+                                    placeholder={"Choose Parent"}
+                                    isClearable={true}
+                                    value={optionsParent.find((el: { value: any }) => el.value === data.menu_parent) || null}
+                                    onChange={(val: any) => {
+                                        setData("menu_parent", val ? val.value : null);
+                                    }}
+                                    primaryColor={"red"}
+                                />
+
                             </div>
                             <div className="mt-2">
                                 <InputLabel
@@ -297,18 +385,12 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 show={modal.sequence}
                 onClose={
                     () =>
-                        setModal({
-                            add: false,
-                            edit: false,
-                            detail: false,
-                            sequence: false,
-                        })
-
+                        setModal({ ...modal, sequence: false })
                 }
                 title={"Sort Sequence"}
                 url={`/setting/changeSeqMenu`}
                 data={seqMenu}
-                onSuccess={handleSuccessMenu}
+                onSuccess={handleSuccessMenuSeq}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
                 }
@@ -356,28 +438,21 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                     </div>
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[100%]">
                         <TextInput
-                            id="menu_name"
                             type="text"
-                            name="menu_name"
-                            value={searchMenu.menu_search[0].menu_name}
+                            value={searchMenu.menu_search[0].menu_name === "" ? "" : searchMenu.menu_search[0].menu_name}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) => {
                                 inputDataSearch("menu_name", e.target.value, 0)
-                            }
-                            }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    const name = searchMenu.menu_search[0].menu_name;
-                                    const id = searchMenu.menu_search[0].id;
-                                    if (name || id) {
-                                        inputDataSearch("flag", name || id, 0);
-                                        setIsSuccess("success");
-                                    } else {
-                                        inputDataSearch("flag", "", 0);
-                                        setIsSuccess("Get All Menu");
-                                    }
+                                if (
+                                    searchMenu.menu_search[0]
+                                        .menu_name === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
                                 }
-                            }}
+                            }
+                            }
                             placeholder="Search Menu Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
@@ -394,14 +469,27 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                     }
-                                    setIsSuccess("Search");
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
                                 }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={(e) => clearSearch(e)}
+                                onClick={() => {
+                                    // Clear the search field and reset the flag
+                                    inputDataSearch("menu_name", "", 0);
+                                    inputDataSearch("flag", "", 0);
+
+                                    // Refresh the grid to show the default data (without search filters)
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }}
                             >
                                 Clear Search
                             </div>
@@ -421,7 +509,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                             // loading={isLoading.get_policy}
                             url={"getMenusJson"}
                             doubleClickEvent={handleDetailMenu}
-                            triggeringRefreshData={isSuccess}
+                            triggeringRefreshData={refreshGrid}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -451,10 +539,29 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     field: "menu_url",
                                     flex: 4,
                                 },
+                                // {
+                                //     headerName: "Parent",
+                                //     field: "parent.menu_name",
+                                //     flex: 3,
+                                //     cellRenderer: (params: any) => {
+                                //         return params.value || 'as parent';
+                                //     }
+                                // },
                                 {
                                     headerName: "Parent",
-                                    field: "parent.menu_name",
+                                    field: "menu_parent_id",
                                     flex: 3,
+                                    valueGetter: (params: any) => {
+                                        // Return menu_parent_id for sorting purposes
+                                        return params.data ? params.data.menu_parent_id : null;
+                                    },
+                                    cellRenderer: (params: any) => {
+                                        // Return parent menu name for display purposes
+                                        if (params.data && params.data.parent && params.data.parent.menu_name) {
+                                            return params.data.parent.menu_name;
+                                        }
+                                        return 'as parent'; // Default display if no parent
+                                    }
                                 },
                                 {
                                     headerName: "Sequence",

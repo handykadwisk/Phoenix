@@ -18,6 +18,7 @@ export default function ModalEdit({
     classPanel = "",
     buttonAddOns,
     toggleMenuDeleteStatus= () => {},
+    actionDelete,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -30,6 +31,7 @@ export default function ModalEdit({
     onSuccess: any;
     buttonAddOns: any;
     toggleMenuDeleteStatus:any
+    actionDelete?:any
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<string>("");
@@ -89,7 +91,7 @@ export default function ModalEdit({
                     </Transition.Child>
 
                     <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 ">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"
@@ -104,7 +106,7 @@ export default function ModalEdit({
                                     // style={{ maxWidth: "65%" }}
                                 >
                                     <form onSubmit={action}>
-                                        <div className="bg-gray-100 p-6 sm:pb-4">
+                                        <div className="bg-gray-100 px-4 pb-4 pt-3 sm:pb-4">
                                             <div className="flex justify-between">
                                                 <div className="px-1">
                                                     <Dialog.Title
@@ -147,7 +149,7 @@ export default function ModalEdit({
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
                                                     disabled={isProcessing}
-                                                    onClick={() => toggleMenuDeleteStatus(data.id)}
+                                                    onClick={(e) => actionDelete(e,data.id, buttonAddOns)}
                                                 >
                                                     {buttonAddOns}
                                                     
