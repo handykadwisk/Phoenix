@@ -723,6 +723,7 @@ export default function ModalChatMessage({
 
             // action for status read dan read date
             actionUpdateReadMention(itemsChatId, userId);
+            setShowTarget(true);
             setDataTarget({
                 ...dataTarget,
                 TEXT_MESSAGE: itemsMessage,
@@ -774,7 +775,7 @@ export default function ModalChatMessage({
     };
 
     // for target
-    const [showTarget, setShowTarget] = useState<boolean>(true);
+    const [showTarget, setShowTarget] = useState<boolean>(false);
     // data select target
     const [dataTarget, setDataTarget] = useState<any>({
         TEXT_MESSAGE: "",
@@ -857,7 +858,9 @@ export default function ModalChatMessage({
                                                                 }
                                                             );
                                                             setTextReply(false);
-                                                            setShowTarget(true);
+                                                            setShowTarget(
+                                                                false
+                                                            );
                                                         }}
                                                     >
                                                         <ArrowLeftIcon className="w-6" />
@@ -2012,8 +2015,8 @@ export default function ModalChatMessage({
                                                                                                     true &&
                                                                                                 activeIndex ===
                                                                                                     i
-                                                                                                    ? "hover:bg-red-600 bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 text-white mb-2"
-                                                                                                    : "hover:bg-red-600 cursor-pointer rounded-md hover:text-white text-sm p-1 mb-2"
+                                                                                                    ? "bg-red-600 rounded-md hover:text-white text-sm p-1 text-white mb-2"
+                                                                                                    : "rounded-md text-sm p-1 mb-2"
                                                                                             }
                                                                                         >
                                                                                             <div className="flex justify-between items-center">
@@ -2046,25 +2049,35 @@ export default function ModalChatMessage({
                                                                                                                             items.CHAT_DETAIL_USER_TO,
                                                                                                                             items
                                                                                                                                 .t_chat_detail
-                                                                                                                                .CHAT_DETAIL_TEXT
+                                                                                                                                .CHAT_DETAIL_TEXT,
+                                                                                                                            items.CHAT_DETAIL_ID
                                                                                                                         );
                                                                                                                     }}
                                                                                                                     className="text-xs text-gray-400"
                                                                                                                 >
-                                                                                                                    <span>
-                                                                                                                        {items
-                                                                                                                            .t_chat_detail
-                                                                                                                            .t_user
-                                                                                                                            .name +
-                                                                                                                            ": "}
-                                                                                                                    </span>
-                                                                                                                    <span>
-                                                                                                                        {
-                                                                                                                            items
-                                                                                                                                .t_chat_detail
-                                                                                                                                .CHAT_DETAIL_TEXT
+                                                                                                                    <div
+                                                                                                                        className={
+                                                                                                                            items.CHAT_DETAIL_USER_REPLY_DATE ===
+                                                                                                                            null
+                                                                                                                                ? "bg-yellow-200 p-1 rounded-md mb-1 text-black hover:bg-yellow-100 cursor-pointer"
+                                                                                                                                : ""
                                                                                                                         }
-                                                                                                                    </span>
+                                                                                                                    >
+                                                                                                                        <span>
+                                                                                                                            {items
+                                                                                                                                .t_chat_detail
+                                                                                                                                .t_user
+                                                                                                                                .name +
+                                                                                                                                ": "}
+                                                                                                                        </span>
+                                                                                                                        <span>
+                                                                                                                            {
+                                                                                                                                items
+                                                                                                                                    .t_chat_detail
+                                                                                                                                    .CHAT_DETAIL_TEXT
+                                                                                                                            }
+                                                                                                                        </span>
+                                                                                                                    </div>
                                                                                                                 </div>
                                                                                                             );
                                                                                                         }

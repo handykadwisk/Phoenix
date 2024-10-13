@@ -19,8 +19,6 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`phoenix` /*!40100 DEFAULT CHARACTER SET
 insert  into `r_plugin_process`(`PLUGIN_PROCESS_ID`,`PLUGIN_PROCESS_NAME`,`PLUG_PROCESS_CLASS`,`PLUGIN_PROCESS_DESCRIPTION`) values 
 (1,'Chat','cls_attach_chat',NULL),
 (2,'Task','cls_attach_task',NULL),
-(3,'Reminder','cls_attach_reminder',NULL),
-(4,'Document','cls_attach_document',NULL);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
