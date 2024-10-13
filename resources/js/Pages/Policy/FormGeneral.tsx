@@ -1630,7 +1630,8 @@ export default function FormGeneral({
                 data.map((val: any, i: number) => {
                     policy_insured_detail.push({
                         INTEREST_INSURED_ID: val["INTEREST_INSURED_ID"],
-                        REMARKS: val["REMARKS"],
+                        // REMARKS: val["REMARKS"],
+                        REMARKS: val["REMARKS"]? val["REMARKS"] : "",
                         POLICY_COVERAGE_ID: val["POLICY_COVERAGE_ID"],
                         CURRENCY_ID: val["CURRENCY_ID"],
                         PREMIUM_AMOUNT: val["INSURER_NETT_PREMIUM"],
@@ -10250,7 +10251,7 @@ export default function FormGeneral({
                                             scope="col"
                                             className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
                                         >
-                                            Payable{" "}
+                                            Tax Payable{" "}
                                             <span className="text-red-600">
                                                 *
                                             </span>

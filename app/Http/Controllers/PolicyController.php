@@ -79,6 +79,57 @@ class PolicyController extends Controller
         ]);
     }
 
+    public function getPolicyForAgGrid(Request $request)
+    {
+        // dd($request);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+        $sortModel = $request->input('sort');
+
+        $query = DB::table('t_policy as p')->leftJoin('t_relation as r', 'p.RELATION_ID', '=', 'r.RELATION_ORGANIZATION_ID');
+            
+        $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);        
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
+            }
+        } else {
+            $query->orderBy('POLICY_ID', 'DESC'); 
+        }
+
+        if ($request->newFilter !== "") {
+            // if ($newSearch[0]["flag"] !== "") {
+            //     $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            // }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'POLICY_NUMBER') {
+                        // echo "POLICY_NUMBER: ";
+                        // print_r($searchValue);
+                        if ($searchValue != "") {
+                            $query->where('POLICY_NUMBER', 'LIKE', '%' . $searchValue . '%');
+                        }                        
+                    }elseif ($keyId === 'CLIENT_ID'){
+                        // echo " | CLIENT_ID: ";
+                        // print_r($searchValue);
+                        if ($searchValue != "") {
+                            $query->where('RELATION_ID', $searchValue);
+                        }
+                    }
+                }
+            // }
+        }
+        // print_r($query->toSql());
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        return $data;
+    }
+
     public function getPolicyDataForJSON(Request $request) {
         $data = $this->getPolicyData(10, $request);
         return response()->json($data);
@@ -121,37 +172,37 @@ class PolicyController extends Controller
             ]);
         }        
         
-        // Create Policy
-        $policy = Policy::insertGetId([
-            'RELATION_ID'           => $request->relation_id,
-            'POLICY_NUMBER'         => trim($request->policy_number),
-            'INSURANCE_TYPE_ID'     => $request->insurance_type_id,
-            'POLICY_THE_INSURED'    => $request->policy_the_insured,
-            'POLICY_INCEPTION_DATE' => $request->policy_inception_date,
-            'POLICY_DUE_DATE'       => $request->policy_due_date,
-            'POLICY_STATUS_ID'      => $request->policy_status_id,
-            'POLICY_TYPE'           => $request->policy_type,
-            'SELF_INSURED'          => $request->self_insured,
-            'POLICY_CREATED_BY'      => Auth::user()->id
-        ]);
-
-        // print_r(Auth::user());
+        $policy_id = DB::transaction(function () use ($request) {
+            // Create Policy
+            $policy = Policy::insertGetId([
+                'RELATION_ID'           => $request->relation_id,
+                'POLICY_NUMBER'         => trim($request->policy_number),
+                'INSURANCE_TYPE_ID'     => $request->insurance_type_id,
+                'POLICY_THE_INSURED'    => $request->policy_the_insured,
+                'POLICY_INCEPTION_DATE' => $request->policy_inception_date,
+                'POLICY_DUE_DATE'       => $request->policy_due_date,
+                'POLICY_STATUS_ID'      => $request->policy_status_id,
+                'POLICY_TYPE'           => $request->policy_type,
+                'SELF_INSURED'          => $request->self_insured,
+                'POLICY_CREATED_BY'      => Auth::user()->id
+            ]);
         
-        // Created Log
-        UserLog::create([
-            'created_by' => Auth::user()->id,
-            'action'     => json_encode([
-                "description" => "Created (Policy).",
-                "module"      => "Policy",
-                "id"          => $policy
-            ]),
-            'action_by'  => Auth::user()->user_login
-        ]);
-
+            // Created Log
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Created (Policy).",
+                    "module"      => "Policy",
+                    "id"          => $policy
+                ]),
+                'action_by'  => Auth::user()->user_login
+            ]);
+            return $policy;
+        });
 
         return new JsonResponse([
             "msg" => "Success Registered Policy",
-            "id" => $policy
+            "id" => $policy_id
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -216,82 +267,83 @@ class PolicyController extends Controller
                 'X-Inertia' => true
             ]);
         }
-        
-        $policy = Policy::where('policy_id', $request->id)
-                        ->update([
-                            'RELATION_ID'           => $request->RELATION_ID,
-                            'POLICY_NUMBER'         => trim($request->POLICY_NUMBER),
-                            'INSURANCE_TYPE_ID'     => $request->INSURANCE_TYPE_ID,
-                            'POLICY_THE_INSURED'    => $request->POLICY_THE_INSURED,
-                            'POLICY_INCEPTION_DATE' => $request->POLICY_INCEPTION_DATE,
-                            'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
-                            'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
-                            'POLICY_TYPE'           => $request->POLICY_TYPE,
-                            'SELF_INSURED'          => $request->SELF_INSURED,
-                            'POLICY_UPDATED_BY'     => Auth::user()->id,
-                            'POLICY_UPDATED_DATE'   => now()
-                        ]);
-                        
-        foreach ($request->policy_premium as $req) {
+        DB::transaction(function () use ($request) {
+            $policy = Policy::where('policy_id', $request->id)
+                            ->update([
+                                'RELATION_ID'           => $request->RELATION_ID,
+                                'POLICY_NUMBER'         => trim($request->POLICY_NUMBER),
+                                'INSURANCE_TYPE_ID'     => $request->INSURANCE_TYPE_ID,
+                                'POLICY_THE_INSURED'    => $request->POLICY_THE_INSURED,
+                                'POLICY_INCEPTION_DATE' => $request->POLICY_INCEPTION_DATE,
+                                'POLICY_DUE_DATE'       => $request->POLICY_DUE_DATE,
+                                'POLICY_STATUS_ID'      => $request->POLICY_STATUS_ID,
+                                'POLICY_TYPE'           => $request->POLICY_TYPE,
+                                'SELF_INSURED'          => $request->SELF_INSURED,
+                                'POLICY_UPDATED_BY'     => Auth::user()->id,
+                                'POLICY_UPDATED_DATE'   => now()
+                            ]);
+                            
+            foreach ($request->policy_premium as $req) {
+                
+                MPolicyPremium::updateOrCreate(
+                    [
+                        'POLICY_INITIAL_PREMIUM_ID'    => $req['POLICY_INITIAL_PREMIUM_ID']
+                    ],
+                    [
+                        'POLICY_ID' => $req['POLICY_ID'],
+                        'CURRENCY_ID' => $req['CURRENCY_ID'],
+                        'COVERAGE_NAME' => $req['COVERAGE_NAME'],
+                        'GROSS_PREMI' => $req['GROSS_PREMI'],
+                        'ADMIN_COST' => $req['ADMIN_COST'],
+                        'DISC_BROKER' => $req['DISC_BROKER'],
+                        'DISC_CONSULTATION' => $req['DISC_CONSULTATION'],
+                        'DISC_ADMIN' => $req['DISC_ADMIN'],
+                        'NETT_PREMI' => $req['NETT_PREMI'],
+                        'FEE_BASED_INCOME' => $req['FEE_BASED_INCOME'],
+                        'AGENT_COMMISION' => $req['AGENT_COMMISION'],
+                        'ACQUISITION_COST' => $req['ACQUISITION_COST'],
+                        'UPDATED_BY' => Auth::user()->id,
+                        'UPDATED_DATE' => now()
+                    ]
+                );
+            }
             
-            MPolicyPremium::updateOrCreate(
-                [
-                    'POLICY_INITIAL_PREMIUM_ID'    => $req['POLICY_INITIAL_PREMIUM_ID']
-                ],
-                [
-                    'POLICY_ID' => $req['POLICY_ID'],
-                    'CURRENCY_ID' => $req['CURRENCY_ID'],
-                    'COVERAGE_NAME' => $req['COVERAGE_NAME'],
-                    'GROSS_PREMI' => $req['GROSS_PREMI'],
-                    'ADMIN_COST' => $req['ADMIN_COST'],
-                    'DISC_BROKER' => $req['DISC_BROKER'],
-                    'DISC_CONSULTATION' => $req['DISC_CONSULTATION'],
-                    'DISC_ADMIN' => $req['DISC_ADMIN'],
-                    'NETT_PREMI' => $req['NETT_PREMI'],
-                    'FEE_BASED_INCOME' => $req['FEE_BASED_INCOME'],
-                    'AGENT_COMMISION' => $req['AGENT_COMMISION'],
-                    'ACQUISITION_COST' => $req['ACQUISITION_COST'],
-                    'UPDATED_BY' => Auth::user()->id,
-                    'UPDATED_DATE' => now()
-                ]
-            );
-        }
-        
-        if ($request->deletedPolicyPremium) {
-            foreach ($request->deletedPolicyPremium as $del) {
-                MPolicyPremium::where('POLICY_INITIAL_PREMIUM_ID', $del['policy_initial_premium_id'])->delete();
+            if ($request->deletedPolicyPremium) {
+                foreach ($request->deletedPolicyPremium as $del) {
+                    MPolicyPremium::where('POLICY_INITIAL_PREMIUM_ID', $del['policy_initial_premium_id'])->delete();
+                }
             }
-        }
 
-        foreach ($request->policy_installment as $req2) {
-            PolicyInstallment::updateOrCreate(
-                [
-                    'POLICY_INSTALLMENT_ID'    => $req2['POLICY_INSTALLMENT_ID']
-                ],
-                [
-                    'POLICY_ID' => $req2['POLICY_ID'],
-                    'POLICY_INSTALLMENT_TERM' => $req2['POLICY_INSTALLMENT_TERM'],
-                    'POLICY_INSTALLMENT_PERCENTAGE' => $req2['POLICY_INSTALLMENT_PERCENTAGE'],
-                    'INSTALLMENT_DUE_DATE' => $req2['INSTALLMENT_DUE_DATE']
-                ]
-            );
-        }
-        
-        if ($request->deletedInstallment) {
-            foreach ($request->deletedInstallment as $del2) {
-                PolicyInstallment::where('POLICY_INSTALLMENT_ID', $del2['POLICY_INSTALLMENT_ID'])->delete();
+            foreach ($request->policy_installment as $req2) {
+                PolicyInstallment::updateOrCreate(
+                    [
+                        'POLICY_INSTALLMENT_ID'    => $req2['POLICY_INSTALLMENT_ID']
+                    ],
+                    [
+                        'POLICY_ID' => $req2['POLICY_ID'],
+                        'POLICY_INSTALLMENT_TERM' => $req2['POLICY_INSTALLMENT_TERM'],
+                        'POLICY_INSTALLMENT_PERCENTAGE' => $req2['POLICY_INSTALLMENT_PERCENTAGE'],
+                        'INSTALLMENT_DUE_DATE' => $req2['INSTALLMENT_DUE_DATE']
+                    ]
+                );
             }
-        }
+            
+            if ($request->deletedInstallment) {
+                foreach ($request->deletedInstallment as $del2) {
+                    PolicyInstallment::where('POLICY_INSTALLMENT_ID', $del2['POLICY_INSTALLMENT_ID'])->delete();
+                }
+            }
 
-        UserLog::create([
-            'created_by' => Auth::user()->id,
-            'action'     => json_encode([
-                "description" => "Edit policy.",
-                "module"      => "Policy",
-                "id"          => $request->id
-            ]),
-            'action_by'  => Auth::user()->user_login
-        ]);
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Edit policy.",
+                    "module"      => "Policy",
+                    "id"          => $request->id
+                ]),
+                'action_by'  => Auth::user()->user_login
+            ]);
+        });
 
         return new JsonResponse([
             "msg" => "Success Edit Policy",
