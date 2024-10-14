@@ -32,7 +32,7 @@ export default function Login({
 
         post(route("login"));
     };
-    console.log(errors);
+    // console.log(errors);
     
 
     return (

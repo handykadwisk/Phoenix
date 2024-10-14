@@ -189,7 +189,7 @@ class TEmployeeController extends Controller
                 "module"      => "Employee",
                 "id"          => $employee->EMPLOYEE_ID,
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -290,7 +290,7 @@ class TEmployeeController extends Controller
                 "module"      => "Employee",
                 "id"          =>  $request->EMPLOYEE_ID,
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -332,7 +332,7 @@ class TEmployeeController extends Controller
                 "module"      => "Employee",
                 "id"          => $request->EMPLOYEE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -374,7 +374,7 @@ class TEmployeeController extends Controller
                 "module"      => "Employee",
                 "id"          => $request->EMPLOYEE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([

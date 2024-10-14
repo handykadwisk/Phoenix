@@ -94,7 +94,7 @@ class TCompanyDivisionController extends Controller
                 "module"      => "Division",
                 "id"          => $division->COMPANY_DIVISION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -141,7 +141,7 @@ class TCompanyDivisionController extends Controller
                 "module"      => "Division",
                 "id"          => $request->COMPANY_DIVISION_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 

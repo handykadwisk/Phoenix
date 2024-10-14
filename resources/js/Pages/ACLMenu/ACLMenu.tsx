@@ -61,6 +61,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             }
         ]
     });
+    
     const [comboMenu, setComboMenu] = useState<any>([]);
 
     const [detailMenu, setDetailMenu] = useState<any>({
@@ -439,7 +440,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[100%]">
                         <TextInput
                             type="text"
-                            value={searchMenu.menu_search[0].menu_name === "" ? "" : searchMenu.menu_search[0].menu_name}
+                            value={searchMenu.menu_search[0].menu_name}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) => {
                                 inputDataSearch("menu_name", e.target.value, 0)
@@ -453,6 +454,23 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                 }
                             }
                             }
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    const title = searchMenu.menu_search[0].menu_name;
+                                    const id = searchMenu.menu_search[0].id;
+                                    if (title || id) {
+                                        inputDataSearch("flag", title || id, 0);
+                                        setIsSuccess("success");
+                                        setTimeout(() => {
+                                            setIsSuccess("");
+                                        }, 5000);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Permission");
+                                    }
+                                }
+                            }}
+                            // onKeyDo
                             placeholder="Search Menu Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
@@ -509,7 +527,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                             // loading={isLoading.get_policy}
                             url={"getMenusJson"}
                             doubleClickEvent={handleDetailMenu}
-                            triggeringRefreshData={refreshGrid}
+                            triggeringRefreshData={isSuccess}
                             colDefs={[
                                 {
                                     headerName: "No.",

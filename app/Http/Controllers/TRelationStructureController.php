@@ -79,7 +79,7 @@ class TRelationStructureController extends Controller
                 "module"      => "Structure",
                 "id"          => $structure->RELATION_STRUCTURE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 
@@ -128,7 +128,7 @@ class TRelationStructureController extends Controller
                 "module"      => "Structure",
                 "id"          => $request->RELATION_STRUCTURE_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
 

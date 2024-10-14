@@ -142,7 +142,6 @@ export default function DetailGroup({
         };
     });
 
-    console.log(dataById);
     
     
     return (

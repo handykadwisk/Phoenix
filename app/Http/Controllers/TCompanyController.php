@@ -85,6 +85,11 @@ class TCompanyController extends Controller
         return response()->json($data);
     }
 
+    public function getAllCompanyJson(){
+        $data = TCompany::get();
+        return response()->json($data);
+    }
+
     // add company to database
     public function store(Request $request){
 
@@ -109,7 +114,7 @@ class TCompanyController extends Controller
                 "module"      => "Company",
                 "id"          => $company->COMPANY_ID
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([

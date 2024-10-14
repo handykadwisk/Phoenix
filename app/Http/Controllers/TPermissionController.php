@@ -19,7 +19,6 @@ class TPermissionController extends Controller
 
     // Get Data Paginate and Search
     public function getPermissionData($request){
-
         // $data = TPermission::orderBy('PERMISSION_ID', 'DESC');
         // if ($searchQuery) {
         //     if ($searchQuery->input('PERMISSION_NAME')) {
@@ -35,6 +34,8 @@ class TPermissionController extends Controller
         $query = TPermission::query();
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
+        $newFilter = $request->input('newFilter', '');
+        $newSearch = json_decode($request->newFilter, true);
         
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -48,6 +49,19 @@ class TPermissionController extends Controller
             foreach ($filterModel as $colId => $filterValue) {
                 $query->where($colId, 'LIKE', '%' . $filterValue . '%');
             }
+        }
+        if ($newFilter !== "") {
+            foreach ($newSearch as $search) {
+            foreach ($search as $keyId => $searchValue) {
+                // Pencarian berdasarkan nama menu
+                if ($keyId === 'PERMISSION_NAME') {
+                $query->where('PERMISSION_NAME', 'LIKE', '%' . $searchValue . '%');
+                }
+            }
+            }
+        }
+        if (!$sortModel && !$filterModel) {
+            $query->orderBy('PERMISSION_ID', 'desc');
         }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);

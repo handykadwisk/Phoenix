@@ -67,6 +67,7 @@ extends Controller
             }
             }
         }
+        
         if (!$sortModel && !$filterModel) {
             $query->orderBy('id', 'desc');
         }
@@ -102,9 +103,7 @@ extends Controller
                 'X-Inertia' => true
             ]);
         }
-        // Log::info(Auth::user()->id);
-        // Auth::user()->id;
-
+        
         $name = $request->name;
         if($name === null || $name === ''){
             $name = $request->user_login;
@@ -112,12 +111,13 @@ extends Controller
         $User = User::create([  
             "role_id" => 0,
             "name" => $name,  // Tambahkan name di sini
-            'employee_id'=>$request->employee_id,
-            'company_division_id'=>$request->company_division_id,
-            'individual_relation_id'=>$request->individual_relations_id,
+            'employee_id' => $request->employee_id == 0 ? null : $request->employee_id,
+            'company_division_id' => $request->company_division_id == 0 ? null : $request->company_division_id,
+            'individual_relation_id'=>$request->individual_relations_id == 0 ? null : $request->individual_relations_id,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
-            'jobpost_id'=>$request->jobpost,
+            'jobpost_id'=>$request->jobpost == 0 ? null : $request->jobpost,
+            'company_id'=>$request->company_id == 0 ? null : $request->company_id,
             "password" => bcrypt($request->password),
             "USER_CREATED_BY" => Auth::user()->id,
             "USER_CREATED_DATE" => now()
@@ -178,17 +178,18 @@ extends Controller
         $typeInput = collect($request->input('type'))->first();
 
         $User->update([
-            'individual_relation_id'=>$request->individual_relation_id,
+            'individual_relation_id'=>$request->individual_relation_id == 0 ? null : $request->individual_relation_id,
             "user_status" => $request->user_status,
-            'company_division_id'=>$request->company_division_id,
+            'company_division_id'=>$request->company_division_id == 0 ? null : $request->company_division_id,
             "name" => $request->name,
             "email" => $request->email,
             "user_login" => $request->user_login,
-            "employee_id" => $request->employee_id,
+            "employee_id" => $request->employee_id == 0 ? null : $request->employee_id,
             "user_type_id" => $typeInput,
-            'jobpost_id'=>$request->jobpost,
+            'jobpost_id'=>$request->jobpost == 0 ? null : $request->jobpost,
+            'company_id'=>$request->company_id == 0 ? null : $request->company_id,
             "USER_UPDATED_BY" => Auth::user()->id,
-            "USER_UPDATED_DATE" => now()
+            "USER_UPDATED_DATE" => null
         ]);
 
         // Hapus entri di m_role_users jika tipe bukan 2

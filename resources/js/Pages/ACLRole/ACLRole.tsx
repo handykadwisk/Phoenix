@@ -213,6 +213,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         inputDataSearch("flag", "", 0);
         setIsSuccess("Cleared");
     };
+    
+    
     // for modal
     const [modal, setModal] = useState({
         add: false,
@@ -1011,7 +1013,7 @@ const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
                             id="role_name"
                             type="text"
                             name="role_name"
-                            value={searchRole.role_name}
+                            value={ searchRole.role_search[0].role_name}
                             className="mt-2 ring-1 ring-red-600"
                             onChange={(e) => {
                                 inputDataSearch("role_name", e.target.value, 0);
@@ -1024,6 +1026,9 @@ const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
                                     if (title || id) {
                                         inputDataSearch("flag", title || id, 0);
                                         setIsSuccess("success");
+                                        setTimeout(() => {
+                                            setIsSuccess("");
+                                        }, 5000);
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                         setIsSuccess("Get All Job Post");

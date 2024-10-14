@@ -28,6 +28,7 @@ import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import Swal from "sweetalert2";
 import AGGrid from "@/Components/AgGrid";
+import { set } from "react-datepicker/dist/date_utils";
 // import DetailMenu from "./DetailMenu";
 
 export default function ACLPermission({ auth }: PageProps) {
@@ -37,7 +38,7 @@ export default function ACLPermission({ auth }: PageProps) {
 
     // state for permission
     const [dataPermission, setDataPermission] = useState<any>([]);
-    const [searchPermission, setSearchPermission] = useState<any>([]);
+    // const [searchPermission, setSearchPermission] = useState<any>([]);
     const [dataById, setDataById] = useState<any>({
         PERMISSION_ID: "",
         PERMISSION_NAME: "",
@@ -83,20 +84,20 @@ export default function ACLPermission({ auth }: PageProps) {
             });
     };
 
-    const clearSearchPermission = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getPermission?${pageNumber}`)
-            .then((res) => {
-                setDataPermission(res.data);
-                setSearchPermission({
-                    ...searchPermission,
-                    PERMISSION_NAME: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+    // const clearSearchPermission = async (pageNumber = "page=1") => {
+    //     await axios
+    //         .post(`/getPermission?${pageNumber}`)
+    //         .then((res) => {
+    //             setDataPermission(res.data);
+    //             setSearchPermission({
+    //                 ...searchPermission,
+    //                 PERMISSION_NAME: "",
+    //             });
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         });
+    // };
 
     // for modal
     const [modal, setModal] = useState({
@@ -220,6 +221,36 @@ export default function ACLPermission({ auth }: PageProps) {
         }
     }
 
+    const [searchPermission, setSearchPermission] = useState<any>({
+        permission_search: [
+            {
+                PERMISSION_ID: "",
+                PERMISSION_NAME: "",
+                flag: "flag"
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchPermission.permission_search];
+        changeVal[i][name] = value;
+        setSearchPermission({ ...searchPermission, permission_search: changeVal });
+    };
+
+    const clearSearch = (e: React.MouseEvent) => {
+        // Kosongkan input pencarian
+        inputDataSearch("PERMISSION_NAME", "", 0);
+        // Reset flag untuk menampilkan semua data
+        inputDataSearch("flag", "", 0);
+        setIsSuccess("Cleared");
+    };
+
+    
+
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Permission"}>
@@ -236,12 +267,19 @@ export default function ACLPermission({ auth }: PageProps) {
             {/* modal Add */}
             <ModalToAdd
                 show={modal.add}
-                onClose={() =>
+                onClose={() =>{
                     setModal({
                         add: false,
                         edit: false,
                         detail: false,
                     })
+                    setData({
+                        PERMISSION_NAME: "",
+                        PERMISSION_CLASS_NAME: "clsf_",
+                    });
+                    
+
+                }
                 }
                 title={"Add Permission"}
                 url={`/setting/addPermission`}
@@ -308,11 +346,25 @@ export default function ACLPermission({ auth }: PageProps) {
             <ModalToAdd
                 show={modal.edit}
                 onClose={() =>
+                {
                     setModal({
                         add: false,
                         edit: false,
                         detail: false,
                     })
+                    setDataById({
+                        PERMISSION_ID: "",
+                        PERMISSION_NAME: "",
+                        PERMISSION_CLASS_NAME: "",
+                        PERMISSION_CREATED_BY: "",
+                        PERMISSION_CREATED_DATE: "",
+                        PERMISSION_DELETED_BY: "",
+                        PERMISSION_DELETED_DATE: "",
+                        PERMISSION_FLAG: "",
+                        PERMISSION_UPDATED_BY: "",
+                        PERMISSION_UPDATED_DATE: "",
+                    });
+                }
                 }
                 title={"Edit Permission"}
                 url={`/setting/editPermission`}
@@ -392,39 +444,54 @@ export default function ACLPermission({ auth }: PageProps) {
                             id="PERMISSION_NAME"
                             type="text"
                             name="PERMISSION_NAME"
-                            value={searchPermission.PERMISSION_NAME}
+                            value={searchPermission.permission_search[0].PERMISSION_NAME}
                             className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchPermission({
-                                    ...searchPermission,
-                                    PERMISSION_NAME: e.target.value,
-                                })
+                            onChange={
+                                (e) => inputDataSearch("PERMISSION_NAME", e.target.value, 0)
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                    if (
-                                        searchPermission.PERMISSION_NAME !== ""
-                                    ) {
-                                        getPermission();
-                                        setSearchPermission({
-                                            ...searchPermission,
-                                            PERMISSION_NAME: "",
-                                        });
+                                    const title = searchPermission.permission_search[0].PERMISSION_NAME;
+                                    const id = searchPermission.permission_search[0].PERMISSION_ID;
+                                    if (title || id) {
+                                        inputDataSearch("flag", title || id, 0);
+                                        setIsSuccess("success");
+                                        setTimeout(() => {
+                                            setIsSuccess("");
+                                        }, 5000);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Permission");
                                     }
                                 }
                             }}
+                            // onKeyDown={(e) => {
+                            //     if (e.key === "Enter") {
+                            //         if (
+                            //             searchPermission.PERMISSION_NAME !== ""
+                            //         ) {
+                            //             getPermission();
+                            //             setSearchPermission({
+                            //                 ...searchPermission,
+                            //                 PERMISSION_NAME: "",
+                            //             });
+                            //         }
+                            //     }
+                            // }}
                             placeholder="Search Permission Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPermission()}
+                                // onClick={() => clearSearchPermission()}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPermission()}
+                                // onClick={() => clearSearchPermission()}
+                                onClick={(e) => clearSearch(e)}
+
                             >
                                 Clear Search
                             </div>
@@ -539,7 +606,7 @@ export default function ACLPermission({ auth }: PageProps) {
                             addButtonLabel={null}
                             addButtonModalState={undefined}
                             withParam={null}
-                            searchParam={null}
+                            searchParam={searchPermission.permission_search}
                             // loading={isLoading.get_policy}
                             url={"getPermission"}
                             doubleClickEvent={handleDetailPermission}
