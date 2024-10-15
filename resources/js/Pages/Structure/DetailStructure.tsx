@@ -136,7 +136,7 @@ export default function DetailStructure({
                                 }
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mt-2">
+                        <div className="grid grid-cols-1 gap-4 mt-2">
                             <div>
                                 <InputLabel
                                     className="absolute"
@@ -163,7 +163,7 @@ export default function DetailStructure({
                                     placeholder="Structure Name"
                                 />
                             </div>
-                            <div>
+                            <div className="hidden">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="RELATION_GRADE_ID"
