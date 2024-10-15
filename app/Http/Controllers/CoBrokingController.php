@@ -75,7 +75,6 @@ class CoBrokingController extends Controller
 
                 array_push($arrCoBrokingId, $id);
                 array_push($arrLogData, $data);
-                return [$arrCoBrokingId, $arrLogData];
             }
             
             // Deleted Co Broking By Id
@@ -84,6 +83,7 @@ class CoBrokingController extends Controller
                     MPolicyCoBroking::where('CO_BROKING_ID', $del['CO_BROKING_ID'])->delete();
                 }
             }
+            return [$arrCoBrokingId, $arrLogData];
         });
       
         // Created Log

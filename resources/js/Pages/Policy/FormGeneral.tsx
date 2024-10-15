@@ -2202,6 +2202,11 @@ export default function FormGeneral({
             INCOME_NAME: "Business Acquisition Assistance",
             income_detail: [],
         },
+        // {
+        //     INCOME_CATEGORY_ID: 4,
+        //     INCOME_NAME: "Co Broking",
+        //     income_detail: [],
+        // },
     ];
     const getDataPartner = async (policy_id: number) => {
         setIsLoading({
@@ -2352,6 +2357,49 @@ export default function FormGeneral({
                         };
                         items[2] = item;
                     }
+                    // } else if (val["INCOME_TYPE"] == 4) {
+                    //     const item: any = {
+                    //         ...items[3],
+                    //         income_detail: [
+                    //             ...items[3].income_detail,
+                    //             {
+                    //                 INCOME_TYPE: val["INCOME_TYPE"],
+                    //                 POLICY_ID: val["POLICY_ID"],
+                    //                 PARTNER_NAME: val["PARTNER_NAME"],
+                    //                 RELATION_ID: val["RELATION_ID"],
+                    //                 PERSON_ID: val["PERSON_ID"],
+                    //                 BROKERAGE_FEE_PERCENTAGE:
+                    //                     val["BROKERAGE_FEE_PERCENTAGE"],
+                    //                 BROKERAGE_FEE_AMOUNT:
+                    //                     val["BROKERAGE_FEE_AMOUNT"],
+                    //                 ENGINEERING_FEE_PERCENTAGE:
+                    //                     val["ENGINEERING_FEE_PERCENTAGE"],
+                    //                 ENGINEERING_FEE_AMOUNT:
+                    //                     val["ENGINEERING_FEE_AMOUNT"],
+                    //                 ADMIN_COST: val["ADMIN_COST"],
+                    //                 CONSULTANCY_FEE_PERCENTAGE:
+                    //                     val["CONSULTANCY_FEE_PERCENTAGE"],
+                    //                 CONSULTANCY_FEE_AMOUNT:
+                    //                     val["CONSULTANCY_FEE_AMOUNT"],
+                    //                 M_PKS_RELATION_ID: val["M_PKS_RELATION_ID"],
+                    //                 BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
+                    //                 BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
+                    //                 BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
+                    //                 BROKERAGE_FEE_NETT_AMOUNT: val["BROKERAGE_FEE_NETT_AMOUNT"],
+                    //                 ENGINEERING_FEE_VAT: val["ENGINEERING_FEE_VAT"],
+                    //                 ENGINEERING_FEE_PPN: val["ENGINEERING_FEE_PPN"],
+                    //                 ENGINEERING_FEE_PPH: val["ENGINEERING_FEE_PPH"],
+                    //                 ENGINEERING_FEE_NETT_AMOUNT: val["ENGINEERING_FEE_NETT_AMOUNT"],
+                    //                 CONSULTANCY_FEE_VAT: val["CONSULTANCY_FEE_VAT"],
+                    //                 CONSULTANCY_FEE_PPN: val["CONSULTANCY_FEE_PPN"],
+                    //                 CONSULTANCY_FEE_PPH: val["CONSULTANCY_FEE_PPH"],
+                    //                 CONSULTANCY_FEE_NETT_AMOUNT: val["CONSULTANCY_FEE_NETT_AMOUNT"],
+                    //                 PAYABLE: val["PAYABLE"],
+                    //             },
+                    //         ],
+                    //     };
+                    //     items[3] = item;
+                    // }
                 });
 
                 setListDataPartners(items);
@@ -2362,6 +2410,7 @@ export default function FormGeneral({
             })
             .catch((err) => console.log(err));
     };
+    console.log("listDataPartners: ", listDataPartners);
 
 
 
@@ -4076,13 +4125,13 @@ export default function FormGeneral({
                                                             rowSpan={2}
                                                             className="text-center p-4 border"
                                                         >
-                                                            %
+                                                            Loss Limit %
                                                         </th>
                                                         <th
                                                             rowSpan={2}
                                                             className="text-center p-4 border"
                                                         >
-                                                            Scale %
+                                                            Premium Scale %
                                                         </th>
                                                         <th
                                                             rowSpan={2}
@@ -4774,13 +4823,13 @@ export default function FormGeneral({
                                                         rowSpan={2}
                                                         className="text-center p-4 border"
                                                     >
-                                                        %
+                                                        Loss Limit %
                                                     </th>
                                                     <th
                                                         rowSpan={2}
                                                         className="text-center p-4 border"
                                                     >
-                                                        Scale %
+                                                        Premium Scale %
                                                     </th>
                                                     <th
                                                         rowSpan={2}
@@ -10268,7 +10317,7 @@ export default function FormGeneral({
                                         </th>
                                         <th
                                             scope="col"
-                                            colSpan={7}
+                                            colSpan={6}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             <div>Brokerage Fee</div>
@@ -10282,7 +10331,7 @@ export default function FormGeneral({
                                         </th>
                                         <th
                                             scope="col"
-                                            colSpan={7}
+                                            colSpan={6}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             <div>Engineering Fee</div>
@@ -10296,7 +10345,7 @@ export default function FormGeneral({
                                         </th>
                                         <th
                                             scope="col"
-                                            colSpan={7}
+                                            colSpan={6}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             <div>Consultancy Fee</div>
@@ -10357,13 +10406,13 @@ export default function FormGeneral({
                                         >
                                             Nett Amount
                                         </th>
-                                        <th
+                                        {/* <th
                                             rowSpan={2}
                                             scope="col"
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             Co Broking
-                                        </th>
+                                        </th> */}
                                         <th
                                             scope="col"
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
@@ -10400,13 +10449,13 @@ export default function FormGeneral({
                                         >
                                             Nett Amount
                                         </th>
-                                        <th
+                                        {/* <th
                                             rowSpan={2}
                                             scope="col"
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             Co Broking
-                                        </th>
+                                        </th> */}
                                         <th
                                             scope="col"
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
@@ -10443,13 +10492,13 @@ export default function FormGeneral({
                                         >
                                             Nett Amount
                                         </th>
-                                        <th
+                                        {/* <th
                                             rowSpan={2}
                                             scope="col"
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
                                             Co Broking
-                                        </th>
+                                        </th> */}
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white">
@@ -11074,7 +11123,7 @@ export default function FormGeneral({
                                                                     required
                                                                 />
                                                             </td>
-                                                            <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                            {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                 <tr key={i}>
                                                                     <td
                                                                         scope="col"
@@ -11149,7 +11198,7 @@ export default function FormGeneral({
                                                                         );
                                                                     }
                                                                 )}
-                                                            </td>
+                                                            </td> */}
                                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
                                                                 <CurrencyInput
                                                                     id="engineering_fee_percentage"
@@ -11379,7 +11428,7 @@ export default function FormGeneral({
                                                                     required
                                                                 />
                                                             </td>
-                                                            <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                            {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                 <tr key={i}>
                                                                     <td
                                                                         scope="col"
@@ -11454,7 +11503,7 @@ export default function FormGeneral({
                                                                         );
                                                                     }
                                                                 )}
-                                                            </td>
+                                                            </td> */}
                                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-[1px]">
                                                                 <CurrencyInput
                                                                     id="consultancy_fee_percentage"
@@ -11684,7 +11733,7 @@ export default function FormGeneral({
                                                                     required
                                                                 />
                                                             </td>
-                                                            <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                            {/* <td className="border-b text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
                                                                 <tr key={i}>
                                                                     <td
                                                                         scope="col"
@@ -11759,7 +11808,7 @@ export default function FormGeneral({
                                                                         );
                                                                     }
                                                                 )}
-                                                            </td>
+                                                            </td> */}
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
                                                                 {detailIdx >
                                                                 0 ? (

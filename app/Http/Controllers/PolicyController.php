@@ -142,8 +142,8 @@ class PolicyController extends Controller
             $request->all(), [
             // Rule
             'policy_number'              => 'required|string',
-            'relation_id'                => 'required|string',
-            'insurance_type_id'            => 'required',
+            // 'relation_id'                => 'required|string',
+            // 'insurance_type_id'            => 'required',
             'policy_status_id'            => 'required',
         ], [
             // Message
@@ -173,18 +173,29 @@ class PolicyController extends Controller
         }        
         
         $policy_id = DB::transaction(function () use ($request) {
+            
+            $relationId = $request->relation_id;
+            if ($request->relation_id != NULL || $request->relation_id != "") {
+                $relationId = $request->relation_id['value'];
+            }
+
+            $insuranceType = $request->insurance_type_id;
+            if ($request->insurance_type_id != NULL || $request->insurance_type_id != "") {
+                $insuranceType = $request->insurance_type_id['value'];
+            }
+
             // Create Policy
             $policy = Policy::insertGetId([
-                'RELATION_ID'           => $request->relation_id,
+                'RELATION_ID'           => $relationId,
                 'POLICY_NUMBER'         => trim($request->policy_number),
-                'INSURANCE_TYPE_ID'     => $request->insurance_type_id,
+                'INSURANCE_TYPE_ID'     => $insuranceType,
                 'POLICY_THE_INSURED'    => $request->policy_the_insured,
                 'POLICY_INCEPTION_DATE' => $request->policy_inception_date,
                 'POLICY_DUE_DATE'       => $request->policy_due_date,
                 'POLICY_STATUS_ID'      => $request->policy_status_id,
                 'POLICY_TYPE'           => $request->policy_type,
                 'SELF_INSURED'          => $request->self_insured,
-                'POLICY_CREATED_BY'      => Auth::user()->id
+                'POLICY_CREATED_BY'     => Auth::user()->id
             ]);
         
             // Created Log
@@ -268,6 +279,7 @@ class PolicyController extends Controller
             ]);
         }
         DB::transaction(function () use ($request) {
+            
             $policy = Policy::where('policy_id', $request->id)
                             ->update([
                                 'RELATION_ID'           => $request->RELATION_ID,

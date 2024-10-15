@@ -49,27 +49,13 @@ export default function PolicyIndex({ auth }: PageProps) {
             },
         ],
     });
-    // const [searchPolicy, setSearchPolicy] = useState<any>({
-    //     POLICY_NUMBER: "",
-    //     CLIENT_ID: "",
-    // });
+    
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [policyId, setPolicyId] = useState<string>("");
     const [arrCurrency, setarrCurrency] = useState<any>([]);
     const [sumByCurrency, setSumByCurrency] = useState<any>([]);
 
-    // useEffect(() => {
-    //     if (
-    //         Object.keys(searchPolicy).length == 0 ||
-    //         (searchPolicy.POLICY_NUMBER == "" &&
-    //         searchPolicy.CLIENT_ID == "")
-    //     ) {
-    //         setPolicies([]);
-    //     } else {
-    //         getPolicy();
-    //     }
-    // }, [searchPolicy]);
-
+    
     const getPolicy = async (pageNumber = "page=1") => {
         setIsLoading(true);
         await axios
@@ -95,7 +81,6 @@ export default function PolicyIndex({ auth }: PageProps) {
             .catch((err) => {
                 console.log(err);
             });
-        // setPolicies(policy)
     };
 
     const clearSearchPolicy = async (e: FormEvent) => {
@@ -117,22 +102,7 @@ export default function PolicyIndex({ auth }: PageProps) {
         setSearchPolicy({ ...searchPolicy, policy_search: changeVal });
     };
 
-    // const clearSearchPolicy = async (pageNumber = "page=1") => {
-    //     await axios
-    //         .post(`/getPolicy?${pageNumber}`)
-    //         .then((res) => {
-    //             setPolicies([]);
-    //             setSearchPolicy({
-    //                 ...searchPolicy,
-    //                 POLICY_NUMBER: "",
-    //                 CLIENT_ID: "",
-    //             });
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
-
+    
      const policyType = [
          { ID: "1", NAME: "Full Policy" },
          { ID: "2", NAME: "Master Policy/Certificate" }
@@ -159,6 +129,20 @@ export default function PolicyIndex({ auth }: PageProps) {
         view: false,
         document: false,
         search: false,
+    });
+
+    const selectClient = clients?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
+    });
+
+    const selectInsuranceType = insuranceType?.map((query: any) => {
+        return {
+            value: query.INSURANCE_TYPE_ID,
+            label: query.INSURANCE_TYPE_NAME,
+        };
     });
 
 
@@ -702,7 +686,7 @@ export default function PolicyIndex({ auth }: PageProps) {
 
     useEffect(() => {
         if (data.relation_id) {
-            getRelation(data.relation_id);
+            getRelation(data.relation_id.value);
         }
     }, [data.relation_id]);
 
@@ -795,7 +779,6 @@ export default function PolicyIndex({ auth }: PageProps) {
     };
     // End fungsi hitung initial premium
 
-
     const handleSwitch = () => {
         setFlagSwitch(!flagSwitch);
     };
@@ -833,32 +816,27 @@ export default function PolicyIndex({ auth }: PageProps) {
                                 htmlFor="client_name"
                                 value="Client Name"
                             />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                value={data.relation_id}
-                                onChange={(e) => {
-                                    setData("relation_id", e.target.value);
-                                    // getRelation(
-                                    //     e.target.value
-                                    // );
+                            <Select
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                        }`,
                                 }}
-                            >
-                                <option value={""}>
-                                    -- <i>Choose Client Name</i> --
-                                </option>
-                                {clients.map((client: any, i: number) => {
-                                    return (
-                                        <option
-                                            key={i}
-                                            value={
-                                                client.RELATION_ORGANIZATION_ID
-                                            }
-                                        >
-                                            {client.RELATION_ORGANIZATION_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                                options={selectClient}
+                                isSearchable={true}
+                                placeholder={"Search Client"}
+                                value={data.relation_id}
+                                onChange={(val: any) =>
+                                    setData("relation_id", val)
+                                }
+                                primaryColor={"bg-red-500"}
+                            />
                         </div>
                         <div className="grid grid-rows grid-flow-col gap-4 mb-4 ml-4 mr-4">
                             <div>
@@ -884,36 +862,27 @@ export default function PolicyIndex({ auth }: PageProps) {
                                     htmlFor="insurance_type_id"
                                     value="Insurance Type"
                                 />
-                                <select
-                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={selectInsuranceType}
+                                    isSearchable={true}
+                                    placeholder={"Search Insurance Type"}
                                     value={data.insurance_type_id}
-                                    onChange={(e) =>
-                                        setData(
-                                            "insurance_type_id",
-                                            e.target.value
-                                        )
+                                    onChange={(val: any) =>
+                                        setData("insurance_type_id", val)
                                     }
-                                >
-                                    <option value={""}>
-                                        -- <i>Choose Insurance Type</i> --
-                                    </option>
-                                    {insuranceType.map(
-                                        (insuranceTypes: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={
-                                                        insuranceTypes.INSURANCE_TYPE_ID
-                                                    }
-                                                >
-                                                    {
-                                                        insuranceTypes.INSURANCE_TYPE_NAME
-                                                    }
-                                                </option>
-                                            );
-                                        }
-                                    )}
-                                </select>
+                                    primaryColor={"bg-red-500"}
+                                />
                             </div>
                             <div>
                                 <InputLabel
@@ -968,7 +937,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                     value="Inception Date"
                                 />
                                 <div className="relative max-w-sm">
-                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                    <div className="absolute inset-y-0 z-19 start-0 flex items-center px-3  pointer-events-none">
                                         <svg
                                             className="w-3 h-3 text-gray-500 dark:text-gray-400"
                                             aria-hidden="true"
@@ -1001,7 +970,7 @@ export default function PolicyIndex({ auth }: PageProps) {
                                     value="Expiry Date"
                                 />
                                 <div className="relative max-w-sm">
-                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                    <div className="absolute inset-y-0 z-19 start-0 flex items-center px-3  pointer-events-none">
                                         <svg
                                             className="w-3 h-3 text-gray-500 dark:text-gray-400"
                                             aria-hidden="true"
@@ -1258,9 +1227,11 @@ export default function PolicyIndex({ auth }: PageProps) {
                             name="search_policy_number"
                             // value={searchPolicy.POLICY_NUMBER}
                             value={
-                                searchPolicy.policy_search[0].POLICY_NUMBER === ""
+                                searchPolicy.policy_search[0].POLICY_NUMBER ===
+                                ""
                                     ? ""
-                                    : searchPolicy.policy_search[0].POLICY_NUMBER
+                                    : searchPolicy.policy_search[0]
+                                          .POLICY_NUMBER
                             }
                             className="mt-2 ring-1 ring-red-600"
                             autoComplete="off"
