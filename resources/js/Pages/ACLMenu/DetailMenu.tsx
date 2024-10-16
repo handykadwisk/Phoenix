@@ -142,6 +142,16 @@ export default function DetailGroup({
         };
     });
 
+    const handleInputChange = (field: string) => (event: any) => {
+        setDataById({
+            ...dataById,
+            [field]: event ? (event.target ? event.target.value : event.value) : null
+        });
+    };
+
+    
+
+    console.log(dataById);
     
     
     return (
@@ -179,27 +189,6 @@ export default function DetailGroup({
                                     htmlFor="menu_parent_id"
                                     value={"Parent"}
                                 />
-                                {/* <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={dataById.menu_parent_id || ''}
-                                    onChange={(e) => {
-                                        setDataById({
-                                            ...dataById,
-                                            menu_parent_id: e.target.value,
-                                        });
-                                    }}
-                                >
-                                    <option value={dataById.menu_id}>
-                                        {dataById.menu_id ? dataById.menu_name : '-- Choose Parent --'}
-                                    </option>
-                                    {show.map((mData: any, i: number) => {
-                                        return (
-                                            <option value={mData.id} key={i}>
-                                                {mData.text_combo}
-                                            </option>
-                                        );
-                                    })}
-                                </select> */}
                                 <Select
                                     classNames={{
                                         menuButton: () =>
@@ -217,14 +206,15 @@ export default function DetailGroup({
                                     placeholder={"Choose Parent"}
                                     isClearable={true}
                                     value={optionsParent.find((el: { value: any }) => el.value === dataById.menu_parent_id) || null}
-                                    onChange={
-                                        (value: any) => {
-                                            setDataById({
-                                                ...dataById,
-                                                menu_parent_id: value.value,
-                                            });
-                                        }
-                                    }
+                                    // onChange={
+                                    //     (value: any) => {
+                                    //         setDataById({
+                                    //             ...dataById,
+                                    //             menu_parent_id: value.value,
+                                    //         });
+                                    //     }
+                                    // }
+                                    onChange={handleInputChange('menu_parent_id')}
                                     primaryColor={"red"}
                                 />
                             </div>

@@ -1028,7 +1028,7 @@ const handleCheckboxChange = (e: any, item: any, parent: any = null) => {
                                         setIsSuccess("success");
                                         setTimeout(() => {
                                             setIsSuccess("");
-                                        }, 5000);
+                                        });
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                         setIsSuccess("Get All Job Post");

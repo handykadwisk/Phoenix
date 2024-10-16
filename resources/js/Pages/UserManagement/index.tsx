@@ -463,10 +463,6 @@ export default function UserManagement({ auth, type }: any) {
     const filterEmployeeDiv = div.filter((el: any) => el.COMPANY_ID === dataInput.company_id);
     const filterEmployeeDivEdit = div.filter((el: any) => el.COMPANY_ID === dataInputEdit.company_id);
 
-    console.log('employee', employeeDiv);
-
-    console.log(dataInputEdit);
-
     useEffect(() => {
         if (employeeDiv) {
             setDataInput((prevState) => ({
@@ -496,19 +492,23 @@ export default function UserManagement({ auth, type }: any) {
     const filterEmployee = employee.filter((el: any) => el.COMPANY_ID === dataInput.company_id)
     const filterEmployeeEdit = employee.filter((el: any) => el.COMPANY_ID === dataInputEdit.company_id)
 
-    const selectEmployee = filterEmployee.map((el: any) => {
-        return {
-            value: el.EMPLOYEE_ID,
-            label: el.EMPLOYEE_FIRST_NAME
-        };
-    })
+    const selectEmployee = filterEmployee
+        .sort((a: any, b: any) => a.EMPLOYEE_FIRST_NAME.localeCompare(b.EMPLOYEE_FIRST_NAME))
+        .map((el: any) => {
+            return {
+                value: el.EMPLOYEE_ID,
+                label: el.EMPLOYEE_FIRST_NAME
+            };
+        });
 
-    const selectEmployeeEdit = filterEmployeeEdit.map((el: any) => {
-        return {
-            value: el.EMPLOYEE_ID,
-            label: el.EMPLOYEE_FIRST_NAME
-        };
-    })
+    const selectEmployeeEdit = filterEmployeeEdit
+        .sort((a: any, b: any) => a.EMPLOYEE_FIRST_NAME.localeCompare(b.EMPLOYEE_FIRST_NAME))
+        .map((el: any) => {
+            return {
+                value: el.EMPLOYEE_ID,
+                label: el.EMPLOYEE_FIRST_NAME
+            };
+        })
     //end employee data
 
 
@@ -541,6 +541,16 @@ export default function UserManagement({ auth, type }: any) {
         };
     });
     //end jobpost data
+
+    const optionRelation = relation.map((el: any) => {
+        return {
+            value: el.RELATION_ORGANIZATION_ID,
+            label: el.RELATION_ORGANIZATION_NAME
+        }
+    });
+
+
+
 
 
 
@@ -749,11 +759,11 @@ export default function UserManagement({ auth, type }: any) {
                                 {/* jobpost  */}
                                 <div className="relative">
                                     <InputLabel
-                                        className="absolute"
+                                        className=""
                                         htmlFor="type"
                                         value={'Job Post'}
                                     />
-                                    <div className="ml-[4rem] text-red-600">*</div>
+                                    {/* <div className="ml-[4rem] text-red-600">*</div> */}
                                     <div className="mb-2">
                                         <Select
                                             classNames={{
@@ -836,7 +846,7 @@ export default function UserManagement({ auth, type }: any) {
                                         />
                                         <div className="ml-[9.7rem] text-red-600">*</div>
                                     </div>
-                                    <select
+                                    {/* <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataInput.individual_relations_id}
                                         onChange={handleRelationChange}
@@ -854,7 +864,27 @@ export default function UserManagement({ auth, type }: any) {
                                             })
                                         }
 
-                                    </select>
+                                    </select> */}
+                                    <Select
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                            menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                }`,
+                                        }}
+                                        options={optionRelation}
+                                        isSearchable={true}
+                                        isMultiple={false}
+                                        placeholder={"Select"}
+                                        isClearable={true}
+                                        value={optionRelation.find((emp: { value: any }) => emp.value === dataInput.individual_relations_id) || ""}
+                                        onChange={handleInputChange('individual_relations_id')}
+                                        primaryColor={"red"}
+                                    />
                                 </div>
                                 {/* company */}
                             </>
@@ -960,6 +990,7 @@ export default function UserManagement({ auth, type }: any) {
                             </div>
                             {/* end user_login */}
 
+                            {/* type */}
                             <div className="relative">
                                 <div className="mb-2">
                                     <InputLabel
@@ -991,10 +1022,11 @@ export default function UserManagement({ auth, type }: any) {
                                     </select>
                                 </div>
                             </div>
+                            {/* type */}
 
                             {(dataInputEdit?.type === 2 || dataInputEdit?.type?.user_type_id === 2) && (
                                 <>
-                                    {/* Employee */}
+                                    {/* Company */}
                                     < div className="mb-2">
                                         <div className="relative">
                                             <InputLabel
@@ -1025,7 +1057,7 @@ export default function UserManagement({ auth, type }: any) {
                                             primaryColor={"red"}
                                         />
                                     </div>
-                                    {/* Employee */}
+                                    {/* Company */}
 
                                     {/* Employee */}
                                     < div className="mb-2">
@@ -1145,11 +1177,11 @@ export default function UserManagement({ auth, type }: any) {
                                     {/* jobpost  */}
                                     <div className="relative">
                                         <InputLabel
-                                            className="absolute"
+                                            className=""
                                             htmlFor="type"
                                             value={'Job Post'}
                                         />
-                                        <div className="ml-[4rem] text-red-600">*</div>
+                                        {/* <div className="ml-[4rem] text-red-600">*</div> */}
                                         <div className="mb-2">
                                             <Select
                                                 classNames={{
@@ -1196,26 +1228,6 @@ export default function UserManagement({ auth, type }: any) {
                                             />
                                             <div className="ml-[9.7rem] text-red-600">*</div>
                                         </div>
-                                        {/* <select
-                                            className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                            value={dataInputEdit?.individual_relations_id}
-                                            onChange={handleRelationChange
-                                            }
-                                        >
-                                            <option value={""}>
-                                                -- Choose Type --
-                                            </option>
-                                            {
-                                                relation?.map((mRel: any, i: number) => {
-                                                    return (
-                                                        <option value={mRel.RELATION_ORGANIZATION_ID} key={i}>
-                                                            {mRel.RELATION_ORGANIZATION_NAME}
-                                                        </option>
-                                                    )
-                                                })
-                                            }
-
-                                        </select> */}
                                         <Select
                                             classNames={{
                                                 menuButton: () =>
@@ -1273,6 +1285,7 @@ export default function UserManagement({ auth, type }: any) {
                             </div>
                             {/* end user_login */}
 
+                            {/* isActive user */}
                             <div className="flex items-center mt-4 ">
                                 <span className="mr-2 text-sm">Is Active</span>
                                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1282,9 +1295,11 @@ export default function UserManagement({ auth, type }: any) {
                                         checked={dataInputEdit.user_status}
                                         onChange={handleUserStatusChange}
                                     />
-                                    <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                    <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-red-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                                 </label>
                             </div>
+                            {/* end isActive user */}
+
 
 
                             {/* Reset Password */}
@@ -1302,6 +1317,7 @@ export default function UserManagement({ auth, type }: any) {
                                 </div>
                             </div>
                             {/* Switch for User Status */}
+
                         </div>
                     </>
                 }
@@ -1379,6 +1395,9 @@ export default function UserManagement({ auth, type }: any) {
                                     if (title || id) {
                                         inputDataSearch("flag", title || id, 0);
                                         setIsSuccess("success");
+                                        setTimeout(() => {
+                                            setIsSuccess("");
+                                        })
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                         setIsSuccess("Get All Job Post");

@@ -38,6 +38,8 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
 
     const [refreshGrid, setRefreshGrid] = useState<any>("");
+
+    //data show
     const [show, setShow] = useState<any>([]);
     const getmenusShow = async () => {
         try {
@@ -154,26 +156,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
 
     const [isSuccess, setIsSuccess] = useState<any>("");
 
-    // const handleSuccessMenu = (message: string) => {
-    //     setIsSuccess('');
-
-    //     if (message !== '') {
-    //         setIsSuccess(message[0]);
-    //         setTimeout(() => {
-    //             setIsSuccess('');
-    //         }, 5000);
-
-    //         getComboMenu();
-
-    //         setRefreshGrid("success");
-    //         setTimeout(() => {
-    //             setRefreshGrid("");
-    //         }, 1000);
-
-
-    //     }
-    // };
-
     const handleSuccessMenu = (message: string, e: any) => {
         setIsSuccess('');
         if (message !== '') {
@@ -189,7 +171,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
         //get combo menu
         getComboMenu();
         Swal.fire({
-            title: `${message[0]} Please Arrange the Sequence`,
+            title: `${message && message.length > 0 ? message[0] : 'Success'} Please Arrange the Sequence`,
             icon: 'info',
             timer: 2000,
             timerProgressBar: true,
@@ -224,10 +206,20 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
     };
 
     const handleDetailMenu = async (data: any) => {
-        setDetailMenu({
+        // console.log('Data received:', data);
+        // setDetailMenu({
+        //     id: data.id,
+        //     menu_name: data.menu_name,
+        // });
+        getmenusShow()
+        setData({
             id: data.id,
+            menu_parent_id: data.menu_parent_id,
             menu_name: data.menu_name,
-        });
+            menu_url: data.menu_url,
+            menu_sequence: data.menu_sequence,
+            menu_is_deleted: data.menu_is_deleted,
+        })
         setModal({
             add: false,
             edit: !modal.edit,
@@ -244,6 +236,57 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
         };
     });
 
+    // action delete
+    const toggleMenuDeleteStatus = (id: number) => {
+        // Periksa apakah id menu yang ingin diubah sesuai dengan id dalam state
+        setData({
+            ...data,
+            menu_is_deleted: data.menu_is_deleted === 1 ? 0 : 1
+        });
+    };
+
+    const actionDelete = async (e: any, idMenu: any, flag: any) => {
+        e.preventDefault();
+        console.log(idMenu, flag);
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, do it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // send request to server
+                    const response = await axios.post(`/changeMenuStatus`, { idMenu, flag });
+                    // check status response
+                    if (response.status === 200) {
+                        Swal.fire(
+                            'Deleted!',
+                            'Your menu has been deleted.',
+                            'success'
+                        );
+                        handleSuccessMenu(response.data, e); // Panggil fungsi sukses untuk memperbarui UI atau state
+                    } else {
+                        throw new Error('Unexpected response status');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire(
+                        'Error!',
+                        'There was an error deleting the menu.',
+                        'error'
+                    );
+                }
+            }
+        });
+    };
+    //end action delete
+
+    console.log('data',data);
+    
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Menu"}>
@@ -313,7 +356,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     classNames={{
                                         menuButton: () =>
                                             `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                        menu: "text-left z-20 w-fit bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                         listItem: ({ isSelected }: any) =>
                                             `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
                                                 ? `text-white bg-primary-pelindo`
@@ -380,6 +423,113 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             />
             {/* modal end add */}
 
+            {/* modal Edit */}
+            <ModalToAction
+                submitButtonName={'Submit'}
+                headers={"Add Menu"}
+                method="POST"
+                show={modal.edit}
+                onClose={
+                    () => {
+
+                        setModal({ ...modal, edit: false })
+                        setData({
+                            menu_name: "",
+                            menu_url: "",
+                        })
+                    }
+                }
+                title={"Edit Menu"}
+                url={`/setting/editMenu`}
+                data={data}
+                buttonAddOns={data.menu_is_deleted === 1 ? "Reactivate" : "Delete"}
+                actionDelete={actionDelete}
+                toggleMenuDeleteStatus={toggleMenuDeleteStatus}
+                onSuccess={handleSuccessMenu}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
+                }
+                body={
+                    <>
+                        {/* Parent */}
+                        <div className="mb-3">
+                            <div>
+                                <InputLabel
+                                    className=""
+                                    htmlFor="name_parent"
+                                    value={"Parent"}
+                                />
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                            }`,
+                                    }}
+                                    options={optionsParent}
+                                    isSearchable={true}
+                                    isMultiple={false}
+                                    placeholder={"Choose Parent"}
+                                    isClearable={true}
+                                    value={optionsParent.find((el: { value: any }) => el.value === data.menu_parent_id) || null}
+                                    onChange={(val: any) => {
+                                        setData("menu_parent_id", val ? val.value : null);
+                                    }}
+                                    primaryColor={"red"}
+                                />
+
+                            </div>
+                            <div className="mt-2">
+                                <InputLabel
+                                    className="absolute"
+                                    htmlFor="menu_name"
+                                    value={"Menu Name"}
+                                />
+                                <div className="ml-[5.5rem] text-red-600">
+                                    *
+                                </div>
+                                <TextInput
+                                    id="menu_name"
+                                    type="text"
+                                    name="menu_name"
+                                    value={data.menu_name || ''}
+                                    className="mt-2"
+                                    onChange={(e) =>
+                                        setData("menu_name", e? e.target.value : '')
+                                    }
+                                    required
+                                    placeholder="Name Menu"
+                                />
+                            </div>
+                            <div className="mt-2">
+                                <InputLabel
+                                    className=""
+                                    htmlFor="menu_url"
+                                    value={"Menu URL"}
+                                />
+
+                                <TextInput
+                                    id="menu_url"
+                                    type="text"
+                                    name="menu_url"
+                                    value={data.menu_url || ''}
+                                    className="mt-2"
+                                    onChange={(e) =>
+                                        setData("menu_url",e? e.target.value : '')
+                                    }
+                                    placeholder="Menu URL"
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+            {/* modal end add */}
+
             {/* modal sequence */}
             <ModalToAdd
                 buttonAddOns={''}
@@ -402,22 +552,23 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 }
             />
             {/* modal end sequence */}
-
+                
             {/* Modal detail */}
-            <DetailMenu
+            {/* <DetailMenu
                 idMenu={detailMenu.id}
                 comboMenu={comboMenu}
                 modal={modal.edit}
-                setModal={() =>
-                    setModal({
+                setModal={() =>{
+                    console.log('Modal close');
+                    setModal({  
                         add: false,
                         edit: false,
                         detail: false,
                         sequence: false
-                    })
+                    })}
                 }
                 handleSuccess={handleSuccessMenu}
-            />
+            /> */}
             {/* modal end detail */}
 
 
@@ -463,7 +614,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                         setIsSuccess("success");
                                         setTimeout(() => {
                                             setIsSuccess("");
-                                        }, 5000);
+                                        });
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                         setIsSuccess("Get All Permission");

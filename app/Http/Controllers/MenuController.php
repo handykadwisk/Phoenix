@@ -181,13 +181,14 @@ class MenuController extends Controller
     // edit r_menu
     public function edit(Request $request)
     {   
+        // dd($request);
         // get data menu
         $menuParent = Menu::find($request->id);
         // dd($request->menu_parent_id,$menuParent->menu_parent_id); 
         // dd($menuParent);
 
         if ($menuParent->menu_parent_id == $request->menu_parent_id) {
-
+            // dd('edit');
             // save data menu
             Menu::where('id', $request->id)
                 ->update([
@@ -202,6 +203,8 @@ class MenuController extends Controller
 
         } else {
 
+            // dd('edit parent');
+
             // If the parent menu is different, process the change parent
             $newParent =  $request->menu_parent_id;
             $relationParent = Menu::find($request->menu_parent_id);
@@ -209,6 +212,7 @@ class MenuController extends Controller
             $relationParent = Menu::find($newParent);
 
             if ($relationParent) {
+
                 // $concatID = "." . $relationParent->id . '.';
 
                 // Cek apakah parent dan child berada dalam satu grup
@@ -223,10 +227,12 @@ class MenuController extends Controller
                     FROM
                         r_menu 
                     WHERE id = ?
-                ", [$newParent, $request->id]);
-
+                ", [ $request->id,$newParent ]);
+                // dd('masuk', $cekExisting);
                 // if existing group status is 'satu group
                 if ($cekExisting[0]->group_status === 'satu group') {
+
+                    // dd('masuk');
 
                     // get  the original parent and the new parent
                     $originalParent = Menu::find($newParent);
@@ -235,7 +241,7 @@ class MenuController extends Controller
                     // update the parent of the new parent to original parent
                     Menu::where('id', $newParent)
                         ->update([
-                            'menu_parent_id' => $originalParent->menu_parent_id,
+                            'menu_parent_id' => $oldParent->parent_menu_id,
                             'menu_updated_by' => Auth::user()->id,
                             'menu_updated_date' => now()
                         ]);
@@ -250,41 +256,56 @@ class MenuController extends Controller
 
                 } else {
 
-                    // if parent and child are in different groups, update as usual
+                    Menu::where('id', $request->id)
+                    ->update([
+                        "menu_parent_id" => $newParent,
+                        'menu_updated_by' => Auth::user()->id,
+                        'menu_updated_date' => now()
+                    ]);
 
-                    $oldParent = Menu::find($request->id);
-                    // Jika parent `menu_parent_id` null dan child adalah id parent
+                    // // if parent and child are in different groups, update as usual
 
-                    // If the parent 'menu_parent_id' is null and the child is the parent id
-                    if ($oldParent->menu_parent_id === null) {
+                    // $oldParent = Menu::find($request->id);
+                    // // Jika parent `menu_parent_id` null dan child adalah id parent
 
-                        // change the new parent to old parent
+                    // // If the parent 'menu_parent_id' is null and the child is the parent id
+                    // if ($oldParent->menu_parent_id === null) {
 
-                        Menu::where('id', $newParent)
-                            ->update([
-                                'menu_parent_id' => $oldParent->menu_parent_id, 
-                                'menu_updated_by' => Auth::user()->id,
-                                'menu_updated_date' => now()
-                            ]);
+                    //     // change the new parent to old parent
 
-                        Menu::where('id', $request->id)
-                            ->update([
-                                "menu_parent_id" => $newParent,
-                                'menu_updated_by' => Auth::user()->id,
-                                'menu_updated_date' => now()
-                            ]);
+                    //     Menu::where('id', $newParent)
+                    //         ->update([
+                    //             'menu_parent_id' => $oldParent->menu_parent_id, 
+                    //             'menu_updated_by' => Auth::user()->id,
+                    //             'menu_updated_date' => now()
+                    //         ]);
 
-                    } else {
+                    //     Menu::where('id', $request->id)
+                    //         ->update([
+                    //             "menu_parent_id" => $newParent,
+                    //             'menu_updated_by' => Auth::user()->id,
+                    //             'menu_updated_date' => now()
+                    //         ]);
 
-                        // Jika tidak berada dalam satu grup, lakukan update biasa
-                        Menu::where('id', $request->id)
-                            ->update([
-                                "menu_parent_id" => $newParent,
-                                'menu_updated_by' => Auth::user()->id,
-                                'menu_updated_date' => now()
-                            ]);
-                    }
+                    // } else {
+
+                    //     // Jika tidak berada dalam satu grup, lakukan update biasa
+                    //     Menu::where('id', $request->id)
+                    //         ->update([
+                    //             "menu_parent_id" => $newParent,
+                    //             'menu_updated_by' => Auth::user()->id,
+                    //             'menu_updated_date' => now()
+                    //         ]);
+                    // }
                 }
+            }
+            else{
+                Menu::where('id', $request->id)
+                ->update([
+                    "menu_parent_id" => null,
+                    'menu_updated_by' => Auth::user()->id,
+                    'menu_updated_date' => now()
+                ]);
             }
             //call store prosedure set mapping menu
             DB::select('call sp_set_mapping_menu');

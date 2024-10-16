@@ -458,7 +458,7 @@ export default function ACLPermission({ auth }: PageProps) {
                                         setIsSuccess("success");
                                         setTimeout(() => {
                                             setIsSuccess("");
-                                        }, 5000);
+                                        });
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                         setIsSuccess("Get All Permission");
