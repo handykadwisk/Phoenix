@@ -67,6 +67,7 @@ export default function FormGeneral({
     const [listPksNumber, setListPksNumber] = useState<any>([]);
     const [relationIdForPayable, setRelationIdForPayable] = useState<any>([]);
     const [isSuccess, setIsSuccess] = useState<string>("");
+    const [switchPayment, setSwitchPayment] = useState<boolean>(false);
 
     const [isLoading, setIsLoading] = useState<any>({
         get_detail: false,
@@ -78,7 +79,38 @@ export default function FormGeneral({
         { ID: "2", NAME: "Master Policy/Certificate" },
     ];
 
+    const [dataLossLimit, setDataLossLimit] = useState<any>([]);
+    const getLossLimit = async () => {
+        await axios
+            .get(`/getLossLimit`)
+            .then((res) => setDataLossLimit(res.data))
+            .catch((err) => console.log(err));
+    };
+
+    const searchingLossLimit = (lossLimitPercentage: any) => {
+        const data = dataLossLimit;
+        const result = data.find(
+            (value: any) => value.LOSS_LIMIT_PERCENTAGE == lossLimitPercentage
+        );
+        // console.log("result: ", result);
+        return result ? result.PREMIUM_SCALE_PERCENTAGE : 0;
+    };
+    
+    // const handleSwitch = () => {
+    //     setFlagSwitch(!flagSwitch);
+    // };
+    const handleSwitchPayment = (e: any) => {
+        if (e == true) {
+            setSwitchPayment(!switchPayment);
+            // setData("DEFAULT_PAYABLE", "1");
+        } else {
+            setSwitchPayment(!switchPayment);
+            // setData("DEFAULT_PAYABLE", "0");
+        }
+    };
+
     useEffect(() => {
+        getLossLimit();
         getFbiPks(13);
         getAgent(3);
         getBroker(9);
@@ -386,6 +418,7 @@ export default function FormGeneral({
     };
 
     const handleAddCoverage = async (policy_id: any) => {
+        getLossLimit();
         getInterestInsured();
         setDataPolicyCoverage([{ ...fieldDataCoverage, POLICY_ID: policy_id }]);
         setModal({
@@ -411,6 +444,25 @@ export default function FormGeneral({
         setDataPolicyCoverage([
             ...dataPolicyCoverage,
             { ...fieldDataCoverage, POLICY_ID: policy.POLICY_ID },
+        ]);
+    };
+
+    const copyCoverage = (e: FormEvent) => {
+        e.preventDefault();
+        const items = [...dataPolicyCoverage];
+        const index = items.length - 1
+        const item = items[index]
+        const coverageDetail = item.policy_coverage_detail;
+        // console.log(
+        //     "items: ",
+        //     items
+        // );
+        // console.log("item: ", item);
+        // console.log("coverageDetail: ", coverageDetail);
+        
+        setDataPolicyCoverage([
+            ...dataPolicyCoverage,
+            { item, policy_coverage_detail: coverageDetail },
         ]);
     };
 
@@ -487,10 +539,26 @@ export default function FormGeneral({
                 value = 0;
             }
         }
+        let sum_insured = policy_coverage_detail["SUM_INSURED"];
         if (name == "LOST_LIMIT_PERCENTAGE") {
             if (value == undefined) {
                 value = 0;
             }
+            const lossLimit = searchingLossLimit(value);
+            // lossLimit == 0 && alert('Scale tidak ditemukan')
+            // lossLimit != undefined || lossLimit != null ? lossLimit : 0;
+            // console.log('lossLimit: ', lossLimit)
+            policy_coverage_detail["LOST_LIMIT_SCALE"] = lossLimit;
+            policy_coverage_detail["LOST_LIMIT_AMOUNT"] =
+                sum_insured *
+                (policy_coverage_detail["RATE"] / 100) *
+                (lossLimit / 100);
+            policy_coverage_detail["PREMIUM"] =
+                (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
+                policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
+                    ? policy_coverage_detail["GROSS_PREMIUM"]
+                    : policy_coverage_detail["LOST_LIMIT_AMOUNT"]) -
+                policy_coverage_detail["INSURANCE_DISC_AMOUNT"];
         }
         if (name == "DEPOSIT_PREMIUM_AMOUNT") {
             if (value == undefined) {
@@ -498,7 +566,7 @@ export default function FormGeneral({
             }
         }
 
-        let sum_insured = policy_coverage_detail["SUM_INSURED"];
+        // let sum_insured = policy_coverage_detail["SUM_INSURED"];
         // let policy_coverage_id = policy_coverage_detail["POLICY_COVERAGE_ID"];
         if (name == "RATE") {
             if (value == undefined) {
@@ -506,16 +574,23 @@ export default function FormGeneral({
             }
             policy_coverage_detail["GROSS_PREMIUM"] =
                 (sum_insured * value) / 100;
+            
+            policy_coverage_detail["LOST_LIMIT_PERCENTAGE"] = 100;
+            policy_coverage_detail["LOST_LIMIT_SCALE"] = 100;
+            policy_coverage_detail["LOST_LIMIT_AMOUNT"] =
+                sum_insured *
+                (value / 100) *
+                (policy_coverage_detail["LOST_LIMIT_SCALE"] / 100);
+            policy_coverage_detail["DEPOSIT_PREMIUM_AMOUNT"] =
+                (policy_coverage_detail["PREMIUM"] *
+                    policy_coverage_detail["DEPOSIT_PREMIUM_PERCENTAGE"]) /
+                100;
             policy_coverage_detail["PREMIUM"] =
                 (policy_coverage_detail["LOST_LIMIT_AMOUNT"] == 0 ||
                 policy_coverage_detail["LOST_LIMIT_AMOUNT"] == null
                     ? policy_coverage_detail["GROSS_PREMIUM"]
                     : policy_coverage_detail["LOST_LIMIT_AMOUNT"]) -
                 policy_coverage_detail["INSURANCE_DISC_AMOUNT"];
-            policy_coverage_detail["DEPOSIT_PREMIUM_AMOUNT"] =
-                (policy_coverage_detail["PREMIUM"] *
-                    policy_coverage_detail["DEPOSIT_PREMIUM_PERCENTAGE"]) /
-                100;
         }
 
         if (name == "GROSS_PREMIUM") {
@@ -700,10 +775,28 @@ export default function FormGeneral({
                 value = 0;
             }
         }
+        let sum_insured = changeVal[i]["SUM_INSURED"];
+        // if (name == "LOST_LIMIT_PERCENTAGE") {
+        //     if (value == undefined) {
+        //         value = 0;
+        //     }
+        // }
         if (name == "LOST_LIMIT_PERCENTAGE") {
             if (value == undefined) {
                 value = 0;
             }
+            const lossLimit = searchingLossLimit(value);
+            changeVal[i]["LOST_LIMIT_SCALE"] = lossLimit;
+            changeVal[i]["LOST_LIMIT_AMOUNT"] =
+                sum_insured *
+                (changeVal[i]["RATE"] / 100) *
+                (lossLimit / 100);
+            changeVal[i]["PREMIUM"] =
+                (changeVal[i]["LOST_LIMIT_AMOUNT"] == 0 ||
+                changeVal[i]["LOST_LIMIT_AMOUNT"] == null
+                    ? changeVal[i]["GROSS_PREMIUM"]
+                    : changeVal[i]["LOST_LIMIT_AMOUNT"]) -
+                changeVal[i]["INSURANCE_DISC_AMOUNT"];
         }
         if (name == "DEPOSIT_PREMIUM_AMOUNT") {
             if (value == undefined) {
@@ -711,7 +804,7 @@ export default function FormGeneral({
             }
         }
 
-        let sum_insured = changeVal[i]["SUM_INSURED"];
+        // let sum_insured = changeVal[i]["SUM_INSURED"];
         if (name == "RATE") {
             if (value == undefined) {
                 value = 0;
@@ -890,6 +983,7 @@ export default function FormGeneral({
     const handleAddInsurer = async () => {
         const id = policy.POLICY_ID;
         setFlagSwitch(policy.SELF_INSURED ? true : false);
+        setSwitchPayment(policy.SELF_INSURED ? true : false);
 
         getCoverageNameByPolicyId(id);
         getCoverageGrouping(id);
@@ -1267,6 +1361,7 @@ export default function FormGeneral({
     const handleEditInsurer = async () => {
         const id = policy.POLICY_ID;
         setFlagSwitch(policy.SELF_INSURED ? true : false);
+        setSwitchPayment(policy.SELF_INSURED ? true : false);
 
         getCoverageNameByPolicyId(id);
         getCoverageGrouping(id);
@@ -1626,9 +1721,12 @@ export default function FormGeneral({
             })
             .then((res) => {
                 const data = res.data;
+                data.length > 0 ? console.log("ada") : console.log("tidak");
                 let policy_insured_detail: any = [];
                 data.map((val: any, i: number) => {
+                    console.log('val["INTEREST_INSURED_ID"]: ', val["INTEREST_INSURED_ID"])
                     policy_insured_detail.push({
+                        
                         INTEREST_INSURED_ID: val["INTEREST_INSURED_ID"],
                         // REMARKS: val["REMARKS"],
                         REMARKS: val["REMARKS"]? val["REMARKS"] : "",
@@ -1658,6 +1756,7 @@ export default function FormGeneral({
                             parseFloat(val["CONSULTANCY_FEE"]),
                     });
                 });
+                console.log("policy_insured_detail: ", policy_insured_detail);
                 fieldDataInsured["policy_insured_detail"] =
                     policy_insured_detail;
                 setDataInsured([
@@ -4137,7 +4236,7 @@ export default function FormGeneral({
                                                             rowSpan={2}
                                                             className="text-center p-4 border"
                                                         >
-                                                            Amount
+                                                            Premium Amount
                                                         </th>
                                                         <th
                                                             rowSpan={2}
@@ -4436,7 +4535,7 @@ export default function FormGeneral({
                                                                                 );
                                                                             }}
                                                                             className="block w-36 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
-                                                                            required
+                                                                            readOnly
                                                                         />
                                                                     </td>
                                                                     <td className="p-4 border">
@@ -4662,14 +4761,25 @@ export default function FormGeneral({
                                 </div>
                             </div>
                         ))}
-                        <div className="ml-4 w-40 mb-2 mt-2">
-                            <a
-                                href=""
-                                className="text-xs mt-1 text-primary-pelindo ms-1"
-                                onClick={(e) => addRowCoverage(e)}
-                            >
-                                + Add Coverage
-                            </a>
+                        <div className="ml-4 w-full mb-2 mt-2">
+                            <span className="ml-2 mr-8">
+                                <a
+                                    href=""
+                                    className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
+                                    onClick={(e) => addRowCoverage(e)}
+                                >
+                                    + Add Coverage
+                                </a>
+                            </span>
+                            <span>
+                                <a
+                                    href=""
+                                    className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
+                                    onClick={(e) => copyCoverage(e)}
+                                >
+                                    + Copy From Above
+                                </a>
+                            </span>
                         </div>
                     </>
                 }
@@ -4835,7 +4945,7 @@ export default function FormGeneral({
                                                         rowSpan={2}
                                                         className="text-center p-4 border"
                                                     >
-                                                        Amount
+                                                        Premium Amount
                                                     </th>
                                                     <th
                                                         rowSpan={2}
@@ -5399,10 +5509,10 @@ export default function FormGeneral({
                                     </div>
                                     <div className=" col-span-3">
                                         <span className="font-normal text-gray-500">
-                                            {
-                                                policy.relation ? policy.relation
-                                                    .RELATION_ORGANIZATION_NAME : "-"
-                                            }
+                                            {policy.relation
+                                                ? policy.relation
+                                                      .RELATION_ORGANIZATION_NAME
+                                                : "-"}
                                         </span>
                                     </div>
                                 </div>
@@ -5452,7 +5562,33 @@ export default function FormGeneral({
                                         </h3> */}
                                         <div className="shadow-md border-2 mt-3">
                                             <div className=" ml-4 mr-4 mb-4 mt-4">
-                                                <div className="grid grid-cols-5 gap-4">
+                                                <div className="grid grid-cols-6 gap-4">
+                                                    <div className="text-sm mt-6 flex">
+                                                        <div className="rotate-90 -ml-3">
+                                                            <SwitchPage
+                                                                enabled={
+                                                                    switchPayment
+                                                                }
+                                                                onChangeButton={
+                                                                    handleSwitchPayment
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div className="">
+                                                            <div className="text-xs mb-1">
+                                                                <span>
+                                                                    Direct
+                                                                    Insurance
+                                                                </span>
+                                                            </div>
+                                                            <div className="text-xs">
+                                                                <span>
+                                                                    Direct
+                                                                    Fresnel
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div>
                                                         <InputLabel
                                                             htmlFor="edit_relation"
@@ -5753,7 +5889,7 @@ export default function FormGeneral({
                                                                 colSpan={6}
                                                                 className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
                                                             >
-                                                                Engineering Fee
+                                                                Additional Fee
                                                             </th>
                                                             <th
                                                                 colSpan={5}
@@ -6806,10 +6942,10 @@ export default function FormGeneral({
                                     </div>
                                     <div className=" col-span-3">
                                         <span className="font-normal text-gray-500">
-                                            {
-                                                policy.relation ? policy.relation
-                                                    .RELATION_ORGANIZATION_NAME : "-"
-                                            }
+                                            {policy.relation
+                                                ? policy.relation
+                                                      .RELATION_ORGANIZATION_NAME
+                                                : "-"}
                                         </span>
                                     </div>
                                 </div>
@@ -7138,7 +7274,7 @@ export default function FormGeneral({
                                                                 colSpan={6}
                                                                 className="text-center md:p-4 p-0 md:w-52 text-black border-r border-gray-300"
                                                             >
-                                                                Engineering Fee
+                                                                Additional Fee
                                                             </th>
                                                             <th
                                                                 colSpan={5}
@@ -8388,7 +8524,7 @@ export default function FormGeneral({
                                                             colSpan={4}
                                                             className="text-center p-4 border border-t-0 border-gray-300"
                                                         >
-                                                            Engineering Fee
+                                                            Additional Fee
                                                         </th>
                                                         <th
                                                             colSpan={4}
@@ -9313,7 +9449,7 @@ export default function FormGeneral({
                                                         colSpan={4}
                                                         className="text-center p-4 border border-t-0 border-gray-300"
                                                     >
-                                                        Engineering Fee
+                                                        Additional Fee
                                                     </th>
                                                     <th
                                                         colSpan={4}
@@ -10080,7 +10216,7 @@ export default function FormGeneral({
                                                 scope="col"
                                                 className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
                                             >
-                                                Engineering Fee
+                                                Additional Fee
                                             </th>
                                             <th
                                                 colSpan={2}
@@ -10334,7 +10470,7 @@ export default function FormGeneral({
                                             colSpan={6}
                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                         >
-                                            <div>Engineering Fee</div>
+                                            <div>Additional Fee</div>
                                             <div>
                                                 {new Intl.NumberFormat("id", {
                                                     style: "decimal",
@@ -12415,9 +12551,11 @@ export default function FormGeneral({
                                                                     {i + 1}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border border-gray-30">
-                                                                    {
-                                                                        val.insurance ? val.insurance.RELATION_ORGANIZATION_NAME : "-"
-                                                                    }
+                                                                    {val.insurance
+                                                                        ? val
+                                                                              .insurance
+                                                                              .RELATION_ORGANIZATION_NAME
+                                                                        : "-"}
                                                                 </td>
                                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border border-gray-30 text-right">
                                                                     {new Intl.NumberFormat(
@@ -13095,7 +13233,7 @@ export default function FormGeneral({
                                                             colSpan={2}
                                                             className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900  border-[1px]"
                                                         >
-                                                            Engineering Fee
+                                                            Additional Fee
                                                         </th>
                                                         <th
                                                             scope="col"

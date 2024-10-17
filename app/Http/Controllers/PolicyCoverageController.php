@@ -158,6 +158,11 @@ class PolicyCoverageController extends Controller
         $data = RInterestInsured::get();
         return response()->json($data);
     }
+    
+    public function getLossLimit() {
+        $data = DB::table('r_loss_limit_scale')->get();
+        return response()->json($data);
+    }
 
      public function getCoverageGroupingByPolicyId($id) {
         
