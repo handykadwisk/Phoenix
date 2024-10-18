@@ -20,6 +20,9 @@ export default function ModalToAction({
     headers,
     submitButtonName,
     classPanel,
+    buttonAddOns,
+    actionDelete,
+    toggleMenuDeleteStatus,
     buttonEdit,
     actionEdit,
 }: PropsWithChildren<{
@@ -35,6 +38,9 @@ export default function ModalToAction({
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
+    buttonAddOns?: any;
+    actionDelete?: any;
+    toggleMenuDeleteStatus?: any;
     buttonEdit?: null | string | any;
     actionEdit?: any;
 }>) {
@@ -176,6 +182,16 @@ export default function ModalToAction({
                                                     disabled={isProcessing}
                                                 >
                                                     {submitButtonName}
+                                                </PrimaryButton>
+                                            )}
+                                             {buttonAddOns && (
+                                                <PrimaryButton
+                                                    className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                    disabled={isProcessing}
+                                                    onClick={(e) => actionDelete(e,data.id, buttonAddOns)}
+                                                >
+                                                    {buttonAddOns}
+
                                                 </PrimaryButton>
                                             )}
                                             {buttonEdit?.textButton ===

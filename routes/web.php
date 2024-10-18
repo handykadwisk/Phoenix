@@ -646,7 +646,24 @@ Route::middleware('auth')->group(function () {
     Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
     Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
 
-
+    // Message Chat
+    Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
+    Route::post('/addChatMessage', [TDetailChatController::class, 'store'])->name('addChatMessage.store');
+    Route::post('/getTypeChatByTagId', [TDetailChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
+    Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
+    Route::post('/pinMessageObject', [TDetailChatController::class, 'pinMessageObject'])->name('pinMessageObject.pinMessageObject');
+    Route::post('/getChatPin', [TDetailChatController::class, 'getChatPin'])->name('getChatPin.getChatPin');
+    Route::post('/getDataParticipant', [TDetailChatController::class, 'get_participant'])->name('getDataParticipant.get_participant');
+    Route::post('/unPinMessageObject', [TDetailChatController::class, 'unPinMessageObject'])->name('unPinMessageObject.unPinMessageObject');
+    Route::post('/getDataParticipantById', [TDetailChatController::class, 'getDataParticipantById'])->name('getDataParticipantById.getDataParticipantById');
+    Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
+    Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
+    Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
+    Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
+    Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
+    Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
+    Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
+    Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
 
 
 
