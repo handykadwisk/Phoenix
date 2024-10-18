@@ -26,82 +26,85 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            tuser::class,
+        // create menu
+        $dashboard = Menu::create(
+            [
+                'menu_name'       => 'Dashboard',
+                'menu_url'        => 'dashboard',
+                'menu_is_deleted' => 1,
+                'menu_sequence'   => 1,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $relation = Menu::create(
+            [
+                'menu_name'       => 'Relation',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 2,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $policy = Menu::create(
+            [
+                'menu_name'       => 'Policy',
+                'menu_url'        => 'policy',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 3,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $group = Menu::create(
+            [
+                'menu_name'       => 'Policy',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'policy/policy',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 8,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $group = Menu::create(
+            [
+                'menu_name'       => 'Group',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation/group',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 5,
+                'menu_created_by' => 'admin'
+            ]
+        );
+        $childRelation = Menu::create(
+            [
+                'menu_name'       => 'Relation',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 4,
+                'menu_created_by' => 'admin'
+            ]
+        );
 
-        ]);
-        $this->call([
-            rusertype::class,
+        $childAgent = Menu::create(
+            [
+                'menu_name'       => 'Agent',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation/agent',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 6,
+                'menu_created_by' => 'admin'
+            ]
+        );
 
-        ]);
-        $this->call([
-            r_menu::class,
-
-        ]);
-        $this->call([
-            mroleusers::class,
-
-        ]);
-
-
-
-        // // create menu
-        // $dashboard = Menu::create(
-        //     [
-        //         'menu_name'       => 'Dashboard',
-        //         'menu_url'        => 'dashboard',
-        //         'menu_is_deleted' => 1,
-        //         'menu_sequence'   => 1,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // );
-        // $relation = Menu::create(
-        //     [
-        //         'menu_name'       => 'Relation',
-        //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 2,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // );
-        // $policy = Menu::create(
-        //     [
-        //         'menu_name'       => 'Policy',
-        //         'menu_url'        => 'policy',
-        //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 3,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // );
-        // $group = Menu::create(
-        //     [
-        //         'menu_name'       => 'Policy',
-        //         'menu_parent_id'  => $relation->id,
-        //         'menu_url'        => 'policy/policy',
-        //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 8,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // );
-        // $group = Menu::create(
-        //     [
-        //         'menu_name'       => 'Group',
-        //         'menu_parent_id'  => $relation->id,
-        //         'menu_url'        => 'relation/group',
-        //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 5,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // );
-        // $childRelation = Menu::create(
-        //     [
-        //         'menu_name'       => 'Relation',
-        //         'menu_parent_id'  => $relation->id,
-        //         'menu_url'        => 'relation',
-        //         'menu_is_deleted' => 0,
-        //         'menu_sequence'   => 4,
-        //         'menu_created_by' => 'admin'
-        //     ]
-        // );
+        $childBAA = Menu::create(
+            [
+                'menu_name'       => 'BAA',
+                'menu_parent_id'  => $relation->id,
+                'menu_url'        => 'relation/baa',
+                'menu_is_deleted' => 0,
+                'menu_sequence'   => 7,
+                'menu_created_by' => 'admin'
+            ]
+        );
 
         // $finance = Menu::create(
         //     [
@@ -324,30 +327,33 @@ class DatabaseSeeder extends Seeder
         //     'menu_id' => $ACLRole->id
         // ]);
 
-        // RoleAccessMenu::create([
-        //     'role_id' => $admin->id,
-        //     'menu_id' => $group->id
-        // ]);
-        // RoleAccessMenu::create([
-        //     'role_id' => $admin->id,
-        //     'menu_id' => $childRelation->id
-        // ]);
-        // RoleAccessMenu::create([
-        //     'role_id' => $admin->id,
-        //     'menu_id' => $childAgent->id
-        // ]);
-        // RoleAccessMenu::create([
-        //     'role_id' => $admin->id,
-        //     'menu_id' => $childBAA->id
-        // ]);
-        // RoleAccessMenu::create([
-        //     'role_id' => $admin->id,
-        //     'menu_id' => $HR->id
-        // ]);
-        // RoleAccessMenu::create([
-        //     'role_id' => $admin->id,
-        //     'menu_id' => $hrCompany->id
-        // ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $group->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childRelation->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childAgent->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $childBAA->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $HR->id
+        ]);
+        RoleAccessMenu::create([
+            'role_id' => $admin->id,
+            'menu_id' => $hrCompany->id
+        ]);
+
+
+
 
         // create user
         // User::create(
@@ -650,10 +656,18 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path32)
         );
 
-        $file_path33 = resource_path('../database/LogDB/2024_07_31_t_menu.sql');
+        // create 2024_14_10_r_method_notification
+        $r_method_notification = resource_path('../database/LogDB/2024_14_10_r_method_notification.sql');
 
         DB::unprepared(
-            file_get_contents($file_path33)
+            file_get_contents($r_method_notification)
+        );
+
+        // create 2024_14_10_r_reminder_tier
+        $r_reminder_tier = resource_path('../database/LogDB/2024_14_10_r_reminder_tier.sql');
+
+        DB::unprepared(
+            file_get_contents($r_reminder_tier)
         );
     }
 }

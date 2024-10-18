@@ -4,15 +4,33 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Button/Button";
 import TextInput from "@/Components/TextInput";
 import AGGrid from "@/Components/AgGrid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
 import ToastMessage from "@/Components/ToastMessage";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import DetailCompany from "./DetailCompany";
+import KendoGrid from "@/Components/KendoGrid/KendoGrid";
+import axios from "axios";
 
 export default function Company({ auth }: PageProps) {
+    // for get Company
+    useEffect(() => {
+        getCompany();
+    }, []);
+    const [Company, setCompany] = useState<any>([]);
+    const getCompany = async () => {
+        await axios
+            .post(`/getCompany`)
+            .then((res) => {
+                setCompany(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     // modal for commpany
     const [modalCompany, setModalCompany] = useState<any>({
         add: false,
@@ -394,6 +412,7 @@ export default function Company({ auth }: PageProps) {
                 
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        {/* <KendoGrid dataResult={Company} /> */}
                         <AGGrid
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}

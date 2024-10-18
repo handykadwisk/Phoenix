@@ -222,7 +222,7 @@ export default function Structure({
                                 {nameRelation}
                             </div>
                         </div>
-                        <div className="xs:grid xs:grid-cols-1 xs:gap-4 mt-2 lg:grid lg:grid-cols-2 lg:gap-4">
+                        <div className="xs:grid xs:grid-cols-1 xs:gap-4 mt-2 lg:grid lg:grid-cols-1 lg:gap-4">
                             <div className="relative">
                                 <InputLabel
                                     className="absolute"
@@ -248,7 +248,7 @@ export default function Structure({
                                     placeholder="Structure Name"
                                 />
                             </div>
-                            <div className="relative">
+                            <div className="relative hidden">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="RELATION_GRADE_ID"

@@ -406,38 +406,90 @@ export default function DetailBaa({
             />
             {/* end modal relation */}
 
-            <div className="max-w-full h-[100%] mt-2">
-                <AGGrid
-                    searchParam={""}
-                    // loading={isLoading.get_policy}
-                    url={"getMRelationBAA"}
-                    addButtonLabel={"Add Relation"}
-                    withParam={idBaa}
-                    addButtonModalState={() => handleClickAddRelationBAA(idBaa)}
-                    doubleClickEvent={handleDetailRelation}
-                    triggeringRefreshData={isSuccessBAA}
-                    colDefs={[
-                        {
-                            headerName: "No.",
-                            valueGetter: "node.rowIndex + 1",
-                            flex: 1,
-                        },
-                        {
-                            headerName: "Relation Name",
-                            field: "RELATION_ORGANIZATION_ALIAS",
-                            flex: 7,
-                            filter: "agTextColumnFilter",
-                            filterParams: {
-                                filterOptions: ["contains"],
-                            },
-                            floatingFilter: true,
-                        },
-                        {
-                            field: "Action",
-                            cellRenderer: CustomButtonComponent,
-                        },
-                    ]}
-                />
+            <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
+                <div className="flex flex-col">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-[100%]">
+                        <div
+                            className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
+                            onClick={(e) => handleClickAddRelationBAA(idBaa)}
+                        >
+                            <span>Add Relation</span>
+                        </div>
+                    </div>
+                    {/* <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
+                        <TextInput
+                            type="text"
+                            value={searchAgent.RELATION_ORGANIZATION_NAME}
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) =>
+                                setSearchAgent({
+                                    ...searchAgent,
+                                    RELATION_ORGANIZATION_NAME: e.target.value,
+                                })
+                            }
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    if (
+                                        searchAgent.RELATION_ORGANIZATION_NAME !==
+                                        ""
+                                    ) {
+                                        getAgent();
+                                    }
+                                }
+                            }}
+                            placeholder="Search Agent Name"
+                        />
+                        <div className="mt-4 flex justify-end gap-2">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
+                                onClick={() => clearSearchAgent()}
+                            >
+                                Search
+                            </div>
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => clearSearchAgent()}
+                            >
+                                Clear Search
+                            </div>
+                        </div>
+                    </div> */}
+                </div>
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            searchParam={""}
+                            // loading={isLoading.get_policy}
+                            url={"getMRelationBAA"}
+                            addButtonLabel={undefined}
+                            withParam={idBaa}
+                            addButtonModalState={undefined}
+                            doubleClickEvent={handleDetailRelation}
+                            triggeringRefreshData={isSuccessBAA}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Relation Name",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                    filter: "agTextColumnFilter",
+                                    filterParams: {
+                                        filterOptions: ["contains"],
+                                    },
+                                    floatingFilter: true,
+                                },
+                                {
+                                    field: "Action",
+                                    cellRenderer: CustomButtonComponent,
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
             </div>
         </>
     );

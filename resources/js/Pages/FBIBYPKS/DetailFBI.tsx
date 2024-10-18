@@ -427,7 +427,120 @@ export default function DetailFBI({
             />
             {/* end modal relation */}
 
-            <div className="max-w-full h-[100%] mt-2">
+            <div className="grid grid-cols-4 gap-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
+                <div className="flex flex-col">
+                    <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-[100%]">
+                        <div
+                            className="bg-red-600 w-fit p-2 rounded-md text-white hover:bg-red-500 hover:cursor-pointer"
+                            onClick={(e) => handleClickAddRelationFBI(idFBI)}
+                        >
+                            <span>Add Relation</span>
+                        </div>
+                    </div>
+                    {/* <div className="bg-white rounded-md shadow-md p-4 max-h-[80rem] h-[100%]">
+                        <TextInput
+                            id="PERSON_FIRST_NAME"
+                            type="text"
+                            name="PERSON_FIRST_NAME"
+                            value={
+                                searchEmployee.company_employee[0]
+                                    .EMPLOYEE_FIRST_NAME === ""
+                                    ? ""
+                                    : searchEmployee.company_employee[0]
+                                          .EMPLOYEE_FIRST_NAME
+                            }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "EMPLOYEE_FIRST_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchEmployee.company_employee[0]
+                                        .EMPLOYEE_FIRST_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+
+                                // setSearchRelation([
+                                //     ...searchRelation,
+                                //     {
+                                //         RELATION_ORGANIZATION_NAME:
+                                //             e.target.value,
+                                //     },
+                                // ])
+                            }}
+                            placeholder="Search Employee Name"
+                        />
+                        <div className="mt-4 flex justify-end gap-2">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                // onClick={() => {
+                                //     if (
+                                //         searchEmployee.company_employee[0]
+                                //             .EMPLOYEE_FIRST_NAME === ""
+                                //     ) {
+                                //         inputDataSearch("flag", "", 0);
+                                //     } else {
+                                //         inputDataSearch("flag", "", 0);
+                                //     }
+                                //     setRefreshGrid("success");
+                                //     setTimeout(() => {
+                                //         setRefreshGrid("");
+                                //     }, 1000);
+                                // }}
+                            >
+                                Search
+                            </div>
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                // onClick={(e) => clearSearchEmployee(e)}
+                            >
+                                Clear Search
+                            </div>
+                        </div>
+                    </div> */}
+                </div>
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-employee rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            searchParam={""}
+                            // loading={isLoading.get_policy}
+                            url={"getMRelationFBI"}
+                            addButtonLabel={undefined}
+                            withParam={idFBI}
+                            addButtonModalState={undefined}
+                            doubleClickEvent={handleDetailRelation}
+                            triggeringRefreshData={isSuccessNew}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Relation Name",
+                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    flex: 7,
+                                    filter: "agTextColumnFilter",
+                                    filterParams: {
+                                        filterOptions: ["contains"],
+                                    },
+                                    floatingFilter: true,
+                                },
+                                {
+                                    field: "Action",
+                                    cellRenderer: CustomButtonComponent,
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
+            </div>
+            {/* <div className="max-w-full h-[100%] mt-2">
                 <AGGrid
                     searchParam={""}
                     // loading={isLoading.get_policy}
@@ -459,7 +572,7 @@ export default function DetailFBI({
                         },
                     ]}
                 />
-            </div>
+            </div> */}
         </>
     );
 }

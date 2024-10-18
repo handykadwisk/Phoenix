@@ -18,16 +18,18 @@ export default function AddChatPlugin({
     dataPluginProcess,
     setDataPluginProcess,
     handleSuccessPlugin,
+    optionsParticipant,
 }: PropsWithChildren<{
     modalPlugin: any;
     setModalPlugin: any;
     dataPluginProcess: any;
     setDataPluginProcess: any;
     handleSuccessPlugin: any;
+    optionsParticipant: any;
 }>) {
-    useEffect(() => {
-        getDataParticipant();
-    }, [dataPluginProcess]);
+    // useEffect(() => {
+    //     getDataParticipant();
+    // }, []);
     const permissionObject = (e: any) => {
         // e.preventDefault();
 
@@ -40,17 +42,17 @@ export default function AddChatPlugin({
         });
     };
 
-    const [optionsParticipant, setOptionsParticipant] = useState<any>([]);
-    const getDataParticipant = async () => {
-        await axios
-            .post(`/getDataParticipant`)
-            .then((res) => {
-                setOptionsParticipant(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+    // const [optionsParticipant, setOptionsParticipant] = useState<any>([]);
+    // const getDataParticipant = async () => {
+    //     await axios
+    //         .post(`/getDataParticipant`)
+    //         .then((res) => {
+    //             setOptionsParticipant(res.data);
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         });
+    // };
 
     const dataParticipant = optionsParticipant?.map((query: any) => {
         return {
@@ -68,7 +70,7 @@ export default function AddChatPlugin({
                         add: false,
                     })
                 }
-                title={"Add Plugin"}
+                title={"Add Chat"}
                 url={`/addPluginProcess`}
                 data={dataPluginProcess}
                 onSuccess={handleSuccessPlugin}

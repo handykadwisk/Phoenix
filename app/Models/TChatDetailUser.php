@@ -28,4 +28,9 @@ class TChatDetailUser extends Model
     {
         return $this->hasOne(TChat::class, "CHAT_ID", "CHAT_ID");
     }
+
+    public function userFormTo()
+    {
+        return $this->hasOne(User::class, "id", "CHAT_DETAIL_USER_FROM");
+    }
 }

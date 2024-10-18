@@ -361,8 +361,14 @@ export default function Group({ auth }: PageProps) {
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchGroup()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchGroup.RELATION_GROUP_NAME !== ""
+                                    ) {
+                                        getRelationGroup();
+                                    }
+                                }}
                             >
                                 Search
                             </div>

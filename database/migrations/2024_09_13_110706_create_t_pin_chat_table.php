@@ -16,6 +16,8 @@ return new class extends Migration
             $table->smallInteger('PIN_CHAT')->nullable()->comment("1 = Pin, 0 = Unpin")->default(0);
             $table->bigInteger('CREATED_PIN_CHAT_BY')->nullable();
             $table->dateTime('CREATED_PIN_CHAT_DATE')->nullable();
+            $table->bigInteger('CHAT_DETAIL_ID')->nullable();
+            $table->bigInteger('CHAT_ID')->nullable();
         });
     }
 
