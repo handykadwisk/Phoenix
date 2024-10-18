@@ -14,21 +14,45 @@ export default function AddReminder({
     setData,
     modalReminder,
     setModalReminder,
+    setIsSuccessChat,
 }: PropsWithChildren<{
     data: any;
     setData: any;
     modalReminder: any;
     setModalReminder: any;
+    setIsSuccessChat: any;
 }>) {
     useEffect(() => {
         getDataParticipant();
+        getReminderTier();
+        getMethodNotification();
     }, []);
 
-    const dataNotification = [
-        { id: 1, name: "App Notification" },
-        { id: 2, name: "Email" },
-        { id: 3, name: "WA" },
-    ];
+    // for tier Participant
+    const [reminderTier, setReminderTier] = useState<any>([]);
+    const getReminderTier = async () => {
+        await axios
+            .post(`/getReminderTier`)
+            .then((res) => {
+                setReminderTier(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // for get notification method
+    const [methodNotification, setMethodNotification] = useState<any>([]);
+    const getMethodNotification = async () => {
+        await axios
+            .post(`/getMethodNotification`)
+            .then((res) => {
+                setMethodNotification(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     const [optionsParticipant, setOptionsParticipant] = useState<any>([]);
     const getDataParticipant = async () => {
@@ -56,6 +80,7 @@ export default function AddReminder({
             PARTICIPANT: [
                 ...data.PARTICIPANT,
                 {
+                    TIER: "",
                     PARTICIPANT_ID: null,
                 },
             ],
@@ -72,9 +97,69 @@ export default function AddReminder({
         setData({ ...data, PARTICIPANT: changeVal });
     };
 
+    const inputDataTier = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...data.PARTICIPANT];
+        changeVal[i][name] = value;
+        setData({ ...data, PARTICIPANT: changeVal });
+    };
+
     const checkCheckedMRelation = (id: number) => {
-        if (data.NOTIFICATION_ID === id) {
+        if (data.NOTIFICATION[0].NOTIFICATION_ID === id) {
             return true;
+        }
+    };
+
+    const handleCheckbox = (e: any) => {
+        const { value, checked } = e.target;
+
+        if (checked) {
+            setData({
+                ...data,
+                NOTIFICATION: [
+                    ...data.NOTIFICATION,
+                    {
+                        NOTIFICATION_ID: value,
+                    },
+                ],
+            });
+        } else {
+            const updatedData = data.NOTIFICATION.filter(
+                (data: any) => data.NOTIFICATION_ID !== value
+            );
+            setData({ ...data, NOTIFICATION: updatedData });
+        }
+    };
+
+    const handleSuccessAddReminder = async (message: any) => {
+        setIsSuccessChat("");
+        if (message !== "") {
+            setIsSuccessChat(message[0]);
+            setData({
+                REMINDER_TITLE: "",
+                REMINDER_TIMES: "",
+                REMINDER_DAYS: "",
+                REMINDER_START_DATE: "",
+                REMINDER_DESKRIPSI: "",
+                NOTIFICATION: [
+                    {
+                        NOTIFICATION_ID: 1,
+                    },
+                ],
+                PARTICIPANT: [
+                    {
+                        TIER: "",
+                        PARTICIPANT_ID: null,
+                    },
+                ],
+            });
+
+            setTimeout(() => {
+                setIsSuccessChat("");
+            }, 2000);
         }
     };
 
@@ -106,13 +191,17 @@ export default function AddReminder({
                     });
                     setData({
                         ...data,
-                        NOTIFICATION_ID: 1,
+                        NOTIFICATION: [
+                            {
+                                NOTIFICATION_ID: 1,
+                            },
+                        ],
                     });
                 }}
                 title={"Add Reminder"}
-                url={`/addCompany`}
+                url={`/addReminder`}
                 data={data}
-                onSuccess={""}
+                onSuccess={handleSuccessAddReminder}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
                 }
@@ -127,15 +216,20 @@ export default function AddReminder({
                                 />
                                 <TextInput
                                     type="text"
-                                    value={data.EMPLOYEE_BANK_ACCOUNT_NUMBER}
+                                    value={data.REMINDER_TITLE}
                                     className=""
-                                    onChange={(e) => {}}
+                                    onChange={(e) => {
+                                        setData({
+                                            ...data,
+                                            REMINDER_TITLE: e.target.value,
+                                        });
+                                    }}
                                     required
                                     placeholder="Title Reminder *"
                                 />
                             </div>
                         </div>
-                        <div>
+                        <div className="mt-1">
                             <div>
                                 <InputLabel
                                     className=""
@@ -196,6 +290,15 @@ export default function AddReminder({
                                                                 val,
                                                                 index
                                                             );
+                                                            inputDataTier(
+                                                                "TIER",
+                                                                "Tier " +
+                                                                    `${
+                                                                        1 +
+                                                                        index
+                                                                    }`,
+                                                                index
+                                                            );
                                                         }}
                                                         primaryColor={
                                                             "bg-red-500"
@@ -244,18 +347,23 @@ export default function AddReminder({
                                     );
                                 }
                             )}
-                            <div className="mt-1">
-                                <a
-                                    className="text-sm cursor-pointer text-slate-500"
-                                    onClick={(e: any) => addRowBParticipant(e)}
-                                >
-                                    <span className="hover:underline hover:decoration-from-font">
-                                        <i>+ Add Participant</i>
-                                    </span>
-                                </a>
-                            </div>
+                            {data.PARTICIPANT.length ===
+                            reminderTier.length ? null : (
+                                <div className="mt-1">
+                                    <a
+                                        className="text-sm cursor-pointer text-slate-500"
+                                        onClick={(e: any) =>
+                                            addRowBParticipant(e)
+                                        }
+                                    >
+                                        <span className="hover:underline hover:decoration-from-font">
+                                            <i>+ Add Tier</i>
+                                        </span>
+                                    </a>
+                                </div>
+                            )}
                         </div>
-                        <div>
+                        <div className="mt-1">
                             <div>
                                 <InputLabel
                                     className="text-lg"
@@ -267,23 +375,29 @@ export default function AddReminder({
                                 <div className="col-span-3">
                                     <TextInput
                                         type="text"
-                                        value={
-                                            data.EMPLOYEE_BANK_ACCOUNT_NUMBER
-                                        }
+                                        value={data.REMINDER_TIMES}
                                         className=""
-                                        onChange={(e) => {}}
+                                        onChange={(e) => {
+                                            setData({
+                                                ...data,
+                                                REMINDER_TIMES: e.target.value,
+                                            });
+                                        }}
                                         required
-                                        placeholder="Times *"
+                                        placeholder="How Many Times *"
                                     />
                                 </div>
                                 <div className="col-span-3">
                                     <TextInput
                                         type="text"
-                                        value={
-                                            data.EMPLOYEE_BANK_ACCOUNT_NUMBER
-                                        }
+                                        value={data.REMINDER_DAYS}
                                         className=""
-                                        onChange={(e) => {}}
+                                        onChange={(e) => {
+                                            setData({
+                                                ...data,
+                                                REMINDER_DAYS: e.target.value,
+                                            });
+                                        }}
                                         required
                                         placeholder="How Many Days Apart *"
                                     />
@@ -303,15 +417,16 @@ export default function AddReminder({
                                         </div>
                                         <div className="grid grid-cols-1">
                                             <DatePicker
-                                                value={data.EMPLOYEE_BIRTH_DATE}
-                                                onChange={(date: any) =>
-                                                    setData(
-                                                        "EMPLOYEE_BIRTH_DATE",
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        )
-                                                    )
-                                                }
+                                                value={data.REMINDER_START_DATE}
+                                                onChange={(date: any) => {
+                                                    setData({
+                                                        ...data,
+                                                        REMINDER_START_DATE:
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            ),
+                                                    });
+                                                }}
                                                 peekNextMonth
                                                 showMonthDropdown
                                                 showYearDropdown
@@ -336,9 +451,9 @@ export default function AddReminder({
                             <div>
                                 <ul
                                     role="list"
-                                    className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+                                    className="mt-1 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-2 lg:grid-cols-3"
                                 >
-                                    {dataNotification.map(
+                                    {methodNotification.map(
                                         (items: any, i: number) => {
                                             return (
                                                 <li
@@ -348,34 +463,24 @@ export default function AddReminder({
                                                     <div className="flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white">
                                                         <Checkbox
                                                             defaultChecked={checkCheckedMRelation(
-                                                                items.id
+                                                                items.METHOD_NOTIFICATION_ID
                                                             )}
-                                                            value={items.id}
-                                                            // defaultChecked={
-                                                            //     data.relation_type_id
-                                                            // }
+                                                            value={
+                                                                items.METHOD_NOTIFICATION_ID
+                                                            }
                                                             onChange={(e) => {
-                                                                setData({
-                                                                    ...data,
-                                                                    NOTIFICATION_ID:
-                                                                        e.target
-                                                                            .value,
-                                                                });
-                                                                // handleCheckbox(
-                                                                //     e
-                                                                // );
-                                                                // checkFBIAndAgent();
-                                                                // checkBAA(
-                                                                //     e.target
-                                                                //         .value
-                                                                // );
+                                                                handleCheckbox(
+                                                                    e
+                                                                );
                                                             }}
                                                         />
                                                     </div>
                                                     <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
                                                         <div className="flex-1 truncate px-1 py-2 text-xs">
                                                             <span className="text-gray-900">
-                                                                {items.name}
+                                                                {
+                                                                    items.METHOD_NOTIFICATION_NAME
+                                                                }
                                                             </span>
                                                         </div>
                                                     </div>
@@ -396,14 +501,13 @@ export default function AddReminder({
                             </div>
                             <TextArea
                                 className=""
-                                defaultValue={data.DESCRIPTION}
+                                defaultValue={data.REMINDER_DESKRIPSI}
                                 onChange={(e: any) =>
                                     setData({
                                         ...data,
-                                        DESCRIPTION: e.target.value,
+                                        REMINDER_DESKRIPSI: e.target.value,
                                     })
                                 }
-                                required
                             />
                         </div>
                     </>

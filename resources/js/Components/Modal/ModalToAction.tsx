@@ -20,6 +20,8 @@ export default function ModalToAction({
     headers,
     submitButtonName,
     classPanel,
+    buttonEdit,
+    actionEdit,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
@@ -33,6 +35,8 @@ export default function ModalToAction({
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
+    buttonEdit?: null | string | any;
+    actionEdit?: any;
 }>) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isValidationError, setIsValidationError] = useState<string>("");
@@ -95,7 +99,7 @@ export default function ModalToAction({
                 <Dialog
                     as="div"
                     className="relative z-50"
-                    onClose={close}
+                    onClose={() => {}}
                     initialFocus={modalRef}
                 >
                     <Transition.Child
@@ -174,6 +178,17 @@ export default function ModalToAction({
                                                     {submitButtonName}
                                                 </PrimaryButton>
                                             )}
+                                            {buttonEdit?.textButton ===
+                                            "Edit" ? (
+                                                <div
+                                                    className="inline-flex w-full sm:ml-3 sm:w-auto bg-red-600 p-2 rounded-md text-white font-semibold text-sm cursor-pointer"
+                                                    onClick={(e: any) => {
+                                                        actionEdit(e);
+                                                    }}
+                                                >
+                                                    {buttonEdit?.textButton}
+                                                </div>
+                                            ) : null}
                                             <button
                                                 type="button"
                                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"

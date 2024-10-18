@@ -37,6 +37,7 @@ use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
 use App\Http\Controllers\TJobDescCompanyController;
 use App\Http\Controllers\TDetailChatController;
+use App\Http\Controllers\TReminderController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
@@ -487,12 +488,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
     Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
     Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
+    Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
+
 
 
 
 
     // Reminder
     Route::get('reminder', [TCompanyController::class, 'reminder'])->name('reminder');
+    Route::post('/getReminderTier', [TReminderController::class, 'getReminderTier'])->name('getReminderTier.getReminderTier');
+    Route::post('/getMethodNotification', [TReminderController::class, 'getMethodNotification'])->name('getMethodNotification.getMethodNotification');
+    Route::post('/addReminder', [TReminderController::class, 'store'])->name('addReminder.addReminder');
+    Route::post('/getTReminder', [TReminderController::class, 'get_reminder'])->name('getTReminder.getTReminder');
+    Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.getDetailReminder');
 });
 
 require __DIR__ . '/auth.php';

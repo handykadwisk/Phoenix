@@ -1099,7 +1099,7 @@ export default function ModalChatMessage({
                                                                                     menuButton:
                                                                                         () =>
                                                                                             `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
-                                                                                    menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                                                    menu: "absolute text-left z-999999 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                                                                     listItem:
                                                                                         ({
                                                                                             isSelected,

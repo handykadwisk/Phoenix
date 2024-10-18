@@ -159,6 +159,21 @@ class TDetailChatController extends Controller
         return response()->json($combined);
     }
 
+    public function getParticipantAll()
+    {
+        $employee = DB::table('t_user')
+            ->select('t_user.name as PARTICIPANT_NAME', 't_user.id as PARTICIPANT_ID')
+            ->leftJoin('t_employee', 't_user.employee_id', '=', 't_employee.EMPLOYEE_ID')
+            ->whereNotNull('t_user.employee_id');
+
+        // $division = DB::table('t_company_division')
+        //     ->select('COMPANY_DIVISION_ALIAS AS PARTICIPANT_NAME', 'COMPANY_DIVISION_ID AS PARTICIPANT_ID');
+
+        $combined = $employee->get();
+
+        return response()->json($combined);
+    }
+
     public function getDataParticipantById(Request $request)
     {
         $dataParticipant = TChatParticipant::where('CHAT_ID', $request->chatId)->get();

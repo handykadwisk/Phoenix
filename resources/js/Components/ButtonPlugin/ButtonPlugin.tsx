@@ -50,19 +50,6 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
             });
     };
 
-    // // for load data object chat
-    // const [dataObjectChat, setDataObjectChat] = useState<any>([]);
-    // const getObjectChat = async () => {
-    //     await axios
-    //         .post(`/getObjectChat`)
-    //         .then((res) => {
-    //             setDataObjectChat(res.data);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
-
     const [flagPlugin, setFlagPlugin] = useState<boolean>(false);
     // for modal chat message
     const [showChatMessage, setShowChatMessage] = useState({
@@ -165,7 +152,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
             ) : null} */}
 
             <div
-                className="fixed z-99 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
+                className="fixed z-50 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
                 onClick={(e) => handleClickShow(e)}
             >
                 <span>

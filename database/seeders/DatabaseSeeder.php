@@ -94,7 +94,7 @@ class DatabaseSeeder extends Seeder
                 'menu_created_by' => 'admin'
             ]
         );
-        
+
         $childBAA = Menu::create(
             [
                 'menu_name'       => 'BAA',
@@ -317,7 +317,7 @@ class DatabaseSeeder extends Seeder
             'menu_id' => $hrCompany->id
         ]);
 
-        
+
 
 
         // create user
@@ -520,5 +520,18 @@ class DatabaseSeeder extends Seeder
             file_get_contents($r_plugin_process)
         );
 
+        // create 2024_14_10_r_method_notification
+        $r_method_notification = resource_path('../database/LogDB/2024_14_10_r_method_notification.sql');
+
+        DB::unprepared(
+            file_get_contents($r_method_notification)
+        );
+
+        // create 2024_14_10_r_reminder_tier
+        $r_reminder_tier = resource_path('../database/LogDB/2024_14_10_r_reminder_tier.sql');
+
+        DB::unprepared(
+            file_get_contents($r_reminder_tier)
+        );
     }
 }
