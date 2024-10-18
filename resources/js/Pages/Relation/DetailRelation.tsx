@@ -2472,6 +2472,45 @@ export default function DetailRelation({
                 <>
                     {/* Button */}
                     <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickAddressLocation(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Address & Location</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickPIC(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>PIC</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickDocument(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Document</span>
+                            </div>
+                        </div>
                         <div className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500">
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <div>
@@ -2502,19 +2541,7 @@ export default function DetailRelation({
                                 <span>Division</span>
                             </div>
                         </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickAddressLocation(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Address & Location</span>
-                            </div>
-                        </div>
+
                         <div
                             className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
                             onClick={(e) =>
@@ -2539,32 +2566,6 @@ export default function DetailRelation({
                         >
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <span>Person & User</span>
-                            </div>
-                        </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickPIC(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>PIC</span>
-                            </div>
-                        </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickDocument(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Document</span>
                             </div>
                         </div>
                     </div>

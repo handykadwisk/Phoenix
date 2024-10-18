@@ -28,6 +28,7 @@ import TextArea from "@/Components/TextArea";
 import SelectTailwind from "react-tailwindcss-select";
 import DetailSubGroup from "./DetailSubGroup";
 import SummaryGroup from "./SummaryGroup";
+import SummaryRelation from "./SummaryRelation";
 
 export default function DetailGroup({
     idGroup,
@@ -61,6 +62,11 @@ export default function DetailGroup({
     const [groupName, setGroupName] = useState<any>({
         RELATION_GROUP_NAME: "",
         RELATION_GROUP_ID: "",
+    });
+
+    const [relationName, setRelationName] = useState<any>({
+        RELATION_NAME: "",
+        RELATION_ID: "",
     });
 
     // variable for modal
@@ -246,6 +252,11 @@ export default function DetailGroup({
     });
 
     const [modalSummaryGroup, setModalSummaryGroup] = useState({
+        view: false,
+        edit: false,
+    });
+
+    const [modalSummaryRelation, setModalSummaryRelation] = useState({
         view: false,
         edit: false,
     });
@@ -444,6 +455,18 @@ export default function DetailGroup({
                                                       >
                                                           <span>Edit</span>
                                                       </div>
+                                                      <div
+                                                          className="text-sm bg-amber-400 p-2 rounded-md text-white cursor-pointer hover:bg-amber-200"
+                                                          onClick={(e) => {
+                                                              handleClickSummary(
+                                                                  e,
+                                                                  dChilds.RELATION_GROUP_ID,
+                                                                  dChilds.RELATION_GROUP_NAME
+                                                              );
+                                                          }}
+                                                      >
+                                                          <span>Summary</span>
+                                                      </div>
                                                   </div>
                                               </li>
                                           </ul>
@@ -549,6 +572,22 @@ export default function DetailGroup({
                                                                                         Group
                                                                                     </span>
                                                                                 </div>
+                                                                                <div
+                                                                                    className="text-sm bg-amber-400 p-2 rounded-md text-white cursor-pointer hover:bg-amber-300"
+                                                                                    onClick={(
+                                                                                        e: any
+                                                                                    ) => {
+                                                                                        handleClickRelationSummary(
+                                                                                            e,
+                                                                                            dataRelationsNew.RELATION_ORGANIZATION_ID,
+                                                                                            dataRelationsNew.RELATION_ORGANIZATION_NAME
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    <span>
+                                                                                        Summary
+                                                                                    </span>
+                                                                                </div>
                                                                             </div>
                                                                         </li>
                                                                     </ul>
@@ -625,12 +664,6 @@ export default function DetailGroup({
         name_group: string
     ) => {
         e.preventDefault();
-        // getRelationNoGroup();
-        // getDetailSubGroupParent(idGroup);
-        // setDataRelation({
-        //     ...dataRelation,
-        //     RELATION_ORGANIZATION_GROUP: idGroup,
-        // });
         setGroupName({
             RELATION_GROUP_NAME: name_group,
             RELATION_GROUP_ID: idGroup,
@@ -641,6 +674,24 @@ export default function DetailGroup({
         });
     };
     // end Add summary Group
+
+    // for handle click relation summary
+    const handleClickRelationSummary = async (
+        e: FormEvent,
+        idRelation: string,
+        nameRelation: string
+    ) => {
+        e.preventDefault();
+        setRelationName({
+            RELATION_NAME: nameRelation,
+            RELATION_ID: idRelation,
+        });
+        setModalSummaryRelation({
+            view: !modalSummaryRelation.view,
+            edit: false,
+        });
+    };
+    // end for handle click relation summary
 
     const inputRefTag = useRef<HTMLInputElement>(null);
     const [query, setQuery] = useState("");
@@ -849,6 +900,36 @@ export default function DetailGroup({
                 body={
                     <>
                         <SummaryGroup idGroup={idGroup} />
+                    </>
+                }
+            />
+
+            {/* modal summary relation */}
+            <ModalToAction
+                show={modalSummaryRelation.view}
+                onClose={() => {
+                    setModalSummaryRelation({
+                        view: false,
+                        edit: false,
+                    });
+                    getDetailGroup(idGroup);
+                    getGroupName(idGroup);
+                }}
+                title={relationName.RELATION_NAME}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={""}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <SummaryRelation
+                            idRelation={relationName.RELATION_ID}
+                        />
                     </>
                 }
             />
@@ -1604,6 +1685,22 @@ export default function DetailGroup({
                                                                                                   Remove
                                                                                                   From
                                                                                                   Group
+                                                                                              </span>
+                                                                                          </div>
+                                                                                          <div
+                                                                                              className="text-sm bg-amber-400 p-2 rounded-md text-white cursor-pointer hover:bg-amber-300"
+                                                                                              onClick={(
+                                                                                                  e: any
+                                                                                              ) => {
+                                                                                                  handleClickRelationSummary(
+                                                                                                      e,
+                                                                                                      dataRelation.RELATION_ORGANIZATION_ID,
+                                                                                                      dataRelation.RELATION_ORGANIZATION_NAME
+                                                                                                  );
+                                                                                              }}
+                                                                                          >
+                                                                                              <span>
+                                                                                                  Summary
                                                                                               </span>
                                                                                           </div>
                                                                                       </div>
