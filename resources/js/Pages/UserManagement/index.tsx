@@ -203,6 +203,13 @@ export default function UserManagement({ auth, type }: any) {
         }
     }
 
+    const roleFor = dataRole?.map((role: Role) => {
+        return {
+            value: role.id,
+            label: role.role_name
+        };
+    });
+
     //get type
     const getTypeTest = async () => {
         try {
@@ -213,54 +220,10 @@ export default function UserManagement({ auth, type }: any) {
         }
     }
 
-    //clear search
-    const clearSearchRole = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getUser?${pageNumber}`)
-            .then((res) => {
-                setDataUser(res.data);
-                setSearchUser({
-                    ...searchUser,
-                    name: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
 
-    const roleFor = dataRole?.map((role: Role) => {
-        return {
-            value: role.id,
-            label: role.role_name
-        };
-    });
-
+    
     //modal add
     const addRolePopup = async (e: FormEvent) => {
-        // e.preventDefault();
-        // try {
-        //     // Jalankan semua request secara paralel dan tunggu hingga semuanya selesai
-        //     await Promise.all([
-        //         getTypeTest(),
-        //         getDiv(),
-        //         getRole(),
-        //         getJobPost(),
-        //         getAllRelations(),
-        //         getEmployee()
-        //     ]);
-
-        //     // Jika semua request selesai, baru buka modal
-        //     setModal({
-        //         add: true, // Ubah ke true, bukan toggle, karena kita pasti ingin membukanya
-        //         edit: false,
-        //         reset: false
-        //     });
-
-        // } catch (error) {
-        //     console.error("Error loading data:", error);
-        //     // Anda bisa menambahkan penanganan error di sini, misalnya menampilkan pesan error di UI
-        // }
         getCompanies()
         getTypeTest()
         getDiv()
@@ -307,7 +270,6 @@ export default function UserManagement({ auth, type }: any) {
     })
     //end relation data
 
-    // handle success
     const getDataRoleSelect = (dataRole: any) => {
         const roleFor = dataRole?.map((role: any) => {
             // console.log("aaab",role.role_name);
@@ -330,43 +292,6 @@ export default function UserManagement({ auth, type }: any) {
         dataInputEdit.newRole = dataInputEdit.role.map((role: any) => role.id);
     }
 
-    // Fungsi untuk menangani perubahan saat employee dipilih
-    const handleEmployeeChange = (e: any) => {
-        const selectedEmployeeId = Number(e.value);
-        const selectedEmployee = employee.find((emp: any) => emp.EMPLOYEE_ID === selectedEmployeeId);
-
-        // Update state dengan employee_id dan email yang terkait
-        setDataInput({
-            ...dataInput,
-            employee_id: selectedEmployeeId,
-            user_login: selectedEmployee?.EMPLOYEE_EMAIL || '', // Set email jika ada, kosongkan jika tidak ada
-            name: selectedEmployee?.EMPLOYEE_FIRST_NAME || '' // Set email jika ada, kosongkan jika tidak ada
-        });
-    };
-    const handleEmployeeChangeEdit = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedEmployeeId = Number(e.target.value);
-        const selectedEmployee = employee.find((emp: any) => emp.EMPLOYEE_ID === selectedEmployeeId);
-
-        // Update state dengan employee_id dan email yang terkait
-        setDataInputEdit({
-            ...dataInputEdit,
-            employee_id: selectedEmployeeId,
-            user_login: selectedEmployee?.EMPLOYEE_EMAIL || '', // Set email jika ada, kosongkan jika tidak ada
-            name: selectedEmployee?.EMPLOYEE_FIRST_NAME || '' // Set email jika ada, kosongkan jika tidak ada
-        });
-    };
-    // Change relations
-    const handleRelationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectRelationId = Number(e.target.value);
-        const selectRelation = relation.find((emp: any) => emp.RELATION_ORGANIZATION_ID === selectRelationId);
-
-        setDataInput({
-            ...dataInput,
-            individual_relations_id: selectRelationId,
-            user_login: selectRelation?.RELATION_ORGANIZATION_EMAIL || '', // Set email jika ada, kosongkan jika tidak ada
-            name: selectRelation?.RELATION_ORGANIZATION_NAME || '' // Set email jika ada, kosongkan jika tidak ada
-        });
-    };
 
     const handleUserStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Ubah nilai menjadi 1 (on) atau 0 (off) sesuai status switch
@@ -376,25 +301,6 @@ export default function UserManagement({ auth, type }: any) {
 
 
     const handleDetailUser = async (e: any) => {
-        // try {
-        //     await Promise.all([
-        //         getUserById(e.id),
-        //         getTypeTest(),
-        //         getRole(),
-        //         getEmployee(),
-        //         getAllRelations(),
-        //         getJobPost(),
-        //         getDiv()
-        //     ])
-        //     setModal({
-        //         add: false,
-        //         edit: !modal.edit,
-        //         reset: false
-        //     });
-        // } catch (error) {
-        //     console.error("Error loading data:", error);
-        // }
-
         getUserById(e.id);
         getTypeTest()
         getRole()
@@ -430,6 +336,8 @@ export default function UserManagement({ auth, type }: any) {
         setIsSuccess("Cleared");
     };
 
+    //company
+
     const [company, setCompany] = useState<any>([])
     const getCompanies = async () => {
         try {
@@ -447,7 +355,9 @@ export default function UserManagement({ auth, type }: any) {
             label: el.COMPANY_NAME
         }
     })
+    //end company
 
+    //division
     const [div, setDiv] = useState<any>([]);
     const getDiv = async () => {
         try {
@@ -487,10 +397,11 @@ export default function UserManagement({ auth, type }: any) {
         }
 
     });
+    //end division
 
     //employee data
-    const filterEmployee = employee.filter((el: any) => el.COMPANY_ID === dataInput.company_id)
-    const filterEmployeeEdit = employee.filter((el: any) => el.COMPANY_ID === dataInputEdit.company_id)
+    const filterEmployee = employee.filter((el: any) => el.COMPANY_ID === dataInput.company_id && el.EMPLOYEE_IS_DELETED === 0)
+    const filterEmployeeEdit = employee.filter((el: any) => el.COMPANY_ID === dataInputEdit.company_id && el.EMPLOYEE_IS_DELETED === 0)
 
     const selectEmployee = filterEmployee
         .sort((a: any, b: any) => a.EMPLOYEE_FIRST_NAME.localeCompare(b.EMPLOYEE_FIRST_NAME))
@@ -549,12 +460,7 @@ export default function UserManagement({ auth, type }: any) {
         }
     });
 
-
-
-
-
-
-
+    //handleInputChange
     const handleInputChange = (field: string) => (event: any) => {
         setDataInput({
             ...dataInput,
@@ -688,6 +594,7 @@ export default function UserManagement({ auth, type }: any) {
                                     />
                                 </div>
                                 {/* Company */}
+
                                 {/* Employee */}
                                 <div className="mb-2">
                                     <div className="relative">
@@ -846,25 +753,6 @@ export default function UserManagement({ auth, type }: any) {
                                         />
                                         <div className="ml-[9.7rem] text-red-600">*</div>
                                     </div>
-                                    {/* <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataInput.individual_relations_id}
-                                        onChange={handleRelationChange}
-                                    >
-                                        <option value={""}>
-                                            -- Choose Type --
-                                        </option>
-                                        {
-                                            relation?.map((mRel: any, i: number) => {
-                                                return (
-                                                    <option value={mRel.RELATION_ORGANIZATION_ID} key={i}>
-                                                        {mRel.RELATION_ORGANIZATION_NAME}
-                                                    </option>
-                                                )
-                                            })
-                                        }
-
-                                    </select> */}
                                     <Select
                                         classNames={{
                                             menuButton: () =>
@@ -1453,10 +1341,10 @@ export default function UserManagement({ auth, type }: any) {
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
-                                    flex: 4,
+                                    flex: 3,
                                 },
                                 {
-                                    headerName: "Login User",
+                                    headerName: "User Login",
                                     field: "user_login",
                                     flex: 7,
 
@@ -1468,23 +1356,31 @@ export default function UserManagement({ auth, type }: any) {
 
                                 },
                                 {
-                                    headerName: "Type",
-                                    field: "user_type_id",
+                                    headerName: "Company",
+                                    field:'company_id',
                                     flex: 7,
                                     valueGetter: (params: any) => {
-                                        // console.log(params.data.type.user_type_name,'<<<<');
-
-                                        return params.data ? params.data.type.user_type_name : null;
+                                        return params.data?.company?.COMPANY_NAME;
                                     },
-                                    cellRenderer: (params: any) => {
-                                        // Return type name for display purposes
-                                        if (params.data && params.data && params.data.type && params.data.type.user_type_name) {
-                                            return params.data.type.user_type_name;
-                                        }
-                                        return 'Unknown'; // Default display if no user type name
-                                    }
 
-                                }
+                                },
+                               
+                                {
+                                    headerName: "User Status",
+                                    field: 'user_status',
+                                    valueGetter: (params: any) => {
+                                        return params.data?.user_status === 1 ? 'Active' : 'Inactive';
+                                    },
+                                    flex: 3,
+                                    cellStyle: (params: any) => {
+                                        return {
+                                            color: params.data?.user_status === 1 ? 'green' : 'red',
+                                            fontWeight: 'bold' 
+                                        };
+                                    }
+                                
+                                },
+                               
                             ]}
                         />
                     </div>

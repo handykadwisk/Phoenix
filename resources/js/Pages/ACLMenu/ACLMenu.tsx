@@ -206,11 +206,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
     };
 
     const handleDetailMenu = async (data: any) => {
-        // console.log('Data received:', data);
-        // setDetailMenu({
-        //     id: data.id,
-        //     menu_name: data.menu_name,
-        // });
         getmenusShow()
         setData({
             id: data.id,
@@ -285,7 +280,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
     };
     //end action delete
 
-    console.log('data',data);
     
 
     return (
@@ -334,24 +328,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     htmlFor="name_parent"
                                     value={"Parent"}
                                 />
-                                {/* <select
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    value={data.menu_parent}
-                                    onChange={(e) => {
-                                        setData("menu_parent", e.target.value);
-                                    }}
-                                >
-                                    <option value={""}>
-                                        -- Choose Parent --
-                                    </option>
-                                    {show.map((mData: any, i: number) => {
-                                        return (
-                                            <option value={mData.id} key={i}>
-                                                {mData.text_combo}
-                                            </option>
-                                        );
-                                    })}
-                                </select> */}
                                 <Select
                                     classNames={{
                                         menuButton: () =>
@@ -708,14 +684,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     field: "menu_url",
                                     flex: 4,
                                 },
-                                // {
-                                //     headerName: "Parent",
-                                //     field: "parent.menu_name",
-                                //     flex: 3,
-                                //     cellRenderer: (params: any) => {
-                                //         return params.value || 'as parent';
-                                //     }
-                                // },
                                 {
                                     headerName: "Parent",
                                     field: "menu_parent_id",

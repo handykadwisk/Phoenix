@@ -69,7 +69,7 @@ class MenuController extends Controller
        
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 5);
-
+        // dd($page);
         // $query = Menu::query()->with('parent')->orderBy('id', 'asc');
         $query = Menu::query()->with('parent');
         $sortModel = $request->input('sort');
