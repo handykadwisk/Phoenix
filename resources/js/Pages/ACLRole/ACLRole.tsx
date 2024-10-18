@@ -72,7 +72,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             })
             setDataRole(res.data);
         } catch (err) {
-            console.log(err);
+            // console.log(err);
+            throw err;
         }
     };
 
@@ -148,7 +149,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 setDataById(res.data);
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
+                throw err
             });
         setIsLoading({ ...isLoading, get_data_by_id: false })
 
@@ -631,6 +633,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                                     setData("role_name", e.target.value)
                                 }
                                 required
+                                autoComplete="off"
                                 placeholder="Role Name"
                             />
                         </div>
@@ -680,6 +683,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                                     roleObject(e);
                                 }}
                                 required
+                                autoComplete="off"
                                 placeholder="Role Name"
                                 disabled
                             />

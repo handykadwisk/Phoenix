@@ -209,7 +209,7 @@ export default function ACLPermission({ auth }: PageProps) {
         setIsSuccess("Cleared");
     };
 
-    
+
 
 
     return (
@@ -226,11 +226,11 @@ export default function ACLPermission({ auth }: PageProps) {
 
             {/* modal Add */}
             <ModalToAction
-            submitButtonName={'Submit'}
-            headers={'Add Permission'}
-            method="POST"
+                submitButtonName={'Submit'}
+                headers={'Add Permission'}
+                method="POST"
                 show={modal.add}
-                onClose={() =>{
+                onClose={() => {
                     setModal({
                         add: false,
                         edit: false,
@@ -240,7 +240,7 @@ export default function ACLPermission({ auth }: PageProps) {
                         PERMISSION_NAME: "",
                         PERMISSION_CLASS_NAME: "clsf_",
                     });
-                    
+
 
                 }
                 }
@@ -273,6 +273,7 @@ export default function ACLPermission({ auth }: PageProps) {
                                 onKeyUp={(e) => {
                                     permissionObject(e);
                                 }}
+                                autoComplete="off"
                                 required
                                 placeholder="Permission Name"
                             />
@@ -289,6 +290,7 @@ export default function ACLPermission({ auth }: PageProps) {
                                 type="text"
                                 name="PERMISSION_CLASS_NAME"
                                 value={data.PERMISSION_CLASS_NAME}
+                                autoComplete="off"
                                 className="mt-2"
                                 onChange={(e) =>
                                     setData(
@@ -307,12 +309,11 @@ export default function ACLPermission({ auth }: PageProps) {
 
             {/* Modal Edit */}
             <ModalToAction
-            headers={'Edit Permission'}
-            submitButtonName={'Submit'}
+                headers={'Edit Permission'}
+                submitButtonName={'Submit'}
                 show={modal.edit}
                 method="POST"
-                onClose={() =>
-                {
+                onClose={() => {
                     setModal({
                         add: false,
                         edit: false,
@@ -351,6 +352,7 @@ export default function ACLPermission({ auth }: PageProps) {
                             <div className="ml-[7.9rem] text-red-600">*</div>
                             <TextInput
                                 id="PERMISSION_NAME"
+                                autoComplete="off"
                                 type="text"
                                 name="PERMISSION_NAME"
                                 value={dataById.PERMISSION_NAME}
@@ -377,6 +379,7 @@ export default function ACLPermission({ auth }: PageProps) {
                             <div className="ml-[5.4rem] text-red-600">*</div>
                             <TextInput
                                 id="PERMISSION_CLASS_NAME"
+                                autoComplete="off"
                                 type="text"
                                 name="PERMISSION_CLASS_NAME"
                                 value={dataById.PERMISSION_CLASS_NAME}
@@ -438,21 +441,21 @@ export default function ACLPermission({ auth }: PageProps) {
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
                                 onClick={
                                     (e) => {
-                                       
-                                            const title = searchPermission.permission_search[0].PERMISSION_NAME;
-                                            const id = searchPermission.permission_search[0].PERMISSION_ID;
-                                            if (title || id) {
-                                                inputDataSearch("flag", title || id, 0);
-                                                setIsSuccess("success");
-                                                setTimeout(() => {
-                                                    setIsSuccess("");
-                                                });
-                                            } else {
-                                                inputDataSearch("flag", "", 0);
-                                                setIsSuccess("Get All Permission");
-                                            }
+
+                                        const title = searchPermission.permission_search[0].PERMISSION_NAME;
+                                        const id = searchPermission.permission_search[0].PERMISSION_ID;
+                                        if (title || id) {
+                                            inputDataSearch("flag", title || id, 0);
+                                            setIsSuccess("success");
+                                            setTimeout(() => {
+                                                setIsSuccess("");
+                                            });
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                            setIsSuccess("Get All Permission");
                                         }
-                                    
+                                    }
+
                                 }
                             >
                                 Search
