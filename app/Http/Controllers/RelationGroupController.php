@@ -375,7 +375,7 @@ class RelationGroupController extends Controller
             // Jalankan stored procedure untuk memperbarui mapping relasi grup
             $name = NULL;
             DB::select('call sp_set_mapping_relation_group(?)', [$name]);
-    
+                
         } else {
             // Jika parent baru tidak ada dalam mapping, langsung update parent ID yang baru
             $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)

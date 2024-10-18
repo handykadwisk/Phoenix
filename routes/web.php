@@ -270,6 +270,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
     Route::get('/showMenu', [MenuController::class, 'showMenu'])->name('showMenu.showMenu');
+    Route::post('/changeMenuStatus',[MenuController::class, 'changeMenuStatus'])->name('changeMenuStatus.changeMenuStatus');
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
     Route::get('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
@@ -295,6 +296,7 @@ Route::middleware('auth')->group(function () {
     // access role menu
     Route::get('/getRoleAccessMenuByRoleId/{role_id}', [RoleAccesMenuController::class, 'getAccessMenuByRoleId'])->name('getRoleAccessMenuByRoleId.getMenuByRole');
     Route::post('/roleAccessMenu', [RoleAccesMenuController::class, 'store'])->name('roleAccessMenu.store');
+    Route::post('/addAccessMenu/{role_id}', [RoleAccesMenuController::class, 'addAccessMenu'])->name('addAccessMenu.addAccessMenu');
 
 
     //role permission
@@ -544,6 +546,7 @@ Route::middleware('auth')->group(function () {
     // HR
     Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
     Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
+    Route::get('/getAllCompany',[TCompanyController::class,'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
     Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
     Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
