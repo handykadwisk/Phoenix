@@ -20,7 +20,7 @@ export default function AddReminder({
     setData: any;
     modalReminder: any;
     setModalReminder: any;
-    setIsSuccessChat: any;
+    setIsSuccessChat?: any;
 }>) {
     useEffect(() => {
         getDataParticipant();
