@@ -188,7 +188,8 @@ export default function UserManagement({ auth, type }: any) {
                 company_division_id: result.data.company_division_id
             });
         } catch (error) {
-            console.log(error);
+            // console.log(error);
+            throw error;
         }
     }
 
@@ -199,7 +200,8 @@ export default function UserManagement({ auth, type }: any) {
             const result = await axios.post('/getAllRole');
             setDataRole(result.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            // console.error('Fetch error:', error);
+            throw error;
         }
     }
 
@@ -216,12 +218,13 @@ export default function UserManagement({ auth, type }: any) {
             const result = await axios.post('/getType');
             setDataType(result.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            // console.error('Fetch error:', error);
+            throw error;
         }
     }
 
 
-    
+
     //modal add
     const addRolePopup = async (e: FormEvent) => {
         getCompanies()
@@ -247,7 +250,8 @@ export default function UserManagement({ auth, type }: any) {
             const result = await axios.get('/getAllEmployee');
             setEmployee(result.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            // console.error('Fetch error:', error);
+            throw error;
         }
     }
 
@@ -259,7 +263,8 @@ export default function UserManagement({ auth, type }: any) {
             const result = await axios.get('/getAllRelations');
             setRelation(result.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            // console.error('Fetch error:', error);
+            throw error;
         }
     }
     const relationSelect = relation.map((el: any) => {
@@ -344,7 +349,8 @@ export default function UserManagement({ auth, type }: any) {
             const result = await axios.get('/getAllCompany')
             setCompany(result.data)
         } catch (error) {
-            console.log(error);
+            // console.log(error);
+            throw error;
         }
     }
 
@@ -364,7 +370,8 @@ export default function UserManagement({ auth, type }: any) {
             const result = await axios.get('/getAllDivisionCompany');
             setDiv(result.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            // console.error('Fetch error:', error);
+            throw error;
         }
     }
 
@@ -430,7 +437,8 @@ export default function UserManagement({ auth, type }: any) {
             const res = await axios.get('/getAllJobpost')
             setJobpost(res.data)
         } catch (error) {
-            console.log(error);
+            // console.log(error);
+            throw error;
 
         }
     }
@@ -800,6 +808,7 @@ export default function UserManagement({ auth, type }: any) {
                                         ...dataInput, user_login: e.target.value,
                                     })}
                                 required
+                                autoComplete="off"
                                 placeholder="Email or Other unique id"
                             />
                         </div>
@@ -824,6 +833,7 @@ export default function UserManagement({ auth, type }: any) {
                                 onChange={(e) => setDataInput({ ...dataInput, password: e.target.value })}
                                 required
                                 placeholder="Password"
+                                autoComplete="off"
                             />
                         </div>
                         {/* end password */}
@@ -872,6 +882,7 @@ export default function UserManagement({ auth, type }: any) {
                                         className="mt-2"
                                         onChange={(e) => setDataInputEdit({ ...dataInputEdit, name: e.target.value })}
                                         required
+                                        autoComplete="off"
                                         placeholder="Name or unique id"
                                     />
                                 </div>
@@ -1167,6 +1178,7 @@ export default function UserManagement({ auth, type }: any) {
                                         className="mt-2"
                                         onChange={handleUserLoginChange}
                                         required
+                                        autoComplete="off"
                                         placeholder="user login or unique id"
                                     />
                                 </div>
@@ -1357,14 +1369,14 @@ export default function UserManagement({ auth, type }: any) {
                                 },
                                 {
                                     headerName: "Company",
-                                    field:'company_id',
+                                    field: 'company_id',
                                     flex: 7,
                                     valueGetter: (params: any) => {
                                         return params.data?.company?.COMPANY_NAME;
                                     },
 
                                 },
-                               
+
                                 {
                                     headerName: "User Status",
                                     field: 'user_status',
@@ -1375,12 +1387,12 @@ export default function UserManagement({ auth, type }: any) {
                                     cellStyle: (params: any) => {
                                         return {
                                             color: params.data?.user_status === 1 ? 'green' : 'red',
-                                            fontWeight: 'bold' 
+                                            fontWeight: 'bold'
                                         };
                                     }
-                                
+
                                 },
-                               
+
                             ]}
                         />
                     </div>

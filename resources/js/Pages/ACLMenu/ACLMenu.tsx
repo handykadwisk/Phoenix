@@ -371,6 +371,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                         setData("menu_name", e.target.value)
                                     }
                                     required
+                                    autoComplete="off"
                                     placeholder="Name Menu"
                                 />
                             </div>
@@ -386,6 +387,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     type="text"
                                     name="menu_url"
                                     value={data.menu_url}
+                                    autoComplete="off"
                                     className="mt-2"
                                     onChange={(e) =>
                                         setData("menu_url", e.target.value)
@@ -477,6 +479,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     onChange={(e) =>
                                         setData("menu_name", e? e.target.value : '')
                                     }
+                                    autoComplete="off"
                                     required
                                     placeholder="Name Menu"
                                 />
@@ -497,6 +500,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     onChange={(e) =>
                                         setData("menu_url",e? e.target.value : '')
                                     }
+                                    autoComplete="off"
                                     placeholder="Menu URL"
                                 />
                             </div>
