@@ -132,7 +132,7 @@ export default function AGGrid({
                     suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={25}
-                    paginationAutoPageSize={true}
+                    // paginationAutoPageSize={true}
                     cacheBlockSize={25}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}
