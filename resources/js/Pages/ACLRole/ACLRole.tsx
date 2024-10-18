@@ -551,7 +551,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 url={`/rolePermission`}
                 data={accessPermission}
                 headers={null}
-                submitButtonName={''}
+                submitButtonName={'Submit'}
                 onSuccess={handleSuccessRole}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-1xl"
