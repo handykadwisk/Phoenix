@@ -27,20 +27,27 @@ extends Controller
 
     public function getUserData($request)
     {
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
+        // dd($request);
 
-        // $query = User::with('roles', 'type');
-        $query = User::query()->with('roles', 'type');
+        $page = $request->input('page',1);
+        // $page = $request->page;
+        $perPage = $request->input('perPage', 25);
+        // $perPage = $request->perPage;
+        // dd($page, $perPage);
+
+        $query = User::with('roles', 'type');
+        // $query = User::query()->with('company');
 
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
         $newFilter = $request->input('newFilter', '');
         $newSearch = json_decode($request->newFilter, true);
 
+        // dd($sortModel);
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
             foreach ($sortModel as $sortItem) {
+                // dd($sortItem);
                 list($colId, $sortDirection) = explode(',', $sortItem);
                 $query->orderBy($colId, $sortDirection); 
             }
@@ -71,17 +78,18 @@ extends Controller
         if (!$sortModel && !$filterModel) {
             $query->orderBy('id', 'desc');
         }
-
+        // dd($query);
         $data = $query->paginate($perPage, ['*'], 'page', $page);
-
+        
         return $data;
     }
 
     public function getUserJson(Request $request)
     {
-        // dd($request);
+        // dd($request->id);
         $data = $this->getUserData($request);
         return response()->json($data);
+        
     }
 
     public function store(Request $request)

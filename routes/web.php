@@ -304,8 +304,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/rolePermission', [RolePermissionController::class, 'store'])->name('rolePermission.store');
 
     //settings/userManagement
-    Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUerJson');
-    Route::get('/getUser',[UserManagementController::class, 'getUserJson'])->name('getUser.getUserJson');
+    Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUserJson');
+    Route::get('/getUser',[UserManagementController::class, 'getUserJson'])->name('getUser');
     Route::get('/settings/user', [UserManagementController::class, 'index'])->name('settings/user');
     Route::post('/settings/addUser', [UserManagementController::class, 'store'])->name('settings/addUser.store');
     Route::get('/settings/getUserJson', [UserManagementController::class, 'getUserDataByMRole'])->name('settings/getUserJson.getUserJson');
