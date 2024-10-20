@@ -147,23 +147,36 @@ export default function DetailReminder({
         value: string | undefined | any,
         i: number
     ) => {
+        console.log("data", value);
+
+        const idTier = i + 1;
         // console.log(value);
 
-        const filteredArray = dataDetailReminder?.PARTICIPANT?.filter(
+        const data = dataDetailReminder?.PARTICIPANT?.filter(
+            (data: any) => data.REMINDER_TIER_ID === idTier
+        );
+
+        const filteredArray = data?.filter(
             (items: any) =>
                 !value?.some((itemsDb: any) => itemsDb.value === items.USER_ID)
         );
-        // console.log("dataFilter", filteredArray);
 
-        // const idTier = i + 1;
+        const resultFilter = dataDetailReminder?.PARTICIPANT?.filter(
+            (items: any) =>
+                !filteredArray?.some(
+                    (itemsDb: any) => itemsDb.USER_ID === items.USER_ID
+                )
+        );
 
-        // const changeVal:any =
+        console.log("dataFilter", resultFilter);
 
         setDataDetailReminder({
             ...dataDetailReminder,
-            PARTICIPANT: filteredArray,
+            PARTICIPANT: resultFilter,
         });
     };
+
+    console.log(dataDetailReminder.PARTICIPANT);
 
     return (
         <>
