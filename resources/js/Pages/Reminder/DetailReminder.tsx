@@ -147,36 +147,84 @@ export default function DetailReminder({
         value: string | undefined | any,
         i: number
     ) => {
-        console.log("data", value);
-
         const idTier = i + 1;
-        // console.log(value);
 
+        // get data yang sesuai reminder idnya
         const data = dataDetailReminder?.PARTICIPANT?.filter(
             (data: any) => data.REMINDER_TIER_ID === idTier
         );
+        console.log("daasdadata", data);
 
+        // get data yang mau di hilangkan
         const filteredArray = data?.filter(
             (items: any) =>
                 !value?.some((itemsDb: any) => itemsDb.value === items.USER_ID)
         );
+        console.log("data", filteredArray);
+        if (filteredArray.length !== 0) {
+            if (data.length === 1) {
+                console.log("masuk sini");
+            } else {
+                // hasil filter data sesuai data yang hilang
+                const resultFilter = dataDetailReminder?.PARTICIPANT?.filter(
+                    (items: any) =>
+                        !filteredArray?.some(
+                            (itemsDb: any) => itemsDb.USER_ID === items.USER_ID
+                        )
+                );
+                console.log("dkwokwo", resultFilter);
 
-        const resultFilter = dataDetailReminder?.PARTICIPANT?.filter(
-            (items: any) =>
-                !filteredArray?.some(
-                    (itemsDb: any) => itemsDb.USER_ID === items.USER_ID
-                )
-        );
+                setDataDetailReminder({
+                    ...dataDetailReminder,
+                    PARTICIPANT: resultFilter,
+                });
+            }
+            // if (value === null) {
+            // setDataDetailReminder({
+            //     ...dataDetailReminder,
+            //     PARTICIPANT: [
+            //         ...dataDetailReminder.PARTICIPANT,
+            //         {
+            //             REMINDER_TIER_ID: idTier,
+            //             USER_ID: null,
+            //         },
+            //     ],
+            // });
+            // }
+        } else {
+            // get filter data yang di tambah
+            const filteredArray = value?.filter(
+                (items: any) =>
+                    !data?.some(
+                        (itemsDb: any) => itemsDb.USER_ID === items.value
+                    )
+            );
 
-        console.log("dataFilter", resultFilter);
-
-        setDataDetailReminder({
-            ...dataDetailReminder,
-            PARTICIPANT: resultFilter,
-        });
+            setDataDetailReminder({
+                ...dataDetailReminder,
+                PARTICIPANT: [
+                    ...dataDetailReminder.PARTICIPANT,
+                    {
+                        REMINDER_TIER_ID: idTier,
+                        USER_ID: filteredArray[0].value,
+                    },
+                ],
+            });
+        }
+        // if (value === null) {
+        //     setDataDetailReminder({
+        //         ...dataDetailReminder,
+        //         PARTICIPANT: [
+        //             ...dataDetailReminder.PARTICIPANT,
+        //             {
+        //                 REMINDER_TIER_ID: idTier,
+        //                 USER_ID: null,
+        //             },
+        //         ],
+        //     });
+        // }
     };
-
-    console.log(dataDetailReminder.PARTICIPANT);
+    console.log("ada", dataDetailReminder.PARTICIPANT);
 
     return (
         <>
@@ -270,7 +318,8 @@ export default function DetailReminder({
                                         primaryColor={"bg-red-500"}
                                     />
                                     <div className="flex items-center">
-                                        {groupedData?.length !== 1 && (
+                                        {Object.keys(groupedData)?.length !==
+                                            1 && (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 viewBox="0 0 24 24"
