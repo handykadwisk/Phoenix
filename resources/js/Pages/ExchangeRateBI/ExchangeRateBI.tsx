@@ -55,13 +55,10 @@ export default function ExchangeRateController({ auth }: PageProps) {
 
     const cleanDataRecursively = (data: any): any => {
         if (typeof data === "string") {
-            // Jika data adalah string, hapus karakter \r\n
             return data.replace(/\r\n/g, "").replace(/\n/g, "");
         } else if (Array.isArray(data)) {
-            // Jika data adalah array, lakukan pembersihan pada setiap elemen array
             return data.map((item) => cleanDataRecursively(item));
         } else if (typeof data === "object" && data !== null) {
-            // Jika data adalah object, lakukan pembersihan pada setiap value dalam object
             const cleanedObject: any = {};
             for (const key in data) {
                 if (data.hasOwnProperty(key)) {
@@ -77,7 +74,13 @@ export default function ExchangeRateController({ auth }: PageProps) {
         axios
             .get(`/getCurrencies`)
             .then((res) => {
-                const parseData = cleanDataRecursively(res.data);
+                let parseData = cleanDataRecursively(res.data);
+
+                parseData = parseData.map((currency: any) => ({
+                    ...currency,
+                    EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE:
+                        currency.CURRENCY_SYMBOL === "IDR" ? 1 : 0,
+                }));
 
                 setData({
                     exchange_rate_bi_date: date,
@@ -111,9 +114,9 @@ export default function ExchangeRateController({ auth }: PageProps) {
             if (!exchangeRateDetail || exchangeRateDetail === undefined) {
                 getCurrencies(selectedDate);
 
-                console.log("Using Currency", data);
+                // console.log("Using Currency", data);
             } else {
-                console.log("Using By Date", exchangeRateDetail);
+                // console.log("Using By Date", exchangeRateDetail);
 
                 Swal.fire({
                     title: "Data already exist",
@@ -128,11 +131,9 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         setData((prevData: any) => {
                             const updatedData = { ...prevData };
 
-                            // Simpan hasil request berdasarkan tanggal
                             updatedData.exchange_rate_bi_detail =
                                 exchangeRateDetail;
 
-                            // Simpan nilai yang dipilih pada field
                             updatedData[name] = selectedDate;
 
                             return updatedData;
@@ -184,7 +185,17 @@ export default function ExchangeRateController({ auth }: PageProps) {
             const workbook = XLSX.read(excel, { type: "array" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            let jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            jsonData = jsonData.map((currency: any) => {
+                if (currency.CURRENCY_SYMBOL === "IDR") {
+                    return {
+                        ...currency,
+                        EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE: 1,
+                    };
+                }
+                return currency;
+            });
 
             setData({
                 exchange_rate_bi_date: data.exchange_rate_bi_date,
@@ -300,7 +311,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
     });
     // End Function Format Currency
 
-    // console.log("Data", data);
+    console.log("Data", data);
     // console.log("Data Exchange Rate BI", exchangeRateBI);
     // console.log("Data Exchange Rate BI By Id", dataById);
     // console.log("Data Edit", dataEdit);
@@ -438,8 +449,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                             decimalScale={2}
                                                             decimalsLimit={2}
                                                             value={
-                                                                currency.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE ||
-                                                                ""
+                                                                currency.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE
                                                             }
                                                             onValueChange={(
                                                                 val
@@ -450,9 +460,26 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                                     i
                                                                 )
                                                             }
-                                                            className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right`}
+                                                            className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right ${
+                                                                (currency.CURRENCY_SYMBOL ===
+                                                                    "IDR" ||
+                                                                    currency
+                                                                        .currency
+                                                                        ?.CURRENCY_SYMBOL ===
+                                                                        "IDR") &&
+                                                                "bg-gray-100"
+                                                            }`}
                                                             placeholder="0.00"
                                                             autoComplete="off"
+                                                            readOnly={
+                                                                (currency.CURRENCY_SYMBOL ===
+                                                                    "IDR" ||
+                                                                    currency
+                                                                        .currency
+                                                                        ?.CURRENCY_SYMBOL ===
+                                                                        "IDR") &&
+                                                                true
+                                                            }
                                                             required
                                                         />
                                                     </TD>
@@ -606,15 +633,15 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                 <tr
                                                     key={i}
                                                     className={`
-                                                    hover:bg-gray-200 text-center cursor-pointer`}
+                                                    hover:bg-gray-200 cursor-pointer`}
                                                     onDoubleClick={() =>
                                                         handleEditModal(
                                                             data.EXCHANGE_RATE_BI_DETAIL_ID
                                                         )
                                                     }
                                                 >
-                                                    <TD className="border p-2">
-                                                        {i + 1}
+                                                    <TD className="border text-center p-2">
+                                                        {i + 1}.
                                                     </TD>
                                                     <TD className="border p-2">
                                                         {
@@ -622,14 +649,14 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                                 ?.CURRENCY_NAME
                                                         }
                                                     </TD>
-                                                    <TD className="border p-2">
+                                                    <TD className="border text-center p-2">
                                                         <span className="bg-orange-500 text-white px-2 py-1 rounded-md inline-block text-center w-14">
                                                             {data.currency
                                                                 ?.CURRENCY_SYMBOL ||
                                                                 "No Currency"}
                                                         </span>
                                                     </TD>
-                                                    <TD className="border p-2">
+                                                    <TD className="border text-right p-2">
                                                         {formatCurrency.format(
                                                             data.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE
                                                         )}
@@ -654,7 +681,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                             onClick={handleAddModal}
                         >
-                            {"Upload"}
+                            {"Add Exchange Rate BI"}
                         </Button>
                     </>
                 }

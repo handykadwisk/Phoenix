@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 
@@ -92,13 +93,17 @@ class CashAdvanceController extends Controller
                 if ($status == 1 && $status_type == "Approve1") {
                     $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 1);
                 } else if ($status == 2 && $status_type == "Approve1") {
-                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2);
+                    $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 2)
+                         ->whereDoesntHave('cash_advance_report');
                 } else if ($status == 2 && $status_type == "Approve2") {
-                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2);
+                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 2)
+                         ->whereDoesntHave('cash_advance_report');
                 } else if ($status == 2 && $status_type == "Approve3") {
-                    $data->where('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2);
+                    $data->where('CASH_ADVANCE_THIRD_APPROVAL_STATUS', 2)
+                         ->whereDoesntHave('cash_advance_report');
                 } else if ($status == 5 && $status_type == "Pending Report") {
-                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
+                    $data->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)
+                         ->whereDoesntHave('cash_advance_report');
                 } else if ($status == 3 && $status_type == "Need Revision") {
                     $data->where('CASH_ADVANCE_FIRST_APPROVAL_STATUS', 3)
                         ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 3)
@@ -262,7 +267,9 @@ class CashAdvanceController extends Controller
 
     public function getCountCAPendingReportStatus()
     {
-        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)->count();
+        $data = CashAdvance::where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5)
+                           ->whereDoesntHave('cash_advance_report')
+                           ->count();
 
         return response()->json($data);
     }
@@ -439,6 +446,21 @@ class CashAdvanceController extends Controller
 
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'cash_advance_cost_center' => 'required',
+            'cash_advance_used_by' => 'required',
+            'cash_advance_branch' => 'required',
+            'cash_advance_first_approval_by' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return new JsonResponse([
+                $validator->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
+        
         DB::transaction(function () use ($request) {
             $user = Auth::user();
             $user_id = $user->id;
@@ -610,14 +632,18 @@ class CashAdvanceController extends Controller
             $cash_advance_first_approval_change_status_date = date('Y-m-d H:i:s');
             $cash_advance_first_approval_status = $request->CASH_ADVANCE_FIRST_APPROVAL_STATUS;
             $cash_advance_to_bank_account = $request->CASH_ADVANCE_TO_BANK_ACCOUNT;
+            $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
+            $cash_advance_delivery_method_cash = $request->CASH_ADVANCE_DELIVERY_METHOD_CASH;
             $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
     
             CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
                 'CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $cash_advance_first_approval_change_status_date,
                 'CASH_ADVANCE_FIRST_APPROVAL_STATUS' => $cash_advance_first_approval_status,
                 'CASH_ADVANCE_TO_BANK_ACCOUNT' => $cash_advance_to_bank_account,
+                'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
+                'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount
             ]);
 
@@ -908,20 +934,24 @@ class CashAdvanceController extends Controller
         DB::transaction(function () use ($request) {
             $cash_advance_id = $request->CASH_ADVANCE_ID;
             $cash_advance_second_approval_status = 5;
+            $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_transfer_date = $request->CASH_ADVANCE_TRANSFER_DATE;
             $cash_advance_from_bank_account = $request->CASH_ADVANCE_FROM_BANK_ACCOUNT;
             $cash_advance_to_bank_account = $request->CASH_ADVANCE_TO_BANK_ACCOUNT;
+            $cash_advance_delivery_method_cash = $request->CASH_ADVANCE_DELIVERY_METHOD_CASH;
             $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
             $cash_advance_receive_date = $request->CASH_ADVANCE_RECEIVE_DATE;
             $cash_advance_receive_name = $request->CASH_ADVANCE_RECEIVE_NAME;
     
             CashAdvance::where('CASH_ADVANCE_ID', $cash_advance_id)->update([
                 'CASH_ADVANCE_SECOND_APPROVAL_STATUS' => $cash_advance_second_approval_status,
+                'CASH_ADVANCE_DELIVERY_METHOD_TRANSFER' => $cash_advance_delivery_method_transfer,
                 'CASH_ADVANCE_TRANSFER_AMOUNT' => $cash_advance_transfer_amount,
                 'CASH_ADVANCE_TRANSFER_DATE' => $cash_advance_transfer_date,
                 'CASH_ADVANCE_FROM_BANK_ACCOUNT' => $cash_advance_from_bank_account,
                 'CASH_ADVANCE_TO_BANK_ACCOUNT' => $cash_advance_to_bank_account,
+                'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
                 'CASH_ADVANCE_RECEIVE_DATE' => $cash_advance_receive_date,
                 'CASH_ADVANCE_RECEIVE_NAME' => $cash_advance_receive_name,
