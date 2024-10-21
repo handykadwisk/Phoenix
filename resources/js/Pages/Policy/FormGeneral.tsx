@@ -121,6 +121,7 @@ export default function FormGeneral({
         getDataCoverageName(policy.POLICY_ID);
         getDataInsured(policy.POLICY_ID);
         getDetailPolicy(policy.POLICY_ID);
+        getCoBrokingByPolicyId(policy.POLICY_ID);
         getCurrencyOnPolicyCoverage(policy.POLICY_ID);
         getDataPartner(policy.POLICY_ID);
         getPolicyExchangeRate(policy.POLICY_ID);
@@ -129,7 +130,7 @@ export default function FormGeneral({
         getSummaryFinancial(policy.POLICY_ID);
         getCoa();
         setSwitchCoBroking(policy.CO_BROKING);
-        getCoBrokingByPolicyId(policy.POLICY_ID);
+        
     }, [policy.POLICY_ID]);
 
     const getDetailPolicy = async (id: number) => {
@@ -281,7 +282,7 @@ export default function FormGeneral({
         axios
             .get(`/getCoBrokingByPolicyId/${policy_id}`)
             .then((res) => {
-                // console.log("res.data: ", res.data);
+                console.log("res.data: ", res.data);
                 setListDataCoBroking(res.data);
             })
             .catch((err) => console.log(err));
@@ -384,6 +385,7 @@ export default function FormGeneral({
                 setIsSuccess("");
             }, 5000);
         }
+        getCoBrokingByPolicyId(policy.POLICY_ID);
         setModalCoBroking({
             addCoBroking: !modalCoBroking.addCoBroking,
         });
@@ -2301,11 +2303,11 @@ export default function FormGeneral({
             INCOME_NAME: "Business Acquisition Assistance",
             income_detail: [],
         },
-        // {
-        //     INCOME_CATEGORY_ID: 4,
-        //     INCOME_NAME: "Co Broking",
-        //     income_detail: [],
-        // },
+        {
+            INCOME_CATEGORY_ID: 4,
+            INCOME_NAME: "Co Broking",
+            income_detail: [],
+        },
     ];
     const getDataPartner = async (policy_id: number) => {
         setIsLoading({
@@ -2365,7 +2367,7 @@ export default function FormGeneral({
                                     CONSULTANCY_FEE_NETT_AMOUNT:
                                         val["CONSULTANCY_FEE_NETT_AMOUNT"],
                                     PAYABLE: val["PAYABLE"],
-                                    co_broking: listDataCoBroking ? listDataCoBroking : []
+                                    // co_broking: listDataCoBroking ? listDataCoBroking : []
                                 },
                             ],
                         };
@@ -2408,7 +2410,7 @@ export default function FormGeneral({
                                     CONSULTANCY_FEE_PPH: val["CONSULTANCY_FEE_PPH"],
                                     CONSULTANCY_FEE_NETT_AMOUNT: val["CONSULTANCY_FEE_NETT_AMOUNT"],
                                     PAYABLE: val["PAYABLE"],
-                                    co_broking: listDataCoBroking ? listDataCoBroking : []
+                                    // co_broking: listDataCoBroking ? listDataCoBroking : []
                                 },
                             ],
                         };
@@ -2455,50 +2457,49 @@ export default function FormGeneral({
                             ],
                         };
                         items[2] = item;
+                    } else if (val["INCOME_TYPE"] == 4) {
+                        const item: any = {
+                            ...items[3],
+                            income_detail: [
+                                ...items[3].income_detail,
+                                {
+                                    INCOME_TYPE: val["INCOME_TYPE"],
+                                    POLICY_ID: val["POLICY_ID"],
+                                    PARTNER_NAME: val["PARTNER_NAME"],
+                                    RELATION_ID: val["RELATION_ID"],
+                                    PERSON_ID: val["PERSON_ID"],
+                                    BROKERAGE_FEE_PERCENTAGE:
+                                        val["BROKERAGE_FEE_PERCENTAGE"],
+                                    BROKERAGE_FEE_AMOUNT:
+                                        val["BROKERAGE_FEE_AMOUNT"],
+                                    ENGINEERING_FEE_PERCENTAGE:
+                                        val["ENGINEERING_FEE_PERCENTAGE"],
+                                    ENGINEERING_FEE_AMOUNT:
+                                        val["ENGINEERING_FEE_AMOUNT"],
+                                    ADMIN_COST: val["ADMIN_COST"],
+                                    CONSULTANCY_FEE_PERCENTAGE:
+                                        val["CONSULTANCY_FEE_PERCENTAGE"],
+                                    CONSULTANCY_FEE_AMOUNT:
+                                        val["CONSULTANCY_FEE_AMOUNT"],
+                                    M_PKS_RELATION_ID: val["M_PKS_RELATION_ID"],
+                                    BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
+                                    BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
+                                    BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
+                                    BROKERAGE_FEE_NETT_AMOUNT: val["BROKERAGE_FEE_NETT_AMOUNT"],
+                                    ENGINEERING_FEE_VAT: val["ENGINEERING_FEE_VAT"],
+                                    ENGINEERING_FEE_PPN: val["ENGINEERING_FEE_PPN"],
+                                    ENGINEERING_FEE_PPH: val["ENGINEERING_FEE_PPH"],
+                                    ENGINEERING_FEE_NETT_AMOUNT: val["ENGINEERING_FEE_NETT_AMOUNT"],
+                                    CONSULTANCY_FEE_VAT: val["CONSULTANCY_FEE_VAT"],
+                                    CONSULTANCY_FEE_PPN: val["CONSULTANCY_FEE_PPN"],
+                                    CONSULTANCY_FEE_PPH: val["CONSULTANCY_FEE_PPH"],
+                                    CONSULTANCY_FEE_NETT_AMOUNT: val["CONSULTANCY_FEE_NETT_AMOUNT"],
+                                    PAYABLE: val["PAYABLE"],
+                                },
+                            ],
+                        };
+                        items[3] = item;
                     }
-                    // } else if (val["INCOME_TYPE"] == 4) {
-                    //     const item: any = {
-                    //         ...items[3],
-                    //         income_detail: [
-                    //             ...items[3].income_detail,
-                    //             {
-                    //                 INCOME_TYPE: val["INCOME_TYPE"],
-                    //                 POLICY_ID: val["POLICY_ID"],
-                    //                 PARTNER_NAME: val["PARTNER_NAME"],
-                    //                 RELATION_ID: val["RELATION_ID"],
-                    //                 PERSON_ID: val["PERSON_ID"],
-                    //                 BROKERAGE_FEE_PERCENTAGE:
-                    //                     val["BROKERAGE_FEE_PERCENTAGE"],
-                    //                 BROKERAGE_FEE_AMOUNT:
-                    //                     val["BROKERAGE_FEE_AMOUNT"],
-                    //                 ENGINEERING_FEE_PERCENTAGE:
-                    //                     val["ENGINEERING_FEE_PERCENTAGE"],
-                    //                 ENGINEERING_FEE_AMOUNT:
-                    //                     val["ENGINEERING_FEE_AMOUNT"],
-                    //                 ADMIN_COST: val["ADMIN_COST"],
-                    //                 CONSULTANCY_FEE_PERCENTAGE:
-                    //                     val["CONSULTANCY_FEE_PERCENTAGE"],
-                    //                 CONSULTANCY_FEE_AMOUNT:
-                    //                     val["CONSULTANCY_FEE_AMOUNT"],
-                    //                 M_PKS_RELATION_ID: val["M_PKS_RELATION_ID"],
-                    //                 BROKERAGE_FEE_VAT: val["BROKERAGE_FEE_VAT"],
-                    //                 BROKERAGE_FEE_PPN: val["BROKERAGE_FEE_PPN"],
-                    //                 BROKERAGE_FEE_PPH: val["BROKERAGE_FEE_PPH"],
-                    //                 BROKERAGE_FEE_NETT_AMOUNT: val["BROKERAGE_FEE_NETT_AMOUNT"],
-                    //                 ENGINEERING_FEE_VAT: val["ENGINEERING_FEE_VAT"],
-                    //                 ENGINEERING_FEE_PPN: val["ENGINEERING_FEE_PPN"],
-                    //                 ENGINEERING_FEE_PPH: val["ENGINEERING_FEE_PPH"],
-                    //                 ENGINEERING_FEE_NETT_AMOUNT: val["ENGINEERING_FEE_NETT_AMOUNT"],
-                    //                 CONSULTANCY_FEE_VAT: val["CONSULTANCY_FEE_VAT"],
-                    //                 CONSULTANCY_FEE_PPN: val["CONSULTANCY_FEE_PPN"],
-                    //                 CONSULTANCY_FEE_PPH: val["CONSULTANCY_FEE_PPH"],
-                    //                 CONSULTANCY_FEE_NETT_AMOUNT: val["CONSULTANCY_FEE_NETT_AMOUNT"],
-                    //                 PAYABLE: val["PAYABLE"],
-                    //             },
-                    //         ],
-                    //     };
-                    //     items[3] = item;
-                    // }
                 });
 
                 setListDataPartners(items);
@@ -2886,6 +2887,16 @@ export default function FormGeneral({
                 }
                 
             }
+
+            if (detailItem["INCOME_TYPE"] == 3) {
+                detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
+                    detailItem["BROKERAGE_FEE_AMOUNT"];                
+            }
+
+            if (detailItem["INCOME_TYPE"] == 4) {
+                detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
+                    detailItem["BROKERAGE_FEE_AMOUNT"];
+            }
         }
 
         if (name == "BROKERAGE_FEE_VAT") {
@@ -2938,6 +2949,15 @@ export default function FormGeneral({
                     detailItem["ENGINEERING_FEE_NETT_AMOUNT"] =
                         detailItem["ENGINEERING_FEE_AMOUNT"] + ef_pph;
                 }
+            }
+            if (detailItem["INCOME_TYPE"] == 3) {
+                detailItem["ENGINEERING_FEE_NETT_AMOUNT"] =
+                    detailItem["ENGINEERING_FEE_AMOUNT"];
+            }
+
+            if (detailItem["INCOME_TYPE"] == 4) {
+                detailItem["ENGINEERING_FEE_NETT_AMOUNT"] =
+                    detailItem["ENGINEERING_FEE_AMOUNT"];
             }
         }
 
@@ -3002,6 +3022,15 @@ export default function FormGeneral({
                         detailItem["CONSULTANCY_FEE_AMOUNT"] + cf_pph;
                 }
             }
+            if (detailItem["INCOME_TYPE"] == 3) {
+                detailItem["CONSULTANCY_FEE_NETT_AMOUNT"] =
+                    detailItem["CONSULTANCY_FEE_AMOUNT"];
+            }
+
+            if (detailItem["INCOME_TYPE"] == 4) {
+                detailItem["CONSULTANCY_FEE_NETT_AMOUNT"] =
+                    detailItem["CONSULTANCY_FEE_AMOUNT"];
+            }
         }
 
         if (name == "CONSULTANCY_FEE_VAT") {
@@ -3030,13 +3059,12 @@ export default function FormGeneral({
                 if (detailItem["BROKERAGE_FEE_VAT"] == 1) {
                     bf_ppn = -((value * 11) / 100);
                     detailItem["BROKERAGE_FEE_PPN"] = bf_ppn;
-                    detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
-                        parseFloat(value) + parseFloat(detailItem["BROKERAGE_FEE_PPN"]);
                 } else {
                     detailItem["BROKERAGE_FEE_PPN"] = 0;
-                    detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
-                        value + bf_ppn;
                 }
+                detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
+                    parseFloat(value) +
+                    parseFloat(detailItem["BROKERAGE_FEE_PPN"]);
             }
 
             if (detailItem["INCOME_TYPE"] == 2) {
@@ -3046,13 +3074,18 @@ export default function FormGeneral({
                     // untuk perorangan 5%
                     bf_pph = -((value * 5) / 100);
                     detailItem["BROKERAGE_FEE_PPH"] = bf_pph;
-                    detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
-                        value + bf_pph;
                 } else {
                     detailItem["BROKERAGE_FEE_PPH"] = 0;
-                    detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
-                        value + bf_pph;
                 }
+                detailItem["BROKERAGE_FEE_NETT_AMOUNT"] =
+                    parseFloat(value) +
+                    parseFloat(detailItem["BROKERAGE_FEE_PPH"]);
+            }
+            if (detailItem["INCOME_TYPE"] == 3) {                
+                detailItem["BROKERAGE_FEE_NETT_AMOUNT"] = parseFloat(value);
+            }
+            if (detailItem["INCOME_TYPE"] == 4) {
+                detailItem["BROKERAGE_FEE_NETT_AMOUNT"] = parseFloat(value);
             }
         }
 
@@ -3084,6 +3117,12 @@ export default function FormGeneral({
                     detailItem["ENGINEERING_FEE_NETT_AMOUNT"] = parseFloat(value) + ef_pph;
                 }
             }
+            if (detailItem["INCOME_TYPE"] == 3) {                
+                detailItem["ENGINEERING_FEE_NETT_AMOUNT"] = parseFloat(value);
+            }
+            if (detailItem["INCOME_TYPE"] == 4) {
+                detailItem["ENGINEERING_FEE_NETT_AMOUNT"] = parseFloat(value);
+            }
         }
 
         if (name == "CONSULTANCY_FEE_AMOUNT") {
@@ -3113,6 +3152,12 @@ export default function FormGeneral({
                     detailItem["CONSULTANCY_FEE_PPH"] = 0;
                     detailItem["CONSULTANCY_FEE_NETT_AMOUNT"] = parseFloat(value) + cf_pph;
                 }
+            }
+            if (detailItem["INCOME_TYPE"] == 3) {
+                detailItem["CONSULTANCY_FEE_NETT_AMOUNT"] = parseFloat(value);
+            }
+            if (detailItem["INCOME_TYPE"] == 4) {
+                detailItem["CONSULTANCY_FEE_NETT_AMOUNT"] = parseFloat(value);
             }
         }
 
@@ -3167,6 +3212,7 @@ export default function FormGeneral({
         const fbi_by_pks = { ...items[0] };
         const agent_commission = { ...items[1] };
         const acquisition_cost = { ...items[2] };
+        const coBroking = { ...items[3] };
 
         // Nett Brokerage Fee
         const nettBF_fbi = fbi_by_pks.income_detail.reduce(function (
@@ -3185,6 +3231,13 @@ export default function FormGeneral({
         0);
 
         const nettBF_acquisition = acquisition_cost.income_detail.reduce(
+            function (prev: any, current: any) {
+                return prev + +current.BROKERAGE_FEE_NETT_AMOUNT;
+            },
+            0
+        );
+
+        const nettBF_coBroking = coBroking.income_detail.reduce(
             function (prev: any, current: any) {
                 return prev + +current.BROKERAGE_FEE_NETT_AMOUNT;
             },
@@ -3212,6 +3265,13 @@ export default function FormGeneral({
             },
             0
         );
+        const nettEF_coBroking = coBroking.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.ENGINEERING_FEE_NETT_AMOUNT;
+        },
+        0);
 
         // Nett Consultancy Fee
         const nettCF_fbi = fbi_by_pks.income_detail.reduce(function (
@@ -3234,6 +3294,13 @@ export default function FormGeneral({
             },
             0
         );
+        const nettCF_coBroking = coBroking.income_detail.reduce(function (
+            prev: any,
+            current: any
+        ) {
+            return prev + +current.CONSULTANCY_FEE_NETT_AMOUNT;
+        },
+        0);
 
         const initBF = parseFloat(dataInitialForBP.BF_NETT_AMOUNT);
         const initEF = parseFloat(dataInitialForBP.EF_NETT_AMOUNT);
@@ -3242,16 +3309,21 @@ export default function FormGeneral({
         const nettBF =
             parseFloat(nettBF_fbi) +
             parseFloat(nettBF_agent) +
-            parseFloat(nettBF_acquisition);
+            parseFloat(nettBF_acquisition) +
+            parseFloat(nettBF_coBroking);
         
         const nettEF =
             parseFloat(nettEF_fbi) +
             parseFloat(nettEF_agent) +
-            parseFloat(nettEF_acquisition);
+            parseFloat(nettEF_acquisition) +
+            parseFloat(nettEF_coBroking);
+        
         const nettCF =
             parseFloat(nettCF_fbi) +
             parseFloat(nettCF_agent) +
-            parseFloat(nettCF_acquisition);
+            parseFloat(nettCF_acquisition) +
+            parseFloat(nettCF_coBroking);
+        
         setDataEditNettIncome([
             {
                 nettBf: initBF - nettBF,
@@ -4745,7 +4817,7 @@ export default function FormGeneral({
                                             >
                                                 <a
                                                     href=""
-                                                    className="pl-2 text-xs mt-1 text-primary-pelindo ms-1"
+                                                    className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
                                                     onClick={(e) =>
                                                         addRowCoverageDetail(
                                                             e,
@@ -10782,6 +10854,66 @@ export default function FormGeneral({
                                                                             --
                                                                         </option>
                                                                         {listBAA.map(
+                                                                            (
+                                                                                item: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            item.RELATION_ORGANIZATION_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            item.RELATION_ORGANIZATION_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </select>
+                                                                ) : editPartner.INCOME_CATEGORY_ID ==
+                                                                  4 ? (
+                                                                    <select
+                                                                        className="block w-40 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                        value={
+                                                                            detail.RELATION_ID
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            inputDataEditIncome(
+                                                                                "RELATION_ID",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i,
+                                                                                detailIdx
+                                                                            ),
+                                                                                getPksNumber(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                );
+                                                                        }}
+                                                                    >
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
+                                                                            --{" "}
+                                                                            <i>
+                                                                                Choose
+                                                                                FBI
+                                                                                PKS
+                                                                            </i>{" "}
+                                                                            --
+                                                                        </option>
+                                                                        {listBroker.map(
                                                                             (
                                                                                 item: any,
                                                                                 i: number

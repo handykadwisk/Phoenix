@@ -360,6 +360,7 @@ class PolicyPartnerController extends Controller
         // dd($request);
         DB::transaction(function () use ($request) {
             $data = $request[0]['listDataPartners'];//$request->input("listDataPartners");
+            // dd($data);
             $dataExchangeRate = array_key_exists("1", $request->input()) ? $request[1]["exchangeRate"] : null;
             // dd($dataExchangeRate);
 
@@ -503,6 +504,43 @@ class PolicyPartnerController extends Controller
                         ];
                         array_push($arrData, $tmpArr3);
                         $policy_id = $detail3['POLICY_ID'];
+                }
+            }
+
+            if (array_key_exists("income_detail", $data[3])) {
+                $data_acquisition =$data[3]['income_detail'];
+                foreach ($data_acquisition as $details4 => $detail4) {
+                    $tmpArr4 = [
+                            'INCOME_TYPE' => $detail4['INCOME_TYPE'],
+                            'POLICY_ID' => $detail4['POLICY_ID'],
+                            // 'PARTNER_NAME' => $detail4['PARTNER_NAME'],
+                            'RELATION_ID' => array_key_exists("RELATION_ID",$detail4) ? $detail4['RELATION_ID'] : null,
+                            'PERSON_ID' => array_key_exists("PERSON_ID",$detail4) ? $detail4['PERSON_ID'] : null,
+                            'BROKERAGE_FEE_PERCENTAGE' => $detail4['BROKERAGE_FEE_PERCENTAGE'],
+                            'BROKERAGE_FEE_AMOUNT' => $detail4['BROKERAGE_FEE_AMOUNT'],
+                            'ENGINEERING_FEE_PERCENTAGE' => $detail4['ENGINEERING_FEE_PERCENTAGE'],
+                            'ENGINEERING_FEE_AMOUNT' => $detail4['ENGINEERING_FEE_AMOUNT'],
+                            'ADMIN_COST' => $detail4['ADMIN_COST'],
+                            'CONSULTANCY_FEE_PERCENTAGE' => $detail4['CONSULTANCY_FEE_PERCENTAGE'],
+                            'CONSULTANCY_FEE_AMOUNT' => $detail4['CONSULTANCY_FEE_AMOUNT'],
+
+                            // tambahan field 29-08-2024
+                            'M_PKS_RELATION_ID' => array_key_exists("M_PKS_RELATION_ID",$detail4) ? $detail4['M_PKS_RELATION_ID'] : null,
+                            'BROKERAGE_FEE_VAT' => array_key_exists("BROKERAGE_FEE_VAT",$detail4) ? $detail4['BROKERAGE_FEE_VAT'] : null,
+                            'BROKERAGE_FEE_PPN' => $detail4['BROKERAGE_FEE_PPN'],
+                            'BROKERAGE_FEE_PPH' => $detail4['BROKERAGE_FEE_PPH'],
+                            'BROKERAGE_FEE_NETT_AMOUNT' => $detail4['BROKERAGE_FEE_NETT_AMOUNT'],
+                            'ENGINEERING_FEE_VAT' => array_key_exists("ENGINEERING_FEE_VAT",$detail4) ? $detail4['ENGINEERING_FEE_VAT'] : null,
+                            'ENGINEERING_FEE_PPN' => $detail4['ENGINEERING_FEE_PPN'],
+                            'ENGINEERING_FEE_PPH' => $detail4['ENGINEERING_FEE_PPH'],
+                            'ENGINEERING_FEE_NETT_AMOUNT' => $detail4['ENGINEERING_FEE_NETT_AMOUNT'],
+                            'CONSULTANCY_FEE_VAT' => array_key_exists("CONSULTANCY_FEE_VAT",$detail4) ? $detail4['CONSULTANCY_FEE_VAT'] : null,
+                            'CONSULTANCY_FEE_PPN' => $detail4['CONSULTANCY_FEE_PPN'],
+                            'CONSULTANCY_FEE_PPH' => $detail4['CONSULTANCY_FEE_PPH'],
+                            'CONSULTANCY_FEE_NETT_AMOUNT' => $detail4['CONSULTANCY_FEE_NETT_AMOUNT'],
+                        ];
+                        array_push($arrData, $tmpArr4);
+                        $policy_id = $detail4['POLICY_ID'];
                 }
             }
             
