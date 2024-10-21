@@ -26,6 +26,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $this->call([
+            RTimeOffTypeSeeder::class,
+            TRequestTimeOffException::class,
+            RLossLimitSeeder::class
+        ]);
+
+
         // create menu
         $dashboard = Menu::create(
             [

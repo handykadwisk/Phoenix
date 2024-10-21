@@ -43,6 +43,7 @@ use App\Http\Controllers\TCompanyDivisionController;
 use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
+use App\Http\Controllers\TimeOffController;
 use App\Http\Controllers\TJobDescCompanyController;
 use App\Http\Controllers\TDetailChatController;
 use App\Http\Controllers\TReminderController;
@@ -446,6 +447,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelation/{id}', [PolicyController::class, 'getRelationById'])->name('policy.getRelationById');
     Route::patch('/editPolicy/{id}', [PolicyController::class, 'edit'])->name('policy.edit');
     Route::patch('/deactivatePolicy/{id}', [PolicyController::class, 'deactivate'])->name('policy.deactivate');
+    Route::get('/getPolicyForAgGrid', [PolicyController::class, 'getPolicyForAgGrid'])->name('getPolicyForAgGrid.getPolicyForAgGrid');
 
     // Insurance Panel
     Route::get('/insurancePanel', [InsurancePanelController::class, 'index'])->name('insurancePanel');
@@ -521,6 +523,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertManyCoverage', [PolicyCoverageController::class, 'store'])->name('policyCoverage.store');
     Route::post('/editCoverage', [PolicyCoverageController::class, 'editCoverage'])->name('policyCoverage.editCoverage');
     Route::get('/getInterestInsured', [PolicyCoverageController::class, 'getInterestInsured'])->name('policyCoverage.getInterestInsured');
+    Route::get('/getLossLimit', [PolicyCoverageController::class, 'getLossLimit'])->name('policyCoverage.getLossLimit');
 
     // Policy Insured
     Route::post('/insertManyInsured', [PolicyInsuredController::class, 'store'])->name('policyInsured.store');
@@ -664,6 +667,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
     Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
     Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
+
+
+    // Time Off
+    Route::get('/timeOff', [TimeOffController::class, 'index'])->name('timeOff');
+    Route::post('/getSubtitute', [TimeOffController::class, 'getSubtitute'])->name('timeOff.getSubtitute');
+    Route::post('/getRequestTo', [TimeOffController::class, 'getRequestTo'])->name('timeOff.getRequestTo');
+    // Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
+    // Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
 
 
 

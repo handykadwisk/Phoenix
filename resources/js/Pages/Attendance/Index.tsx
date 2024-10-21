@@ -612,7 +612,7 @@ export default function Index({ auth }: PageProps) {
             {/* End Modal Clock Out */}
 
             <div className="">
-                <div className="col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
+                {/* <div className="col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]"> */}
                     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
                         <div className="px-4 py-5 grid grid-cols-2 gap-4">
                             <div className="col-start-1 col-end-3 text-left ml-2">
@@ -702,7 +702,7 @@ export default function Index({ auth }: PageProps) {
                             </div>
                         )}
                     </div>
-                </div>
+                {/* </div> */}
             </div>
         </AuthenticatedLayout>
     );

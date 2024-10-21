@@ -30,63 +30,16 @@ class PolicyCoverageController extends Controller
 
     public function store(Request $request) {
 
-        foreach ($request->input() as $key => $value) {
-            $coverage = MPolicyCoverage::insertGetId([
-                'POLICY_ID'             => $value['POLICY_ID'],
-                'POLICY_COVERAGE_NAME'  => trim($value['POLICY_COVERAGE_NAME']),
-            ]);
-            
-            foreach ($value['policy_coverage_detail'] as $details => $detail) {                
-                $detail = MPolicyCoverageDetail::insertGetId([
-                    'POLICY_COVERAGE_ID' => $coverage,
-                    'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
-                    'REMARKS' => $detail['REMARKS'],
-                    'CURRENCY_ID' => $detail['CURRENCY_ID'],
-                    'SUM_INSURED' => $detail['SUM_INSURED'],
-                    'RATE' => $detail['RATE'],
-                    'GROSS_PREMIUM' => $detail['GROSS_PREMIUM'],
-                    'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
-                    'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
-                    'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
-                    'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
-                    'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
-                    'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
-                    'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
-                    'PREMIUM' => $detail['PREMIUM'],
+        DB::transaction(function () use ($request) {
+            foreach ($request->input() as $key => $value) {
+                $coverage = MPolicyCoverage::insertGetId([
+                    'POLICY_ID'             => $value['POLICY_ID'],
+                    'POLICY_COVERAGE_NAME'  => trim($value['POLICY_COVERAGE_NAME']),
                 ]);
-            }
-        }
-        
-        UserLog::create([
-            'created_by' => Auth::user()->id,
-            'action'     => json_encode([
-                "description" => "Add Coverage.",
-                "module"      => "Add Coverage",
-            ]),
-            'action_by'  => Auth::user()->user_login
-        ]);
-        
-        return new JsonResponse([
-            "msg" => "Success Registered Coverage.",
-            "id" => $request->id
-        ], 201, [
-            'X-Inertia' => true
-        ]);
-    }
-
-    public function editCoverage(Request $request) {
-
-        $insurerCoverage = MPolicyCoverage::where('POLICY_COVERAGE_ID', $request['POLICY_COVERAGE_ID'])
-            ->update([
-                'POLICY_COVERAGE_NAME'  => trim($request['POLICY_COVERAGE_NAME'])
-            ]);
-
-        foreach ($request['policy_coverage_detail'] as $key => $detail) {
-            
-            if ($detail['POLICY_COVERAGE_DETAIL_ID']) {
-                // jika ada POLICY_COVERAGE_DETAIL_ID maka update
-                $coverageDetail = MPolicyCoverageDetail::where('POLICY_COVERAGE_DETAIL_ID', $detail['POLICY_COVERAGE_DETAIL_ID'])
-                    ->update([
+                
+                foreach ($value['policy_coverage_detail'] as $details => $detail) {                
+                    $detail = MPolicyCoverageDetail::insertGetId([
+                        'POLICY_COVERAGE_ID' => $coverage,
                         'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
                         'REMARKS' => $detail['REMARKS'],
                         'CURRENCY_ID' => $detail['CURRENCY_ID'],
@@ -102,33 +55,85 @@ class PolicyCoverageController extends Controller
                         'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
                         'PREMIUM' => $detail['PREMIUM'],
                     ]);
-            } else {
-                // jika Tidak ada POLICY_COVERAGE_DETAIL_ID maka Insert
-                $coverageDetail = MPolicyCoverageDetail::insertGetId([
-                    'POLICY_COVERAGE_ID' => $detail['POLICY_COVERAGE_ID'],
-                    'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
-                    'REMARKS' => $detail['REMARKS'],
-                    'CURRENCY_ID' => $detail['CURRENCY_ID'],
-                    'SUM_INSURED' => $detail['SUM_INSURED'],
-                    'RATE' => $detail['RATE'],
-                    'GROSS_PREMIUM' => $detail['GROSS_PREMIUM'],
-                    'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
-                    'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
-                    'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
-                    'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
-                    'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
-                    'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
-                    'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
-                    'PREMIUM' => $detail['PREMIUM'],
-                ]);
+                }
             }
-        }
+            
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Add Coverage.",
+                    "module"      => "Add Coverage",
+                ]),
+                'action_by'  => Auth::user()->user_login
+            ]);
+        });
+        
+        return new JsonResponse([
+            "msg" => "Success Registered Coverage.",
+            "id" => $request->id
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
 
-        if ($request['deletedCoverageDetail']) {
-            foreach ($request['deletedCoverageDetail'] as $del) {
-                MPolicyCoverageDetail::where('POLICY_COVERAGE_DETAIL_ID', $del['POLICY_COVERAGE_DETAIL_ID'])->delete();
+    public function editCoverage(Request $request) {
+
+        DB::transaction(function () use ($request) {
+
+            $insurerCoverage = MPolicyCoverage::where('POLICY_COVERAGE_ID', $request['POLICY_COVERAGE_ID'])
+                ->update([
+                    'POLICY_COVERAGE_NAME'  => trim($request['POLICY_COVERAGE_NAME'])
+                ]);
+
+            foreach ($request['policy_coverage_detail'] as $key => $detail) {
+                
+                if ($detail['POLICY_COVERAGE_DETAIL_ID']) {
+                    // jika ada POLICY_COVERAGE_DETAIL_ID maka update
+                    $coverageDetail = MPolicyCoverageDetail::where('POLICY_COVERAGE_DETAIL_ID', $detail['POLICY_COVERAGE_DETAIL_ID'])
+                        ->update([
+                            'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
+                            'REMARKS' => $detail['REMARKS'],
+                            'CURRENCY_ID' => $detail['CURRENCY_ID'],
+                            'SUM_INSURED' => $detail['SUM_INSURED'],
+                            'RATE' => $detail['RATE'],
+                            'GROSS_PREMIUM' => $detail['GROSS_PREMIUM'],
+                            'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
+                            'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
+                            'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
+                            'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
+                            'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
+                            'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
+                            'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
+                            'PREMIUM' => $detail['PREMIUM'],
+                        ]);
+                } else {
+                    // jika Tidak ada POLICY_COVERAGE_DETAIL_ID maka Insert
+                    $coverageDetail = MPolicyCoverageDetail::insertGetId([
+                        'POLICY_COVERAGE_ID' => $detail['POLICY_COVERAGE_ID'],
+                        'INTEREST_INSURED_ID' => $detail['INTEREST_INSURED_ID'],
+                        'REMARKS' => $detail['REMARKS'],
+                        'CURRENCY_ID' => $detail['CURRENCY_ID'],
+                        'SUM_INSURED' => $detail['SUM_INSURED'],
+                        'RATE' => $detail['RATE'],
+                        'GROSS_PREMIUM' => $detail['GROSS_PREMIUM'],
+                        'LOST_LIMIT_PERCENTAGE' => $detail['LOST_LIMIT_PERCENTAGE'],
+                        'LOST_LIMIT_AMOUNT' => $detail['LOST_LIMIT_AMOUNT'],
+                        'LOST_LIMIT_SCALE' => $detail['LOST_LIMIT_SCALE'],
+                        'DEPOSIT_PREMIUM_PERCENTAGE' => $detail['DEPOSIT_PREMIUM_PERCENTAGE'],
+                        'DEPOSIT_PREMIUM_AMOUNT' => $detail['DEPOSIT_PREMIUM_AMOUNT'],
+                        'INSURANCE_DISC_PERCENTAGE' => $detail['INSURANCE_DISC_PERCENTAGE'],
+                        'INSURANCE_DISC_AMOUNT' => $detail['INSURANCE_DISC_AMOUNT'],
+                        'PREMIUM' => $detail['PREMIUM'],
+                    ]);
+                }
             }
-        }
+
+            if ($request['deletedCoverageDetail']) {
+                foreach ($request['deletedCoverageDetail'] as $del) {
+                    MPolicyCoverageDetail::where('POLICY_COVERAGE_DETAIL_ID', $del['POLICY_COVERAGE_DETAIL_ID'])->delete();
+                }
+            }
+        });
 
         return new JsonResponse([
             "msg" => "Success Edit Coverage.",
@@ -151,6 +156,11 @@ class PolicyCoverageController extends Controller
 
     public function getInterestInsured() {
         $data = RInterestInsured::get();
+        return response()->json($data);
+    }
+    
+    public function getLossLimit() {
+        $data = DB::table('r_loss_limit_scale')->get();
         return response()->json($data);
     }
 
