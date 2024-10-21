@@ -55,7 +55,7 @@ class AttendanceController extends Controller
                 "module"      => "Attendance",
                 "id"          => $attendance
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([
@@ -107,7 +107,7 @@ class AttendanceController extends Controller
                 "module"      => "Attendance",
                 "id"          => $attendance
             ]),
-            'action_by'  => Auth::user()->email
+            'action_by'  => Auth::user()->user_login
         ]);
 
         return new JsonResponse([

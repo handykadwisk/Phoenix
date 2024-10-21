@@ -126,9 +126,9 @@ class AttendanceSettingController extends Controller
                 ];
             } else {
                 $tmpData = [
-                    'M_EMPLOYEE_ATTENDANCE_ID' => null,
-                    'ATTENDANCE_TYPE' => null,
-                    'ATTENDANCE_SETTING_ID' => null,
+                    'M_EMPLOYEE_ATTENDANCE_ID' => "",
+                    'ATTENDANCE_TYPE' => "",
+                    'ATTENDANCE_SETTING_ID' => "",
                     'EMPLOYEE_ID' => $value["EMPLOYEE_ID"],
                 ];
             }
