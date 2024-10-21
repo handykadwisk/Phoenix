@@ -8,6 +8,7 @@ use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CoBrokingController extends Controller
 {
@@ -52,43 +53,46 @@ class CoBrokingController extends Controller
     public function store(Request $request)
     {        
         // dd($request);
-        $dataCoBroking = $request[0]['dataCoBroking'];
-        $deletedCoBroking = array_key_exists("1", $request->input()) ? $request[1]["deletedCoBroking"] : null;
-        $arrCoBrokingId = [];
-        $arrLogData = [];
-        foreach ($dataCoBroking as $key => $value) {
-            $data = [
-                'POLICY_ID' => $value["POLICY_ID"],
-                'RELATION_ID' => $value["RELATION_ID"],
-                'CO_BROKING_PERCENTAGE' => $value["CO_BROKING_PERCENTAGE"],
-                'CO_BROKING_IS_LEADER' => $value["CO_BROKING_IS_LEADER"]
-            ];
-            if (array_key_exists('CO_BROKING_ID', $value) && $value['CO_BROKING_ID'] != "") {
-                $coBroking = $this->getCoBrokingByCoBrokingId($value['CO_BROKING_ID']);
-                MPolicyCoBroking::where('CO_BROKING_ID', $value['CO_BROKING_ID'])->update($data);
-                $id = $value['CO_BROKING_ID'];
-            } else {
-                $id = MPolicyCoBroking::insertGetId($data);
-            }
+        $arr = DB::transaction(function () use ($request) {
+            $dataCoBroking = $request[0]['dataCoBroking'];
+            $deletedCoBroking = array_key_exists("1", $request->input()) ? $request[1]["deletedCoBroking"] : null;
+            $arrCoBrokingId = [];
+            $arrLogData = [];
+            foreach ($dataCoBroking as $key => $value) {
+                $data = [
+                    'POLICY_ID' => $value["POLICY_ID"],
+                    'RELATION_ID' => $value["RELATION_ID"],
+                    'CO_BROKING_PERCENTAGE' => $value["CO_BROKING_PERCENTAGE"],
+                    'CO_BROKING_IS_LEADER' => $value["CO_BROKING_IS_LEADER"]
+                ];
+                if (array_key_exists('CO_BROKING_ID', $value) && $value['CO_BROKING_ID'] != "") {
+                    $coBroking = $this->getCoBrokingByCoBrokingId($value['CO_BROKING_ID']);
+                    MPolicyCoBroking::where('CO_BROKING_ID', $value['CO_BROKING_ID'])->update($data);
+                    $id = $value['CO_BROKING_ID'];
+                } else {
+                    $id = MPolicyCoBroking::insertGetId($data);
+                }
 
-            array_push($arrCoBrokingId, $id);
-            array_push($arrLogData, $data);
-        }
-        
-         // Deleted Co Broking By Id
-        if ($deletedCoBroking) {
-            foreach ($deletedCoBroking as $dels => $del) {
-                 MPolicyCoBroking::where('CO_BROKING_ID', $del['CO_BROKING_ID'])->delete();
+                array_push($arrCoBrokingId, $id);
+                array_push($arrLogData, $data);
             }
-        }
+            
+            // Deleted Co Broking By Id
+            if ($deletedCoBroking) {
+                foreach ($deletedCoBroking as $dels => $del) {
+                    MPolicyCoBroking::where('CO_BROKING_ID', $del['CO_BROKING_ID'])->delete();
+                }
+            }
+            return [$arrCoBrokingId, $arrLogData];
+        });
       
         // Created Log
         UserLog::create([
             'created_by' => Auth::user()->user_login,
             'action'     => json_encode([
-                "description" => "Created/Update (Co Broking). Data: ". json_encode($arrLogData),
+                "description" => "Created/Update (Co Broking). Data: ". json_encode($arr[1]),
                 "module"      => "Policy (Co Broking)",
-                "id"          => $arrCoBrokingId
+                "id"          => $arr[0]
             ]),
             'action_by'  => Auth::user()->user_login
         ]);
@@ -104,16 +108,18 @@ class CoBrokingController extends Controller
     public function updatePolicyCoBroking(Request $request)
     {        
         // dd($request);
+        DB::transaction(function () use ($request) {
         // Update tabel t_policy
-        $updateCoBroking = Policy::where('POLICY_ID', $request->input('policyId'))
-                        ->update(['CO_BROKING' => $request->input('coBroking')]);
+            $updateCoBroking = Policy::where('POLICY_ID', $request->input('policyId'))
+                            ->update(['CO_BROKING' => $request->input('coBroking')]);
 
-        if ($updateCoBroking) {
-            if (!$request->input('coBroking')) {
-                // jika false maka update Delete data di MPolicyCoBroking berdasarkan POLICY_ID
-                MPolicyCoBroking::where('POLICY_ID', $request->input('policyId'))->delete();
+            if ($updateCoBroking) {
+                if (!$request->input('coBroking')) {
+                    // jika false maka update Delete data di MPolicyCoBroking berdasarkan POLICY_ID
+                    MPolicyCoBroking::where('POLICY_ID', $request->input('policyId'))->delete();
+                }
             }
-        }
+        });
         return response()->json([
             "Success Updated Co Broking"
         ]);

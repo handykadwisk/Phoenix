@@ -26,6 +26,7 @@ import DatePicker from "react-datepicker";
 import FormGeneral from "./FormGeneral";
 import FormCertificate from "./FormCertificate";
 import ToastMessage from "@/Components/ToastMessage";
+import Select from "react-tailwindcss-select";
 // import ModalTest from "./ModalTest";
 
 export default function DetailPolicy({
@@ -56,6 +57,37 @@ export default function DetailPolicy({
         { ID: "1", NAME: "Full Policy" },
         { ID: "2", NAME: "Master Policy/Certificate" },
     ];
+
+    const selectClient = clients?.map((query: any) => {
+        return {
+            value: query.RELATION_ORGANIZATION_ID,
+            label: query.RELATION_ORGANIZATION_NAME,
+        };
+    });
+
+    const selectInsuranceType = insuranceType?.map((query: any) => {
+        return {
+            value: query.INSURANCE_TYPE_ID,
+            label: query.INSURANCE_TYPE_NAME,
+        };
+    });
+
+    const getClientSelect = (value: any) => {
+        if (value) {
+            const selected = selectClient.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+    const getInsuranceTypeSelect = (value: any) => {
+        if (value) {
+            const selected = selectInsuranceType.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
 
     useEffect(() => {
         getDataCoverageName(policy.POLICY_ID);
@@ -257,31 +289,37 @@ export default function DetailPolicy({
                                 htmlFor="edit_relation"
                                 value="Client Name"
                             />
-                            <select
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                value={dataById.RELATION_ID}
-                                onChange={(e) =>
-                                    setDataById({
-                                        ...dataById,
-                                        RELATION_ID: e.target.value,
-                                    })
+                            <Select
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-500`
+                                                : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                        }`,
+                                }}
+                                options={selectClient}
+                                isSearchable={true}
+                                placeholder={"Search Client"}
+                                value={{
+                                    label: getClientSelect(
+                                        dataById.RELATION_ID
+                                    ),
+                                    value: dataById.RELATION_ID,
+                                }}
+                                onChange={
+                                    (val: any) =>
+                                        setDataById({
+                                            ...dataById,
+                                            RELATION_ID: val.value,
+                                        })
                                 }
-                            >
-                                <option>
-                                    -- <i>Choose Client</i> --
-                                </option>
-                                {clients?.map((status: any) => {
-                                    return (
-                                        <option
-                                            value={
-                                                status.RELATION_ORGANIZATION_ID
-                                            }
-                                        >
-                                            {status.RELATION_ORGANIZATION_NAME}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                                primaryColor={"bg-red-500"}
+                            />
+                            
                         </div>
                         <div className="grid grid-rows grid-flow-col gap-4 ml-4 mr-4">
                             <div className="mb-4">
@@ -310,29 +348,37 @@ export default function DetailPolicy({
                                     htmlFor="edit_insurance_type"
                                     value="Insurance Type"
                                 />
-                                <select
-                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    value={dataById.INSURANCE_TYPE_ID}
-                                    onChange={(e) =>
-                                        setDataById({
-                                            ...dataById,
-                                            INSURANCE_TYPE_ID: e.target.value,
-                                        })
+                                <Select
+                                    classNames={{
+                                        menuButton: () =>
+                                            `flex text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-red-600`,
+                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                        listItem: ({ isSelected }: any) =>
+                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                isSelected
+                                                    ? `text-white bg-red-500`
+                                                    : `text-gray-500 hover:bg-red-500 hover:text-white`
+                                            }`,
+                                    }}
+                                    options={selectInsuranceType}
+                                    isSearchable={true}
+                                    placeholder={"Search Insurance Type"}
+                                    value={{
+                                        label: getInsuranceTypeSelect(
+                                            dataById.INSURANCE_TYPE_ID
+                                        ),
+                                        value: dataById.INSURANCE_TYPE_ID,
+                                    }}
+                                    onChange={
+                                        (val: any) =>
+                                            setDataById({
+                                                ...dataById,
+                                                INSURANCE_TYPE_ID: val.value,
+                                            })
                                     }
-                                >
-                                    <option value={""}>
-                                        -- <i>Choose Insurance Type</i> --
-                                    </option>
-                                    {insuranceType?.map((status: any) => {
-                                        return (
-                                            <option
-                                                value={status.INSURANCE_TYPE_ID}
-                                            >
-                                                {status.INSURANCE_TYPE_NAME}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
+                                    primaryColor={"bg-red-500"}
+                                />
+                                
                             </div>
                             <div className="mb-4">
                                 <InputLabel
@@ -340,7 +386,7 @@ export default function DetailPolicy({
                                     value="Policy Type"
                                 />
                                 <select
-                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="mt-0 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={dataById.POLICY_TYPE}
                                     onChange={(e) =>
                                         setDataById({
@@ -391,7 +437,7 @@ export default function DetailPolicy({
                                     value="Inception Date"
                                 />
                                 <div className="relative max-w-sm">
-                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3 pointer-events-none">
+                                    <div className="absolute inset-y-0 z-10 start-0 flex items-center px-3 pointer-events-none">
                                         <svg
                                             className="w-3 h-3 text-gray-500 dark:text-gray-400"
                                             aria-hidden="true"
@@ -429,7 +475,7 @@ export default function DetailPolicy({
                                     value="Expiry Date"
                                 />
                                 <div className="relative max-w-sm">
-                                    <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                    <div className="absolute inset-y-0 z-10 start-0 flex items-center px-3  pointer-events-none">
                                         <svg
                                             className="w-3 h-3 text-gray-500 dark:text-gray-400"
                                             aria-hidden="true"
@@ -578,10 +624,10 @@ export default function DetailPolicy({
                                         </div>
                                         <div className=" col-span-3">
                                             <span className="font-normal text-gray-500">
-                                                {
-                                                    policyDetail.relation
-                                                        .RELATION_ORGANIZATION_NAME
-                                                }
+                                                {policyDetail.relation
+                                                    ? policyDetail.relation
+                                                          .RELATION_ORGANIZATION_NAME
+                                                    : "-"}
                                             </span>
                                         </div>
                                     </div>
@@ -662,7 +708,6 @@ export default function DetailPolicy({
                                                     policyDetail.POLICY_DUE_DATE,
                                                     "dd-mm-yyyy"
                                                 )}
-                                                {/* {policyDetail.POLICY_DUE_DATE} */}
                                             </span>
                                         </div>
                                     </div>
@@ -744,8 +789,6 @@ export default function DetailPolicy({
                                         <tbody>
                                             {summaryFinancial.map(
                                                 (record: any, i: number) => {
-                                                    // return record.map(
-                                                    //     (course:any, j:number) => {
                                                     return record.detail.map(
                                                         (r: any, k: number) => {
                                                             let titleTdEl;
@@ -783,21 +826,6 @@ export default function DetailPolicy({
                                                                     >
                                                                         {
                                                                             <div className="block w-40 mx-auto text-right">
-                                                                                {/* {record.detail.reduce(
-                                                                                    function (
-                                                                                        prev: any,
-                                                                                        current: any
-                                                                                    ) {
-                                                                                        return (
-                                                                                            prev +
-                                                                                            +(
-                                                                                                current.AMOUNT *
-                                                                                                current.EXCHANGE_RATE
-                                                                                            )
-                                                                                        );
-                                                                                    },
-                                                                                    0
-                                                                                )} */}
                                                                                 {new Intl.NumberFormat(
                                                                                     "id",
                                                                                     {
@@ -897,15 +925,12 @@ export default function DetailPolicy({
                                                                     <td className="p-1 border">
                                                                         {
                                                                             <div className="block w-40 mx-auto text-right">
-                                                                                {/* Nett
-                                                                                Value */}
                                                                                 {new Intl.NumberFormat(
                                                                                     "id",
                                                                                     {
                                                                                         style: "decimal",
                                                                                     }
                                                                                 ).format(
-                                                                                    // r.AMOUNT
                                                                                     parseFloat(
                                                                                         r.AMOUNT
                                                                                     ) +
@@ -1000,8 +1025,6 @@ export default function DetailPolicy({
                                                             );
                                                         }
                                                     );
-                                                    //     }
-                                                    // );
                                                 }
                                             )}
                                         </tbody>

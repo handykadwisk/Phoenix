@@ -18,4 +18,9 @@ class RPluginProcess extends Model
     ];
 
     public $timestamps = false;
+
+    public function TTagPlugin()
+    {
+        return $this->hasOne(TTagPluginProcess::class, 'PLUGIN_PROCESS_ID', 'PLUGIN_PROCESS_ID');
+    }
 }

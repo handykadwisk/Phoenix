@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceSettingController;
+use App\Http\Controllers\BankTransactionController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
 use App\Http\Controllers\CoBrokingController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\ExchangeRateBIController;
@@ -12,7 +14,7 @@ use App\Http\Controllers\ExchangeRateTaxController;
 use App\Http\Controllers\InsurancePanelController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
-use App\Http\Controllers\OtherExpensesController;
+use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
@@ -34,6 +36,7 @@ use App\Models\TRelationStructure;
 use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
+use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RoleAccesMenuController;
 use App\Http\Controllers\RolePermissionController;
@@ -43,8 +46,10 @@ use App\Http\Controllers\TCompanyDivisionController;
 use App\Http\Controllers\TCompanyOfficeController;
 use App\Http\Controllers\TCompanyStructureController;
 use App\Http\Controllers\TEmployeeController;
+use App\Http\Controllers\TimeOffController;
 use App\Http\Controllers\TJobDescCompanyController;
 use App\Http\Controllers\TDetailChatController;
+use App\Http\Controllers\TReminderController;
 use App\Http\Controllers\TJobpostController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Http\Controllers\UserManagementController;
@@ -270,6 +275,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
     Route::get('/showMenu', [MenuController::class, 'showMenu'])->name('showMenu.showMenu');
+    Route::post('/changeMenuStatus',[MenuController::class, 'changeMenuStatus'])->name('changeMenuStatus.changeMenuStatus');
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
     Route::get('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
@@ -295,6 +301,7 @@ Route::middleware('auth')->group(function () {
     // access role menu
     Route::get('/getRoleAccessMenuByRoleId/{role_id}', [RoleAccesMenuController::class, 'getAccessMenuByRoleId'])->name('getRoleAccessMenuByRoleId.getMenuByRole');
     Route::post('/roleAccessMenu', [RoleAccesMenuController::class, 'store'])->name('roleAccessMenu.store');
+    Route::post('/addAccessMenu/{role_id}', [RoleAccesMenuController::class, 'addAccessMenu'])->name('addAccessMenu.addAccessMenu');
 
 
     //role permission
@@ -302,8 +309,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/rolePermission', [RolePermissionController::class, 'store'])->name('rolePermission.store');
 
     //settings/userManagement
-    Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUerJson');
-    Route::get('/getUser',[UserManagementController::class, 'getUserJson'])->name('getUser.getUserJson');
+    Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUserJson');
+    Route::get('/getUser',[UserManagementController::class, 'getUserJson'])->name('getUser');
     Route::get('/settings/user', [UserManagementController::class, 'index'])->name('settings/user');
     Route::post('/settings/addUser', [UserManagementController::class, 'store'])->name('settings/addUser.store');
     Route::get('/settings/getUserJson', [UserManagementController::class, 'getUserDataByMRole'])->name('settings/getUserJson.getUserJson');
@@ -358,7 +365,7 @@ Route::middleware('auth')->group(function () {
     // Cash Advance Report
     Route::post('/getCAReport', [CashAdvanceReportController::class, 'getCAReport'])->name('cashAdvance.getCAReport');
     Route::get('/getCAReportById/{id}', [CashAdvanceReportController::class, 'getCAReportById'])->name('getCAReportById');
-    Route::get('/getCashAdvanceDifferents', [CashAdvanceReportController::class, 'getCashAdvanceDifferents'])->name('getCashAdvanceDifferents');
+    Route::get('/getCashAdvanceDifference', [CashAdvanceReportController::class, 'getCashAdvanceDifference'])->name('getCashAdvanceDifference');
     Route::get('/getCashAdvanceApproval', [CashAdvanceReportController::class, 'getCashAdvanceApproval'])->name('getCashAdvanceApproval');
     Route::get('/getCashAdvanceMethod', [CashAdvanceReportController::class, 'getCashAdvanceMethod'])->name('getCashAdvanceMethod');
     Route::post('/cashAdvanceReport', [CashAdvanceReportController::class, 'cash_advance_report'])->name('cashAdvanceReport.cash_advance_report');
@@ -396,15 +403,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/reimburseDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_doc_reader'])->name('reimburseDocReader.reimburse_doc_reader');
     Route::get('/reimburseProofOfDocumentDocReader/{id}/{key}', [ReimburseController::class, 'reimburse_proof_of_document_doc_reader'])->name('reimburseProofOfDocumentDocReader.reimburse_proof_of_document_doc_reader');
 
-    // Other Expenses
-    Route::post('/getOtherExpenses', [OtherExpensesController::class, 'getOtherExpenses'])->name('cashAdvance.getOtherExpenses');
-    Route::get('/getOtherExpensesNumber', [OtherExpensesController::class, 'getOtherExpensesNumber'])->name('getOtherExpensesNumber');
-    Route::get('/getOtherExpensesById/{id}', [OtherExpensesController::class, 'getOtherExpensesById'])->name('getOtherExpensesById');
-    Route::get('/otherExpenses', [OtherExpensesController::class, 'index'])->name('otherExpenses');
-    Route::post('/otherExpenses', [OtherExpensesController::class, 'store'])->name('otherExpenses.store');
-    Route::patch('/otherExpensesApprove/{id}', [OtherExpensesController::class, 'approve'])->name('otherExpenses.approve');
-    Route::patch('/otherExpensesRevised/{id}', [OtherExpensesController::class, 'revised'])->name('otherExpenses.revised');
-    Route::get('/otherExpensesDownload/{id}', [OtherExpensesController::class, 'download'])->name('otherExpenses.download');
+    // Expenses
+    Route::post('/getExpenses', [ExpensesController::class, 'getExpenses'])->name('cashAdvance.getExpenses');
+    Route::get('/getExpensesNumber', [ExpensesController::class, 'getExpensesNumber'])->name('getExpensesNumber');
+    Route::get('/getExpensesById/{id}', [ExpensesController::class, 'getExpensesById'])->name('getExpensesById');
+    Route::get('/getExpensesApproval', [ExpensesController::class, 'getExpensesApproval'])->name('getExpensesApproval');
+    Route::get('/getExpensesNotes', [ExpensesController::class, 'getExpensesNotes'])->name('getExpensesNotes');
+    Route::get('/getExpensesMethod', [ExpensesController::class, 'getExpensesMethod'])->name('getExpensesMethod');
+    Route::get('/expenses', [ExpensesController::class, 'index'])->name('expenses');
+    Route::post('/expensesAdd', [ExpensesController::class, 'expenses_add'])->name('otherExpenses.add');
+    Route::patch('/expensesApprove', [ExpensesController::class, 'approve'])->name('expenses.approve');
+    Route::patch('/expensesRevised', [ExpensesController::class, 'revised'])->name('expenses.revised');
+    Route::patch('/expensesExecute', [ExpensesController::class, 'execute'])->name('expenses.execute');
+    Route::get('/expensesDownload/{id}/{key}', [ExpensesController::class, 'download'])->name('expenses.download');
 
     // Approval Limit
     Route::get('/approvalLimit', [CashAdvanceController::class, 'index'])->name('approvalLimit');
@@ -431,8 +442,22 @@ Route::middleware('auth')->group(function () {
     Route::patch('/exchangeRateBIEdit', [ExchangeRateBIController::class, 'exchange_rate_bi_edit'])->name('exchangeRateBI.edit');
     Route::get('/exchangeRateBIDownloadTemplate', [ExchangeRateBIController::class, 'exchange_rate_bi_download_template'])->name('exchangeRateBIDownloadTemplate');
 
+    // Currency
+    Route::get('/getCurrency', [CurrencyController::class, 'getCurrency'])->name('getCurrency');
+
     // Receipt
-    Route::get('/receipt', [ExchangeRateBIController::class, 'index'])->name('receipt');
+    Route::get('/getClient', [ReceiptController::class, 'getClient'])->name('getClient');
+    // Route::get('/getCurrency', [ReceiptController::class, 'getCurrency'])->name('getCurrency');
+    Route::get('/getBankAccount', [ReceiptController::class, 'getBankAccount'])->name('getBankAccount');
+    Route::post('/getReceipt', [ReceiptController::class, 'getReceipt'])->name('receipt.getReceipt');
+    Route::get('/getReceiptById/{id}', [ReceiptController::class, 'getReceiptById'])->name('receipt.getReceiptById');
+    Route::get('/receipt', [ReceiptController::class, 'index'])->name('receipt');
+    Route::post('/receiptAdd', [ReceiptController::class, 'receipt_add'])->name('receipt.add');
+    Route::patch('/receiptDraft', [ReceiptController::class, 'receipt_draft'])->name('receipt.draft');
+
+    // Bank Transaction
+    Route::post('/getBankTransaction', [BankTransactionController::class, 'getBankTransaction'])->name('getBankTransaction');
+    Route::get('/bankTransaction', [BankTransactionController::class, 'index'])->name('bankTransaction');
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');
@@ -443,6 +468,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getRelation/{id}', [PolicyController::class, 'getRelationById'])->name('policy.getRelationById');
     Route::patch('/editPolicy/{id}', [PolicyController::class, 'edit'])->name('policy.edit');
     Route::patch('/deactivatePolicy/{id}', [PolicyController::class, 'deactivate'])->name('policy.deactivate');
+    Route::get('/getPolicyForAgGrid', [PolicyController::class, 'getPolicyForAgGrid'])->name('getPolicyForAgGrid.getPolicyForAgGrid');
 
     // Insurance Panel
     Route::get('/insurancePanel', [InsurancePanelController::class, 'index'])->name('insurancePanel');
@@ -518,6 +544,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertManyCoverage', [PolicyCoverageController::class, 'store'])->name('policyCoverage.store');
     Route::post('/editCoverage', [PolicyCoverageController::class, 'editCoverage'])->name('policyCoverage.editCoverage');
     Route::get('/getInterestInsured', [PolicyCoverageController::class, 'getInterestInsured'])->name('policyCoverage.getInterestInsured');
+    Route::get('/getLossLimit', [PolicyCoverageController::class, 'getLossLimit'])->name('policyCoverage.getLossLimit');
 
     // Policy Insured
     Route::post('/insertManyInsured', [PolicyInsuredController::class, 'store'])->name('policyInsured.store');
@@ -544,9 +571,11 @@ Route::middleware('auth')->group(function () {
     // HR
     Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
     Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
+    Route::get('/getAllCompany',[TCompanyController::class,'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
     Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
     Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
+    Route::post('/getCompany', [TCompanyController::class, 'getCompany'])->name('getCompany.getCompany');
 
     // Employee
     Route::get('/getAllEmployee',[TEmployeeController::class,'getAllEmployeeJson'])->name('getAllEmployee.');
@@ -635,34 +664,48 @@ Route::middleware('auth')->group(function () {
     Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
     Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
     Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
+    Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
+    Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
+    Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
+    Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
+    Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
+
+    // Message Chat
+    Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
+    Route::post('/addChatMessage', [TDetailChatController::class, 'store'])->name('addChatMessage.store');
+    Route::post('/getTypeChatByTagId', [TDetailChatController::class, 'getTypeChatByTagId'])->name('getTypeChatByTagId.getTypeChatByTagId');
+    Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
+    Route::post('/pinMessageObject', [TDetailChatController::class, 'pinMessageObject'])->name('pinMessageObject.pinMessageObject');
+    Route::post('/getChatPin', [TDetailChatController::class, 'getChatPin'])->name('getChatPin.getChatPin');
+    Route::post('/getDataParticipant', [TDetailChatController::class, 'get_participant'])->name('getDataParticipant.get_participant');
+    Route::post('/unPinMessageObject', [TDetailChatController::class, 'unPinMessageObject'])->name('unPinMessageObject.unPinMessageObject');
+    Route::post('/getDataParticipantById', [TDetailChatController::class, 'getDataParticipantById'])->name('getDataParticipantById.getDataParticipantById');
+    Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
+    Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
+    Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
+    Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
+    Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
+    Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
+    Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
+    Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
+
+
+    // Time Off
+    Route::get('/timeOff', [TimeOffController::class, 'index'])->name('timeOff');
+    Route::post('/getSubtitute', [TimeOffController::class, 'getSubtitute'])->name('timeOff.getSubtitute');
+    Route::post('/getRequestTo', [TimeOffController::class, 'getRequestTo'])->name('timeOff.getRequestTo');
+    // Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
+    // Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
 
 
 
-
-
-
-
-    Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
-    
-
-    // Attendance Setting
-    Route::get('hr/attendanceSetting', [AttendanceSettingController::class, 'index'])->name('hr/attendanceSetting');
-    Route::post('/addWorkAttendance', [AttendanceSettingController::class, 'store'])->name('attendanceSetting.store');
-    Route::get('/getAttendanceSetting', [AttendanceSettingController::class, 'getAttendanceSetting'])->name('getAttendanceSetting.getAttendanceSetting');
-    Route::post('/getAttendanceSettingById', [AttendanceSettingController::class, 'getAttendanceSettingById'])->name('getAttendanceSettingById.getAttendanceSettingById');
-    Route::post('/editAttendanceSetting', [AttendanceSettingController::class, 'editAttendanceSetting'])->name('editAttendanceSetting.editAttendanceSetting');
-    Route::post('/mappingEmployeeToSettingAttendance', [AttendanceSettingController::class, 'mappingEmployeeToSettingAttendance'])->name('mappingEmployeeToSettingAttendance.mappingEmployeeToSettingAttendance');
-    Route::post('/addPersonAttendance', [AttendanceSettingController::class, 'addPersonAttendance'])->name('attendanceSetting.addPersonAttendance');
-    
-    
-    // Co Broking
-    Route::post('/insertCoBroking', [CoBrokingController::class, 'store'])->name('policyCoBroking.store');
-    Route::post('/mappingCoBroking', [CoBrokingController::class, 'mappingCoBroking'])->name('policyCoBroking.mappingCoBroking');
-    Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
-    Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
-
-
-
+    // Reminder
+    Route::get('reminder', [TCompanyController::class, 'reminder'])->name('reminder');
+    Route::post('/getReminderTier', [TReminderController::class, 'getReminderTier'])->name('getReminderTier.getReminderTier');
+    Route::post('/getMethodNotification', [TReminderController::class, 'getMethodNotification'])->name('getMethodNotification.getMethodNotification');
+    Route::post('/addReminder', [TReminderController::class, 'store'])->name('addReminder.addReminder');
+    Route::post('/getTReminder', [TReminderController::class, 'get_reminder'])->name('getTReminder.getTReminder');
+    Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.getDetailReminder');
 });
 
 require __DIR__ . '/auth.php';

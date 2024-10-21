@@ -18,7 +18,7 @@ class ExchangeRateBIController extends Controller
     {
         $exchange_rate_bi_date = $searchQuery->exchange_rate_bi_date;
 
-        $data = ExchangeRateBI::orderBy('EXCHANGE_RATE_BI_ID', 'desc');
+        $data = ExchangeRateBI::orderBy('EXCHANGE_RATE_BI_DATE', 'desc');
         
         if ($searchQuery) {
             if ($searchQuery->input('exchange_rate_bi_date')) {
@@ -103,8 +103,6 @@ class ExchangeRateBIController extends Controller
             ]);
 
             foreach ($exchange_rate_bi_detail as $value) {
-                $exchange_rate_bi_detail_id = isset($value['EXCHANGE_RATE_BI_DETAIL_ID']) ? $value['EXCHANGE_RATE_BI_DETAIL_ID'] : null;
-                
                 $exchange_rate_bi_detail_currency_id = isset($value['EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID']) ? $value['EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID'] : $value['CURRENCY_ID'];
 
                 $exchange_rate_bi_detail_exchange_rate = $value['EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE'];
@@ -112,11 +110,10 @@ class ExchangeRateBIController extends Controller
                 $exchange_rate_bi_detail_created_at = now();
 
                 ExchangeRateBIDetail::updateOrCreate([
-                    'EXCHANGE_RATE_BI_DETAIL_ID' => $exchange_rate_bi_detail_id,
-                ],
-                [
                     'EXCHANGE_RATE_BI_ID' => $exchange_rate_bi,
                     'EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID' => $exchange_rate_bi_detail_currency_id,
+                ],
+                [
                     'EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE' => $exchange_rate_bi_detail_exchange_rate,
                     'EXCHANGE_RATE_BI_DETAIL_CREATED_BY' => $exchange_rate_bi_detail_created_by,
                     'EXCHANGE_RATE_BI_DETAIL_CREATED_AT' => $exchange_rate_bi_detail_created_at

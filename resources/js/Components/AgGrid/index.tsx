@@ -18,8 +18,8 @@ export default function AGGrid({
     withParam,
     searchParam,
     triggeringRefreshData,
-    doubleClickEvent = () => {},
-    addButtonModalState = () => {},
+    doubleClickEvent = () => { },
+    addButtonModalState = () => { },
 }: PropsWithChildren<{
     colDefs: any;
     url: string;
@@ -32,7 +32,7 @@ export default function AGGrid({
     addButtonModalState: CallableFunction | undefined;
 }>) {
     // console.log("searchParamAGGRid", searchParam);
-    
+
 
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
@@ -61,34 +61,33 @@ export default function AGGrid({
                         filterParams[colId] = filterModel[colId].dateFrom;
                     }
                 }
-
-                let urlNew: any = "";
+                
+                let urlNew: string = "";
 
                 if (withParam !== "") {
                     urlNew = `${url}?id=${withParam}`;
-                } else if (withParam === "") {
+                } else {
                     urlNew = `${url}?`;
                 }
 
                 axios
                     .get(
-                        `/${urlNew}page=${page}&perPage=${
-                            endRow - startRow
-                        }&sort=${sortParams}&filter=${JSON.stringify(
+                        `/${urlNew}&page=${page}&perPage=${endRow - startRow}&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
                         )}&newFilter=${JSON.stringify(searchParam)}`
                     )
                     .then((res) => {
                         params.success({
-                            rowData: res.data.data,                            
+                            rowData: res.data.data,
                             rowCount: res.data.total,
                         });
                     })
                     .catch((err) => console.log(err));
+
             },
         };
     };
-    
+
 
     const onGridReady = (params: GridReadyEvent<any, any>) => {
         var dataSource = getServerSideDatasource();
@@ -133,7 +132,7 @@ export default function AGGrid({
                     suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={25}
-                    // paginationAutoPageSize={true} 
+                    // paginationAutoPageSize={true}
                     cacheBlockSize={25}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}

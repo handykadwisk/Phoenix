@@ -91,6 +91,8 @@ class RelationController extends Controller
         // dd($newSearch[0]);
 
 
+
+
         if ($sortModel) {
             $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
@@ -123,7 +125,19 @@ class RelationController extends Controller
             }
         }
 
-      
+        // if ($filterModel) {
+        //     foreach ($filterModel as $colId => $filterValue) {
+        //         if ($colId === 'policy_number') {
+        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
+        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
+        //         } elseif ($colId === 'policy_inception_date') {
+        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
+        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
+        //         }
+        //     }
+        // }
+        // dd($query->toSql());
+        $query->orderBy('RELATION_ORGANIZATION_ID', "DESC");
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
@@ -681,7 +695,7 @@ class RelationController extends Controller
 
     public function get_detail(Request $request)
     {
-        $detailRelation = Relation::with('TPerson')->find($request->id);
+        $detailRelation = Relation::with('TPerson')->with('groupRelation')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
@@ -865,7 +879,7 @@ class RelationController extends Controller
         //     foreach ($filterModel as $colId => $filterValue) {
         //         if ($colId === 'RELATION_ORGANIZATION_ALIAS') {
         //             $query->where('RELATION_ORGANIZATION_ALIAS', 'LIKE', '%' . $filterValue . '%');
-        //         } 
+        //         }
         //         // elseif ($colId === 'policy_inception_date') {
         //         //     $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
         //         //           ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
@@ -900,7 +914,7 @@ class RelationController extends Controller
         //     foreach ($filterModel as $colId => $filterValue) {
         //         if ($colId === 'RELATION_ORGANIZATION_ALIAS') {
         //             $query->where('RELATION_ORGANIZATION_ALIAS', 'LIKE', '%' . $filterValue . '%');
-        //         } 
+        //         }
         //         // elseif ($colId === 'policy_inception_date') {
         //         //     $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
         //         //           ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));

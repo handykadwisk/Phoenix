@@ -39,12 +39,9 @@ class HandleInertiaRequests extends Middleware
         
         if (Auth::check()) {
             $menu = [];
-            // dd($user->user_type_id);
 
             if ($user->user_type_id === 1 || $user->user_type_id === '1') {
-                // Ambil semua menu jika type_user_id adalah 1 (administrator atau sejenisnya)
-                // $menu = $menuAdmin;
-                // dd($user->user_type_id);
+             
     
                 $menu = Menu::where('menu_is_deleted', 0) ->orderBy('menu_sequence', 'asc')->get()->toArray();
             } else {

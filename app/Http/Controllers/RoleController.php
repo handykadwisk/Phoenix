@@ -41,7 +41,7 @@ class RoleController extends Controller
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
 
-        $query = Role::query();
+        $query = Role::query()->orderBy('id', 'desc');
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
         $newFilter = $request->input('newFilter', '');

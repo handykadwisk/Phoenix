@@ -146,8 +146,6 @@ export default function DetailDocumentRelation({
             ],
         });
     };
-
-    console.log(dataDocumentPks);
     return (
         <>
             {" "}
@@ -167,7 +165,7 @@ export default function DetailDocumentRelation({
                         edit: false,
                     });
                 }}
-                title={"Add Certificate"}
+                title={"Add Document"}
                 url={`/editDocumentPks`}
                 data={dataDocumentPks}
                 classPanel={
@@ -654,58 +652,62 @@ export default function DetailDocumentRelation({
                             />
                         </div>
                     </div>
-                ) : (
-                    dataRelationNew.m_relation_type.find(
-                        (f: any) => f.RELATION_TYPE_ID === 13
-                    ) && (
-                        <div className="bg-white rounded-md shadow-md mb-2 p-2">
-                            <div className="flex justify-between items-center">
-                                <div className="border-b-2 border-red-600 font-semibold">
-                                    <span>Document PKS FBI By PKS</span>
-                                </div>
-                                <div
-                                    className="bg-red-600 p-2 rounded-md shadow-md text-white cursor-pointer hover:bg-red-400"
-                                    onClick={(e: FormEvent) => {
-                                        handleEditDocument(e);
-                                    }}
-                                >
-                                    <span>
-                                        <PencilSquareIcon className="w-5" />
-                                    </span>
-                                </div>
+                ) : dataRelationNew.m_relation_type.find(
+                      (f: any) => f.RELATION_TYPE_ID === 13
+                  ) ? (
+                    <div className="bg-white rounded-md shadow-md mb-2 p-2">
+                        <div className="flex justify-between items-center">
+                            <div className="border-b-2 border-red-600 font-semibold">
+                                <span>Document PKS FBI By PKS</span>
                             </div>
-                            {/* ag grid Document PKS FBI */}
-                            <div className="mt-2 ag-grid-layout">
-                                <AGGrid
-                                    addButtonLabel={undefined}
-                                    addButtonModalState={undefined}
-                                    withParam={idRelation}
-                                    searchParam={""}
-                                    // loading={isLoading.get_policy}
-                                    url={"getDocumentPKSFbi"}
-                                    doubleClickEvent={undefined}
-                                    triggeringRefreshData={isSuccess}
-                                    colDefs={[
-                                        {
-                                            headerName: "No.",
-                                            valueGetter: "node.rowIndex + 1",
-                                            flex: 1,
-                                        },
-                                        {
-                                            headerName: "No. PKS FBI By PKS",
-                                            field: "NO_PKS",
-                                            flex: 11,
-                                        },
-                                        {
-                                            headerName: "Document",
-                                            field: "DOCUMENT_ORIGINAL_NAME",
-                                            flex: 11,
-                                        },
-                                    ]}
-                                />
+                            <div
+                                className="bg-red-600 p-2 rounded-md shadow-md text-white cursor-pointer hover:bg-red-400"
+                                onClick={(e: FormEvent) => {
+                                    handleEditDocument(e);
+                                }}
+                            >
+                                <span>
+                                    <PencilSquareIcon className="w-5" />
+                                </span>
                             </div>
                         </div>
-                    )
+                        {/* ag grid Document PKS FBI */}
+                        <div className="mt-2 ag-grid-layout">
+                            <AGGrid
+                                addButtonLabel={undefined}
+                                addButtonModalState={undefined}
+                                withParam={idRelation}
+                                searchParam={""}
+                                // loading={isLoading.get_policy}
+                                url={"getDocumentPKSFbi"}
+                                doubleClickEvent={undefined}
+                                triggeringRefreshData={isSuccess}
+                                colDefs={[
+                                    {
+                                        headerName: "No.",
+                                        valueGetter: "node.rowIndex + 1",
+                                        flex: 1,
+                                    },
+                                    {
+                                        headerName: "No. PKS FBI By PKS",
+                                        field: "NO_PKS",
+                                        flex: 11,
+                                    },
+                                    {
+                                        headerName: "Document",
+                                        field: "DOCUMENT_ORIGINAL_NAME",
+                                        flex: 11,
+                                    },
+                                ]}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="text-red-400">
+                            <span>Document No Exist!</span>
+                        </div>
+                    </>
                 )}
             </div>
         </>

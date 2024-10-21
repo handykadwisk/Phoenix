@@ -47,7 +47,12 @@ class User extends Authenticatable
         ];
     }
 
-    protected $with = ['employee','jobpost'];
+    protected $with = ['employee','jobpost','type','company','roles','type'];
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(TCompany::class, 'company_id');
+    }
 
     public function employee(): BelongsTo
     {

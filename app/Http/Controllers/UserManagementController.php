@@ -27,19 +27,27 @@ extends Controller
 
     public function getUserData($request)
     {
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
+        // dd($request);
+
+        $page = $request->input('page',1);
+        // $page = $request->page;
+        $perPage = $request->input('perPage', 25);
+        // $perPage = $request->perPage;
+        // dd($page, $perPage);
 
         $query = User::with('roles', 'type');
+        // $query = User::query()->with('company');
 
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
         $newFilter = $request->input('newFilter', '');
         $newSearch = json_decode($request->newFilter, true);
 
+        // dd($sortModel);
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
             foreach ($sortModel as $sortItem) {
+                // dd($sortItem);
                 list($colId, $sortDirection) = explode(',', $sortItem);
                 $query->orderBy($colId, $sortDirection); 
             }
@@ -66,21 +74,27 @@ extends Controller
             }
             }
         }
-
+        
+        if (!$sortModel && !$filterModel) {
+            $query->orderBy('id', 'desc');
+        }
+        // dd($query);
         $data = $query->paginate($perPage, ['*'], 'page', $page);
-
+        
         return $data;
     }
 
     public function getUserJson(Request $request)
     {
-        // dd($request);
+        // dd($request->id);
         $data = $this->getUserData($request);
         return response()->json($data);
+        
     }
 
     public function store(Request $request)
     {
+        // dd($request);
         // Define validation rules
         $rules = [
             'user_login' => 'required|string|unique:t_user,user_login',  // Validasi untuk user_login
@@ -97,9 +111,7 @@ extends Controller
                 'X-Inertia' => true
             ]);
         }
-        // Log::info(Auth::user()->id);
-        // Auth::user()->id;
-
+        
         $name = $request->name;
         if($name === null || $name === ''){
             $name = $request->user_login;
@@ -107,11 +119,13 @@ extends Controller
         $User = User::create([  
             "role_id" => 0,
             "name" => $name,  // Tambahkan name di sini
-            'employee_id'=>$request->employee_id,
-            'individual_relation_id'=>$request->individual_relation_id,
+            'employee_id' => $request->employee_id == 0 ? null : $request->employee_id,
+            'company_division_id' => $request->company_division_id == 0 ? null : $request->company_division_id,
+            'individual_relation_id'=>$request->individual_relations_id == 0 ? null : $request->individual_relations_id,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
-            'jobpost_id'=>$request->jobpost,
+            'jobpost_id'=>$request->jobpost == 0 ? null : $request->jobpost,
+            'company_id'=>$request->company_id == 0 ? null : $request->company_id,
             "password" => bcrypt($request->password),
             "USER_CREATED_BY" => Auth::user()->id,
             "USER_CREATED_DATE" => now()
@@ -172,16 +186,18 @@ extends Controller
         $typeInput = collect($request->input('type'))->first();
 
         $User->update([
-            'individual_relation_id'=>$request->individual_relation_id,
+            'individual_relation_id'=>$request->individual_relation_id == 0 ? null : $request->individual_relation_id,
             "user_status" => $request->user_status,
+            'company_division_id'=>$request->company_division_id == 0 ? null : $request->company_division_id,
             "name" => $request->name,
             "email" => $request->email,
             "user_login" => $request->user_login,
-            "employee_id" => $request->employee_id,
+            "employee_id" => $request->employee_id == 0 ? null : $request->employee_id,
             "user_type_id" => $typeInput,
-            'jobpost_id'=>$request->jobpost,
+            'jobpost_id'=>$request->jobpost == 0 ? null : $request->jobpost,
+            'company_id'=>$request->company_id == 0 ? null : $request->company_id,
             "USER_UPDATED_BY" => Auth::user()->id,
-            "USER_UPDATED_DATE" => now()
+            "USER_UPDATED_DATE" => null
         ]);
 
         // Hapus entri di m_role_users jika tipe bukan 2

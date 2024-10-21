@@ -8,6 +8,7 @@ import { FormEvent } from "react";
 import indonesiaFlag from "../../Images/indonesia.png";
 import usFlag from "../../Images/united-states.png";
 import { router } from "@inertiajs/react";
+import ButtonPlugin from "../ButtonPlugin/ButtonPlugin";
 // import { MyProvider } from "@/Utility/GlobalContext";
 
 const Header = (props: {
@@ -131,6 +132,7 @@ const Header = (props: {
                     className="px-4 sm:px-6 lg:px-8 py-5 modal-action-container"
                     id="bodyAll"
                 >
+                    <ButtonPlugin />
                     {props.children}
                 </div>
             </main>

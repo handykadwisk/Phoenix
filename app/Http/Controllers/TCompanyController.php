@@ -27,13 +27,13 @@ class TCompanyController extends Controller
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
         $newSearch = json_decode($request->newFilter, true);
-        
-        
+
+
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
 
@@ -85,8 +85,16 @@ class TCompanyController extends Controller
         return response()->json($data);
     }
 
+    // get company new
+    public function getCompany(Request $request)
+    {
+        $data = TCompany::get();
+        return response()->json($data);
+    }
+
     // add company to database
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         $company = TCompany::create([
             "COMPANY_NAME"                  => $request->COMPANY_NAME,
@@ -120,13 +128,15 @@ class TCompanyController extends Controller
     }
 
 
-    public function get_company_detail(Request $request){
+    public function get_company_detail(Request $request)
+    {
         $dataCompany = TCompany::where('COMPANY_ID', $request->idCompany)->first();
 
         return response()->json($dataCompany);
     }
 
-    public function editStore(Request $request){
+    public function editStore(Request $request)
+    {
         TCompany::where('COMPANY_ID', $request->COMPANY_ID)->update([
             "COMPANY_NAME"                  => $request->COMPANY_NAME,
             "COMPANY_ABBREVIATION"          => $request->COMPANY_ABBREVIATION,
@@ -158,5 +168,10 @@ class TCompanyController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function reminder(Request $request)
+    {
+        return Inertia::render('Reminder/Reminder');
     }
 }

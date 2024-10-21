@@ -73,6 +73,7 @@ const Sidebar = ({
     const hasChildren = menu.children && menu.children.length > 0;
     // console.log(hasChildren,'hassschild');
 
+    const userType = auth.user.user_type_id
 
     return (
       <li key={index}>
@@ -131,11 +132,13 @@ const Sidebar = ({
                   <ul className="mt-2 flex flex-col pl-6 space-y-1">
                     {/* Render children secara rekursif */}
                     {hasChildren &&
-                      menu.children.map((child: any, childIndex: number) => (
+                      menu.children
+                        .filter((child: any) => userType !== 1 ? child.access.length > 0 : true) // hanya render children dengan akses lebih dari 0 jika userType !== 1
+                        .map((child: any, childIndex: number) => (
                         <Fragment key={`${index}-${childIndex}`}>
                           {renderMenu(child, childIndex)}
                         </Fragment>
-                      ))}
+                        ))}
                   </ul>
                 </div>
               </Fragment>

@@ -398,7 +398,7 @@ class ReimburseController extends Controller
             $reimburse_created_at = now();
             $reimburse_created_by = $user_id;
 
-            // Insert CA
+            // Insert Reimburse
             $reimburse = Reimburse::create([
                 'REIMBURSE_NUMBER' => $reimburse_number,
                 'REIMBURSE_USED_BY' => $reimburse_used_by,
@@ -416,7 +416,7 @@ class ReimburseController extends Controller
                 'REIMBURSE_CREATED_BY' => $reimburse_created_by
             ])->REIMBURSE_ID;
 
-            // Created Log CA
+            // Created Log Reimburse
             UserLog::create([
                 'created_by' => $user->id,
                 'action'     => json_encode([
@@ -443,7 +443,7 @@ class ReimburseController extends Controller
                 $reimburse_detail_relation_position = $rd['reimburse_detail_relation_position'];
                 $reimburse_detail_amount = $rd['reimburse_detail_amount'];
                 
-                // Insert CA Detail
+                // Insert Reimburse Detail
                 $ReimburseDetail = ReimburseDetail::create([
                     'REIMBURSE_ID' => $reimburse,
                     'REIMBURSE_DETAIL_DATE' => $reimburse_detail_date,
@@ -510,7 +510,7 @@ class ReimburseController extends Controller
                 }
                 // End process file upload
 
-                // Created Log CA Detail
+                // Created Log Reimburse Detail
                 UserLog::create([
                     'created_by' => $user->id,
                     'action'     => json_encode([
@@ -535,22 +535,15 @@ class ReimburseController extends Controller
         DB::transaction(function () use ($request) {
             $reimburse_detail = $request->reimburse_detail;
     
-            $total_amount_approve = 0;
-    
-            if (is_array($reimburse_detail) && !empty($reimburse_detail)) {
-                foreach ($request->reimburse_detail as $value) {
-                    $total_amount_approve += $value['REIMBURSE_DETAIL_AMOUNT_APPROVE'];
-                }
-            }
-    
-            $reimburse_total_amount_different = $request->REIMBURSE_TOTAL_AMOUNT - $total_amount_approve;
-    
+            $total_amount_approve = $request->REIMBURSE_TOTAL_AMOUNT_APPROVE;
+            
             $reimburse_id = $request->REIMBURSE_ID;
             $reimburse_first_approval_change_status_date = date('Y-m-d H:i:s');
             $reimburse_first_approval_status = $request->REIMBURSE_FIRST_APPROVAL_STATUS;
             $reimburse_type = $request->REIMBURSE_TYPE;
             $reimburse_total_amount = $request->REIMBURSE_TOTAL_AMOUNT;
             $reimburse_total_amount_approve = $total_amount_approve;
+            $reimburse_total_amount_different = $reimburse_total_amount - $total_amount_approve;
     
             Reimburse::where('REIMBURSE_ID', $reimburse_id)->update([
                 'REIMBURSE_FIRST_APPROVAL_CHANGE_STATUS_DATE' => $reimburse_first_approval_change_status_date,
@@ -600,7 +593,7 @@ class ReimburseController extends Controller
                 ]);
             }
     
-            // Created Log CA
+            // Created Log Reimburse
             UserLog::create([
                 'created_by' => Auth::user()->id,
                 'action'     => json_encode([
@@ -632,7 +625,7 @@ class ReimburseController extends Controller
                         'REIMBURSE_DETAIL_REMARKS' => $reimburse_detail_remarks
                     ]);
     
-                    // Created Log CA Detail
+                    // Created Log Reimburse Detail
                     UserLog::create([
                         'created_by' => Auth::user()->id,
                         'action'     => json_encode([
@@ -661,14 +654,7 @@ class ReimburseController extends Controller
             $user_id = $user->id;
             
             $reimburse_id = $request->REIMBURSE_ID;
-    
-            $total_amount = 0;
-    
-            foreach ($request->reimburse_detail as $value) {
-                $total_amount += $value['REIMBURSE_DETAIL_AMOUNT'];
-            }
-    
-            $reimburse_total_amount = $total_amount;
+            $reimburse_total_amount = $request->REIMBURSE_TOTAL_AMOUNT;
             $reimburse_first_approval_status = 1;
             $reimburse_request_note = $request->REIMBURSE_REQUEST_NOTE;
             $reimburse_updated_at = now();
@@ -682,7 +668,7 @@ class ReimburseController extends Controller
                 'REIMBURSE_UPDATED_BY' => $reimburse_updated_by
             ]);
     
-            // Created Log CA
+            // Created Log Reimburse
             UserLog::create([
                 'created_by' => $user->id,
                 'action'     => json_encode([
@@ -778,7 +764,7 @@ class ReimburseController extends Controller
                     }
                 }
     
-                // Created Log CA Detail
+                // Created Log Reimburse Detail
                 UserLog::create([
                     'created_by' => $user->id,
                     'action'     => json_encode([
@@ -905,7 +891,7 @@ class ReimburseController extends Controller
                 }
             }
     
-            // Created Log CA Detail
+            // Created Log Reimburse Detail
             UserLog::create([
                 'created_by' => Auth::user()->id,
                 'action'     => json_encode([
@@ -915,12 +901,12 @@ class ReimburseController extends Controller
                 ]),
                 'action_by'  => Auth::user()->user_login
             ]);
-    
-            return new JsonResponse([
-                'Reimburse has been execute.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Reimburse has been execute.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

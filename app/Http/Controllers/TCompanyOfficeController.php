@@ -15,52 +15,52 @@ class TCompanyOfficeController extends Controller
 
     public function getOfficeData($request)
     {
-       // dd(json_decode($request->newFilter, true));
-       $page = $request->input('page', 1);
-       $perPage = $request->input('perPage', 10);
+        // dd(json_decode($request->newFilter, true));
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-       $query = TCompanyOffice::query();
-       $sortModel = $request->input('sort');
-       $filterModel = json_decode($request->input('filter'), true);
-       $newSearch = json_decode($request->newFilter, true);
-       $query->where('COMPANY_ID', $request->id);
-       // dd($newSearch[0]);
-       
-       
-       if ($sortModel) {
-           $sortModel = explode(';', $sortModel); 
-           foreach ($sortModel as $sortItem) {
-               list($colId, $sortDirection) = explode(',', $sortItem);
-               $query->orderBy($colId, $sortDirection); 
-           }
-       }
-       // dd($newSearch[0]['COMPANY_TYPE_ID']['value']);
+        $query = TCompanyOffice::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
+        $query->where('COMPANY_ID', $request->id);
+        // dd($newSearch[0]);
 
-       // if ($request->newFilter !== "") {
-       //     if ($newSearch[0]["flag"] !== "") {
-       //         $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-       //     }else{
-       //         foreach ($newSearch[0] as $keyId => $searchValue) {
-       //             if ($keyId === 'COMPANY_ORGANIZATION_NAME') {
-       //                 $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-       //             }elseif ($keyId === 'COMPANY_TYPE_ID'){
-       //                 if (!isset($searchValue['value'])) {
-       //                     $valueTypeId = $searchValue;
-       //                 }else{
-       //                     $valueTypeId = $searchValue['value'];
-       //                 }
-       //                 // dd($searchValue);
-       //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-       //                     // Query the name field in status table
-       //                     $q->where('COMPANY_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-       //                 });
-       //             }
-       //         }
-       //     }
-       // }
-       $data = $query->paginate($perPage, ['*'], 'page', $page);
 
-       return $data;
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel);
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection);
+            }
+        }
+        // dd($newSearch[0]['COMPANY_TYPE_ID']['value']);
+
+        // if ($request->newFilter !== "") {
+        //     if ($newSearch[0]["flag"] !== "") {
+        //         $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+        //     }else{
+        //         foreach ($newSearch[0] as $keyId => $searchValue) {
+        //             if ($keyId === 'COMPANY_ORGANIZATION_NAME') {
+        //                 $query->where('COMPANY_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
+        //             }elseif ($keyId === 'COMPANY_TYPE_ID'){
+        //                 if (!isset($searchValue['value'])) {
+        //                     $valueTypeId = $searchValue;
+        //                 }else{
+        //                     $valueTypeId = $searchValue['value'];
+        //                 }
+        //                 // dd($searchValue);
+        //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
+        //                     // Query the name field in status table
+        //                     $q->where('COMPANY_TYPE_ID', 'like', '%'.$valueTypeId.'%');
+        //                 });
+        //             }
+        //         }
+        //     }
+        // }
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
     public function getOfficeCompanyJson(Request $request)
@@ -72,7 +72,8 @@ class TCompanyOfficeController extends Controller
 
 
     // add office to database
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         // dd($request->COMPANY_LOCATION_TYPE);
         // jika parent kosong = 0
 
@@ -96,7 +97,7 @@ class TCompanyOfficeController extends Controller
 
         // add store t_COMPANY_office
         $office = TCompanyOffice::create([
-            "COMPANY_OFFICE_NAME"          => $request->COMPANY_NAME." ".$request->COMPANY_OFFICE_ALIAS,
+            "COMPANY_OFFICE_NAME"          => $request->COMPANY_NAME . " " . $request->COMPANY_OFFICE_ALIAS,
             "COMPANY_OFFICE_ALIAS"         => $request->COMPANY_OFFICE_ALIAS,
             "COMPANY_OFFICE_DESCRIPTION"   => $request->COMPANY_OFFICE_DESCRIPTION,
             "COMPANY_OFFICE_PARENT_ID"     => $parentId,
@@ -114,7 +115,7 @@ class TCompanyOfficeController extends Controller
         }
 
         // store to m relation location type
-        for ($i=0; $i < sizeof($request->COMPANY_LOCATION_TYPE); $i++) { 
+        for ($i = 0; $i < sizeof($request->COMPANY_LOCATION_TYPE); $i++) {
             $idLocationType = $request->COMPANY_LOCATION_TYPE[$i]['id'];
             MCompanyOfficeLocationType::create([
                 "COMPANY_OFFICE_ID" => $office->COMPANY_OFFICE_ID,
@@ -144,20 +145,23 @@ class TCompanyOfficeController extends Controller
     }
 
     // get Office by relation id
-    public function getOfficeComboCompany(Request $request){
+    public function getOfficeComboCompany(Request $request)
+    {
         $data = DB::select('call sp_combo_company_office(?)', [$request->id]);
         return response()->json($data);
     }
 
     // get Detail Office
-    public function get_detail(Request $request){
+    public function get_detail(Request $request)
+    {
 
         $data = TCompanyOffice::with('mLocationType')->with('toCompany')->with('parent')->find($request->id);
         return response()->json($data);
     }
 
     // edit office
-    public function edit(Request $request){
+    public function edit(Request $request)
+    {
         // dd($request);
         // jika parent kosong = 0
         $parentId = 0;
@@ -167,7 +171,7 @@ class TCompanyOfficeController extends Controller
 
         // add store t_COMPANY_office
         $office = TCompanyOffice::where('COMPANY_OFFICE_ID', $request->COMPANY_OFFICE_ID)->update([
-            "COMPANY_OFFICE_NAME"          => $request->to_company['COMPANY_NAME']." ".$request->COMPANY_OFFICE_ALIAS,
+            "COMPANY_OFFICE_NAME"          => $request->to_company['COMPANY_NAME'] . " " . $request->COMPANY_OFFICE_ALIAS,
             "COMPANY_OFFICE_ALIAS"         => $request->COMPANY_OFFICE_ALIAS,
             "COMPANY_OFFICE_DESCRIPTION"   => $request->COMPANY_OFFICE_DESCRIPTION,
             "COMPANY_OFFICE_PARENT_ID"     => $parentId,
@@ -187,13 +191,13 @@ class TCompanyOfficeController extends Controller
 
         // check m location type
         $existingLocationType = MCompanyOfficeLocationType::where('COMPANY_OFFICE_ID', $request->COMPANY_OFFICE_ID)->get();
-        if ($existingLocationType->count()>0) {
+        if ($existingLocationType->count() > 0) {
             MCompanyOfficeLocationType::where('COMPANY_OFFICE_ID', $request->COMPANY_OFFICE_ID)->delete();
         }
 
         // store to m relation location type
-        for ($i=0; $i < sizeof($request->m_location_type); $i++) { 
-            
+        for ($i = 0; $i < sizeof($request->m_location_type); $i++) {
+
             $idLocationType = $request->m_location_type[$i]['LOCATION_TYPE_ID'];
             MCompanyOfficeLocationType::create([
                 "COMPANY_OFFICE_ID" => $request->COMPANY_OFFICE_ID,
@@ -222,8 +226,9 @@ class TCompanyOfficeController extends Controller
         ]);
     }
 
-    public function getOffice(Request $request){
-        $data = DB::select('call sp_combo_company_office(?)', [$request->id]);
+    public function getOffice(Request $request)
+    {
+        $data = DB::select('call sp_combo_company_office(?)', [$request->idCompany]);
         return response()->json($data);
         // $structure = TRelationStructure::where('RELATION_ORGANIZATION_ID', $request->id)->get();
         // // dd($structure);

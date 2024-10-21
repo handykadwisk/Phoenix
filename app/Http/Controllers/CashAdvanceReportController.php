@@ -8,6 +8,7 @@ use App\Models\Document;
 use App\Models\MCashAdvanceProofOfDocument;
 use App\Models\MCashAdvanceReportDocument;
 use App\Models\RCashAdvanceApproval;
+use App\Models\RCashAdvanceDifference;
 use App\Models\RCashAdvanceDifferent;
 use App\Models\RCashAdvanceMethod;
 use App\Models\TEmployee;
@@ -85,9 +86,9 @@ class CashAdvanceReportController extends Controller
         return response()->json($data);
     }
 
-    public function getCashAdvanceDifferents()
+    public function getCashAdvanceDifference()
     {
-        $data = RCashAdvanceDifferent::all();
+        $data = RCashAdvanceDifference::all();
 
         return response()->json($data);
     }
@@ -412,13 +413,13 @@ class CashAdvanceReportController extends Controller
                     'action_by'  => Auth::user()->user_login
                 ]);
             }
-    
-            return new JsonResponse([
-                'New Cash Advance Report has been added.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'New Cash Advance Report has been added.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function cash_advance_report_approve(Request $request)
@@ -536,13 +537,13 @@ class CashAdvanceReportController extends Controller
                     ]);
                 }
             }
-    
-            return new JsonResponse([
-                'Cash Advance Report has been approved.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Cash Advance Report has been approved.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function cash_advance_report_revised(Request $request)
@@ -738,13 +739,13 @@ class CashAdvanceReportController extends Controller
                     'action_by'  => Auth::user()->user_login
                 ]);
             }
-            
-            return new JsonResponse([
-                'Cash Advance Report has been revised.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Cash Advance Report has been revised.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 
     public function cash_advance_report_execute(Request $request)
@@ -818,12 +819,12 @@ class CashAdvanceReportController extends Controller
                 ]),
                 'action_by'  => Auth::user()->user_login
             ]);
-    
-            return new JsonResponse([
-                'Cash Advance Report has been execute.'
-            ], 201, [
-                'X-Inertia' => true
-            ]);
         });
+        
+        return new JsonResponse([
+            'Cash Advance Report has been execute.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

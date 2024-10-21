@@ -37,10 +37,25 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+    // public function authenticate(): void
+    // {
+    //     $this->ensureIsNotRateLimited();
+
+    //     if (! Auth::attempt($this->only('user_login', 'password'), $this->boolean('remember'))) {
+    //         RateLimiter::hit($this->throttleKey());
+
+    //         throw ValidationException::withMessages([
+    //             'user_login' => trans('auth.failed'),
+    //         ]);
+    //     }
+
+    //     RateLimiter::clear($this->throttleKey());
+    // }
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
+        // Coba autentikasi user berdasarkan login dan password
         if (! Auth::attempt($this->only('user_login', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -49,6 +64,20 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Ambil data pengguna yang sedang login
+        $user = Auth::user();
+
+        // Cek status pengguna (misalnya hanya mengizinkan pengguna dengan status "active")
+        if ($user->user_status !== 1) {
+            // Jika status tidak sesuai, log out pengguna dan kembalikan pesan error
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'user_login' => 'Your account is not active.',
+            ]);
+        }
+
+        // Jika semua cek lolos, reset rate limiter
         RateLimiter::clear($this->throttleKey());
     }
 
@@ -80,6 +109,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('user_name')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('user_name')) . '|' . $this->ip());
     }
 }

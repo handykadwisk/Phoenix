@@ -16,18 +16,15 @@ class ExchangeRateTaxController extends Controller
 {
     public function getExchangeRateTaxData($dataPerPage = 2, $searchQuery = null)
     {
-        $exchange_rate_tax_start_date = $searchQuery->exchange_rate_tax_start_date;
-        $exchange_rate_tax_end_date = $searchQuery->exchange_rate_tax_end_date;
-
-        $data = ExchangeRateTax::orderBy('EXCHANGE_RATE_TAX_ID', 'desc');
+        $data = ExchangeRateTax::orderBy('EXCHANGE_RATE_TAX_START_DATE', 'desc');
         
         if ($searchQuery) {
-            if (
-                $searchQuery->input('exchange_rate_tax_start_date') &&
-                $searchQuery->input('exchange_rate_tax_end_date')
-            ) {
-                $data->where('EXCHANGE_RATE_TAX_START_DATE', $exchange_rate_tax_start_date)
-                    ->where('EXCHANGE_RATE_TAX_END_DATE', $exchange_rate_tax_end_date);
+            if ($searchQuery->input('exchange_rate_tax_search_date')) {
+                $searchDate = $searchQuery->input('exchange_rate_tax_search_date');
+                $data->where(function ($query) use ($searchDate) {
+                    $query->where('EXCHANGE_RATE_TAX_START_DATE', '<=', $searchDate)
+                          ->where('EXCHANGE_RATE_TAX_END_DATE', '>=', $searchDate);
+                });
             }
         }
 
@@ -112,8 +109,6 @@ class ExchangeRateTaxController extends Controller
             ]);
 
             foreach ($exchange_rate_tax_detail as $value) {
-                $exchange_rate_tax_detail_id = isset($value['EXCHANGE_RATE_TAX_DETAIL_ID']) ? $value['EXCHANGE_RATE_TAX_DETAIL_ID'] : null;
-                
                 $exchange_rate_tax_detail_currency_id = isset($value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID']) ? $value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID'] : $value['CURRENCY_ID'];
 
                 $exchange_rate_tax_detail_exchange_rate = $value['EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE'];
@@ -121,11 +116,10 @@ class ExchangeRateTaxController extends Controller
                 $exchange_rate_tax_detail_created_at = now();
 
                 ExchangeRateTaxDetail::updateOrCreate([
-                    'EXCHANGE_RATE_TAX_DETAIL_ID' => $exchange_rate_tax_detail_id,
-                ],
-                [
                     'EXCHANGE_RATE_TAX_ID' => $exchange_rate_tax,
                     'EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID' => $exchange_rate_tax_detail_currency_id,
+                ],
+                [
                     'EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE' => $exchange_rate_tax_detail_exchange_rate,
                     'EXCHANGE_RATE_TAX_DETAIL_CREATED_BY' => $exchange_rate_tax_detail_created_by,
                     'EXCHANGE_RATE_TAX_DETAIL_CREATED_AT' => $exchange_rate_tax_detail_created_at

@@ -397,7 +397,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
     const handleSuccessEditCorporate = (message: string) => {
@@ -407,7 +407,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
 
@@ -418,7 +418,7 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
 
@@ -522,7 +522,7 @@ export default function DetailRelation({
         });
     };
 
-    const [modalDocuemnt, setModalDocument] = useState<any>({
+    const [modalDocument, setModalDocument] = useState<any>({
         view: false,
     });
 
@@ -533,7 +533,7 @@ export default function DetailRelation({
         e.preventDefault();
 
         setModalDocument({
-            view: !modalDocuemnt.view,
+            view: !modalDocument.view,
         });
     };
 
@@ -677,7 +677,6 @@ export default function DetailRelation({
             const selected = bankSelect.filter(
                 (option: any) => option.value === value
             );
-            // console.log("aaa", selected);
             return selected[0]?.label;
         }
     };
@@ -720,12 +719,13 @@ export default function DetailRelation({
             getDetailRelation(message[0]);
             setTimeout(() => {
                 setIsSuccess("");
-            }, 5000);
+            }, 1000);
         }
     };
 
     return (
         <>
+            <AppPlugin parameterID={detailRelation} />
             {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
@@ -735,7 +735,7 @@ export default function DetailRelation({
             )}
 
             <ModalToAction
-                show={modalDocuemnt.view}
+                show={modalDocument.view}
                 onClose={() =>
                     setModalDocument({
                         view: false,
@@ -2163,7 +2163,6 @@ export default function DetailRelation({
             />
             {/* end modal for person */}
             {/* modal end chat */}
-            <AppPlugin parameterID={detailRelation} />
 
             {/* <MyProvider>
                 <PhoenixComponent otherId={detailRelation} />
@@ -2197,24 +2196,18 @@ export default function DetailRelation({
                         <div className="font-semibold">
                             <span>Group</span>
                         </div>
-                        {dataRelationNew.group_relation?.length === 0 ? (
+                        {dataRelationNew.group_relation === null ? (
                             <>
                                 <div className="text-sm text-gray-400">-</div>
                             </>
                         ) : (
                             <>
-                                {dataRelationNew.group_relation?.map(
-                                    (gRelation: any, i: number) => {
-                                        return (
-                                            <div
-                                                className="text-sm text-gray-400"
-                                                key={i}
-                                            >
-                                                {gRelation.RELATION_GROUP_NAME}
-                                            </div>
-                                        );
+                                <div className="text-sm text-gray-400">
+                                    {
+                                        dataRelationNew.group_relation
+                                            ?.RELATION_GROUP_NAME
                                     }
-                                )}
+                                </div>
                             </>
                         )}
                     </div>
@@ -2479,6 +2472,45 @@ export default function DetailRelation({
                 <>
                     {/* Button */}
                     <div className="mt-4 mb-2 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickAddressLocation(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Address & Location</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickPIC(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>PIC</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                            onClick={(e) =>
+                                handleClickDocument(
+                                    e,
+                                    dataRelationNew.RELATION_ORGANIZATION_NAME
+                                )
+                            }
+                        >
+                            <div className="flex justify-center items-center text-sm font-medium">
+                                <span>Document</span>
+                            </div>
+                        </div>
                         <div className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500">
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <div>
@@ -2509,19 +2541,7 @@ export default function DetailRelation({
                                 <span>Division</span>
                             </div>
                         </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickAddressLocation(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Address & Location</span>
-                            </div>
-                        </div>
+
                         <div
                             className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
                             onClick={(e) =>
@@ -2546,32 +2566,6 @@ export default function DetailRelation({
                         >
                             <div className="flex justify-center items-center text-sm font-medium">
                                 <span>Person & User</span>
-                            </div>
-                        </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickPIC(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>PIC</span>
-                            </div>
-                        </div>
-                        <div
-                            className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                            onClick={(e) =>
-                                handleClickDocument(
-                                    e,
-                                    dataRelationNew.RELATION_ORGANIZATION_NAME
-                                )
-                            }
-                        >
-                            <div className="flex justify-center items-center text-sm font-medium">
-                                <span>Document</span>
                             </div>
                         </div>
                     </div>

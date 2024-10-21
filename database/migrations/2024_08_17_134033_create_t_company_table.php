@@ -27,13 +27,13 @@ return new class extends Migration
             $table->string('COMPANY_EMAIL')->nullable();
             $table->string('COMPANY_WEBSITE')->nullable();
             $table->string('COMPANY_MAPPING')->nullable();
-            $table->bigInteger('HR_MANAGED_BY_APP')->nullable()->comment("0 = No, 1 = Yes");
-            $table->bigInteger('IS_TBK')->nullable();
             $table->bigInteger('COMPANY_LOGO_ID')->nullable();
             $table->string('COMPANY_SIGNATURE_NAME')->nullable();
             $table->string('COMPANY_SIGNATURE_TITLE')->nullable();
             $table->string('COMPANY_BANK_ACCOUNT_NUMBER')->nullable();
             $table->string('COMPANY_BANK_ACCOUNT_NAME')->nullable();
+            $table->bigInteger('HR_MANAGED_BY_APP')->nullable()->comment("0 = No, 1 = Yes");
+            $table->bigInteger('IS_TBK')->nullable();
             $table->bigInteger('RELATION_PROFESSION_ID')->nullable();
             $table->bigInteger('RELATION_LOB_ID')->nullable();
             $table->bigInteger('PRE_SALUTATION')->nullable();

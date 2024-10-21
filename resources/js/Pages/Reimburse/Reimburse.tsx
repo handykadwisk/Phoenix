@@ -133,53 +133,50 @@ export default function Reimburse({ auth }: PageProps) {
         setIsSuccess("");
 
         reset();
-        if (message != "") {
-            setIsSuccess(message[0]);
-            setData({
-                reimburse_id: "",
-                reimburse_used_by: "",
-                reimburse_requested_by: "",
-                reimburse_division: "",
-                reimburse_cost_center: "",
-                reimburse_branch: "",
-                reimburse_first_approval_by: "",
-                reimburse_request_note: "",
-                reimburse_method: "",
-                reimburse_settlement_date: "",
-                reimburse_total_amount: "",
-                proof_of_document: [],
-                ReimburseDetail: [
-                    {
-                        reimburse_detail_date: "",
-                        reimburse_detail_purpose: "",
-                        reimburse_detail_location: "",
-                        reimburse_detail_address: "",
-                        reimburse_detail_type: "",
-                        reimburse_detail_relation_name: "",
-                        reimburse_detail_relation_position: "",
-                        reimburse_detail_relation_organization_id: "",
-                        reimburse_detail_amount: "",
-                        reimburse_detail_note: "",
-                        reimburse_detail_document: [],
-                    },
-                ],
-            });
+        setData({
+            reimburse_id: "",
+            reimburse_used_by: "",
+            reimburse_requested_by: "",
+            reimburse_division: "",
+            reimburse_cost_center: "",
+            reimburse_branch: "",
+            reimburse_first_approval_by: "",
+            reimburse_request_note: "",
+            reimburse_method: "",
+            reimburse_settlement_date: "",
+            reimburse_total_amount: "",
+            proof_of_document: [],
+            ReimburseDetail: [
+                {
+                    reimburse_detail_date: "",
+                    reimburse_detail_purpose: "",
+                    reimburse_detail_location: "",
+                    reimburse_detail_address: "",
+                    reimburse_detail_type: "",
+                    reimburse_detail_relation_name: "",
+                    reimburse_detail_relation_position: "",
+                    reimburse_detail_relation_organization_id: "",
+                    reimburse_detail_amount: "",
+                    reimburse_detail_note: "",
+                    reimburse_detail_document: [],
+                },
+            ],
+        });
 
-            // setIsSuccess(message);
-            getReimburse();
-            getReimburseRequestStatus();
-            getReimburseApprove1Status();
-            getReimburseApprove2Status();
-            getReimburseApprove3Status();
-            getReimburseNeedRevisionStatus();
-            getReimburseRejectStatus();
-            getReimburseApproval();
-            getReimburseNotes();
-            getReimburseMethod();
-            setTimeout(() => {
-                setIsSuccess("");
-            }, 5000);
-        }
+        setIsSuccess(message[0]);
+        getReimburse();
+        getReimburseRequestStatus();
+        getReimburseApprove1Status();
+        getReimburseApprove2Status();
+        getReimburseApprove3Status();
+        getReimburseNeedRevisionStatus();
+        getReimburseRejectStatus();
+        getReimburseApproval();
+        getReimburseNotes();
+        getReimburseMethod();
+        setTimeout(() => {
+            setIsSuccess("");
+        }, 5000);
     };
     // Handle Success End
 
@@ -1038,7 +1035,6 @@ export default function Reimburse({ auth }: PageProps) {
     // End Function Format Currency
 
     const [totalAmount, setTotalAmount] = useState(0);
-
     useEffect(() => {
         let newTotalAmount = 0;
 
@@ -1063,37 +1059,81 @@ export default function Reimburse({ auth }: PageProps) {
         }
     }, [totalAmount]);
 
-    let revised_total_amount = 0;
+    // Start get data reimburse revised total amount
+    const [revisedTotalAmount, setRevisedTotalAmount] = useState(0);
+    useEffect(() => {
+        let newRevisedTotalAmount = 0;
 
-    dataById.reimburse_detail.forEach((item: any) => {
-        revised_total_amount += Number(item.REIMBURSE_DETAIL_AMOUNT);
+        dataById.reimburse_detail.forEach((item: any) => {
+            const revisedAmount = Number(item.REIMBURSE_DETAIL_AMOUNT);
 
-        if (isNaN(revised_total_amount)) {
-            revised_total_amount = 0;
+            if (!isNaN(revisedAmount)) {
+                newRevisedTotalAmount += revisedAmount;
+            }
+        });
+
+        if (newRevisedTotalAmount !== 0) {
+            setRevisedTotalAmount(newRevisedTotalAmount);
+        } else {
+            setRevisedTotalAmount(0);
         }
-    });
+    }, [dataById]);
 
-    let reimburse_total_amount_approve = 0;
-
-    dataById?.reimburse_detail.forEach((item: any) => {
-        reimburse_total_amount_approve += Number(
-            item.REIMBURSE_DETAIL_AMOUNT_APPROVE
-        );
-        if (isNaN(reimburse_total_amount_approve)) {
-            reimburse_total_amount_approve = 0;
+    useEffect(() => {
+        if (revisedTotalAmount !== 0) {
+            setDataById({
+                ...dataById,
+                REIMBURSE_TOTAL_AMOUNT: revisedTotalAmount,
+            });
         }
-    });
+    }, [revisedTotalAmount]);
+    // End get data reimburse revised total amount
+
+    // Start get data reimburse approve total amount
+    const [approveTotalAmount, setApproveTotalAmount] = useState(0);
+    // console.log("Approve Total Amount", approveTotalAmount);
+    useEffect(() => {
+        let newApproveTotalAmount = 0;
+
+        dataById?.reimburse_detail.forEach((item: any) => {
+            const approveAmount = Number(item.REIMBURSE_DETAIL_AMOUNT_APPROVE);
+
+            if (!isNaN(approveAmount)) {
+                newApproveTotalAmount += approveAmount;
+            }
+        });
+
+        if (newApproveTotalAmount !== 0) {
+            setApproveTotalAmount(newApproveTotalAmount);
+        } else {
+            setApproveTotalAmount(0);
+        }
+    }, [dataById]);
+
+    useEffect(() => {
+        if (approveTotalAmount !== 0) {
+            setDataById({
+                ...dataById,
+                REIMBURSE_TOTAL_AMOUNT_APPROVE: approveTotalAmount,
+            });
+        }
+    }, [approveTotalAmount]);
+    // End get data reimburse approve total amount
 
     useEffect(() => {
         const difference =
-            reimburse_total_amount_approve - dataById.REIMBURSE_TOTAL_AMOUNT;
+            dataById.REIMBURSE_TOTAL_AMOUNT_APPROVE -
+            dataById.REIMBURSE_TOTAL_AMOUNT;
 
         if (difference < 0) {
             setDataById({ ...dataById, REIMBURSE_TYPE: 1 });
         } else {
             setDataById({ ...dataById, REIMBURSE_TYPE: 2 });
         }
-    }, [reimburse_total_amount_approve, dataById.REIMBURSE_TOTAL_AMOUNT]);
+    }, [
+        dataById.REIMBURSE_TOTAL_AMOUNT_APPROVE,
+        dataById.REIMBURSE_TOTAL_AMOUNT,
+    ]);
 
     const selectDivision = division
         ?.filter((m: any) => m.COMPANY_ID === auth.user.employee?.COMPANY_ID)
@@ -1162,7 +1202,7 @@ export default function Reimburse({ auth }: PageProps) {
         };
     });
 
-    console.log("Data Reimburse", data);
+    // console.log("Data Reimburse", data);
     // console.log(DataRow);
     // console.log("Reimburse", reimburse.data);
     // console.log("Data By Id", dataById);
@@ -1790,7 +1830,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD>
+                                        <TD className="font-bold">
                                             {formatCurrency.format(totalAmount)}
                                         </TD>
                                     </tr>
@@ -2309,12 +2349,12 @@ export default function Reimburse({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border text-right pr-5 py-2 font-bold"
                                             colSpan={9}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border py-2">
+                                        <TD className="border py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataById.REIMBURSE_TOTAL_AMOUNT
                                             )}
@@ -3002,7 +3042,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         </TD>
                                         <TD className="border text-center py-2">
                                             {formatCurrency.format(
-                                                reimburse_total_amount_approve
+                                                approveTotalAmount
                                             )}
                                         </TD>
                                     </tr>
@@ -3831,7 +3871,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         </TD>
                                         <TD className="py-2">
                                             {formatCurrency.format(
-                                                revised_total_amount
+                                                revisedTotalAmount
                                             )}
                                         </TD>
                                     </tr>

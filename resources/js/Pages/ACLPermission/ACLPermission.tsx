@@ -28,6 +28,7 @@ import TableTD from "@/Components/Table/TableTD";
 import ModalSearch from "@/Components/Modal/ModalSearch";
 import Swal from "sweetalert2";
 import AGGrid from "@/Components/AgGrid";
+import { set } from "react-datepicker/dist/date_utils";
 // import DetailMenu from "./DetailMenu";
 
 export default function ACLPermission({ auth }: PageProps) {
@@ -37,7 +38,7 @@ export default function ACLPermission({ auth }: PageProps) {
 
     // state for permission
     const [dataPermission, setDataPermission] = useState<any>([]);
-    const [searchPermission, setSearchPermission] = useState<any>([]);
+    // const [searchPermission, setSearchPermission] = useState<any>([]);
     const [dataById, setDataById] = useState<any>({
         PERMISSION_ID: "",
         PERMISSION_NAME: "",
@@ -76,21 +77,6 @@ export default function ACLPermission({ auth }: PageProps) {
             })
             .then((res) => {
                 setDataById(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const clearSearchPermission = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getPermission?${pageNumber}`)
-            .then((res) => {
-                setDataPermission(res.data);
-                setSearchPermission({
-                    ...searchPermission,
-                    PERMISSION_NAME: "",
-                });
             })
             .catch((err) => {
                 console.log(err);
@@ -151,18 +137,6 @@ export default function ACLPermission({ auth }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getPermission();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
         } else if (modal.edit) {
@@ -173,18 +147,6 @@ export default function ACLPermission({ auth }: PageProps) {
             }).then((result: any) => {
                 if (result.value) {
                     getPermission();
-                    // setGetDetailRelation({
-                    //     RELATION_ORGANIZATION_NAME: message[1],
-                    //     RELATION_ORGANIZATION_ID: message[0],
-                    // });
-                    // setModal({
-                    //     add: false,
-                    //     delete: false,
-                    //     edit: false,
-                    //     view: true,
-                    //     document: false,
-                    //     search: false,
-                    // });
                 }
             });
         }
@@ -219,6 +181,36 @@ export default function ACLPermission({ auth }: PageProps) {
         }
     }
 
+    const [searchPermission, setSearchPermission] = useState<any>({
+        permission_search: [
+            {
+                PERMISSION_ID: "",
+                PERMISSION_NAME: "",
+                flag: "flag"
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchPermission.permission_search];
+        changeVal[i][name] = value;
+        setSearchPermission({ ...searchPermission, permission_search: changeVal });
+    };
+
+    const clearSearch = (e: React.MouseEvent) => {
+        // Kosongkan input pencarian
+        inputDataSearch("PERMISSION_NAME", "", 0);
+        // Reset flag untuk menampilkan semua data
+        inputDataSearch("flag", "", 0);
+        setIsSuccess("Cleared");
+    };
+
+
+
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Permission"}>
@@ -233,14 +225,24 @@ export default function ACLPermission({ auth }: PageProps) {
             )}
 
             {/* modal Add */}
-            <ModalToAdd
+            <ModalToAction
+                submitButtonName={'Submit'}
+                headers={'Add Permission'}
+                method="POST"
                 show={modal.add}
-                onClose={() =>
+                onClose={() => {
                     setModal({
                         add: false,
                         edit: false,
                         detail: false,
                     })
+                    setData({
+                        PERMISSION_NAME: "",
+                        PERMISSION_CLASS_NAME: "clsf_",
+                    });
+
+
+                }
                 }
                 title={"Add Permission"}
                 url={`/setting/addPermission`}
@@ -271,6 +273,7 @@ export default function ACLPermission({ auth }: PageProps) {
                                 onKeyUp={(e) => {
                                     permissionObject(e);
                                 }}
+                                autoComplete="off"
                                 required
                                 placeholder="Permission Name"
                             />
@@ -287,6 +290,7 @@ export default function ACLPermission({ auth }: PageProps) {
                                 type="text"
                                 name="PERMISSION_CLASS_NAME"
                                 value={data.PERMISSION_CLASS_NAME}
+                                autoComplete="off"
                                 className="mt-2"
                                 onChange={(e) =>
                                     setData(
@@ -304,14 +308,30 @@ export default function ACLPermission({ auth }: PageProps) {
             {/* modal end add */}
 
             {/* Modal Edit */}
-            <ModalToAdd
+            <ModalToAction
+                headers={'Edit Permission'}
+                submitButtonName={'Submit'}
                 show={modal.edit}
-                onClose={() =>
+                method="POST"
+                onClose={() => {
                     setModal({
                         add: false,
                         edit: false,
                         detail: false,
                     })
+                    setDataById({
+                        PERMISSION_ID: "",
+                        PERMISSION_NAME: "",
+                        PERMISSION_CLASS_NAME: "",
+                        PERMISSION_CREATED_BY: "",
+                        PERMISSION_CREATED_DATE: "",
+                        PERMISSION_DELETED_BY: "",
+                        PERMISSION_DELETED_DATE: "",
+                        PERMISSION_FLAG: "",
+                        PERMISSION_UPDATED_BY: "",
+                        PERMISSION_UPDATED_DATE: "",
+                    });
+                }
                 }
                 title={"Edit Permission"}
                 url={`/setting/editPermission`}
@@ -332,6 +352,7 @@ export default function ACLPermission({ auth }: PageProps) {
                             <div className="ml-[7.9rem] text-red-600">*</div>
                             <TextInput
                                 id="PERMISSION_NAME"
+                                autoComplete="off"
                                 type="text"
                                 name="PERMISSION_NAME"
                                 value={dataById.PERMISSION_NAME}
@@ -358,6 +379,7 @@ export default function ACLPermission({ auth }: PageProps) {
                             <div className="ml-[5.4rem] text-red-600">*</div>
                             <TextInput
                                 id="PERMISSION_CLASS_NAME"
+                                autoComplete="off"
                                 type="text"
                                 name="PERMISSION_CLASS_NAME"
                                 value={dataById.PERMISSION_CLASS_NAME}
@@ -391,24 +413,24 @@ export default function ACLPermission({ auth }: PageProps) {
                             id="PERMISSION_NAME"
                             type="text"
                             name="PERMISSION_NAME"
-                            value={searchPermission.PERMISSION_NAME}
+                            value={searchPermission.permission_search[0].PERMISSION_NAME}
                             className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchPermission({
-                                    ...searchPermission,
-                                    PERMISSION_NAME: e.target.value,
-                                })
+                            onChange={
+                                (e) => inputDataSearch("PERMISSION_NAME", e.target.value, 0)
                             }
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                    if (
-                                        searchPermission.PERMISSION_NAME !== ""
-                                    ) {
-                                        getPermission();
-                                        setSearchPermission({
-                                            ...searchPermission,
-                                            PERMISSION_NAME: "",
+                                    const title = searchPermission.permission_search[0].PERMISSION_NAME;
+                                    const id = searchPermission.permission_search[0].PERMISSION_ID;
+                                    if (title || id) {
+                                        inputDataSearch("flag", title || id, 0);
+                                        setIsSuccess("success");
+                                        setTimeout(() => {
+                                            setIsSuccess("");
                                         });
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Permission");
                                     }
                                 }
                             }}
@@ -417,13 +439,32 @@ export default function ACLPermission({ auth }: PageProps) {
                         <div className="mt-4 flex justify-end gap-2">
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchPermission()}
+                                onClick={
+                                    (e) => {
+
+                                        const title = searchPermission.permission_search[0].PERMISSION_NAME;
+                                        const id = searchPermission.permission_search[0].PERMISSION_ID;
+                                        if (title || id) {
+                                            inputDataSearch("flag", title || id, 0);
+                                            setIsSuccess("success");
+                                            setTimeout(() => {
+                                                setIsSuccess("");
+                                            });
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                            setIsSuccess("Get All Permission");
+                                        }
+                                    }
+
+                                }
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchPermission()}
+                                // onClick={() => clearSearchPermission()}
+                                onClick={(e) => clearSearch(e)}
+
                             >
                                 Clear Search
                             </div>
@@ -431,114 +472,13 @@ export default function ACLPermission({ auth }: PageProps) {
                     </div>
                 </div>
 
-                {/* <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[60rem] xs:mt-4 lg:mt-0">
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible mb-20">
-                        <table className="w-full table-auto divide-y divide-gray-300">
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        colSpan={""}
-                                        rowSpan={""}
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg"
-                                        }
-                                        label={"No."}
-                                    />
-                                    <TableTH
-                                        colSpan={""}
-                                        rowSpan={""}
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Name Permission"}
-                                    />
-                                    <TableTH
-                                        colSpan={""}
-                                        rowSpan={""}
-                                        className={"min-w-[50px] bg-gray-200"}
-                                        label={"Class Name"}
-                                    />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dataPermission.data?.map(
-                                    (dPermission: any, i: number) => {
-                                        return (
-                                            <tr
-                                                onDoubleClick={() => {
-                                                    setDetailPermission({
-                                                        PERMISSION_ID:
-                                                            dPermission.PERMISSION_ID,
-                                                        PERMISSION_NAME:
-                                                            dPermission.PERMISSION_NAME,
-                                                    });
-                                                    setModal({
-                                                        add: false,
-                                                        edit: !modal.edit,
-                                                        detail: false,
-                                                    });
-                                                    getPermissionById(
-                                                        dPermission.PERMISSION_ID
-                                                    );
-                                                }}
-                                                key={i}
-                                                className={
-                                                    i % 2 === 0
-                                                        ? "cursor-pointer"
-                                                        : "bg-gray-100 cursor-pointer"
-                                                }
-                                            >
-                                                <TableTD
-                                                    value={
-                                                        dataPermission.from + i
-                                                    }
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dPermission.PERMISSION_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dPermission.PERMISSION_CLASS_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                        <Pagination
-                            links={dataPermission.links}
-                            fromData={dataPermission.from}
-                            toData={dataPermission.to}
-                            totalData={dataPermission.total}
-                            clickHref={(url: string) =>
-                                getPermission(url.split("?").pop())
-                            }
-                        />
-                    </div>
-                </div> */}
-
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid
                             addButtonLabel={null}
                             addButtonModalState={undefined}
                             withParam={null}
-                            searchParam={null}
+                            searchParam={searchPermission.permission_search}
                             // loading={isLoading.get_policy}
                             url={"getPermission"}
                             doubleClickEvent={handleDetailPermission}
