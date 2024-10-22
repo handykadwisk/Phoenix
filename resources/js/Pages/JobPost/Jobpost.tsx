@@ -67,7 +67,7 @@ export default function Jobpost({ auth }: PageProps) {
     ],
   });
   // console.log(data ,'inputttt');
-  
+
   const [modal, setModal] = useState<any>({
     add: false,
     addJob: false,
@@ -86,9 +86,9 @@ export default function Jobpost({ auth }: PageProps) {
       const data = res.data;
       // console.log('dataaaaaa', data);
       setDevJobpost(data);
-      
+
     } catch (error) {
-      console.log(error,'ini erorr');
+      console.log(error, 'ini erorr');
     }
   }
 
@@ -99,7 +99,7 @@ export default function Jobpost({ auth }: PageProps) {
       const res = await axios.get(`/JobpostByDiv/${id}`);
       const data = res.data;
       // console.log(data[0],'<<<<<<<<<');
-      
+
       setJobpostDevId(data[0]);
     } catch (error) {
       console.log(error);
@@ -223,7 +223,7 @@ export default function Jobpost({ auth }: PageProps) {
         <li className="mb-2">
           {/* Parent/Child Node */}
           <div
-            className="flex items-center shadow-md p-2 rounded-md hover:bg-gray-300 cursor-pointer"
+            className="flex items-center shadow-md p-2 rounded-md hover:bg-gray-300 cursor-pointer "
             onClick={() => onJobpostClick(jobpost.jobpost_id)}
           >
             <span className="w-3 h-3 bg-red-400 rounded-full inline-block mr-2"></span>
@@ -395,7 +395,7 @@ export default function Jobpost({ auth }: PageProps) {
                 type="text"
                 id="Job Post Detail"
                 name="Job Post Detail"
-                value={data.jobpost_description||''}
+                value={data.jobpost_description || ''}
                 onChange={(e: any) =>
                   setData({
                     ...data,
@@ -545,18 +545,18 @@ export default function Jobpost({ auth }: PageProps) {
                         .filter((jobpost: any) => jobpost.COMPANY_DIVISION_NAME)
                         .map((jobpost: any) => jobpost.COMPANY_DIVISION_NAME)
                     )
-                  ).map((divisionName: any) => (
-                    <TreeDivision
-                      key={divisionName}
-                      divisionName={divisionName}
-                      jobposts={devJobpost.filter(
-                        (jobpost: any) => jobpost.COMPANY_DIVISION_NAME === divisionName
-                      )}
-                    />
+                  ).map((divisionName: any, index: number) => (
+                    // Ganti <li> dengan <div> untuk menghindari nested <li>
+                    <div key={divisionName + index} className="mb-2 border-l-4 border-red-500 pl-2">
+                      <TreeDivision
+                        divisionName={divisionName}
+                        jobposts={devJobpost.filter(
+                          (jobpost: any) => jobpost.COMPANY_DIVISION_NAME === divisionName
+                        )}
+                      />
+                    </div>
                   ))
-               }
-
-
+                }
               </ul>
             </div>
           </>

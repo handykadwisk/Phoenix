@@ -846,12 +846,30 @@ export default function UserManagement({ auth, type }: any) {
                 headers={null}
                 submitButtonName={"Submit"}
                 show={modal.edit}
-                onClose={() => setModal({
-                    add: false,
-                    edit: false,
-                    reset: false
-                })
-                }
+                onClose={() => {
+                    setModal({
+                        add: false,
+                        edit: false,
+                        reset: false
+                    });
+
+                    setDataInputEdit({
+                        name: "",
+                        email: "",
+                        user_login: "",
+                        password: "",
+                        employee_id: 0,
+                        individual_relations_id: 0,
+                        type: 2,
+                        user_status: 0,
+                        company_division_id: 0,
+                        company_id: 0,
+                        jobpost: 0,
+                        role: [],
+                        newRole: null
+
+                    });
+                }}
                 method="patch"
                 title={'Edit User'}
                 url={`/settings/userEdit/${dataUserId.id}`}
