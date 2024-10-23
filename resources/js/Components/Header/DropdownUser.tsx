@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import InputLabel from '../InputLabel';
 import TextInput from '../TextInput';
 import { log } from 'console';
+import { ShowHideButton } from '../ShowHideButton';
 
 const DropdownUser = () => {
 
@@ -90,6 +91,8 @@ const DropdownUser = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
   // console.log("password", password);
+  const [showPassword, setShowPassword] = useState(false);
+  const toggleShowPassword = () => setShowPassword(!showPassword);
 
   return (
     <>
@@ -193,9 +196,11 @@ const DropdownUser = () => {
                     />
                     <div className="ml-[6.8rem] text-red-600">*</div>
                   </div>
+                  <div className="relative">
                   <TextInput
                     id="password"
-                    type="password"
+                    // type="password"
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={password.password}
                     className="mt-2"
@@ -203,6 +208,11 @@ const DropdownUser = () => {
                     required
                     placeholder="Password"
                   />
+                  <ShowHideButton
+                          showPassword={showPassword}
+                          toggleShowPassword={toggleShowPassword}
+                        />
+                  </div>
                   <div className="relative mt-4">
                     <div className="mb-2">
                       <div className="relative">
@@ -213,16 +223,18 @@ const DropdownUser = () => {
                         />
                         <div className="ml-[10.5rem] text-red-600">*</div>
                       </div>
-                      <TextInput
-                        id="confirmPassword"
-                        type="password"
-                        name="confirmPassword"
-                        value={confirmPassword.password}
-                        className="mt-2"
-                        onChange={(e) => setConfirmPassword({ ...confirmPassword, password: e.target.value })}
-                        required
-                        placeholder="Confirm Password"
-                      />
+                      <div className="relative">
+                        <TextInput
+                          id="confirmPassword"
+                          type={showPassword ? 'text' : 'password'}
+                          name="confirmPassword"
+                          value={confirmPassword.password}
+                          className="mt-2"
+                          onChange={(e) => setConfirmPassword({ ...confirmPassword, password: e.target.value })}
+                          required
+                          placeholder="Confirm Password"
+                        />
+                      </div>
                     </div>
                   </div>
                   {errorMessage && <p className="text-red-600 mt-2">{errorMessage}</p>}

@@ -1,4 +1,4 @@
-import { useEffect, FormEventHandler } from "react";
+import { useEffect, FormEventHandler, useState } from "react";
 import Checkbox from "@/Components/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
 import KillianLogo from "@/Images/phoenix.png";
@@ -7,6 +7,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/Button/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { ShowHideButton } from "@/Components/ShowHideButton";
 
 export default function Login({
     status,
@@ -32,6 +33,9 @@ export default function Login({
 
         post(route("login"));
     };
+
+    const [showPassword, setShowPassword] = useState(false);
+    const toggleShowPassword = () => setShowPassword(!showPassword);
 
     return (
         <GuestLayout>
@@ -92,19 +96,19 @@ export default function Login({
                                     >
                                         Password
                                     </label>
-                                    <div className="mt-2">
+                                    <div className="mt-2 relative">
                                         <TextInput
                                             id="password"
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="password"
                                             value={data.password}
                                             className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                            onChange={(e) =>
-                                                setData(
-                                                    "password",
-                                                    e.target.value
-                                                )
-                                            }
+                                            onChange={(e) => setData("password", e.target.value)}
+                                        />
+                                        {/* Gunakan komponen ShowHideButton */}
+                                        <ShowHideButton
+                                            showPassword={showPassword}
+                                            toggleShowPassword={toggleShowPassword}
                                         />
                                         <InputError
                                             message={errors.password}

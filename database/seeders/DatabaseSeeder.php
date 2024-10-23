@@ -28,21 +28,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             tuser::class,
-           
-        ]);
-        $this->call([
             rusertype::class,
-           
-        ]);
-        $this->call([
             r_menu::class,
-           
-        ]);
-        $this->call([
             mroleusers::class,
-           
+            m_role_access_menu::class,
         ]);
-
+        
         
     
         // // create menu
