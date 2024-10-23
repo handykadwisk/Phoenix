@@ -6,12 +6,15 @@ import TableTH from "@/Components/Table/TableTH";
 import ToastMessage from "@/Components/ToastMessage";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowDownTrayIcon,
+    CalendarDaysIcon,
+} from "@heroicons/react/24/outline";
 import { Head } from "@inertiajs/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import TextInput from "@/Components/TextInput";
 import Input from "@/Components/Input";
 import ModalToDocument from "@/Components/Modal/ModalToDocument";
@@ -24,6 +27,7 @@ import * as XLSX from "xlsx";
 import dateFormat from "dateformat";
 import TH from "@/Components/TH";
 import Swal from "sweetalert2";
+import AGGrid from "@/Components/AgGrid";
 
 export default function ExchangeRateController({ auth }: PageProps) {
     const [modalAdd, setModalAdd] = useState<any>({
@@ -86,7 +90,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                     exchange_rate_bi_date: date,
                     exchange_rate_bi_detail: parseData,
                 });
-                console.log("Currency", parseData);
+                // console.log("Currency", parseData);
             })
             .catch((err) => {
                 console.log(err);
@@ -153,7 +157,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
             responseType: "blob",
         })
             .then((response) => {
-                console.log(response);
+                // console.log(response);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -218,12 +222,27 @@ export default function ExchangeRateController({ auth }: PageProps) {
     };
 
     const [dataById, setDataById] = useState<any>({});
-    const handleShowModal = async (id: number) => {
+
+    const handleShowModalAfterCreate = async (id: number) => {
         await axios
             .get(`/getExchangeRateBIById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModalShow({
+            show: true,
+        });
+    };
+
+    const handleShowModal = async (data: any) => {
+        await axios
+            .get(`/getExchangeRateBIById/${data.EXCHANGE_RATE_BI_ID}`)
+            .then((res) => {
+                setDataById(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -238,7 +257,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
             .get(`/getExchangeRateBIDetailById/${id}`)
             .then((res) => {
                 setDataEdit(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -255,52 +274,67 @@ export default function ExchangeRateController({ auth }: PageProps) {
         setDataEdit(onChange);
     };
 
-    const [isSuccess, setIsSuccess] = useState<string>("");
-
+    const [isSuccess, setIsSuccess] = useState<any>("");
     const handleSuccess = (message: any) => {
         setIsSuccess("");
 
         setIsSuccess(message.msg);
-        getExchangeRateBI();
-        handleShowModal(message.id);
+        handleShowModalAfterCreate(message.id);
+
+        setTimeout(() => {
+            setIsSuccess("");
+        }, 5000);
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
     // Handle Success End
 
+    // For refresh AG Grid data
+    const [refreshSuccess, setRefreshSuccess] = useState<string>("");
+
     // Search Start
-    const [exchangeRateBI, setExchangeRateBI] = useState<any>([]);
-
     const [searchExchangeRateBI, setSearchExchangeRateBI] = useState<any>({
-        exchange_rate_bi_date: "",
+        exchange_rate_bi_search: [
+            {
+                EXCHANGE_RATE_BI_ID: "",
+                EXCHANGE_RATE_BI_DATE: "",
+                flag: "flag",
+            },
+        ],
     });
-
-    const getExchangeRateBI = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getExchangeRateBI?${pageNumber}`, {
-                exchange_rate_bi_date:
-                    searchExchangeRateBI.exchange_rate_bi_date,
-            })
-            .then((res) => {
-                setExchangeRateBI(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
     // Search End
 
+    // OnChange Input Search Start
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        // console.log(value);
+        const changeVal: any = [
+            ...searchExchangeRateBI.exchange_rate_bi_search,
+        ];
+        changeVal[i][name] = value;
+        setSearchExchangeRateBI({
+            ...searchExchangeRateBI,
+            exchange_rate_bi_search: changeVal,
+        });
+    };
+    // OnChange Input Search End
+
     // Clear Search Start
-    const clearSearchExchangeRateBI = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getExchangeRateBI?${pageNumber}`)
-            .then((res) => {
-                setExchangeRateBI(res.data);
-                setSearchExchangeRateBI({
-                    exchange_rate_bi_date: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchExchangeRateBI = () => {
+        inputDataSearch("EXCHANGE_RATE_BI_ID", "", 0);
+        inputDataSearch("EXCHANGE_RATE_BI_DATE", "", 0);
+        inputDataSearch("flag", "flag", 0);
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
     // Clear Search End
 
@@ -311,7 +345,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
     });
     // End Function Format Currency
 
-    console.log("Data", data);
+    // console.log("Data", data);
     // console.log("Data Exchange Rate BI", exchangeRateBI);
     // console.log("Data Exchange Rate BI By Id", dataById);
     // console.log("Data Edit", dataEdit);
@@ -328,7 +362,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                 />
             )}
 
-            {/* Modal Upload Start */}
+            {/* Modal Add Start */}
             <ModalToAdd
                 classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[40%]`}
                 show={modalAdd.add}
@@ -376,6 +410,23 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             }
                         />
 
+                        <div className="mt-3 mb-5">
+                            <InputLabel htmlFor="dateRange" className="mb-2">
+                                Download Template
+                            </InputLabel>
+                            <a
+                                href=""
+                                className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+                                onClick={handleDownloadTemplate}
+                            >
+                                <div className="flex">
+                                    <ArrowDownTrayIcon className="w-5" />
+                                    <span className="ml-1">
+                                        exchange_rate_bi_template.xlsx
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
                         <div className="block md:flex md:space-x-4 mt-4">
                             <div className="w-full mb-5">
                                 <InputLabel
@@ -397,7 +448,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                         }
                                         dateFormat={"dd-MM-yyyy"}
                                         placeholderText="dd-mm-yyyy"
-                                        className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm focus:ring-red-600 placeholder:text-sm pl-10"
                                         autoComplete="off"
                                         required
                                     />
@@ -405,15 +456,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             </div>
                             <div className="w-full mb-5">
                                 <InputLabel className="mb-2">File</InputLabel>
-                                <div className="flex pt-1 space-x-4">
-                                    <Button
-                                        type="button"
-                                        className="bg-green-600 hover:bg-green-500 text-sm text-white py-1.5 w-1/2"
-                                        title="Download Template"
-                                        onClick={handleDownloadTemplate}
-                                    >
-                                        Template
-                                    </Button>
+                                <div>
                                     <Button
                                         type="button"
                                         className="bg-red-600 hover:bg-red-500 text-sm text-white py-1.5 w-1/2"
@@ -443,45 +486,49 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                             ")"}
                                                     </TD>
                                                     <TD className="w-full">
-                                                        <CurrencyInput
-                                                            id="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                                            name="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                                            decimalScale={2}
-                                                            decimalsLimit={2}
-                                                            value={
-                                                                currency.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE
-                                                            }
-                                                            onValueChange={(
-                                                                val
-                                                            ) =>
-                                                                handleChangeUploadFile(
-                                                                    val,
-                                                                    "EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE",
-                                                                    i
-                                                                )
-                                                            }
-                                                            className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right ${
-                                                                (currency.CURRENCY_SYMBOL ===
-                                                                    "IDR" ||
-                                                                    currency
-                                                                        .currency
-                                                                        ?.CURRENCY_SYMBOL ===
-                                                                        "IDR") &&
-                                                                "bg-gray-100"
-                                                            }`}
-                                                            placeholder="0.00"
-                                                            autoComplete="off"
-                                                            readOnly={
-                                                                (currency.CURRENCY_SYMBOL ===
-                                                                    "IDR" ||
-                                                                    currency
-                                                                        .currency
-                                                                        ?.CURRENCY_SYMBOL ===
-                                                                        "IDR") &&
-                                                                true
-                                                            }
-                                                            required
-                                                        />
+                                                        <div className="w-56 sm:w-full">
+                                                            <CurrencyInput
+                                                                id="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
+                                                                name="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
+                                                                decimalScale={2}
+                                                                decimalsLimit={
+                                                                    2
+                                                                }
+                                                                value={
+                                                                    currency.EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE
+                                                                }
+                                                                onValueChange={(
+                                                                    val
+                                                                ) =>
+                                                                    handleChangeUploadFile(
+                                                                        val,
+                                                                        "EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE",
+                                                                        i
+                                                                    )
+                                                                }
+                                                                className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right ${
+                                                                    (currency.CURRENCY_SYMBOL ===
+                                                                        "IDR" ||
+                                                                        currency
+                                                                            .currency
+                                                                            ?.CURRENCY_SYMBOL ===
+                                                                            "IDR") &&
+                                                                    "bg-gray-100"
+                                                                }`}
+                                                                placeholder="0.00"
+                                                                autoComplete="off"
+                                                                readOnly={
+                                                                    (currency.CURRENCY_SYMBOL ===
+                                                                        "IDR" ||
+                                                                        currency
+                                                                            .currency
+                                                                            ?.CURRENCY_SYMBOL ===
+                                                                            "IDR") &&
+                                                                    true
+                                                                }
+                                                                required
+                                                            />
+                                                        </div>
                                                     </TD>
                                                 </tr>
                                             )
@@ -493,7 +540,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                     </>
                 }
             />
-            {/* Modal Upload End */}
+            {/* Modal Add End */}
 
             {/* Modal Show Start */}
             <ModalToAction
@@ -678,7 +725,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                 buttonOnAction={
                     <>
                         <Button
-                            className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                            className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                             onClick={handleAddModal}
                         >
                             {"Add Exchange Rate BI"}
@@ -690,117 +737,93 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         <div className="grid grid-cols-1 mb-5 relative">
                             <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                             <DatePicker
-                                name="exchange_rate_bi_date"
+                                name="EXCHANGE_RATE_BI_DATE"
                                 selected={
-                                    searchExchangeRateBI.exchange_rate_bi_date
+                                    searchExchangeRateBI
+                                        .exchange_rate_bi_search[0]
+                                        .EXCHANGE_RATE_BI_DATE
                                 }
-                                onChange={(date: any) =>
-                                    setSearchExchangeRateBI({
-                                        ...searchExchangeRateBI,
-                                        exchange_rate_bi_date:
-                                            date.toLocaleDateString("en-CA"),
-                                    })
-                                }
+                                onChange={(date: any) => {
+                                    inputDataSearch(
+                                        "EXCHANGE_RATE_BI_DATE",
+                                        date.toLocaleDateString("en-CA"),
+                                        0
+                                    );
+                                    if (
+                                        searchExchangeRateBI
+                                            .exchange_rate_bi_search[0]
+                                            .EXCHANGE_RATE_BI_DATE === ""
+                                    ) {
+                                        inputDataSearch("flag", "flag", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                }}
                                 dateFormat={"dd-MM-yyyy"}
                                 placeholderText="dd-mm-yyyyy (Start Date)"
-                                className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm focus:ring-red-600 placeholder:text-sm pl-10"
                                 autoComplete="off"
                             />
                         </div>
-                        <div className="flex flex-col md:flex-row justify-end gap-2">
-                            <Button
-                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                onClick={() => getExchangeRateBI()}
-                            >
-                                Search
-                            </Button>
-                            <Button
-                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                onClick={() => clearSearchExchangeRateBI()}
-                            >
-                                Clear Search
-                            </Button>
-                        </div>
                     </>
                 }
-                th={
-                    <tr className="text-center">
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"No"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Date"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                    </tr>
-                }
-                td={
+                buttonSearch={
                     <>
-                        {exchangeRateBI.data === undefined && (
-                            <tr className="text-center">
-                                <TD
-                                    className="leading-10 font-medium text-gray-500"
-                                    colSpan="2"
-                                >
-                                    Please Search Exchange Rate BI
-                                </TD>
-                            </tr>
-                        )}
-                        {exchangeRateBI.data?.length === 0 ? (
-                            <tr className="text-center">
-                                <TD
-                                    className="leading-10 font-medium text-gray-500"
-                                    colSpan="2"
-                                >
-                                    Data not available
-                                </TD>
-                            </tr>
-                        ) : (
-                            <>
-                                {exchangeRateBI.data?.map(
-                                    (data: any, i: number) => (
-                                        <tr
-                                            key={i}
-                                            className="text-center cursor-pointer"
-                                            onDoubleClick={() =>
-                                                handleShowModal(
-                                                    data.EXCHANGE_RATE_BI_ID
-                                                )
-                                            }
-                                        >
-                                            <TableTD
-                                                value={i + 1}
-                                                className="w-px"
-                                            />
-                                            <TableTD
-                                                value={dateFormat(
-                                                    data.EXCHANGE_RATE_BI_DATE,
-                                                    "dd-mm-yyyy"
-                                                )}
-                                                className=""
-                                            />
-                                        </tr>
-                                    )
-                                )}
-                            </>
-                        )}
+                        <Button
+                            className="mb-4 w-full md:w-[35%] text-white text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                            onClick={() => {
+                                if (
+                                    searchExchangeRateBI
+                                        .exchange_rate_bi_search[0]
+                                        .EXCHANGE_RATE_BI_ID === "" &&
+                                    searchExchangeRateBI
+                                        .exchange_rate_bi_search[0]
+                                        .EXCHANGE_RATE_BI_DATE === ""
+                                ) {
+                                    inputDataSearch("flag", "", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                                setRefreshSuccess("success");
+                                setTimeout(() => {
+                                    setRefreshSuccess("");
+                                }, 1000);
+                            }}
+                        >
+                            Search
+                        </Button>
+                        <Button
+                            className="mb-4 w-full md:w-[35%] text-white text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                            onClick={clearSearchExchangeRateBI}
+                        >
+                            Clear Search
+                        </Button>
                     </>
                 }
-                pagination={
+                dataList={
                     <>
-                        <Pagination
-                            links={exchangeRateBI.links}
-                            fromData={exchangeRateBI.from}
-                            toData={exchangeRateBI.to}
-                            totalData={exchangeRateBI.totalAmount}
-                            clickHref={(url: string) =>
-                                getExchangeRateBI(url.split("?").pop())
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={
+                                searchExchangeRateBI.exchange_rate_bi_search
                             }
+                            url={"getExchangeRateBI"}
+                            doubleClickEvent={handleShowModal}
+                            triggeringRefreshData={refreshSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Date",
+                                    field: "EXCHANGE_RATE_BI_DATE",
+                                    flex: 7,
+                                },
+                            ]}
                         />
                     </>
                 }

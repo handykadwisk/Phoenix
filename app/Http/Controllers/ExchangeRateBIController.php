@@ -14,24 +14,49 @@ use Illuminate\Support\Facades\DB;
 
 class ExchangeRateBIController extends Controller
 {
-    public function getExchangeRateBIData($dataPerPage = 2, $searchQuery = null)
+    public function getExchangeRateBIData($request)
     {
-        $exchange_rate_bi_date = $searchQuery->exchange_rate_bi_date;
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        $data = ExchangeRateBI::orderBy('EXCHANGE_RATE_BI_DATE', 'desc');
+        $query = ExchangeRateBI::query();
+        $sortModel = $request->input('sort');
+        $newSearch = json_decode($request->newFilter, true);
+
+        // dd($newSearch[0]);
         
-        if ($searchQuery) {
-            if ($searchQuery->input('exchange_rate_bi_date')) {
-                $data->where('EXCHANGE_RATE_BI_DATE', 'like', '%'. $exchange_rate_bi_date .'%');;
+        
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
         }
 
-        return $data->paginate($dataPerPage);
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('EXCHANGE_RATE_BI_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'EXCHANGE_RATE_BI_DATE') {
+                        $query->where('EXCHANGE_RATE_BI_DATE', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
+        $query->orderBy('EXCHANGE_RATE_BI_DATE', 'desc');
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
     
     public function getExchangeRateBI(Request $request)
     {
-        $data = $this->getExchangeRateBIData(10, $request);
+        $data = $this->getExchangeRateBIData($request);
         
         return response()->json($data);
     }

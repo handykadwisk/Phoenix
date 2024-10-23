@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             RCashAdvanceStatusSeeder::class,
             RCurrencySeeder::class,
             RJournalTypeSeeder::class,
+            RPaymentTypeSeeder::class,
             RReimburseNotesSeeder::class
         ]);
         

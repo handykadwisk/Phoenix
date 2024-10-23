@@ -7,7 +7,11 @@ import TableTH from "@/Components/Table/TableTH";
 import ToastMessage from "@/Components/ToastMessage";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
-import { ArrowUpTrayIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowDownTrayIcon,
+    ArrowUpTrayIcon,
+    CalendarDaysIcon,
+} from "@heroicons/react/24/outline";
 import { Head } from "@inertiajs/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -25,6 +29,7 @@ import * as XLSX from "xlsx";
 import dateFormat from "dateformat";
 import TH from "@/Components/TH";
 import TextInput from "@/Components/TextInput";
+import AGGrid from "@/Components/AgGrid";
 
 export default function ExchangeRateController({ auth }: PageProps) {
     const [modalAdd, setModalAdd] = useState<any>({
@@ -111,7 +116,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         exchange_rate_tax_detail: parseData,
                     });
 
-                    console.log("Currency", parseData);
+                    // console.log("Currency", parseData);
                 } else {
                     setData({
                         exchange_rate_tax_start_date: "",
@@ -119,7 +124,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         exchange_rate_tax_detail: parseData,
                     });
 
-                    console.log("Currency (no date)", parseData);
+                    // console.log("Currency (no date)", parseData);
                 }
             })
             .catch((err) => {
@@ -204,7 +209,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                 return currency;
             });
 
-            console.log("Data Upload", jsonData);
+            // console.log("Data Upload", jsonData);
             setData({
                 exchange_rate_tax_start_date: data.exchange_rate_tax_start_date,
                 exchange_rate_tax_end_date: data.exchange_rate_tax_end_date,
@@ -233,7 +238,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
             responseType: "blob",
         })
             .then((response) => {
-                console.log(response);
+                // console.log(response);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -258,12 +263,27 @@ export default function ExchangeRateController({ auth }: PageProps) {
     };
 
     const [dataById, setDataById] = useState<any>({});
-    const handleShowModal = async (id: number) => {
+
+    const handleShowModalAfterCreate = async (id: number) => {
         await axios
             .get(`/getExchangeRateTaxById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
+            })
+            .catch((err) => console.log(err));
+
+        setModalShow({
+            show: true,
+        });
+    };
+
+    const handleShowModal = async (data: any) => {
+        await axios
+            .get(`/getExchangeRateTaxById/${data.EXCHANGE_RATE_TAX_ID}`)
+            .then((res) => {
+                setDataById(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -278,7 +298,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
             .get(`/getExchangeRateTaxDetailById/${id}`)
             .then((res) => {
                 setDataEdit(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -295,52 +315,70 @@ export default function ExchangeRateController({ auth }: PageProps) {
         setDataEdit(onChange);
     };
 
-    const [isSuccess, setIsSuccess] = useState<string>("");
+    const [isSuccess, setIsSuccess] = useState<any>("");
 
     const handleSuccess = (message: any) => {
         setIsSuccess("");
 
         setIsSuccess(message.msg);
-        getExchangeRateTax();
-        handleShowModal(message.id);
+        handleShowModalAfterCreate(message.id);
+
+        setTimeout(() => {
+            setIsSuccess("");
+        }, 5000);
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
     // Handle Success End
 
+    // For refresh AG Grid data
+    const [refreshSuccess, setRefreshSuccess] = useState<string>("");
+
     // Search Start
-    const [exchangeRateTax, setExchangeRateTax] = useState<any>([]);
-
     const [searchExchangeRateTax, setSearchExchangeRateTax] = useState<any>({
-        exchange_rate_tax_search_date: "",
+        exchange_rate_tax_search: [
+            {
+                EXCHANGE_RATE_TAX_ID: "",
+                EXCHANGE_RATE_TAX_DATE: "",
+                flag: "flag",
+            },
+        ],
     });
-
-    const getExchangeRateTax = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getExchangeRateTax?${pageNumber}`, {
-                exchange_rate_tax_search_date:
-                    searchExchangeRateTax.exchange_rate_tax_search_date,
-            })
-            .then((res) => {
-                setExchangeRateTax(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
     // Search End
 
+    // console.log("adsadadd", searchExchangeRateTax);
+
+    // OnChange Input Search Start
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        // console.log(value);
+        const changeVal: any = [
+            ...searchExchangeRateTax.exchange_rate_tax_search,
+        ];
+        changeVal[i][name] = value;
+        setSearchExchangeRateTax({
+            ...searchExchangeRateTax,
+            exchange_rate_tax_search: changeVal,
+        });
+    };
+    // OnChange Input Search End
+
     // Clear Search Start
-    const clearSearchExchangeRateTax = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getExchangeRateTax?${pageNumber}`)
-            .then((res) => {
-                setExchangeRateTax(res.data);
-                setSearchExchangeRateTax({
-                    exchange_rate_tax_search_date: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchExchangeRateTax = () => {
+        inputDataSearch("EXCHANGE_RATE_TAX_ID", "", 0);
+        inputDataSearch("EXCHANGE_RATE_TAX_DATE", "", 0);
+        inputDataSearch("flag", "flag", 0);
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
     // Clear Search End
 
@@ -417,6 +455,23 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 </>
                             }
                         />
+                        <div className="mt-3 mb-5">
+                            <InputLabel htmlFor="dateRange" className="mb-2">
+                                Download Template
+                            </InputLabel>
+                            <a
+                                href=""
+                                className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+                                onClick={handleDownloadTemplate}
+                            >
+                                <div className="flex">
+                                    <ArrowDownTrayIcon className="w-5" />
+                                    <span className="ml-1">
+                                        exchange_rate_tax_template.xlsx
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
                         <div className="mt-4">
                             <div className="w-full mb-5">
                                 <InputLabel
@@ -466,13 +521,6 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 <InputLabel className="mb-2">File</InputLabel>
                                 <div className="flex pt-1 space-x-4">
                                     <Button
-                                        className="bg-green-600 hover:bg-green-500 text-sm text-white py-1.5 w-1/2"
-                                        title="Download Template"
-                                        onClick={handleDownloadTemplate}
-                                    >
-                                        Template
-                                    </Button>
-                                    <Button
                                         type="button"
                                         className="bg-red-600 hover:bg-red-500 text-sm text-white py-1.5 w-1/2"
                                         onClick={handleUploadModal}
@@ -500,43 +548,47 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                         ")"}
                                                 </TD>
                                                 <TD className="w-full">
-                                                    <CurrencyInput
-                                                        id="EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE"
-                                                        name="EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE"
-                                                        decimalScale={2}
-                                                        decimalsLimit={2}
-                                                        value={
-                                                            currency.EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE
-                                                        }
-                                                        onValueChange={(val) =>
-                                                            handleChangeUploadFile(
-                                                                val,
-                                                                "EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE",
-                                                                i
-                                                            )
-                                                        }
-                                                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right ${
-                                                            (currency.CURRENCY_SYMBOL ===
-                                                                "IDR" ||
-                                                                currency
-                                                                    .currency
-                                                                    ?.CURRENCY_SYMBOL ===
-                                                                    "IDR") &&
-                                                            "bg-gray-100"
-                                                        }`}
-                                                        placeholder="0.00"
-                                                        autoComplete="off"
-                                                        readOnly={
-                                                            (currency.CURRENCY_SYMBOL ===
-                                                                "IDR" ||
-                                                                currency
-                                                                    .currency
-                                                                    ?.CURRENCY_SYMBOL ===
-                                                                    "IDR") &&
-                                                            true
-                                                        }
-                                                        required
-                                                    />
+                                                    <div className="w-56 sm:w-full">
+                                                        <CurrencyInput
+                                                            id="EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE"
+                                                            name="EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE"
+                                                            decimalScale={2}
+                                                            decimalsLimit={2}
+                                                            value={
+                                                                currency.EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE
+                                                            }
+                                                            onValueChange={(
+                                                                val
+                                                            ) =>
+                                                                handleChangeUploadFile(
+                                                                    val,
+                                                                    "EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE",
+                                                                    i
+                                                                )
+                                                            }
+                                                            className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-2 md:leading-6 text-right ${
+                                                                (currency.CURRENCY_SYMBOL ===
+                                                                    "IDR" ||
+                                                                    currency
+                                                                        .currency
+                                                                        ?.CURRENCY_SYMBOL ===
+                                                                        "IDR") &&
+                                                                "bg-gray-100"
+                                                            }`}
+                                                            placeholder="0.00"
+                                                            autoComplete="off"
+                                                            readOnly={
+                                                                (currency.CURRENCY_SYMBOL ===
+                                                                    "IDR" ||
+                                                                    currency
+                                                                        .currency
+                                                                        ?.CURRENCY_SYMBOL ===
+                                                                        "IDR") &&
+                                                                true
+                                                            }
+                                                            required
+                                                        />
+                                                    </div>
                                                 </TD>
                                             </tr>
                                         )
@@ -737,7 +789,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                 buttonOnAction={
                     <>
                         <Button
-                            className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                            className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                             onClick={handleAddModal}
                         >
                             {"Add Exchange Rate Tax"}
@@ -749,150 +801,98 @@ export default function ExchangeRateController({ auth }: PageProps) {
                         <div className="grid grid-cols-1 mb-5 relative">
                             <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                             <DatePicker
-                                name="exchange_rate_tax_search_date"
+                                name="EXCHANGE_RATE_TAX_DATE"
                                 selected={
-                                    searchExchangeRateTax.exchange_rate_tax_search_date
+                                    searchExchangeRateTax
+                                        .exchange_rate_tax_search[0]
+                                        .EXCHANGE_RATE_TAX_DATE
                                 }
-                                onChange={(date: any) =>
-                                    setSearchExchangeRateTax({
-                                        ...searchExchangeRateTax,
-                                        exchange_rate_tax_search_date:
-                                            date.toLocaleDateString("en-CA"),
-                                    })
-                                }
+                                onChange={(date: any) => {
+                                    inputDataSearch(
+                                        "EXCHANGE_RATE_TAX_DATE",
+                                        date.toLocaleDateString("en-CA"),
+                                        0
+                                    );
+                                    if (
+                                        searchExchangeRateTax
+                                            .exchange_rate_tax_search[0]
+                                            .EXCHANGE_RATE_TAX_DATE === ""
+                                    ) {
+                                        inputDataSearch("flag", "flag", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                }}
                                 dateFormat={"dd-MM-yyyy"}
-                                placeholderText="dd-mm-yyyyy"
-                                className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                placeholderText="dd-mm-yyyyy (Start Date)"
+                                className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm focus:ring-red-600 placeholder:text-sm pl-10"
                                 autoComplete="off"
                             />
                         </div>
-                        {/* <div className="grid grid-cols-1 mb-5 relative">
-                            <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
-                            <DatePicker
-                                name="exchange_rate_tax_end_date"
-                                selected={
-                                    searchExchangeRateTax.exchange_rate_tax_end_date
-                                }
-                                onChange={(date: any) =>
-                                    setSearchExchangeRateTax({
-                                        ...searchExchangeRateTax,
-                                        exchange_rate_tax_end_date:
-                                            date.toLocaleDateString("en-CA"),
-                                    })
-                                }
-                                dateFormat={"dd-MM-yyyy"}
-                                placeholderText="dd-mm-yyyy (End Date)"
-                                className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
-                                autoComplete="off"
-                            />
-                        </div> */}
-                        <div className="flex flex-col md:flex-row justify-end gap-2">
-                            <Button
-                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                onClick={() => getExchangeRateTax()}
-                            >
-                                Search
-                            </Button>
-                            <Button
-                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                onClick={() => clearSearchExchangeRateTax()}
-                            >
-                                Clear Search
-                            </Button>
-                        </div>
                     </>
                 }
-                th={
-                    <tr className="text-center">
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"No"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Start Date"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"End Date"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                    </tr>
-                }
-                td={
+                buttonSearch={
                     <>
-                        {exchangeRateTax.data === undefined && (
-                            <tr className="text-center">
-                                <TD
-                                    className="leading-10 font-medium text-gray-500"
-                                    colSpan="3"
-                                >
-                                    Please Search Exchange Rate Tax
-                                </TD>
-                            </tr>
-                        )}
-                        {exchangeRateTax.data?.length === 0 ? (
-                            <tr className="text-center">
-                                <TD
-                                    className="leading-10 font-medium text-gray-500"
-                                    colSpan="3"
-                                >
-                                    Data not available
-                                </TD>
-                            </tr>
-                        ) : (
-                            <>
-                                {exchangeRateTax.data?.map(
-                                    (data: any, i: number) => (
-                                        <tr
-                                            key={i}
-                                            className="text-center cursor-pointer"
-                                            onDoubleClick={() =>
-                                                handleShowModal(
-                                                    data.EXCHANGE_RATE_TAX_ID
-                                                )
-                                            }
-                                        >
-                                            <TableTD
-                                                value={i + 1}
-                                                className="w-px"
-                                            />
-                                            <TableTD
-                                                value={dateFormat(
-                                                    data.EXCHANGE_RATE_TAX_START_DATE,
-                                                    "dd-mm-yyyy"
-                                                )}
-                                                className=""
-                                            />
-                                            <TableTD
-                                                value={dateFormat(
-                                                    data.EXCHANGE_RATE_TAX_END_DATE,
-                                                    "dd-mm-yyyy"
-                                                )}
-                                                className=""
-                                            />
-                                        </tr>
-                                    )
-                                )}
-                            </>
-                        )}
+                        <Button
+                            className="mb-4 w-full md:w-[35%] text-white text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                            onClick={() => {
+                                if (
+                                    searchExchangeRateTax
+                                        .exchange_rate_tax_search[0]
+                                        .EXCHANGE_RATE_TAX_ID === "" &&
+                                    searchExchangeRateTax
+                                        .exchange_rate_tax_search[0]
+                                        .EXCHANGE_RATE_TAX_DATE === ""
+                                ) {
+                                    inputDataSearch("flag", "", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                                setRefreshSuccess("success");
+                                setTimeout(() => {
+                                    setRefreshSuccess("");
+                                }, 1000);
+                            }}
+                        >
+                            Search
+                        </Button>
+                        <Button
+                            className="mb-4 w-full md:w-[35%] text-white text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                            onClick={clearSearchExchangeRateTax}
+                        >
+                            Clear Search
+                        </Button>
                     </>
                 }
-                pagination={
+                dataList={
                     <>
-                        <Pagination
-                            links={exchangeRateTax.links}
-                            fromData={exchangeRateTax.from}
-                            toData={exchangeRateTax.to}
-                            totalData={exchangeRateTax.totalAmount}
-                            clickHref={(url: string) =>
-                                getExchangeRateTax(url.split("?").pop())
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={
+                                searchExchangeRateTax.exchange_rate_tax_search
                             }
+                            url={"getExchangeRateTax"}
+                            doubleClickEvent={handleShowModal}
+                            triggeringRefreshData={refreshSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Start Date",
+                                    field: "EXCHANGE_RATE_TAX_START_DATE",
+                                    flex: 7,
+                                },
+                                {
+                                    headerName: "End Date",
+                                    field: "EXCHANGE_RATE_TAX_END_DATE",
+                                    flex: 7,
+                                },
+                            ]}
                         />
                     </>
                 }

@@ -14,26 +14,46 @@ use Inertia\Inertia;
 
 class ExchangeRateTaxController extends Controller
 {
-    public function getExchangeRateTaxData($dataPerPage = 2, $searchQuery = null)
+    public function getExchangeRateTaxData($request)
     {
-        $data = ExchangeRateTax::orderBy('EXCHANGE_RATE_TAX_START_DATE', 'desc');
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = ExchangeRateTax::query();
+        $sortModel = $request->input('sort');
+        $newSearch = json_decode($request->newFilter, true);
         
-        if ($searchQuery) {
-            if ($searchQuery->input('exchange_rate_tax_search_date')) {
-                $searchDate = $searchQuery->input('exchange_rate_tax_search_date');
-                $data->where(function ($query) use ($searchDate) {
-                    $query->where('EXCHANGE_RATE_TAX_START_DATE', '<=', $searchDate)
-                          ->where('EXCHANGE_RATE_TAX_END_DATE', '>=', $searchDate);
-                });
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
+            }
+        }
+        
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('EXCHANGE_RATE_TAX_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'EXCHANGE_RATE_TAX_DATE') {
+                        $query->where('EXCHANGE_RATE_TAX_START_DATE', '<=', $searchValue)
+                              ->where('EXCHANGE_RATE_TAX_END_DATE', '>=', $searchValue);
+                    }
+                }
             }
         }
 
-        return $data->paginate($dataPerPage);
+        $query->orderBy('EXCHANGE_RATE_TAX_START_DATE', 'desc');
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
     
     public function getExchangeRateTax(Request $request)
     {
-        $data = $this->getExchangeRateTaxData(10, $request);
+        $data = $this->getExchangeRateTaxData($request);
         
         return response()->json($data);
     }
