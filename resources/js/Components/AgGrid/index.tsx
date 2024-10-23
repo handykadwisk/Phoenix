@@ -67,6 +67,8 @@ export default function AGGrid({
                     urlNew = `${url}?`;
                 }
 
+                // console.log("Search param", searchParam);
+
                 axios
                     .get(
                         `/${urlNew}page=${page}&perPage=${
@@ -129,7 +131,7 @@ export default function AGGrid({
                     suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
                     paginationPageSize={10}
-                    paginationAutoPageSize={true}
+                    // paginationAutoPageSize={true}
                     cacheBlockSize={10}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}
