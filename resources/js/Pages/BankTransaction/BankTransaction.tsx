@@ -970,24 +970,40 @@ export default function BankTransaction({ auth }: PageProps) {
                             url={"getBankTransaction"}
                             doubleClickEvent={handleEditModal}
                             triggeringRefreshData={refreshSuccess}
+                            cellHeight={80}
                             colDefs={[
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
-                                    flex: 1,
-                                    cellStyle: { textAlign: "center" },
+                                    width: 100,
+                                    cellStyle: {
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        textAlign: "center",
+                                    },
                                 },
                                 {
                                     headerName: "Title",
                                     field: "BANK_TRANSACTION_NAME",
                                     flex: 2,
+                                    cellStyle: {
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        textAlign: "left",
+                                    },
                                 },
                                 {
                                     headerName: "Bank",
-                                    field: "BANK_TRANSACTION_NAME",
                                     flex: 2,
+                                    cellStyle: {
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        textAlign: "left",
+                                    },
                                     cellRenderer: (params: any) => {
-                                        // console.log("Paraamss", params.data);
                                         const bank_name =
                                             params.data.bank?.BANK_NAME;
                                         const currency =
@@ -1006,23 +1022,30 @@ export default function BankTransaction({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Account",
-                                    field: "",
                                     flex: 2,
                                     cellStyle: {
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
                                         textAlign: "center",
-                                        "white-space": "pre",
                                     },
                                     cellRenderer: (params: any) => {
-                                        return params.data
-                                            .BANK_TRANSACTION_ACCOUNT_NUMBER
-                                            ? `${
-                                                  params.data
-                                                      .BANK_TRANSACTION_ACCOUNT_NUMBER +
-                                                  " - " +
-                                                  params.data
-                                                      .BANK_TRANSACTION_ACCOUNT_NAME
-                                              }`
-                                            : "";
+                                        return (
+                                            <>
+                                                <div>
+                                                    {
+                                                        params.data
+                                                            .BANK_TRANSACTION_ACCOUNT_NUMBER
+                                                    }
+                                                </div>
+                                                <div>
+                                                    {
+                                                        params.data
+                                                            .BANK_TRANSACTION_ACCOUNT_NAME
+                                                    }
+                                                </div>
+                                            </>
+                                        );
                                     },
                                 },
                             ]}

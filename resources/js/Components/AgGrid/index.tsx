@@ -20,6 +20,7 @@ export default function AGGrid({
     triggeringRefreshData,
     doubleClickEvent = () => {},
     addButtonModalState = () => {},
+    cellHeight,
 }: PropsWithChildren<{
     colDefs: any;
     url: string;
@@ -30,6 +31,7 @@ export default function AGGrid({
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
+    cellHeight: number | undefined;
 }>) {
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
@@ -137,6 +139,7 @@ export default function AGGrid({
                     onGridReady={onGridReady}
                     rowModelType="serverSide"
                     onRowDoubleClicked={doubleClicked}
+                    rowHeight={cellHeight}
                 />
             </div>
         </div>
