@@ -4,23 +4,15 @@ import { Head } from "@inertiajs/react";
 import Content from "@/Components/Content";
 import Button from "@/Components/Button/Button";
 import InputSearch from "@/Components/InputSearch";
-import TableTH from "@/Components/Table/TableTH";
-import TableTD from "@/Components/Table/TableTD";
-import Dropdown from "@/Components/Dropdown";
 import InputLabel from "@/Components/InputLabel";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
-import DatePicker from "react-datepicker";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import { useEffect, useState } from "react";
 import ToastMessage from "@/Components/ToastMessage";
 import TextInput from "@/Components/TextInput";
 import Select from "react-tailwindcss-select";
 import TextArea from "@/Components/TextArea";
-import { Switch } from "@headlessui/react";
 import ToggleWithIcon from "@/Components/ToggleWithIcon";
 import axios from "axios";
-import Pagination from "@/Components/Pagination";
-import TD from "@/Components/TD";
 import AGGrid from "@/Components/AgGrid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 
@@ -458,6 +450,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Account Number
+                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <TextInput
                                     id="BANK_TRANSACTION_ACCOUNT_NUMBER"
@@ -479,6 +472,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Account Name
+                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <TextInput
                                     id="BANK_TRANSACTION_ACCOUNT_NAME"
@@ -635,6 +629,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Bank Name
+                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <Select
                                     classNames={{
@@ -742,6 +737,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Account Number
+                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <TextInput
                                     id="BANK_TRANSACTION_ACCOUNT_NUMBER"
@@ -766,6 +762,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Account Name
+                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <TextInput
                                     id="BANK_TRANSACTION_ACCOUNT_NAME"
@@ -1027,7 +1024,6 @@ export default function BankTransaction({ auth }: PageProps) {
                                         display: "flex",
                                         flexDirection: "column",
                                         justifyContent: "center",
-                                        textAlign: "center",
                                     },
                                     cellRenderer: (params: any) => {
                                         return (

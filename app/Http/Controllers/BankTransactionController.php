@@ -90,14 +90,18 @@ class BankTransactionController extends Controller
     {
         $validator = Validator::make($request->all(), 
             [
-                'BANK_ID' => 'required',
                 'BANK_TRANSACTION_NAME' => 'required',
+                'BANK_ID' => 'required',
                 'BANK_TRANSACTION_CURRENCY_ID' => 'required',
+                'BANK_TRANSACTION_ACCOUNT_NUMBER' => 'required',
+                'BANK_TRANSACTION_ACCOUNT_NAME' => 'required',
             ],
             [
-                'BANK_ID.required' => 'The bank name field is required.',
                 'BANK_TRANSACTION_NAME.required' => 'The title field is required.',
+                'BANK_ID.required' => 'The bank name field is required.',
                 'BANK_TRANSACTION_CURRENCY_ID.required' => 'The currency field is required.',
+                'BANK_TRANSACTION_ACCOUNT_NUMBER.required' => 'The account number field is required.',
+                'BANK_TRANSACTION_ACCOUNT_NAME.required' => 'The account name field is required.',
             ]
         );
 
@@ -143,14 +147,18 @@ class BankTransactionController extends Controller
     {
         $validator = Validator::make($request->all(), 
             [
-                'BANK_ID' => 'required',
                 'BANK_TRANSACTION_NAME' => 'required',
+                'BANK_ID' => 'required',
                 'BANK_TRANSACTION_CURRENCY_ID' => 'required',
+                'BANK_TRANSACTION_ACCOUNT_NUMBER' => 'required',
+                'BANK_TRANSACTION_ACCOUNT_NAME' => 'required',
             ],
             [
-                'BANK_ID.required' => 'The bank name field is required.',
                 'BANK_TRANSACTION_NAME.required' => 'The title field is required.',
+                'BANK_ID.required' => 'The bank name field is required.',
                 'BANK_TRANSACTION_CURRENCY_ID.required' => 'The currency field is required.',
+                'BANK_TRANSACTION_ACCOUNT_NUMBER.required' => 'The account number field is required.',
+                'BANK_TRANSACTION_ACCOUNT_NAME.required' => 'The account name field is required.',
             ]
         );
 
