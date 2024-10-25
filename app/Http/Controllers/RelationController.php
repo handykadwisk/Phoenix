@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\MBankAccountRelation;
 use App\Models\MPksRelation;
 use App\Models\MRelationAka;
+use App\Models\MRelationPic;
 use App\Models\MRelationType;
 use App\Models\MTag;
 use App\Models\Relation;
@@ -141,7 +142,6 @@ class RelationController extends Controller
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
-
     }
 
     // Get All Relation Type
@@ -216,12 +216,29 @@ class RelationController extends Controller
 
     public function store(Request $request)
     {
+        // for cek abbreviation
         $flag = "0";
         $message = "Abbreviation already exists";
         $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->abbreviation)))->get();
         if ($abbreviation->count() > 0) {
             $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
             if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
+                return new JsonResponse([
+                    $flag,
+                    $message
+                ], 201, [
+                    'X-Inertia' => true
+                ]);
+            }
+        }
+
+        // for cek relation
+        $flag = "0";
+        $message = "Relation already exists";
+        $relation = Relation::where('RELATION_ORGANIZATION_NAME', trim($request->name_relation))->get();
+        if ($relation->count() > 0) {
+            $relationName = $relation[0]->RELATION_ORGANIZATION_NAME;
+            if ($relationName == trim($request->name_relation)) {
                 return new JsonResponse([
                     $flag,
                     $message
@@ -297,6 +314,13 @@ class RelationController extends Controller
 
         ]);
 
+        // create relation individu for person
+        $personCreate = TPerson::create([
+            "PERSON_FIRST_NAME"         => $addTBK,
+            "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID,
+            "PERSON_IS_DELETED"         => "0"
+        ]);
+
         if ($request->relation_status_id == "2") {
             // jika dia corporate pic dan milih corporate pic maka akan melakukan mapping ke t person
             if (is_countable($request->corporate_pic_for)) {
@@ -304,11 +328,9 @@ class RelationController extends Controller
                     $idRelation = $request->corporate_pic_for[$i]['value'];
 
                     // simpan mapping ke t person
-                    TPerson::create([
-                        "PERSON_FIRST_NAME"         => $addTBK,
+                    MRelationPic::create([
                         "RELATION_ORGANIZATION_ID"  => $idRelation,
-                        "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID,
-                        "PERSON_IS_DELETED"         => "0"
+                        "PERSON_ID"                 => $personCreate->PERSON_ID
                     ]);
                 }
             }
@@ -518,7 +540,28 @@ class RelationController extends Controller
     public function edit(Request $request)
     {
 
+        // cek abbrev apakah sama seperti sebelumnya
+        $relation = Relation::find($request->RELATION_ORGANIZATION_ID);
+        $relationOld = $relation->RELATION_ORGANIZATION_NAME;
 
+        // cek jika sama tidak melakukan cek abbreviation existing
+        if ($relationOld != $request->RELATION_ORGANIZATION_NAME) {
+            // cek abbreviation
+            $flag = "0";
+            $message = "Relation already exists";
+            $relationNew = Relation::where('RELATION_ORGANIZATION_NAME', trim(strtoupper($request->RELATION_ORGANIZATION_NAME)))->get();
+            if ($relationNew->count() > 0) {
+                $abbreviationName = $relationNew[0]->RELATION_ORGANIZATION_NAME;
+                if ($abbreviationName == trim(strtoupper($request->RELATION_ORGANIZATION_NAME))) {
+                    return new JsonResponse([
+                        $flag,
+                        $message
+                    ], 201, [
+                        'X-Inertia' => true
+                    ]);
+                }
+            }
+        }
 
         // cek abbrev apakah sama seperti sebelumnya
         $abbre = Relation::find($request->RELATION_ORGANIZATION_ID);
@@ -695,7 +738,7 @@ class RelationController extends Controller
 
     public function get_detail(Request $request)
     {
-        $detailRelation = Relation::with('TPerson')->with('groupRelation')->find($request->id);
+        $detailRelation = Relation::with('mRelationPic')->with('groupRelation')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }

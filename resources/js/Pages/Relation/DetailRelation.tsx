@@ -47,6 +47,7 @@ export default function DetailRelation({
     relationLOB,
     setGetDetailRelation,
     auth,
+    relation,
 }: PropsWithChildren<{
     detailRelation: any;
     relationStatus: any;
@@ -55,6 +56,7 @@ export default function DetailRelation({
     relationLOB: any;
     setGetDetailRelation: any;
     auth?: any;
+    relation?: any;
 }>) {
     // const { success, detailRelation }: any = usePage().props;
     const [dataRelationNew, setDataRelationNew] = useState<any>([]);
@@ -150,6 +152,7 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
+                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -228,10 +231,12 @@ export default function DetailRelation({
         m_tagging: [],
     });
 
+    const [nameRelationOld, setNameRelationOld] = useState<string>("");
     const handleEditModel = async (e: FormEvent, id: number) => {
         e.preventDefault();
 
         setDataById(dataRelationNew);
+        setNameRelationOld(dataRelationNew.RELATION_ORGANIZATION_NAME);
         getSalutationById(
             dataRelationNew.relation_status_id,
             "relation_status_id"
@@ -583,6 +588,10 @@ export default function DetailRelation({
                         text: "Abbreviation already exists",
                         icon: "warning",
                     }).then((result: any) => {});
+                    setDataById({
+                        ...dataById,
+                        RELATION_ORGANIZATION_ABBREVIATION: "",
+                    });
                 }
             })
             .catch((err) => {
@@ -720,6 +729,43 @@ export default function DetailRelation({
             setTimeout(() => {
                 setIsSuccess("");
             }, 1000);
+        }
+    };
+
+    // for cek relation existing
+    const inputRefEditRelation = useRef<HTMLInputElement>(null);
+    const [showRelation, setShowRelation] = useState<boolean>(false);
+
+    const filterResult = relation.filter(
+        (m: any) =>
+            m.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase() !==
+            nameRelationOld?.toLocaleLowerCase()
+    );
+
+    const filteredRelation = filterResult.filter((item: any) =>
+        item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+            dataById.RELATION_ORGANIZATION_NAME.toLocaleLowerCase()?.trim()
+        )
+    );
+
+    // cek relation existing
+    const cekRelationName = () => {
+        const filterRelation = filterResult.filter(
+            (items: any) =>
+                items.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase() ===
+                dataById.RELATION_ORGANIZATION_NAME.toLocaleLowerCase()?.trim()
+        );
+
+        if (filterRelation.length !== 0) {
+            Swal.fire({
+                title: "Warning",
+                text: "Relation Already Exists",
+                icon: "warning",
+            }).then((result: any) => {});
+            setDataById({
+                ...dataById,
+                RELATION_ORGANIZATION_NAME: "",
+            });
         }
     };
 
@@ -1321,19 +1367,53 @@ export default function DetailRelation({
                                     *
                                 </div>
                                 <TextInput
+                                    ref={inputRefEditRelation}
                                     type="text"
                                     value={dataById.RELATION_ORGANIZATION_NAME}
                                     className="mt-2"
-                                    onChange={(e) =>
+                                    onChange={(e) => {
                                         setDataById({
                                             ...dataById,
                                             RELATION_ORGANIZATION_NAME:
                                                 e.target.value,
-                                        })
-                                    }
+                                        });
+                                        if (e.target.value !== "") {
+                                            setShowRelation(true);
+                                        } else {
+                                            setShowRelation(false);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        cekRelationName();
+                                        setShowRelation(false);
+                                    }}
                                     required
                                     placeholder="Name Relation"
                                 />
+                                {showRelation &&
+                                    filteredRelation.length !== 0 && (
+                                        <div className="bg-white shadow-md rounded-md absolute mt-1 w-full px-2 text-sm overflow-y-auto h-32">
+                                            <div className="mt-1 font-semibold italic">
+                                                <span>
+                                                    Relation Already Exists
+                                                </span>
+                                            </div>
+                                            {filteredRelation?.map(
+                                                (items: any, index: number) => {
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="mt-1 px-2"
+                                                        >
+                                                            {
+                                                                items.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
+                                    )}
                             </div>
                             <div className="mt-4 relative" id="abbr">
                                 <InputLabel
@@ -2230,10 +2310,21 @@ export default function DetailRelation({
                                 null ? (
                                 <div className="text-sm text-gray-400">-</div>
                             ) : (
-                                <div className="text-sm text-gray-400">
-                                    {
-                                        dataRelationNew.RELATION_ORGANIZATION_WEBSITE
-                                    }
+                                <div className="text-sm text-gray-400 w-fit italic hover:border-b-2 hover:text-blue-400 hover:border-blue-300">
+                                    <span>
+                                        <a
+                                            href={
+                                                "https://" +
+                                                dataRelationNew.RELATION_ORGANIZATION_WEBSITE
+                                            }
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {
+                                                dataRelationNew.RELATION_ORGANIZATION_WEBSITE
+                                            }
+                                        </a>
+                                    </span>
                                 </div>
                             )
                         ) : dataRelationNew.RELATION_ORGANIZATION_EMAIL ===
@@ -2275,7 +2366,7 @@ export default function DetailRelation({
                                         // <>
                                         <div
                                             key={i}
-                                            className="rounded-lg w-fit py-1.5 px-3 bg-red-500 flex items-center gap-2 text-sm"
+                                            className="rounded-lg w-fit py-1.5 px-3 bg-red-600 flex items-center gap-2 text-sm"
                                         >
                                             <span className="text-white">
                                                 {
@@ -2435,12 +2526,8 @@ export default function DetailRelation({
                         <div className="grid grid-cols-2 gap-4 mt-2">
                             <div className="grid grid-cols-1 gap-4 mt-2">
                                 <div className="mb-2 relative flex flex-wrap gap-3">
-                                    {dataRelationNew.t_person
-                                        ?.filter(
-                                            (m: any) =>
-                                                m.PERSON_IS_DELETED === 0
-                                        )
-                                        .map((dCorporate: any, i: number) => {
+                                    {dataRelationNew.m_relation_pic.map(
+                                        (dCorporate: any, i: number) => {
                                             return (
                                                 // <>
                                                 <div
@@ -2449,15 +2536,15 @@ export default function DetailRelation({
                                                 >
                                                     <span>
                                                         {
-                                                            dCorporate
-                                                                .corporate_p_i_c
+                                                            dCorporate?.relation
                                                                 .RELATION_ORGANIZATION_ALIAS
                                                         }
                                                     </span>
                                                 </div>
                                                 // </>
                                             );
-                                        })}
+                                        }
+                                    )}
                                 </div>
                             </div>
                             <div></div>

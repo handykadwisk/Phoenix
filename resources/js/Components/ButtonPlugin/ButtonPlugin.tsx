@@ -22,6 +22,11 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
     const { auth }: any = usePage().props;
     useEffect(() => {
         getDataPluginChat();
+        connectWebSocket();
+
+        return () => {
+            window.Echo.leave(webSocketChannel);
+        };
     }, []);
     // for modal show menu plugin
     const [show, setShow] = useState<boolean>(false);
@@ -79,6 +84,15 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
             reminder: !showReminder.reminder,
         });
         setShow(false);
+    };
+
+    const [notification, setNotification] = useState<boolean>(false);
+    const webSocketChannel = `channel-name`;
+    const connectWebSocket = () => {
+        window.Echo.private(webSocketChannel).listen("GotMessage", (e: any) => {
+            // e.message
+            setNotification(true);
+        });
     };
 
     return (
@@ -155,6 +169,12 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                 className="fixed z-50 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
                 onClick={(e) => handleClickShow(e)}
             >
+                {notification && (
+                    <div className="absolute top-0 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg">
+                        {/* <span>a</span> */}
+                    </div>
+                )}
+
                 <span>
                     <img src={iconGrid} className="w-5" />
                 </span>
