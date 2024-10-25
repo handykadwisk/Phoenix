@@ -34,45 +34,46 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $env = env('APP_ENV');
         $user = $request->user();
-       
-        
+
         if (Auth::check()) {
             $menu = [];
 
             if ($user->user_type_id === 1 || $user->user_type_id === '1') {
-             
-    
-                $menu = Menu::where('menu_is_deleted', 0) ->orderBy('menu_sequence', 'asc')->get()->toArray();
+
+
+                $menu = Menu::where('menu_is_deleted', 0)->orderBy('menu_sequence', 'asc')->get()->toArray();
             } else {
                 $menu = $user->roles->pluck('menu')->flatten()->unique('id')->values()->toArray();
             }
             return [
                 ...parent::share($request),
+                'env' => $env,
                 'auth' => [
                     'user'       => $request->user(),
                     'role'       => $request->user()->roles->pluck('id'),
                     'menu'       => $menu,  // Menu yang sudah di-filter
                     'permission' => $user->roles->pluck('permission')->flatten(),
-                    'additional' => $request->user()->additional
+                    'additional' => $request->user()->additional,
+
                 ],
-                'custom_menu' => Menu::where(['menu_is_deleted' => 0, 'menu_parent_id' => null])->orderby('menu_sequence','asc')->get(),
+                'custom_menu' => Menu::where(['menu_is_deleted' => 0, 'menu_parent_id' => null])->orderby('menu_sequence', 'asc')->get(),
                 'flash' => [
-                    'message' => fn () => $request->session()->get('message')
+                    'message' => fn() => $request->session()->get('message')
                 ],
-                'ziggy' => fn () => [
+                'ziggy' => fn() => [
                     ...(new Ziggy)->toArray(),
                     'location' => $request->url(),
                 ],
             ];
-
         } else {
             return [
                 ...parent::share($request),
                 'auth' => [
                     'user' => $request->user(),
                 ],
-                'ziggy' => fn () => [
+                'ziggy' => fn() => [
                     ...(new Ziggy)->toArray(),
                     'location' => $request->url(),
                 ],

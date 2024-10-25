@@ -18,9 +18,10 @@ export default function Dashboard({ auth, language }: any) {
         { name: lang.claim, stat: "0" },
         { name: lang.assets, stat: "0" },
     ];
+    
 
     return (
-        <AuthenticatedLayout user={auth.user} header={lang.dashboard}>
+        <AuthenticatedLayout user={auth.user} header={lang.dashboard} >
             <Head title={lang.dashboard} />
 
             <div>
