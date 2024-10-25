@@ -34,6 +34,7 @@ import { Console, log } from "console";
 import ModalToDetail from "@/Components/Modal/ModalToDetail";
 import ModalToActions from "@/Components/Modal/ModalToActions";
 import AGGrid from "@/Components/AgGrid";
+import { set } from "react-datepicker/dist/date_utils";
 
 export default function ACLRole({ auth, custom_menu, language, permission, newRole, menu }: any) {
 
@@ -244,11 +245,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
 
     const handleDetail = async (id: number) => {
         setRoleId(id)
-        await axios.get(`/getRoleAccessMenuByRoleId/${id}`)
-            .then((res) => {
-                setAccessMenu(res.data)
-            })
-            .catch((err) => console.log(err))
+        getMenuById(id)
         setModal({ ...modal, detail: true })
 
     }
@@ -256,14 +253,16 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
     //handle modal Edit Menu
     const handleSetEditMenuModal = async (id: number) => {
         setRoleId(id)
+        getMenuById(id)
+        setModal({ ...modal, menu: true, detail: false })
+    }
 
+    const getMenuById = async (id: number) => {
         await axios.get(`/getRoleAccessMenuByRoleId/${id}`)
             .then((res) => {
                 setAccessMenu(res.data)
             })
             .catch((err) => console.log(err))
-        setModal({ ...modal, menu: true, detail: false })
-
     }
 
     //role Object
@@ -348,20 +347,18 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
         try {
             const data = await axios.get(`/rolePermission/${id}`)
             setAccessPermission(data.data)
-            // console.log(data.data);
-
-
         } catch (error) {
             console.log('Fetch error:', error);
         }
     }
 
     const handlePermissionModal = async (id: number) => {
+        await getPermissionId(id);
         setModal({
             ...modal,
             permission: true,
             detail: false
-        })
+        });
     }
     const editPermissionMapping = (e: any) => {
         // destructuring
@@ -450,7 +447,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             if (!updatedAccessMenu.some((data: any) => data.menu_id === parsedValue)) {
                 updatedAccessMenu.push({ menu_id: parsedValue });
             }
-    
+
             // Fungsi rekursif untuk mencentang semua child dari item yang dicentang
             const checkAllChildrenRecursively = (parentItem: any) => {
                 if (parentItem.children) {
@@ -463,9 +460,9 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                     });
                 }
             };
-    
+
             checkAllChildrenRecursively(item);  // Pastikan semua child ikut dicentang
-    
+
             // Centang parent dan semua parent di atasnya secara rekursif
             const checkParentsRecursively = (parentItem: any) => {
                 if (parentItem && !updatedAccessMenu.some((data: any) => data.menu_id === parentItem.id)) {
@@ -476,27 +473,27 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                     }
                 }
             };
-    
+
             checkParentsRecursively(parent);
         } else {
             // Hapus item yang tidak dicentang
-        updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
+            updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== parsedValue);
 
-        // Fungsi rekursif untuk menghapus semua child dari item yang di-uncheck
-        const uncheckAllChildrenRecursively = (parentItem: any) => {
-            if (parentItem.children) {
-                parentItem.children.forEach((child: any) => {
-                    updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
-                    // Panggil rekursif untuk setiap child
-                    uncheckAllChildrenRecursively(child);
-                });
-            }
-        };
+            // Fungsi rekursif untuk menghapus semua child dari item yang di-uncheck
+            const uncheckAllChildrenRecursively = (parentItem: any) => {
+                if (parentItem.children) {
+                    parentItem.children.forEach((child: any) => {
+                        updatedAccessMenu = updatedAccessMenu.filter((data: any) => data.menu_id !== child.id);
+                        // Panggil rekursif untuk setiap child
+                        uncheckAllChildrenRecursively(child);
+                    });
+                }
+            };
 
-        uncheckAllChildrenRecursively(item);  // Pastikan semua child ikut di-uncheck
+            uncheckAllChildrenRecursively(item);  // Pastikan semua child ikut di-uncheck
 
-        // Tidak perlu uncheck parent
-    
+            // Tidak perlu uncheck parent
+
         }
 
         // Perbarui state accessMenu
@@ -530,7 +527,6 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
 
 
 
-
     return (
         <AuthenticatedLayout user={auth.user} header={"Role"}>
             <Head title="Role" />
@@ -542,10 +538,16 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                     type={"success"}
                 />
             )}
+
             {/* modal edit mapping permission */}
             <ModalToAction
                 show={modal.permission}
-                onClose={() => setModal({ ...modal, permission: false, detail: true })}
+                onClose={() => {
+                    getPermissionId(dataById.id);
+                    setModal({ ...modal, permission: false, detail: true })
+                    // setAccessPermission([])
+                }
+                }
                 title={"Set Permission"}
                 method={"post"}
                 url={`/rolePermission`}
@@ -575,7 +577,11 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             {/* modal edit mapping menu */}
             <ModalToAction
                 show={modal.menu}
-                onClose={() => setModal({ ...modal, menu: false, detail: true })}
+                onClose={() => {
+                    getMenuById(dataById.id);
+                    setModal({ ...modal, menu: false, detail: true })
+                }
+                }
                 title={"Set Menu"}
                 method={"post"}
                 url={`/addAccessMenu/${roleId}`}
@@ -647,6 +653,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                 headers={''}
                 show={modal.detail}
                 onClose={() =>
+                {
                     setModal({
                         add: false,
                         edit: false,
@@ -654,6 +661,9 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                         menu: false,
                         permission: false
                     })
+                    setAccessMenu([])
+                    setAccessPermission([])
+                }
                 }
                 title={"Detail Role"}
                 url={``}

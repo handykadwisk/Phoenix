@@ -225,8 +225,11 @@ class TJobpostController extends Controller
 
     public function getDevJobpostById($id)
     {
-        $jobpost = TJobpost::with('company_division')->where('jobpost_id', $id)->get();
-        return response()->json($jobpost);
+        // $jobpost = TJobpost::with('company_division')->where('jobpost_id', $id)->get();
+        // return response()->json($jobpost);
+        $jobposts = TCompanyDivision::with('jobposts')->where('COMPANY_ID', $id)->get();
+
+        return response()->json($jobposts);
     }
     /**
      * Display the specified resource.

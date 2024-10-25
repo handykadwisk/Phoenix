@@ -7,7 +7,7 @@ import ImageDropdown from "../ImageDropdown";
 import { FormEvent } from "react";
 import indonesiaFlag from "../../Images/indonesia.png";
 import usFlag from "../../Images/united-states.png";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import ButtonPlugin from "../ButtonPlugin/ButtonPlugin";
 // import { MyProvider } from "@/Utility/GlobalContext";
 
@@ -20,6 +20,8 @@ const Header = (props: {
   header: string;
   children: any;
 }) => {
+
+  const env = usePage().props?.env
 
   const handleOpenSidebar = () => {
     if (!props.sidebarDesktopOpen) {
@@ -55,6 +57,13 @@ const Header = (props: {
 
   return (
     <div className={`${props.sidebarDesktopOpen ? '' : 'lg:pl-72'}`}>
+
+      {env === 'testing' && (
+        <div className="bg-yellow-300 text-red-600 text-center py-2 overflow-hidden font-bold">
+            <span>Only For Testing | Data will be deleted every 10th of every month</span>
+        </div>
+      )}
+
       <div className="  sticky z-9 top-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
         {/* check resolution */}
         {
