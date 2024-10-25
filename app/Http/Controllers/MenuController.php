@@ -393,6 +393,16 @@ class MenuController extends Controller
             // Log::info($item);
 
         }
+         // updated userlog
+         UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action' => json_encode([
+                "description" => "Menu sequence updated.",
+                "module" => "Menu",
+                "id" => $request->id
+            ]),
+            'action_by' => Auth::user()->user_login
+        ]);
 
         return new JsonResponse([
             'Menu sequence updated successfully'

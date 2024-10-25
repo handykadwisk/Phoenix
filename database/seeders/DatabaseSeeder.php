@@ -14,7 +14,6 @@ use App\Models\RelationStatus;
 use App\Models\RelationType;
 use App\Models\Role;
 use App\Models\RoleAccessMenu;
-use App\Models\RReimburseNotes;
 use App\Models\Salutation;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -132,39 +131,71 @@ class DatabaseSeeder extends Seeder
         //         'menu_name'       => 'Finance',
         //         'menu_url'        => NULL,
         //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 2,
         //         'menu_created_by' => 'admin'
         //     ]
-        // )->id;
-
-        // $cashAdvance = Menu::create(
+        // );
+        // $policy = Menu::create(
         //     [
-        //         'menu_parent_id' => $finance,
-        //         'menu_name'       => 'Cash Advance',
-        //         'menu_url'        => 'cashAdvance',
+        //         'menu_name'       => 'Policy',
+        //         'menu_url'        => 'policy',
         //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 3,
         //         'menu_created_by' => 'admin'
         //     ]
-        // )->id;
-
-        // $reimburse = Menu::create(
+        // );
+        // $group = Menu::create(
         //     [
-        //         'menu_parent_id' => $finance,
-        //         'menu_name'       => 'Reimburse',
-        //         'menu_url'        => 'reimburse',
+        //         'menu_name'       => 'Policy',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'policy/policy',
         //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 8,
         //         'menu_created_by' => 'admin'
         //     ]
-        // )->id;
-
-        // $otherExpenses = Menu::create(
+        // );
+        // $group = Menu::create(
         //     [
-        //         'menu_parent_id' => $finance,
-        //         'menu_name'       => 'Other Expenses',
-        //         'menu_url'        => 'otherExpenses',
+        //         'menu_name'       => 'Group',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'relation/group',
         //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 5,
         //         'menu_created_by' => 'admin'
         //     ]
-        // )->id;
+        // );
+        // $childRelation = Menu::create(
+        //     [
+        //         'menu_name'       => 'Relation',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'relation',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 4,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $childAgent = Menu::create(
+        //     [
+        //         'menu_name'       => 'Agent',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'relation/agent',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 6,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
+
+        // $childBAA = Menu::create(
+        //     [
+        //         'menu_name'       => 'BAA',
+        //         'menu_parent_id'  => $relation->id,
+        //         'menu_url'        => 'relation/baa',
+        //         'menu_is_deleted' => 0,
+        //         'menu_sequence'   => 7,
+        //         'menu_created_by' => 'admin'
+        //     ]
+        // );
 
         // $finance = Menu::create(
         //     [
@@ -534,6 +565,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path12)
         );
 
+        // create 2024_16_05_r_currency
+        $file_path13 = resource_path('../database/LogDB/2024_16_05_r_currency.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path13)
+        );
 
         // create 2024_08_07_r_interest_insured
         $r_interest_insured = resource_path('../database/LogDB/2024_08_07_r_interest_insured.sql');
@@ -545,6 +582,24 @@ class DatabaseSeeder extends Seeder
         RelationStatus::create([
             'relation_status_name' => 'Individu',
         ]);
+
+        $file_path12 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_status.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path12)
+        );
+
+        $file_path13 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_purpose.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path13)
+        );
+
+        $file_path14 = resource_path('../database/LogDB/2024_07_29_r_cash_advance_approval.sql');
+
+        DB::unprepared(
+            file_get_contents($file_path14)
+        );
 
         $file_path15 = resource_path('../database/LogDB/2024_07_31_r_coa.sql');
 

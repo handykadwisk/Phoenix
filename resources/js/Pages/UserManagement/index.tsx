@@ -42,6 +42,7 @@ import AGGrid from "@/Components/AgGrid";
 import { Label } from "flowbite-react";
 import { data } from "jquery";
 import ModalToActions from "@/Components/Modal/ModalToActions";
+import { ShowHideButton } from "@/Components/ShowHideButton";
 
 export default function UserManagement({ auth, type }: any) {
 
@@ -482,6 +483,8 @@ export default function UserManagement({ auth, type }: any) {
         });
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+    const toggleShowPassword = () => setShowPassword(!showPassword);
 
 
     return (
@@ -824,9 +827,10 @@ export default function UserManagement({ auth, type }: any) {
                                 />
                                 <div className="ml-[6.8rem] text-red-600">*</div>
                             </div>
+                            <div className="relative">
                             <TextInput
                                 id="password"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 name="password"
                                 value={dataInput.password}
                                 className="mt-2"
@@ -835,6 +839,11 @@ export default function UserManagement({ auth, type }: any) {
                                 placeholder="Password"
                                 autoComplete="off"
                             />
+                            <ShowHideButton
+                                showPassword = { showPassword}
+                                toggleShowPassword={toggleShowPassword}
+                            />
+                            </div>
                         </div>
                         {/* end password */}
                     </>
@@ -846,12 +855,30 @@ export default function UserManagement({ auth, type }: any) {
                 headers={null}
                 submitButtonName={"Submit"}
                 show={modal.edit}
-                onClose={() => setModal({
-                    add: false,
-                    edit: false,
-                    reset: false
-                })
-                }
+                onClose={() => {
+                    setModal({
+                        add: false,
+                        edit: false,
+                        reset: false
+                    });
+
+                    setDataInputEdit({
+                        name: "",
+                        email: "",
+                        user_login: "",
+                        password: "",
+                        employee_id: 0,
+                        individual_relations_id: 0,
+                        type: 2,
+                        user_status: 0,
+                        company_division_id: 0,
+                        company_id: 0,
+                        jobpost: 0,
+                        role: [],
+                        newRole: null
+
+                    });
+                }}
                 method="patch"
                 title={'Edit User'}
                 url={`/settings/userEdit/${dataUserId.id}`}
