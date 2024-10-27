@@ -2044,24 +2044,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border px-2"
+                                            className="border w-10 p-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border py-2">
-                                            Due Date
-                                        </TH>
-                                        <TH className="border py-2">Type</TH>
-                                        <TH className="border py-2">
-                                            Currency
-                                        </TH>
-                                        <TH className="border py-2">Value</TH>
-                                        <TH className="border py-2">Paid To</TH>
-                                        <TH className="border py-2">
+                                        <TH className="border p-2">Due Date</TH>
+                                        <TH className="border p-2">Type</TH>
+                                        <TH className="border p-2">Currency</TH>
+                                        <TH className="border p-2">Value</TH>
+                                        <TH className="border p-2">Paid To</TH>
+                                        <TH className="border p-2">
                                             Description
                                         </TH>
-                                        <TH className="border py-2 px-3">
-                                            Document
-                                        </TH>
+                                        <TH className="border p-2">Document</TH>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2071,45 +2065,45 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="text-center text-gray-700 text-sm"
                                                 key={i}
                                             >
-                                                <TD className="border py-2">
+                                                <TD className="border w-10 p-2">
                                                     {i + 1}.
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {dateFormat(
                                                         ed.EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {
                                                         ed.payment_type
                                                             ?.PAYMENT_TYPE_NAME
                                                     }
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {
                                                         ed.currency
                                                             ?.CURRENCY_SYMBOL
                                                     }
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {formatCurrency.format(
                                                         ed.EXPENSES_DETAIL_AMOUNT_VALUE
                                                     )}
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {ed.relation_organization
                                                         ? ed
                                                               .relation_organization
                                                               .RELATION_ORGANIZATION_ALIAS
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {ed.EXPENSES_DETAIL_DESCRIPTION
                                                         ? ed.EXPENSES_DETAIL_DESCRIPTION
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border py-2">
+                                                <TD className="border p-2">
                                                     {ed?.m_expenses_document
                                                         ?.length > 0 ? (
                                                         <button
@@ -2145,7 +2139,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border py-2 font-bold">
+                                        <TD className="border p-2 font-bold">
                                             {formatCurrency.format(
                                                 dataById.EXPENSES_TOTAL_AMOUNT
                                             )}
@@ -2156,7 +2150,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         </div>
                         {/* Table form end */}
 
-                        <div className="grid md:grid-cols-2 my-10">
+                        <div className="grid md:grid-cols-2 my-5">
                             <div className="w-full p-2">
                                 <InputLabel htmlFor="type" className="mb-2">
                                     Information
@@ -2200,7 +2194,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                         </div>
 
-                        <div className="w-full p-2 mt-5">
+                        <div className="w-full p-2">
                             <InputLabel
                                 htmlFor="expenses_request_note"
                                 value="Note"
@@ -2627,49 +2621,28 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border px-3"
+                                            className="border w-10 p-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border py-2 px-3">
-                                            Due Date
-                                        </TH>
-                                        <TH className="border py-2 px-3">
-                                            Type
-                                        </TH>
-                                        <TH className="border py-2 px-3">
-                                            Currency
-                                        </TH>
-                                        <TH className="border py-2 px-3">
-                                            Value
-                                        </TH>
-                                        <TH className="border py-2 px-3">
-                                            Paid To
-                                        </TH>
-                                        <TH className="border py-2 px-3">
+                                        <TH className="border p-2">Due Date</TH>
+                                        <TH className="border p-2">Type</TH>
+                                        <TH className="border p-2">Currency</TH>
+                                        <TH className="border p-2">Value</TH>
+                                        <TH className="border p-2">Paid To</TH>
+                                        <TH className="border p-2">
                                             Description
                                         </TH>
-                                        <TH className="border py-2 px-3">
-                                            Document
-                                        </TH>
-                                        <TH
-                                            className="border py-2 px-3"
-                                            rowSpan="2"
-                                        >
+                                        <TH className="border p-2">Document</TH>
+                                        <TH className="border p-2" rowSpan="2">
                                             Approval
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH
-                                            className="border py-2 px-3"
-                                            rowSpan="2"
-                                        >
+                                        <TH className="border p-2" rowSpan="2">
                                             Cost Classification
                                         </TH>
-                                        <TH
-                                            className="border py-2 px-3"
-                                            rowSpan="2"
-                                        >
+                                        <TH className="border p-2" rowSpan="2">
                                             Amount Approve
                                             <span className="text-red-600">
                                                 *
@@ -2677,7 +2650,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Remarks"
-                                            className="border px-3 py-2"
+                                            className="border p-2"
                                             rowSpan="2"
                                         />
                                     </tr>
@@ -2692,42 +2665,42 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <TD className="border w-10">
                                                     {i + 1}.
                                                 </TD>
-                                                <TD className="border py-2 px-3">
+                                                <TD className="border p-2">
                                                     {dateFormat(
                                                         ed.EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
-                                                <TD className="border py-2 px-3">
+                                                <TD className="border p-2">
                                                     {
                                                         ed.payment_type
                                                             ?.PAYMENT_TYPE_NAME
                                                     }
                                                 </TD>
-                                                <TD className="border py-2 px-3">
+                                                <TD className="border p-2">
                                                     {
                                                         ed.currency
                                                             ?.CURRENCY_SYMBOL
                                                     }
                                                 </TD>
-                                                <TD className="border py-2 px-3">
+                                                <TD className="border p-2">
                                                     {formatCurrency.format(
                                                         ed.EXPENSES_DETAIL_AMOUNT_VALUE
                                                     )}
                                                 </TD>
-                                                <TD className="border py-2 px-3">
+                                                <TD className="border p-2">
                                                     {ed.relation_organization
                                                         ? ed
                                                               .relation_organization
                                                               .RELATION_ORGANIZATION_ALIAS
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border py-2 px-3">
+                                                <TD className="border p-2">
                                                     {ed.EXPENSES_DETAIL_DESCRIPTION
                                                         ? ed.EXPENSES_DETAIL_DESCRIPTION
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border px-3 py-2">
+                                                <TD className="border p-2">
                                                     {ed?.m_expenses_document
                                                         ?.length > 0 ? (
                                                         <button
@@ -2913,7 +2886,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             PROPOSE AMOUNT
                                         </TD>
-                                        <TD className="border font-bold text-center py-2">
+                                        <TD className="border font-bold text-center p-2">
                                             {formatCurrency.format(
                                                 dataById.EXPENSES_TOTAL_AMOUNT
                                             )}
@@ -2926,7 +2899,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             APPROVE AMOUNT
                                         </TD>
-                                        <TD className="border font-bold text-center py-2">
+                                        <TD className="border font-bold text-center p-2">
                                             {formatCurrency.format(
                                                 approveTotalAmount
                                             )}
@@ -2937,7 +2910,7 @@ export default function CashAdvance({ auth }: PageProps) {
                         </div>
                         {/* Table form end */}
 
-                        <div className="grid md:grid-cols-2 my-10">
+                        <div className="grid md:grid-cols-2 my-5">
                             <div className="w-full p-2">
                                 <InputLabel
                                     htmlFor="EXPENSES_TYPE"
@@ -2972,7 +2945,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                         </div>
 
-                        <div className="w-full p-2 mt-5">
+                        <div className="w-full p-2">
                             <InputLabel
                                 htmlFor="expenses_request_note"
                                 value="Note"
@@ -3348,41 +3321,35 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border px-2"
+                                            className="border p-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border py-2">
-                                            Due Date
-                                        </TH>
-                                        <TH className="border py-2">Type</TH>
-                                        <TH className="border py-2">
-                                            Currency
-                                        </TH>
-                                        <TH className="border py-2">
+                                        <TH className="border p-2">Due Date</TH>
+                                        <TH className="border p-2">Type</TH>
+                                        <TH className="border p-2">Currency</TH>
+                                        <TH className="border p-2">
                                             Value
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border py-2">
+                                        <TH className="border p-2">
                                             Paid To
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border py-2">
+                                        <TH className="border p-2">
                                             Description
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border py-2 px-3">
-                                            Document
-                                        </TH>
+                                        <TH className="border p-2">Document</TH>
                                         {data.expensesDetail.length > 1 && (
                                             <TH
                                                 label="Action"
-                                                className="border px-3"
+                                                className="border p-2"
                                                 rowSpan="2"
                                             />
                                         )}
@@ -3970,6 +3937,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const expensesNumber =
+                                                searchExpenses
+                                                    .expenses_search[0]
+                                                    .EXPENSES_NUMBER;
+                                            if (expensesNumber) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <InputSearch
                                     id="EXPENSES_VENDOR"
@@ -3996,6 +3984,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const expensesVendor =
+                                                searchExpenses
+                                                    .expenses_search[0]
+                                                    .EXPENSES_VENDOR;
+                                            if (expensesVendor) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <InputSearch
                                     id="EXPENSES_REQUESTED_BY"
@@ -4020,6 +4029,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "flag", 0);
                                         } else {
                                             inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const expensesRequestedBy =
+                                                searchExpenses
+                                                    .expenses_search[0]
+                                                    .EXPENSES_REQUESTED_BY;
+                                            if (expensesRequestedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
                                         }
                                     }}
                                 />
@@ -4091,6 +4121,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const expensesUsedBy =
+                                                searchExpenses
+                                                    .expenses_search[0]
+                                                    .EXPENSES_USED_BY;
+                                            if (expensesUsedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <div className="grid grid-cols-1 mb-5 relative">
                                     <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
@@ -4118,6 +4169,33 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 );
                                             } else {
                                                 inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const expensesStartDate =
+                                                    searchExpenses
+                                                        .expenses_search[0]
+                                                        .EXPENSES_START_DATE;
+                                                if (expensesStartDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess("");
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
                                             }
                                         }}
                                         dateFormat={"dd-MM-yyyy"}
@@ -4151,6 +4229,33 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 );
                                             } else {
                                                 inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const expensesEndDate =
+                                                    searchExpenses
+                                                        .expenses_search[0]
+                                                        .EXPENSES_END_DATE;
+                                                if (expensesEndDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess("");
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
                                             }
                                         }}
                                         dateFormat={"dd-MM-yyyy"}
@@ -4543,6 +4648,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             url={"getExpenses"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
+                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",

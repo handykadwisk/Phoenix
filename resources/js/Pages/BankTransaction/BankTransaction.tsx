@@ -262,7 +262,7 @@ export default function BankTransaction({ auth }: PageProps) {
         ],
     });
 
-    // console.log("Search", searchBankTransaction);
+    console.log("Search", searchBankTransaction);
     // Search End
 
     // OnChange Input Search Start
@@ -918,6 +918,27 @@ export default function BankTransaction({ auth }: PageProps) {
                                     inputDataSearch("flag", "flag", 0);
                                 } else {
                                     inputDataSearch("flag", "", 0);
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    const title =
+                                        searchBankTransaction
+                                            .bank_transaction_search[0]
+                                            .BANK_TRANSACTION_NAME;
+                                    const id =
+                                        searchBankTransaction
+                                            .bank_transaction_search[0]
+                                            .BANK_TRANSACTION_ID;
+                                    if (title || id) {
+                                        inputDataSearch("flag", "", 0);
+                                        setRefreshSuccess("success");
+                                        setTimeout(() => {
+                                            setRefreshSuccess("");
+                                        });
+                                    } else {
+                                        inputDataSearch("flag", "flag", 0);
+                                    }
                                 }
                             }}
                         />

@@ -4362,6 +4362,27 @@ export default function Reimburse({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const reimburseNumber =
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_NUMBER;
+                                            if (reimburseNumber) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <InputSearch
                                     id="REIMBURSE_REQUESTED_BY"
@@ -4386,6 +4407,27 @@ export default function Reimburse({ auth }: PageProps) {
                                             inputDataSearch("flag", "flag", 0);
                                         } else {
                                             inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const reimburseRequestedBy =
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_REQUESTED_BY;
+                                            if (reimburseRequestedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
                                         }
                                     }}
                                 />
@@ -4457,6 +4499,27 @@ export default function Reimburse({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const reimburseUsedBy =
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_USED_BY;
+                                            if (reimburseUsedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <div className="grid grid-cols-1 mb-5 relative">
                                     <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
@@ -4484,6 +4547,33 @@ export default function Reimburse({ auth }: PageProps) {
                                                 );
                                             } else {
                                                 inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const reimburseStartDate =
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_START_DATE;
+                                                if (reimburseStartDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess("");
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
                                             }
                                         }}
                                         dateFormat={"dd-MM-yyyy"}
@@ -4517,6 +4607,33 @@ export default function Reimburse({ auth }: PageProps) {
                                                 );
                                             } else {
                                                 inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const reimburseEndDate =
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_END_DATE;
+                                                if (reimburseEndDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess("");
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
                                             }
                                         }}
                                         dateFormat={"dd-MM-yyyy"}
@@ -4916,6 +5033,7 @@ export default function Reimburse({ auth }: PageProps) {
                             url={"getReimburse"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
+                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",

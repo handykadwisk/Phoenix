@@ -9606,6 +9606,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const cashAdvanceNumber =
+                                                searchCashAdvance
+                                                    .cash_advance_search[0]
+                                                    .CASH_ADVANCE_NUMBER;
+                                            if (cashAdvanceNumber) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <InputSearch
                                     id="CASH_ADVANCE_REQUESTED_BY"
@@ -9632,6 +9653,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "flag", 0);
                                         } else {
                                             inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const cashAdvanceRequestedBy =
+                                                searchCashAdvance
+                                                    .cash_advance_search[0]
+                                                    .CASH_ADVANCE_REQUESTED_BY;
+                                            if (cashAdvanceRequestedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
                                         }
                                     }}
                                 />
@@ -9706,6 +9748,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                             inputDataSearch("flag", "", 0);
                                         }
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const cashAdvanceUsedBy =
+                                                searchCashAdvance
+                                                    .cash_advance_search[0]
+                                                    .CASH_ADVANCE_USED_BY;
+                                            if (cashAdvanceUsedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
                                 />
                                 <div className="grid grid-cols-1 mb-5 relative">
                                     <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
@@ -9735,6 +9798,33 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 );
                                             } else {
                                                 inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const cashAdvanceStartDate =
+                                                    searchCashAdvance
+                                                        .cash_advance_search[0]
+                                                        .CASH_ADVANCE_START_DATE;
+                                                if (cashAdvanceStartDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess("");
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
                                             }
                                         }}
                                         dateFormat={"dd-MM-yyyy"}
@@ -9771,6 +9861,33 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 );
                                             } else {
                                                 inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const cashAdvanceEndDate =
+                                                    searchCashAdvance
+                                                        .cash_advance_search[0]
+                                                        .CASH_ADVANCE_END_DATE;
+                                                if (cashAdvanceEndDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess("");
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
                                             }
                                         }}
                                         dateFormat={"dd-MM-yyyy"}
@@ -10496,6 +10613,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             url={"getCA"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
+                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",
