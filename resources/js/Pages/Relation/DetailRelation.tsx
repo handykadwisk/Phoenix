@@ -152,7 +152,6 @@ export default function DetailRelation({
             .post(`/getRelationDetail`, { id })
             .then((res) => {
                 setDataRelationNew(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -164,6 +163,7 @@ export default function DetailRelation({
             .post(`/getCorporatePIC`, { id })
             .then((res) => {
                 setDetailCorporatePIC({
+                    PERSON_ID: detailRelation,
                     detail_corporate: res.data,
                 });
             })
@@ -314,7 +314,7 @@ export default function DetailRelation({
             ) &&
             !detailCorporatePIC.detail_corporate?.find(
                 (f: any) =>
-                    f.RELATION_ORGANIZATION_NAME ===
+                    f?.RELATION_ORGANIZATION_NAME ===
                     item.RELATION_ORGANIZATION_NAME
             )
     );
@@ -1030,12 +1030,8 @@ export default function DetailRelation({
                         <div className="mt-4">
                             {detailCorporatePIC.detail_corporate?.length ? (
                                 <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
-                                    {detailCorporatePIC.detail_corporate
-                                        ?.filter(
-                                            (m: any) =>
-                                                m.PERSON_IS_DELETED === 0
-                                        )
-                                        .map((tag: any, i: number) => {
+                                    {detailCorporatePIC.detail_corporate.map(
+                                        (tag: any, i: number) => {
                                             return (
                                                 <div
                                                     key={i}
@@ -1089,7 +1085,8 @@ export default function DetailRelation({
                                                     </div>
                                                 </div>
                                             );
-                                        })}
+                                        }
+                                    )}
                                     <div className="w-full text-right">
                                         <span
                                             className="text-red-600 cursor-pointer hover:text-red-300 text-sm"
@@ -1157,9 +1154,8 @@ export default function DetailRelation({
                                                                             [
                                                                                 ...detailCorporatePIC.detail_corporate,
                                                                                 {
-                                                                                    INDIVIDU_RELATION_ID:
+                                                                                    PERSON_ID:
                                                                                         detailRelation,
-                                                                                    PERSON_IS_DELETED: 0,
                                                                                     RELATION_ORGANIZATION_NAME:
                                                                                         tag.RELATION_ORGANIZATION_NAME,
                                                                                 },
@@ -2659,17 +2655,45 @@ export default function DetailRelation({
                     {/* End Button */}
                 </>
             ) : (
-                <div
-                    className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
-                    onClick={(e) =>
-                        handleClickDocument(
-                            e,
-                            dataRelationNew.RELATION_ORGANIZATION_NAME
-                        )
-                    }
-                >
-                    <div className="flex justify-center items-center text-sm font-medium">
-                        <span>Document</span>
+                <div className="mt-4 mb-10 xs:grid xs:grid-cols-2 xs:gap-3 lg:grid lg:grid-cols-4 lg:gap-3">
+                    <div
+                        className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                        onClick={(e) =>
+                            handleClickDocument(
+                                e,
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            )
+                        }
+                    >
+                        <div className="flex justify-center items-center text-sm font-medium">
+                            <span>Personal Info</span>
+                        </div>
+                    </div>
+                    <div
+                        className="bg-white p-5 shadow-md rounded-lg hover:cursor-pointer hover:text-red-500"
+                        onClick={(e) =>
+                            handleClickAddressLocation(
+                                e,
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            )
+                        }
+                    >
+                        <div className="flex justify-center items-center text-sm font-medium">
+                            <span>Address & Location</span>
+                        </div>
+                    </div>
+                    <div
+                        className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
+                        onClick={(e) =>
+                            handleClickDocument(
+                                e,
+                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                            )
+                        }
+                    >
+                        <div className="flex justify-center items-center text-sm font-medium">
+                            <span>Document</span>
+                        </div>
                     </div>
                 </div>
             )}

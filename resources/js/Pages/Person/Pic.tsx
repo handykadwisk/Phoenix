@@ -24,11 +24,6 @@ export default function PIC({
     auth: any;
     idRelation: any;
 }>) {
-    const stats = [
-        { name: "Policy", stat: "71,897" },
-        { name: "Claim", stat: "58.16%" },
-        { name: "Assets", stat: "24.57%" },
-    ];
     // data person
     const [dataPerson, setDataPerson] = useState<any>([]);
     const [dataPersonRelationship, setDataPersonRelationship] = useState<any>(
@@ -185,27 +180,40 @@ export default function PIC({
             });
     };
 
-    const individuSelect = individuRelation?.map((query: any) => {
-        // getAKAIndividu(query.RELATION_ORGANIZATION_ID);
+    const individuSelect = individuRelation
+        ?.filter(
+            (items: any) =>
+                !dataPerson.data?.some(
+                    (itemsDb: any) =>
+                        itemsDb.RELATION_ORGANIZATION_ID ===
+                        items.RELATION_ORGANIZATION_ID
+                )
+        )
+        ?.map((query: any) => {
+            // getAKAIndividu(query.RELATION_ORGANIZATION_ID);
 
-        if (query.m_relation_aka[0]?.RELATION_AKA_NAME === undefined) {
-            return {
-                value: query.RELATION_ORGANIZATION_ID,
-                label: query.RELATION_ORGANIZATION_NAME,
-            };
-        } else {
-            return {
-                value: query.RELATION_ORGANIZATION_ID,
-                label:
-                    query.RELATION_ORGANIZATION_NAME +
-                    " (" +
-                    query.m_relation_aka[0]?.RELATION_AKA_NAME +
-                    ")",
-            };
-        }
-    });
+            if (query.m_relation_aka[0]?.RELATION_AKA_NAME === undefined) {
+                return {
+                    value: query.RELATION_ORGANIZATION_ID,
+                    label: query.RELATION_ORGANIZATION_NAME,
+                };
+            } else {
+                return {
+                    value: query.RELATION_ORGANIZATION_ID,
+                    label:
+                        query.RELATION_ORGANIZATION_NAME +
+                        " (" +
+                        query.m_relation_aka[0]?.RELATION_AKA_NAME +
+                        ")",
+                };
+            }
+        });
 
-    const deletePersonAlert = (e: FormEvent, idPerson: any) => {
+    const deletePersonAlert = (
+        e: FormEvent,
+        idPerson: any,
+        idRelationCorporate: any
+    ) => {
         e.preventDefault();
         Swal.fire({
             title: "Are you sure?",
@@ -222,13 +230,13 @@ export default function PIC({
                 //     text: "Your file has been deleted.",
                 //     icon: "success",
                 // });
-                deletePerson(idPerson);
+                deletePerson(idPerson, idRelationCorporate);
             }
         });
     };
-    const deletePerson = async (idPerson: any) => {
+    const deletePerson = async (idPerson: any, idRelationCorporate: any) => {
         await axios
-            .post(`/deletePerson`, { idPerson })
+            .post(`/deletePerson`, { idPerson, idRelationCorporate })
             .then((res) => {
                 Swal.fire({
                     title: "Success",
@@ -469,9 +477,9 @@ export default function PIC({
                                                                     setDetailPerson(
                                                                         {
                                                                             PERSON_ID:
-                                                                                dPerson.PERSON_ID,
+                                                                                dPerson.RELATION_ORGANIZATION_ID,
                                                                             PERSON_FIRST_NAME:
-                                                                                dPerson.PERSON_FIRST_NAME,
+                                                                                dPerson.RELATION_ORGANIZATION_NAME,
                                                                         }
                                                                     );
                                                                     handleDetailModel(
@@ -481,7 +489,7 @@ export default function PIC({
                                                                 }}
                                                             >
                                                                 {
-                                                                    dPerson.PERSON_FIRST_NAME
+                                                                    dPerson.RELATION_ORGANIZATION_NAME
                                                                 }
                                                             </div>
                                                         </>
@@ -499,7 +507,15 @@ export default function PIC({
                                                                     </span>
                                                                 </div>
                                                             </>
-                                                        ) : null
+                                                        ) : (
+                                                            <>
+                                                                <div className="bg-amber-600 w-fit font-semibold text-sm text-white px-2 rounded-md">
+                                                                    <span>
+                                                                        -
+                                                                    </span>
+                                                                </div>
+                                                            </>
+                                                        )
                                                     }
                                                     className={""}
                                                 />
@@ -514,7 +530,8 @@ export default function PIC({
                                                                 ) => {
                                                                     deletePersonAlert(
                                                                         e,
-                                                                        dPerson.PERSON_ID
+                                                                        dPerson.PERSON_ID,
+                                                                        idRelation
                                                                     );
                                                                 }}
                                                             >

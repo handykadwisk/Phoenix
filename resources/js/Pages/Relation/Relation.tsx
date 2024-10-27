@@ -222,56 +222,59 @@ export default function Relation({ auth }: PageProps) {
                 }
             });
         } else {
-            setIsSuccess("");
-            reset();
-            setData({
-                name_relation: "",
-                abbreviation: "",
-                relation_aka: [],
-                relation_email: "",
-                relation_website: "",
-                relation_description: "",
-                relation_lob_id: "",
-                pre_salutation_id: "",
-                post_salutation_id: "",
-                relation_status_id: "",
-                tagging_name: [],
-                is_managed: "",
-                mark_tbk_relation: "",
-                profession_id: "",
-                relation_type_id: [],
-                corporate_pic_for: null,
-                NPWP_RELATION: "",
-                date_of_birth: "",
-                DEFAULT_PAYABLE: 0,
-                no_pks: [],
-                bank_account: [],
-            });
-            Swal.fire({
-                title: "Success",
-                text: "New Relation Added",
-                icon: "success",
-            }).then((result: any) => {
-                if (result.value) {
-                    setGetDetailRelation({
-                        RELATION_ORGANIZATION_NAME: message[1],
-                        RELATION_ORGANIZATION_ID: message[0],
-                        RELATION_SALUTATION_PRE: message[2],
-                        RELATION_SALUTATION_POST: message[3],
-                    });
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: true,
-                        document: false,
-                        search: false,
-                    });
-                }
-            });
-            setSwitchPage(false);
-            setSwitchPagePKS(false);
-            setIsSuccess(message);
+            if (message[4] === "2") {
+            } else {
+                setIsSuccess("");
+                reset();
+                setData({
+                    name_relation: "",
+                    abbreviation: "",
+                    relation_aka: [],
+                    relation_email: "",
+                    relation_website: "",
+                    relation_description: "",
+                    relation_lob_id: "",
+                    pre_salutation_id: "",
+                    post_salutation_id: "",
+                    relation_status_id: "",
+                    tagging_name: [],
+                    is_managed: "",
+                    mark_tbk_relation: "",
+                    profession_id: "",
+                    relation_type_id: [],
+                    corporate_pic_for: null,
+                    NPWP_RELATION: "",
+                    date_of_birth: "",
+                    DEFAULT_PAYABLE: 0,
+                    no_pks: [],
+                    bank_account: [],
+                });
+                Swal.fire({
+                    title: "Success",
+                    text: "New Relation Added",
+                    icon: "success",
+                }).then((result: any) => {
+                    if (result.value) {
+                        setGetDetailRelation({
+                            RELATION_ORGANIZATION_NAME: message[1],
+                            RELATION_ORGANIZATION_ID: message[0],
+                            RELATION_SALUTATION_PRE: message[2],
+                            RELATION_SALUTATION_POST: message[3],
+                        });
+                        setModal({
+                            add: false,
+                            delete: false,
+                            edit: false,
+                            view: true,
+                            document: false,
+                            search: false,
+                        });
+                    }
+                });
+                setSwitchPage(false);
+                setSwitchPagePKS(false);
+                setIsSuccess(message);
+            }
         }
     };
 

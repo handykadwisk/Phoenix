@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
-import defaultImage from "../../Images/user/default.jpg";
+import defaultImage from "@/Images/user/default.jpg";
 import BreadcrumbPage from "@/Components/Breadcrumbs/BreadcrumbPage";
 import { PageProps } from "@/types";
 import {
@@ -143,6 +143,7 @@ export default function DetailPerson({
             .post(`/getPersonDetail`, { id })
             .then((res) => {
                 setDetailPerson(res.data);
+                console.log("detail", res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -965,7 +966,7 @@ export default function DetailPerson({
                 body={
                     <>
                         {/* From Add Person */}
-                        <div className="mt-5">
+                        <div className="">
                             {/* <div className="">
                                 <span className="w-fit border-b-4 border-red-500">
                                     Personal Information
@@ -1231,7 +1232,7 @@ export default function DetailPerson({
                                 </div>
                             </div>
                             <div
-                                className="grid grid-cols-2 gap-2"
+                                className="grid grid-cols-2 gap-2 hidden"
                                 title="BAA (Business Acquisition Assistant)"
                             >
                                 <div className="mt-4 ">

@@ -314,14 +314,15 @@ class RelationController extends Controller
 
         ]);
 
-        // create relation individu for person
-        $personCreate = TPerson::create([
-            "PERSON_FIRST_NAME"         => $addTBK,
-            "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID,
-            "PERSON_IS_DELETED"         => "0"
-        ]);
+
 
         if ($request->relation_status_id == "2") {
+            // create relation individu for person
+            $personCreate = TPerson::create([
+                "PERSON_FIRST_NAME"         => $addTBK,
+                "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID,
+                "PERSON_IS_DELETED"         => "0"
+            ]);
             // jika dia corporate pic dan milih corporate pic maka akan melakukan mapping ke t person
             if (is_countable($request->corporate_pic_for)) {
                 for ($i = 0; $i < sizeof($request->corporate_pic_for); $i++) {
@@ -330,7 +331,7 @@ class RelationController extends Controller
                     // simpan mapping ke t person
                     MRelationPic::create([
                         "RELATION_ORGANIZATION_ID"  => $idRelation,
-                        "PERSON_ID"                 => $personCreate->PERSON_ID
+                        "PERSON_ID"                 => $relation->RELATION_ORGANIZATION_ID
                     ]);
                 }
             }
@@ -523,7 +524,8 @@ class RelationController extends Controller
             $relation->RELATION_ORGANIZATION_ID,
             $addTBK,
             $preSalutation,
-            $postSalutation
+            $postSalutation,
+            $request->relation_status_id
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -745,9 +747,9 @@ class RelationController extends Controller
 
     public function get_corporate(Request $request)
     {
-        $detailPerson = TPerson::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_person.RELATION_ORGANIZATION_ID')->where('INDIVIDU_RELATION_ID', $request->id)->where('PERSON_IS_DELETED', 0)->get();
+        $data = MRelationPic::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_pic.RELATION_ORGANIZATION_ID')->where('PERSON_ID', $request->id)->get();
 
-        return response()->json($detailPerson);
+        return response()->json($data);
     }
 
     public function detail($id)
@@ -800,55 +802,30 @@ class RelationController extends Controller
 
     public function edit_corporate(Request $request)
     {
-
-        $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $request->detail_corporate[0]['INDIVIDU_RELATION_ID'])->get();
-        for ($i = 0; $i < sizeof($arrayPerson); $i++) {
-            for ($a = 0; $a < sizeof($request->detail_corporate); $a++) {
-                $personName = $request->detail_corporate[$a]['RELATION_ORGANIZATION_NAME'];
-                $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
-                if ($arrayPerson[$i]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
-                    TPerson::where('PERSON_ID', $arrayPerson[$i]['PERSON_ID'])->update([
-                        "PERSON_IS_DELETED"         => "1"
-                    ]);
-                }
-            }
+        // cek existing mapping relation pic
+        $cekExisting = MRelationPic::where('PERSON_ID', $request->detail_corporate[0]['PERSON_ID'])->get();
+        if ($cekExisting->count() > 0) {
+            MRelationPic::where('PERSON_ID', $request->detail_corporate[0]['PERSON_ID'])->delete();
         }
+
+
         for ($i = 0; $i < sizeof($request->detail_corporate); $i++) {
-            $personName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
-            $individuId = $request->detail_corporate[$i]['INDIVIDU_RELATION_ID'];
+            $corporateName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
+            $personId = $request->detail_corporate[$i]['PERSON_ID'];
 
-            $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
-            $getName = Relation::select('RELATION_ORGANIZATION_NAME')->where('RELATION_ORGANIZATION_ID', $individuId)->first();
+            $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($corporateName))->first();
 
-            $dataPerson = TPerson::where('RELATION_ORGANIZATION_ID', $dataRelation->RELATION_ORGANIZATION_ID)->first();
-            if ($dataPerson != null) {
-                $id = $dataPerson->PERSON_ID;
-                TPerson::where('PERSON_ID', $id)->update([
-                    "PERSON_IS_DELETED"         => "0"
-                ]);
-            } else {
-                $arrayPerson = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->get();
-                for ($a = 0; $a < sizeof($arrayPerson); $a++) {
-                    if ($arrayPerson[$a]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
-                        $idPerson = $arrayPerson[$a]['PERSON_ID'];
-                        TPerson::where('PERSON_ID', $idPerson)->update([
-                            "PERSON_IS_DELETED"         => "0"
-                        ]);
-                    }
-                }
 
-                TPerson::create([
-                    "PERSON_FIRST_NAME"         => $getName->RELATION_ORGANIZATION_NAME,
-                    "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
-                    "INDIVIDU_RELATION_ID"      => $individuId,
-                    "PERSON_IS_DELETED"         => "0"
-                ]);
-            }
+            // simpan mapping ke t person
+            MRelationPic::create([
+                "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
+                "PERSON_ID"                 => $personId
+            ]);
         }
 
 
         return new JsonResponse([
-            $request->detail_corporate[0]['INDIVIDU_RELATION_ID'],
+            $request->detail_corporate[0]['PERSON_ID'],
             "Corporate For PIC Edited"
         ], 201, [
             'X-Inertia' => true

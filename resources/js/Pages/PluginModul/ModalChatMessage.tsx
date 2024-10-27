@@ -846,7 +846,7 @@ export default function ModalChatMessage({
             (e: any) => {
                 // console.log("User is typing:", e.userId);
                 setTyping(true);
-                setTextTyping(e.userId + "Is Typing ...");
+                setTextTyping(e.userId + " Is Typing ...");
 
                 if (typingTimeoutRef.current) {
                     clearTimeout(typingTimeoutRef.current);
