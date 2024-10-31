@@ -327,7 +327,6 @@ class RelationGroupController extends Controller
 
     public function edit_subgroup(Request $request)
     {
-
         $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)->update([
             "RELATION_GROUP_NAME"           => $request->RELATION_GROUP_NAME,
             "RELATION_GROUP_DESCRIPTION"    => $request->RELATION_GROUP_DESCRIPTION,
@@ -350,7 +349,8 @@ class RelationGroupController extends Controller
 
         return new JsonResponse([
             $request->RELATION_GROUP_ID,
-            $request->RELATION_GROUP_NAME
+            $request->RELATION_GROUP_NAME,
+            $request->RELATION_PARENT_ID
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -415,5 +415,61 @@ class RelationGroupController extends Controller
         ]);
     }
 
+    public function get_relation_group(Request $request)
+    {
+        // dd($request);
+        // dd(json_decode($request->newFilter, true));
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
+        $query = RelationGroup::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
+
+        // dd($newSearch[0]);
+
+
+
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel);
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection);
+            }
+        }
+        // dd($newSearch[0]['RELATION_TYPE_ID']['value']);
+
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('RELATION_GROUP_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            } else {
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'RELATION_GROUP_NAME') {
+                        $query->where('RELATION_GROUP_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
+        // if ($filterModel) {
+        //     foreach ($filterModel as $colId => $filterValue) {
+        //         if ($colId === 'policy_number') {
+        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
+        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
+        //         } elseif ($colId === 'policy_inception_date') {
+        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
+        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
+        //         }
+        //     }
+        // }
+        // dd($query->toSql());
+        $query->orderBy('RELATION_GROUP_ID', "DESC");
+        $query->where('RELATION_GROUP_PARENT', 0);
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
+    }
 }

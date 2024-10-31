@@ -29,6 +29,7 @@ import ModalSearch from "@/Components/Modal/ModalSearch";
 import ModalDetailGroup from "./DetailGroup";
 import Swal from "sweetalert2";
 import SelectTailwind from "react-tailwindcss-select";
+import AGGrid from "@/Components/AgGrid";
 
 export default function Group({ auth }: PageProps) {
     // useEffect(() => {
@@ -39,6 +40,15 @@ export default function Group({ auth }: PageProps) {
     const [relationsGroup, setRelationsGroup] = useState<any>([]);
     const [searchGroup, setSearchGroup] = useState<any>({
         RELATION_GROUP_NAME: "",
+    });
+
+    const [searchGroupNew, setSearchGroupNew] = useState<any>({
+        group_search: [
+            {
+                RELATION_GROUP_NAME: "",
+                flag: "flag",
+            },
+        ],
     });
     const [idGroup, setIdGroup] = useState<any>({
         RELATION_GROUP_ID: "",
@@ -67,7 +77,7 @@ export default function Group({ auth }: PageProps) {
             value: query.RELATION_GROUP_ID,
             label: query.text_combo,
         };
-    }); 
+    });
 
     // Get Relation Group
     const getRelationGroup = async (pageNumber = "page=1") => {
@@ -77,8 +87,7 @@ export default function Group({ auth }: PageProps) {
             })
             .then((res) => {
                 setRelationsGroup(res.data);
-                console.log('data group', res.data);
-                
+
                 if (modal.search) {
                     setModal({
                         add: false,
@@ -147,20 +156,40 @@ export default function Group({ auth }: PageProps) {
     });
 
     // search
-    const clearSearchGroup = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRelationGroup?${pageNumber}`)
-            .then((res) => {
-                setRelationsGroup([]);
-                setSearchGroup({
-                    ...searchGroup,
-                    RELATION_GROUP_NAME: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchGroup = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("RELATION_GROUP_NAME", "", 0);
+        inputDataSearch("flag", "flag", 0);
+        setIsSuccess({
+            isSuccess: "success",
+        });
     };
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchGroupNew.group_search];
+        changeVal[i][name] = value;
+        setSearchGroupNew({ ...searchGroupNew, group_search: changeVal });
+    };
+
+    const handleClickDetailGroup = async (data: any) => {
+        setModal({
+            add: false,
+            delete: false,
+            edit: false,
+            view: true,
+            document: false,
+            search: false,
+        });
+        setIdGroup({
+            RELATION_GROUP_ID: data.RELATION_GROUP_ID,
+            RELATION_GROUP_NAME: data.RELATION_GROUP_NAME,
+        });
+    };
+    const [isSuccess, setIsSuccess] = useState<any>("");
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Group"}>
@@ -340,21 +369,39 @@ export default function Group({ auth }: PageProps) {
                     <div className="bg-white rounded-md shadow-md p-4 max-h-[100rem] h-96">
                         <TextInput
                             type="text"
-                            value={searchGroup.RELATION_GROUP_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchGroup({
-                                    ...searchGroup,
-                                    RELATION_GROUP_NAME: e.target.value,
-                                })
+                            value={
+                                searchGroupNew.group_search[0]
+                                    .RELATION_GROUP_NAME
                             }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "RELATION_GROUP_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchGroupNew.group_search[0]
+                                        .RELATION_GROUP_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (
-                                        searchGroup.RELATION_GROUP_NAME !== ""
+                                        searchGroupNew.group_search[0]
+                                            .RELATION_GROUP_NAME === ""
                                     ) {
-                                        getRelationGroup();
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
                                     }
+                                    setIsSuccess({
+                                        isSuccess: "success",
+                                    });
                                 }
                             }}
                             placeholder="Search Group Name"
@@ -364,107 +411,60 @@ export default function Group({ auth }: PageProps) {
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
                                     if (
-                                        searchGroup.RELATION_GROUP_NAME !== ""
+                                        searchGroupNew.group_search[0]
+                                            .RELATION_GROUP_NAME === ""
                                     ) {
-                                        getRelationGroup();
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
                                     }
+                                    setIsSuccess({
+                                        isSuccess: "success",
+                                    });
                                 }}
+                                // onClick={() => {
+                                //     if (
+                                //         searchGroup.RELATION_GROUP_NAME !== ""
+                                //     ) {
+                                //         getRelationGroup();
+                                //     }
+                                // }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchGroup()}
+                                onClick={(e: any) => clearSearchGroup(e)}
                             >
                                 Clear Search
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem]">
-                    <div className="max-w-full ring-1 ring-gray-200 rounded-lg custom-table overflow-visible">
-                        <table className="w-full table-auto divide-y divide-gray-300">
-                            <thead className="">
-                                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                    <TableTH
-                                        colSpan={""}
-                                        rowSpan={""}
-                                        className={
-                                            "w-[10px] text-center bg-gray-200 rounded-tl-lg rounded-bl-lg"
-                                        }
-                                        label={"No"}
-                                    />
-                                    <TableTH
-                                        colSpan={""}
-                                        rowSpan={""}
-                                        className={
-                                            "min-w-[50px] bg-gray-200 rounded-tr-lg rounded-br-lg"
-                                        }
-                                        label={"Name Group"}
-                                    />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {relationsGroup.data?.map(
-                                    (dataGroup: any, i: number) => {
-                                        return (
-                                            <tr
-                                                onDoubleClick={() => {
-                                                    setModal({
-                                                        add: false,
-                                                        delete: false,
-                                                        edit: false,
-                                                        view: true,
-                                                        document: false,
-                                                        search: false,
-                                                    });
-                                                    setIdGroup({
-                                                        RELATION_GROUP_ID:
-                                                            dataGroup.RELATION_GROUP_ID,
-                                                        RELATION_GROUP_NAME:
-                                                            dataGroup.RELATION_GROUP_NAME,
-                                                    });
-                                                }}
-                                                key={i}
-                                                className={
-                                                    i % 2 === 0
-                                                        ? "cursor-pointer"
-                                                        : "bg-gray-100 cursor-pointer"
-                                                }
-                                            >
-                                                <TableTD
-                                                    value={
-                                                        relationsGroup.from + i
-                                                    }
-                                                    className={"text-center"}
-                                                />
-                                                <TableTD
-                                                    value={
-                                                        <>
-                                                            {
-                                                                dataGroup.RELATION_GROUP_NAME
-                                                            }
-                                                        </>
-                                                    }
-                                                    className={""}
-                                                />
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </tbody>
-                        </table>
-                        <div className="w-full px-5 py-2 bottom-0 left-0 absolute">
-                            <Pagination
-                                links={relationsGroup.links}
-                                fromData={relationsGroup.from}
-                                toData={relationsGroup.to}
-                                totalData={relationsGroup.total}
-                                clickHref={(url: string) =>
-                                    getRelationGroup(url.split("?").pop())
-                                }
-                            />
-                        </div>
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={searchGroupNew.group_search}
+                            // loading={isLoading.get_policy}
+                            url={"getRelationGroupNew"}
+                            doubleClickEvent={handleClickDetailGroup}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                },
+                                {
+                                    headerName: "Name Group",
+                                    field: "RELATION_GROUP_NAME",
+                                    flex: 7,
+                                },
+                            ]}
+                        />
                     </div>
                 </div>
             </div>

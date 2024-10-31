@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMessage;
 use App\Models\MPinChatDetail;
 use App\Models\RPluginProcess;
 use App\Models\TChat;
@@ -49,6 +50,9 @@ class TDetailChatController extends Controller
             "CREATED_CHAT_DETAIL_BY"       => Auth::user()->id,
             "CHAT_DETAIL_PARENT_ID"        => $request->CHAT_DETAIL_PARENT_ID
         ]);
+        $modulChat = "Chat";
+
+        SendMessage::dispatch($createMessage, $modulChat);
 
         // update table t_Chat_detail_user jika di reply
         if ($request->CHAT_DETAIL_PARENT_ID != null) {

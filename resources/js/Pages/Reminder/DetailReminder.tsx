@@ -21,37 +21,37 @@ import ToastMessage from "@/Components/ToastMessage";
 import DatePicker from "react-datepicker";
 import dateFormat from "dateformat";
 import SelectTailwind from "react-tailwindcss-select";
+import Checkbox from "@/Components/Checkbox";
 
 export default function DetailReminder({
     textButton,
     idReminder,
-}: PropsWithChildren<{ textButton?: any; idReminder?: any }>) {
+    dataDetailReminder,
+    setDataDetailReminder,
+}: PropsWithChildren<{
+    textButton?: any;
+    idReminder?: any;
+    dataDetailReminder: any;
+    setDataDetailReminder: any;
+}>) {
     useEffect(() => {
         getDetailReminder(idReminder);
         getDataParticipant();
+        getMethodNotification();
     }, []);
 
     const [resultReminder, setResultReminder] = useState<any>([]);
 
-    const [dataDetailReminder, setDataDetailReminder] = useState<any>({
-        REMINDER_TITLE: "",
-        REMINDER_TIMES: "",
-        REMINDER_DAYS: "",
-        REMINDER_START_DATE: "",
-        REMINDER_DESKRIPSI: "",
-        NOTIFICATION: [
-            {
-                NOTIFICATION_ID: 1,
-            },
-        ],
-        PARTICIPANT: [
-            {
-                TIER: "",
-                PARTICIPANT_ID: null,
-            },
-        ],
-        TIER_REMINDER: [],
-    });
+    // const [dataDetailReminder, setDataDetailReminder] = useState<any>({
+    //     REMINDER_TITLE: "",
+    //     REMINDER_TIMES: "",
+    //     REMINDER_DAYS: "",
+    //     REMINDER_START_DATE: "",
+    //     REMINDER_DESKRIPSI: "",
+    //     NOTIFICATION: [],
+    //     PARTICIPANT: [],
+    //     TIER_REMINDER: [],
+    // });
     // getDetail Reminder
     const getDetailReminder = async (idReminder: any) => {
         await axios
@@ -59,16 +59,13 @@ export default function DetailReminder({
             .then((res) => {
                 // setResultReminder(res.data);
                 setDataDetailReminder({
+                    REMINDER_ID: res.data.REMINDER_ID,
                     REMINDER_TITLE: res.data.REMINDER_TITLE,
                     REMINDER_TIMES: res.data.REMINDER_TIMES,
                     REMINDER_DAYS: res.data.REMINDER_DAYS,
                     REMINDER_START_DATE: res.data.REMINDER_START_DATE,
                     REMINDER_DESKRIPSI: res.data.REMINDER_DESKRIPSI,
-                    NOTIFICATION: [
-                        {
-                            NOTIFICATION_ID: 1,
-                        },
-                    ],
+                    NOTIFICATION: res.data.m_method_reminder,
                     PARTICIPANT: res.data.m_reminder_participant,
                 });
             })
@@ -153,17 +150,35 @@ export default function DetailReminder({
         const data = dataDetailReminder?.PARTICIPANT?.filter(
             (data: any) => data.REMINDER_TIER_ID === idTier
         );
-        console.log("daasdadata", data);
+        console.log("data", data);
 
         // get data yang mau di hilangkan
         const filteredArray = data?.filter(
             (items: any) =>
-                !value?.some((itemsDb: any) => itemsDb.value === items.USER_ID)
+                !value?.some(
+                    (itemsDb: any) =>
+                        items.USER_ID === null ||
+                        itemsDb.value === items.USER_ID
+                )
         );
-        console.log("data", filteredArray);
+        console.log("filteredArray", filteredArray);
+
         if (filteredArray.length !== 0) {
             if (data.length === 1) {
-                console.log("masuk sini");
+                console.log("ada");
+                const updatedUsers = dataDetailReminder.PARTICIPANT.map(
+                    (items: any) =>
+                        items.USER_ID === filteredArray[0]["USER_ID"]
+                            ? {
+                                  ...items,
+                                  USER_ID: null,
+                              }
+                            : items
+                );
+                setDataDetailReminder({
+                    ...dataDetailReminder,
+                    PARTICIPANT: updatedUsers,
+                });
             } else {
                 // hasil filter data sesuai data yang hilang
                 const resultFilter = dataDetailReminder?.PARTICIPANT?.filter(
@@ -172,25 +187,12 @@ export default function DetailReminder({
                             (itemsDb: any) => itemsDb.USER_ID === items.USER_ID
                         )
                 );
-                console.log("dkwokwo", resultFilter);
 
                 setDataDetailReminder({
                     ...dataDetailReminder,
                     PARTICIPANT: resultFilter,
                 });
             }
-            // if (value === null) {
-            // setDataDetailReminder({
-            //     ...dataDetailReminder,
-            //     PARTICIPANT: [
-            //         ...dataDetailReminder.PARTICIPANT,
-            //         {
-            //             REMINDER_TIER_ID: idTier,
-            //             USER_ID: null,
-            //         },
-            //     ],
-            // });
-            // }
         } else {
             // get filter data yang di tambah
             const filteredArray = value?.filter(
@@ -211,20 +213,71 @@ export default function DetailReminder({
                 ],
             });
         }
-        // if (value === null) {
-        //     setDataDetailReminder({
-        //         ...dataDetailReminder,
-        //         PARTICIPANT: [
-        //             ...dataDetailReminder.PARTICIPANT,
-        //             {
-        //                 REMINDER_TIER_ID: idTier,
-        //                 USER_ID: null,
-        //             },
-        //         ],
-        //     });
-        // }
     };
-    console.log("ada", dataDetailReminder.PARTICIPANT);
+
+    // for get notification method
+    const [methodNotification, setMethodNotification] = useState<any>([]);
+    const getMethodNotification = async () => {
+        await axios
+            .post(`/getMethodNotification`)
+            .then((res) => {
+                setMethodNotification(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const checkValueMethodNotification = (id: number, idr: number) => {
+        if (
+            dataDetailReminder.NOTIFICATION.find(
+                (f: any) =>
+                    f.METHOD_NOTIFICATION_ID === id && f.REMINDER_ID === idr
+            )
+        ) {
+            return true;
+        }
+    };
+
+    const handleCheckboxEdit = (e: any, idReminder: any) => {
+        const { value, checked } = e.target;
+
+        if (checked) {
+            setDataDetailReminder({
+                ...dataDetailReminder,
+                NOTIFICATION: [
+                    ...dataDetailReminder.NOTIFICATION,
+                    {
+                        METHOD_NOTIFICATION_ID: parseInt(value),
+                        REMINDER_ID: idReminder,
+                    },
+                ],
+            });
+        } else {
+            const updatedData = dataDetailReminder.NOTIFICATION.filter(
+                (data: any) => data.METHOD_NOTIFICATION_ID !== parseInt(value)
+            );
+            setDataDetailReminder({
+                ...dataDetailReminder,
+                NOTIFICATION: updatedData,
+            });
+        }
+    };
+
+    const addRowBParticipant = (e: FormEvent) => {
+        const tierIdReminder = Object.keys(groupedData)?.length;
+        e.preventDefault();
+        setDataDetailReminder({
+            ...dataDetailReminder,
+            PARTICIPANT: [
+                ...dataDetailReminder.PARTICIPANT,
+                {
+                    REMINDER_TIER_ID: tierIdReminder + 1,
+                    USER_ID: null,
+                },
+            ],
+        });
+    };
 
     return (
         <>
@@ -284,7 +337,12 @@ export default function DetailReminder({
                                     <SelectTailwind
                                         classNames={{
                                             menuButton: () =>
-                                                `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                `flex text-sm text-gray-500 mt-1 rounded-md shadow-sm transition-all duration-300 focus:outline-none hover:border-gray-400 ${
+                                                    textButton.textButton !==
+                                                    "Edit"
+                                                        ? `bg-white`
+                                                        : `bg-gray-300`
+                                                }`,
                                             menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
                                             listItem: ({ isSelected }: any) =>
                                                 `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
@@ -293,11 +351,16 @@ export default function DetailReminder({
                                                         : `text-gray-500 hover:bg-red-100 hover:text-black`
                                                 }`,
                                         }}
+                                        isDisabled={
+                                            textButton.textButton === "Edit"
+                                                ? true
+                                                : false
+                                        }
                                         options={dataParticipant}
                                         isSearchable={true}
                                         isMultiple={true}
                                         placeholder={"Select Participant"}
-                                        isClearable={true}
+                                        isClearable={false}
                                         // value={{
                                         //     label: getLabelParticipant(items),
                                         //     value: getValueParticipant(items),
@@ -327,18 +390,81 @@ export default function DetailReminder({
                                                 stroke="currentColor"
                                                 className=" h-6 text-red-500 cursor-pointer font-semibold"
                                                 onClick={() => {
-                                                    const updatedData =
-                                                        dataDetailReminder.PARTICIPANT.filter(
-                                                            (
-                                                                data: any,
-                                                                a: number
-                                                            ) => a !== index
-                                                        );
-                                                    setDataDetailReminder({
-                                                        ...dataDetailReminder,
-                                                        PARTICIPANT:
-                                                            updatedData,
-                                                    });
+                                                    if (
+                                                        textButton.textButton !==
+                                                        "Edit"
+                                                    ) {
+                                                        const updatedData =
+                                                            dataDetailReminder.PARTICIPANT.filter(
+                                                                (
+                                                                    data: any,
+                                                                    a: number
+                                                                ) =>
+                                                                    data.REMINDER_TIER_ID !==
+                                                                    index + 1
+                                                            );
+                                                        if (index === 0) {
+                                                            const updatedUsers =
+                                                                updatedData.map(
+                                                                    (
+                                                                        items: any
+                                                                    ) =>
+                                                                        items.REMINDER_TIER_ID ===
+                                                                        2
+                                                                            ? {
+                                                                                  ...items,
+                                                                                  REMINDER_TIER_ID: 1,
+                                                                              }
+                                                                            : {
+                                                                                  ...items,
+                                                                                  REMINDER_TIER_ID: 2,
+                                                                              }
+                                                                );
+                                                            setDataDetailReminder(
+                                                                {
+                                                                    ...dataDetailReminder,
+                                                                    PARTICIPANT:
+                                                                        updatedUsers,
+                                                                }
+                                                            );
+                                                        } else if (
+                                                            index === 1
+                                                        ) {
+                                                            const updatedUsers =
+                                                                updatedData.map(
+                                                                    (
+                                                                        items: any
+                                                                    ) =>
+                                                                        items.REMINDER_TIER_ID ===
+                                                                        3
+                                                                            ? {
+                                                                                  ...items,
+                                                                                  REMINDER_TIER_ID: 2,
+                                                                              }
+                                                                            : {
+                                                                                  ...items,
+                                                                                  REMINDER_TIER_ID: 1,
+                                                                              }
+                                                                );
+                                                            setDataDetailReminder(
+                                                                {
+                                                                    ...dataDetailReminder,
+                                                                    PARTICIPANT:
+                                                                        updatedUsers,
+                                                                }
+                                                            );
+                                                        } else {
+                                                            setDataDetailReminder(
+                                                                {
+                                                                    ...dataDetailReminder,
+                                                                    PARTICIPANT:
+                                                                        updatedData,
+                                                                }
+                                                            );
+                                                        }
+                                                    } else {
+                                                        null;
+                                                    }
                                                 }}
                                             >
                                                 <path
@@ -355,7 +481,7 @@ export default function DetailReminder({
                         </div>
                     );
                 })}
-                {/* {data.PARTICIPANT.length === reminderTier.length ? null : (
+                {Object.keys(groupedData)?.length === 3 ? null : (
                     <div className="mt-1">
                         <a
                             className="text-sm cursor-pointer text-slate-500"
@@ -366,7 +492,7 @@ export default function DetailReminder({
                             </span>
                         </a>
                     </div>
-                )} */}
+                )}
             </div>
             <div className="mt-1">
                 <div>
@@ -492,7 +618,7 @@ export default function DetailReminder({
                         }
                     />
                 </div>
-                {/* <div>
+                <div>
                     <ul
                         role="list"
                         className="mt-1 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-2 lg:grid-cols-3"
@@ -503,18 +629,39 @@ export default function DetailReminder({
                                     key={i}
                                     className="col-span-1 flex rounded-md shadow-sm"
                                 >
-                                    <div className="flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white">
+                                    <div
+                                        className={
+                                            textButton.textButton !== "Edit"
+                                                ? "flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium  text-white bg-white"
+                                                : "flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium  bg-gray-300 text-black"
+                                        }
+                                    >
                                         <Checkbox
-                                            defaultChecked={checkCheckedMRelation(
-                                                items.METHOD_NOTIFICATION_ID
+                                            defaultChecked={checkValueMethodNotification(
+                                                items.METHOD_NOTIFICATION_ID,
+                                                dataDetailReminder.REMINDER_ID
                                             )}
                                             value={items.METHOD_NOTIFICATION_ID}
                                             onChange={(e) => {
-                                                handleCheckbox(e);
+                                                handleCheckboxEdit(
+                                                    e,
+                                                    dataDetailReminder.REMINDER_ID
+                                                );
                                             }}
+                                            disabled={
+                                                textButton.textButton === "Edit"
+                                                    ? true
+                                                    : false
+                                            }
                                         />
                                     </div>
-                                    <div className="flex flex-1 items-center justify-between truncate rounded-r-md shadow-md bg-white">
+                                    <div
+                                        className={
+                                            textButton.textButton !== "Edit"
+                                                ? "flex flex-1 items-center justify-between truncate rounded-r-md bg-white"
+                                                : "flex flex-1 items-center justify-between truncate rounded-r-md bg-gray-300"
+                                        }
+                                    >
                                         <div className="flex-1 truncate px-1 py-2 text-xs">
                                             <span className="text-gray-900">
                                                 {items.METHOD_NOTIFICATION_NAME}
@@ -525,7 +672,7 @@ export default function DetailReminder({
                             );
                         })}
                     </ul>
-                </div> */}
+                </div>
             </div>
             <div className="mb-2">
                 <div className="mt-1">

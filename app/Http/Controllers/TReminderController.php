@@ -102,13 +102,86 @@ class TReminderController extends Controller
 
     public function get_reminder(Request $request)
     {
-        $data = TReminder::get();
+        $data = TReminder::where('REMINDER_CREATED_BY', $request->idUser)->get();
         return response()->json($data);
     }
 
     public function get_detail_reminder(Request $request)
     {
-        $data = TReminder::with('mReminderParticipant')->where('REMINDER_ID', $request->idReminder)->first();
+        $data = TReminder::with('mReminderParticipant')->with('mMethodReminder')->where('REMINDER_ID', $request->idReminder)->first();
         return response()->json($data);
+    }
+
+    public function edit(Request $request)
+    {
+        // dd($request);
+        // update TReminder 
+        $updateReminder = TReminder::where('REMINDER_ID', $request->REMINDER_ID)
+            ->update([
+                "REMINDER_TITLE"        => $request->REMINDER_TITLE,
+                "REMINDER_TIMES"        => $request->REMINDER_TIMES,
+                "REMINDER_DAYS"         => $request->REMINDER_DAYS,
+                "REMINDER_START_DATE"   => $request->REMINDER_START_DATE,
+                "REMINDER_DESKRIPSI"    => $request->REMINDER_DESKRIPSI,
+                "REMINDER_UPDATED_BY"   => Auth::user()->id,
+                "REMINDER_UPDATED_DATE" => now()
+            ]);
+
+
+        // cek existing mapping participant
+        $existingMappingParticipant = MReminderParticipant::where('REMINDER_ID', $request->REMINDER_ID)->get();
+        if ($existingMappingParticipant->count() > 0) {
+            MReminderParticipant::where('REMINDER_ID', $request->REMINDER_ID)->delete();
+        }
+        // create Reminder Participant
+        if (is_countable($request->PARTICIPANT)) {
+            for ($i = 0; $i < sizeof($request->PARTICIPANT); $i++) {
+                $userId = $request->PARTICIPANT[$i]['USER_ID'];
+                $tierId = $request->PARTICIPANT[$i]['REMINDER_TIER_ID'];
+
+                if ($userId !== null) {
+                    $createTierParticipant = MReminderParticipant::create([
+                        "REMINDER_ID"               => $request->REMINDER_ID,
+                        "REMINDER_TIER_ID"          => $tierId,
+                        "USER_ID"                   => $userId
+                    ]);
+                }
+            }
+        }
+
+        // cek existing mapping participant
+        $existingMethodNotification = MReminderMethodNotification::where('REMINDER_ID', $request->REMINDER_ID)->get();
+        if ($existingMethodNotification->count() > 0) {
+            MReminderMethodNotification::where('REMINDER_ID', $request->REMINDER_ID)->delete();
+        }
+        if (is_countable($request->NOTIFICATION)) {
+            for ($i = 0; $i < sizeof($request->NOTIFICATION); $i++) {
+                $notificationId = $request->NOTIFICATION[$i]['METHOD_NOTIFICATION_ID'];
+                // create mapping method notification
+                $createMappingNotification = MReminderMethodNotification::create([
+                    "REMINDER_ID"                   => $request->REMINDER_ID,
+                    "METHOD_NOTIFICATION_ID"        => $notificationId,
+                ]);
+            }
+        }
+
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Update Reminder (Reminder)",
+                "module"      => "Reminder",
+                "id"          => $request->REMINDER_ID
+            ]),
+            'action_by'  => Auth::user()->user_login
+        ]);
+
+        return new JsonResponse([
+            "Reminder Success Edited",
+            $request->REMINDER_ID,
+            Auth::user()->id
+        ], 201, [
+            'X-Inertia' => true
+        ]);
     }
 }

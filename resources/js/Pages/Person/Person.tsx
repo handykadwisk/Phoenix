@@ -261,8 +261,6 @@ export default function Person({
                 }
                 data={data}
                 setData={setData}
-                handleSuccess={handleSuccess}
-                dataPersonRelationship={dataPersonRelationship}
             />
             {/* end modal add person */}
 

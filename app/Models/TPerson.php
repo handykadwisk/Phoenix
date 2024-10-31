@@ -18,31 +18,37 @@ class TPerson extends Model
         'PERSON_ID',
     ];
 
-    public $with = ['corporatePIC'];
+    public $with = ['tPIC'];
 
     public $timestamps = false;
 
-    public function users(){
+    public function users()
+    {
         return $this->hasMany(User::class, 'id', 'PERSON_ID');
     }
 
-    public function ContactEmergency(){
+    public function ContactEmergency()
+    {
         return $this->hasMany(TPersonEmergencyContact::class, 'PERSON_ID');
     }
 
-    public function Relation(){
+    public function Relation()
+    {
         return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
-    public function taxStatus(){
+    public function taxStatus()
+    {
         return $this->hasOne(RTaxStatus::class, 'TAX_STATUS_ID', 'TAX_STATUS_ID');
     }
 
-    public function Office(){
+    public function Office()
+    {
         return $this->hasOne(TRelationOffice::class, 'RELATION_OFFICE_ID', 'OFFICE_ID');
     }
 
-    public function Structure(){
+    public function Structure()
+    {
         return $this->hasOne(TRelationStructure::class, 'RELATION_STRUCTURE_ID', 'STRUCTURE_ID');
     }
 
@@ -51,36 +57,48 @@ class TPerson extends Model
         return $this->belongsTo(TRelationDivision::class, 'DIVISION_ID');
     }
 
-    public function Document(){
+    public function Document()
+    {
         return $this->hasOne(Document::class, 'DOCUMENT_ID', 'PERSON_IMAGE_ID');
     }
 
-    public function mPersonContact(){
-        return $this->hasMany(MPersonContact::class, 'PERSON_ID', 'PERSON_ID');
+    public function mPersonContact()
+    {
+        return $this->hasMany(TPersonContact::class, 'PERSON_ID', 'PERSON_ID');
     }
 
-    public function mAddressPerson(){
+    public function mPersonEmail()
+    {
+        return $this->hasMany(TPersonEmail::class, 'PERSON_ID', 'PERSON_ID');
+    }
+
+    public function mAddressPerson()
+    {
         return $this->hasMany(MPersonAddress::class, 'PERSON_ID', 'PERSON_ID');
     }
 
-    public function PersonEducation(){
+    public function PersonEducation()
+    {
         return $this->hasMany(TPersonEducation::class, 'PERSON_ID', 'PERSON_ID');
     }
 
-    public function PersonCertificate(){
+    public function PersonCertificate()
+    {
         return $this->hasMany(TPersonCertificate::class, 'PERSON_ID', 'PERSON_ID');
     }
 
-    public function MPersonDocument(){
+    public function MPersonDocument()
+    {
         return $this->hasMany(MPersonDocument::class, 'PERSON_ID', 'PERSON_ID');
     }
 
-    public function TPersonBank(){
+    public function TPersonBank()
+    {
         return $this->hasMany(TPersonBankAccount::class, 'PERSON_ID', 'PERSON_ID');
     }
 
-    public function corporatePIC(){
-        return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    public function tPIC()
+    {
+        return $this->hasMany(TPic::class, 'PERSON_ID', 'PERSON_ID');
     }
-
 }

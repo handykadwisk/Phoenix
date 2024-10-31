@@ -81,11 +81,11 @@ export default function DetailGroup({
 
     useEffect(() => {
         getDetailGroup(idGroup);
-    }, [idGroup]);
+    }, []);
 
     useEffect(() => {
         getGroupName(idGroup);
-    }, [idGroup]);
+    }, []);
 
     const getDetailGroup = async (id: string) => {
         await axios
@@ -792,14 +792,14 @@ export default function DetailGroup({
             icon: "success",
         }).then((result: any) => {
             if (result.value) {
-                getDetailGroup(idGroup);
-                getGroupName(idGroup);
+                getDetailGroup(message[2]);
+                getGroupName(message[2]);
 
-                setIdGroup({
-                    ...idGroup,
-                    RELATION_GROUP_ID: message[0],
-                    RELATION_GROUP_NAME: message[1],
-                });
+                // setIdGroup({
+                //     ...idGroup,
+                //     RELATION_GROUP_ID: message[0],
+                //     RELATION_GROUP_NAME: message[1],
+                // });
                 // setModal({
                 //     add: false,
                 //     delete: false,
@@ -875,8 +875,6 @@ export default function DetailGroup({
         });
     };
 
-    console.log('dataRelationGroupNew',dataRelationGroupNew);
-    
     return (
         <>
             {/* modal detail  */}
@@ -948,8 +946,9 @@ export default function DetailGroup({
                 }
                 dataDetailGroups={dataDetailSubGroupParent}
                 handleSuccessEdit={handleSuccessEdit}
+                parentId={idGroup}
             />
-            
+
             <ModalToAdd
                 show={modalChangeParent.edit}
                 buttonAddOns={""}

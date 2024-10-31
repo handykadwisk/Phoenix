@@ -23,4 +23,9 @@ class TReminder extends Model
     {
         return $this->hasMany(MReminderParticipant::class, 'REMINDER_ID', 'REMINDER_ID');
     }
+
+    public function mMethodReminder()
+    {
+        return $this->hasMany(MReminderMethodNotification::class, 'REMINDER_ID', 'REMINDER_ID');
+    }
 }

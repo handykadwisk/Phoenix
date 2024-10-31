@@ -420,11 +420,6 @@ export default function PhoenixComponent({
             <ModalChatMessage
                 showChatMessage={showChatMessage}
                 setShowChatMessage={setShowChatMessage}
-                // onClose={() =>
-                //     setShowChatMessage({
-                //         chatModal: false,
-                //     })
-                // }
                 typeChatId={typeChatId.typeID}
                 tagIdChat={tagIdChat}
                 auth={auth}

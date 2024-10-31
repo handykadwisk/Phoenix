@@ -37,23 +37,34 @@ export default function DetailSubGroup({
     modal,
     dataDetailGroups,
     handleSuccessEdit,
+    parentId,
 }: PropsWithChildren<{
     show: any;
     modal: any;
     dataDetailGroups: any;
     handleSuccessEdit: any;
+    parentId?: any;
 }>) {
     useEffect(() => {
         setDetailGroups(dataDetailGroups);
     }, [dataDetailGroups]);
 
     const [dataDetailGroup, setDataDetailGroup] = useState<any>({
+        RELATION_GROUP_ID: "",
         RELATION_GROUP_NAME: "",
         RELATION_GROUP_DESCRIPTION: "",
+        RELATION_PARENT_ID: "",
     });
 
     const setDetailGroups = async (dataDetailGroupNew: any) => {
-        setDataDetailGroup(dataDetailGroupNew);
+        setDataDetailGroup({
+            ...dataDetailGroup,
+            RELATION_GROUP_ID: dataDetailGroupNew.RELATION_GROUP_ID,
+            RELATION_GROUP_NAME: dataDetailGroupNew.RELATION_GROUP_NAME,
+            RELATION_GROUP_DESCRIPTION:
+                dataDetailGroupNew.RELATION_GROUP_DESCRIPTION,
+            RELATION_PARENT_ID: parentId,
+        });
     };
 
     return (

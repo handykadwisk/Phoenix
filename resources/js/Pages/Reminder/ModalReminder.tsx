@@ -38,6 +38,7 @@ import AddReminder from "./AddReminder";
 import ModalToAction from "@/Components/Modal/ModalToAction";
 import DetailReminder from "./DetailReminder";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
+import { usePage } from "@inertiajs/react";
 
 export default function ModalReminder({
     showReminder,
@@ -48,8 +49,9 @@ export default function ModalReminder({
     closeable?: boolean | any | undefined;
     setShowReminder: any;
 }>) {
+    const { auth }: any = usePage().props;
     useEffect(() => {
-        getTReminder();
+        getTReminder(auth.user.id);
     }, []);
 
     const close = () => {
@@ -62,9 +64,9 @@ export default function ModalReminder({
 
     // for get reminder
     const [dataReminder, setDataReminder] = useState<any>([]);
-    const getTReminder = async () => {
+    const getTReminder = async (idUser: any) => {
         await axios
-            .post(`/getTReminder`)
+            .post(`/getTReminder`, { idUser })
             .then((res) => {
                 setDataReminder(res.data);
             })
@@ -72,6 +74,18 @@ export default function ModalReminder({
                 console.log(err);
             });
     };
+
+    // for detail reminder
+    const [dataDetailReminder, setDataDetailReminder] = useState<any>({
+        REMINDER_TITLE: "",
+        REMINDER_TIMES: "",
+        REMINDER_DAYS: "",
+        REMINDER_START_DATE: "",
+        REMINDER_DESKRIPSI: "",
+        NOTIFICATION: [],
+        PARTICIPANT: [],
+        TIER_REMINDER: [],
+    });
 
     // for Reminder
     const [data, setData] = useState<any>({
@@ -138,6 +152,49 @@ export default function ModalReminder({
         });
     };
 
+    const handleSuccessEdit = (message: string) => {
+        setIsSuccessChat("");
+        if (message !== "") {
+            setIsSuccessChat(message[0]);
+
+            getTReminder(message[2]);
+
+            setTimeout(() => {
+                setIsSuccessChat("");
+            }, 2000);
+        }
+    };
+
+    const handleSuccessAddReminder = async (message: any) => {
+        setIsSuccessChat("");
+        if (message !== "") {
+            setIsSuccessChat(message[0]);
+            setData({
+                REMINDER_TITLE: "",
+                REMINDER_TIMES: "",
+                REMINDER_DAYS: "",
+                REMINDER_START_DATE: "",
+                REMINDER_DESKRIPSI: "",
+                NOTIFICATION: [
+                    {
+                        NOTIFICATION_ID: 1,
+                    },
+                ],
+                PARTICIPANT: [
+                    {
+                        TIER: "",
+                        PARTICIPANT_ID: null,
+                    },
+                ],
+            });
+            getTReminder(auth.user.id);
+
+            setTimeout(() => {
+                setIsSuccessChat("");
+            }, 2000);
+        }
+    };
+
     const [isSuccessChat, setIsSuccessChat] = useState<string>("");
     return (
         <>
@@ -174,6 +231,9 @@ export default function ModalReminder({
                                         setData={setData}
                                         modalReminder={modalReminder}
                                         setModalReminder={setModalReminder}
+                                        handleSuccessAddReminder={
+                                            handleSuccessAddReminder
+                                        }
                                     />
 
                                     <ModalToAction
@@ -187,11 +247,11 @@ export default function ModalReminder({
                                         buttonEdit={textButton}
                                         actionEdit={actionEdit}
                                         title={textTitle.textTitle}
-                                        url={""}
-                                        data={""}
-                                        onSuccess={""}
-                                        method={""}
-                                        headers={""}
+                                        url={`/editReminder/${dataDetailReminder}`}
+                                        data={dataDetailReminder}
+                                        onSuccess={handleSuccessEdit}
+                                        method={"patch"}
+                                        headers={null}
                                         classPanel={
                                             "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[70%]"
                                         }
@@ -203,6 +263,12 @@ export default function ModalReminder({
                                         body={
                                             <>
                                                 <DetailReminder
+                                                    dataDetailReminder={
+                                                        dataDetailReminder
+                                                    }
+                                                    setDataDetailReminder={
+                                                        setDataDetailReminder
+                                                    }
                                                     textButton={textButton}
                                                     idReminder={
                                                         idReminder.idReminder
@@ -240,37 +306,52 @@ export default function ModalReminder({
                                             <Accordion collapseAll>
                                                 <AccordionPanel>
                                                     <AccordionTitle className="text-xs">
-                                                        All Reminders
+                                                        All Your Reminders
                                                     </AccordionTitle>
                                                     <AccordionContent>
-                                                        {dataReminder?.map(
-                                                            (
-                                                                itemsReminder: any,
-                                                                index: number
-                                                            ) => {
-                                                                return (
-                                                                    <div
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                        className="text-sm cursor-pointer hover:bg-red-600 p-1 rounded-md hover:text-white"
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            handleDetailReminder(
-                                                                                e,
-                                                                                itemsReminder.REMINDER_ID
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <span>
-                                                                            {
-                                                                                itemsReminder.REMINDER_TITLE
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                );
-                                                            }
+                                                        {dataReminder?.length ===
+                                                        0 ? (
+                                                            <>
+                                                                <div className="text-xs text-red-600">
+                                                                    <span>
+                                                                        Reminder
+                                                                        No
+                                                                        Existing
+                                                                    </span>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {dataReminder?.map(
+                                                                    (
+                                                                        itemsReminder: any,
+                                                                        index: number
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="text-sm cursor-pointer hover:bg-red-600 p-1 rounded-md hover:text-white"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    handleDetailReminder(
+                                                                                        e,
+                                                                                        itemsReminder.REMINDER_ID
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                <span>
+                                                                                    {
+                                                                                        itemsReminder.REMINDER_TITLE
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </>
                                                         )}
                                                     </AccordionContent>
                                                 </AccordionPanel>

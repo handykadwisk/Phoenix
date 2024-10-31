@@ -12,7 +12,7 @@ import {
 } from "@heroicons/react/20/solid";
 import TextInput from "@/Components/TextInput";
 import dateFormat from "dateformat";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import PrimaryButton from "@/Components/Button/PrimaryButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbtack } from "@fortawesome/free-solid-svg-icons";
@@ -60,6 +60,12 @@ export default function ModalChatMessage({
 }>) {
     useEffect(() => {
         getMessageChatByTypeId(typeChatId);
+        connectWebSocket();
+        listenForTyping();
+
+        return () => {
+            window.Echo.leave(webSocketChannel);
+        };
     }, [typeChatId]);
     useEffect(() => {
         getDataChatDetailUser(auth.user.id);
@@ -799,6 +805,62 @@ export default function ModalChatMessage({
             targetDiv?.classList.remove("rounded-md");
         }, 1000);
     };
+
+    // for Reverb Message
+    const webSocketChannel = `channel-name`;
+    const connectWebSocket = () => {
+        window.Echo.private(webSocketChannel).listen("GotMessage", (e: any) => {
+            // e.message
+
+            getMessageChatByTypeId(e.message.CHAT_ID);
+        });
+    };
+
+    const [typing, setTyping] = useState<boolean>(false);
+    const [textTyping, setTextTyping] = useState<string>("");
+    let typingTimeout: any;
+
+    const sendTypingEvent = () => {
+        window.Echo.private("typingChat").whisper("user.typing", {
+            userId: auth.user.name,
+        });
+    };
+    // document
+    //     .getElementById("textInput")
+    //     ?.addEventListener("input", function () {
+    //         clearTimeout(typingTimeout);
+
+    //         // Kirim event "sedang mengetik" ke server
+    //         typingTimeout = setTimeout(() => {
+    //             // Kirim event user typing
+    //             window.Echo.private(webSocketChannel).whisper("user.typing", {
+    //                 userId: auth.user.name,
+    //             });
+    //         }, 300); // Misalnya, setelah 300ms tidak ada input
+    //     });
+
+    const typingTimeoutRef: any = useRef(null);
+    const listenForTyping = () => {
+        window.Echo.private("typingChat").listenForWhisper(
+            "user.typing",
+            (e: any) => {
+                // console.log("User is typing:", e.userId);
+                setTyping(true);
+                setTextTyping(e.userId + " Is Typing ...");
+
+                if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current);
+                }
+
+                typingTimeoutRef.current = setTimeout(() => {
+                    setTyping(false);
+                }, 2000);
+
+                // Perbarui UI untuk menunjukkan bahwa pengguna sedang mengetik
+            }
+        );
+    };
+    // End For Reverb Message
     return (
         <>
             <Transition.Root show={showChatMessage.chatModal} as={Fragment}>
@@ -1351,6 +1413,12 @@ export default function ModalChatMessage({
                                                 )}
                                             </div>
                                             {/* INPUT CHAT MESSAGE */}
+
+                                            {typing && (
+                                                <div className="text-xs px-2 py-1 italic typing">
+                                                    <span>{textTyping}</span>
+                                                </div>
+                                            )}
                                             <div className="">
                                                 <form onSubmit={action}>
                                                     <hr />
@@ -1453,7 +1521,7 @@ export default function ModalChatMessage({
                                                             value={
                                                                 data.INITIATE_YOUR_CHAT
                                                             }
-                                                            className="w-full ring-1 ring-red-500 h-10"
+                                                            className="w-full ring-1 ring-red-500 h-10 italic"
                                                             onChange={(
                                                                 e: any
                                                             ) => {
@@ -1461,6 +1529,9 @@ export default function ModalChatMessage({
                                                                     e
                                                                 );
                                                             }}
+                                                            onKeyDown={
+                                                                sendTypingEvent
+                                                            }
                                                             onInput={(
                                                                 e: any
                                                             ) => {
@@ -1471,7 +1542,7 @@ export default function ModalChatMessage({
                                                                         .scrollHeight +
                                                                     "px"; // Atur tinggi sesuai dengan scrollHeight
                                                             }}
-                                                            placeholder="Your Chat"
+                                                            placeholder="Typing Here ... "
                                                         />
                                                         <PrimaryButton
                                                             className="inline-flex w-full sm:ml-3 sm:w-auto"
