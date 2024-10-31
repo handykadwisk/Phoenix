@@ -149,7 +149,7 @@ export default function Relation({ auth }: PageProps) {
                 if (message[4] === "2") {
                     Swal.fire({
                         title: "",
-                        text: "Do You Want To Create Person For Relation Individu?",
+                        text: "Do you want to create detail person for this relation?",
                         icon: "question",
                         showCancelButton: true,
                         confirmButtonColor: "#3085d6",
