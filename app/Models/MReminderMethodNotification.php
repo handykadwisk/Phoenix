@@ -17,5 +17,12 @@ class MReminderMethodNotification extends Model
         'M_REMINDER_METHOD_NOTIFICATION_ID',
     ];
 
+    public $with = ['rMethodReminder'];
+
     public $timestamps = false;
+
+    public function rMethodReminder()
+    {
+        return $this->hasOne(RMethodNotification::class, 'METHOD_NOTIFICATION_ID', 'METHOD_NOTIFICATION_ID');
+    }
 }

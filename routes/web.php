@@ -82,7 +82,7 @@ Route::middleware('auth')->group(function () {
 
     // BR
     Route::get('/relation', [RelationController::class, 'index'])->name('relation');
-    Route::get('/getAllRelations',[RelationController::class,'getAllRelations'])->name('getAllRelations');
+    Route::get('/getAllRelations', [RelationController::class, 'getAllRelations'])->name('getAllRelations');
     Route::post('/relation', [RelationController::class, 'store'])->name('relation.store');
     Route::post('/getMappingParent', [RelationController::class, 'get_mapping'])->name('relation.get_mapping');
     Route::get('/getRelation', [RelationController::class, 'getRelationJson'])->name('getRelation.getRelationJson');
@@ -146,6 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/removeRelation', [RelationGroupController::class, 'remove_relation'])->name('removeRelation.remove_relation');
     Route::post('/editSubGroup', [RelationGroupController::class, 'edit_subgroup'])->name('editSubGroup.edit_subgroup');
     Route::post('/changeParent', [RelationGroupController::class, 'change_parent'])->name('changeParent.change_parent');
+    Route::get('/getRelationGroupNew', [RelationGroupController::class, 'get_relation_group'])->name('getRelationGroupNew.get_relation_group');
 
 
 
@@ -189,6 +190,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
     Route::get('getPersonRelationship', [TPersonController::class, 'getDataPersonRelationship'])->name('getPersonRelationship.getDataPersonRelationship');
     Route::post('/person', [TPersonController::class, 'store'])->name('person.store');
+    Route::post('/editPersonRelation', [TPersonController::class, 'edit_person_relation'])->name('editPersonRelation.edit_person_relation');
     Route::post('/editPersons', [TPersonController::class, 'edit'])->name('editPersons.edit');
     Route::post('/getPersonDetail', [TPersonController::class, 'get_detail'])->name('getPersonDetail.get_detail');
     Route::post('/personEmployment', [TPersonController::class, 'addPersonEmployment'])->name('personEmployment.addPersonEmployment');
@@ -225,6 +227,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/getIndividuRelation', [TPersonController::class, 'get_individu_relation'])->name('getIndividuRelation.get_individu_relation');
     Route::post('/addPic', [TPersonController::class, 'add_pic'])->name('addPic.add_pic');
     Route::post('/deletePerson', [TPersonController::class, 'delete_person'])->name('deletePerson.delete_person');
+    Route::post('/getDataPic', [TPersonController::class, 'get_Data_Pic'])->name('getDataPic.get_Data_Pic');
+    Route::post('/setStatusVip', [TPersonController::class, 'set_status_vip'])->name('setStatusVip.set_status_vip');
+    Route::post('/setUnStatusVip', [TPersonController::class, 'set_unstatus_vip'])->name('setUnStatusVip.set_unstatus_vip');
+
+
 
 
 
@@ -275,7 +282,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/setting/editMenu', [MenuController::class, 'edit'])->name('editMenu.edit');
     Route::post(('/setting/changeSeqMenu'), [MenuController::class, 'updateMenuSequence'])->name('changeMenu.changeMenu');
     Route::get('/showMenu', [MenuController::class, 'showMenu'])->name('showMenu.showMenu');
-    Route::post('/changeMenuStatus',[MenuController::class, 'changeMenuStatus'])->name('changeMenuStatus.changeMenuStatus');
+    Route::post('/changeMenuStatus', [MenuController::class, 'changeMenuStatus'])->name('changeMenuStatus.changeMenuStatus');
     // Permission
     Route::get('/setting/permission', [TPermissionController::class, 'index'])->name('setting/permission');
     Route::get('/getPermission', [TPermissionController::class, 'getPermissionJson'])->name('getPermission.getPermissionJson');
@@ -291,12 +298,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
     Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
 
-     // Role
-     Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
-     Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
-     Route::post('/getAllRole', [RoleController::class, 'getRole'])->name('/getAllRole');
-     Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
-     Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
+    // Role
+    Route::get('/setting/role', [RoleController::class, 'index'])->name('setting/role');
+    Route::post('/getRole', [RoleController::class, 'getRoleJson'])->name('getRole.getRoleJson');
+    Route::post('/getAllRole', [RoleController::class, 'getRole'])->name('/getAllRole');
+    Route::post('/getRoleById', [RoleController::class, 'getDetail'])->name('getRole.getRoleByidJson');
+    Route::post('/setting/addRole', [RoleController::class, 'store'])->name('addRole.store');
 
     // access role menu
     Route::get('/getRoleAccessMenuByRoleId/{role_id}', [RoleAccesMenuController::class, 'getAccessMenuByRoleId'])->name('getRoleAccessMenuByRoleId.getMenuByRole');
@@ -310,7 +317,7 @@ Route::middleware('auth')->group(function () {
 
     //settings/userManagement
     Route::post('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser.getUserJson');
-    Route::get('/getUser',[UserManagementController::class, 'getUserJson'])->name('getUser');
+    Route::get('/getUser', [UserManagementController::class, 'getUserJson'])->name('getUser');
     Route::get('/settings/user', [UserManagementController::class, 'index'])->name('settings/user');
     Route::post('/settings/addUser', [UserManagementController::class, 'store'])->name('settings/addUser.store');
     Route::get('/settings/getUserJson', [UserManagementController::class, 'getUserDataByMRole'])->name('settings/getUserJson.getUserJson');
@@ -322,7 +329,7 @@ Route::middleware('auth')->group(function () {
 
 
     //setting/usertype
-    Route::get('/settings/type',[RUserTypeController::class, 'index' ])->name('type');
+    Route::get('/settings/type', [RUserTypeController::class, 'index'])->name('type');
     // Route::get('/getType', [RUserTypeController::class, 'getTypeJson'])->name('getType');
     Route::post('/getType', [RUserTypeController::class, 'getTypeJson'])->name('getType.getTypeJson');
 
@@ -571,14 +578,14 @@ Route::middleware('auth')->group(function () {
     // HR
     Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
     Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
-    Route::get('/getAllCompany',[TCompanyController::class,'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
+    Route::get('/getAllCompany', [TCompanyController::class, 'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
     Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
     Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');
     Route::post('/getCompany', [TCompanyController::class, 'getCompany'])->name('getCompany.getCompany');
 
     // Employee
-    Route::get('/getAllEmployee',[TEmployeeController::class,'getAllEmployeeJson'])->name('getAllEmployee.');
+    Route::get('/getAllEmployee', [TEmployeeController::class, 'getAllEmployeeJson'])->name('getAllEmployee.');
     Route::get('/getEmployee', [TEmployeeController::class, 'getEmployeeJson'])->name('getEmployee.getEmployeeJson');
     Route::post('/addEmployee', [TEmployeeController::class, 'store'])->name('addEmployee.store');
     Route::post('/getDetailEmployee', [TEmployeeController::class, 'get_employeeById'])->name('getDetailEmployee.get_employeeById');
@@ -706,6 +713,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/addReminder', [TReminderController::class, 'store'])->name('addReminder.addReminder');
     Route::post('/getTReminder', [TReminderController::class, 'get_reminder'])->name('getTReminder.getTReminder');
     Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.getDetailReminder');
+    Route::patch('/editReminder/{id}', [TReminderController::class, 'edit'])->name('editReminder.edit');
 });
 
 require __DIR__ . '/auth.php';

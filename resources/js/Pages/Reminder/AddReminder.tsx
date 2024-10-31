@@ -15,12 +15,14 @@ export default function AddReminder({
     modalReminder,
     setModalReminder,
     setIsSuccessChat,
+    handleSuccessAddReminder,
 }: PropsWithChildren<{
     data: any;
     setData: any;
     modalReminder: any;
     setModalReminder: any;
     setIsSuccessChat?: any;
+    handleSuccessAddReminder?: any;
 }>) {
     useEffect(() => {
         getDataParticipant();
@@ -107,7 +109,7 @@ export default function AddReminder({
         setData({ ...data, PARTICIPANT: changeVal });
     };
 
-    const checkCheckedMRelation = (id: number) => {
+    const checkCheckedMethodNotification = (id: number) => {
         if (data.NOTIFICATION[0].NOTIFICATION_ID === id) {
             return true;
         }
@@ -134,34 +136,34 @@ export default function AddReminder({
         }
     };
 
-    const handleSuccessAddReminder = async (message: any) => {
-        setIsSuccessChat("");
-        if (message !== "") {
-            setIsSuccessChat(message[0]);
-            setData({
-                REMINDER_TITLE: "",
-                REMINDER_TIMES: "",
-                REMINDER_DAYS: "",
-                REMINDER_START_DATE: "",
-                REMINDER_DESKRIPSI: "",
-                NOTIFICATION: [
-                    {
-                        NOTIFICATION_ID: 1,
-                    },
-                ],
-                PARTICIPANT: [
-                    {
-                        TIER: "",
-                        PARTICIPANT_ID: null,
-                    },
-                ],
-            });
+    // const handleSuccessAddReminder = async (message: any) => {
+    //     setIsSuccessChat("");
+    //     if (message !== "") {
+    //         setIsSuccessChat(message[0]);
+    //         setData({
+    //             REMINDER_TITLE: "",
+    //             REMINDER_TIMES: "",
+    //             REMINDER_DAYS: "",
+    //             REMINDER_START_DATE: "",
+    //             REMINDER_DESKRIPSI: "",
+    //             NOTIFICATION: [
+    //                 {
+    //                     NOTIFICATION_ID: 1,
+    //                 },
+    //             ],
+    //             PARTICIPANT: [
+    //                 {
+    //                     TIER: "",
+    //                     PARTICIPANT_ID: null,
+    //                 },
+    //             ],
+    //         });
 
-            setTimeout(() => {
-                setIsSuccessChat("");
-            }, 2000);
-        }
-    };
+    //         setTimeout(() => {
+    //             setIsSuccessChat("");
+    //         }, 2000);
+    //     }
+    // };
 
     // const checkboxes =
     //     document.querySelectorAll<HTMLInputElement>(".checkParticipant");
@@ -462,7 +464,7 @@ export default function AddReminder({
                                                 >
                                                     <div className="flex w-10 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium shadow-md text-white bg-white">
                                                         <Checkbox
-                                                            defaultChecked={checkCheckedMRelation(
+                                                            defaultChecked={checkCheckedMethodNotification(
                                                                 items.METHOD_NOTIFICATION_ID
                                                             )}
                                                             value={

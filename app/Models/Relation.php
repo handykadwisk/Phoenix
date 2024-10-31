@@ -73,7 +73,7 @@ class Relation extends Model
 
     public function TPerson()
     {
-        return $this->hasMany(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
+        return $this->hasOne(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
     public function MBankRelation()
@@ -81,7 +81,13 @@ class Relation extends Model
         return $this->hasMany(MBankAccountRelation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
-    public function pksNumber(){
+    public function pksNumber()
+    {
         return $this->hasMany(MPksRelation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ORGANIZATION_ID');
+    }
+
+    public function mRelationPic()
+    {
+        return $this->hasMany(MRelationPic::class, 'PERSON_ID', 'RELATION_ORGANIZATION_ID');
     }
 }

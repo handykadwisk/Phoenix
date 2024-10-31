@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
-import defaultImage from "../../Images/user/default.jpg";
+import defaultImage from "@/Images/user/default.jpg";
 import BreadcrumbPage from "@/Components/Breadcrumbs/BreadcrumbPage";
 import { PageProps } from "@/types";
 import {
@@ -57,10 +57,12 @@ export default function DetailPerson({
     idPerson,
     idRelation,
     dataPersonRelationship,
+    flagFrom = "",
 }: PropsWithChildren<{
     idPerson: any;
-    idRelation: any;
+    idRelation?: any;
     dataPersonRelationship: any;
+    flagFrom?: any | string | undefined;
 }>) {
     const [detailPerson, setDetailPerson] = useState<any>([]);
     const [taxStatus, setTaxStatus] = useState<any>([]);
@@ -77,7 +79,7 @@ export default function DetailPerson({
     // for switch vip
     const [switchPageVIP, setSwitchPageVIP] = useState(false);
     useEffect(() => {
-        getPersonDetail(idPerson);
+        getPersonDetail(idPerson, idRelation);
     }, [idPerson]);
 
     useEffect(() => {
@@ -138,17 +140,37 @@ export default function DetailPerson({
         };
     });
 
-    const getPersonDetail = async (id: string) => {
+    const getPersonDetail = async (id: string, idRelation?: any) => {
         await axios
-            .post(`/getPersonDetail`, { id })
+            .post(`/getPersonDetail`, { id, idRelation })
             .then((res) => {
                 setDetailPerson(res.data);
+                getDataPic(res.data?.PERSON_ID, idRelation);
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
+    // get data pic for relation corporate
+    const [dataPic, setDataPic] = useState<any>([]);
+    const getDataPic = async (personIdNew: any, idRelationNew: any) => {
+        await axios
+            .post(`/getDataPic`, { personIdNew, idRelationNew })
+            .then((res) => {
+                setDataPic(res.data);
+                setDataStructure({
+                    ...dataStructure,
+                    PIC_ID: res.data.PIC_ID,
+                    RELATION_ORGANIZATION_NAME:
+                        res.data?.t_relation_corporate
+                            ?.RELATION_ORGANIZATION_NAME,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     const getTax = async () => {
         await axios
             .get(`/getTaxStatus`)
@@ -228,13 +250,14 @@ export default function DetailPerson({
     });
 
     const [editPerson, setEditPerson] = useState<any>({
+        idRelation: idRelation,
         PERSON_ID: idPerson,
         PERSON_FIRST_NAME: "",
         PERSON_GENDER: "",
         PERSON_BIRTH_PLACE: "",
         PERSON_BIRTH_DATE: "",
-        // PERSON_EMAIL: "",
-        // PERSON_CONTACT: "",
+        PERSON_EMAIL: "",
+        PERSON_CONTACT: "",
         PERSON_UPDATED_BY: "",
         PERSON_UPDATED_DATE: "",
         PERSON_KTP: "",
@@ -245,14 +268,28 @@ export default function DetailPerson({
         PERSON_BLOOD_TYPE: "",
         PERSON_BLOOD_RHESUS: "",
         PERSON_MARITAL_STATUS: "",
-        m_person_contact: [
+        m_person_email: [
             {
-                t_person_contact: {
-                    PERSON_PHONE_NUMBER: "",
+                t_person_email: {
                     PERSON_EMAIL: "",
                 },
             },
         ],
+        m_person_contact: [
+            {
+                t_person_contact: {
+                    PERSON_PHONE_NUMBER: "",
+                },
+            },
+        ],
+        // m_person_contact: [
+        //     {
+        //         t_person_contact: {
+        //             PERSON_PHONE_NUMBER: "",
+        //             PERSON_EMAIL: "",
+        //         },
+        //     },
+        // ],
         contact_emergency: [
             {
                 PERSON_EMERGENCY_CONTACT_NAME: "",
@@ -314,14 +351,17 @@ export default function DetailPerson({
     });
 
     const [dataStructure, setDataStructure] = useState<any>({
-        PERSON_ID: idPerson,
+        PIC_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
         STRUCTURE_ID: "",
         DIVISION_ID: "",
         OFFICE_ID: "",
     });
 
     const [dataStructureId, setDataStructureId] = useState<any>({
-        PERSON_ID: idPerson,
+        flag: "Edit",
+        PIC_ID: "",
+        RELATION_ORGANIZATION_NAME: "",
         STRUCTURE_ID: "",
         DIVISION_ID: "",
         OFFICE_ID: "",
@@ -535,14 +575,21 @@ export default function DetailPerson({
 
     const handleStructure = async (e: FormEvent) => {
         e.preventDefault();
-
-        setDataStructureId(detailPerson);
+        setDataStructureId({
+            ...dataStructureId,
+            PIC_ID: dataPic.PIC_ID,
+            RELATION_ORGANIZATION_NAME:
+                dataPic.t_relation_corporate.RELATION_ORGANIZATION_NAME,
+            DIVISION_ID: dataPic.DIVISION_ID,
+            STRUCTURE_ID: dataPic.STRUCTURE_ID,
+            OFFICE_ID: dataPic.OFFICE_ID,
+        });
         getStructure(idRelation);
         getDivision(idRelation);
         getOffice(idRelation);
-        detailPerson.STRUCTURE_ID !== null &&
-        detailPerson.DIVISION_ID !== null &&
-        detailPerson.OFFICE_ID !== null
+        dataPic.STRUCTURE_ID !== null ||
+        dataPic.DIVISION_ID !== null ||
+        dataPic.OFFICE_ID !== null
             ? setModalStructure({
                   add: false,
                   delete: false,
@@ -604,7 +651,7 @@ export default function DetailPerson({
         // setIsSuccess("");
         if (message !== "") {
             setIsSuccess(message[1]);
-            getPersonDetail(message[0]);
+            getPersonDetail(message[0], idRelation);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
@@ -727,18 +774,18 @@ export default function DetailPerson({
         if (message[1] === "add") {
             setIsSuccess(message[2]);
             setDataStructure({
-                PERSON_ID: idPerson,
+                PIC_ID: "",
                 STRUCTURE_ID: "",
                 DIVISION_ID: "",
                 OFFICE_ID: "",
             });
-            getPersonDetail(message[0]);
+            getPersonDetail(message[0], message[3]);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
         } else {
             setIsSuccess("Person Structure Edited");
-            getPersonDetail(message[0]);
+            getPersonDetail(message[0], message[3]);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
@@ -778,7 +825,7 @@ export default function DetailPerson({
         i: number
     ) => {
         const changeVal: any = [...editPerson.m_person_contact];
-        changeVal[i].t_person_contact[name] = value;
+        changeVal[i][name] = value;
         setEditPerson({
             ...editPerson,
             m_person_contact: changeVal,
@@ -792,13 +839,119 @@ export default function DetailPerson({
             m_person_contact: [
                 ...editPerson.m_person_contact,
                 {
-                    t_person_contact: {
-                        PERSON_PHONE_NUMBER: "",
-                        PERSON_EMAIL: "",
-                    },
+                    PERSON_PHONE_NUMBER: "",
                 },
             ],
         });
+    };
+
+    const inputDataPersonEmail = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...editPerson.m_person_email];
+        changeVal[i][name] = value;
+        setEditPerson({
+            ...editPerson,
+            m_person_email: changeVal,
+        });
+    };
+    const addRowPersonEmail = (e: FormEvent) => {
+        e.preventDefault();
+        setEditPerson({
+            ...editPerson,
+            m_person_email: [
+                ...editPerson.m_person_email,
+                {
+                    PERSON_EMAIL: "",
+                },
+            ],
+        });
+    };
+
+    const alertStatusVIP = async (
+        e: any,
+        idPersonVip: any,
+        idRelationVip: any
+    ) => {
+        if (e.target.checked === true) {
+            Swal.fire({
+                title: "Are you sure to change this to be VIP?",
+                text: "",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setStatusVip(idPersonVip, idRelationVip);
+                    // Swal.fire({
+                    //     title: "Deleted!",
+                    //     text: "Your file has been deleted.",
+                    //     icon: "success",
+                    // });
+                }
+            });
+        } else {
+            Swal.fire({
+                title: "Are You Sure?",
+                text: "",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setUnStatusVip(idPersonVip, idRelationVip);
+                    // Swal.fire({
+                    //     title: "Deleted!",
+                    //     text: "Your file has been deleted.",
+                    //     icon: "success",
+                    // });
+                }
+            });
+        }
+    };
+
+    const setStatusVip = async (idPersonVip: any, idRelationVip: any) => {
+        await axios
+            .post(`/setStatusVip`, { idPersonVip, idRelationVip })
+            .then((res) => {
+                Swal.fire({
+                    title: "Success",
+                    text: "Person Success VIP",
+                    icon: "success",
+                }).then((result: any) => {
+                    if (result.value) {
+                        getPersonDetail(idPerson, idRelation);
+                    }
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const setUnStatusVip = async (idPersonVip: any, idRelationVip: any) => {
+        await axios
+            .post(`/setUnStatusVip`, { idPersonVip, idRelationVip })
+            .then((res) => {
+                Swal.fire({
+                    title: "Success",
+                    text: "",
+                    icon: "success",
+                }).then((result: any) => {
+                    if (result.value) {
+                        getPersonDetail(idPerson, idRelation);
+                    }
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     const [isSuccess, setIsSuccess] = useState<string>("");
@@ -965,14 +1118,14 @@ export default function DetailPerson({
                 body={
                     <>
                         {/* From Add Person */}
-                        <div className="mt-5">
+                        <div className="">
                             {/* <div className="">
                                 <span className="w-fit border-b-4 border-red-500">
                                     Personal Information
                                 </span> */}
                             {/* <div className=""></div> */}
                             {/* </div> */}
-                            <div className="mt-4 relative">
+                            <div className="relative">
                                 <InputLabel
                                     className="absolute"
                                     htmlFor="PERSON_FIRST_NAME"
@@ -1231,7 +1384,7 @@ export default function DetailPerson({
                                 </div>
                             </div>
                             <div
-                                className="grid grid-cols-2 gap-2"
+                                className="grid grid-cols-2 gap-2 hidden"
                                 title="BAA (Business Acquisition Assistant)"
                             >
                                 <div className="mt-4 ">
@@ -1281,7 +1434,219 @@ export default function DetailPerson({
                                     </ul>
                                 </div>
                             </div>
-                            <div className="mt-6">
+                            <div className="grid grid-cols-2 gap-4 mt-2">
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_CONTACT"
+                                        value={"Person Number"}
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={editPerson.PERSON_CONTACT}
+                                        className="mt-2"
+                                        onChange={(e) => {
+                                            setEditPerson({
+                                                ...editPerson,
+                                                PERSON_CONTACT: e.target.value,
+                                            });
+                                        }}
+                                        placeholder="Phone Number"
+                                    />
+                                </div>
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_EMAIL"
+                                        value={"Person Email "}
+                                    />
+                                    <TextInput
+                                        type="email"
+                                        value={editPerson.PERSON_EMAIL}
+                                        className="mt-2"
+                                        onChange={(e) => {
+                                            setEditPerson({
+                                                ...editPerson,
+                                                PERSON_EMAIL: e.target.value,
+                                            });
+                                        }}
+                                        placeholder="example@gmail.com"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="mt-6">
+                                    <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                        <thead className="border-slate-300 bg-slate-300">
+                                            <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                                <th
+                                                    className="py-2 px-2 text-slate-900-700"
+                                                    colSpan={3}
+                                                >
+                                                    <span>
+                                                        Alternative Contact
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {editPerson.m_person_contact?.map(
+                                                (Cp: any, i: number) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={
+                                                                        Cp?.PERSON_PHONE_NUMBER
+                                                                    }
+                                                                    className="mt-2"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputDataPersonContact(
+                                                                            "PERSON_PHONE_NUMBER",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                    placeholder="Phone Number"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <XMarkIcon
+                                                                    className="w-7 mt-2 cursor-pointer hover:text-red-600"
+                                                                    onClick={() => {
+                                                                        const updatedData =
+                                                                            editPerson.m_person_contact.filter(
+                                                                                (
+                                                                                    data: any,
+                                                                                    a: number
+                                                                                ) =>
+                                                                                    a !==
+                                                                                    i
+                                                                            );
+                                                                        setEditPerson(
+                                                                            {
+                                                                                ...editPerson,
+                                                                                m_person_contact:
+                                                                                    updatedData,
+                                                                            }
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                            <tr className="">
+                                                <td>
+                                                    <a
+                                                        className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                        onClick={(e) =>
+                                                            addRowPersonContact(
+                                                                e
+                                                            )
+                                                        }
+                                                    >
+                                                        <span className="hover:underline hover:decoration-from-font">
+                                                            + Add Person Contact
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="mt-6">
+                                    <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                        <thead className="border-slate-300 bg-slate-300">
+                                            <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                                <th
+                                                    className="py-2 px-2 text-slate-900-700"
+                                                    colSpan={3}
+                                                >
+                                                    <span>
+                                                        Alternative Email
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {editPerson?.m_person_email?.map(
+                                                (Cp: any, i: number) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={
+                                                                        Cp?.PERSON_EMAIL
+                                                                    }
+                                                                    className="mt-2"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputDataPersonEmail(
+                                                                            "PERSON_EMAIL",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                    placeholder="Email"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <XMarkIcon
+                                                                    className="w-7 mt-2 cursor-pointer hover:text-red-600"
+                                                                    onClick={() => {
+                                                                        const updatedData =
+                                                                            editPerson.m_person_email.filter(
+                                                                                (
+                                                                                    data: any,
+                                                                                    a: number
+                                                                                ) =>
+                                                                                    a !==
+                                                                                    i
+                                                                            );
+                                                                        setEditPerson(
+                                                                            {
+                                                                                ...editPerson,
+                                                                                m_person_email:
+                                                                                    updatedData,
+                                                                            }
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                            <tr className="">
+                                                <td>
+                                                    <a
+                                                        className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                        onClick={(e) =>
+                                                            addRowPersonEmail(e)
+                                                        }
+                                                    >
+                                                        <span className="hover:underline hover:decoration-from-font">
+                                                            + Add Person Email
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {/* <div className="mt-6">
                                 <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
                                     <thead className="border-slate-300 bg-slate-300">
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
@@ -1289,7 +1654,7 @@ export default function DetailPerson({
                                                 className="py-2 px-2 text-slate-900-700"
                                                 colSpan={3}
                                             >
-                                                <span>Person Contact</span>
+                                                <span>Alternative Contact</span>
                                             </th>
                                         </tr>
                                     </thead>
@@ -1344,7 +1709,7 @@ export default function DetailPerson({
                                                         </td>
                                                         <td>
                                                             <XMarkIcon
-                                                                className="w-7 mt-2"
+                                                                className="w-7 mt-2 hover:text-red-600 hover:cursor-pointer"
                                                                 onClick={() => {
                                                                     const updatedData =
                                                                         editPerson.m_person_contact.filter(
@@ -1378,14 +1743,15 @@ export default function DetailPerson({
                                                     }
                                                 >
                                                     <span className="hover:underline hover:decoration-from-font">
-                                                        + Add Person Contact
+                                                        + Add Alternative
+                                                        Contact
                                                     </span>
                                                 </a>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> */}
                             <div className="mt-6">
                                 <table className="w-full table-auto border border-red-500 overflow-x-auto rounded-xl">
                                     <thead className="border-red-500 bg-red-300">
@@ -1902,8 +2268,7 @@ export default function DetailPerson({
                                         type="text"
                                         name="RELATION_ORGANIZATION_ID"
                                         value={
-                                            detailPerson.relation
-                                                ?.RELATION_ORGANIZATION_NAME
+                                            dataStructure.RELATION_ORGANIZATION_NAME
                                         }
                                         className="mt-2 bg-slate-400"
                                         // onChange={(e) =>
@@ -1913,19 +2278,15 @@ export default function DetailPerson({
                                         //             e.target.value,
                                         //     })
                                         // }
-                                        required
                                         disabled
                                     />
                                 </div>
                                 <div className="relative">
                                     <InputLabel
-                                        className="absolute"
+                                        className=""
                                         htmlFor="STRUCTURE_ID"
                                         value={"Structure"}
                                     />
-                                    <div className="ml-[67px] text-red-600">
-                                        *
-                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.STRUCTURE_ID}
@@ -1935,7 +2296,6 @@ export default function DetailPerson({
                                                 STRUCTURE_ID: e.target.value,
                                             });
                                         }}
-                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Sub Entity --
@@ -1962,13 +2322,10 @@ export default function DetailPerson({
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
                                     <InputLabel
-                                        className="absolute"
+                                        className=""
                                         htmlFor="DIVISION_ID"
                                         value={"Division"}
                                     />
-                                    <div className="ml-[58px] text-red-600">
-                                        *
-                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.DIVISION_ID}
@@ -1978,7 +2335,6 @@ export default function DetailPerson({
                                                 DIVISION_ID: e.target.value,
                                             });
                                         }}
-                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Division --
@@ -2003,13 +2359,10 @@ export default function DetailPerson({
                                 </div>
                                 <div className="relative">
                                     <InputLabel
-                                        className="absolute"
+                                        className=""
                                         htmlFor="OFFICE_ID"
                                         value={"Office"}
                                     />
-                                    <div className="ml-[45px] text-red-600">
-                                        *
-                                    </div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={dataStructure.OFFICE_ID}
@@ -2019,7 +2372,6 @@ export default function DetailPerson({
                                                 OFFICE_ID: e.target.value,
                                             });
                                         }}
-                                        required
                                     >
                                         <option value={""}>
                                             -- Choose Office --
@@ -2082,8 +2434,7 @@ export default function DetailPerson({
                                         type="text"
                                         name="RELATION_ORGANIZATION_ID"
                                         value={
-                                            dataStructureId.relation
-                                                ?.RELATION_ORGANIZATION_NAME
+                                            dataStructureId?.RELATION_ORGANIZATION_NAME
                                         }
                                         className="mt-2 bg-slate-400"
                                         // onChange={(e) =>
@@ -2218,19 +2569,19 @@ export default function DetailPerson({
             />
             {/* End Edit Structure And Division */}
 
-            <div className="mt-4">
+            <div className="mt-4 mb-5">
                 {/* Profile and information */}
                 <div className="xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-3 lg:gap-4">
                     <div className="bg-white p-4 shadow-md rounded-md">
                         <div
                             className={
-                                detailPerson.PERSON_IS_VIP === 1
+                                dataPic.PIC_IS_VIP === 1
                                     ? "flex justify-between items-center"
                                     : "flex justify-end"
                             }
                         >
                             {/* label vip */}
-                            {detailPerson.PERSON_IS_VIP === 1 ? (
+                            {dataPic.PIC_IS_VIP === 1 ? (
                                 <>
                                     <div className="bg-amber-600 w-fit font-semibold text-sm text-white px-2 rounded-md">
                                         <span>VIP</span>
@@ -2311,11 +2662,27 @@ export default function DetailPerson({
                             <div className="absolute pb-9">
                                 {detailPerson.PERSON_FIRST_NAME}
                             </div>
-                            <div className="text-[12px] text-gray-500">
-                                {
-                                    detailPerson.relation
-                                        ?.RELATION_ORGANIZATION_NAME
-                                }
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mt-4">
+                            <div className="p-2">
+                                <div className="text-sm font-semibold text-red-600">
+                                    Phone Number
+                                </div>
+                                <div className="text-sm mt-2 text-gray-500">
+                                    {detailPerson.PERSON_CONTACT === null
+                                        ? "-"
+                                        : detailPerson.PERSON_CONTACT}
+                                </div>
+                            </div>
+                            <div className="p-2">
+                                <div className="text-sm font-semibold text-red-600">
+                                    Email
+                                </div>
+                                <div className="text-sm mt-2 text-gray-500">
+                                    {detailPerson.PERSON_EMAIL === null
+                                        ? "-"
+                                        : detailPerson.PERSON_EMAIL}
+                                </div>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-2 mt-4">
@@ -2343,7 +2710,7 @@ export default function DetailPerson({
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 mt-0">
+                        <div className="grid grid-cols-2 gap-2 mt-0 hidden">
                             <div className="p-2">
                                 <div className="text-sm font-semibold text-red-600">
                                     Blood Type
@@ -2435,34 +2802,38 @@ export default function DetailPerson({
                     </div>
                     <div className="col-span-2 bg-white px-5 py-4 shadow-md rounded-md xs:mt-4 lg:mt-0">
                         {/* contact */}
-                        <div className="grid grid-cols-3 gap-4 divide-x xs:grid xs:grid-cols-1 xs:divide-x-0 lg:grid lg:grid-cols-3 lg:divide-x">
+                        <div className="grid grid-cols-3 gap-4 divide-x xs:grid xs:grid-cols-1 xs:divide-x-0 lg:grid lg:grid-cols-2 lg:divide-x">
                             <div>
                                 <div className="font-semibold text-red-600">
-                                    <span>Contact</span>
+                                    <span>Alt Contact</span>
                                 </div>
-                                {detailPerson.m_person_contact?.length === 0 ? (
-                                    "-"
-                                ) : (
-                                    <>
-                                        {detailPerson.m_person_contact?.map(
-                                            (pc: any, i: number) => {
-                                                return (
-                                                    <div key={i}>
-                                                        <div className="flex justify-between mt-2">
-                                                            <div className="relative text-sm text-gray-500">
-                                                                <span>
-                                                                    <PhoneIcon className="w-4 absolute" />
-                                                                </span>
-                                                                <span className="ml-7">
-                                                                    {
-                                                                        pc
-                                                                            .t_person_contact
-                                                                            ?.PERSON_PHONE_NUMBER
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex justify-between mt-3">
+                                <div className="grid grid-cols-2">
+                                    <div>
+                                        <div className="text-xs text-gray-500">
+                                            <span>Phone Number</span>
+                                        </div>
+                                        {detailPerson.m_person_contact
+                                            ?.length === 0 ? (
+                                            "-"
+                                        ) : (
+                                            <>
+                                                {detailPerson.m_person_contact?.map(
+                                                    (pc: any, i: number) => {
+                                                        return (
+                                                            <div key={i}>
+                                                                <div className="flex justify-between mt-2">
+                                                                    <div className="relative text-sm text-gray-500">
+                                                                        <span>
+                                                                            <PhoneIcon className="w-4 absolute" />
+                                                                        </span>
+                                                                        <span className="ml-7">
+                                                                            {
+                                                                                pc?.PERSON_PHONE_NUMBER
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                {/* <div className="flex justify-between mt-3">
                                                             <div className="relative text-sm text-gray-500">
                                                                 <span>
                                                                     <EnvelopeIcon className="w-4 absolute" />
@@ -2475,42 +2846,77 @@ export default function DetailPerson({
                                                                     }
                                                                 </span>
                                                             </div>
-                                                        </div>
-                                                        {i !==
-                                                        detailPerson
-                                                            .m_person_contact
-                                                            ?.length -
-                                                            1 ? (
-                                                            <hr className="mt-2" />
-                                                        ) : null}
-                                                    </div>
-                                                );
-                                            }
+                                                        </div> */}
+                                                                {/* {i !==
+                                                                detailPerson
+                                                                    .m_person_contact
+                                                                    ?.length -
+                                                                    1 ? (
+                                                                    <hr className="mt-2" />
+                                                                ) : null} */}
+                                                            </div>
+                                                        );
+                                                    }
+                                                )}
+                                            </>
                                         )}
-                                    </>
-                                )}
-                                {/* <div className="flex justify-between mt-2">
-                                    <div className="relative text-sm text-gray-500">
-                                        <span>
-                                            <PhoneIcon className="w-4 absolute" />
-                                        </span>
-                                        <span className="ml-7">
-                                            {detailPerson.PERSON_CONTACT}
-                                        </span>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs text-gray-500">
+                                            <span>Email</span>
+                                        </div>
+                                        {detailPerson.m_person_email?.length ===
+                                        0 ? (
+                                            "-"
+                                        ) : (
+                                            <>
+                                                {detailPerson.m_person_email?.map(
+                                                    (pc: any, i: number) => {
+                                                        return (
+                                                            <div key={i}>
+                                                                <div className="flex justify-between mt-2">
+                                                                    <div className="relative text-sm text-gray-500">
+                                                                        <span>
+                                                                            <EnvelopeIcon className="w-4 absolute" />
+                                                                        </span>
+                                                                        <span className="ml-7">
+                                                                            {
+                                                                                pc?.PERSON_EMAIL
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                {/* <div className="flex justify-between mt-3">
+                                                            <div className="relative text-sm text-gray-500">
+                                                                <span>
+                                                                    <EnvelopeIcon className="w-4 absolute" />
+                                                                </span>
+                                                                <span className="ml-7">
+                                                                    {
+                                                                        pc
+                                                                            .t_person_contact
+                                                                            ?.PERSON_EMAIL
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div> */}
+                                                                {/* {i !==
+                                                                detailPerson
+                                                                    .m_person_contact
+                                                                    ?.length -
+                                                                    1 ? (
+                                                                    <hr className="mt-2" />
+                                                                ) : null} */}
+                                                            </div>
+                                                        );
+                                                    }
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="flex justify-between mt-3">
-                                    <div className="relative text-sm text-gray-500">
-                                        <span>
-                                            <EnvelopeIcon className="w-4 absolute" />
-                                        </span>
-                                        <span className="ml-7">
-                                            {detailPerson.PERSON_EMAIL}
-                                        </span>
-                                    </div>
-                                </div> */}
                             </div>
-                            <div className="px-2 xs:px-0 lg:px-2">
+                            {/* <div className="px-2 xs:px-0 lg:px-2">
                                 <div className="font-semibold text-red-600">
                                     <span>Alt Contact</span>
                                 </div>
@@ -2521,7 +2927,7 @@ export default function DetailPerson({
                                         </span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="px-2 xs:px-0 lg:px-2">
                                 <div className="font-semibold text-red-600">
                                     <span>Contact Emergency</span>
@@ -2591,89 +2997,136 @@ export default function DetailPerson({
                         {/* end Contact */}
                         <hr className="mt-5" />
                         {/* Division And Location */}
-                        <div className="flex justify-between mt-4">
-                            <div className="text-red-600 font-semibold">
-                                <span>Structure & Division</span>
-                            </div>
-                            <a
-                                className="hover:text-red-500 cursor-pointer"
-                                onClick={(e) => handleStructure(e)}
-                            >
-                                <PencilSquareIcon
-                                    className="w-6 text-red-600"
-                                    title="Structure & Division"
-                                />
-                            </a>
-                        </div>
-                        {detailPerson.STRUCTURE_ID === null &&
-                        detailPerson.DIVISION_ID === null &&
-                        detailPerson.OFFICE_ID === null ? (
-                            <div className="text-gray-500">
-                                <span>
-                                    <i>None</i>
-                                </span>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-3 gap-4 mt-1">
-                                <div className="p-2 grid grid-cols-3 gap-2 relative">
-                                    <div className="flex justify-center">
-                                        <UserGroupIcon className="w-12 text-red-600" />
+
+                        {flagFrom !== "" ? null : (
+                            <>
+                                <div className="grid grid-cols-1">
+                                    <div className="text-red-600 font-semibold">
+                                        <span>VIP</span>
                                     </div>
-                                    <div className="col-span-2 text-sm font-semibold flex items-center">
-                                        <div className="absolute">
-                                            <span>Structure</span>
-                                        </div>
-                                        <div className="mt-7 text-[13px] text-gray-500">
-                                            <span className="">
-                                                {
-                                                    detailPerson.structure
-                                                        ?.RELATION_STRUCTURE_ALIAS
-                                                }
-                                            </span>
+                                    <div>
+                                        <div className="mt-2">
+                                            <label className="switch">
+                                                <input
+                                                    type="checkbox"
+                                                    // defaultChecked={
+                                                    //     dataPic.PIC_IS_VIP ===
+                                                    //         1 ||
+                                                    //     dataPic.PIC_IS_VIP ===
+                                                    //         "1"
+                                                    // }
+                                                    checked={
+                                                        dataPic.PIC_IS_VIP ===
+                                                            1 ||
+                                                        dataPic.PIC_IS_VIP ===
+                                                            "1"
+                                                            ? true
+                                                            : false
+                                                    }
+                                                    // id={i.toString()}
+                                                    onChange={(e: any) => {
+                                                        alertStatusVIP(
+                                                            e,
+                                                            dataPic.PERSON_ID,
+                                                            dataPic.RELATION_ORGANIZATION_ID
+                                                        );
+                                                    }}
+                                                />
+                                                <span className="slider round"></span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-2 grid grid-cols-3 gap-2 relative">
-                                    <div className="flex justify-center">
-                                        <IdentificationIcon className="w-12 text-red-600" />
+                                <div className="flex justify-between mt-4">
+                                    <div className="text-red-600 font-semibold">
+                                        <span>Structure & Division</span>
                                     </div>
-                                    <div className="col-span-2 text-sm font-semibold flex items-center">
-                                        <div className="absolute">
-                                            <span>Division</span>
-                                        </div>
-                                        <div className="mt-8 text-[13px] text-gray-500">
-                                            <span className="">
-                                                {
-                                                    detailPerson.division
-                                                        ?.RELATION_DIVISION_INITIAL
-                                                }
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <a
+                                        className="hover:text-red-500 cursor-pointer"
+                                        onClick={(e) => handleStructure(e)}
+                                    >
+                                        <PencilSquareIcon
+                                            className="w-6 text-red-600"
+                                            title="Structure & Division"
+                                        />
+                                    </a>
                                 </div>
-                                <div className="p-2 grid grid-cols-3 gap-2 relative">
-                                    <div className="flex justify-center">
-                                        <MapIcon className="w-12 text-red-600" />
+                                {dataPic.STRUCTURE_ID === null &&
+                                dataPic.DIVISION_ID === null &&
+                                dataPic.OFFICE_ID === null ? (
+                                    <div className="text-gray-500">
+                                        <span>
+                                            <i>None</i>
+                                        </span>
                                     </div>
-                                    <div className="col-span-2 text-sm font-semibold flex items-center">
-                                        <div className="absolute">
-                                            <span>Addres & Location</span>
+                                ) : (
+                                    <div className="grid grid-cols-3 gap-4 mt-1">
+                                        <div className="p-2 grid grid-cols-3 gap-2 relative">
+                                            <div className="flex justify-center">
+                                                <UserGroupIcon className="w-12 text-red-600" />
+                                            </div>
+                                            <div className="col-span-2 text-sm font-semibold flex items-center">
+                                                <div className="absolute">
+                                                    <span>Structure</span>
+                                                </div>
+                                                <div className="mt-7 text-[13px] text-gray-500">
+                                                    <span className="">
+                                                        {dataPic?.structure ===
+                                                        null
+                                                            ? "-"
+                                                            : dataPic.structure
+                                                                  ?.RELATION_STRUCTURE_ALIAS}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="mt-8 text-[13px] text-gray-500">
-                                            <span className="">
-                                                {
-                                                    detailPerson.office
-                                                        ?.RELATION_OFFICE_ALIAS
-                                                }
-                                            </span>
+                                        <div className="p-2 grid grid-cols-3 gap-2 relative">
+                                            <div className="flex justify-center">
+                                                <IdentificationIcon className="w-12 text-red-600" />
+                                            </div>
+                                            <div className="col-span-2 text-sm font-semibold flex items-center">
+                                                <div className="absolute">
+                                                    <span>Division</span>
+                                                </div>
+                                                <div className="mt-8 text-[13px] text-gray-500">
+                                                    <span className="">
+                                                        {dataPic?.division ===
+                                                        null
+                                                            ? "-"
+                                                            : dataPic.division
+                                                                  ?.RELATION_DIVISION_INITIAL}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-2 grid grid-cols-3 gap-2 relative">
+                                            <div className="flex justify-center">
+                                                <MapIcon className="w-12 text-red-600" />
+                                            </div>
+                                            <div className="col-span-2 text-sm font-semibold flex items-center">
+                                                <div className="absolute">
+                                                    <span>
+                                                        Addres & Location
+                                                    </span>
+                                                </div>
+                                                <div className="mt-8 text-[13px] text-gray-500">
+                                                    <span className="">
+                                                        {dataPic?.office ===
+                                                        null
+                                                            ? "-"
+                                                            : dataPic.office
+                                                                  ?.RELATION_OFFICE_ALIAS}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                )}
+                                <hr className="mt-5" />
+                            </>
                         )}
 
                         {/* end structure division */}
-                        <hr className="mt-5" />
                         {/* <div className="flex justify-between mt-4">
                             <div className="text-red-600 font-semibold">
                                 <span>Address KTP</span>

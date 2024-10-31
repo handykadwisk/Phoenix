@@ -378,6 +378,38 @@ export default function AddRelation({
         setData("bank_account", changeVal);
     };
 
+    const [showRelation, setShowRelation] = useState<boolean>(false);
+    const inputRefRelation = useRef<HTMLInputElement>(null);
+    const filteredRelation = relation.filter((item: any) =>
+        item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
+            data.name_relation.toLocaleLowerCase()?.trim()
+        )
+    );
+
+    // cek relation existing
+    const cekRelationName = () => {
+        const filterRelation = relation.filter(
+            (items: any) =>
+                items.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase() ===
+                data.name_relation.toLocaleLowerCase()?.trim()
+        );
+
+        if (filterRelation.length !== 0) {
+            Swal.fire({
+                title: "Warning",
+                text: "Relation Already Exists",
+                icon: "warning",
+            }).then((result: any) => {});
+            setData("name_relation", "");
+        }
+    };
+
+    const checkCheckedMRelation = (id: string) => {
+        if (data.relation_type_id.find((f: any) => f.id === String(id))) {
+            return true;
+        }
+    };
+
     return (
         <>
             <ModalToAdd
@@ -540,15 +572,53 @@ export default function AddRelation({
                                     *
                                 </div>
                                 <TextInput
+                                    ref={inputRefRelation}
                                     type="text"
                                     value={data.name_relation}
                                     className="mt-2"
-                                    onChange={(e) =>
-                                        setData("name_relation", e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        setData(
+                                            "name_relation",
+                                            e.target.value
+                                        );
+
+                                        if (e.target.value !== "") {
+                                            setShowRelation(true);
+                                        } else {
+                                            setShowRelation(false);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        cekRelationName();
+                                        setShowRelation(false);
+                                    }}
                                     required
                                     placeholder="Name Relation"
                                 />
+                                {showRelation &&
+                                    filteredRelation.length !== 0 && (
+                                        <div className="bg-white shadow-md rounded-md absolute mt-1 w-full px-2 text-sm overflow-y-auto h-32">
+                                            <div className="mt-1 font-semibold italic">
+                                                <span>
+                                                    Relation Already Exists
+                                                </span>
+                                            </div>
+                                            {filteredRelation?.map(
+                                                (items: any, index: number) => {
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="mt-1 px-2"
+                                                        >
+                                                            {
+                                                                items.RELATION_ORGANIZATION_NAME
+                                                            }
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
+                                    )}
                             </div>
                             <div className="mt-4 relative">
                                 <InputLabel
@@ -694,7 +764,13 @@ export default function AddRelation({
                                 </button>
                             </div>
                         </div>
-                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-3 lg:grid lg:gap-4">
+                        <div
+                            className={
+                                data.relation_status_id === "2"
+                                    ? "xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4"
+                                    : "xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-3 lg:grid lg:gap-4"
+                            }
+                        >
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="date_of_birth"
@@ -727,7 +803,13 @@ export default function AddRelation({
                                     />
                                 </div>
                             </div>
-                            <div className="mt-4">
+                            <div
+                                className={
+                                    data.relation_status_id === "2"
+                                        ? "hidden"
+                                        : "mt-4"
+                                }
+                            >
                                 <InputLabel
                                     htmlFor="relation_email"
                                     value="Email"
@@ -794,9 +876,9 @@ export default function AddRelation({
                                                             value={
                                                                 typeRelation.RELATION_TYPE_ID
                                                             }
-                                                            // defaultChecked={
-                                                            //     data.relation_type_id
-                                                            // }
+                                                            defaultChecked={checkCheckedMRelation(
+                                                                typeRelation.RELATION_TYPE_ID
+                                                            )}
                                                             onChange={(e) => {
                                                                 handleCheckbox(
                                                                     e
