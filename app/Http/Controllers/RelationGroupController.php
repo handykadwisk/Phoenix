@@ -327,7 +327,6 @@ class RelationGroupController extends Controller
 
     public function edit_subgroup(Request $request)
     {
-
         $updateGroup = RelationGroup::where('RELATION_GROUP_ID', $request->RELATION_GROUP_ID)->update([
             "RELATION_GROUP_NAME"           => $request->RELATION_GROUP_NAME,
             "RELATION_GROUP_DESCRIPTION"    => $request->RELATION_GROUP_DESCRIPTION,
@@ -350,7 +349,8 @@ class RelationGroupController extends Controller
 
         return new JsonResponse([
             $request->RELATION_GROUP_ID,
-            $request->RELATION_GROUP_NAME
+            $request->RELATION_GROUP_NAME,
+            $request->RELATION_PARENT_ID
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -467,6 +467,7 @@ class RelationGroupController extends Controller
         // }
         // dd($query->toSql());
         $query->orderBy('RELATION_GROUP_ID', "DESC");
+        $query->where('RELATION_GROUP_PARENT', 0);
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;

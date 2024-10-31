@@ -38,6 +38,7 @@ import DetailDocumentRelation from "./DetailDocument";
 import PhoenixComponent from "@/Utility/PhoenixComponent";
 import { MyProvider } from "@/Utility/GlobalContext";
 import AppPlugin from "@/Utility/AppPlugin";
+import DetailPerson from "../Person/DetailPerson";
 
 export default function DetailRelation({
     detailRelation,
@@ -158,12 +159,12 @@ export default function DetailRelation({
             });
     };
 
-    const getCorporatePIC = async (id: string) => {
+    const getCorporatePIC = async (id: string, idPerson: any) => {
         await axios
             .post(`/getCorporatePIC`, { id })
             .then((res) => {
                 setDetailCorporatePIC({
-                    PERSON_ID: detailRelation,
+                    PERSON_ID: idPerson,
                     detail_corporate: res.data,
                 });
             })
@@ -475,6 +476,38 @@ export default function DetailRelation({
     };
     // End Address Location Click
 
+    // handle click personal info
+    const [modalPersonalInfo, setModalPersonalInfo] = useState<any>({
+        view: false,
+    });
+    const [idIndividuRelation, setIdIndividuRelation] = useState<any>("");
+    const [flagFrom, setFlagFrom] = useState<any>("");
+    const handleClickPersonalInfo = async (e: FormEvent, idRelation: any) => {
+        e.preventDefault();
+        setIdIndividuRelation(idRelation);
+        setFlagFrom("flagFromPersonalInfo");
+        getPersonRelationship();
+        setModalPersonalInfo({
+            view: !modalPersonalInfo.view,
+        });
+    };
+
+    const [dataPersonRelationship, setDataPersonRelationship] = useState<any>(
+        []
+    );
+
+    const getPersonRelationship = async () => {
+        await axios
+            .get(`/getPersonRelationship`)
+            .then((res) => {
+                setDataPersonRelationship(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    // end handle click personal info
+
     // OnClick Address Location
     const handleClickJobDesk = async (
         e: FormEvent,
@@ -601,11 +634,12 @@ export default function DetailRelation({
 
     const handleClickEditCorporate = async (
         e: FormEvent,
-        idRelationOrganization: string
+        idRelationOrganization: string,
+        idPerson: string
     ) => {
         e.preventDefault();
 
-        getCorporatePIC(idRelationOrganization);
+        getCorporatePIC(idRelationOrganization, idPerson);
         getRelationAll();
         setModalCorporatePIC({
             add: false,
@@ -779,6 +813,35 @@ export default function DetailRelation({
                     type={"success"}
                 />
             )}
+
+            <ModalToAction
+                show={modalPersonalInfo.view}
+                onClose={() => {
+                    setModalPersonalInfo({
+                        view: false,
+                    });
+                    setFlagFrom("");
+                }}
+                title={"Detail Person"}
+                url={""}
+                data={""}
+                onSuccess={""}
+                method={""}
+                headers={null}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[95%]"
+                }
+                submitButtonName={""}
+                body={
+                    <>
+                        <DetailPerson
+                            idPerson={idIndividuRelation}
+                            dataPersonRelationship={dataPersonRelationship}
+                            flagFrom={flagFrom}
+                        />
+                    </>
+                }
+            />
 
             <ModalToAction
                 show={modalDocument.view}
@@ -1030,7 +1093,7 @@ export default function DetailRelation({
                         <div className="mt-4">
                             {detailCorporatePIC.detail_corporate?.length ? (
                                 <div className="bg-white p-2 mb-2 relative flex flex-wrap gap-1 rounded-lg shadow-md">
-                                    {detailCorporatePIC.detail_corporate.map(
+                                    {detailCorporatePIC.detail_corporate?.map(
                                         (tag: any, i: number) => {
                                             return (
                                                 <div
@@ -1154,8 +1217,7 @@ export default function DetailRelation({
                                                                             [
                                                                                 ...detailCorporatePIC.detail_corporate,
                                                                                 {
-                                                                                    PERSON_ID:
-                                                                                        detailRelation,
+                                                                                    PIC_IS_DELETED: 0,
                                                                                     RELATION_ORGANIZATION_NAME:
                                                                                         tag.RELATION_ORGANIZATION_NAME,
                                                                                 },
@@ -2510,7 +2572,8 @@ export default function DetailRelation({
                                 onClick={(e) =>
                                     handleClickEditCorporate(
                                         e,
-                                        dataRelationNew.RELATION_ORGANIZATION_ID
+                                        dataRelationNew.RELATION_ORGANIZATION_ID,
+                                        dataRelationNew?.t_person?.PERSON_ID
                                     )
                                 }
                             >
@@ -2522,8 +2585,12 @@ export default function DetailRelation({
                         <div className="grid grid-cols-2 gap-4 mt-2">
                             <div className="grid grid-cols-1 gap-4 mt-2">
                                 <div className="mb-2 relative flex flex-wrap gap-3">
-                                    {dataRelationNew.m_relation_pic.map(
-                                        (dCorporate: any, i: number) => {
+                                    {dataRelationNew?.t_person?.t_p_i_c
+                                        ?.filter(
+                                            (items: any) =>
+                                                items.PIC_IS_DELETED === 0
+                                        )
+                                        ?.map((dCorporate: any, i: number) => {
                                             return (
                                                 // <>
                                                 <div
@@ -2532,15 +2599,15 @@ export default function DetailRelation({
                                                 >
                                                     <span>
                                                         {
-                                                            dCorporate?.relation
-                                                                .RELATION_ORGANIZATION_ALIAS
+                                                            dCorporate
+                                                                ?.t_relation_corporate
+                                                                .RELATION_ORGANIZATION_NAME
                                                         }
                                                     </span>
                                                 </div>
                                                 // </>
                                             );
-                                        }
-                                    )}
+                                        })}
                                 </div>
                             </div>
                             <div></div>
@@ -2659,9 +2726,9 @@ export default function DetailRelation({
                     <div
                         className="bg-white p-5 shadow-md rounded-lg cursor-pointer hover:text-red-500"
                         onClick={(e) =>
-                            handleClickDocument(
+                            handleClickPersonalInfo(
                                 e,
-                                dataRelationNew.RELATION_ORGANIZATION_NAME
+                                dataRelationNew.RELATION_ORGANIZATION_ID
                             )
                         }
                     >

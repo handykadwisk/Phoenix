@@ -190,6 +190,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
     Route::get('getPersonRelationship', [TPersonController::class, 'getDataPersonRelationship'])->name('getPersonRelationship.getDataPersonRelationship');
     Route::post('/person', [TPersonController::class, 'store'])->name('person.store');
+    Route::post('/editPersonRelation', [TPersonController::class, 'edit_person_relation'])->name('editPersonRelation.edit_person_relation');
     Route::post('/editPersons', [TPersonController::class, 'edit'])->name('editPersons.edit');
     Route::post('/getPersonDetail', [TPersonController::class, 'get_detail'])->name('getPersonDetail.get_detail');
     Route::post('/personEmployment', [TPersonController::class, 'addPersonEmployment'])->name('personEmployment.addPersonEmployment');
@@ -226,6 +227,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/getIndividuRelation', [TPersonController::class, 'get_individu_relation'])->name('getIndividuRelation.get_individu_relation');
     Route::post('/addPic', [TPersonController::class, 'add_pic'])->name('addPic.add_pic');
     Route::post('/deletePerson', [TPersonController::class, 'delete_person'])->name('deletePerson.delete_person');
+    Route::post('/getDataPic', [TPersonController::class, 'get_Data_Pic'])->name('getDataPic.get_Data_Pic');
+    Route::post('/setStatusVip', [TPersonController::class, 'set_status_vip'])->name('setStatusVip.set_status_vip');
+    Route::post('/setUnStatusVip', [TPersonController::class, 'set_unstatus_vip'])->name('setUnStatusVip.set_unstatus_vip');
+
+
 
 
 

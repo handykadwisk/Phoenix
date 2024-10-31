@@ -39,12 +39,9 @@ import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the Data Grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the Data Grid
 import AGGrid from "@/Components/AgGrid";
+import AddPerson from "../Person/AddPerson";
 
 export default function Relation({ auth }: PageProps) {
-    const [mappingParent, setMappingParent] = useState<any>({
-        mapping_parent: [],
-    });
-
     const [getDetailRelation, setGetDetailRelation] = useState<any>({
         RELATION_ORGANIZATION_ID: "",
         RELATION_ORGANIZATION_NAME: "",
@@ -52,8 +49,6 @@ export default function Relation({ auth }: PageProps) {
         RELATION_SALUTATION_POST: "",
     });
 
-    const [relations, setRelations] = useState<any>([]);
-    const [salutations, setSalutations] = useState<any>([]);
     const [searchRelation, setSearchRelation] = useState<any>({
         relation_search: [
             {
@@ -63,31 +58,6 @@ export default function Relation({ auth }: PageProps) {
             },
         ],
     });
-
-    const getRelation = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRelation?${pageNumber}`, {
-                RELATION_ORGANIZATION_NAME:
-                    searchRelation.RELATION_ORGANIZATION_NAME,
-                RELATION_TYPE_ID: searchRelation.RELATION_TYPE_ID.value,
-            })
-            .then((res) => {
-                setRelations(res.data);
-                if (modal.search) {
-                    setModal({
-                        add: false,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
 
     const {
         flash,
@@ -103,48 +73,8 @@ export default function Relation({ auth }: PageProps) {
     }: any = usePage().props;
 
     const [isSuccess, setIsSuccess] = useState<any>("");
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [mRelation, setMRelation] = useState<any>([]);
     const [switchPage, setSwitchPage] = useState(true);
     const [switchPagePKS, setSwitchPagePKS] = useState({});
-
-    const getMappingParent = async (name: string, column: string) => {
-        // setIsLoading(true)
-
-        // if (name) {
-        await axios
-            .post(`/getMappingParent`, { name, column })
-            .then((res: any) => {
-                setMappingParent({
-                    mapping_parent: res.data,
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const getSalutationById = async (id: string, column: string) => {
-        if (id) {
-            await axios
-                .post(`/getSalutationById`, { id, column })
-                .then((res) => {
-                    setSalutations(res.data);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-
-        if (id == "1") {
-            // jika corporate
-            document.getElementById("relationLob")!.style.display = "";
-            document.getElementById("relationJobs")!.style.display = "none";
-        } else if (id == "2") {
-            document.getElementById("relationLob")!.style.display = "none";
-            document.getElementById("relationJobs")!.style.display = "";
-        }
-    };
 
     const { data, setData, errors, reset } = useForm<any>({
         name_relation: "",
@@ -170,178 +100,127 @@ export default function Relation({ auth }: PageProps) {
         bank_account: [],
     });
 
-    const [dataById, setDataById] = useState<any>({
-        RELATION_ORGANIZATION_GROUP: "",
-        RELATION_ORGANIZATION_NAME: "",
-        RELATION_ORGANIZATION_PARENT_ID: "",
-        RELATION_ORGANIZATION_ABBREVIATION: "",
-        RELATION_ORGANIZATION_AKA: "",
-        RELATION_ORGANIZATION_EMAIL: "",
-        RELATION_ORGANIZATION_WEBSITE: "",
-        relation_description: "",
-        RELATION_PROFESSION_ID: "",
-        RELATION_LOB_ID: "",
-        PRE_SALUTATION: "",
-        POST_SALUTATION: "",
-        relation_status_id: "",
-        TAG_NAME: "",
-        HR_MANAGED_BY_APP: "",
-        MARK_TBK_RELATION: "",
-        m_relation_type: [
-            {
-                RELATION_ORGANIZATION_TYPE_ID: "",
-                RELATION_ORGANIZATION_ID: "",
-                RELATION_TYPE_ID: "",
-            },
-        ],
-        m_relation_aka: [
-            {
-                RELATION_AKA_NAME: "",
-            },
-        ],
-        m_tagging: [],
+    // for detail person
+    const [modalPerson, setModalPerson] = useState<any>({
+        add: false,
     });
 
-    const handleSuccess = (message: string) => {
-        if (message[0] === "0" || message[0] === "rType") {
-            Swal.fire({
-                title: "Warning",
-                text: message[1],
-                icon: "warning",
-            }).then((result: any) => {
-                // console.log(result);
-                if (result.value) {
-                    setModal({
-                        add: true,
-                        delete: false,
-                        edit: false,
-                        view: false,
-                        document: false,
-                        search: false,
-                    });
-                }
-            });
-        } else {
-            if (message[4] === "2") {
-            } else {
-                setIsSuccess("");
-                reset();
-                setData({
-                    name_relation: "",
-                    abbreviation: "",
-                    relation_aka: [],
-                    relation_email: "",
-                    relation_website: "",
-                    relation_description: "",
-                    relation_lob_id: "",
-                    pre_salutation_id: "",
-                    post_salutation_id: "",
-                    relation_status_id: "",
-                    tagging_name: [],
-                    is_managed: "",
-                    mark_tbk_relation: "",
-                    profession_id: "",
-                    relation_type_id: [],
-                    corporate_pic_for: null,
-                    NPWP_RELATION: "",
-                    date_of_birth: "",
-                    DEFAULT_PAYABLE: 0,
-                    no_pks: [],
-                    bank_account: [],
-                });
+    const [dataPerson, setDataPerson] = useState<any>({
+        PERSON_FIRST_NAME: "",
+        PERSON_GENDER: "",
+        PERSON_BIRTH_PLACE: "",
+        PERSON_BIRTH_DATE: "",
+        PERSON_KTP: "",
+        PERSON_NPWP: "",
+        PERSON_CONTACT: "",
+        PERSON_EMAIL: "",
+        PERSON_KK: "",
+        m_person_email: [],
+        m_person_contact: [],
+        contact_emergency: [],
+        INDIVIDU_RELATION_ID: "",
+        PERSON_UPDATED_BY: "",
+        PERSON_UPDATED_DATE: "",
+    });
+
+    // end for detail person
+
+    const handleSuccess = async (message: string) => {
+        if (message !== "") {
+            if (message[0] === "0" || message[0] === "rType") {
                 Swal.fire({
-                    title: "Success",
-                    text: "New Relation Added",
-                    icon: "success",
+                    title: "Warning",
+                    text: message[1],
+                    icon: "warning",
                 }).then((result: any) => {
+                    // console.log(result);
                     if (result.value) {
-                        setGetDetailRelation({
-                            RELATION_ORGANIZATION_NAME: message[1],
-                            RELATION_ORGANIZATION_ID: message[0],
-                            RELATION_SALUTATION_PRE: message[2],
-                            RELATION_SALUTATION_POST: message[3],
-                        });
                         setModal({
-                            add: false,
+                            add: true,
                             delete: false,
                             edit: false,
-                            view: true,
+                            view: false,
                             document: false,
                             search: false,
                         });
                     }
                 });
-                setSwitchPage(false);
-                setSwitchPagePKS(false);
-                setIsSuccess(message);
+            } else {
+                if (message[4] === "2") {
+                    Swal.fire({
+                        title: "",
+                        text: "Do You Want To Create Person For Relation Individu?",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            setDataPerson({
+                                ...dataPerson,
+                                PERSON_FIRST_NAME: message[1],
+                                PERSON_BIRTH_DATE: message[5],
+                                INDIVIDU_RELATION_ID: message[0],
+                            });
+                            setModalPerson({
+                                add: !modalPerson.add,
+                            });
+                        }
+                    });
+                } else {
+                    setIsSuccess("");
+                    reset();
+                    setData({
+                        name_relation: "",
+                        abbreviation: "",
+                        relation_aka: [],
+                        relation_email: "",
+                        relation_website: "",
+                        relation_description: "",
+                        relation_lob_id: "",
+                        pre_salutation_id: "",
+                        post_salutation_id: "",
+                        relation_status_id: "",
+                        tagging_name: [],
+                        is_managed: "",
+                        mark_tbk_relation: "",
+                        profession_id: "",
+                        relation_type_id: [],
+                        corporate_pic_for: null,
+                        NPWP_RELATION: "",
+                        date_of_birth: "",
+                        DEFAULT_PAYABLE: 0,
+                        no_pks: [],
+                        bank_account: [],
+                    });
+                    Swal.fire({
+                        title: "Success",
+                        text: "New Relation Added",
+                        icon: "success",
+                    }).then((result: any) => {
+                        if (result.value) {
+                            setGetDetailRelation({
+                                RELATION_ORGANIZATION_NAME: message[1],
+                                RELATION_ORGANIZATION_ID: message[0],
+                                RELATION_SALUTATION_PRE: message[2],
+                                RELATION_SALUTATION_POST: message[3],
+                            });
+                            setModal({
+                                add: false,
+                                delete: false,
+                                edit: false,
+                                view: true,
+                                document: false,
+                                search: false,
+                            });
+                        }
+                    });
+                    setSwitchPage(false);
+                    setSwitchPagePKS(false);
+                    setIsSuccess(message);
+                }
             }
-        }
-    };
-
-    const handleCheckboxEdit = (e: any) => {
-        const { value, checked } = e.target;
-
-        if (checked) {
-            setDataById({
-                ...dataById,
-                m_relation_type: [
-                    ...dataById.m_relation_type,
-                    {
-                        RELATION_ORGANIZATION_TYPE_ID: "",
-                        RELATION_ORGANIZATION_ID:
-                            dataById.RELATION_ORGANIZATION_ID,
-                        RELATION_TYPE_ID: value,
-                    },
-                ],
-            });
-        } else {
-            const updatedData = dataById.m_relation_type.filter(
-                (data: any) => data.RELATION_TYPE_ID !== parseInt(value)
-            );
-            setDataById({ ...dataById, m_relation_type: updatedData });
-        }
-    };
-
-    const checkCheckedMRelation = (id: number, idr: number) => {
-        if (
-            dataById.m_relation_type.find(
-                (f: any) =>
-                    f.RELATION_ORGANIZATION_ID === id &&
-                    f.RELATION_TYPE_ID === idr
-            )
-        ) {
-            return true;
-        }
-    };
-
-    const disableLob = async (id: string) => {
-        if (id == "1") {
-            // jika corporate
-            document.getElementById("relationLob")!.style.display = "";
-            document.getElementById("relationJobs")!.style.display = "none";
-        } else if (id == "2") {
-            document.getElementById("relationLob")!.style.display = "none";
-            document.getElementById("relationJobs")!.style.display = "";
-        }
-    };
-
-    const handleCheckboxHREdit = (e: any) => {
-        if (e == true) {
-            setSwitchPage(true);
-            setDataById({ ...dataById, HR_MANAGED_BY_APP: "1" });
-        } else {
-            setSwitchPage(false);
-            setDataById({ ...dataById, HR_MANAGED_BY_APP: "0" });
-        }
-    };
-
-    const handleCheckboxTBKEdit = (e: any) => {
-        if (e == true) {
-            setSwitchPagePKS(true);
-            setDataById({ ...dataById, MARK_TBK_RELATION: "1" });
-        } else {
-            setSwitchPagePKS(false);
-            setDataById({ ...dataById, MARK_TBK_RELATION: "0" });
         }
     };
 
@@ -353,67 +232,6 @@ export default function Relation({ auth }: PageProps) {
         document: false,
         search: false,
     });
-
-    // new haris
-    const [query, setQuery] = useState("");
-    const [selected, setSelected] = useState<any>([]);
-    const [menuOpen, setMenuOpen] = useState(true);
-
-    const inputRef = useRef<HTMLInputElement>(null);
-    const inputRefTag = useRef<HTMLInputElement>(null);
-
-    const tags = [
-        "Tutorial",
-        "HowTo",
-        "DIY",
-        "Review",
-        "Tech",
-        "Gaming",
-        "Travel",
-        "Fitness",
-        "Cooking",
-        "Vlog",
-    ];
-
-    const filteredTags = tags.filter(
-        (item) =>
-            item
-                ?.toLocaleLowerCase()
-                ?.includes(query.toLocaleLowerCase()?.trim()) &&
-            !selected.includes(item)
-    );
-
-    const isDisable =
-        !query?.trim() ||
-        data.relation_aka.filter(
-            (item: any) =>
-                item.name_aka?.toLocaleLowerCase()?.trim() ===
-                query?.toLocaleLowerCase()?.trim()
-        )?.length;
-
-    const isDisableEdit =
-        !query?.trim() ||
-        dataById.m_relation_aka.filter(
-            (item: any) =>
-                item.RELATION_AKA_NAME?.toLocaleLowerCase()?.trim() ===
-                query?.toLocaleLowerCase()?.trim()
-        )?.length;
-
-    const isDisableTag =
-        !query?.trim() ||
-        data.tagging_name.filter(
-            (item: any) =>
-                item.name_tag?.toLocaleLowerCase()?.trim() ===
-                query?.toLocaleLowerCase()?.trim()
-        )?.length;
-
-    const isDisableTagEdit =
-        !query?.trim() ||
-        dataById.m_tagging.filter(
-            (item: any) =>
-                item.tagging.TAG_NAME?.toLocaleLowerCase()?.trim() ===
-                query?.toLocaleLowerCase()?.trim()
-        )?.length;
 
     // search
     const clearSearchRelation = async (e: FormEvent) => {
@@ -497,6 +315,91 @@ export default function Relation({ auth }: PageProps) {
                 console.log(err);
             });
     };
+
+    const handleSuccessPersonalInfo = async (message: string) => {
+        if (message !== "") {
+            setIsSuccess("");
+            reset();
+            setDataPerson({
+                ...dataPerson,
+                PERSON_FIRST_NAME: "",
+                PERSON_GENDER: "",
+                PERSON_BIRTH_PLACE: "",
+                PERSON_BIRTH_DATE: "",
+                PERSON_KTP: "",
+                PERSON_NPWP: "",
+                PERSON_KK: "",
+                m_person_email: [
+                    {
+                        t_person_email: {
+                            PERSON_EMAIL: "",
+                        },
+                    },
+                ],
+                m_person_contact: [
+                    {
+                        t_person_contact: {
+                            PERSON_PHONE_NUMBER: "",
+                        },
+                    },
+                ],
+                contact_emergency: [],
+                INDIVIDU_RELATION_ID: "",
+                PERSON_UPDATED_BY: "",
+                PERSON_UPDATED_DATE: "",
+            });
+
+            setData({
+                name_relation: "",
+                abbreviation: "",
+                relation_aka: [],
+                relation_email: "",
+                relation_website: "",
+                relation_description: "",
+                relation_lob_id: "",
+                pre_salutation_id: "",
+                post_salutation_id: "",
+                relation_status_id: "",
+                tagging_name: [],
+                is_managed: "",
+                mark_tbk_relation: "",
+                profession_id: "",
+                relation_type_id: [],
+                corporate_pic_for: null,
+                NPWP_RELATION: "",
+                date_of_birth: "",
+                DEFAULT_PAYABLE: 0,
+                no_pks: [],
+                bank_account: [],
+            });
+            Swal.fire({
+                title: "Success",
+                text: "New Relation Added",
+                icon: "success",
+            }).then((result: any) => {
+                if (result.value) {
+                    setGetDetailRelation({
+                        RELATION_ORGANIZATION_NAME: message[0],
+                        RELATION_ORGANIZATION_ID: message[1],
+                        RELATION_SALUTATION_PRE: message[2],
+                        RELATION_SALUTATION_POST: message[3],
+                    });
+                    setModal({
+                        add: false,
+                        delete: false,
+                        edit: false,
+                        view: true,
+                        document: false,
+                        search: false,
+                    });
+                }
+            });
+            setSwitchPage(false);
+            setSwitchPagePKS(false);
+            setIsSuccess(message);
+        }
+    };
+
     return (
         <AuthenticatedLayout user={auth.user} header={"Relation"}>
             <Head title="Relation" />
@@ -508,6 +411,20 @@ export default function Relation({ auth }: PageProps) {
                     isSuccess={true}
                 />
             )} */}
+
+            {/* modal add Person */}
+            <AddPerson
+                show={modalPerson.add}
+                modal={() =>
+                    setModalPerson({
+                        add: false,
+                    })
+                }
+                data={dataPerson}
+                setData={setDataPerson}
+                handleSuccessPersonalInfo={handleSuccessPersonalInfo}
+            />
+            {/* end modal add person */}
 
             {/* modal add relation */}
             <AddRelationPopup

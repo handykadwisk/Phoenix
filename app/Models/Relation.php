@@ -73,7 +73,7 @@ class Relation extends Model
 
     public function TPerson()
     {
-        return $this->hasMany(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
+        return $this->hasOne(TPerson::class, 'INDIVIDU_RELATION_ID', 'RELATION_ORGANIZATION_ID');
     }
 
     public function MBankRelation()

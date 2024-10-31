@@ -31,46 +31,79 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function AddPerson({
     show,
     modal,
-    handleSuccess,
+    handleSuccessPersonalInfo,
     setData,
     data,
-    dataPersonRelationship,
 }: PropsWithChildren<{
     show: any;
     modal: any;
     setData: any;
     data: any;
-    handleSuccess: any;
-    dataPersonRelationship: any;
+    handleSuccessPersonalInfo?: any;
 }>) {
+    useEffect(() => {
+        getPersonRelationship();
+    }, []);
     // for switch baa
     const [switchPageBAA, setSwitchPageBAA] = useState(false);
     // for switch vip
     const [switchPageVIP, setSwitchPageVIP] = useState(false);
     const [isSuccess, setIsSuccess] = useState<string>("");
     // for data from
+    const [dataPersonRelationship, setDataPersonRelationship] = useState<any>(
+        []
+    );
+
+    const getPersonRelationship = async () => {
+        await axios
+            .get(`/getPersonRelationship`)
+            .then((res) => {
+                setDataPersonRelationship(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     const addRowEmergencyContact = (e: FormEvent) => {
         e.preventDefault();
-        setData("CONTACT_EMERGENCY", [
-            ...data.CONTACT_EMERGENCY,
-            {
-                NAME_CONTACT_EMERGENCY: "",
-                PHONE_CONTACT_EMERGENCY: "",
-                PERSON_RELATIONSHIP: "",
-            },
-        ]);
+        setData({
+            ...data,
+            contact_emergency: [
+                ...data.contact_emergency,
+                {
+                    PERSON_EMERGENCY_CONTACT_NAME: "",
+                    PERSON_EMERGENCY_CONTACT_NUMBER: "",
+                    PERSON_RELATIONSHIP_ID: "",
+                },
+            ],
+        });
     };
 
     const addRowPersonContact = (e: FormEvent) => {
         e.preventDefault();
-        setData("PERSON_CONTACT", [
-            ...data.PERSON_CONTACT,
-            {
-                PERSON_PHONE_NUMBER: "",
-                PERSON_EMAIL: "",
-            },
-        ]);
+        setData({
+            ...data,
+            m_person_contact: [
+                ...data.m_person_contact,
+                {
+                    PERSON_PHONE_NUMBER: "",
+                },
+            ],
+        });
+    };
+
+    const addRowPersonEmail = (e: FormEvent) => {
+        e.preventDefault();
+        setData({
+            ...data,
+            m_person_email: [
+                ...data.m_person_email,
+                {
+                    PERSON_EMAIL: "",
+                },
+            ],
+        });
     };
 
     const inputContactEmergency = (
@@ -78,9 +111,12 @@ export default function AddPerson({
         value: string | undefined,
         i: number
     ) => {
-        const changeVal: any = [...data.CONTACT_EMERGENCY];
+        const changeVal: any = [...data.contact_emergency];
         changeVal[i][name] = value;
-        setData("CONTACT_EMERGENCY", changeVal);
+        setData({
+            ...data,
+            contact_emergency: changeVal,
+        });
     };
 
     const handleCheckboxBAA = (e: any) => {
@@ -108,9 +144,25 @@ export default function AddPerson({
         value: string | undefined,
         i: number
     ) => {
-        const changeVal: any = [...data.PERSON_CONTACT];
+        const changeVal: any = [...data.m_person_contact];
         changeVal[i][name] = value;
-        setData({ ...data, PERSON_CONTACT: changeVal });
+        setData({
+            ...data,
+            m_person_contact: changeVal,
+        });
+    };
+
+    const inputDataPersonEmail = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...data.m_person_email];
+        changeVal[i][name] = value;
+        setData({
+            ...data,
+            m_person_email: changeVal,
+        });
     };
 
     return (
@@ -120,22 +172,16 @@ export default function AddPerson({
                 onClose={modal}
                 buttonAddOns={""}
                 title={"Add Person"}
-                url={`/person`}
+                url={`/editPersonRelation`}
                 data={data}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
                 }
-                onSuccess={handleSuccess}
+                onSuccess={handleSuccessPersonalInfo}
                 body={
                     <>
                         {/* From Add Person */}
                         <div className="">
-                            {/* <div className="">
-                                <span className="w-fit border-b-4 border-red-500">
-                                    Personal Information
-                                </span> */}
-                            {/* <div className=""></div> */}
-                            {/* </div> */}
                             <div className="relative">
                                 <InputLabel
                                     className="absolute"
@@ -148,10 +194,10 @@ export default function AddPerson({
                                     value={data.PERSON_FIRST_NAME}
                                     className="mt-2"
                                     onChange={(e) =>
-                                        setData(
-                                            "PERSON_FIRST_NAME",
-                                            e.target.value
-                                        )
+                                        setData({
+                                            ...data,
+                                            PERSON_FIRST_NAME: e.target.value,
+                                        })
                                     }
                                     required
                                     placeholder="Name Person"
@@ -168,10 +214,14 @@ export default function AddPerson({
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                         value={data.PERSON_GENDER}
                                         onChange={(e) => {
-                                            setData(
-                                                "PERSON_GENDER",
-                                                e.target.value
-                                            );
+                                            setData({
+                                                ...data,
+                                                PERSON_GENDER: e.target.value,
+                                            });
+                                            // setData(
+                                            //     "PERSON_GENDER",
+                                            //     e.target.value
+                                            // );
                                         }}
                                     >
                                         <option value={""}>
@@ -192,10 +242,11 @@ export default function AddPerson({
                                         value={data.PERSON_BIRTH_PLACE}
                                         className="mt-2"
                                         onChange={(e) =>
-                                            setData(
-                                                "PERSON_BIRTH_PLACE",
-                                                e.target.value
-                                            )
+                                            setData({
+                                                ...data,
+                                                PERSON_BIRTH_PLACE:
+                                                    e.target.value,
+                                            })
                                         }
                                         placeholder="Place Of Birth"
                                     />
@@ -221,102 +272,21 @@ export default function AddPerson({
                                         <DatePicker
                                             selected={data.PERSON_BIRTH_DATE}
                                             onChange={(date: any) =>
-                                                setData(
-                                                    "PERSON_BIRTH_DATE",
-                                                    date.toLocaleDateString(
-                                                        "en-CA"
-                                                    )
-                                                )
+                                                setData({
+                                                    ...data,
+                                                    PERSON_BIRTH_DATE:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
                                             }
                                             className="border-0 rounded-md shadow-md text-sm mt-2 h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
                                             dateFormat={"dd-MM-yyyy"}
                                             placeholderText="dd - mm - yyyy"
                                         />
                                     </div>
-
-                                    {/* <TextInput
-                                    //     type="date"
-                                    //     value={data.PERSON_BIRTH_DATE}
-                                    //     className="mt-2"
-                                    //     onChange={(e) =>
-                                             setData(
-                                                 "PERSON_BIRTH_DATE",
-                                                 e.target.value
-                                             )
-                                    //     }
-                                    //     placeholder="Date Of Birth"
-                                    // /> */}
                                 </div>
                             </div>
-                            {/* <div className="grid gap-4 grid-cols-3 mt-4">
-                                <div>
-                                    <InputLabel
-                                        className=""
-                                        htmlFor="PERSON_BLOOD_TYPE"
-                                        value={"Blood Type "}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={data.PERSON_BLOOD_TYPE}
-                                        onChange={(e) => {
-                                            setData(
-                                                "PERSON_BLOOD_TYPE",
-                                                e.target.value
-                                            );
-                                        }}
-                                    >
-                                        <option>-- Blood Type --</option>
-                                        <option value={"1"}>A</option>
-                                        <option value={"2"}>B</option>
-                                        <option value={"3"}>AB</option>
-                                        <option value={"4"}>O</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <InputLabel
-                                        className=""
-                                        htmlFor="PERSON_BLOOD_RHESUS"
-                                        value={"Blood Rhesus "}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={data.PERSON_BLOOD_RHESUS}
-                                        onChange={(e) => {
-                                            setData(
-                                                "PERSON_BLOOD_RHESUS",
-                                                e.target.value
-                                            );
-                                        }}
-                                    >
-                                        <option>-- Blood Rhesus --</option>
-                                        <option value={"1"}>Positive</option>
-                                        <option value={"2"}>Negative</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <InputLabel
-                                        className=""
-                                        htmlFor="PERSON_MARTIAL_STATUS"
-                                        value={"Marital Status "}
-                                    />
-                                    <select
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={data.PERSON_MARITAL_STATUS}
-                                        onChange={(e) => {
-                                            setData(
-                                                "PERSON_MARITAL_STATUS",
-                                                e.target.value
-                                            );
-                                        }}
-                                    >
-                                        <option>-- Marital Status --</option>
-                                        <option value={"1"}>Single</option>
-                                        <option value={"2"}>Married</option>
-                                        <option value={"3"}>Divorced</option>
-                                        <option value={"4"}>Widowed</option>
-                                    </select>
-                                </div>
-                            </div> */}
                             <div className="grid gap-4 grid-cols-3 mt-4">
                                 <div>
                                     <InputLabel
@@ -329,10 +299,10 @@ export default function AddPerson({
                                         value={data.PERSON_KTP}
                                         className="mt-2"
                                         onChange={(e) => {
-                                            setData(
-                                                "PERSON_KTP",
-                                                e.target.value
-                                            );
+                                            setData({
+                                                ...data,
+                                                PERSON_KTP: e.target.value,
+                                            });
                                         }}
                                         placeholder="Person KTP"
                                     />
@@ -348,10 +318,10 @@ export default function AddPerson({
                                         value={data.PERSON_NPWP}
                                         className="mt-2"
                                         onChange={(e) => {
-                                            setData(
-                                                "PERSON_NPWP",
-                                                e.target.value
-                                            );
+                                            setData({
+                                                ...data,
+                                                PERSON_NPWP: e.target.value,
+                                            });
                                         }}
                                         placeholder="Person NPWP"
                                     />
@@ -367,63 +337,228 @@ export default function AddPerson({
                                         value={data.PERSON_KK}
                                         className="mt-2"
                                         onChange={(e) => {
-                                            setData(
-                                                "PERSON_KK",
-                                                e.target.value
-                                            );
+                                            setData({
+                                                ...data,
+                                                PERSON_KK: e.target.value,
+                                            });
                                         }}
                                         placeholder="Person KK"
                                     />
                                 </div>
                             </div>
-                            <div
-                                className="grid grid-cols-2 gap-2"
-                                title="BAA (Business Acquisition Assistant)"
-                            >
-                                <div className="mt-4 ">
-                                    <ul role="list" className="">
-                                        <li className="col-span-1 flex rounded-md shadow-sm">
-                                            <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                                <span className="mt-1 ml-2">
-                                                    <Switch
-                                                        enabled={switchPageBAA}
-                                                        onChangeButton={(
-                                                            e: any
-                                                        ) =>
-                                                            handleCheckboxBAA(e)
-                                                        }
-                                                    />
-                                                </span>
-                                                <span className="ml-2 text-sm">
-                                                    PERSON IS BAA
-                                                </span>
-                                            </div>
-                                        </li>
-                                    </ul>
+                            <div className="grid grid-cols-2 gap-4 mt-2">
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_CONTACT"
+                                        value={"Person Number"}
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        value={data.PERSON_CONTACT}
+                                        className="mt-2"
+                                        onChange={(e) => {
+                                            setData({
+                                                ...data,
+                                                PERSON_CONTACT: e.target.value,
+                                            });
+                                        }}
+                                        placeholder="Phone Number"
+                                    />
                                 </div>
-                                <div className="mt-4 ">
-                                    <ul role="list" className="">
-                                        <li className="col-span-1 flex rounded-md shadow-sm">
-                                            <div className="flex flex-1 items-center truncate rounded-md shadow-md bg-white h-9">
-                                                <span className="mt-1 ml-2">
-                                                    <Switch
-                                                        enabled={switchPageVIP}
-                                                        onChangeButton={(
-                                                            e: any
-                                                        ) =>
-                                                            handleCheckboxVIP(e)
-                                                        }
-                                                    />
-                                                </span>
-                                                <span className="ml-2 text-sm">
-                                                    PERSON IS VIP
-                                                </span>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                <div>
+                                    <InputLabel
+                                        className=""
+                                        htmlFor="PERSON_EMAIL"
+                                        value={"Person Email"}
+                                    />
+                                    <TextInput
+                                        type="email"
+                                        value={data.PERSON_EMAIL}
+                                        className="mt-2"
+                                        onChange={(e) => {
+                                            setData({
+                                                ...data,
+                                                PERSON_EMAIL: e.target.value,
+                                            });
+                                        }}
+                                        placeholder="example@gmail.com"
+                                    />
                                 </div>
                             </div>
-                            <div className="mt-6">
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="mt-6">
+                                    <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                        <thead className="border-slate-300 bg-slate-300">
+                                            <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                                <th
+                                                    className="py-2 px-2 text-slate-900-700"
+                                                    colSpan={3}
+                                                >
+                                                    <span>
+                                                        Alternative Contact
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {data.m_person_contact?.map(
+                                                (Cp: any, i: number) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={
+                                                                        Cp?.PERSON_PHONE_NUMBER
+                                                                    }
+                                                                    className="mt-2"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputDataPersonContact(
+                                                                            "PERSON_PHONE_NUMBER",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                    placeholder="Phone Number"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <XMarkIcon
+                                                                    className="w-7 mt-2 cursor-pointer hover:text-red-600"
+                                                                    onClick={() => {
+                                                                        const updatedData =
+                                                                            data.m_person_contact.filter(
+                                                                                (
+                                                                                    data: any,
+                                                                                    a: number
+                                                                                ) =>
+                                                                                    a !==
+                                                                                    i
+                                                                            );
+                                                                        setData(
+                                                                            {
+                                                                                ...data,
+                                                                                m_person_contact:
+                                                                                    updatedData,
+                                                                            }
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                            <tr className="">
+                                                <td>
+                                                    <a
+                                                        className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                        onClick={(e) =>
+                                                            addRowPersonContact(
+                                                                e
+                                                            )
+                                                        }
+                                                    >
+                                                        <span className="hover:underline hover:decoration-from-font">
+                                                            + Add Person Contact
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="mt-6">
+                                    <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                        <thead className="border-slate-300 bg-slate-300">
+                                            <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                                <th
+                                                    className="py-2 px-2 text-slate-900-700"
+                                                    colSpan={3}
+                                                >
+                                                    <span>
+                                                        Alternative Email
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {data?.m_person_email?.map(
+                                                (Cp: any, i: number) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={
+                                                                        Cp?.PERSON_EMAIL
+                                                                    }
+                                                                    className="mt-2"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputDataPersonEmail(
+                                                                            "PERSON_EMAIL",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                    placeholder="Email"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <XMarkIcon
+                                                                    className="w-7 mt-2 cursor-pointer hover:text-red-600"
+                                                                    onClick={() => {
+                                                                        const updatedData =
+                                                                            data.m_person_email.filter(
+                                                                                (
+                                                                                    data: any,
+                                                                                    a: number
+                                                                                ) =>
+                                                                                    a !==
+                                                                                    i
+                                                                            );
+                                                                        setData(
+                                                                            {
+                                                                                ...data,
+                                                                                m_person_email:
+                                                                                    updatedData,
+                                                                            }
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                            <tr className="">
+                                                <td>
+                                                    <a
+                                                        className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                        onClick={(e) =>
+                                                            addRowPersonEmail(e)
+                                                        }
+                                                    >
+                                                        <span className="hover:underline hover:decoration-from-font">
+                                                            + Add Person Email
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {/* <div className="mt-6">
                                 <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
                                     <thead className="border-slate-300 bg-slate-300">
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
@@ -431,23 +566,22 @@ export default function AddPerson({
                                                 className="py-2 px-2 text-slate-900-700"
                                                 colSpan={3}
                                             >
-                                                <span>Person Contact</span>
+                                                <span>Alternative Contact</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.PERSON_CONTACT?.map(
-                                            (
-                                                dataPersonContact: any,
-                                                i: number
-                                            ) => {
+                                        {data.m_person_contact?.map(
+                                            (Cp: any, i: number) => {
                                                 return (
                                                     <tr key={i}>
                                                         <td className="px-2 py-2 text-xs text-red-500 mb-2">
                                                             <TextInput
                                                                 type="text"
                                                                 value={
-                                                                    dataPersonContact.PERSON_PHONE_NUMBER
+                                                                    Cp
+                                                                        .t_person_contact
+                                                                        .PERSON_PHONE_NUMBER
                                                                 }
                                                                 className="mt-2"
                                                                 onChange={(e) =>
@@ -464,9 +598,13 @@ export default function AddPerson({
                                                         </td>
                                                         <td>
                                                             <TextInput
+                                                                id="PERSON_EMAIL"
                                                                 type="email"
+                                                                name="PERSON_EMAIL"
                                                                 value={
-                                                                    dataPersonContact.PERSON_EMAIL
+                                                                    Cp
+                                                                        .t_person_contact
+                                                                        .PERSON_EMAIL
                                                                 }
                                                                 className="mt-2"
                                                                 onChange={(e) =>
@@ -481,12 +619,12 @@ export default function AddPerson({
                                                                 placeholder="Email"
                                                             />
                                                         </td>
-                                                        <td className="">
+                                                        <td>
                                                             <XMarkIcon
-                                                                className="w-6 mt-2 text-red-600 hover:cursor-pointer"
+                                                                className="w-7 mt-2 hover:text-red-600 hover:cursor-pointer"
                                                                 onClick={() => {
                                                                     const updatedData =
-                                                                        data.PERSON_CONTACT.filter(
+                                                                        data.m_person_contact.filter(
                                                                             (
                                                                                 data: any,
                                                                                 a: number
@@ -496,7 +634,7 @@ export default function AddPerson({
                                                                         );
                                                                     setData({
                                                                         ...data,
-                                                                        PERSON_CONTACT:
+                                                                        m_person_contact:
                                                                             updatedData,
                                                                     });
                                                                 }}
@@ -515,7 +653,8 @@ export default function AddPerson({
                                                     }
                                                 >
                                                     <span className="hover:underline hover:decoration-from-font">
-                                                        + Add Person Contact
+                                                        + Add Alternative
+                                                        Contact
                                                     </span>
                                                 </a>
                                             </td>
@@ -531,15 +670,15 @@ export default function AddPerson({
                                                 className="py-2 px-2 text-red-700"
                                                 colSpan={4}
                                             >
-                                                Emergency Contact
+                                                Contact Emergency
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.CONTACT_EMERGENCY?.length !==
+                                        {data.contact_emergency?.length !==
                                         0 ? (
                                             <>
-                                                {data.CONTACT_EMERGENCY?.map(
+                                                {data.contact_emergency?.map(
                                                     (cm: any, i: number) => {
                                                         return (
                                                             <tr key={i}>
@@ -550,78 +689,75 @@ export default function AddPerson({
                                                                         {i + 1}
                                                                     </span>
                                                                     <TextInput
+                                                                        id="PERSON_EMERGENCY_CONTACT_NAME"
                                                                         type="text"
+                                                                        name="PERSON_EMERGENCY_CONTACT_NAME"
                                                                         value={
-                                                                            cm.NAME_CONTACT_EMERGENCY
+                                                                            cm.PERSON_EMERGENCY_CONTACT_NAME
                                                                         }
                                                                         className="mt-1"
                                                                         onChange={(
                                                                             e
                                                                         ) =>
                                                                             inputContactEmergency(
-                                                                                "NAME_CONTACT_EMERGENCY",
+                                                                                "PERSON_EMERGENCY_CONTACT_NAME",
                                                                                 e
                                                                                     .target
                                                                                     .value,
                                                                                 i
                                                                             )
                                                                         }
-                                                                        required
-                                                                        placeholder="Name *"
+                                                                        placeholder="Name"
                                                                     />
                                                                 </td>
                                                                 <td className="py-3 px-2">
                                                                     <TextInput
+                                                                        id="PERSON_EMERGENCY_CONTACT_NUMBER"
                                                                         type="text"
+                                                                        name="PERSON_EMERGENCY_CONTACT_NUMBER"
                                                                         value={
-                                                                            cm.PHONE_CONTACT_EMERGENCY
+                                                                            cm.PERSON_EMERGENCY_CONTACT_NUMBER
                                                                         }
                                                                         className="mt-7"
                                                                         onChange={(
                                                                             e
                                                                         ) =>
                                                                             inputContactEmergency(
-                                                                                "PHONE_CONTACT_EMERGENCY",
+                                                                                "PERSON_EMERGENCY_CONTACT_NUMBER",
                                                                                 e
                                                                                     .target
                                                                                     .value,
                                                                                 i
                                                                             )
                                                                         }
-                                                                        required
-                                                                        placeholder="Phone Number *"
+                                                                        placeholder="Phone Number"
                                                                     />
                                                                 </td>
                                                                 <td className="py-3 px-2">
                                                                     <select
                                                                         className="mt-7 rounded-md border-0 py-1.5 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
                                                                         value={
-                                                                            cm.PERSON_RELATIONSHIP
+                                                                            cm.PERSON_RELATIONSHIP_ID
                                                                         }
                                                                         onChange={(
                                                                             e
                                                                         ) =>
                                                                             inputContactEmergency(
-                                                                                "PERSON_RELATIONSHIP",
+                                                                                "PERSON_RELATIONSHIP_ID",
                                                                                 e
                                                                                     .target
                                                                                     .value,
                                                                                 i
                                                                             )
                                                                         }
-                                                                        required
                                                                     >
-                                                                        <option
-                                                                            value={
-                                                                                ""
-                                                                            }
-                                                                        >
+                                                                        <option>
                                                                             --
                                                                             Person
                                                                             Relationship
                                                                             --
                                                                         </option>
-                                                                        {dataPersonRelationship.map(
+                                                                        {dataPersonRelationship?.map(
                                                                             (
                                                                                 getPersonRelation: any,
                                                                                 i: number
@@ -644,12 +780,18 @@ export default function AddPerson({
                                                                         )}
                                                                     </select>
                                                                 </td>
-                                                                <td>
-                                                                    <XMarkIcon
-                                                                        className="w-7 mt-7 text-red-600 hover:cursor-pointer"
+                                                                <td className="py-3 px-2">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="mx-auto h-6 text-red-500 cursor-pointer font-semibold mt-7"
                                                                         onClick={() => {
                                                                             const updatedData =
-                                                                                data.CONTACT_EMERGENCY.filter(
+                                                                                data.contact_emergency.filter(
                                                                                     (
                                                                                         data: any,
                                                                                         a: number
@@ -660,12 +802,560 @@ export default function AddPerson({
                                                                             setData(
                                                                                 {
                                                                                     ...data,
-                                                                                    CONTACT_EMERGENCY:
+                                                                                    contact_emergency:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <path
+                                                                            fill="#AB7C94"
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M6 18 18 6M6 6l12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )}
+                                            </>
+                                        ) : null}
+                                        <tr>
+                                            <td>
+                                                <a
+                                                    className="px-2 py-2 text-xs cursor-pointer text-red-500"
+                                                    onClick={(e) =>
+                                                        addRowEmergencyContact(
+                                                            e
+                                                        )
+                                                    }
+                                                >
+                                                    <span className="hover:underline hover:decoration-from-font">
+                                                        + Add Emergency Contact
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> */}
+                            {/* <div className="grid grid-cols-2 gap-2">
+                                <div className="mt-6">
+                                    <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                        <thead className="border-slate-300 bg-slate-300">
+                                            <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                                <th
+                                                    className="py-2 px-2 text-slate-900-700"
+                                                    colSpan={3}
+                                                >
+                                                    <span>Person Contact</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {data.m_person_contact?.map(
+                                                (Cp: any, i: number) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={
+                                                                        Cp
+                                                                            .t_person_contact
+                                                                            .PERSON_PHONE_NUMBER
+                                                                    }
+                                                                    className="mt-2"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputDataPersonContact(
+                                                                            "PERSON_PHONE_NUMBER",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                    placeholder="Phone Number"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                {data
+                                                                    .m_person_contact
+                                                                    .length !==
+                                                                1 ? (
+                                                                    <XMarkIcon
+                                                                        className="w-7 mt-2 cursor-pointer hover:text-red-600"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                data.m_person_contact.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setData(
+                                                                                {
+                                                                                    ...data,
+                                                                                    m_person_contact:
                                                                                         updatedData,
                                                                                 }
                                                                             );
                                                                         }}
                                                                     />
+                                                                ) : null}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                            <tr className="hidden">
+                                                <td>
+                                                    <a
+                                                        className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                        onClick={(e) =>
+                                                            addRowPersonContact(
+                                                                e
+                                                            )
+                                                        }
+                                                    >
+                                                        <span className="hover:underline hover:decoration-from-font">
+                                                            + Add Person Contact
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="mt-6">
+                                    <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                        <thead className="border-slate-300 bg-slate-300">
+                                            <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                                <th
+                                                    className="py-2 px-2 text-slate-900-700"
+                                                    colSpan={3}
+                                                >
+                                                    <span>Person Email</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {data.m_person_email?.map(
+                                                (Cp: any, i: number) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td className="px-2 py-2 text-xs text-red-500 mb-2">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={
+                                                                        Cp
+                                                                            .t_person_email
+                                                                            .PERSON_EMAIL
+                                                                    }
+                                                                    className="mt-2"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        inputDataPersonEmail(
+                                                                            "PERSON_EMAIL",
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                            i
+                                                                        )
+                                                                    }
+                                                                    placeholder="Email"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                {data
+                                                                    .m_person_email
+                                                                    .length !==
+                                                                1 ? (
+                                                                    <XMarkIcon
+                                                                        className="w-7 mt-2 cursor-pointer hover:text-red-600"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                data.m_person_email.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setData(
+                                                                                {
+                                                                                    ...data,
+                                                                                    m_person_email:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                ) : null}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                            <tr className="hidden">
+                                                <td>
+                                                    <a
+                                                        className="px-2 py-2 text-xs cursor-pointer text-gray-500 hover:text-red-500"
+                                                        onClick={(e) =>
+                                                            addRowPersonEmail(e)
+                                                        }
+                                                    >
+                                                        <span className="hover:underline hover:decoration-from-font">
+                                                            + Add Person Email
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className="mt-6">
+                                <table className="w-full table-auto border border-red-500 overflow-x-auto rounded-xl">
+                                    <thead className="border-red-500 bg-red-300">
+                                        <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                            <th
+                                                className="py-2 px-2 text-red-700"
+                                                colSpan={4}
+                                            >
+                                                Emergency Contact
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.contact_emergency?.length !==
+                                        0 ? (
+                                            <>
+                                                {data.contact_emergency?.map(
+                                                    (cm: any, i: number) => {
+                                                        return (
+                                                            <tr key={i}>
+                                                                <td className="py-3 px-2">
+                                                                    <span className="text-sm">
+                                                                        Emergency
+                                                                        Contact{" "}
+                                                                        {i + 1}
+                                                                    </span>
+                                                                    <TextInput
+                                                                        id="PERSON_EMERGENCY_CONTACT_NAME"
+                                                                        type="text"
+                                                                        name="PERSON_EMERGENCY_CONTACT_NAME"
+                                                                        value={
+                                                                            cm.PERSON_EMERGENCY_CONTACT_NAME
+                                                                        }
+                                                                        className="mt-1"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputContactEmergency(
+                                                                                "PERSON_EMERGENCY_CONTACT_NAME",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        placeholder="Name"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <TextInput
+                                                                        id="PERSON_EMERGENCY_CONTACT_NUMBER"
+                                                                        type="text"
+                                                                        name="PERSON_EMERGENCY_CONTACT_NUMBER"
+                                                                        value={
+                                                                            cm.PERSON_EMERGENCY_CONTACT_NUMBER
+                                                                        }
+                                                                        className="mt-7"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputContactEmergency(
+                                                                                "PERSON_EMERGENCY_CONTACT_NUMBER",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        placeholder="Phone Number"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <select
+                                                                        className="mt-7 rounded-md border-0 py-1.5 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                        value={
+                                                                            cm.PERSON_RELATIONSHIP_ID
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputContactEmergency(
+                                                                                "PERSON_RELATIONSHIP_ID",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <option>
+                                                                            --
+                                                                            Person
+                                                                            Relationship
+                                                                            --
+                                                                        </option>
+                                                                        {dataPersonRelationship?.map(
+                                                                            (
+                                                                                getPersonRelation: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </select>
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="mx-auto h-6 text-red-500 cursor-pointer font-semibold mt-7"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                data.contact_emergency.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setData(
+                                                                                {
+                                                                                    ...data,
+                                                                                    contact_emergency:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <path
+                                                                            fill="#AB7C94"
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M6 18 18 6M6 6l12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )}
+                                            </>
+                                        ) : null}
+                                        <tr>
+                                            <td>
+                                                <a
+                                                    className="px-2 py-2 text-xs cursor-pointer text-red-500"
+                                                    onClick={(e) =>
+                                                        addRowEmergencyContact(
+                                                            e
+                                                        )
+                                                    }
+                                                >
+                                                    <span className="hover:underline hover:decoration-from-font">
+                                                        + Add Emergency Contact
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> */}
+                            <div className="mt-6">
+                                <table className="w-full table-auto border border-red-500 overflow-x-auto rounded-xl">
+                                    <thead className="border-red-500 bg-red-300">
+                                        <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                            <th
+                                                className="py-2 px-2 text-red-700"
+                                                colSpan={4}
+                                            >
+                                                Emergency Contact
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.contact_emergency?.length !==
+                                        0 ? (
+                                            <>
+                                                {data.contact_emergency?.map(
+                                                    (cm: any, i: number) => {
+                                                        return (
+                                                            <tr key={i}>
+                                                                <td className="py-3 px-2">
+                                                                    <span className="text-sm">
+                                                                        Emergency
+                                                                        Contact{" "}
+                                                                        {i + 1}
+                                                                    </span>
+                                                                    <TextInput
+                                                                        id="PERSON_EMERGENCY_CONTACT_NAME"
+                                                                        type="text"
+                                                                        name="PERSON_EMERGENCY_CONTACT_NAME"
+                                                                        value={
+                                                                            cm.PERSON_EMERGENCY_CONTACT_NAME
+                                                                        }
+                                                                        className="mt-1"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputContactEmergency(
+                                                                                "PERSON_EMERGENCY_CONTACT_NAME",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        placeholder="Name"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <TextInput
+                                                                        id="PERSON_EMERGENCY_CONTACT_NUMBER"
+                                                                        type="text"
+                                                                        name="PERSON_EMERGENCY_CONTACT_NUMBER"
+                                                                        value={
+                                                                            cm.PERSON_EMERGENCY_CONTACT_NUMBER
+                                                                        }
+                                                                        className="mt-7"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputContactEmergency(
+                                                                                "PERSON_EMERGENCY_CONTACT_NUMBER",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        placeholder="Phone Number"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <select
+                                                                        className="mt-7 rounded-md border-0 py-1.5 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
+                                                                        value={
+                                                                            cm.PERSON_RELATIONSHIP_ID
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputContactEmergency(
+                                                                                "PERSON_RELATIONSHIP_ID",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <option>
+                                                                            --
+                                                                            Person
+                                                                            Relationship
+                                                                            --
+                                                                        </option>
+                                                                        {dataPersonRelationship?.map(
+                                                                            (
+                                                                                getPersonRelation: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </select>
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="mx-auto h-6 text-red-500 cursor-pointer font-semibold mt-7"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                data.contact_emergency.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setData(
+                                                                                {
+                                                                                    ...data,
+                                                                                    contact_emergency:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <path
+                                                                            fill="#AB7C94"
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M6 18 18 6M6 6l12 12"
+                                                                        />
+                                                                    </svg>
                                                                 </td>
                                                             </tr>
                                                         );

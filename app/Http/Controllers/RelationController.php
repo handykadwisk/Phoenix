@@ -18,6 +18,7 @@ use App\Models\RelationType;
 use App\Models\Salutation;
 use App\Models\Tag;
 use App\Models\TPerson;
+use App\Models\TPic;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -321,18 +322,28 @@ class RelationController extends Controller
             $personCreate = TPerson::create([
                 "PERSON_FIRST_NAME"         => $addTBK,
                 "INDIVIDU_RELATION_ID"      => $relation->RELATION_ORGANIZATION_ID,
-                "PERSON_IS_DELETED"         => "0"
+                "PERSON_BIRTH_DATE"         => $request->date_of_birth,
+                "PERSON_IS_DELETED"         => "0",
+                "PERSON_CREATED_BY"         => Auth::user()->id,
+                "PERSON_CREATED_DATE"       => now()
             ]);
             // jika dia corporate pic dan milih corporate pic maka akan melakukan mapping ke t person
             if (is_countable($request->corporate_pic_for)) {
                 for ($i = 0; $i < sizeof($request->corporate_pic_for); $i++) {
                     $idRelation = $request->corporate_pic_for[$i]['value'];
 
-                    // simpan mapping ke t person
-                    MRelationPic::create([
-                        "RELATION_ORGANIZATION_ID"  => $idRelation,
-                        "PERSON_ID"                 => $relation->RELATION_ORGANIZATION_ID
+                    // simpan t pic
+                    $createPIC = TPic::create([
+                        "PERSON_ID"                     => $personCreate->PERSON_ID,
+                        "RELATION_ORGANIZATION_ID"      => $idRelation,
+                        "PIC_CREATED_BY"                => Auth::user()->id,
+                        "PIC_CREATED_DATE"              => now()
                     ]);
+
+                    // MRelationPic::create([
+                    //     "RELATION_ORGANIZATION_ID"  => $idRelation,
+                    //     "PERSON_ID"                 => $relation->RELATION_ORGANIZATION_ID
+                    // ]);
                 }
             }
         }
@@ -525,7 +536,8 @@ class RelationController extends Controller
             $addTBK,
             $preSalutation,
             $postSalutation,
-            $request->relation_status_id
+            $request->relation_status_id,
+            $request->date_of_birth
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -541,6 +553,28 @@ class RelationController extends Controller
 
     public function edit(Request $request)
     {
+
+
+        if ($request->relation_status_id == 2 || $request->relation_status_id == "2") {
+
+            // cek jika nama first name dan birth date berubah, maka di person berubah juga
+            $getPersonData = TPerson::select('PERSON_FIRST_NAME', 'PERSON_BIRTH_DATE')->where('INDIVIDU_RELATION_ID', $request->RELATION_ORGANIZATION_ID)->first();
+            $personName = $getPersonData->PERSON_FIRST_NAME;
+            $dateOfBirthPerson = $getPersonData->PERSON_BIRTH_DATE;
+
+            $nameRelation = strtolower($request->RELATION_ORGANIZATION_NAME);
+            $nameRelationNew = ucwords($nameRelation);
+
+            if (strtolower($personName) != strtolower($request->RELATION_ORGANIZATION_NAME) || $dateOfBirthPerson != $request->RELATION_ORGANIZATION_DATE_OF_BIRTH) {
+                // update relation 
+                TPerson::where('INDIVIDU_RELATION_ID', $request->RELATION_ORGANIZATION_ID)->update([
+                    "PERSON_FIRST_NAME"          => $nameRelationNew,
+                    "PERSON_BIRTH_DATE"          => $request->RELATION_ORGANIZATION_DATE_OF_BIRTH
+                ]);
+            }
+        }
+
+
 
         // cek abbrev apakah sama seperti sebelumnya
         $relation = Relation::find($request->RELATION_ORGANIZATION_ID);
@@ -740,14 +774,18 @@ class RelationController extends Controller
 
     public function get_detail(Request $request)
     {
-        $detailRelation = Relation::with('mRelationPic')->with('groupRelation')->find($request->id);
+        $detailRelation = Relation::with('mRelationPic')->with('TPerson')->with('groupRelation')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
 
     public function get_corporate(Request $request)
     {
-        $data = MRelationPic::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_pic.RELATION_ORGANIZATION_ID')->where('PERSON_ID', $request->id)->get();
+        // $data = MRelationPic::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_pic.RELATION_ORGANIZATION_ID')->where('PERSON_ID', $request->id)->get();
+        $getIdPerson = TPerson::select('PERSON_ID')->where('INDIVIDU_RELATION_ID', $request->id)->first();
+        // get data T PIC
+        $data = TPic::where('PERSON_ID', $getIdPerson->PERSON_ID)->leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_pic.RELATION_ORGANIZATION_ID')->where('t_pic.PIC_IS_DELETED', 0)->get();
+
 
         return response()->json($data);
     }
@@ -802,30 +840,86 @@ class RelationController extends Controller
 
     public function edit_corporate(Request $request)
     {
-        // cek existing mapping relation pic
-        $cekExisting = MRelationPic::where('PERSON_ID', $request->detail_corporate[0]['PERSON_ID'])->get();
-        if ($cekExisting->count() > 0) {
-            MRelationPic::where('PERSON_ID', $request->detail_corporate[0]['PERSON_ID'])->delete();
+        $arrayPerson = TPic::where('PERSON_ID', $request->PERSON_ID)->get();
+        for ($i = 0; $i < sizeof($arrayPerson); $i++) {
+            for ($a = 0; $a < sizeof($request->detail_corporate); $a++) {
+                $personName = $request->detail_corporate[$a]['RELATION_ORGANIZATION_NAME'];
+                $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
+                if ($arrayPerson[$i]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
+                    TPic::where('RELATION_ORGANIZATION_ID', $arrayPerson[$i]['RELATION_ORGANIZATION_ID'])->update([
+                        "PIC_IS_DELETED"         => "1"
+                    ]);
+                }
+            }
         }
 
 
         for ($i = 0; $i < sizeof($request->detail_corporate); $i++) {
-            $corporateName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
-            $personId = $request->detail_corporate[$i]['PERSON_ID'];
+            $personName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
+            $individuId = $request->PERSON_ID;
 
-            $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($corporateName))->first();
+            $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
+            // $getName = Relation::select('RELATION_ORGANIZATION_NAME')->where('RELATION_ORGANIZATION_ID', $individuId)->first();
 
+            $dataPerson = TPic::where('RELATION_ORGANIZATION_ID', $dataRelation->RELATION_ORGANIZATION_ID)->first();
+            if ($dataPerson != null) {
+                $id = $dataPerson->RELATION_ORGANIZATION_ID;
+                TPic::where('RELATION_ORGANIZATION_ID', $id)->update([
+                    "PIC_IS_DELETED"         => "0"
+                ]);
+            } else {
+                // $arrayPerson = TPic::where('PERSON_ID', $request->PERSON_ID)->get();
+                // for ($a = 0; $a < sizeof($request->detail_corporate); $a++) {
+                //     $personName = $request->detail_corporate[$a]['RELATION_ORGANIZATION_NAME'];
+                //     $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($personName))->first();
+                //     if ($arrayPerson[$a]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
+                //         TPic::where('RELATION_ORGANIZATION_ID', $arrayPerson[$a]['RELATION_ORGANIZATION_ID'])->update([
+                //             "PIC_IS_DELETED"         => "0"
+                //         ]);
+                //     }
+                // }
+                // for ($a = 0; $a < sizeof($arrayPerson); $a++) {
+                //     if ($arrayPerson[$a]['RELATION_ORGANIZATION_ID'] != $dataRelation->RELATION_ORGANIZATION_ID) {
+                //         $idPerson = $arrayPerson[$a]['RELATION_ORGANIZATION_ID'];
+                //         TPic::where('RELATION_ORGANIZATION_ID', $idPerson)->update([
+                //             "PIC_IS_DELETED"         => "0"
+                //         ]);
+                //     }
+                // }
 
-            // simpan mapping ke t person
-            MRelationPic::create([
-                "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
-                "PERSON_ID"                 => $personId
-            ]);
+                TPic::create([
+                    "PERSON_ID"                 => $request->PERSON_ID,
+                    "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
+                    "PIC_IS_DELETED"            => "0"
+                ]);
+            }
         }
+        // cek existing mapping relation pic
+        // $cekExisting = MRelationPic::where('PERSON_ID', $request->detail_corporate[0]['PERSON_ID'])->get();
+        // if ($cekExisting->count() > 0) {
+        //     MRelationPic::where('PERSON_ID', $request->detail_corporate[0]['PERSON_ID'])->delete();
+        // }
 
+
+
+        // for ($i = 0; $i < sizeof($request->detail_corporate); $i++) {
+        //     $corporateName = $request->detail_corporate[$i]['RELATION_ORGANIZATION_NAME'];
+        //     $personId = $request->detail_corporate[$i]['PERSON_ID'];
+
+        //     $dataRelation = Relation::where('RELATION_ORGANIZATION_NAME', trim($corporateName))->first();
+
+
+        //     // simpan mapping ke t person
+        //     MRelationPic::create([
+        //         "RELATION_ORGANIZATION_ID"  => $dataRelation->RELATION_ORGANIZATION_ID,
+        //         "PERSON_ID"                 => $personId
+        //     ]);
+        // }
+
+        $getIdRelation = TPerson::where('PERSON_ID', $request->PERSON_ID)->first();
 
         return new JsonResponse([
-            $request->detail_corporate[0]['PERSON_ID'],
+            $getIdRelation->INDIVIDU_RELATION_ID,
             "Corporate For PIC Edited"
         ], 201, [
             'X-Inertia' => true

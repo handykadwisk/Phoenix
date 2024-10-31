@@ -764,7 +764,13 @@ export default function AddRelation({
                                 </button>
                             </div>
                         </div>
-                        <div className="xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-3 lg:grid lg:gap-4">
+                        <div
+                            className={
+                                data.relation_status_id === "2"
+                                    ? "xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-2 lg:grid lg:gap-4"
+                                    : "xs:grid-cols-1 xs:grid xs:gap-0 lg:grid-cols-3 lg:grid lg:gap-4"
+                            }
+                        >
                             <div className="mt-4">
                                 <InputLabel
                                     htmlFor="date_of_birth"
@@ -797,7 +803,13 @@ export default function AddRelation({
                                     />
                                 </div>
                             </div>
-                            <div className="mt-4">
+                            <div
+                                className={
+                                    data.relation_status_id === "2"
+                                        ? "hidden"
+                                        : "mt-4"
+                                }
+                            >
                                 <InputLabel
                                     htmlFor="relation_email"
                                     value="Email"

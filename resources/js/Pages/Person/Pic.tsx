@@ -50,6 +50,7 @@ export default function PIC({
             })
             .then((res) => {
                 setDataPerson(res.data);
+
                 // if (modal.search) {
                 //     setModal({
                 //         add: false,
@@ -216,8 +217,8 @@ export default function PIC({
     ) => {
         e.preventDefault();
         Swal.fire({
-            title: "Are you sure?",
-            text: "You won't delete Person!",
+            title: "Delete This PIC?",
+            text: "",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -330,7 +331,7 @@ export default function PIC({
             {/* modal detail person */}
             <ModalToAction
                 show={modal.view}
-                onClose={() =>
+                onClose={() => {
                     setModal({
                         add: false,
                         delete: false,
@@ -338,8 +339,9 @@ export default function PIC({
                         view: false,
                         document: false,
                         search: false,
-                    })
-                }
+                    });
+                    getPersons();
+                }}
                 title={"Detail Person"}
                 url={""}
                 data={""}
@@ -437,7 +439,7 @@ export default function PIC({
                                         colSpan={""}
                                         rowSpan={""}
                                         className={"min-w-[50px] bg-gray-200 "}
-                                        label={"Status"}
+                                        label={"VIP"}
                                     />
 
                                     <TableTH
@@ -484,12 +486,12 @@ export default function PIC({
                                                                     );
                                                                     handleDetailModel(
                                                                         e,
-                                                                        dPerson.PERSON_ID
+                                                                        dPerson.INDIVIDU_RELATION_ID
                                                                     );
                                                                 }}
                                                             >
                                                                 {
-                                                                    dPerson.RELATION_ORGANIZATION_NAME
+                                                                    dPerson.PERSON_FIRST_NAME
                                                                 }
                                                             </div>
                                                         </>
@@ -498,7 +500,7 @@ export default function PIC({
                                                 />
                                                 <TableTD
                                                     value={
-                                                        dPerson.PERSON_IS_VIP ===
+                                                        dPerson.PIC_IS_VIP ===
                                                         1 ? (
                                                             <>
                                                                 <div className="bg-amber-600 w-fit font-semibold text-sm text-white px-2 rounded-md">
@@ -509,7 +511,7 @@ export default function PIC({
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <div className="bg-amber-600 w-fit font-semibold text-sm text-white px-2 rounded-md">
+                                                                <div className="w-fit font-semibold text-sm text-black px-2 rounded-md">
                                                                     <span>
                                                                         -
                                                                     </span>

@@ -15,15 +15,19 @@ use App\Models\TAddress;
 use App\Models\Document;
 use App\Models\MForPersonBankAccount;
 use App\Models\MPersonDocument;
+use App\Models\MPersonEmail;
 use App\Models\MRelationPic;
 use App\Models\Relation;
 use App\Models\RForAccountBank;
+use App\Models\Salutation;
 use App\Models\TPerson;
 use App\Models\TPersonBankAccount;
 use App\Models\TPersonCertificate;
 use App\Models\TPersonContact;
 use App\Models\TPersonEducation;
+use App\Models\TPersonEmail;
 use App\Models\TPersonEmergencyContact;
+use App\Models\TPic;
 use App\Models\TRelationStructure;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -40,11 +44,12 @@ class TPersonController extends Controller
     {
 
         // dd($searchQuery);
-        $data = MRelationPic::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_pic.PERSON_ID')->where('m_relation_pic.RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
-            ->orderBy('m_relation_pic.M_RELATION_PIC_ID', 'desc');
+        $data = TPic::leftJoin('t_person', 't_person.PERSON_ID', '=', 't_pic.PERSON_ID')->where('t_pic.RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
+            ->where('t_pic.PIC_IS_DELETED', 0)
+            ->orderBy('t_pic.PIC_ID', 'desc');
         if ($searchQuery) {
-            if ($searchQuery->input('t_relation.RELATION_ORGANIZATION_NAME')) {
-                $data->where('t_relation.RELATION_ORGANIZATION_NAME', 'like', '%' . $searchQuery->RELATION_ORGANIZATION_NAME . '%');
+            if ($searchQuery->input('t_person.PERSON_FIRST_NAME')) {
+                $data->where('t_person.PERSON_FIRST_NAME', 'like', '%' . $searchQuery->PERSON_FIRST_NAME . '%');
             }
         }
         // dd($data->toSql());
@@ -82,60 +87,316 @@ class TPersonController extends Controller
         return response()->json($dataAddressStatus);
     }
 
-
-
-    public function edit(Request $request)
+    public function edit_person_relation(Request $request)
     {
-        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+        // cek jika nama first name dan birth date berubah, maka di relation individu berubah juga
+        $getRelationData = Relation::select('RELATION_ORGANIZATION_NAME', 'RELATION_ORGANIZATION_DATE_OF_BIRTH', 'PRE_SALUTATION', 'POST_SALUTATION')->where('RELATION_ORGANIZATION_ID', $request->INDIVIDU_RELATION_ID)->first();
+        $relationName = $getRelationData->RELATION_ORGANIZATION_NAME;
+        $dateOfBirthRelation = $getRelationData->RELATION_ORGANIZATION_DATE_OF_BIRTH;
+
+        if ($relationName != $request->PERSON_FIRST_NAME || $dateOfBirthRelation != $request->PERSON_BIRTH_DATE) {
+            // update relation 
+            Relation::where('RELATION_ORGANIZATION_ID', $request->INDIVIDU_RELATION_ID)->update([
+                "RELATION_ORGANIZATION_NAME"          => $request->PERSON_FIRST_NAME,
+                "RELATION_ORGANIZATION_DATE_OF_BIRTH" => $request->PERSON_BIRTH_DATE
+            ]);
+        }
+
+        $getPersonId = TPerson::select('PERSON_ID')->where('INDIVIDU_RELATION_ID', $request->INDIVIDU_RELATION_ID)->first();
+
+        $person = TPerson::where('PERSON_ID', $getPersonId->PERSON_ID)
             ->update([
                 'PERSON_FIRST_NAME' => $request->PERSON_FIRST_NAME,
                 'PERSON_GENDER' => $request->PERSON_GENDER,
                 'PERSON_BIRTH_PLACE' => $request->PERSON_BIRTH_PLACE,
                 'PERSON_BIRTH_DATE' => $request->PERSON_BIRTH_DATE,
-                // 'PERSON_EMAIL' => $request->PERSON_EMAIL,
-                // 'PERSON_CONTACT' => $request->PERSON_CONTACT,
-                'PERSON_UPDATED_BY' => Auth::user()->id,
-                'PERSON_UPDATED_DATE' => now(),
                 'PERSON_KTP' => $request->PERSON_KTP,
                 'PERSON_NPWP' => $request->PERSON_NPWP,
+                'PERSON_CONTACT' => $request->PERSON_CONTACT,
+                'PERSON_EMAIL' => $request->PERSON_EMAIL,
                 'PERSON_KK' => $request->PERSON_KK,
-                'PERSON_IS_BAA' => $request->PERSON_IS_BAA,
-                'PERSON_IS_VIP' => $request->PERSON_IS_VIP,
-                'PERSON_BLOOD_TYPE' => $request->PERSON_BLOOD_TYPE,
-                'PERSON_BLOOD_RHESUS' => $request->PERSON_BLOOD_RHESUS,
-                'PERSON_MARITAL_STATUS' => $request->PERSON_MARITAL_STATUS,
+                'PERSON_UPDATED_BY' => Auth::user()->id,
+                'PERSON_UPDATED_DATE' => now(),
             ]);
 
         // cek existing PErson Contact
-        $personContact = MPersonContact::where('PERSON_ID', $request->PERSON_ID)->get();
-        for ($i = 0; $i < sizeof($personContact); $i++) {
-            $idPersonContact = $personContact[$i]['PERSON_CONTACT_ID'];
-            // delete person contact
-            $deleteMPerson = TPersonContact::where('PERSON_CONTACT_ID', $idPersonContact)->delete();
-        }
+        $personContact = TPersonContact::where('PERSON_ID', $getPersonId->PERSON_ID)->get();
+        // for ($i = 0; $i < sizeof($personContact); $i++) {
+        //     $idPersonContact = $personContact[$i]['PERSON_CONTACT_ID'];
+        //     // delete person contact
+        //     $deleteMPerson = TPersonContact::where('PERSON_CONTACT_ID', $idPersonContact)->delete();
+        // }
 
         if ($personContact->count() > 0) { //jika ada delete data sebelumnya
-            MPersonContact::where('PERSON_ID', $request->PERSON_ID)->delete();
+            TPersonContact::where('PERSON_ID', $getPersonId->PERSON_ID)->delete();
         }
 
         // created emergency contact
         if (is_countable($request->m_person_contact)) {
             // Created Mapping Relation AKA
             for ($i = 0; $i < sizeof($request->m_person_contact); $i++) {
-                $phoneNumber = $request->m_person_contact[$i]['t_person_contact']['PERSON_PHONE_NUMBER'];
-                $email = $request->m_person_contact[$i]['t_person_contact']['PERSON_EMAIL'];
+                $phoneNumber = $request->m_person_contact[$i]['PERSON_PHONE_NUMBER'];
                 $createPersonContact = TPersonContact::create([
-                    "PERSON_PHONE_NUMBER"   => $phoneNumber,
+                    "PERSON_ID"             => $getPersonId->PERSON_ID,
+                    "PERSON_PHONE_NUMBER"   => $phoneNumber
+                ]);
+
+                // create mapping
+                // if ($createPersonContact) {
+                //     MPersonContact::create([
+                //         "PERSON_ID"         => $getPersonId->PERSON_ID,
+                //         "PERSON_CONTACT_ID" => $createPersonContact->PERSON_CONTACT_ID
+                //     ]);
+                // }
+            }
+        }
+
+
+        $personContact = TPersonEmail::where('PERSON_ID', $getPersonId->PERSON_ID)->get();
+        // for ($i = 0; $i < sizeof($personContact); $i++) {
+        //     $idPersonContact = $personContact[$i]['PERSON_EMAIL_ID'];
+        //     // delete person contact
+        //     $deleteMPerson = TPersonEmail::where('PERSON_EMAIL_ID', $idPersonContact)->delete();
+        // }
+
+        if ($personContact->count() > 0) { //jika ada delete data sebelumnya
+            TPersonEmail::where('PERSON_ID', $getPersonId->PERSON_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->m_person_email)) {
+            // Created Mapping Relation AKA
+            for ($i = 0; $i < sizeof($request->m_person_email); $i++) {
+                $email = $request->m_person_email[$i]['PERSON_EMAIL'];
+                $createPersonContact = TPersonEmail::create([
+                    "PERSON_ID"             => $getPersonId->PERSON_ID,
                     "PERSON_EMAIL"          => $email
                 ]);
 
                 // create mapping
-                if ($createPersonContact) {
-                    MPersonContact::create([
-                        "PERSON_ID"         => $request->PERSON_ID,
-                        "PERSON_CONTACT_ID" => $createPersonContact->PERSON_CONTACT_ID
-                    ]);
-                }
+                // if ($createPersonContact) {
+                //     MPersonEmail::create([
+                //         "PERSON_ID"         => $getPersonId->PERSON_ID,
+                //         "PERSON_EMAIL_ID" => $createPersonContact->PERSON_EMAIL_ID
+                //     ]);
+                // }
+            }
+        }
+
+
+        // // cek existing PErson Contact
+        // $personContact = MPersonContact::where('PERSON_ID', $request->PERSON_ID)->get();
+        // for ($i = 0; $i < sizeof($personContact); $i++) {
+        //     $idPersonContact = $personContact[$i]['PERSON_CONTACT_ID'];
+        //     // delete person contact
+        //     $deleteMPerson = TPersonContact::where('PERSON_CONTACT_ID', $idPersonContact)->delete();
+        // }
+
+        // if ($personContact->count() > 0) { //jika ada delete data sebelumnya
+        //     MPersonContact::where('PERSON_ID', $request->PERSON_ID)->delete();
+        // }
+
+        // // created emergency contact
+        // if (is_countable($request->m_person_contact)) {
+        //     // Created Mapping Relation AKA
+        //     for ($i = 0; $i < sizeof($request->m_person_contact); $i++) {
+        //         $phoneNumber = $request->m_person_contact[$i]['t_person_contact']['PERSON_PHONE_NUMBER'];
+        //         $email = $request->m_person_contact[$i]['t_person_contact']['PERSON_EMAIL'];
+        //         $createPersonContact = TPersonContact::create([
+        //             "PERSON_PHONE_NUMBER"   => $phoneNumber,
+        //             "PERSON_EMAIL"          => $email
+        //         ]);
+
+        //         // create mapping
+        //         if ($createPersonContact) {
+        //             MPersonContact::create([
+        //                 "PERSON_ID"         => $request->PERSON_ID,
+        //                 "PERSON_CONTACT_ID" => $createPersonContact->PERSON_CONTACT_ID
+        //             ]);
+        //         }
+        //     }
+        // }
+
+
+        // // cek existing contact emergency
+        // $contactEmergency = TPersonEmergencyContact::where('PERSON_ID', $request->PERSON_ID)->get();
+        // if ($contactEmergency->count() > 0) { //jika ada delete data sebelumnya
+        //     TPersonEmergencyContact::where('PERSON_ID', $request->PERSON_ID)->delete();
+        // }
+
+        // // created emergency contact
+        // if (is_countable($request->contact_emergency)) {
+        //     // Created Mapping Relation AKA
+        //     for ($i = 0; $i < sizeof($request->contact_emergency); $i++) {
+        //         TPersonEmergencyContact::create([
+        //             "PERSON_ID" => $request->PERSON_ID,
+        //             "PERSON_EMERGENCY_CONTACT_NAME" => $request->contact_emergency[$i]["PERSON_EMERGENCY_CONTACT_NAME"],
+        //             "PERSON_EMERGENCY_CONTACT_NUMBER" => $request->contact_emergency[$i]["PERSON_EMERGENCY_CONTACT_NUMBER"],
+        //             "PERSON_RELATIONSHIP_ID" => $request->contact_emergency[$i]["PERSON_RELATIONSHIP_ID"]
+        //         ]);
+        //     }
+        // }
+
+        // // cek existing PErson Contact
+        // $personContact = MPersonContact::where('PERSON_ID', $getPersonId->PERSON_ID)->get();
+        // for ($i = 0; $i < sizeof($personContact); $i++) {
+        //     $idPersonContact = $personContact[$i]['PERSON_CONTACT_ID'];
+        //     // delete person contact
+        //     $deleteMPerson = TPersonContact::where('PERSON_CONTACT_ID', $idPersonContact)->delete();
+        // }
+
+        // if ($personContact->count() > 0) { //jika ada delete data sebelumnya
+        //     MPersonContact::where('PERSON_ID', $getPersonId->PERSON_ID)->delete();
+        // }
+
+        // // created emergency contact
+        // if (is_countable($request->m_person_contact)) {
+        //     // Created Mapping Relation AKA
+        //     for ($i = 0; $i < sizeof($request->m_person_contact); $i++) {
+        //         $phoneNumber = $request->m_person_contact[$i]['t_person_contact']['PERSON_PHONE_NUMBER'];
+        //         $email = $request->m_person_email[$i]['t_person_email']['PERSON_EMAIL'];
+        //         $createPersonContact = TPersonContact::create([
+        //             "PERSON_PHONE_NUMBER"   => $phoneNumber,
+        //             "PERSON_EMAIL"   => $email,
+        //         ]);
+
+        //         // create mapping
+        //         if ($createPersonContact) {
+        //             MPersonContact::create([
+        //                 "PERSON_ID"         => $getPersonId->PERSON_ID,
+        //                 "PERSON_CONTACT_ID" => $createPersonContact->PERSON_CONTACT_ID
+        //             ]);
+        //         }
+        //     }
+        // }
+
+        // cek existing contact emergency
+        $contactEmergency = TPersonEmergencyContact::where('PERSON_ID', $getPersonId->PERSON_ID)->get();
+        if ($contactEmergency->count() > 0) { //jika ada delete data sebelumnya
+            TPersonEmergencyContact::where('PERSON_ID', $getPersonId->PERSON_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->contact_emergency)) {
+            // Created Mapping Relation AKA
+            for ($i = 0; $i < sizeof($request->contact_emergency); $i++) {
+                TPersonEmergencyContact::create([
+                    "PERSON_ID" => $getPersonId->PERSON_ID,
+                    "PERSON_EMERGENCY_CONTACT_NAME" => $request->contact_emergency[$i]["PERSON_EMERGENCY_CONTACT_NAME"],
+                    "PERSON_EMERGENCY_CONTACT_NUMBER" => $request->contact_emergency[$i]["PERSON_EMERGENCY_CONTACT_NUMBER"],
+                    "PERSON_RELATIONSHIP_ID" => $request->contact_emergency[$i]["PERSON_RELATIONSHIP_ID"]
+                ]);
+            }
+        }
+
+        // get salutation name for detail relation
+        $preSalutation = "";
+        $postSalutation = "";
+
+
+        // Created Log
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+                "description" => "Updated (Person).",
+                "module"      => "Person",
+                "id"          => $getPersonId->PERSON_ID
+            ]),
+            'action_by'  => Auth::user()->user_login
+        ]);
+
+        return new JsonResponse([
+            $request->PERSON_FIRST_NAME,
+            $request->INDIVIDU_RELATION_ID,
+            $preSalutation,
+            $postSalutation
+
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function edit(Request $request)
+    {
+        // dd($request);
+        // get relation individu by individu relation
+        $dataRelationIndividu = Relation::where('RELATION_ORGANIZATION_ID', $request->INDIVIDU_RELATION_ID)->first();
+        // cek first name person ganti apa tidak, jika diganti maka relation name ke ganti juga
+        $relationName = $dataRelationIndividu->RELATION_ORGANIZATION_NAME;
+        $dateOfBirthRelation = $dataRelationIndividu->RELATION_ORGANIZATION_DATE_OF_BIRTH;
+
+        if ($relationName != $request->PERSON_FIRST_NAME || $dateOfBirthRelation != $request->PERSON_BIRTH_DATE) {
+            // update relation 
+            Relation::where('RELATION_ORGANIZATION_ID', $request->INDIVIDU_RELATION_ID)->update([
+                "RELATION_ORGANIZATION_NAME"          => $request->PERSON_FIRST_NAME,
+                "RELATION_ORGANIZATION_DATE_OF_BIRTH" => $request->PERSON_BIRTH_DATE
+            ]);
+        }
+
+
+        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+            ->update([
+                'PERSON_FIRST_NAME' => $request->PERSON_FIRST_NAME,
+                'PERSON_GENDER' => $request->PERSON_GENDER,
+                'PERSON_BIRTH_PLACE' => $request->PERSON_BIRTH_PLACE,
+                'PERSON_BIRTH_DATE' => $request->PERSON_BIRTH_DATE,
+                'PERSON_EMAIL' => $request->PERSON_EMAIL,
+                'PERSON_CONTACT' => $request->PERSON_CONTACT,
+                'PERSON_UPDATED_BY' => Auth::user()->id,
+                'PERSON_UPDATED_DATE' => now(),
+                'PERSON_KTP' => $request->PERSON_KTP,
+                'PERSON_NPWP' => $request->PERSON_NPWP,
+                'PERSON_KK' => $request->PERSON_KK,
+                'PERSON_BLOOD_TYPE' => $request->PERSON_BLOOD_TYPE,
+                'PERSON_BLOOD_RHESUS' => $request->PERSON_BLOOD_RHESUS,
+                'PERSON_MARITAL_STATUS' => $request->PERSON_MARITAL_STATUS,
+            ]);
+
+        // // cek existing PErson Contact
+        $personContact = TPersonContact::where('PERSON_ID', $request->PERSON_ID)->get();
+        // for ($i = 0; $i < sizeof($personContact); $i++) {
+        //     $idPersonContact = $personContact[$i]['PERSON_CONTACT_ID'];
+        //     // delete person contact
+        //     $deleteMPerson = TPersonContact::where('PERSON_CONTACT_ID', $idPersonContact)->delete();
+        // }
+
+        if ($personContact->count() > 0) { //jika ada delete data sebelumnya
+            TPersonContact::where('PERSON_ID', $request->PERSON_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->m_person_contact)) {
+            // Created Mapping Relation AKA
+            for ($i = 0; $i < sizeof($request->m_person_contact); $i++) {
+                $phoneNumber = $request->m_person_contact[$i]['PERSON_PHONE_NUMBER'];
+                $createPersonContact = TPersonContact::create([
+                    "PERSON_ID"             => $request->PERSON_ID,
+                    "PERSON_PHONE_NUMBER"   => $phoneNumber,
+                ]);
+            }
+        }
+
+
+        $personContact = TPersonEmail::where('PERSON_ID', $request->PERSON_ID)->get();
+        // for ($i = 0; $i < sizeof($personContact); $i++) {
+        //     $idPersonContact = $personContact[$i]['PERSON_EMAIL_ID'];
+        //     // delete person contact
+        //     $deleteMPerson = TPersonEmail::where('PERSON_EMAIL_ID', $idPersonContact)->delete();
+        // }
+
+        if ($personContact->count() > 0) { //jika ada delete data sebelumnya
+            TPersonEmail::where('PERSON_ID', $request->PERSON_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->m_person_email)) {
+            // Created Mapping Relation AKA
+            for ($i = 0; $i < sizeof($request->m_person_email); $i++) {
+                $email = $request->m_person_email[$i]['PERSON_EMAIL'];
+                $createPersonContact = TPersonEmail::create([
+                    "PERSON_ID"      => $request->PERSON_ID,
+                    "PERSON_EMAIL"   => $email
+                ]);
             }
         }
 
@@ -171,8 +432,8 @@ class TPersonController extends Controller
         ]);
 
         return new JsonResponse([
-            $request->PERSON_ID,
-            "Relation Person Edited"
+            $request->INDIVIDU_RELATION_ID,
+            "Relation Individu Edited"
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -287,9 +548,16 @@ class TPersonController extends Controller
         ]);
     }
 
+    public function get_Data_Pic(Request $request)
+    {
+        $data = TPic::where('PERSON_ID', $request->personIdNew)->where('RELATION_ORGANIZATION_ID', $request->idRelationNew)->with('Structure')->with('Division')->with('Office')->first();
+
+        return response()->json($data);
+    }
+
     public function get_detail(Request $request)
     {
-        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('mAddressPerson')->with('PersonEducation')->with('PersonCertificate')->with('MPersonDocument')->with('TPersonBank')->where("INDIVIDU_RELATION_ID", $request->id)->first();
+        $dataPersonDetail = TPerson::with('ContactEmergency')->with('taxStatus')->with('Relation')->with('Structure')->with('Division')->with('Office')->with('Document')->with('MPersonContact')->with('MPersonEmail')->with('mAddressPerson')->with('PersonEducation')->with('PersonCertificate')->with('MPersonDocument')->with('TPersonBank')->where("INDIVIDU_RELATION_ID", $request->id)->first();
         // dd($dataPersonDetail);
 
         return response()->json($dataPersonDetail);
@@ -428,30 +696,42 @@ class TPersonController extends Controller
         // print_r($request);die;
 
         // Update Person
-        $person = TPerson::where('PERSON_ID', $request->PERSON_ID)
+        $person = TPic::where('PIC_ID', $request->PIC_ID)
             ->update([
                 'STRUCTURE_ID' => $request->STRUCTURE_ID,
                 'DIVISION_ID' => $request->DIVISION_ID,
                 'OFFICE_ID' => $request->OFFICE_ID,
-                'PERSON_UPDATED_BY' => Auth::user()->id,
-                'PERSON_UPDATED_DATE' => now()
+                'PIC_UPDATED_BY' => Auth::user()->id,
+                'PIC_UPDATED_DATE' => now()
             ]);
 
         // Created Log
         UserLog::create([
             "created_by" => Auth::user()->id,
             "action"     => json_encode([
-                "description" => "Updated (Person).",
-                "module"      => "Person",
-                "id"          => $request->PERSON_ID
+                "description" => "Updated (PIC).",
+                "module"      => "PIC",
+                "id"          => $request->PIC_ID
             ]),
             'action_by'  => Auth::user()->user_login
         ]);
 
+        $idIndividuRelation = TPic::where('PIC_ID', $request->PIC_ID)->first();
+        $dataPerson = TPerson::where('PERSON_ID', $idIndividuRelation->PERSON_ID)->first();
+
+
+        $textAlert = "";
+        if ($request->flag === "Edit") {
+            $textAlert = "PIC Structure Success Edit";
+        } else {
+            $textAlert = "PIC Structure Success Add";
+        }
+        // dd($idIndividuRelation->RELATION_ORGANIZATION_ID);
         return new JsonResponse([
-            $request->PERSON_ID,
+            $dataPerson->INDIVIDU_RELATION_ID,
             "add",
-            "Person Structure Added"
+            $textAlert,
+            $idIndividuRelation->RELATION_ORGANIZATION_ID
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -1371,40 +1651,41 @@ class TPersonController extends Controller
             $individuId = $request->individu_relation[$i]['value'];
 
             // simpan mapping ke t person
-            MRelationPic::create([
-                "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
-                "PERSON_ID"                 => $individuId
-            ]);
-
-            // cek person
-            // $dataPerson = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->first();
-            // if ($dataPerson != null) { //jika ada delete data sebelumnya
-            //     $idPerson = $dataPerson->PERSON_ID;
-            //     TPerson::where('PERSON_ID', $idPerson)->update([
-            //         "PERSON_IS_DELETED"         => "0"
-            //     ]);
-
-            //     $idLog = $idPerson;
-            // } else {
-            //     // simpan mapping ke t person
-            //     $person = TPerson::create([
-            //         "PERSON_FIRST_NAME"         => $personName,
-            //         "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
-            //         "INDIVIDU_RELATION_ID"      => $individuId,
-            //         "PERSON_IS_DELETED"         => "0"
-            //     ]);
-            //     $idLog = $person;
-            // }
-            // // Created Log
-            // UserLog::create([
-            //     'created_by' => Auth::user()->id,
-            //     'action'     => json_encode([
-            //         "description" => "Created PIC (PIC).",
-            //         "module"      => "Person PIC",
-            //         "id"          => $idLog
-            //     ]),
-            //     'action_by'  => Auth::user()->user_login
+            // MRelationPic::create([
+            //     "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
+            //     "PERSON_ID"                 => $individuId
             // ]);
+            // get person id from by relation individual
+            $idPersonByIndividual = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->first();
+            // cek person
+            $dataPerson = TPic::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->where('PERSON_ID', $idPersonByIndividual->PERSON_ID)->first();
+            // dd($dataPerson);
+            if ($dataPerson != null) { //jika ada aktifkan lagi data sebelumnya
+                $idPerson = $dataPerson->RELATION_ORGANIZATION_ID;
+                TPic::where('RELATION_ORGANIZATION_ID', $idPerson)->where('PERSON_ID', $idPersonByIndividual->PERSON_ID)->update([
+                    "PIC_IS_DELETED"         => "0"
+                ]);
+
+                // $idLog = $idPerson;
+            } else {
+                // simpan mapping ke t person
+                TPic::create([
+                    "PERSON_ID"                 => $idPersonByIndividual->PERSON_ID,
+                    "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
+                    "PIC_IS_DELETED"            => "0"
+                ]);
+                // $idLog = $person;
+            }
+            // Created Log
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Created PIC (PIC).",
+                    "module"      => "Person PIC",
+                    "id"          => $idLog
+                ]),
+                'action_by'  => Auth::user()->user_login
+            ]);
         }
         return new JsonResponse([
             $idLog,
@@ -1415,7 +1696,38 @@ class TPersonController extends Controller
 
     public function delete_person(Request $request)
     {
-        MRelationPic::where('PERSON_ID', $request->idPerson)->where('RELATION_ORGANIZATION_ID', $request->idRelationCorporate)->delete();
+        // dd($request);
+        // MRelationPic::where('PERSON_ID', $request->idPerson)->where('RELATION_ORGANIZATION_ID', $request->idRelationCorporate)->delete();
+        TPic::where('PERSON_ID', $request->idPerson)->where('RELATION_ORGANIZATION_ID', $request->idRelationCorporate)->update([
+            "PIC_IS_DELETED"         => "1"
+        ]);
+
+        return new JsonResponse([
+            $request->idPerson,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function set_status_vip(Request $request)
+    {
+        TPic::where('PERSON_ID', $request->idPersonVip)->where('RELATION_ORGANIZATION_ID', $request->idRelationVip)->update([
+            "PIC_IS_VIP"         => "1"
+        ]);
+
+        return new JsonResponse([
+            $request->idPerson,
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function set_unstatus_vip(Request $request)
+    {
+        TPic::where('PERSON_ID', $request->idPersonVip)->where('RELATION_ORGANIZATION_ID', $request->idRelationVip)->update([
+            "PIC_IS_VIP"         => "0"
+        ]);
+
         return new JsonResponse([
             $request->idPerson,
         ], 201, [
