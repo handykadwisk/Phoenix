@@ -579,36 +579,14 @@ class TimeOffController extends Controller
         $perPage = $request->input('perPage', 10);
         $sortModel = $request->input('sort');
 
-        // $query = DB::table('t_policy as p')->leftJoin('t_relation as r', 'p.RELATION_ID', '=', 'r.RELATION_ORGANIZATION_ID');
-        $query = TimeOffMaster::where('STATUS', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
-            
-        // $filterModel = json_decode($request->input('filter'), true);
-        // $newSearch = json_decode($request->newFilter, true);        
+        $newSearch = json_decode($request->newFilter, true);       
+        $query = DB::table('t_request_time_off_master as rtom')
+            ->join('t_employee AS e', 'rtom.EMPLOYEE_ID', '=', 'e.EMPLOYEE_ID')
+            ->where('STATUS', '=', '0')
+            ->where('e.COMPANY_ID', '=', $newSearch['COMPANY_ID'])
+            ->where('e.DIVISION_ID', '=', $newSearch['DIVISION_ID'])
+            ->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc'); 
         
-        // if ($sortModel) {
-        //     $sortModel = explode(';', $sortModel); 
-        //     foreach ($sortModel as $sortItem) {
-        //         list($colId, $sortDirection) = explode(',', $sortItem);
-        //         $query->orderBy($colId, $sortDirection); 
-        //     }
-        // } else {
-        //     $query->orderBy('POLICY_ID', 'DESC'); 
-        // }
-
-        // if ($request->newFilter !== "") {
-        //     foreach ($newSearch[0] as $keyId => $searchValue) {
-        //         if ($keyId === 'POLICY_NUMBER') {
-        //             if ($searchValue != "") {
-        //                 $query->where('POLICY_NUMBER', 'LIKE', '%' . $searchValue . '%');
-        //             }                        
-        //         }elseif ($keyId === 'CLIENT_ID'){
-        //             if ($searchValue != "") {
-        //                 $query->where('RELATION_ID', $searchValue);
-        //             }
-        //         }
-        //     }
-        // }
-
         $data = $query->paginate($perPage, ['*'], 'page', $page);
         
         return $data;

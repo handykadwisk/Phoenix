@@ -25,6 +25,12 @@ export default function Index({ auth }: PageProps) {
     // console.log("dataReviewTimeOff: ", dataReviewTimeOff);
 
     const employee: any = auth.user.employee;
+    // console.log('xx: ', employee)
+
+    const [searchDefault, setSearchDefault] = useState<any>({
+        COMPANY_ID: employee.COMPANY_ID,
+        DIVISION_ID: employee.division.COMPANY_DIVISION_ID            
+    });
     
     useEffect(() => {
         getSubtitute();
@@ -420,7 +426,6 @@ export default function Index({ auth }: PageProps) {
                                                         }
                                                     />
                                                 </span>
-                                                
                                             </div>
                                         </div>
                                     )}
@@ -558,16 +563,15 @@ export default function Index({ auth }: PageProps) {
                 }
             />
 
-           
             <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
                 <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                     <AGGrid
                         addButtonLabel={undefined}
                         addButtonModalState={undefined}
                         withParam={""}
-                        searchParam={""}
+                        searchParam={searchDefault}
                         // loading={isLoading.get_policy}
-                        url={"getRequestTimeOffAgGrid"}
+                        url={"getRequestTimeOffForApprove"}
                         doubleClickEvent={handleEditModal}
                         triggeringRefreshData={isSuccess}
                         colDefs={[
