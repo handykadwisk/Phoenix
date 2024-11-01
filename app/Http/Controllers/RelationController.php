@@ -7,6 +7,7 @@ use App\Models\MBankAccountRelation;
 use App\Models\MPksRelation;
 use App\Models\MRelationAka;
 use App\Models\MRelationPic;
+use App\Models\RRelationStatus;
 use App\Models\MRelationType;
 use App\Models\MTag;
 use App\Models\Relation;
@@ -15,6 +16,7 @@ use App\Models\RelationLob;
 use App\Models\RelationProfession;
 use App\Models\RelationStatus;
 use App\Models\RelationType;
+use App\Models\RSalutation;
 use App\Models\Salutation;
 use App\Models\Tag;
 use App\Models\TPerson;
@@ -176,7 +178,7 @@ class RelationController extends Controller
     public function index(Request $request)
     {
         // call data relation
-        $relation = Relation::get();
+        $relation = Relation::with('relationStatus')->get();
 
         // call data relation group
         $relationGroup = RelationGroup::get();
@@ -234,12 +236,13 @@ class RelationController extends Controller
         }
 
         // for cek relation
-        $flag = "0";
-        $message = "Relation already exists";
-        $relation = Relation::where('RELATION_ORGANIZATION_NAME', trim($request->name_relation))->get();
-        if ($relation->count() > 0) {
-            $relationName = $relation[0]->RELATION_ORGANIZATION_NAME;
-            if ($relationName == trim($request->name_relation)) {
+        if ($request->relation_status_id == 1 || $request->relation_status_id == "1") {
+            $flag = "0";
+            $relation = Relation::where('RELATION_ORGANIZATION_NAME', trim($request->name_relation))->where('PRE_SALUTATION', $request->pre_salutation_id)->get();
+            $preName = RSalutation::where('salutation_id', $relation[0]['PRE_SALUTATION'])->first();
+            $message = $preName->salutation_name . " " . $relation[0]['RELATION_ORGANIZATION_NAME'] . " has already exists";
+            // dd($preName);
+            if ($relation->count() > 0) {
                 return new JsonResponse([
                     $flag,
                     $message
@@ -582,13 +585,15 @@ class RelationController extends Controller
 
         // cek jika sama tidak melakukan cek abbreviation existing
         if ($relationOld != $request->RELATION_ORGANIZATION_NAME) {
-            // cek abbreviation
-            $flag = "0";
-            $message = "Relation already exists";
-            $relationNew = Relation::where('RELATION_ORGANIZATION_NAME', trim(strtoupper($request->RELATION_ORGANIZATION_NAME)))->get();
-            if ($relationNew->count() > 0) {
-                $abbreviationName = $relationNew[0]->RELATION_ORGANIZATION_NAME;
-                if ($abbreviationName == trim(strtoupper($request->RELATION_ORGANIZATION_NAME))) {
+            if ($request->relation_status_id == 1 || $request->relation_status_id == "1") {
+
+                // cek abbreviation
+                $flag = "0";
+                $relationNew = Relation::where('RELATION_ORGANIZATION_NAME', trim(strtoupper($request->RELATION_ORGANIZATION_NAME)))->where('PRE_SALUTATION', $request->PRE_SALUTATION)->get();
+                $preName = RSalutation::where('salutation_id', $relationNew[0]['PRE_SALUTATION'])->first();
+                $message = $preName->salutation_name . " " . $relationNew[0]['RELATION_ORGANIZATION_NAME'] . " has already exists";
+                // dd($relationNew->count());
+                if ($relationNew->count() > 0) {
                     return new JsonResponse([
                         $flag,
                         $message
@@ -605,19 +610,23 @@ class RelationController extends Controller
 
         // cek jika sama tidak melakukan cek abbreviation existing
         if ($abbreOld != $request->RELATION_ORGANIZATION_ABBREVIATION) {
-            // cek abbreviation
-            $flag = "0";
-            $message = "Abbreviation already exists";
-            $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->abbreviation)))->get();
-            if ($abbreviation->count() > 0) {
-                $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
-                if ($abbreviationName == trim(strtoupper($request->abbreviation))) {
-                    return new JsonResponse([
-                        $flag,
-                        $message
-                    ], 201, [
-                        'X-Inertia' => true
-                    ]);
+            if ($request->relation_status_id == 1 || $request->relation_status_id == "1") {
+
+                // cek abbreviation
+                // dd("masuk ga");
+                $flag = "0";
+                $message = "Abbreviation already exists";
+                $abbreviation = Relation::where('RELATION_ORGANIZATION_ABBREVIATION', trim(strtoupper($request->RELATION_ORGANIZATION_ABBREVIATION)))->get();
+                if ($abbreviation->count() > 0) {
+                    $abbreviationName = $abbreviation[0]->RELATION_ORGANIZATION_ABBREVIATION;
+                    if ($abbreviationName == trim(strtoupper($request->RELATION_ORGANIZATION_ABBREVIATION))) {
+                        return new JsonResponse([
+                            $flag,
+                            $message
+                        ], 201, [
+                            'X-Inertia' => true
+                        ]);
+                    }
                 }
             }
         }

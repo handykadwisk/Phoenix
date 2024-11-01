@@ -388,19 +388,21 @@ export default function AddRelation({
 
     // cek relation existing
     const cekRelationName = () => {
-        const filterRelation = relation.filter(
-            (items: any) =>
-                items.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase() ===
-                data.name_relation.toLocaleLowerCase()?.trim()
-        );
+        if (data.relation_status_id !== "2") {
+            const filterRelation = relation.filter(
+                (items: any) =>
+                    items.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase() ===
+                    data.name_relation.toLocaleLowerCase()?.trim()
+            );
 
-        if (filterRelation.length !== 0) {
-            Swal.fire({
-                title: "Warning",
-                text: "Relation Already Exists",
-                icon: "warning",
-            }).then((result: any) => {});
-            setData("name_relation", "");
+            if (filterRelation.length !== 0) {
+                Swal.fire({
+                    title: "Warning",
+                    text: "Relation Already Exists",
+                    icon: "warning",
+                }).then((result: any) => {});
+                setData("name_relation", "");
+            }
         }
     };
 
@@ -589,7 +591,7 @@ export default function AddRelation({
                                         }
                                     }}
                                     onBlur={() => {
-                                        cekRelationName();
+                                        // cekRelationName();
                                         setShowRelation(false);
                                     }}
                                     required
@@ -608,11 +610,20 @@ export default function AddRelation({
                                                     return (
                                                         <div
                                                             key={index}
-                                                            className="mt-1 px-2"
+                                                            className="mt-1 px-2 flex gap-2 items-center"
                                                         >
-                                                            {
-                                                                items.RELATION_ORGANIZATION_NAME
-                                                            }
+                                                            <div>
+                                                                {
+                                                                    items.RELATION_ORGANIZATION_NAME
+                                                                }
+                                                            </div>
+                                                            <div className="text-xs text-gray-500">
+                                                                {"(" +
+                                                                    items
+                                                                        ?.relation_status
+                                                                        .relation_status_name +
+                                                                    ")"}
+                                                            </div>
                                                         </div>
                                                     );
                                                 }

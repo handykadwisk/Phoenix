@@ -90,4 +90,9 @@ class Relation extends Model
     {
         return $this->hasMany(MRelationPic::class, 'PERSON_ID', 'RELATION_ORGANIZATION_ID');
     }
+
+    public function relationStatus()
+    {
+        return $this->hasOne(RRelationStatus::class, 'relation_status_id', 'relation_status_id');
+    }
 }
