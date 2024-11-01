@@ -27,16 +27,17 @@ export default function Index({ auth }: PageProps) {
             (id: any) => id.EMPLOYEE_ID == employeeId
         );
         return result
-            ? result.EMPLOYEE_MIDDLE_NAME != null
-                ? result.EMPLOYEE_FIRST_NAME +
-                  " " +
-                  result.EMPLOYEE_MIDDLE_NAME +
-                  " " +
-                  result.EMPLOYEE_LAST_NAME
-                : result.EMPLOYEE_LAST_NAME != null
-                ? result.EMPLOYEE_FIRST_NAME + " " + result.EMPLOYEE_LAST_NAME
-                : result.EMPLOYEE_FIRST_NAME
-            : null;
+            ? result.EMPLOYEE_FIRST_NAME
+            : // result.EMPLOYEE_MIDDLE_NAME != null
+              //     ? result.EMPLOYEE_FIRST_NAME +
+              //       " " +
+              //       result.EMPLOYEE_MIDDLE_NAME +
+              //       " " +
+              //       result.EMPLOYEE_LAST_NAME
+              //     : result.EMPLOYEE_LAST_NAME != null
+              //     ? result.EMPLOYEE_FIRST_NAME + " " + result.EMPLOYEE_LAST_NAME
+              //     : result.EMPLOYEE_FIRST_NAME
+              null;
     };
 
     const handleSelectCompany = (idCompany: string) => {

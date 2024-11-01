@@ -4,7 +4,7 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Button/Button";
 import TextInput from "@/Components/TextInput";
 import AGGrid from "@/Components/AgGrid";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import ToastMessage from "@/Components/ToastMessage";
@@ -14,24 +14,32 @@ import "react-datepicker/dist/react-datepicker.css";
 // import DetailAttendanceSetting from "./DetailAttendanceSetting";
 import axios from "axios";
 import dateFormat from "dateformat";
+import Input from "@/Components/Input";
 
 export default function Index({ auth }: PageProps) {
     const { timeOffTipes }: any = usePage().props;
     
     const employee:any = auth.user.employee;
-    // console.log("auth.user: ", auth.user);
-
-    console.log("employee: ", employee);
 
     useEffect(() => {
         // alert("ads");
         getSubtitute();
-        getRequestTo()
+        getRequestTo();
+        getTimeOffAvailable()
+        getTimeOffUsed()
     }, [employee]);
 
 
+    const [selectedType, setSelectedType] = useState<any>({});
+    const [dailyOff, setDailyOff] = useState<any>([]);
 
+    const [timeOffUsed, settimeOffUsed] = useState<any>([]);
     const [dataSubtitute, setDataSubtitute] = useState<any>([]);
+    const [timeOffAvailable, setTimeOffAvailable] = useState<any>([]);
+    const [dataRequestTo, setDataRequestTo] = useState<any>([]);
+    const [fieldTotalTimeOff, setFieldTotalTimeOff] = useState<number>(0);
+    const [fieldStartDate, setFieldStartDate] = useState<any>(null);
+    const [fieldEndDate, setFieldEndDate] = useState<any>(null);
     const getSubtitute = async () => {
         await axios
             .post(`/getSubtitute`, { divisionId: employee.DIVISION_ID, employeeId: employee.EMPLOYEE_ID })
@@ -42,26 +50,112 @@ export default function Index({ auth }: PageProps) {
                 console.log(err);
             });
     };
-
     const getRequestTo = async () => {
         await axios
             .post(`/getRequestTo`)
             .then((res) => {
-                setDataSubtitute(res.data);
+                setDataRequestTo(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    const getTimeOffAvailable = async () => {
+        await axios
+            .post(`/getTimeOffAvailable`)
+            .then((res) => {
+                setTimeOffAvailable(res.data);
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
-    console.log("dataSubtitute: ", dataSubtitute);
+    const getTimeOffUsed = async () => {
+        await axios
+            .post(`/getTimeOffUsed`)
+            .then((res) => {
+                settimeOffUsed(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
+    const getSelectedType = (id: any) => {
+        const data = timeOffTipes;
+        const result = data.find((value: any) => value.TIME_OFF_TYPE_ID == id);
+        return result ? result : null;
+    };
 
+    const inputTimeOff = (name: string, value: any) => {
+        const items = { ...dataRequestTimeOff };
+        const details = [items.detail]
+        if (name == "TIME_OFF_TYPE_ID") {
+            if (value) {
+                items["detail"] = [
+                    {
+                        DATE_OF_LEAVE: "",
+                    },
+                ];
+            }
+            
+            const type = getSelectedType(value) ? getSelectedType(value) : null;
+            Object.keys(type).length > 0
+                ? type.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE == 0
+                    ? (items["IS_REDUCE_LEAVE"] = 1)
+                    : (items["IS_REDUCE_LEAVE"] = 0)
+                : "";
+            
+            setSelectedType(getSelectedType(value) ? getSelectedType(value): {});
+        }
+        
+        items[name] = value;
+        setDataRequestTimeOff(items);
+    };
+    
+    
+    const addRowDailyOff = (e: FormEvent) => {
+        e.preventDefault();
+        setDataRequestTimeOff({
+            ...dataRequestTimeOff,
+            detail: [
+                ...dataRequestTimeOff.detail,
+                {
+                    DATE_OF_LEAVE: "",
+                },
+            ],
+        });
 
+        setDailyOff([...dailyOff, { DATE: null }]);
+    };
+
+    const inputDailyOff = (value: any, i:any) => {
+        const items = [...dataRequestTimeOff.detail];
+
+        items[i]["DATE_OF_LEAVE"] = value;
+
+        setDataRequestTimeOff({
+            ...dataRequestTimeOff,
+            detail: items,
+        });
+    };
+
+    const deleteRowDailyOff = (i: number) => {
+        const val = [...dataRequestTimeOff.detail];
+        val.splice(i, 1);
+        setDataRequestTimeOff({
+            ...dataRequestTimeOff,
+            detail: val,
+        });
+    };
+
+   
 
     // Request Time Off
     const [modal, setModal] = useState<any>({
         modalRequestTimeOff: false,
+        modalEditRequestTimeOff: false,
     });
 
     const fieldDataRequestTimeOff = {
@@ -80,20 +174,28 @@ export default function Index({ auth }: PageProps) {
         APPROVED_BY: "",
         STATUS: "",
         NOTE: "",
+        detail: [
+            // {DATE_OF_LEAVE: ""}
+        ]
     };
 
     const [dataRequestTimeOff, setDataRequestTimeOff] = useState<any>({});
 
     const handleRequestTimeOff = () => {
+        getSubtitute();
+        getRequestTo();
+        getTimeOffAvailable();
+        getTimeOffUsed();
         const items = { ...fieldDataRequestTimeOff };
         items["EMPLOYEE_ID"] = employee.EMPLOYEE_ID;
         setDataRequestTimeOff(items);
         setModal({
             modalRequestTimeOff: !modal.modalRequestTimeOff,
+            modalEditRequestTimeOff: false,
         });
     };
 
-    console.log("dataRequestTimeOff: ", dataRequestTimeOff);
+    // console.log("dataRequestTimeOff: ", dataRequestTimeOff);
 
     const handleSuccessRequestTimeOff = (message: string) => {
         setIsSuccess("");
@@ -108,52 +210,75 @@ export default function Index({ auth }: PageProps) {
 
     // End Request Time Off
 
-    // Set Person Attendance
-    const [dataPersonAttendance, setDataPersonAttendance] = useState<any>([]);
-    // get M Employee Attendance
-    const mappingEmployeeToSettingAttendance = (idCompany: string) => {
-        axios
-            //  .get(`/mappingEmployeeToSettingAttendance`)
-            .post(`/mappingEmployeeToSettingAttendance`, { idCompany })
-            .then((res) => {
-                setDataPersonAttendance(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const inputDataPersonAttendance = (name: string, value: any, i: number) => {
-        const changeVal: any = [...dataPersonAttendance];
-
-        changeVal[i][name] = value;
-        setDataPersonAttendance(changeVal);
-    };
-
     
-
-    // End Set Person Attendance
 
     const [isSuccess, setIsSuccess] = useState<string>("");
 
-    const [detailAttendanceSetting, setDetailAttendanceSetting] = useState<any>(
-        {
-            ATTENDANCE_SETTING_ID: "",
-            COMPANY_ID: "",
+   
+    // Edit time Off
+
+    const [editRequestTimeOff, setEditRequestTimeOff] = useState<any>({});
+   const handleEditModal = async (data: any) => {
+       await axios
+           .get(`/getRequestTimeOffById/${data.REQUEST_TIME_OFF_MASTER_ID}`)
+           .then((res) => setEditRequestTimeOff(res.data))
+           .catch((err) => console.log(err));
+       
+       setSelectedTypeForEdit(
+           getSelectedType(data.TIME_OFF_TYPE_ID) ? getSelectedType(data.TIME_OFF_TYPE_ID) : {}
+       );
+
+       setModal({
+           modalRequestTimeOff: false,
+           modalEditRequestTimeOff: !modal.modalEditRequestTimeOff,
+       });
+       
+    };
+    
+    const [selectedTypeForEdit, setSelectedTypeForEdit] = useState<any>({});
+
+    // console.log("editRequestTimeOff: ", editRequestTimeOff);
+    const editTimeOff = (name: string, value: any) => {
+        const items = { ...editRequestTimeOff };
+        const details = [items.request_time_off];
+        
+        if (name == "TIME_OFF_TYPE_ID") {
+            if (value) {
+                items["request_time_off"] = [
+                    {
+                        DATE_OF_LEAVE: "",
+                    },
+                ];
+            }
+            const type = getSelectedType(value) ? getSelectedType(value) : null;
+            Object.keys(type).length > 0
+                ? type.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE == 0
+                    ? (items["IS_REDUCE_LEAVE"] = 1)
+                    : (items["IS_REDUCE_LEAVE"] = 0)
+                : "";
+
+            setSelectedTypeForEdit(
+                getSelectedType(value) ? getSelectedType(value) : {}
+            );
         }
-    );
+        
+        items[name] = value;
+        setEditRequestTimeOff(items);
+    };
 
-    const handleDetailAttendanceSetting = async (data: any) => {
-        setDetailAttendanceSetting({
-            ATTENDANCE_SETTING_ID: data.ATTENDANCE_SETTING_ID,
-            COMPANY_ID: data.COMPANY_ID,
-        });
 
-        setModal({
-            modalRequestTimeOff: false,
-            modalViewWorkAttendce: !modal.modalViewWorkAttendce,
+    const editDailyOff = (value: any, i: any) => {
+        const items = [...editRequestTimeOff.request_time_off];
+
+        items[i]["DATE_OF_LEAVE"] = value;
+
+        setEditRequestTimeOff({
+            ...editRequestTimeOff,
+            request_time_off: items,
         });
     };
+
+    // End Edit Time Off
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Time Off"}>
@@ -178,6 +303,10 @@ export default function Index({ auth }: PageProps) {
                 title={"Request Time Off"}
                 url={`/requestTimeOff`}
                 data={dataRequestTimeOff}
+                // data={[
+                //     { dataRequestTimeOff: dataRequestTimeOff },
+                //     { dailyOff: dailyOff },
+                // ]}
                 onSuccess={handleSuccessRequestTimeOff}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
@@ -196,23 +325,7 @@ export default function Index({ auth }: PageProps) {
                                     id="name"
                                     name="name"
                                     type="text"
-                                    value={
-                                        employee
-                                            ? employee.EMPLOYEE_MIDDLE_NAME !=
-                                              null
-                                                ? employee.EMPLOYEE_FIRST_NAME +
-                                                  " " +
-                                                  employee.EMPLOYEE_MIDDLE_NAME +
-                                                  " " +
-                                                  employee.EMPLOYEE_LAST_NAME
-                                                : employee.EMPLOYEE_LAST_NAME !=
-                                                  null
-                                                ? employee.EMPLOYEE_FIRST_NAME +
-                                                  " " +
-                                                  employee.EMPLOYEE_LAST_NAME
-                                                : employee.EMPLOYEE_FIRST_NAME
-                                            : null
-                                    }
+                                    value={employee.EMPLOYEE_FIRST_NAME}
                                     readOnly
                                     // placeholder="Jane Smith"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
@@ -252,7 +365,9 @@ export default function Index({ auth }: PageProps) {
                                     name="total_time_off_used"
                                     type="text"
                                     readOnly
-                                    value={"4/12"}
+                                    value={
+                                        timeOffUsed + " / " + timeOffAvailable
+                                    }
                                     // placeholder="Jane Smith"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
@@ -269,7 +384,7 @@ export default function Index({ auth }: PageProps) {
                                     name="available_time_off"
                                     type="text"
                                     readOnly
-                                    value={"8"}
+                                    value={timeOffAvailable - timeOffUsed}
                                     // placeholder="Jane Smith"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
@@ -284,12 +399,15 @@ export default function Index({ auth }: PageProps) {
                                 <select
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={dataRequestTimeOff.TIME_OFF_TYPE_ID}
-                                    // onChange={(e) =>
-                                    //     inputClockIn(
-                                    //         "EMPLOYEE_ATTENDANCE_LOCATION_TYPE",
-                                    //         e.target.value
-                                    //     )
-                                    // }
+                                    onChange={
+                                        (e) =>
+                                            inputTimeOff(
+                                                "TIME_OFF_TYPE_ID",
+                                                e.target.value
+                                            )
+                                        // dataRequestTimeOff("TIME_OFF_TYPE_ID", e.target.value)
+                                        // setSelectedType(e.target.value)
+                                    }
                                     required
                                 >
                                     <option value={""}>
@@ -311,6 +429,285 @@ export default function Index({ auth }: PageProps) {
                                     )}
                                 </select>
                             </div>
+                            {!selectedType ? (
+                                ""
+                            ) : selectedType.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
+                              "1" ? (
+                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Not Reduce Leave By
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
+                                                " Month + " +
+                                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
+                                                " Day(s)"
+                                            }
+                                            // placeholder="Jane Smith"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                  !selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Not Reduce Leave By
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
+                                                " Month (s) "
+                                            }
+                                            // placeholder="Jane Smith"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : !selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                  selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Not Reduce Leave By
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
+                                                " Day(s)"
+                                            }
+                                            // placeholder="Jane Smith"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : !selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                  !selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Total Time Off
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="number"
+                                            // readOnly
+                                            value={fieldTotalTimeOff}
+                                            onChange={(e: any) => {
+                                                setFieldTotalTimeOff(
+                                                    e.target.value
+                                                );
+                                            }}
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : (
+                                    ""
+                                )
+                            ) : (
+                                ""
+                            )}
+
+                            {!selectedType ? (
+                                ""
+                            ) : selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                              selectedType.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
+                                  1 ? (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="relative mt-8">
+                                        <label
+                                            htmlFor="start_date"
+                                            className="absolute -top-4 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Start
+                                        </label>
+                                        <DatePicker
+                                            selected={fieldStartDate}
+                                            onChange={(date: any) =>
+                                                inputDailyOff(
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    ),
+                                                    1
+                                                )
+                                            }
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd-mm-yyyyy"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                    <div className="relative mt-8">
+                                        <label
+                                            htmlFor="end_date"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Until
+                                        </label>
+                                        <input
+                                            id="end_date"
+                                            name="end_date"
+                                            type="text"
+                                            value={
+                                                fieldEndDate &&
+                                                dateFormat(
+                                                    fieldEndDate,
+                                                    "dd-mm-yyyy"
+                                                )
+                                            }
+                                            // onChange={(e: any) => {
+                                            //     setFieldEndDate(e.target.value);
+                                            // }}
+                                            readOnly
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                ""
+                            )}
+
+                            {dataRequestTimeOff.detail && (
+                                <div className="relative mt-4">
+                                    <table className="table-fixed w-full mb-4">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th
+                                                    rowSpan={2}
+                                                    scope="col"
+                                                    className="w-4 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                >
+                                                    No.
+                                                </th>
+                                                <th
+                                                    rowSpan={2}
+                                                    scope="col"
+                                                    className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                >
+                                                    Date
+                                                </th>
+                                                <th
+                                                    rowSpan={2}
+                                                    scope="col"
+                                                    className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                >
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                            {dataRequestTimeOff.detail.map(
+                                                (dO: any, i: number) => (
+                                                    <tr className="border-t border-gray-200">
+                                                        <td className="border text-sm border-[#eee] dark:border-strokedark">
+                                                            <div
+                                                                className={
+                                                                    "block w-full mx-auto text-center"
+                                                                }
+                                                            >
+                                                                {i+1}
+                                                            </div>
+                                                        </td>
+                                                        <td className="border text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                            <DatePicker
+                                                                required
+                                                                selected={
+                                                                    dO.DATE_OF_LEAVE
+                                                                }
+                                                                onChange={(
+                                                                    date: any
+                                                                ) =>
+                                                                    inputDailyOff(
+                                                                        date.toLocaleDateString(
+                                                                            "en-CA"
+                                                                        ),
+                                                                        i
+                                                                    )
+                                                                }
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dateFormat={
+                                                                    "dd-MM-yyyy"
+                                                                }
+                                                                placeholderText="dd-mm-yyyyy"
+                                                                className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                            />
+                                                        </td>
+                                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                            {i > 0 ? (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    strokeWidth={
+                                                                        1.5
+                                                                    }
+                                                                    stroke="currentColor"
+                                                                    className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        deleteRowDailyOff(
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <path
+                                                                        fill="#AB7C94"
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M6 18 18 6M6 6l12 12"
+                                                                    />
+                                                                </svg>
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            )}
+                                            <tr>
+                                                <td
+                                                    colSpan={3}
+                                                    className=" h-10 w-40 mb-2 mt-2"
+                                                >
+                                                    <a
+                                                        href=""
+                                                        className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
+                                                        onClick={(e) =>
+                                                            addRowDailyOff(e)
+                                                        }
+                                                    >
+                                                        + Add Date
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
                             <div className="relative mt-4">
                                 <label
                                     // htmlFor="available_time_off"
@@ -320,95 +717,287 @@ export default function Index({ auth }: PageProps) {
                                 </label>
                                 <select
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    // value={
-                                    //     data.EMPLOYEE_ATTENDANCE_LOCATION_TYPE
-                                    // }
-                                    // onChange={(e) =>
-                                    //     inputClockIn(
-                                    //         "EMPLOYEE_ATTENDANCE_LOCATION_TYPE",
-                                    //         e.target.value
-                                    //     )
-                                    // }
+                                    value={dataRequestTimeOff.SUBSTITUTE_PIC}
+                                    onChange={(e) =>
+                                        inputTimeOff(
+                                            "SUBSTITUTE_PIC",
+                                            e.target.value
+                                        )
+                                    }
                                     required
                                 >
                                     <option value={""}>
                                         -- <i>Choose One</i> --
                                     </option>
-                                    {dataSubtitute ? dataSubtitute.map(
-                                        (item: any, i: number) => {
-                                            return (
-                                                <option
-                                                    key={i}
-                                                    value={item.EMPLOYEE_ID}
-                                                >
-                                                    {item
-                                                        ? item.EMPLOYEE_MIDDLE_NAME !=
-                                                          null
-                                                            ? item.EMPLOYEE_FIRST_NAME +
-                                                              " " +
-                                                              item.EMPLOYEE_MIDDLE_NAME +
-                                                              " " +
-                                                              item.EMPLOYEE_LAST_NAME
-                                                            : item.EMPLOYEE_LAST_NAME !=
-                                                              null
-                                                            ? item.EMPLOYEE_FIRST_NAME +
-                                                              " " +
-                                                              item.EMPLOYEE_LAST_NAME
-                                                            : item.EMPLOYEE_FIRST_NAME
-                                                        : null}
-                                                </option>
-                                            );
-                                        }
-                                    ) : ""}
+                                    {dataSubtitute
+                                        ? dataSubtitute.map(
+                                              (item: any, i: number) => {
+                                                  return (
+                                                      <option
+                                                          key={i}
+                                                          value={
+                                                              item.EMPLOYEE_ID
+                                                          }
+                                                      >
+                                                          {
+                                                              item.EMPLOYEE_FIRST_NAME
+                                                          }
+                                                      </option>
+                                                  );
+                                              }
+                                          )
+                                        : ""}
                                 </select>
                             </div>
-                            <div className="relative mt-4">
-                                <label
-                                    htmlFor="file_upload"
-                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
-                                >
-                                    File Upload
-                                </label>
-                                <input
-                                    id="file_upload"
-                                    name="file_upload"
+                            {dataRequestTimeOff.SUBSTITUTE_PIC && (
+                                <div className="relative mt-4">
+                                    <label
+                                        // htmlFor="available_time_off"
+                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                    >
+                                        Second Subtitute PIC
+                                    </label>
+                                    <select
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={
+                                            dataRequestTimeOff.SECOND_SUBSTITUTE_PIC
+                                        }
+                                        onChange={(e) =>
+                                            inputTimeOff(
+                                                "SECOND_SUBSTITUTE_PIC",
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <option value={""}>
+                                            -- <i>Choose One</i> --
+                                        </option>
+                                        {dataSubtitute
+                                            ? dataSubtitute
+                                                  ?.filter(
+                                                      (dataSecond: any) =>
+                                                          dataSecond.EMPLOYEE_ID !=
+                                                          dataRequestTimeOff.SUBSTITUTE_PIC
+                                                  )
+                                                  .map(
+                                                      (
+                                                          item: any,
+                                                          i: number
+                                                      ) => {
+                                                          return (
+                                                              <option
+                                                                  key={i}
+                                                                  value={
+                                                                      item.EMPLOYEE_ID
+                                                                  }
+                                                              >
+                                                                  {
+                                                                      item.EMPLOYEE_FIRST_NAME
+                                                                  }
+                                                              </option>
+                                                          );
+                                                      }
+                                                  )
+                                            : ""}
+                                    </select>
+                                </div>
+                            )}
+
+                            <div className="mt-3">
+                                <InputLabel
+                                    value="File Upload"
+                                    // required={true}
+                                />
+                                <Input
                                     type="file"
-                                    // readOnly
-                                    // value={"8"}
-                                    // placeholder="Jane Smith"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    onChange={(e: any) => {
+                                        inputTimeOff(
+                                            "FILE_ID",
+                                            e.target.files[0]
+                                        );
+                                    }}
+                                    className="mt-1 bg-white ring-white shadow-xl"
                                 />
                             </div>
+
                             <div className="relative mt-4">
                                 <label
-                                    htmlFor="description"
+                                    htmlFor="DESCRIPTION"
                                     className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
                                 >
                                     Description
                                 </label>
-                                <input
-                                    id="description"
-                                    name="description"
-                                    type="text"
+                                <textarea
+                                    id="DESCRIPTION"
+                                    name="DESCRIPTION"
                                     // readOnly
-                                    // value={"8"}
+                                    value={dataRequestTimeOff.DESCRIPTION}
+                                    // placeholder="Jane Smith"
+                                    onChange={(e: any) => {
+                                        inputTimeOff(
+                                            "DESCRIPTION",
+                                            e.target.value
+                                        );
+                                    }}
+                                    className="resize-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="relative mt-4">
+                                    <label
+                                        htmlFor="request_date"
+                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                    >
+                                        Request Date
+                                    </label>
+                                    <input
+                                        id="request_date"
+                                        name="request_date"
+                                        type="text"
+                                        readOnly
+                                        value={dateFormat(
+                                            new Date(),
+                                            "dd-mm-yyyy"
+                                        )}
+                                        // placeholder="Jane Smith"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                <div className="relative mt-4">
+                                    <label
+                                        // htmlFor="available_time_off"
+                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                    >
+                                        Request To
+                                    </label>
+                                    <select
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={dataRequestTimeOff.REQUEST_TO}
+                                        onChange={(e) =>
+                                            inputTimeOff(
+                                                "REQUEST_TO",
+                                                e.target.value
+                                            )
+                                        }
+                                        required
+                                    >
+                                        <option value={""}>
+                                            -- <i>Choose One</i> --
+                                        </option>
+                                        {dataRequestTo.map(
+                                            (item: any, i: number) => {
+                                                return (
+                                                    <option
+                                                        key={i}
+                                                        value={item.EMPLOYEE_ID}
+                                                    >
+                                                        {
+                                                            item.EMPLOYEE_FIRST_NAME
+                                                        }
+                                                    </option>
+                                                );
+                                            }
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }
+            />
+
+            <ModalToAdd
+                buttonAddOns={""}
+                show={modal.modalEditRequestTimeOff}
+                onClose={() =>
+                    setModal({
+                        modalEditRequestTimeOff: false,
+                    })
+                }
+                title={"Edit Request Time Off"}
+                url={`/editRequestTimeOff`}
+                data={editRequestTimeOff}
+                // data={[
+                //     { dataRequestTimeOff: dataRequestTimeOff },
+                //     { dailyOff: dailyOff },
+                // ]}
+                onSuccess={handleSuccessRequestTimeOff}
+                classPanel={
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
+                }
+                body={
+                    <>
+                        <div>
+                            <div className="relative mt-2">
+                                <label
+                                    htmlFor="name"
+                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                >
+                                    Name
+                                </label>
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    value={employee.EMPLOYEE_FIRST_NAME}
+                                    readOnly
                                     // placeholder="Jane Smith"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
                             <div className="relative mt-4">
                                 <label
-                                    htmlFor="request_date"
+                                    htmlFor="division"
                                     className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
                                 >
-                                    Request Date
+                                    Division
                                 </label>
                                 <input
-                                    id="request_date"
-                                    name="request_date"
+                                    id="division"
+                                    name="division"
                                     type="text"
                                     readOnly
-                                    value={"8"}
+                                    value={
+                                        employee
+                                            ? employee.division
+                                                  .COMPANY_DIVISION_NAME
+                                            : null
+                                    }
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            <div className="relative mt-4">
+                                <label
+                                    htmlFor="total_time_off_used"
+                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                >
+                                    Total Time Off Used
+                                </label>
+                                <input
+                                    id="total_time_off_used"
+                                    name="total_time_off_used"
+                                    type="text"
+                                    readOnly
+                                    value={
+                                        timeOffUsed + " / " + timeOffAvailable
+                                    }
+                                    // placeholder="Jane Smith"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            <div className="relative mt-4">
+                                <label
+                                    htmlFor="available_time_off"
+                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                >
+                                    Available Time Off
+                                </label>
+                                <input
+                                    id="available_time_off"
+                                    name="available_time_off"
+                                    type="text"
+                                    readOnly
+                                    value={timeOffAvailable - timeOffUsed}
                                     // placeholder="Jane Smith"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
@@ -418,37 +1007,509 @@ export default function Index({ auth }: PageProps) {
                                     // htmlFor="available_time_off"
                                     className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
                                 >
-                                    Request To
+                                    Type of Request
                                 </label>
                                 <select
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    // value={
-                                    //     data.EMPLOYEE_ATTENDANCE_LOCATION_TYPE
-                                    // }
-                                    // onChange={(e) =>
-                                    //     inputClockIn(
-                                    //         "EMPLOYEE_ATTENDANCE_LOCATION_TYPE",
-                                    //         e.target.value
-                                    //     )
-                                    // }
+                                    value={editRequestTimeOff.TIME_OFF_TYPE_ID}
+                                    onChange={(e) =>
+                                        editTimeOff(
+                                            "TIME_OFF_TYPE_ID",
+                                            e.target.value
+                                        )
+                                    }
                                     required
                                 >
                                     <option value={""}>
                                         -- <i>Choose One</i> --
                                     </option>
-                                    {/* {locationType.map(
+                                    {timeOffTipes.map(
+                                        (item: any, i: number) => {
+                                            return (
+                                                <option
+                                                    key={i}
+                                                    value={
+                                                        item.TIME_OFF_TYPE_ID
+                                                    }
+                                                >
+                                                    {item.TIME_OFF_TYPE_NAME}
+                                                </option>
+                                            );
+                                        }
+                                    )}
+                                </select>
+                            </div>
+                            {!selectedTypeForEdit ? (
+                                ""
+                            ) : selectedTypeForEdit.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
+                              "1" ? (
+                                selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Not Reduce Leave By
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
+                                                " Month + " +
+                                                selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
+                                                " Day(s)"
+                                            }
+                                            // placeholder="Jane Smith"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                  !selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Not Reduce Leave By
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
+                                                " Month (s) "
+                                            }
+                                            // placeholder="Jane Smith"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : !selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                  selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Not Reduce Leave By
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
+                                                " Day(s)"
+                                            }
+                                            // placeholder="Jane Smith"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : !selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                                  !selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY ? (
+                                    <div className="relative mt-4">
+                                        <label
+                                            htmlFor="available_time_off"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Total Time Off
+                                        </label>
+                                        <input
+                                            id="available_time_off"
+                                            name="available_time_off"
+                                            type="number"
+                                            // readOnly
+                                            value={fieldTotalTimeOff}
+                                            onChange={(e: any) => {
+                                                setFieldTotalTimeOff(
+                                                    e.target.value
+                                                );
+                                            }}
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                ) : (
+                                    ""
+                                )
+                            ) : (
+                                ""
+                            )}
+
+                            {!selectedTypeForEdit ? (
+                                ""
+                            ) : selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH &&
+                              selectedTypeForEdit.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
+                                  1 ? (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="relative mt-8">
+                                        <label
+                                            htmlFor="start_date"
+                                            className="absolute -top-4 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Start
+                                        </label>
+                                        <DatePicker
+                                            selected={fieldStartDate}
+                                            onChange={(date: any) =>
+                                                inputDailyOff(
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    ),
+                                                    1
+                                                )
+                                            }
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd-mm-yyyyy"
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                    <div className="relative mt-8">
+                                        <label
+                                            htmlFor="end_date"
+                                            className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                        >
+                                            Until
+                                        </label>
+                                        <input
+                                            id="end_date"
+                                            name="end_date"
+                                            type="text"
+                                            value={
+                                                fieldEndDate &&
+                                                dateFormat(
+                                                    fieldEndDate,
+                                                    "dd-mm-yyyy"
+                                                )
+                                            }
+                                            // onChange={(e: any) => {
+                                            //     setFieldEndDate(e.target.value);
+                                            // }}
+                                            readOnly
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                ""
+                            )}
+
+                            {editRequestTimeOff.request_time_off && (
+                                <div className="relative mt-4">
+                                    <table className="table-fixed w-full mb-4">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th
+                                                    rowSpan={2}
+                                                    scope="col"
+                                                    className="w-4 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                >
+                                                    No.
+                                                </th>
+                                                <th
+                                                    rowSpan={2}
+                                                    scope="col"
+                                                    className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                >
+                                                    Date
+                                                </th>
+                                                <th
+                                                    rowSpan={2}
+                                                    scope="col"
+                                                    className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                >
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                            {editRequestTimeOff.request_time_off.map(
+                                                (dO: any, i: number) => (
+                                                    <tr className="border-t border-gray-200">
+                                                        <td className="border text-sm border-[#eee] dark:border-strokedark">
+                                                            <div
+                                                                className={
+                                                                    "block w-full mx-auto text-center"
+                                                                }
+                                                            >
+                                                                {1}
+                                                            </div>
+                                                        </td>
+                                                        <td className="border text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                            <DatePicker
+                                                                selected={
+                                                                    dO.DATE_OF_LEAVE
+                                                                }
+                                                                onChange={(
+                                                                    date: any
+                                                                ) =>
+                                                                    editDailyOff(
+                                                                        date.toLocaleDateString(
+                                                                            "en-CA"
+                                                                        ),
+                                                                        i
+                                                                    )
+                                                                }
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dateFormat={
+                                                                    "dd-MM-yyyy"
+                                                                }
+                                                                placeholderText="dd-mm-yyyyy"
+                                                                className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                            />
+                                                        </td>
+                                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm  sm:pr-3 border-[1px]">
+                                                            {i > 0 ? (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    strokeWidth={
+                                                                        1.5
+                                                                    }
+                                                                    stroke="currentColor"
+                                                                    className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        deleteRowDailyOff(
+                                                                            i
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <path
+                                                                        fill="#AB7C94"
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M6 18 18 6M6 6l12 12"
+                                                                    />
+                                                                </svg>
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            )}
+                                            <tr>
+                                                <td
+                                                    colSpan={3}
+                                                    className=" h-10 w-40 mb-2 mt-2"
+                                                >
+                                                    <a
+                                                        href=""
+                                                        className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
+                                                        onClick={(e) =>
+                                                            addRowDailyOff(e)
+                                                        }
+                                                    >
+                                                        + Add Date
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            <div className="relative mt-4">
+                                <label
+                                    // htmlFor="available_time_off"
+                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                >
+                                    Subtitute PIC
+                                </label>
+                                <select
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={editRequestTimeOff.SUBSTITUTE_PIC}
+                                    onChange={(e) =>
+                                        editTimeOff(
+                                            "SUBSTITUTE_PIC",
+                                            e.target.value
+                                        )
+                                    }
+                                    required
+                                >
+                                    <option value={""}>
+                                        -- <i>Choose One</i> --
+                                    </option>
+                                    {dataSubtitute
+                                        ? dataSubtitute.map(
+                                              (item: any, i: number) => {
+                                                  return (
+                                                      <option
+                                                          key={i}
+                                                          value={
+                                                              item.EMPLOYEE_ID
+                                                          }
+                                                      >
+                                                          {
+                                                              item.EMPLOYEE_FIRST_NAME
+                                                          }
+                                                      </option>
+                                                  );
+                                              }
+                                          )
+                                        : ""}
+                                </select>
+                            </div>
+                            {editRequestTimeOff.SUBSTITUTE_PIC && (
+                                <div className="relative mt-4">
+                                    <label
+                                        // htmlFor="available_time_off"
+                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                    >
+                                        Second Subtitute PIC
+                                    </label>
+                                    <select
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={
+                                            editRequestTimeOff.SECOND_SUBSTITUTE_PIC
+                                        }
+                                        onChange={(e) =>
+                                            editTimeOff(
+                                                "SECOND_SUBSTITUTE_PIC",
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <option value={""}>
+                                            -- <i>Choose One</i> --
+                                        </option>
+                                        {dataSubtitute
+                                            ? dataSubtitute
+                                                  ?.filter(
+                                                      (dataSecond: any) =>
+                                                          dataSecond.EMPLOYEE_ID !=
+                                                          dataRequestTimeOff.SUBSTITUTE_PIC
+                                                  )
+                                                  .map(
+                                                      (
+                                                          item: any,
+                                                          i: number
+                                                      ) => {
+                                                          return (
+                                                              <option
+                                                                  key={i}
+                                                                  value={
+                                                                      item.EMPLOYEE_ID
+                                                                  }
+                                                              >
+                                                                  {
+                                                                      item.EMPLOYEE_FIRST_NAME
+                                                                  }
+                                                              </option>
+                                                          );
+                                                      }
+                                                  )
+                                            : ""}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* <div className="mt-3">
+                                <InputLabel
+                                    value="File Upload"
+                                    // required={true}
+                                />
+                                <Input
+                                    type="file"
+                                    onChange={(e: any) => {
+                                        // console.log(e.target.files[0]);
+                                        inputTimeOff(
+                                            "FILE_ID",
+                                            e.target.files[0]
+                                        );
+                                    }}
+                                    className="mt-1 bg-white ring-white shadow-xl"
+                                />
+                            </div> */}
+
+                            <div className="relative mt-4">
+                                <label
+                                    htmlFor="DESCRIPTION"
+                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                >
+                                    Description
+                                </label>
+                                <textarea
+                                    id="DESCRIPTION"
+                                    name="DESCRIPTION"
+                                    // readOnly
+                                    value={editRequestTimeOff.DESCRIPTION}
+                                    // placeholder="Jane Smith"
+                                    onChange={(e: any) => {
+                                        editTimeOff(
+                                            "DESCRIPTION",
+                                            e.target.value
+                                        );
+                                    }}
+                                    className="resize-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="relative mt-4">
+                                    <label
+                                        htmlFor="request_date"
+                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                    >
+                                        Request Date
+                                    </label>
+                                    <input
+                                        id="request_date"
+                                        name="request_date"
+                                        type="text"
+                                        readOnly
+                                        value={dateFormat(
+                                            editRequestTimeOff.REQUEST_DATE,
+                                            "dd-mm-yyyy"
+                                        )}
+                                        // placeholder="Jane Smith"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                <div className="relative mt-4">
+                                    <label
+                                        // htmlFor="available_time_off"
+                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
+                                    >
+                                        Request To
+                                    </label>
+                                    <select
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        value={editRequestTimeOff.REQUEST_TO}
+                                        onChange={(e) =>
+                                            editTimeOff(
+                                                "REQUEST_TO",
+                                                e.target.value
+                                            )
+                                        }
+                                        required
+                                    >
+                                        <option value={""}>
+                                            -- <i>Choose One</i> --
+                                        </option>
+                                        {dataRequestTo.map(
                                             (item: any, i: number) => {
                                                 return (
                                                     <option
                                                         key={i}
-                                                        value={item.ID}
+                                                        value={item.EMPLOYEE_ID}
                                                     >
-                                                        {item.NAME}
+                                                        {
+                                                            item.EMPLOYEE_FIRST_NAME
+                                                        }
                                                     </option>
                                                 );
                                             }
-                                        )} */}
-                                </select>
+                                        )}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </>
@@ -468,6 +1529,78 @@ export default function Index({ auth }: PageProps) {
                         >
                             {"Request Time Off"}
                         </Button>
+                    </div>
+                </div>
+                {/* <div className="flex flex-col relative">
+                    <div className="bg-white mb-4 rounded-md shadow-md p-4">
+                        <a
+                            href={"reviewTimeOff/" + 387}
+                            target="_blank"
+                        >
+                            {"Review Time Off"}
+                        </a>
+                        
+                    </div>
+                </div> */}
+                <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={""}
+                            // loading={isLoading.get_policy}
+                            url={"getRequestTimeOffAgGrid"}
+                            doubleClickEvent={handleEditModal}
+                            triggeringRefreshData={isSuccess}
+                            colDefs={[
+                                // {
+                                //     headerName: "No.",
+                                //     valueGetter: "node.rowIndex + 1",
+                                //     flex: 1.5,
+                                // },
+                                {
+                                    headerName: "Request Date",
+                                    flex: 3,
+                                    valueGetter: function (params: any) {
+                                        if (params.data) {
+                                            return dateFormat(
+                                                params.data.REQUEST_DATE,
+                                                "dd-mm-yyyy"
+                                            );
+                                        }
+                                    },
+                                },
+                                // {
+                                //     headerName: "Request To",
+                                //     field: "REQUEST_TO",
+                                //     flex: 4,
+                                // },
+                                // {
+                                //     headerName: "Subtitute PIC",
+                                //     field: "SUBSTITUTE_PIC",
+                                //     flex: 4,
+                                // },
+                                {
+                                    headerName: "Status",
+                                    // field: "POLICY_STATUS_ID",
+                                    flex: 4,
+                                    valueGetter: function (params: any) {
+                                        if (params.data) {
+                                            if (params.data.STATUS == 0) {
+                                                return "Waiting Approval";
+                                            } else if (
+                                                params.data.STATUS == 1
+                                            ) {
+                                                return "Rejected";
+                                            } else {
+                                                return "Approved";
+                                            }
+                                        }
+                                    },
+                                },
+                            ]}
+                        />
                     </div>
                 </div>
             </div>
