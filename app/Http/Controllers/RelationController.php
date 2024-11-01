@@ -240,10 +240,9 @@ class RelationController extends Controller
         if ($request->relation_status_id == 1 || $request->relation_status_id == "1") {
             $flag = "0";
             $relation = Relation::where('RELATION_ORGANIZATION_NAME', trim($request->name_relation))->where('PRE_SALUTATION', $request->pre_salutation_id)->get();
-            $preName = RSalutation::where('salutation_id', $relation[0]['PRE_SALUTATION'])->first();
-            $message = $preName->salutation_name . " " . $relation[0]['RELATION_ORGANIZATION_NAME'] . " has already exists";
-            // dd($preName);
             if ($relation->count() > 0) {
+                $preName = RSalutation::where('salutation_id', $relation[0]['PRE_SALUTATION'])->first();
+                $message = $preName->salutation_name . " " . $relation[0]['RELATION_ORGANIZATION_NAME'] . " has already exists";
                 return new JsonResponse([
                     $flag,
                     $message
@@ -591,10 +590,10 @@ class RelationController extends Controller
                 // cek abbreviation
                 $flag = "0";
                 $relationNew = Relation::where('RELATION_ORGANIZATION_NAME', trim(strtoupper($request->RELATION_ORGANIZATION_NAME)))->where('PRE_SALUTATION', $request->PRE_SALUTATION)->get();
-                $preName = RSalutation::where('salutation_id', $relationNew[0]['PRE_SALUTATION'])->first();
-                $message = $preName->salutation_name . " " . $relationNew[0]['RELATION_ORGANIZATION_NAME'] . " has already exists";
                 // dd($relationNew->count());
                 if ($relationNew->count() > 0) {
+                    $preName = RSalutation::where('salutation_id', $relationNew[0]['PRE_SALUTATION'])->first();
+                    $message = $preName->salutation_name . " " . $relationNew[0]['RELATION_ORGANIZATION_NAME'] . " has already exists";
                     return new JsonResponse([
                         $flag,
                         $message
