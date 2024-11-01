@@ -141,6 +141,7 @@ class RelationController extends Controller
         //     }
         // }
         // dd($query->toSql());
+        $query->where('is_deleted', '<>', 1);
         $query->orderBy('RELATION_ORGANIZATION_ID', "DESC");
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -783,14 +784,14 @@ class RelationController extends Controller
 
     public function get_detail(Request $request)
     {
-        $detailRelation = Relation::with('mRelationPic')->with('TPerson')->with('groupRelation')->find($request->id);
+        $detailRelation = Relation::with('TPerson')->with('groupRelation')->find($request->id);
         // print_r($detailRelation);die;
         return response()->json($detailRelation);
     }
 
     public function get_corporate(Request $request)
     {
-        // $data = MRelationPic::leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_pic.RELATION_ORGANIZATION_ID')->where('PERSON_ID', $request->id)->get();
+
         $getIdPerson = TPerson::select('PERSON_ID')->where('INDIVIDU_RELATION_ID', $request->id)->first();
         // get data T PIC
         $data = TPic::where('PERSON_ID', $getIdPerson->PERSON_ID)->leftJoin('t_relation', 't_relation.RELATION_ORGANIZATION_ID', '=', 't_pic.RELATION_ORGANIZATION_ID')->where('t_pic.PIC_IS_DELETED', 0)->get();
