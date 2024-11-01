@@ -47,7 +47,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
+use App\Mail\SendEmail;
 use App\Models\TCompanyDivision;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
@@ -564,8 +566,31 @@ Route::middleware('auth')->group(function () {
     Route::get('/timeOff', [TimeOffController::class, 'index'])->name('timeOff');
     Route::post('/getSubtitute', [TimeOffController::class, 'getSubtitute'])->name('timeOff.getSubtitute');
     Route::post('/getRequestTo', [TimeOffController::class, 'getRequestTo'])->name('timeOff.getRequestTo');
-    // Route::post('/updatePolicyCoBroking', [CoBrokingController::class, 'updatePolicyCoBroking'])->name('policyCoBroking.updatePolicyCoBroking');
-    // Route::get('/getCoBrokingByPolicyId/{policy_id}', [CoBrokingController::class, 'getCoBrokingByPolicyId'])->name('policyCoBroking.getCoBrokingByPolicyId');
+    Route::post('/getTimeOffAvailable', [TimeOffController::class, 'getTimeOffAvailable'])->name('timeOff.getTimeOffAvailable');
+    Route::post('/getTimeOffUsed', [TimeOffController::class, 'getTimeOffUsed'])->name('timeOff.getTimeOffUsed');
+    Route::post('/requestTimeOff', [TimeOffController::class, 'store'])->name('timeOff.store');
+    Route::get('/getRequestTimeOffAgGrid', [TimeOffController::class, 'getRequestTimeOffAgGrid'])->name('timeOff.getRequestTimeOffAgGrid');
+    Route::get('/getRequestTimeOffForApprove', [TimeOffController::class, 'getRequestTimeOffForApprove'])->name('timeOff.getRequestTimeOffForApprove');
+    Route::get('/getRequestTimeOffById/{id}', [TimeOffController::class, 'getRequestTimeOffById'])->name('timeOff.getRequestTimeOffById');
+    Route::post('/editRequestTimeOff', [TimeOffController::class, 'editRequestTimeOff'])->name('timeOff.editRequestTimeOff');
+    // Route::post('/reviewTimeOff', [TimeOffController::class, 'reviewTimeOff'])->name('timeOff.reviewTimeOff');
+    Route::get('/listApproveTimeOff', [TimeOffController::class, 'listApproveTimeOff'])->name('listApproveTimeOff');
+    Route::get('/reviewTimeOff/{id}', [TimeOffController::class, 'reviewTimeOff'])->name('reviewTimeOff');
+    Route::post('/approveTimeOff', [TimeOffController::class, 'approveTimeOff'])->name('timeOff.approveTimeOff');
+    Route::post('/rejectTimeOff', [TimeOffController::class, 'rejectTimeOff'])->name('timeOff.rejectTimeOff');
+    Route::get('/sendLink', [TimeOffController::class, 'sendLink'])->name('timeOff.sendLink');
+    Route::get('/downloadTimeOffDocument/{id}', [TimeOffController::class, 'time_off_document_download'])->name('downloadTimeOffDocument.time_off_document_download');
+
+    Route::get('/mail/send', function () {
+        $data = [
+            'subject' => 'Testing Kirim Email',
+            'title' => 'Testing Kirim Email',
+            'body' => 'Ini adalah email uji coba dari Tutorial Laravel: Send Email Via SMTP GMAIL @ qadrLabs.com'
+        ];
+
+        Mail::to('apianbaru@gmail.com')->send(new SendEmail($data));
+
+    });
 
 
 
