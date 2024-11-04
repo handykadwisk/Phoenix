@@ -264,6 +264,23 @@ export default function PIC({
             });
     };
 
+    const clearPersonPic = async (pageNumber = "page=1") => {
+        setSearchPerson({
+            ...searchPerson,
+            PERSON_FIRST_NAME: "",
+        });
+        await axios
+            .post(`/getPersons?${pageNumber}`, {
+                idRelation,
+            })
+            .then((res) => {
+                setDataPerson(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <>
             {/* modal add person */}
@@ -391,10 +408,6 @@ export default function PIC({
                                 if (e.key === "Enter") {
                                     if (searchPerson.PERSON_FIRST_NAME !== "") {
                                         getPersons();
-                                        setSearchPerson({
-                                            ...searchPerson,
-                                            PERSON_FIRST_NAME: "",
-                                        });
                                     }
                                 }
                             }}
@@ -402,14 +415,18 @@ export default function PIC({
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                // onClick={() => clearSearchPerson()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={async () => {
+                                    if (searchPerson.PERSON_FIRST_NAME !== "") {
+                                        getPersons();
+                                    }
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                // onClick={() => clearSearchPerson()}
+                                onClick={() => clearPersonPic()}
                             >
                                 Clear Search
                             </div>

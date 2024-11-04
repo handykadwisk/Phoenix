@@ -153,7 +153,7 @@ class TDetailChatController extends Controller
         $employee = DB::table('t_user')
             ->select('t_user.name as PARTICIPANT_NAME', 't_user.id as PARTICIPANT_ID')
             ->leftJoin('t_employee', 't_user.employee_id', '=', 't_employee.EMPLOYEE_ID')
-            ->whereNotNull('t_user.employee_id');
+            ->whereNotNull('t_user.employee_id')->where('user_status', '<>', 0);
 
         $division = DB::table('t_company_division')
             ->select('COMPANY_DIVISION_ALIAS AS PARTICIPANT_NAME', 'COMPANY_DIVISION_ID AS PARTICIPANT_ID');
@@ -438,7 +438,7 @@ class TDetailChatController extends Controller
 
     public function get_plugin_chat(Request $request)
     {
-        $data = RPluginProcess::get();
+        $data = RPluginProcess::where('PLUGIN_PROCESS_SHOW_OBJECT', 1)->get();
 
         return response()->json($data);
     }

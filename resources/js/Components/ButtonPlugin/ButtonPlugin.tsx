@@ -129,7 +129,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                     leaveTo="opacity-0"
                 >
                     <div className="fixed z-99 bottom-0 right-0 mr-3 mb-[70px] cursor-pointer text-white">
-                        <div
+                        {/* <div
                             className="bg-red-600 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
                             onClick={(e: any) => handleClickReminder(e)}
                             title="Reminder"
@@ -137,23 +137,31 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                             <span>
                                 <BellAlertIcon className="w-5" />
                             </span>
-                        </div>
+                        </div> */}
                         {dataPluginProcess?.map((items: any, index: number) => {
                             return (
                                 <div
                                     key={index}
                                     className="bg-red-600 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
-                                    onClick={(e: any) =>
-                                        handleClickModalChatMessage(e)
-                                    }
+                                    onClick={(e: any) => {
+                                        items.PLUGIN_PROCESS_NAME === "Chat"
+                                            ? handleClickModalChatMessage(e)
+                                            : items.PLUGIN_PROCESS_NAME ===
+                                              "Reminder"
+                                            ? handleClickReminder(e)
+                                            : null;
+                                    }}
                                     title={items.PLUGIN_PROCESS_NAME}
                                 >
                                     <span>
                                         {items.PLUGIN_PROCESS_NAME ===
                                         "Chat" ? (
                                             <ChatBubbleLeftRightIcon className="w-5" />
-                                        ) : (
+                                        ) : items.PLUGIN_PROCESS_NAME ===
+                                          "Task" ? (
                                             <ClockIcon className="w-5" />
+                                        ) : (
+                                            <BellAlertIcon className="w-5" />
                                         )}
                                     </span>
                                 </div>

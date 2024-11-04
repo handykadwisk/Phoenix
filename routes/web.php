@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getDocumentPKSAgent', [RelationController::class, 'getPKSAgentJson'])->name('getDocumentPKSAgent.getPKSAgentJson');
     Route::get('/getDocumentPKSFbi', [RelationController::class, 'getPKSFbiJson'])->name('getDocumentPKSFbi.getPKSFbiJson');
     Route::post('/editDocumentPks', [RelationController::class, 'edit_document_pks'])->name('editDocumentPks.edit_document_pks');
+    Route::post('/getRelationClient', [RelationController::class, 'get_relation_client'])->name('getRelationClient.get_relation_client');
 
 
 
@@ -662,20 +663,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/getAttendanceByEmployeeIdAndDate', [AttendanceController::class, 'getAttendanceByEmployeeIdAndDate'])->name('attendance.getAttendanceByEmployeeIdAndDate');
     Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
     Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
-    Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
-    Route::post('/pinMessageObject', [TDetailChatController::class, 'pinMessageObject'])->name('pinMessageObject.pinMessageObject');
-    Route::post('/getChatPin', [TDetailChatController::class, 'getChatPin'])->name('getChatPin.getChatPin');
-    Route::post('/getDataParticipant', [TDetailChatController::class, 'get_participant'])->name('getDataParticipant.get_participant');
-    Route::post('/unPinMessageObject', [TDetailChatController::class, 'unPinMessageObject'])->name('unPinMessageObject.unPinMessageObject');
-    Route::post('/getDataParticipantById', [TDetailChatController::class, 'getDataParticipantById'])->name('getDataParticipantById.getDataParticipantById');
-    Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
-    Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
-    Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
-    Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
-    Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
-    Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
-    Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
-    Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
 
     // Message Chat
     Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');

@@ -18,7 +18,7 @@ class TTagPluginProcessController extends Controller
 {
     public function getPlugin(Request $request)
     {
-        $data = RPluginProcess::get();
+        $data = RPluginProcess::where('PLUGIN_PROCESS_SHOW_CONTEXT_MENU', 1)->get();
         return response()->json($data);
     }
 
