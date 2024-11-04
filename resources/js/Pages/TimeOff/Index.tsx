@@ -38,6 +38,7 @@ export default function Index({ auth }: PageProps) {
     const [timeOffAvailable, setTimeOffAvailable] = useState<any>([]);
     const [dataRequestTo, setDataRequestTo] = useState<any>([]);
     const [fieldTotalTimeOff, setFieldTotalTimeOff] = useState<number>(0);
+    const [rowDate, setRowDate] = useState<number>(0);
     const [fieldStartDate, setFieldStartDate] = useState<any>(null);
     const [fieldEndDate, setFieldEndDate] = useState<any>(null);
     const getSubtitute = async () => {
@@ -88,17 +89,27 @@ export default function Index({ auth }: PageProps) {
         return result ? result : null;
     };
 
+    console.log("rowDate: ", rowDate);
+    useEffect(() => {
+        if (rowDate != 0) {
+            const items = { ...dataRequestTimeOff };
+            let arr: any = [];
+
+            for (let i = 0; i < rowDate; i++) {
+                arr.push({
+                    DATE_OF_LEAVE: "",
+                });
+            }
+            items["detail"] = arr;
+            setDataRequestTimeOff(items);
+
+        }
+    }, [rowDate]);
+
     const inputTimeOff = (name: string, value: any) => {
         const items = { ...dataRequestTimeOff };
         const details = [items.detail]
         if (name == "TIME_OFF_TYPE_ID") {
-            if (value) {
-                items["detail"] = [
-                    {
-                        DATE_OF_LEAVE: "",
-                    },
-                ];
-            }
             
             const type = getSelectedType(value) ? getSelectedType(value) : null;
             Object.keys(type).length > 0
@@ -106,6 +117,23 @@ export default function Index({ auth }: PageProps) {
                     ? (items["IS_REDUCE_LEAVE"] = 1)
                     : (items["IS_REDUCE_LEAVE"] = 0)
                 : "";
+
+            setRowDate(
+                type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY == null &&
+                    type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH == null
+                    ? 1
+                    : type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH != null
+                    ? 0
+                    : type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY
+            );
+
+            // if (value) {
+            //     items["detail"] = [
+            //         {
+            //             DATE_OF_LEAVE: "",
+            //         },
+            //     ];
+            // }
             
             setSelectedType(getSelectedType(value) ? getSelectedType(value): {});
         }
@@ -154,7 +182,7 @@ export default function Index({ auth }: PageProps) {
 
     // Request Time Off
     const [modal, setModal] = useState<any>({
-        modalRequestTimeOff: false,
+        modalRequestTimeOff: true,
         modalEditRequestTimeOff: false,
     });
 
@@ -189,6 +217,9 @@ export default function Index({ auth }: PageProps) {
         const items = { ...fieldDataRequestTimeOff };
         items["EMPLOYEE_ID"] = employee.EMPLOYEE_ID;
         setDataRequestTimeOff(items);
+        setFieldStartDate(null)
+        setFieldEndDate(null);
+        setSelectedType({})
         setModal({
             modalRequestTimeOff: !modal.modalRequestTimeOff,
             modalEditRequestTimeOff: false,
@@ -279,6 +310,50 @@ export default function Index({ auth }: PageProps) {
     };
 
     // End Edit Time Off
+
+
+    // set for 3 month
+    const setForThreeMonth = (value: any) => {
+        const start = new Date(value.toLocaleDateString("en-CA"));
+        const end = new Date(
+            new Date(
+                value.setMonth(
+                    value.getMonth() +
+                        parseInt(
+                            selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
+                        )
+                )
+            ).toLocaleDateString("en-CA")
+        );
+
+        const items = { ...dataRequestTimeOff };
+        const daysBetween =
+            (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
+        const arr = [];
+
+        for (let i = 0; i <= daysBetween; i++) {
+            const temp = new Date();
+            temp.setDate(start.getDate() + i);
+            arr.push({
+                DATE_OF_LEAVE: temp.toLocaleDateString("en-CA"),
+            });
+            // arr.push(temp.toLocaleDateString("en-CA"));
+        }
+       
+
+        // const items = { ...dataRequestTimeOff };
+        // let arr: any = [];
+
+        // for (let i = 0; i < rowDate; i++) {
+        //     arr.push({
+        //         DATE_OF_LEAVE: "",
+        //     });
+        // }
+        items["detail"] = arr;
+        setDataRequestTimeOff(items);
+        console.log('arr: ', arr)
+    };
+    // end set for 3 month
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Time Off"}>
@@ -546,13 +621,59 @@ export default function Index({ auth }: PageProps) {
                                         </label>
                                         <DatePicker
                                             selected={fieldStartDate}
-                                            onChange={(date: any) =>
-                                                inputDailyOff(
-                                                    date.toLocaleDateString(
-                                                        "en-CA"
+                                            onChange={
+                                                (date: any) => {
+                                                    // console.log(
+                                                    //     "date: ",
+                                                    //     date.toLocaleDateString(
+                                                    //         "en-CA"
+                                                    //     )
+                                                    // ),
+                                                    //     console.log(
+                                                    //         selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
+                                                    //         // new Date(
+                                                    //         //     date.setMonth(
+                                                    //         //         date.getMonth() +
+                                                    //         //             selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
+                                                    //         //     )
+                                                    //         // ).toLocaleDateString(
+                                                    //         //     "en-CA"
+                                                    //         // )
+                                                    //     );
+                                                    setForThreeMonth(date)
+                                                    setFieldStartDate(
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        )
                                                     ),
-                                                    1
-                                                )
+                                                        selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH !=
+                                                            null &&
+                                                            (setFieldEndDate(
+                                                                new Date(
+                                                                    date.setMonth(
+                                                                        date.getMonth() +
+                                                                            parseInt(
+                                                                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
+                                                                            )
+                                                                    )
+                                                                ).toLocaleDateString(
+                                                                    "en-CA"
+                                                                )
+                                                            )
+                                                            // setRowDate(
+                                                            //     30
+                                                            // )
+                                                        );
+                                                    
+                                                    
+                                                }
+                                                   
+                                                // inputDailyOff(
+                                                //     date.toLocaleDateString(
+                                                //         "en-CA"
+                                                //     ),
+                                                //     1
+                                                // )
                                             }
                                             showMonthDropdown
                                             showYearDropdown
@@ -629,7 +750,7 @@ export default function Index({ auth }: PageProps) {
                                                                     "block w-full mx-auto text-center"
                                                                 }
                                                             >
-                                                                {i+1}
+                                                                {i + 1}
                                                             </div>
                                                         </td>
                                                         <td className="border text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
@@ -687,22 +808,33 @@ export default function Index({ auth }: PageProps) {
                                                     </tr>
                                                 )
                                             )}
-                                            <tr>
-                                                <td
-                                                    colSpan={3}
-                                                    className=" h-10 w-40 mb-2 mt-2"
-                                                >
-                                                    <a
-                                                        href=""
-                                                        className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
-                                                        onClick={(e) =>
-                                                            addRowDailyOff(e)
-                                                        }
+                                            {selectedType.TIME_OFF_TYPE_ID ==
+                                                "1" ||
+                                            (selectedType.TIME_OFF_TYPE_ID !=
+                                                "2" &&
+                                                selectedType.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
+                                                    "1") ? (
+                                                ""
+                                            ) : (
+                                                <tr>
+                                                    <td
+                                                        colSpan={3}
+                                                        className=" h-10 w-40 mb-2 mt-2"
                                                     >
-                                                        + Add Date
-                                                    </a>
-                                                </td>
-                                            </tr>
+                                                        <a
+                                                            href=""
+                                                            className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
+                                                            onClick={(e) =>
+                                                                addRowDailyOff(
+                                                                    e
+                                                                )
+                                                            }
+                                                        >
+                                                            + Add Date
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>

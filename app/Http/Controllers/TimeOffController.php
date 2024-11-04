@@ -76,7 +76,7 @@ class TimeOffController extends Controller
         //     ];
         // return view('emails/sendemail', ['data'=> $emailForReject]);
         return Inertia::render('TimeOff/Index', [
-            'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->get()
+            'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->where('IS_SHOW', '<>', 0)->get()
         ]);
     }
 
