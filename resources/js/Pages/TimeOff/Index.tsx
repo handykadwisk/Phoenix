@@ -27,6 +27,7 @@ export default function Index({ auth }: PageProps) {
         getRequestTo();
         getTimeOffAvailable()
         getTimeOffUsed()
+        handleRequestTimeOff();
     }, [employee]);
 
 
@@ -221,7 +222,7 @@ export default function Index({ auth }: PageProps) {
         setFieldEndDate(null);
         setSelectedType({})
         setModal({
-            modalRequestTimeOff: !modal.modalRequestTimeOff,
+            modalRequestTimeOff: true,
             modalEditRequestTimeOff: false,
         });
     };
@@ -353,6 +354,7 @@ export default function Index({ auth }: PageProps) {
         setDataRequestTimeOff(items);
         console.log('arr: ', arr)
     };
+    console.log("dataRequestTimeOff: ", dataRequestTimeOff);
     // end set for 3 month
 
     return (
