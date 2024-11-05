@@ -722,35 +722,82 @@ class TimeOffController extends Controller
         return 'Email telah dikirim!';
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(TimeOff $timeOff)
-    {
-        //
+   
+    function collectiveLeave($id= null) {
+        return Inertia::render('TimeOff/CollectiveLeave', [
+            'data' => TimeOffMaster::find($id),
+            'employees' => TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get(),
+            'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->get()
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TimeOff $timeOff)
+     public function getCollectiveLeaveForAgGrid(Request $request)
     {
-        //
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+        $sortModel = $request->input('sort');
+        
+        $query = TimeOffMaster::where('COLLECTIVE_LEAVE_ID', 1)->groupBy('REQUEST_DATE')->orderBy('COLLECTIVE_LEAVE_ID', 'desc');
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        return $data;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, TimeOff $timeOff)
-    {
-        //
+    function setCollectiveLeave(Request $request) {
+
+        DB::transaction(function () use ($request) {
+            $employees = TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get();
+            $employeeLogin = $this->getEmployeeById(Auth::user()->id);
+
+            $arrId = [];
+            foreach ($employees as $key => $value) {
+                $timeOffMaster = TimeOffMaster::create([
+                    'EMPLOYEE_ID'               => $value['EMPLOYEE_ID'],
+                    'COLLECTIVE_LEAVE_ID'       => 1,
+                    'IS_REDUCE_LEAVE'           => 1,
+                    'TIME_OFF_TYPE_ID'          => 0,
+                    'SUBSTITUTE_PIC'            => 0,
+                    'SECOND_SUBSTITUTE_PIC'     => 0,
+                    'DESCRIPTION'               => "Cuti Bersama",
+                    'REQUEST_DATE'              => now(),//$request->REQUEST_DATE,
+                    'REQUEST_TO'                => $employeeLogin['EMPLOYEE_ID'],
+                    'APPROVED_DATE'             => now(),
+                    'APPROVED_BY'               => $employeeLogin['EMPLOYEE_ID'],
+                    'STATUS'                    => 2,
+                    'NOTE'                      => "Cuti Bersama",
+                    'CREATED_BY'                => Auth::user()->id,
+                    'CREATED_DATE'              => now(),
+                    'REQUEST_NUMBER'            => "REQ-".sprintf('%04d', $value['EMPLOYEE_ID']).Carbon::now()->format('YmdHis')
+                ]);
+
+                TimeOff::insert([
+                    'REQUEST_TIME_OFF_MASTER_ID' => $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID,
+                    'DATE_OF_LEAVE'             => $request['DATE_OF_LEAVE'],
+                ]);
+                array_push($arrId, $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID);
+            }
+
+            // Created Log
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Collective Leave.",
+                    "module"      => "Collective Leave",
+                    "id"          => json_encode($arrId)
+                ]),
+                'action_by'  => Auth::user()->user_login
+            ]);
+
+        });
+
+        return new JsonResponse([
+            // "msg" => "Success Set Collective Leave"
+            "Success Request Time Off"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(TimeOff $timeOff)
-    {
-        //
-    }
 }

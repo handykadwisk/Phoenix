@@ -5,6 +5,7 @@ use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
 use App\Http\Controllers\CoBrokingController;
+use App\Http\Controllers\CollectiveLeaveController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\InsurancePanelController;
@@ -581,6 +582,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/cancelTimeOff', [TimeOffController::class, 'cancelTimeOff'])->name('timeOff.cancelTimeOff');
     Route::get('/sendLink', [TimeOffController::class, 'sendLink'])->name('timeOff.sendLink');
     Route::get('/downloadTimeOffDocument/{id}', [TimeOffController::class, 'time_off_document_download'])->name('downloadTimeOffDocument.time_off_document_download');
+
+
+    // Collective Leave
+    Route::get('/collectiveLeave', [TimeOffController::class, 'collectiveLeave'])->name('collectiveLeave');
+    Route::get('/getCollectiveLeaveForAgGrid', [TimeOffController::class, 'getCollectiveLeaveForAgGrid'])->name('timeOff.getCollectiveLeaveForAgGrid');
+    Route::post('/setCollectiveLeave', [TimeOffController::class, 'setCollectiveLeave'])->name('timeOff.setCollectiveLeave');
 
 
 
