@@ -656,7 +656,7 @@ export default function Relation({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Relation Name",
-                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    field: "RELATION_ORGANIZATION_NAME",
                                     flex: 7,
                                 },
                             ]}
