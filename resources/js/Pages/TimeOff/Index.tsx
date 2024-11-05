@@ -128,14 +128,6 @@ export default function Index({ auth }: PageProps) {
                     ? 0
                     : type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY
             );
-
-            // if (value) {
-            //     items["detail"] = [
-            //         {
-            //             DATE_OF_LEAVE: "",
-            //         },
-            //     ];
-            // }
             
             setSelectedType(getSelectedType(value) ? getSelectedType(value): {});
         }
@@ -228,12 +220,11 @@ export default function Index({ auth }: PageProps) {
         });
     };
 
-    // console.log("dataRequestTimeOff: ", dataRequestTimeOff);
 
     const handleSuccessRequestTimeOff = (message: string) => {
         setIsSuccess("");
         if (message != "") {
-            setIsSuccess(message[0]);
+            setIsSuccess(message);
             setDataRequestTimeOff(fieldDataRequestTimeOff);
             setTimeout(() => {
                 setIsSuccess("");
@@ -275,7 +266,6 @@ export default function Index({ auth }: PageProps) {
     
     const [selectedTypeForEdit, setSelectedTypeForEdit] = useState<any>({});
 
-    // console.log("editRequestTimeOff: ", editRequestTimeOff);
     const editTimeOff = (name: string, value: any) => {
         const items = { ...editRequestTimeOff };
         const details = [items.request_time_off];
@@ -373,17 +363,23 @@ export default function Index({ auth }: PageProps) {
 
                     // check status response
                     if (response.status) {
+
+                        if (response.data.status == 1) {
+                            Swal.fire(
+                                "Canceled!",
+                                "Request Time Off has been canceled.",
+                                "success"
+                            );
+                        } else {
+                            Swal.fire(
+                                "Failed!",
+                                "Failed Canceled Request Time Off."
+                            );
+                        }
                         
-                        Swal.fire(
-                            "Canceled!",
-                            "Request Time Off has been canceled.",
-                            "success"
-                        );
+                        
                         handleSuccessRequestTimeOff(response.data.msg); // Panggil fungsi sukses untuk memperbarui UI atau state
-                        // setModal({
-                        //     modalRequestTimeOff: false,
-                        //     modalEditRequestTimeOff: false,
-                        // });
+                        
                     } else {
                         throw new Error("Unexpected response status");
                     }
@@ -422,10 +418,6 @@ export default function Index({ auth }: PageProps) {
                 title={"Request Time Off"}
                 url={`/requestTimeOff`}
                 data={dataRequestTimeOff}
-                // data={[
-                //     { dataRequestTimeOff: dataRequestTimeOff },
-                //     { dailyOff: dailyOff },
-                // ]}
                 onSuccess={handleSuccessRequestTimeOff}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
@@ -446,7 +438,7 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     value={employee.EMPLOYEE_FIRST_NAME}
                                     readOnly
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -468,7 +460,7 @@ export default function Index({ auth }: PageProps) {
                                                   .COMPANY_DIVISION_NAME
                                             : null
                                     }
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -487,7 +479,7 @@ export default function Index({ auth }: PageProps) {
                                     value={
                                         timeOffUsed + " / " + timeOffAvailable
                                     }
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -504,7 +496,7 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     readOnly
                                     value={timeOffAvailable - timeOffUsed}
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -524,8 +516,6 @@ export default function Index({ auth }: PageProps) {
                                                 "TIME_OFF_TYPE_ID",
                                                 e.target.value
                                             )
-                                        // dataRequestTimeOff("TIME_OFF_TYPE_ID", e.target.value)
-                                        // setSelectedType(e.target.value)
                                     }
                                     required
                                 >
@@ -572,7 +562,7 @@ export default function Index({ auth }: PageProps) {
                                                 selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            // placeholder="Jane Smith"
+                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -594,7 +584,7 @@ export default function Index({ auth }: PageProps) {
                                                 selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
                                                 " Month (s) "
                                             }
-                                            // placeholder="Jane Smith"
+                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -616,7 +606,7 @@ export default function Index({ auth }: PageProps) {
                                                 selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            // placeholder="Jane Smith"
+                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -667,23 +657,6 @@ export default function Index({ auth }: PageProps) {
                                             selected={fieldStartDate}
                                             onChange={
                                                 (date: any) => {
-                                                    // console.log(
-                                                    //     "date: ",
-                                                    //     date.toLocaleDateString(
-                                                    //         "en-CA"
-                                                    //     )
-                                                    // ),
-                                                    //     console.log(
-                                                    //         selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
-                                                    //         // new Date(
-                                                    //         //     date.setMonth(
-                                                    //         //         date.getMonth() +
-                                                    //         //             selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
-                                                    //         //     )
-                                                    //         // ).toLocaleDateString(
-                                                    //         //     "en-CA"
-                                                    //         // )
-                                                    //     );
                                                     setForThreeMonth(date);
                                                     setFieldStartDate(
                                                         date.toLocaleDateString(
@@ -704,17 +677,7 @@ export default function Index({ auth }: PageProps) {
                                                                     "en-CA"
                                                                 )
                                                             );
-                                                    // setRowDate(
-                                                    //     30
-                                                    // )
                                                 }
-
-                                                // inputDailyOff(
-                                                //     date.toLocaleDateString(
-                                                //         "en-CA"
-                                                //     ),
-                                                //     1
-                                                // )
                                             }
                                             showMonthDropdown
                                             showYearDropdown
@@ -741,9 +704,6 @@ export default function Index({ auth }: PageProps) {
                                                     "dd-mm-yyyy"
                                                 )
                                             }
-                                            // onChange={(e: any) => {
-                                            //     setFieldEndDate(e.target.value);
-                                            // }}
                                             readOnly
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
@@ -1005,7 +965,7 @@ export default function Index({ auth }: PageProps) {
                                     name="DESCRIPTION"
                                     // readOnly
                                     value={dataRequestTimeOff.DESCRIPTION}
-                                    // placeholder="Jane Smith"
+                                    
                                     onChange={(e: any) => {
                                         inputTimeOff(
                                             "DESCRIPTION",
@@ -1032,7 +992,7 @@ export default function Index({ auth }: PageProps) {
                                             new Date(),
                                             "dd-mm-yyyy"
                                         )}
-                                        // placeholder="Jane Smith"
+                                        
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -1118,7 +1078,7 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     value={employee.EMPLOYEE_FIRST_NAME}
                                     readOnly
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -1158,7 +1118,7 @@ export default function Index({ auth }: PageProps) {
                                     value={
                                         timeOffUsed + " / " + timeOffAvailable
                                     }
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -1175,7 +1135,7 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     readOnly
                                     value={timeOffAvailable - timeOffUsed}
-                                    // placeholder="Jane Smith"
+                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -1240,7 +1200,7 @@ export default function Index({ auth }: PageProps) {
                                                 selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            // placeholder="Jane Smith"
+                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -1262,7 +1222,7 @@ export default function Index({ auth }: PageProps) {
                                                 selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
                                                 " Month (s) "
                                             }
-                                            // placeholder="Jane Smith"
+                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -1284,7 +1244,7 @@ export default function Index({ auth }: PageProps) {
                                                 selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            // placeholder="Jane Smith"
+                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -1366,9 +1326,6 @@ export default function Index({ auth }: PageProps) {
                                                     "dd-mm-yyyy"
                                                 )
                                             }
-                                            // onChange={(e: any) => {
-                                            //     setFieldEndDate(e.target.value);
-                                            // }}
                                             readOnly
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
@@ -1496,7 +1453,6 @@ export default function Index({ auth }: PageProps) {
 
                             <div className="relative mt-4">
                                 <label
-                                    // htmlFor="available_time_off"
                                     className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
                                 >
                                     Subtitute PIC
@@ -1538,7 +1494,6 @@ export default function Index({ auth }: PageProps) {
                             {editRequestTimeOff.SUBSTITUTE_PIC && (
                                 <div className="relative mt-4">
                                     <label
-                                        // htmlFor="available_time_off"
                                         className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
                                     >
                                         Second Subtitute PIC
@@ -1589,24 +1544,6 @@ export default function Index({ auth }: PageProps) {
                                 </div>
                             )}
 
-                            {/* <div className="mt-3">
-                                <InputLabel
-                                    value="File Upload"
-                                    // required={true}
-                                />
-                                <Input
-                                    type="file"
-                                    onChange={(e: any) => {
-                                        // console.log(e.target.files[0]);
-                                        inputTimeOff(
-                                            "FILE_ID",
-                                            e.target.files[0]
-                                        );
-                                    }}
-                                    className="mt-1 bg-white ring-white shadow-xl"
-                                />
-                            </div> */}
-
                             <div className="relative mt-4">
                                 <label
                                     htmlFor="DESCRIPTION"
@@ -1619,7 +1556,7 @@ export default function Index({ auth }: PageProps) {
                                     name="DESCRIPTION"
                                     // readOnly
                                     value={editRequestTimeOff.DESCRIPTION}
-                                    // placeholder="Jane Smith"
+                                    
                                     onChange={(e: any) => {
                                         editTimeOff(
                                             "DESCRIPTION",
@@ -1646,7 +1583,7 @@ export default function Index({ auth }: PageProps) {
                                             editRequestTimeOff.REQUEST_DATE,
                                             "dd-mm-yyyy"
                                         )}
-                                        // placeholder="Jane Smith"
+                                        
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -1708,17 +1645,7 @@ export default function Index({ auth }: PageProps) {
                         </Button>
                     </div>
                 </div>
-                {/* <div className="flex flex-col relative">
-                    <div className="bg-white mb-4 rounded-md shadow-md p-4">
-                        <a
-                            href={"reviewTimeOff/" + 387}
-                            target="_blank"
-                        >
-                            {"Review Time Off"}
-                        </a>
-                        
-                    </div>
-                </div> */}
+               
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid
@@ -1731,11 +1658,6 @@ export default function Index({ auth }: PageProps) {
                             doubleClickEvent={handleEditModal}
                             triggeringRefreshData={isSuccess}
                             colDefs={[
-                                // {
-                                //     headerName: "No.",
-                                //     valueGetter: "node.rowIndex + 1",
-                                //     flex: 1.5,
-                                // },
                                 {
                                     headerName: "Request Date",
                                     flex: 3,
@@ -1748,16 +1670,6 @@ export default function Index({ auth }: PageProps) {
                                         }
                                     },
                                 },
-                                // {
-                                //     headerName: "Request To",
-                                //     field: "REQUEST_TO",
-                                //     flex: 4,
-                                // },
-                                // {
-                                //     headerName: "Subtitute PIC",
-                                //     field: "SUBSTITUTE_PIC",
-                                //     flex: 4,
-                                // },
                                 {
                                     headerName: "Status",
                                     // field: "POLICY_STATUS_ID",

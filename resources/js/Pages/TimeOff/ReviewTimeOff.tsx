@@ -22,10 +22,7 @@ export default function Index({ auth }: PageProps) {
     
     const [dataReviewTimeOff, setDataReviewTimeOff] = useState<any>(data);
 
-    // console.log("dataReviewTimeOff: ", dataReviewTimeOff);
-
     const employee: any = auth.user.employee;
-    // console.log('xx: ', employee)
 
     const [searchDefault, setSearchDefault] = useState<any>({
         COMPANY_ID: employee.COMPANY_ID,
@@ -192,7 +189,6 @@ export default function Index({ auth }: PageProps) {
         setIsSuccess("");
         if (message != "") {
             setIsSuccess(message[0]);
-            // setDataRequestTimeOff(fieldDataRequestTimeOff);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
@@ -268,7 +264,6 @@ export default function Index({ auth }: PageProps) {
             responseType: "blob",
         })
             .then((response) => {
-                // console.log(response);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -279,7 +274,6 @@ export default function Index({ auth }: PageProps) {
                 link.click();
             })
             .catch((err) => {
-                // console.log(err);
                 if (err.response.status === 404) {
                     alert("File not Found");
                 }
@@ -643,16 +637,6 @@ export default function Index({ auth }: PageProps) {
                                     }
                                 },
                             },
-                            // {
-                            //     headerName: "Request To",
-                            //     field: "REQUEST_TO",
-                            //     flex: 4,
-                            // },
-                            // {
-                            //     headerName: "Subtitute PIC",
-                            //     field: "SUBSTITUTE_PIC",
-                            //     flex: 4,
-                            // },
                             {
                                 headerName: "Status",
                                 // field: "POLICY_STATUS_ID",

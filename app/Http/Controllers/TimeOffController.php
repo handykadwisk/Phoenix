@@ -582,30 +582,67 @@ class TimeOffController extends Controller
 
     function cancelTimeOff(Request $request) {
         // dd($request->data);
-        DB::transaction(function () use ($request) {
+        $status = DB::transaction(function () use ($request) {
             $data = $request->data;
-            $timeOffMasterId = TimeOffMaster::where('REQUEST_TIME_OFF_MASTER_ID', $data['REQUEST_TIME_OFF_MASTER_ID'])
+            $updateTimeOffMaster = TimeOffMaster::where('REQUEST_TIME_OFF_MASTER_ID', $data['REQUEST_TIME_OFF_MASTER_ID'])
+                ->where('IS_CANCELED', 0)
                 ->update([
-                    'IS_DELETED'                => 1, //YES
+                    'IS_CANCELED'                => 1, //YES
+                    'CANCELED_BY'                => Auth::user()->id,
+                    'CANCELED_DATE'              => now(),
                 ]);
 
-            $requestTo = $this->getEmployeeById($data['REQUEST_TO']);
             
-            // email untuk Rejected
-            $emailForReject = [
-                'subject' => 'Canceled Request Time Off',
-                'title' => 'Request time off on number - '.$data['REQUEST_NUMBER'] .' has been canceled by '. $data['employee']['EMPLOYEE_FIRST_NAME'],
-                'note_approver' => '',
-                'time_off_type' => '',
-                'date' => '',
-                'email_to' => $requestTo['EMPLOYEE_EMAIL'],
-                'url' => ''
-            ];
-            $this->sendMail($emailForReject);
+            if ($updateTimeOffMaster) {
+                // email untuk Rejected
+                $requestTo = $this->getEmployeeById($data['REQUEST_TO']);
+                $pic1 = $this->getEmployeeById($data['SUBSTITUTE_PIC']);
+
+                // email untuk PIC 1
+                $emailForPic = [
+                    'subject' => 'Canceled Request Time Off',
+                    'title' => 'Request time off on number - '.$data['REQUEST_NUMBER'] .' has been canceled by '. $data['employee']['EMPLOYEE_FIRST_NAME'],
+                    'time_off_type' => '',
+                    'date' => '',
+                    'email_to' => $pic1['EMPLOYEE_EMAIL'],
+                    'url' => '',
+                    'note_approver' => ''
+                ];
+                $this->sendMail($emailForPic);
+
+                // email untuk PIC 2
+                if ($request->SECOND_SUBSTITUTE_PIC) {
+                    $pic2 = $this->getEmployeeById($request->SECOND_SUBSTITUTE_PIC);
+                    $emailForPic2 = [
+                        'subject' => 'Canceled Request Time Off',
+                        'title' => 'Request time off on number - '.$data['REQUEST_NUMBER'] .' has been canceled by '. $data['employee']['EMPLOYEE_FIRST_NAME'],
+                        'time_off_type' => '',
+                        'date' => '',
+                        'email_to' => $pic2['EMPLOYEE_EMAIL'],
+                        'url' => '',
+                        'note_approver' => ''
+                    ];
+                    $this->sendMail($emailForPic2);
+                }
+
+                $emailForReject = [
+                    'subject' => 'Canceled Request Time Off',
+                    'title' => 'Request time off on number - '.$data['REQUEST_NUMBER'] .' has been canceled by '. $data['employee']['EMPLOYEE_FIRST_NAME'],
+                    'note_approver' => '',
+                    'time_off_type' => '',
+                    'date' => '',
+                    'email_to' => $requestTo['EMPLOYEE_EMAIL'],
+                    'url' => ''
+                ];
+                $this->sendMail($emailForReject);
+            }
+            return $updateTimeOffMaster;
 
         });
+        // dd($status);
 
         return new JsonResponse([
+            'status' => $status,
             "msg" => "Success Canceled"
         ], 201, [
             'X-Inertia' => true
@@ -621,7 +658,7 @@ class TimeOffController extends Controller
         $sortModel = $request->input('sort');
 
         // $query = DB::table('t_policy as p')->leftJoin('t_relation as r', 'p.RELATION_ID', '=', 'r.RELATION_ORGANIZATION_ID');
-        $query = TimeOffMaster::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('IS_DELETED', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
+        $query = TimeOffMaster::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('IS_CANCELED', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
             
         // $filterModel = json_decode($request->input('filter'), true);
         // $newSearch = json_decode($request->newFilter, true);        
@@ -666,7 +703,7 @@ class TimeOffController extends Controller
         $query = DB::table('t_request_time_off_master as rtom')
             ->join('t_employee AS e', 'rtom.EMPLOYEE_ID', '=', 'e.EMPLOYEE_ID')
             ->where('STATUS', '=', '0')
-            ->where('rtom.IS_DELETED', '=', '0')
+            ->where('rtom.IS_CANCELED', '=', '0')
             ->where('e.COMPANY_ID', '=', $newSearch['COMPANY_ID'])
             ->where('e.DIVISION_ID', '=', $newSearch['DIVISION_ID'])
             ->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc'); 
