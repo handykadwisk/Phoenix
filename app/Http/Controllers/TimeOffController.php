@@ -258,7 +258,7 @@ class TimeOffController extends Controller
                 }
             }
 
-            $timeOffMasterId = TimeOffMaster::insertGetId([
+            $timeOffMaster = TimeOffMaster::create([
                 'EMPLOYEE_ID'               => $request->EMPLOYEE_ID,
                 'IS_REDUCE_LEAVE'           => $request->IS_REDUCE_LEAVE,
                 'TIME_OFF_TYPE_ID'          => $request->TIME_OFF_TYPE_ID,
@@ -280,7 +280,7 @@ class TimeOffController extends Controller
             if ($request->detail) {
                 foreach ($request->detail as $key => $value) {
                     TimeOff::insert([
-                        'REQUEST_TIME_OFF_MASTER_ID' => $timeOffMasterId,
+                        'REQUEST_TIME_OFF_MASTER_ID' => $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID,
                         'DATE_OF_LEAVE'             => $value['DATE_OF_LEAVE'],
                     ]);
                     array_push($date, $value['DATE_OF_LEAVE']);
@@ -320,9 +320,9 @@ class TimeOffController extends Controller
             }
 
             // email untuk Request To
-            $url= URL::to('reviewTimeOff/'. $timeOffMasterId);
+            $url= URL::to('reviewTimeOff/'. $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID);
             $emailForRequestTo = [
-                'subject' => 'Request Time Off',
+                'subject' => 'Request Time Off - '. $timeOffMaster->REQUEST_NUMBER,
                 'title' => $employee['EMPLOYEE_FIRST_NAME']. ' applied for leave and asked '.$requestTo['EMPLOYEE_FIRST_NAME'].' for permission. ',
                 'time_off_type' => 'Time Off Type: '. $timeOffType['TIME_OFF_TYPE_NAME'],
                 'date' => $date,
@@ -338,7 +338,7 @@ class TimeOffController extends Controller
                 'action'     => json_encode([
                     "description" => "Request Time Off.",
                     "module"      => "Time Off",
-                    "id"          => $timeOffMasterId
+                    "id"          => $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID
                 ]),
                 'action_by'  => Auth::user()->user_login
             ]);       
@@ -384,6 +384,7 @@ class TimeOffController extends Controller
                 'UPDATED_DATE'              => now(),
             ]);
             
+            $date = [];
             if ($request->request_time_off) {
                 TimeOff::where('REQUEST_TIME_OFF_MASTER_ID', $timeOffMasterId)->delete();
                 foreach ($request->request_time_off as $key => $value) {
@@ -391,8 +392,57 @@ class TimeOffController extends Controller
                         'REQUEST_TIME_OFF_MASTER_ID' => $timeOffMasterId,
                         'DATE_OF_LEAVE'             => $value['DATE_OF_LEAVE'],
                     ]);
+                    array_push($date, $value['DATE_OF_LEAVE']);
                 }
             }
+
+            // Kirim Email
+            
+            $timeOffType = $request->time_off_type; // RTimeOffType::find($request->TIME_OFF_TYPE_ID);
+            $employee = $request->employee; //$this->getEmployeeById($request->employee);
+            $pic1 = $this->getEmployeeById($request->SUBSTITUTE_PIC);
+            $requestTo = $this->getEmployeeById($request->REQUEST_TO);
+
+            // email untuk PIC 1
+            $emailForPic = [
+                'subject' => 'Substitute PIC for '. $employee['EMPLOYEE_FIRST_NAME'],
+                'title' => 'You were selected as a substitute PIC by '.$employee['EMPLOYEE_FIRST_NAME'],
+                'time_off_type' => 'Time Off Type: '. $timeOffType['TIME_OFF_TYPE_NAME'],
+                'date' => $date,
+                'email_to' => $pic1['EMPLOYEE_EMAIL'],
+                'url' => '',
+                'note_approver' => ''
+            ];
+            $this->sendMail($emailForPic);
+
+            // email untuk PIC 2
+            if ($request->SECOND_SUBSTITUTE_PIC) {
+                $pic2 = $this->getEmployeeById($request->SECOND_SUBSTITUTE_PIC);
+                $emailForPic2 = [
+                    'subject' => 'Substitute PIC for '. $employee['EMPLOYEE_FIRST_NAME'],
+                    'title' => 'You were selected as a substitute PIC by '.$employee['EMPLOYEE_FIRST_NAME'],
+                    'time_off_type' => 'Time Off Type: '. $timeOffType['TIME_OFF_TYPE_NAME'],
+                    'date' => $date,
+                    'email_to' => $pic2['EMPLOYEE_EMAIL'],
+                    'url' => '',
+                    'note_approver' => ''
+                ];
+                $this->sendMail($emailForPic2);
+            }
+
+            // email untuk Request To
+            $url= URL::to('reviewTimeOff/'. $request->REQUEST_TIME_OFF_MASTER_ID);
+            $emailForRequestTo = [
+                'subject' => 'Edited Request Time Off - '. $request->REQUEST_NUMBER,
+                'title' => $employee['EMPLOYEE_FIRST_NAME']. ' applied for leave and asked '.$requestTo['EMPLOYEE_FIRST_NAME'].' for permission. ',
+                'time_off_type' => 'Time Off Type: '. $timeOffType['TIME_OFF_TYPE_NAME'],
+                'date' => $date,
+                'email_to' => $requestTo['EMPLOYEE_EMAIL'],
+                'url' => $url,
+                'note_approver' => ''
+            ];
+            $this->sendMail($emailForRequestTo);
+            // end Kirim Email
 
             // Created Log
             UserLog::create([
@@ -530,6 +580,39 @@ class TimeOffController extends Controller
 
     }
 
+    function cancelTimeOff(Request $request) {
+        // dd($request->data);
+        DB::transaction(function () use ($request) {
+            $data = $request->data;
+            $timeOffMasterId = TimeOffMaster::where('REQUEST_TIME_OFF_MASTER_ID', $data['REQUEST_TIME_OFF_MASTER_ID'])
+                ->update([
+                    'IS_DELETED'                => 1, //YES
+                ]);
+
+            $requestTo = $this->getEmployeeById($data['REQUEST_TO']);
+            
+            // email untuk Rejected
+            $emailForReject = [
+                'subject' => 'Canceled Request Time Off',
+                'title' => 'Request time off on number - '.$data['REQUEST_NUMBER'] .' has been canceled by '. $data['employee']['EMPLOYEE_FIRST_NAME'],
+                'note_approver' => '',
+                'time_off_type' => '',
+                'date' => '',
+                'email_to' => $requestTo['EMPLOYEE_EMAIL'],
+                'url' => ''
+            ];
+            $this->sendMail($emailForReject);
+
+        });
+
+        return new JsonResponse([
+            "msg" => "Success Canceled"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+
+    }
+
     public function getRequestTimeOffAgGrid(Request $request)
     {
         // dd($request);
@@ -538,7 +621,7 @@ class TimeOffController extends Controller
         $sortModel = $request->input('sort');
 
         // $query = DB::table('t_policy as p')->leftJoin('t_relation as r', 'p.RELATION_ID', '=', 'r.RELATION_ORGANIZATION_ID');
-        $query = TimeOffMaster::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('STATUS', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
+        $query = TimeOffMaster::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('IS_DELETED', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
             
         // $filterModel = json_decode($request->input('filter'), true);
         // $newSearch = json_decode($request->newFilter, true);        
@@ -583,6 +666,7 @@ class TimeOffController extends Controller
         $query = DB::table('t_request_time_off_master as rtom')
             ->join('t_employee AS e', 'rtom.EMPLOYEE_ID', '=', 'e.EMPLOYEE_ID')
             ->where('STATUS', '=', '0')
+            ->where('rtom.IS_DELETED', '=', '0')
             ->where('e.COMPANY_ID', '=', $newSearch['COMPANY_ID'])
             ->where('e.DIVISION_ID', '=', $newSearch['DIVISION_ID'])
             ->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc'); 

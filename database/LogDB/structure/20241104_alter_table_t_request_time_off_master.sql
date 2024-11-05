@@ -1,0 +1,2 @@
+ALTER TABLE `db_phoenix`.`t_request_time_off_master`
+  ADD COLUMN `IS_DELETED` TINYINT DEFAULT 0 NULL COMMENT '0: NO, 1: YES' AFTER `STATUS`;

@@ -578,19 +578,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/reviewTimeOff/{id}', [TimeOffController::class, 'reviewTimeOff'])->name('reviewTimeOff');
     Route::post('/approveTimeOff', [TimeOffController::class, 'approveTimeOff'])->name('timeOff.approveTimeOff');
     Route::post('/rejectTimeOff', [TimeOffController::class, 'rejectTimeOff'])->name('timeOff.rejectTimeOff');
+    Route::post('/cancelTimeOff', [TimeOffController::class, 'cancelTimeOff'])->name('timeOff.cancelTimeOff');
     Route::get('/sendLink', [TimeOffController::class, 'sendLink'])->name('timeOff.sendLink');
     Route::get('/downloadTimeOffDocument/{id}', [TimeOffController::class, 'time_off_document_download'])->name('downloadTimeOffDocument.time_off_document_download');
-
-    Route::get('/mail/send', function () {
-        $data = [
-            'subject' => 'Testing Kirim Email',
-            'title' => 'Testing Kirim Email',
-            'body' => 'Ini adalah email uji coba dari Tutorial Laravel: Send Email Via SMTP GMAIL @ qadrLabs.com'
-        ];
-
-        Mail::to('apianbaru@gmail.com')->send(new SendEmail($data));
-
-    });
 
 
 

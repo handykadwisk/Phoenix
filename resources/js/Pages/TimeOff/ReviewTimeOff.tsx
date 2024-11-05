@@ -253,7 +253,7 @@ export default function Index({ auth }: PageProps) {
                     console.error(error);
                     Swal.fire(
                         "Error!",
-                        "There was an error deleting the menu.",
+                        "There was an error rejected request time off.",
                         "error"
                     );
                 }
@@ -322,6 +322,20 @@ export default function Index({ auth }: PageProps) {
                 buttonAddOns={dataReviewTimeOff.STATUS == 0 ? "Reject" : null}
                 body={
                     <>
+                        {dataReviewTimeOff.STATUS != 0 && (
+                            <div
+                                className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-4"
+                                role="alert"
+                            >
+                                <p>
+                                    This Request Time Off Has Been
+                                    {dataReviewTimeOff.STATUS == 1
+                                        ? " Rejected."
+                                        : " Approved."}
+                                </p>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-2 gap-2">
                             <div className="">
                                 <div className="text-sm font-semibold">

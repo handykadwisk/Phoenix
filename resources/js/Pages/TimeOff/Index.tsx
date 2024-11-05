@@ -15,6 +15,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import dateFormat from "dateformat";
 import Input from "@/Components/Input";
+import Swal from "sweetalert2";
 
 export default function Index({ auth }: PageProps) {
     const { timeOffTipes }: any = usePage().props;
@@ -90,7 +91,7 @@ export default function Index({ auth }: PageProps) {
         return result ? result : null;
     };
 
-    console.log("rowDate: ", rowDate);
+    
     useEffect(() => {
         if (rowDate != 0) {
             const items = { ...dataRequestTimeOff };
@@ -238,6 +239,11 @@ export default function Index({ auth }: PageProps) {
                 setIsSuccess("");
             }, 5000);
         }
+        setModal({
+            modalRequestTimeOff: false,
+            modalEditRequestTimeOff: false,
+        });
+        
     };
 
     // End Request Time Off
@@ -341,21 +347,57 @@ export default function Index({ auth }: PageProps) {
             // arr.push(temp.toLocaleDateString("en-CA"));
         }
        
-
-        // const items = { ...dataRequestTimeOff };
-        // let arr: any = [];
-
-        // for (let i = 0; i < rowDate; i++) {
-        //     arr.push({
-        //         DATE_OF_LEAVE: "",
-        //     });
-        // }
         items["detail"] = arr;
         setDataRequestTimeOff(items);
-        console.log('arr: ', arr)
     };
-    console.log("dataRequestTimeOff: ", dataRequestTimeOff);
     // end set for 3 month
+
+    const cancelRequestTimeOff = async (e: any, data: any, flag: any) => {
+        e.preventDefault();
+
+        Swal.fire({
+            // title: '',
+            text: "Are you sure to Cancel this Request Time Off?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Sure!",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // send request to server
+                    const response = await axios.post(`/cancelTimeOff`, {
+                        data,
+                    });
+
+                    // check status response
+                    if (response.status) {
+                        
+                        Swal.fire(
+                            "Canceled!",
+                            "Request Time Off has been canceled.",
+                            "success"
+                        );
+                        handleSuccessRequestTimeOff(response.data.msg); // Panggil fungsi sukses untuk memperbarui UI atau state
+                        // setModal({
+                        //     modalRequestTimeOff: false,
+                        //     modalEditRequestTimeOff: false,
+                        // });
+                    } else {
+                        throw new Error("Unexpected response status");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire(
+                        "Error!",
+                        "There was an error canceled request time off.",
+                        "error"
+                    );
+                }
+            }
+        });
+    };
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Time Off"}>
@@ -642,7 +684,7 @@ export default function Index({ auth }: PageProps) {
                                                     //         //     "en-CA"
                                                     //         // )
                                                     //     );
-                                                    setForThreeMonth(date)
+                                                    setForThreeMonth(date);
                                                     setFieldStartDate(
                                                         date.toLocaleDateString(
                                                             "en-CA"
@@ -650,7 +692,7 @@ export default function Index({ auth }: PageProps) {
                                                     ),
                                                         selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH !=
                                                             null &&
-                                                            (setFieldEndDate(
+                                                            setFieldEndDate(
                                                                 new Date(
                                                                     date.setMonth(
                                                                         date.getMonth() +
@@ -661,15 +703,12 @@ export default function Index({ auth }: PageProps) {
                                                                 ).toLocaleDateString(
                                                                     "en-CA"
                                                                 )
-                                                            )
-                                                            // setRowDate(
-                                                            //     30
-                                                            // )
-                                                        );
-                                                    
-                                                    
+                                                            );
+                                                    // setRowDate(
+                                                    //     30
+                                                    // )
                                                 }
-                                                   
+
                                                 // inputDailyOff(
                                                 //     date.toLocaleDateString(
                                                 //         "en-CA"
@@ -1040,21 +1079,25 @@ export default function Index({ auth }: PageProps) {
                 }
             />
 
-            <ModalToAdd
-                buttonAddOns={""}
+            <ModalToAction
+                buttonAddOns={
+                    editRequestTimeOff.STATUS == 0 ? "Cancel Request" : null
+                }
+                actionDelete={cancelRequestTimeOff}
                 show={modal.modalEditRequestTimeOff}
                 onClose={() =>
                     setModal({
                         modalEditRequestTimeOff: false,
                     })
                 }
+                headers={null}
+                submitButtonName={
+                    editRequestTimeOff.STATUS == 0 ? "Edit" : null
+                }
                 title={"Edit Request Time Off"}
                 url={`/editRequestTimeOff`}
+                method={"post"}
                 data={editRequestTimeOff}
-                // data={[
-                //     { dataRequestTimeOff: dataRequestTimeOff },
-                //     { dailyOff: dailyOff },
-                // ]}
                 onSuccess={handleSuccessRequestTimeOff}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
