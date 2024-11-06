@@ -164,6 +164,23 @@ export default function Baa({ auth }: PageProps) {
                                         inputDataSearch("flag", "", 0);
                                     }
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        if (
+                                            searchBAA.baa[0]
+                                                .RELATION_ORGANIZATION_NAME ===
+                                            ""
+                                        ) {
+                                            inputDataSearch("flag", "", 0);
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                        }
+                                        setRefreshGrid("success");
+                                        setTimeout(() => {
+                                            setRefreshGrid("");
+                                        }, 1000);
+                                    }
+                                }}
                                 placeholder="Search Relation BAA Name"
                             />
                             <div className="mt-4 flex justify-end gap-2">

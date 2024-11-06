@@ -43,6 +43,7 @@ class TRelationAgentController extends Controller
         });
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel);
@@ -52,38 +53,22 @@ class TRelationAgentController extends Controller
             }
         }
 
-        // if ($filterModel) {
-        //     foreach ($filterModel as $colId => $filterValue) {
-        //         if ($colId === 'policy_number') {
-        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
-        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
-        //         } elseif ($colId === 'policy_inception_date') {
-        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
-        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            } else {
+                // dd("masuk sini");
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'RELATION_ORGANIZATION_NAME') {
+                        $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $data;
-        // dd($searchQuery->RELATION_ORGANIZATION_NAME);
-        // $clientId = 3;
-        // $nullName = "is null";
-        // $data = Relation::orderBy('RELATION_ORGANIZATION_ID', 'desc')->whereHas('mRelationType', function($q) use($clientId) {
-        //     // Query the name field in status table
-        //     $q->where('RELATION_TYPE_ID', 'like', '%'.$clientId.'%');
-        // });
-        // // ->whereDoesntHave('MRelationAgent', function (Builder $query) {
-        // //     $query->whereNotNull('RELATION_ORGANIZATION_ID');
-        // // });
-        // if ($searchQuery) {
-        //     if ($searchQuery->input('RELATION_ORGANIZATION_NAME')) {
-        //             $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'.$searchQuery->RELATION_ORGANIZATION_NAME.'%');
-        //     }
-        // } 
-        // // dd($data->toSql());
-        // return $data->paginate($dataPerPage);
     }
 
     // for get json agent
