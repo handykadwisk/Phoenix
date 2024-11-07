@@ -785,7 +785,7 @@ class TimeOffController extends Controller
                     'TIME_OFF_TYPE_ID'          => 0,
                     'SUBSTITUTE_PIC'            => 0,
                     'SECOND_SUBSTITUTE_PIC'     => 0,
-                    'DESCRIPTION'               => "Cuti Bersama",
+                    'DESCRIPTION'               =>  $request->TITLE,//"Cuti Bersama",
                     'REQUEST_DATE'              => now(),//$request->REQUEST_DATE,
                     'REQUEST_TO'                => $employeeLogin['EMPLOYEE_ID'],
                     'APPROVED_DATE'             => now(),
