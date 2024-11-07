@@ -26,14 +26,20 @@ export default function Index({ auth }: PageProps) {
     // Collective Leave
     const [modal, setModal] = useState<any>({
         modalSetCollectiveLeave: false,
+        modalDetailCollectiveLeave: false,
     });
 
-    const [dataCollectiveLeave, setDataCollectiveLeave] = useState<any>({
-        DATE_OF_LEAVE: "",
-    });
+    const fieldCollectiveLeave = {
+        TITLE: "",
+        detail: [{ DATE_OF_LEAVE :""}],
+    };
+
+    const [dataCollectiveLeave, setDataCollectiveLeave] = useState<any>({});
     const handleCollectiveLeave = () => {
+        setDataCollectiveLeave(fieldCollectiveLeave)
         setModal({
             modalSetCollectiveLeave: true,
+            modalDetailCollectiveLeave: false,
         });
     };
     console.log("dataCollectiveLeave: ", dataCollectiveLeave);
@@ -42,38 +48,68 @@ export default function Index({ auth }: PageProps) {
         setIsSuccess("");
         if (message != "") {
             setIsSuccess(message);
-            setDataCollectiveLeave({
-                DATE_OF_LEAVE: "",
-            });
+            setDataCollectiveLeave(fieldCollectiveLeave);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
         }
         setModal({
             modalSetCollectiveLeave: false,
+            modalDetailCollectiveLeave: false,
         });
     };
+
+    const collectiveLeaveDetail = ( value: any, i:number) => {
+         const items = [...dataCollectiveLeave.detail];
+         items[i]["DATE_OF_LEAVE"] = value;
+         setDataCollectiveLeave({
+             ...dataCollectiveLeave,
+             detail: items,
+         });        
+    };
+
+    const deleteRowDate = (i: number) => {
+        const val = [...dataCollectiveLeave.detail];
+        val.splice(i, 1);
+        setDataCollectiveLeave({
+            ...dataCollectiveLeave,
+            detail: val,
+        });
+    };
+
+    const addRowDate = (e: FormEvent) => {
+        e.preventDefault();
+        setDataCollectiveLeave({
+            ...dataCollectiveLeave,
+            detail: [
+                ...dataCollectiveLeave.detail,
+                {
+                    DATE_OF_LEAVE: "",
+                },
+            ],
+        });
+
+        // setDailyOff([...dailyOff, { DATE: null }]);
+    };
+
     // End Collective Leave
 
 
     // Edit Collective Leave
-    const handleEdit = async (data: any) => {
-        // await axios
-        //     .get(`/getRequestTimeOffById/${data.REQUEST_TIME_OFF_MASTER_ID}`)
-        //     .then((res) => setEditRequestTimeOff(res.data))
-        //     .catch((err) => console.log(err));
+    const [detailCollectiveLeave, setDetailCollectiveLeave] = useState<any>({});
+    const handleDetailCollectiveLeave = async (data: any) => {
+        await axios
+            .get(`/getCollectiveLeaveById/${data.COLLECTIVE_LEAVE_ID}`)
+            .then((res) => setDetailCollectiveLeave(res.data))
+            .catch((err) => console.log(err));
 
-        // setSelectedTypeForEdit(
-        //     getSelectedType(data.TIME_OFF_TYPE_ID)
-        //         ? getSelectedType(data.TIME_OFF_TYPE_ID)
-        //         : {}
-        // );
 
-        // setModal({
-        //     modalSetCollectiveLeave: false,
-        //     modalEditRequestTimeOff: !modal.modalEditRequestTimeOff,
-        // });
+        setModal({
+            modalSetCollectiveLeave: false,
+            modalDetailCollectiveLeave: !modal.modalDetailCollectiveLeave,
+        });
     };
+    console.log("detailCollectiveLeave: ", detailCollectiveLeave);
 
     // End Edit Collective Leave
     
@@ -109,31 +145,114 @@ export default function Index({ auth }: PageProps) {
                 body={
                     <>
                         <div className="grid grid-cols-5">
-                            <div className="relative mt-2 grid grid-cols-2 ">
+                            <div className="relative mt-3 grid grid-cols-2 ">
                                 <div>
-                                    <label htmlFor="date">Date</label>
+                                    <label htmlFor="title">Title</label>
                                 </div>
                                 <div className=" text-red-600">*</div>
                             </div>
                             <div className="relative mt-2 col-span-4">
-                                <DatePicker
-                                    required
-                                    selected={dataCollectiveLeave.DATE_OF_LEAVE}
-                                    onChange={(date: any) =>
+                                <input
+                                    id="title"
+                                    name="title"
+                                    type="text"
+                                    value={dataCollectiveLeave.TITLE}
+                                    onChange={(e: any) => {
                                         setDataCollectiveLeave({
                                             ...dataCollectiveLeave,
-                                            DATE_OF_LEAVE:
-                                                date.toLocaleDateString(
-                                                    "en-CA"
-                                                ),
-                                        })
-                                    }
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy"
-                                    className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                            TITLE: e.target.value,
+                                        });
+                                    }}
+                                    required
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
+                            </div>
+                        </div>
+
+                        {dataCollectiveLeave.detail &&
+                            dataCollectiveLeave.detail.map(
+                                (cLD: any, i: number) => (
+                                    <div className="grid grid-cols-5 mt-2">
+                                        <div className="relative mt-3 grid grid-cols-2 ">
+                                            <div>
+                                                <label htmlFor="date">
+                                                    {i == 0 ? "Date" : ""}
+                                                </label>
+                                            </div>
+                                            <div className=" text-red-600">
+                                                {i == 0 ? "*" : ""}
+                                            </div>
+                                        </div>
+                                        <div className="flex mt-2 col-span-2 gap-4">
+                                            <div className="relative max-w-sm">
+                                                <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                                    <svg
+                                                        className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                        aria-hidden="true"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                                    </svg>
+                                                </div>
+                                                <DatePicker
+                                                    required
+                                                    selected={cLD.DATE_OF_LEAVE}
+                                                    onChange={(date: any) =>
+                                                        collectiveLeaveDetail(
+                                                            date.toLocaleDateString(
+                                                                "en-CA"
+                                                            ),
+                                                            i
+                                                        )
+                                                    }
+                                                    showMonthDropdown
+                                                    showYearDropdown
+                                                    dateFormat={"dd-MM-yyyy"}
+                                                    placeholderText="dd-mm-yyyyy"
+                                                    className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                                />
+                                            </div>
+                                            <div className=" mt-2 ">
+                                                {i > 0 ? (
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth={1.5}
+                                                        stroke="currentColor"
+                                                        className="mx-auto h-6 text-red-500 cursor-pointer"
+                                                        onClick={() => {
+                                                            deleteRowDate(i);
+                                                        }}
+                                                    >
+                                                        <path
+                                                            fill="#AB7C94"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M6 18 18 6M6 6l12 12"
+                                                        />
+                                                    </svg>
+                                                ) : (
+                                                    ""
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            )}
+
+                        <div className="grid grid-cols-5">
+                            <div className="relative mt-3 grid grid-cols-2 "></div>
+                            <div className="relative mt-3 col-span-4">
+                                <a
+                                    href=""
+                                    className="rounded bg-indigo-600 px-2 py-1 text-xs text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    // className="text-xs mt-2 text-slate-800 ms-1 py-1 px-1.5 bg-blue-400 rounded-md"
+                                    onClick={(e) => addRowDate(e)}
+                                >
+                                    + Add Date
+                                </a>
                             </div>
                         </div>
                     </>
@@ -141,58 +260,59 @@ export default function Index({ auth }: PageProps) {
             />
             {/* End Modal Set Collective Leave */}
 
-            {/* <ModalToAction
-                buttonAddOns={
-                    editRequestTimeOff.STATUS == 0 ? "Cancel Request" : null
-                }
-                show={modal.modalEditRequestTimeOff}
+            <ModalToAction
+                show={modal.modalDetailCollectiveLeave}
                 onClose={() =>
                     setModal({
-                        modalEditRequestTimeOff: false,
+                        modalDetailCollectiveLeave: false,
                     })
                 }
                 headers={null}
-                submitButtonName={
-                    editRequestTimeOff.STATUS == 0 ? "Edit" : null
-                }
-                title={"Edit Request Time Off"}
-                url={`/editRequestTimeOff`}
+                submitButtonName={"Cancel Collective Leave"}
+                title={"Detail Collective Leave"}
+                url={`/cancelCollectiveLeave`}
                 method={"post"}
-                data={editRequestTimeOff}
+                data={detailCollectiveLeave}
                 onSuccess={handleSuccessCollectiveLeave}
                 classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[75%]"
+                    "relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-[50%]"
                 }
                 body={
                     <>
                         <div className="grid grid-cols-5">
-                            <div className="relative mt-2 ">
-                                <label htmlFor="date">Date</label>
+                            <div className="relative mt-3 grid grid-cols-2 ">
+                                <div>
+                                    <label htmlFor="title">Title</label>
+                                </div>
                             </div>
                             <div className="relative mt-2 col-span-4">
-                                <DatePicker
-                                    required
-                                    selected={dataCollectiveLeave.DATE_OF_LEAVE}
-                                    onChange={(date: any) =>
-                                        setDataCollectiveLeave({
-                                            ...dataCollectiveLeave,
-                                            DATE_OF_LEAVE:
-                                                date.toLocaleDateString(
-                                                    "en-CA"
-                                                ),
-                                        })
-                                    }
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy"
-                                    className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
-                                />
+                                {detailCollectiveLeave.TITLE}
                             </div>
                         </div>
+
+                        {detailCollectiveLeave.detail &&
+                            detailCollectiveLeave.detail.map(
+                                (cLD: any, i: number) => (
+                                    <div className="grid grid-cols-5 mt-2">
+                                        <div className="relative mt-3 grid grid-cols-2 ">
+                                            <div>
+                                                <label htmlFor="date">
+                                                    {i == 0 ? "Date" : ""}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="flex mt-2 col-span-2 gap-4">
+                                            {dateFormat(
+                                                cLD.COLLECTIVE_LEAVE_DETAIL_DATE,
+                                                "dd-mm-yyyy"
+                                            )}
+                                        </div>
+                                    </div>
+                                )
+                            )}
                     </>
                 }
-            /> */}
+            />
 
             <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4 h-[100%]">
                 <div className="flex flex-col relative">
@@ -217,38 +337,23 @@ export default function Index({ auth }: PageProps) {
                             searchParam={""}
                             // loading={isLoading.get_policy}
                             url={"getCollectiveLeaveForAgGrid"}
-                            doubleClickEvent={handleEdit}
+                            doubleClickEvent={handleDetailCollectiveLeave}
                             triggeringRefreshData={isSuccess}
                             colDefs={[
                                 {
-                                    headerName: "Request Date",
-                                    flex: 3,
-                                    valueGetter: function (params: any) {
-                                        if (params.data) {
-                                            return dateFormat(
-                                                params.data.REQUEST_DATE,
-                                                "dd-mm-yyyy"
-                                            );
-                                        }
-                                    },
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
                                 },
                                 {
-                                    headerName: "Status",
-                                    // field: "POLICY_STATUS_ID",
-                                    flex: 4,
-                                    valueGetter: function (params: any) {
-                                        if (params.data) {
-                                            if (params.data.STATUS == 0) {
-                                                return "Waiting Approval";
-                                            } else if (
-                                                params.data.STATUS == 1
-                                            ) {
-                                                return "Rejected";
-                                            } else {
-                                                return "Approved";
-                                            }
-                                        }
-                                    },
+                                    headerName: "Collective Leave Title",
+                                    flex: 10,
+                                    field: "TITLE",
+                                    // valueGetter: function (params: any) {
+                                    //     if (params.data) {
+                                    //         return params.data.TITLE;
+                                    //     }
+                                    // },
                                 },
                             ]}
                         />

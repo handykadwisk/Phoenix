@@ -6,6 +6,8 @@ use App\Mail\SendEmail;
 use App\Models\Document;
 use App\Models\RGrade;
 use App\Models\RTimeOffType;
+use App\Models\TCollectiveLeave;
+use App\Models\TCollectiveLeaveDetail;
 use App\Models\TCompanyStructure;
 use App\Models\TEmployee;
 use App\Models\TimeOff;
@@ -587,6 +589,7 @@ class TimeOffController extends Controller
             $updateTimeOffMaster = TimeOffMaster::where('REQUEST_TIME_OFF_MASTER_ID', $data['REQUEST_TIME_OFF_MASTER_ID'])
                 ->where('IS_CANCELED', 0)
                 ->update([
+                    'STATUS'                     => 1, //REJECT
                     'IS_CANCELED'                => 1, //YES
                     'CANCELED_BY'                => Auth::user()->id,
                     'CANCELED_DATE'              => now(),
@@ -737,7 +740,14 @@ class TimeOffController extends Controller
         $perPage = $request->input('perPage', 10);
         $sortModel = $request->input('sort');
         
-        $query = TimeOffMaster::where('COLLECTIVE_LEAVE_ID', 1)->groupBy('REQUEST_DATE')->orderBy('COLLECTIVE_LEAVE_ID', 'desc');
+        // $query = DB::table('t_collective_leave AS cl')
+        // ->leftJoin('t_collective_leave_detail AS cld', 'cl.COLLECTIVE_LEAVE_ID', '=', 'cld.COLLECTIVE_LEAVE_ID')
+        // ->select('cl.*', 'cld.COLLECTIVE_LEAVE_DETAIL_ID', 'cld.COLLECTIVE_LEAVE_DETAIL_DATE')
+        // ->where('cl.STATUS', 1)
+        // ->orderBy('cl.COLLECTIVE_LEAVE_ID', 'desc');
+
+        $query = DB::table('t_collective_leave AS cl')->where('cl.STATUS', 1)
+        ->orderBy('cl.COLLECTIVE_LEAVE_ID', 'desc');
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
         
@@ -750,11 +760,27 @@ class TimeOffController extends Controller
             $employees = TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get();
             $employeeLogin = $this->getEmployeeById(Auth::user()->id);
 
+            // simpan ke table Collective Leave
+            $collectiveLeave = TCollectiveLeave::create([
+                'TITLE'         => $request->TITLE,
+                'CREATED_BY'    => Auth::user()->id,
+                'CREATED_DATE'  => now()
+            ]);
+
+            // simpan ke table Collective Leave Detail
+            foreach ($request->detail as $key => $value) {
+                TCollectiveLeaveDetail::create([
+                    'COLLECTIVE_LEAVE_ID' => $collectiveLeave->COLLECTIVE_LEAVE_ID,
+                    'COLLECTIVE_LEAVE_DETAIL_DATE'  => $value['DATE_OF_LEAVE']
+                ]);
+            }
+
             $arrId = [];
-            foreach ($employees as $key => $value) {
+            // simpan ke table t_request_time_off_master
+            foreach ($employees as $key2 => $value2) {
                 $timeOffMaster = TimeOffMaster::create([
-                    'EMPLOYEE_ID'               => $value['EMPLOYEE_ID'],
-                    'COLLECTIVE_LEAVE_ID'       => 1,
+                    'EMPLOYEE_ID'               => $value2['EMPLOYEE_ID'],
+                    'COLLECTIVE_LEAVE_ID'       => $collectiveLeave->COLLECTIVE_LEAVE_ID,
                     'IS_REDUCE_LEAVE'           => 1,
                     'TIME_OFF_TYPE_ID'          => 0,
                     'SUBSTITUTE_PIC'            => 0,
@@ -768,13 +794,17 @@ class TimeOffController extends Controller
                     'NOTE'                      => "Cuti Bersama",
                     'CREATED_BY'                => Auth::user()->id,
                     'CREATED_DATE'              => now(),
-                    'REQUEST_NUMBER'            => "REQ-".sprintf('%04d', $value['EMPLOYEE_ID']).Carbon::now()->format('YmdHis')
+                    'REQUEST_NUMBER'            => "REQ-".sprintf('%04d', $value2['EMPLOYEE_ID']).Carbon::now()->format('YmdHis')
                 ]);
 
-                TimeOff::insert([
-                    'REQUEST_TIME_OFF_MASTER_ID' => $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID,
-                    'DATE_OF_LEAVE'             => $request['DATE_OF_LEAVE'],
-                ]);
+                // simpan ke table t_request_time_off (untuk tanggal cuti bersamanya)
+                foreach ($request->detail as $key3 => $value3) {
+                    TimeOff::insert([
+                        'REQUEST_TIME_OFF_MASTER_ID' => $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID,
+                        'DATE_OF_LEAVE'             => $value3['DATE_OF_LEAVE'],
+                    ]);
+                }
+                
                 array_push($arrId, $timeOffMaster->REQUEST_TIME_OFF_MASTER_ID);
             }
 
@@ -793,7 +823,50 @@ class TimeOffController extends Controller
 
         return new JsonResponse([
             // "msg" => "Success Set Collective Leave"
-            "Success Request Time Off"
+            "Success Set Collective Leave"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+
+    }
+
+    function getCollectiveLeaveById($id= null) {
+        $data = TCollectiveLeave::find($id);
+        return response()->json($data);
+    }
+
+    function cancelCollectiveLeave(Request $request) {
+        
+        DB::transaction(function () use ($request) {
+
+            // Update Status di Tabel t_collective_leave
+            TCollectiveLeave::where('COLLECTIVE_LEAVE_ID', $request->COLLECTIVE_LEAVE_ID)
+                ->update([
+                    'STATUS'                     => 0, // 0= REJECT/CANCEL DI COLLECTIVE LEAVE
+                ]);
+
+            // Update Status di Tabel t_request_time_off_master
+            TimeOffMaster::where('COLLECTIVE_LEAVE_ID', $request->COLLECTIVE_LEAVE_ID)
+                ->update([
+                    'STATUS'                     => 1, // 1= REJECT DI MASTER
+                ]);
+
+            // Created Log
+            UserLog::create([
+                'created_by' => Auth::user()->id,
+                'action'     => json_encode([
+                    "description" => "Collective Leave.",
+                    "module"      => "Collective Leave",
+                    "id"          => $request->COLLECTIVE_LEAVE_ID
+                ]),
+                'action_by'  => Auth::user()->user_login
+            ]);
+
+        });
+
+        return new JsonResponse([
+            // "msg" => "Success Set Collective Leave"
+            "Cancel Collective Leave Successed"
         ], 201, [
             'X-Inertia' => true
         ]);

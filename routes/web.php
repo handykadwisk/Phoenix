@@ -588,6 +588,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/collectiveLeave', [TimeOffController::class, 'collectiveLeave'])->name('collectiveLeave');
     Route::get('/getCollectiveLeaveForAgGrid', [TimeOffController::class, 'getCollectiveLeaveForAgGrid'])->name('timeOff.getCollectiveLeaveForAgGrid');
     Route::post('/setCollectiveLeave', [TimeOffController::class, 'setCollectiveLeave'])->name('timeOff.setCollectiveLeave');
+    Route::get('/getCollectiveLeaveById/{id}', [TimeOffController::class, 'getCollectiveLeaveById'])->name('timeOff.getCollectiveLeaveById');
+    Route::post('/cancelCollectiveLeave', [TimeOffController::class, 'cancelCollectiveLeave'])->name('timeOff.cancelCollectiveLeave');
 
 
 
