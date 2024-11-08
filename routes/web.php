@@ -682,6 +682,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
     Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
     Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
+    Route::post('/getSumMessageUnread', [TDetailChatController::class, 'get_message_unread'])->name('getSumMessageUnread.get_message_unread');
+
 
 
     // Time Off

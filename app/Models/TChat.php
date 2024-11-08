@@ -30,4 +30,9 @@ class TChat extends Model
     {
         return $this->hasMany(TPinChat::class, "CHAT_ID", "CHAT_ID");
     }
+
+    public function tParticipant()
+    {
+        return $this->hasMany(TChatParticipant::class, "CHAT_ID", "CHAT_ID");
+    }
 }

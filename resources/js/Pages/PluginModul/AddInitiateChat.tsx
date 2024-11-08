@@ -77,7 +77,7 @@ export default function AddInitiateChat({
             })
             .then((res) => {
                 setIsSuccessChat(res.data[5]);
-                getObjectChat();
+                getObjectChat(res.data[6]);
                 setShowAddInitiate({
                     addChat: false,
                 });
@@ -125,7 +125,7 @@ export default function AddInitiateChat({
                         <InputLabel
                             className="text-xs"
                             value={"Participant"}
-                            required={false}
+                            required={true}
                         />
                         <SelectTailwind
                             classNames={{

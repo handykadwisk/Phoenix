@@ -10,3 +10,7 @@ Broadcast::channel('channel-name', function ($user) {
 Broadcast::channel('typingChat', function ($user) {
     return true; // Sesuaikan logika autorisasi
 });
+
+Broadcast::channel('real-time-chat', function ($user) {
+    return true; // Sesuaikan logika autorisasi
+});
