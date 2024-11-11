@@ -18,9 +18,14 @@ class GotMessage implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(public array $message)
+    public $message;
+    public $modul;
+
+    public function __construct($message, $modul)
     {
         //
+        $this->message = $message;
+        $this->modul = $modul;
     }
 
     /**
@@ -28,10 +33,18 @@ class GotMessage implements ShouldBroadcastNow
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn()
+    {
+        // return [
+        return new Channel('channel-name');
+        // ];
+    }
+
+    public function broadcastWith()
     {
         return [
-            new PrivateChannel('channel-name'),
+            'message' => $this->message,
+            'modul' => $this->modul
         ];
     }
 }

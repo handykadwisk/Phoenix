@@ -23,6 +23,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
     useEffect(() => {
         getDataPluginChat();
         connectWebSocket();
+        cekDetailChatRead(auth.user.id);
 
         return () => {
             window.Echo.leave(webSocketChannel);
@@ -39,6 +40,18 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
         } else {
             setShow(false);
         }
+    };
+    const [cekMessage, setCekMessage] = useState<any>([]);
+    const cekDetailChatRead = async (userIdLogin?: any) => {
+        await axios
+            .post(`/getCekDetailChatRead`, { userIdLogin })
+            .then((res) => {
+                setCekMessage(res.data);
+                // setShow(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     // for load data chat plugin
@@ -86,11 +99,23 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
         setShow(false);
     };
 
+    const [detailTypeChat, setDetailTypeChat] = useState<any>([]);
+    const getObjectChat = async (userIdLogin?: any) => {
+        await axios
+            .post(`/getObjectChat`, { userIdLogin })
+            .then((res) => {
+                setDetailTypeChat(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     const [notification, setNotification] = useState<boolean>(false);
     const webSocketChannel = `channel-name`;
     const connectWebSocket = () => {
-        window.Echo.private(webSocketChannel).listen("GotMessage", (e: any) => {
-            // e.message
+        window.Echo.channel(webSocketChannel).listen("GotMessage", (e: any) => {
+            cekDetailChatRead(auth.user.id);
             setNotification(true);
         });
     };
@@ -153,6 +178,15 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                                     }}
                                     title={items.PLUGIN_PROCESS_NAME}
                                 >
+                                    {items.PLUGIN_PROCESS_NAME === "Chat" ? (
+                                        <>
+                                            {cekMessage.length !== 0 && (
+                                                <div className="absolute top-0 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg">
+                                                    {/* <span>a</span> */}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : null}
                                     <span>
                                         {items.PLUGIN_PROCESS_NAME ===
                                         "Chat" ? (
@@ -177,7 +211,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                 className="fixed z-50 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
                 onClick={(e) => handleClickShow(e)}
             >
-                {notification && (
+                {cekMessage.length !== 0 && (
                     <div className="absolute top-0 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg">
                         {/* <span>a</span> */}
                     </div>

@@ -128,6 +128,7 @@ export default function ModalChatMessage({
             });
     };
 
+    const [showSum, setShowSum] = useState<any>([]);
     const getSumMessage = (value: any, chatId: any) => {
         if (value) {
             const selected = sumMessage.filter(
@@ -135,6 +136,7 @@ export default function ModalChatMessage({
                     option.CHAT_ID === parseInt(chatId) &&
                     option.CHAT_DETAIL_USER_TO === parseInt(value)
             );
+
             return selected.length;
         }
     };
@@ -1662,7 +1664,7 @@ export default function ModalChatMessage({
                                                                                         }
                                                                                     >
                                                                                         <div
-                                                                                            className="flex items-center gap-24"
+                                                                                            className="grid grid-cols-2 gap-10"
                                                                                             onClick={(
                                                                                                 e
                                                                                             ) => {
@@ -1756,7 +1758,7 @@ export default function ModalChatMessage({
                                                                                                     </span>
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <div className="flex gap-3">
+                                                                                            <div className="flex justify-end items-center gap-2">
                                                                                                 <span className="text-[15px] rotate-45 flex items-center">
                                                                                                     {dTypeChat.PIN_CHAT ===
                                                                                                         1 &&
@@ -1773,8 +1775,8 @@ export default function ModalChatMessage({
                                                                                                         </>
                                                                                                     ) : null}
                                                                                                 </span>
-                                                                                                <div className="bg-red-500 w-15 h-15 p-1 rounded-lg">
-                                                                                                    <span className="text-white">
+                                                                                                <div className="bg-red-500 px-1.5 py-0.5 rounded-full flex justify-center items-center">
+                                                                                                    <span className="text-white text-xs">
                                                                                                         {getSumMessage(
                                                                                                             dTypeChat.USER_ID,
                                                                                                             dTypeChat.CHAT_ID

@@ -683,6 +683,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
     Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
     Route::post('/getSumMessageUnread', [TDetailChatController::class, 'get_message_unread'])->name('getSumMessageUnread.get_message_unread');
+    Route::post('/getCekDetailChatRead', [TDetailChatController::class, 'get_message_cek_detail'])->name('getCekDetailChatRead.get_message_cek_detail');
 
 
 
