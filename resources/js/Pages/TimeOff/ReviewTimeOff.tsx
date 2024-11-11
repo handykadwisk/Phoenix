@@ -309,6 +309,7 @@ export default function Index({ auth }: PageProps) {
                 submitButtonName={
                     dataReviewTimeOff.STATUS == 0 ? "Approve" : null
                 }
+                cancelButtonName={"Close"}
                 classPanel={
                     "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
                 }
@@ -586,7 +587,12 @@ export default function Index({ auth }: PageProps) {
                             {
                                 headerName: "No.",
                                 valueGetter: "node.rowIndex + 1",
-                                flex: 1.5,
+                                flex: 1.2,
+                            },
+                            {
+                                headerName: "Request Number",
+                                field: "REQUEST_NUMBER",
+                                flex: 3,
                             },
                             {
                                 headerName: "Name",
@@ -626,33 +632,21 @@ export default function Index({ auth }: PageProps) {
                             },
                             {
                                 headerName: "Request Date",
-                                flex: 3,
+                                flex: 2.2,
                                 valueGetter: function (params: any) {
                                     // console.log("xsd : ", params);
                                     if (params.data) {
                                         return dateFormat(
                                             params.data.REQUEST_DATE,
-                                            "dd-mm-yyyy"
+                                            "dd mmm yyyy"
                                         );
                                     }
                                 },
                             },
                             {
-                                headerName: "Status",
-                                // field: "POLICY_STATUS_ID",
-                                flex: 4,
-                                valueGetter: function (params: any) {
-                                    // console.log("xsd : ", params);
-                                    if (params.data) {
-                                        if (params.data.STATUS == 0) {
-                                            return "Waiting Approval";
-                                        } else if (params.data.STATUS == 1) {
-                                            return "Rejected";
-                                        } else {
-                                            return "Approved";
-                                        }
-                                    }
-                                },
+                                headerName: "Description",
+                                field: "DESCRIPTION",
+                                flex: 5,
                             },
                         ]}
                     />

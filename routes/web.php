@@ -582,6 +582,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/cancelTimeOff', [TimeOffController::class, 'cancelTimeOff'])->name('timeOff.cancelTimeOff');
     Route::get('/sendLink', [TimeOffController::class, 'sendLink'])->name('timeOff.sendLink');
     Route::get('/downloadTimeOffDocument/{id}', [TimeOffController::class, 'time_off_document_download'])->name('downloadTimeOffDocument.time_off_document_download');
+    Route::get('/agGridRequestTimeOffForHR', [TimeOffController::class, 'agGridRequestTimeOffForHR'])->name('timeOff.agGridRequestTimeOffForHR');
+    Route::get('/timeOffForHR', [TimeOffController::class, 'timeOffForHR'])->name('timeOffForHR');
 
 
     // Collective Leave

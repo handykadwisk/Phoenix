@@ -199,7 +199,8 @@ class TimeOffController extends Controller
             ->leftJoin('t_request_time_off AS rto', 'rtom.REQUEST_TIME_OFF_MASTER_ID', '=', 'rto.REQUEST_TIME_OFF_MASTER_ID')
             ->where("rtom.EMPLOYEE_ID", $employee['EMPLOYEE_ID'])
             ->where("rtom.IS_REDUCE_LEAVE", 1)
-            ->where("rtom.STATUS", 2)
+            // ->where("rtom.STATUS", 2)
+            ->where("rtom.STATUS", "<>", "1")
             ->where('rto.DATE_OF_LEAVE', '>=', $firstDate)
             ->where('rto.DATE_OF_LEAVE', '<=', $endDate)->count();
         return response()->json($data);
@@ -664,7 +665,7 @@ class TimeOffController extends Controller
         $query = TimeOffMaster::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('IS_CANCELED', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
             
         // $filterModel = json_decode($request->input('filter'), true);
-        // $newSearch = json_decode($request->newFilter, true);        
+        $newSearch = json_decode($request->newFilter, true);        
         
         // if ($sortModel) {
         //     $sortModel = explode(';', $sortModel); 
@@ -676,19 +677,19 @@ class TimeOffController extends Controller
         //     $query->orderBy('POLICY_ID', 'DESC'); 
         // }
 
-        // if ($request->newFilter !== "") {
-        //     foreach ($newSearch[0] as $keyId => $searchValue) {
-        //         if ($keyId === 'POLICY_NUMBER') {
-        //             if ($searchValue != "") {
-        //                 $query->where('POLICY_NUMBER', 'LIKE', '%' . $searchValue . '%');
-        //             }                        
-        //         }elseif ($keyId === 'CLIENT_ID'){
-        //             if ($searchValue != "") {
-        //                 $query->where('RELATION_ID', $searchValue);
-        //             }
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            foreach ($newSearch[0] as $keyId => $searchValue) {
+                if ($keyId === 'DATE') {
+                    if ($searchValue != "") {
+                        $query->where('REQUEST_DATE', '=', $searchValue);
+                    }                        
+                // }elseif ($keyId === 'CLIENT_ID'){
+                //     if ($searchValue != "") {
+                //         $query->where('RELATION_ID', $searchValue);
+                //     }
+                }
+            }
+        }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
         
@@ -725,9 +726,64 @@ class TimeOffController extends Controller
         return 'Email telah dikirim!';
     }
 
+     function timeOffForHR($id= null) {
+        return Inertia::render('TimeOff/TimeOffForHR', [
+            'data' => TimeOffMaster::find($id),
+            'employees' => TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get(),
+            'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->get()
+        ]);
+    }
+
+     public function agGridRequestTimeOffForHR(Request $request)
+    {
+        // dd($request);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+        $sortModel = $request->input('sort');
+
+        // $query = TimeOffMaster::where('STATUS', '=', '0')->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc');
+
+        $query = DB::table('t_request_time_off_master AS rtom')
+        ->leftJoin('t_request_time_off AS rto', 'rtom.REQUEST_TIME_OFF_MASTER_ID', '=', 'rto.REQUEST_TIME_OFF_MASTER_ID')
+        ->where('rtom.STATUS','<>', 1)
+        ->orderBy('rtom.REQUEST_TIME_OFF_MASTER_ID', 'desc');
+            
+        // $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);        
+        
+        // if ($sortModel) {
+        //     $sortModel = explode(';', $sortModel); 
+        //     foreach ($sortModel as $sortItem) {
+        //         list($colId, $sortDirection) = explode(',', $sortItem);
+        //         $query->orderBy($colId, $sortDirection); 
+        //     }
+        // } else {
+        //     $query->orderBy('POLICY_ID', 'DESC'); 
+        // }
+
+        if ($request->newFilter !== "") {
+            foreach ($newSearch[0] as $keyId => $searchValue) {
+                if ($keyId === 'DATE') {
+                    if ($searchValue != "") {
+                        $query->where('rto.DATE_OF_LEAVE', '=', $searchValue);
+                    }                        
+                // }elseif ($keyId === 'CLIENT_ID'){
+                //     if ($searchValue != "") {
+                //         $query->where('RELATION_ID', $searchValue);
+                //     }
+                }
+            }
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        return $data;
+    }
+
    
     function collectiveLeave($id= null) {
         return Inertia::render('TimeOff/CollectiveLeave', [
+        // return Inertia::render('TimeOff/TimeOffForHR', [
             'data' => TimeOffMaster::find($id),
             'employees' => TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get(),
             'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->get()
@@ -740,12 +796,6 @@ class TimeOffController extends Controller
         $perPage = $request->input('perPage', 10);
         $sortModel = $request->input('sort');
         
-        // $query = DB::table('t_collective_leave AS cl')
-        // ->leftJoin('t_collective_leave_detail AS cld', 'cl.COLLECTIVE_LEAVE_ID', '=', 'cld.COLLECTIVE_LEAVE_ID')
-        // ->select('cl.*', 'cld.COLLECTIVE_LEAVE_DETAIL_ID', 'cld.COLLECTIVE_LEAVE_DETAIL_DATE')
-        // ->where('cl.STATUS', 1)
-        // ->orderBy('cl.COLLECTIVE_LEAVE_ID', 'desc');
-
         $query = DB::table('t_collective_leave AS cl')->where('cl.STATUS', 1)
         ->orderBy('cl.COLLECTIVE_LEAVE_ID', 'desc');
 
@@ -837,6 +887,7 @@ class TimeOffController extends Controller
 
     function cancelCollectiveLeave(Request $request) {
         
+        // dd($request);
         DB::transaction(function () use ($request) {
 
             // Update Status di Tabel t_collective_leave
@@ -865,8 +916,8 @@ class TimeOffController extends Controller
         });
 
         return new JsonResponse([
-            // "msg" => "Success Set Collective Leave"
-            "Cancel Collective Leave Successed"
+            "msg" => "Cancel Collective Leave Successed"
+            // "Cancel Collective Leave Successed"
         ], 201, [
             'X-Inertia' => true
         ]);

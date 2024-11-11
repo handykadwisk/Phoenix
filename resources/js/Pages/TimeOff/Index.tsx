@@ -31,6 +31,30 @@ export default function Index({ auth }: PageProps) {
         handleRequestTimeOff();
     }, [employee]);
 
+    const [successSearch, setSuccessSearch] = useState<string>("");
+    const [searchDate, setSearchDate] = useState<any>({
+        time_off_search: [
+            {
+                DATE: ""
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        // console.log('name: ', name, ' value: ', value)
+        const changeVal: any = [...searchDate.time_off_search];
+        changeVal[i][name] = value;
+        setSearchDate({ ...searchDate, time_off_search: changeVal });
+    };
+
+    const clearSearch = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("DATE", "", 0);
+    };
 
     const [selectedType, setSelectedType] = useState<any>({});
     const [dailyOff, setDailyOff] = useState<any>([]);
@@ -438,7 +462,6 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     value={employee.EMPLOYEE_FIRST_NAME}
                                     readOnly
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -460,7 +483,6 @@ export default function Index({ auth }: PageProps) {
                                                   .COMPANY_DIVISION_NAME
                                             : null
                                     }
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -479,7 +501,6 @@ export default function Index({ auth }: PageProps) {
                                     value={
                                         timeOffUsed + " / " + timeOffAvailable
                                     }
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -496,7 +517,6 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     readOnly
                                     value={timeOffAvailable - timeOffUsed}
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -510,12 +530,11 @@ export default function Index({ auth }: PageProps) {
                                 <select
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     value={dataRequestTimeOff.TIME_OFF_TYPE_ID}
-                                    onChange={
-                                        (e) =>
-                                            inputTimeOff(
-                                                "TIME_OFF_TYPE_ID",
-                                                e.target.value
-                                            )
+                                    onChange={(e) =>
+                                        inputTimeOff(
+                                            "TIME_OFF_TYPE_ID",
+                                            e.target.value
+                                        )
                                     }
                                     required
                                 >
@@ -562,7 +581,6 @@ export default function Index({ auth }: PageProps) {
                                                 selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -584,7 +602,6 @@ export default function Index({ auth }: PageProps) {
                                                 selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
                                                 " Month (s) "
                                             }
-                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -606,7 +623,6 @@ export default function Index({ auth }: PageProps) {
                                                 selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -655,30 +671,28 @@ export default function Index({ auth }: PageProps) {
                                         </label>
                                         <DatePicker
                                             selected={fieldStartDate}
-                                            onChange={
-                                                (date: any) => {
-                                                    setForThreeMonth(date);
-                                                    setFieldStartDate(
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        )
-                                                    ),
-                                                        selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH !=
-                                                            null &&
-                                                            setFieldEndDate(
-                                                                new Date(
-                                                                    date.setMonth(
-                                                                        date.getMonth() +
-                                                                            parseInt(
-                                                                                selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
-                                                                            )
-                                                                    )
-                                                                ).toLocaleDateString(
-                                                                    "en-CA"
+                                            onChange={(date: any) => {
+                                                setForThreeMonth(date);
+                                                setFieldStartDate(
+                                                    date.toLocaleDateString(
+                                                        "en-CA"
+                                                    )
+                                                ),
+                                                    selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH !=
+                                                        null &&
+                                                        setFieldEndDate(
+                                                            new Date(
+                                                                date.setMonth(
+                                                                    date.getMonth() +
+                                                                        parseInt(
+                                                                            selectedType.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH
+                                                                        )
                                                                 )
-                                                            );
-                                                }
-                                            }
+                                                            ).toLocaleDateString(
+                                                                "en-CA"
+                                                            )
+                                                        );
+                                            }}
                                             showMonthDropdown
                                             showYearDropdown
                                             dateFormat={"dd-MM-yyyy"}
@@ -965,7 +979,6 @@ export default function Index({ auth }: PageProps) {
                                     name="DESCRIPTION"
                                     // readOnly
                                     value={dataRequestTimeOff.DESCRIPTION}
-                                    
                                     onChange={(e: any) => {
                                         inputTimeOff(
                                             "DESCRIPTION",
@@ -992,7 +1005,6 @@ export default function Index({ auth }: PageProps) {
                                             new Date(),
                                             "dd-mm-yyyy"
                                         )}
-                                        
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -1054,6 +1066,7 @@ export default function Index({ auth }: PageProps) {
                 submitButtonName={
                     editRequestTimeOff.STATUS == 0 ? "Edit" : null
                 }
+                cancelButtonName={"Close"}
                 title={"Edit Request Time Off"}
                 url={`/editRequestTimeOff`}
                 method={"post"}
@@ -1078,7 +1091,6 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     value={employee.EMPLOYEE_FIRST_NAME}
                                     readOnly
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -1118,7 +1130,6 @@ export default function Index({ auth }: PageProps) {
                                     value={
                                         timeOffUsed + " / " + timeOffAvailable
                                     }
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -1135,7 +1146,6 @@ export default function Index({ auth }: PageProps) {
                                     type="text"
                                     readOnly
                                     value={timeOffAvailable - timeOffUsed}
-                                    
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -1200,7 +1210,6 @@ export default function Index({ auth }: PageProps) {
                                                 selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -1222,7 +1231,6 @@ export default function Index({ auth }: PageProps) {
                                                 selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH +
                                                 " Month (s) "
                                             }
-                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -1244,7 +1252,6 @@ export default function Index({ auth }: PageProps) {
                                                 selectedTypeForEdit.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY +
                                                 " Day(s)"
                                             }
-                                            
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
@@ -1452,9 +1459,7 @@ export default function Index({ auth }: PageProps) {
                             )}
 
                             <div className="relative mt-4">
-                                <label
-                                    className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
-                                >
+                                <label className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900">
                                     Subtitute PIC
                                 </label>
                                 <select
@@ -1493,9 +1498,7 @@ export default function Index({ auth }: PageProps) {
                             </div>
                             {editRequestTimeOff.SUBSTITUTE_PIC && (
                                 <div className="relative mt-4">
-                                    <label
-                                        className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900"
-                                    >
+                                    <label className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900">
                                         Second Subtitute PIC
                                     </label>
                                     <select
@@ -1556,7 +1559,6 @@ export default function Index({ auth }: PageProps) {
                                     name="DESCRIPTION"
                                     // readOnly
                                     value={editRequestTimeOff.DESCRIPTION}
-                                    
                                     onChange={(e: any) => {
                                         editTimeOff(
                                             "DESCRIPTION",
@@ -1583,7 +1585,6 @@ export default function Index({ auth }: PageProps) {
                                             editRequestTimeOff.REQUEST_DATE,
                                             "dd-mm-yyyy"
                                         )}
-                                        
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -1644,19 +1645,75 @@ export default function Index({ auth }: PageProps) {
                             {"Request Time Off"}
                         </Button>
                     </div>
+                    <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
+                        <DatePicker
+                            required
+                            selected={searchDate.time_off_search[0].DATE}
+                            onChange={(date: any) => {
+                                inputDataSearch(
+                                    "DATE",
+                                    date.toLocaleDateString("en-CA"),
+                                    0
+                                );
+                                setSuccessSearch("success");
+                                setTimeout(() => {
+                                    setSuccessSearch("");
+                                }, 1000);
+                            }}
+                            showMonthDropdown
+                            showYearDropdown
+                            dateFormat={"dd-MM-yyyy"}
+                            placeholderText="dd-mm-yyyyy"
+                            className="border-0 rounded-md shadow-md ring-1 ring-inset ring-gray-300 px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                        />
+                        <div className="mt-4 flex justify-end gap-2">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchDate.time_off_search[0].DATE != ""
+                                    ) {
+                                        inputDataSearch(
+                                            "DATE",
+                                            searchDate.time_off_search[0].DATE,
+                                            0
+                                        ),
+                                            setSuccessSearch("success");
+                                        setTimeout(() => {
+                                            setSuccessSearch("");
+                                        }, 1000);
+                                    }
+                                }}
+                            >
+                                Search
+                            </div>
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={(e) => {
+                                    clearSearch(e);
+                                    setSuccessSearch("success");
+                                    setTimeout(() => {
+                                        setSuccessSearch("");
+                                    }, 1000);
+                                }}
+                            >
+                                Clear Search
+                            </div>
+                        </div>
+                    </div>
                 </div>
-               
+
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
                             withParam={""}
-                            searchParam={""}
+                            searchParam={searchDate.time_off_search}
                             // loading={isLoading.get_policy}
                             url={"getRequestTimeOffAgGrid"}
                             doubleClickEvent={handleEditModal}
-                            triggeringRefreshData={isSuccess}
+                            triggeringRefreshData={successSearch}
                             colDefs={[
                                 {
                                     headerName: "Request Date",
@@ -1665,15 +1722,28 @@ export default function Index({ auth }: PageProps) {
                                         if (params.data) {
                                             return dateFormat(
                                                 params.data.REQUEST_DATE,
-                                                "dd-mm-yyyy"
+                                                "dd mmm yyyy"
                                             );
+                                        }
+                                    },
+                                },
+                                {
+                                    headerName: "Description",
+                                    flex: 4,
+                                    valueGetter: function (params: any) {
+                                        if (params.data) {
+                                            if (params.data.DESCRIPTION ) {
+                                                return params.data.DESCRIPTION;
+                                            } else {
+                                                return "-";
+                                            }
                                         }
                                     },
                                 },
                                 {
                                     headerName: "Status",
                                     // field: "POLICY_STATUS_ID",
-                                    flex: 4,
+                                    flex: 3,
                                     valueGetter: function (params: any) {
                                         if (params.data) {
                                             if (params.data.STATUS == 0) {

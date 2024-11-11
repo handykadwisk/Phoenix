@@ -19,6 +19,7 @@ export default function ModalToAction({
     onSuccess,
     headers,
     submitButtonName,
+    cancelButtonName,
     classPanel,
     buttonAddOns,
     actionDelete,
@@ -38,6 +39,7 @@ export default function ModalToAction({
     headers: any | null | undefined;
     classPanel: any;
     submitButtonName: string | null;
+    cancelButtonName?: string | null;
     buttonAddOns?: any;
     actionDelete?: any;
     toggleMenuDeleteStatus?: any;
@@ -215,7 +217,10 @@ export default function ModalToAction({
                                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                                 onClick={close}
                                             >
-                                                {data ? "Cancel" : "Close"}
+                                                {
+                                                    cancelButtonName ? cancelButtonName :
+                                                    data ? "Cancel" : "Close"
+                                                }
                                             </button>
                                         </div>
                                     </form>
