@@ -1496,7 +1496,7 @@ export default function Index({ auth }: PageProps) {
                                         : ""}
                                 </select>
                             </div>
-                            {editRequestTimeOff.SUBSTITUTE_PIC && (
+                            {editRequestTimeOff.SUBSTITUTE_PIC ? (
                                 <div className="relative mt-4">
                                     <label className="absolute -top-2 left-2 inline-block rounded-md bg-white px-1 text-xs font-medium text-gray-900">
                                         Second Subtitute PIC
@@ -1545,7 +1545,7 @@ export default function Index({ auth }: PageProps) {
                                             : ""}
                                     </select>
                                 </div>
-                            )}
+                            ):""}
 
                             <div className="relative mt-4">
                                 <label
