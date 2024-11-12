@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Events\GotMessage;
 use App\Models\RPluginProcess;
 use App\Models\TChatDetail;
 use App\Models\TTagPluginProcess;
@@ -61,6 +63,7 @@ class TTagPluginProcessController extends Controller
             "CREATED_CHAT_BY"      => Auth::user()->id,
         ]);
 
+
         // create message chat
         if ($createTypeChat) {
             $chatDetail = TChatDetail::create([
@@ -70,6 +73,11 @@ class TTagPluginProcessController extends Controller
                 "CREATED_CHAT_DETAIL_DATE"     => now(),
                 "CREATED_CHAT_DETAIL_BY"       => Auth::user()->id,
             ]);
+
+            // realtime laravel reverb
+            $modulChat = "Chat";
+            // SendMessage::dispatch($createMessage, $modulChat);
+            event(new GotMessage($chatDetail, $modulChat));
 
             // untuk diri sendirinya
             TChatParticipant::create([
@@ -136,6 +144,14 @@ class TTagPluginProcessController extends Controller
             }
             // end add Perticipant
         }
+
+        // Edit T chat detail user yang kirim chat auto read ketika dia ngirim pesan
+        // update read
+        TChatDetailUser::where('CHAT_ID', $createTypeChat->CHAT_ID)
+            ->where('CHAT_DETAIL_ID', $chatDetail->CHAT_DETAIL_ID)
+            ->where('CHAT_DETAIL_USER_TO', Auth::user()->id)->update([
+                "CHAT_DETAIL_USER_STATUS_READ"    => 1
+            ]);
 
 
         return new JsonResponse([

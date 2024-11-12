@@ -26,7 +26,6 @@ class TDetailChatController extends Controller
 {
     public function getMessage(Request $request)
     {
-        // $data = TChatDetail::select(DB::raw('DATE(CREATED_MESSAGE_CHAT_DATE) as date'), DB::raw('count(*) as total'))->groupBy('date')->with('tUser')->get();
         // return response()->json($data);
         $data = TChatDetail::with('pinChat')
             ->with('parent')
@@ -130,8 +129,6 @@ class TDetailChatController extends Controller
 
                             ],
                             [
-                                // "CHAT_ID"                                   => $request->CHAT_ID,
-                                // "CHAT_DETAIL_USER_TO"                       => $idUser,
                                 "CHAT_DETAIL_USER_FROM"                     => Auth::user()->id,
                                 "CHAT_DETAIL_USER_STATUS_READ"              => 0,
                                 "CHAT_DETAIL_USER_STATUS_MENTION"           => 1,
@@ -141,19 +138,6 @@ class TDetailChatController extends Controller
                                 "CHAT_DETAIL_USER_CREATED_ID"               => Auth::user()->id,
                             ]
                         );
-                        // // created t_chat_detail_user
-                        // $createMessage = TChatDetailUser::create([
-                        //     "CHAT_ID"                                   => $request->CHAT_ID,
-                        //     "CHAT_DETAIL_ID"                            => $createMessage->CHAT_DETAIL_ID,
-                        //     "CHAT_DETAIL_USER_TO"                       => $idUser,
-                        //     "CHAT_DETAIL_USER_FROM"                     => Auth::user()->id,
-                        //     "CHAT_DETAIL_USER_STATUS_READ"              => 0,
-                        //     "CHAT_DETAIL_USER_STATUS_MENTION"           => 1,
-                        //     "CHAT_DETAIL_USER_REPLY_DATE"               => null,
-                        //     "CHAT_DETAIL_USER_RELATE_CHAT_DETAIL_ID"    => null,
-                        //     "CHAT_DETAIL_USER_CREATED_DATE"             => now(),
-                        //     "CHAT_DETAIL_USER_CREATED_ID"               => Auth::user()->id,
-                        // ]);
                     }
                 }
             } else {
@@ -198,6 +182,13 @@ class TDetailChatController extends Controller
                 }
             }
 
+            // Edit T chat detail user yang kirim chat auto read ketika dia ngirim pesan
+            // update read
+            TChatDetailUser::where('CHAT_ID', $request->CHAT_ID)
+                ->where('CHAT_DETAIL_ID', $createMessage->CHAT_DETAIL_ID)
+                ->where('CHAT_DETAIL_USER_TO', Auth::user()->id)->update([
+                    "CHAT_DETAIL_USER_STATUS_READ"    => 1
+                ]);
 
 
 
@@ -232,9 +223,6 @@ class TDetailChatController extends Controller
             ->leftJoin('t_employee', 't_user.employee_id', '=', 't_employee.EMPLOYEE_ID')
             ->whereNotNull('t_user.employee_id');
 
-        // $division = DB::table('t_company_division')
-        //     ->select('COMPANY_DIVISION_ALIAS AS PARTICIPANT_NAME', 'COMPANY_DIVISION_ID AS PARTICIPANT_ID');
-
         $combined = $employee->get();
 
         return response()->json($combined);
@@ -266,24 +254,9 @@ class TDetailChatController extends Controller
             ->leftJoin('t_chat_detail', 't_chat.CHAT_ID', '=', 't_chat_detail.CHAT_ID')
             ->where('t_chat_participant.USER_ID', $request->userIdLogin)
             ->where('TAG_ID', $request->tagIdChat)
-            // ->where('t_chat.CREATED_CHAT_BY', $request->userIdLogin)
             ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
             ->orderBy('t_chat.CREATED_CHAT_DATE', 'DESC')
             ->distinct()->get();
-        // TChat::where('TAG_ID', $request->tagIdChat)->where('CHAT_STATUS', 0)->with('tUser')->with('pinChat')
-        //     ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
-        //     ->orderBy('t_chat.CREATED_CHAT_DATE', 'DESC')
-        //     ->select('t_chat.*', 't_pin_chat.PIN_CHAT', DB::raw('f_get_active_chat(t_chat_detail.CREATED_CHAT_DETAIL_DATE) AS STATUS'))
-        //     ->leftJoin('t_pin_chat', 't_chat.CHAT_ID', '=', 't_pin_chat.CHAT_ID')
-        //     ->leftJoin('t_chat_detail', 't_chat.CHAT_ID', '=', 't_chat_detail.CHAT_ID')
-        //     ->distinct()
-        //     ->get();
-        // $data = TChat::select('t_chat.*','t_pin_chat.PIN_CHAT','t_pin_chat.CREATED_PIN_CHAT_BY')->where('TAG_ID', $request->tagIdChat)->with('tUser')
-        // ->leftJoin('t_pin_chat', 't_chat.CHAT_ID', '=', 't_pin_chat.CHAT_ID')
-        // ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
-        // ->distinct()
-        // ->toSql();
-        // dd($data);
 
         return response()->json($data);
     }
@@ -296,12 +269,6 @@ class TDetailChatController extends Controller
             ->where('t_chat.TAG_ID', $request->tagIdChat)
             ->where('t_pin_chat.CREATED_PIN_CHAT_BY', $request->idAuthUser)
             ->get();
-        // $data = TPinChat::select('t_pin_chat.*')->where('TAG_ID', $request->tagIdChat)->with('tUser')
-        // ->leftJoin('t_pin_chat', 't_chat.CHAT_ID', '=', 't_pin_chat.CHAT_ID')
-        // ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
-        // ->where('t_pin_chat.PIN_CHAT', 1)
-        // ->get();
-        // dd($data);
 
         return response()->json($data);
     }
@@ -395,7 +362,6 @@ class TDetailChatController extends Controller
 
     public function add_participant(Request $request)
     {
-        // dd($request);
         // add Participant
         $arrayParticipant = is_countable($request->PARTICIPANT);
         if ($arrayParticipant) {
@@ -482,9 +448,6 @@ class TDetailChatController extends Controller
             ->where('CHAT_DETAIL_USER_STATUS_MENTION', 1)
             ->with('tChatDetail')
             ->leftJoin('t_chat', 't_chat.CHAT_ID', '=', 't_chat_detail_user.CHAT_ID')
-            // ->with('tChat')
-            // ->with('tChatDetail')
-            // ->with('userFormTo')
             ->get()
             ->groupBy('CHAT_TITLE');
 
@@ -494,11 +457,9 @@ class TDetailChatController extends Controller
     public function getDataChatDetailMention(Request $request)
     {
         $dataChatDetailUser = TChatDetailUser::where('CHAT_DETAIL_USER_FROM', $request->idAuthUser)
+            ->where('CHAT_DETAIL_USER_STATUS_MENTION', 1)
             ->with('tChatDetail')
             ->leftJoin('t_chat', 't_chat.CHAT_ID', '=', 't_chat_detail_user.CHAT_ID')
-            // ->with('tChat')
-            // ->with('tChatDetail')
-            // ->with('userFormTo')
             ->get()
             ->groupBy('CHAT_TITLE');
 
@@ -545,12 +506,9 @@ class TDetailChatController extends Controller
             ->leftJoin('t_pin_chat', 't_chat.CHAT_ID', '=', 't_pin_chat.CHAT_ID')
             ->leftJoin('t_chat_detail', 't_chat.CHAT_ID', '=', 't_chat_detail.CHAT_ID')
             ->where('t_chat_participant.USER_ID', $request->userIdLogin)
-            // ->where('t_chat.CREATED_CHAT_BY', $request->userIdLogin)
             ->orderBy('t_pin_chat.PIN_CHAT', 'DESC')
             ->orderBy('t_chat.CREATED_CHAT_DATE', 'DESC')
             ->distinct()->get();
-        //     ->toSql();
-        // dd($data);
 
         return response()->json($data);
     }

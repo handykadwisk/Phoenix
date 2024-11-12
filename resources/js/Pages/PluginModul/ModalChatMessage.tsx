@@ -44,6 +44,7 @@ export default function ModalChatMessage({
     showChatMessage,
     setFlagObject,
     flagObject,
+    cekDetailChatRead,
 }: PropsWithChildren<{
     show?: boolean;
     onClose?: CallableFunction;
@@ -57,17 +58,18 @@ export default function ModalChatMessage({
     showChatMessage: any;
     setFlagObject?: any;
     flagObject?: any;
+    cekDetailChatRead?: any;
 }>) {
     useEffect(() => {
         getMessageChatByTypeId(typeChatId);
-        // connectWebSocket();
+        connectWebSocket();
         listenForTyping();
         listeningChatRealTime();
 
         // return () => {
         //     window.Echo.leave(webSocketChannel);
         // };
-    }, [typeChatId]);
+    }, [typeChatId, showChatMessage.chatModal === true]);
     useEffect(() => {
         getDataChatDetailUser(auth.user.id);
         getDataChatDetailMention(auth.user.id);
@@ -78,10 +80,10 @@ export default function ModalChatMessage({
             getTypeChatByTagId(tagIdChat.TAG_ID, auth.user.id);
             getAllObjectChat(auth.user.id);
         }
-    }, [tagIdChat, flagObject]);
+    }, [tagIdChat, flagObject, showChatMessage.chatModal === true]);
     useEffect(() => {
         getChatPin(tagIdChat.TAG_ID, auth.user.id);
-    }, [tagIdChat]);
+    }, [tagIdChat, showChatMessage.chatModal === true]);
 
     const [isSuccessChat, setIsSuccessChat] = useState<string>("");
     const today = new Date();
@@ -833,17 +835,13 @@ export default function ModalChatMessage({
     };
 
     // for Reverb Message
-    // const webSocketChannel = `channel-name`;
-    // const connectWebSocket = () => {
-    //     window.Echo.private(webSocketChannel).listen(
-    //         "GotMessage",
-    //         async (e: any) => {
-    //             // e.message
-
-    //             await getMessageChatByTypeId(e.message.CHAT_ID);
-    //         }
-    //     );
-    // };
+    const webSocketChannel = `channel-name`;
+    const connectWebSocket = () => {
+        window.Echo.channel(webSocketChannel).listen("GotMessage", (e: any) => {
+            getObjectChat(auth.user.id);
+            getSumMessageUnread();
+        });
+    };
 
     // Contoh aja
     const sendChatRealTime = () => {
@@ -1698,6 +1696,11 @@ export default function ModalChatMessage({
                                                                                                     );
                                                                                                     actionUpdateReadMention(
                                                                                                         dTypeChat.CHAT_ID,
+                                                                                                        auth
+                                                                                                            .user
+                                                                                                            .id
+                                                                                                    );
+                                                                                                    cekDetailChatRead(
                                                                                                         auth
                                                                                                             .user
                                                                                                             .id

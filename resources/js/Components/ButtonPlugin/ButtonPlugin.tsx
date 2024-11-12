@@ -133,6 +133,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                 setFlagObject={setFlagObject}
                 flagObject={flagObject}
                 tagIdChat={1}
+                cekDetailChatRead={cekDetailChatRead}
                 // onClose={() =>
                 //     setShowChatMessage({
                 //         chatModal: false,
