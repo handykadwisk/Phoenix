@@ -245,15 +245,19 @@ export default function Index({ auth }: PageProps) {
     };
 
 
-    const handleSuccessRequestTimeOff = (message: string) => {
+    const handleSuccessRequestTimeOff = (message: any) => {
         setIsSuccess("");
-        if (message != "") {
-            setIsSuccess(message);
+        if (message.msg != "") {
+            setIsSuccess(message.msg);
             setDataRequestTimeOff(fieldDataRequestTimeOff);
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
         }
+        setSuccessSearch("Refreshing");
+        setTimeout(() => {
+            setSuccessSearch("");
+        }, 1000);
         setModal({
             modalRequestTimeOff: false,
             modalEditRequestTimeOff: false,
@@ -379,6 +383,10 @@ export default function Index({ auth }: PageProps) {
             confirmButtonText: "Yes, Sure!",
         }).then(async (result) => {
             if (result.isConfirmed) {
+                setModal({
+                    modalRequestTimeOff: false,
+                    modalEditRequestTimeOff: false,
+                });
                 try {
                     // send request to server
                     const response = await axios.post(`/cancelTimeOff`, {
@@ -400,9 +408,12 @@ export default function Index({ auth }: PageProps) {
                                 "Failed Canceled Request Time Off."
                             );
                         }
-                        
-                        
-                        handleSuccessRequestTimeOff(response.data.msg); // Panggil fungsi sukses untuk memperbarui UI atau state
+                              
+                        setSuccessSearch("Refreshing");
+                        setTimeout(() => {
+                            setSuccessSearch("");
+                        }, 1000);
+                        // handleSuccessRequestTimeOff(response.data.msg); // Panggil fungsi sukses untuk memperbarui UI atau state
                         
                     } else {
                         throw new Error("Unexpected response status");
@@ -1663,7 +1674,7 @@ export default function Index({ auth }: PageProps) {
                             showMonthDropdown
                             showYearDropdown
                             dateFormat={"dd-MM-yyyy"}
-                            placeholderText="dd-mm-yyyyy"
+                            placeholderText="Search Request Date"
                             className="border-0 rounded-md shadow-md ring-1 ring-inset ring-gray-300 px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
                         />
                         <div className="mt-4 flex justify-end gap-2">
