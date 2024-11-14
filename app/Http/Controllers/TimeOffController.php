@@ -487,6 +487,7 @@ class TimeOffController extends Controller
 
 
     function reviewTimeOff($id= null) {
+        // dd($id);
     // function reviewTimeOff(Request $request) {
         return Inertia::render('TimeOff/ReviewTimeOff', [
             // 'data' => TimeOffMaster::find($request->id),
@@ -677,7 +678,7 @@ class TimeOffController extends Controller
         //     $query->orderBy('POLICY_ID', 'DESC'); 
         // }
 
-        if ($request->newFilter !== "") {
+        if ($request->newFilter != "") {
             foreach ($newSearch[0] as $keyId => $searchValue) {
                 if ($keyId === 'DATE') {
                     if ($searchValue != "") {

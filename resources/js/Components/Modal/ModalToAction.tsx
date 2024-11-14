@@ -188,7 +188,7 @@ export default function ModalToAction({
                                             )}
                                             {buttonAddOns && (
                                                 <PrimaryButton
-                                                    className="inline-flex w-full sm:ml-3 sm:w-auto"
+                                                    className="inline-flex w-full sm:ml-3 sm:w-auto lg:mt-0 xs:mt-3"
                                                     disabled={isProcessing}
                                                     onClick={(e) =>
                                                         actionDelete(

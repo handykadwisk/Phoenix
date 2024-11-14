@@ -406,7 +406,7 @@ export default function Index({ auth }: PageProps) {
                                 </h3>
                             </div>
                             <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative mt-1">
-                                {"Search By Date :    "}
+                                {"Search Time Off Date :    "}
                                 <DatePicker
                                     required
                                     selected={

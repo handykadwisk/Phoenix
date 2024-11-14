@@ -210,7 +210,8 @@ export default function Index({ auth }: PageProps) {
 
         setModal({
             // modalRequestTimeOff: false,
-            modalReviewTimeOff: !modal.modalReviewTimeOff,
+            // modalReviewTimeOff: !modal.modalReviewTimeOff,
+            modalReviewTimeOff: true,
         });
     };
 
@@ -282,8 +283,8 @@ export default function Index({ auth }: PageProps) {
 
     
     return (
-        <AuthenticatedLayout user={auth.user} header={"Time Off"}>
-            <Head title="Time Off" />
+        <AuthenticatedLayout user={auth.user} header={"Review Time Off"}>
+            <Head title="Review Time Off" />
             {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
@@ -293,284 +294,292 @@ export default function Index({ auth }: PageProps) {
             )}
 
             {/* Modal Request Time Off */}
-            <ModalToAction
-                show={modal.modalReviewTimeOff}
-                onClose={() =>
-                    setModal({
-                        modalReviewTimeOff: false,
-                    })
-                }
-                title={"Review & Approve Time Off"}
-                url={`/approveTimeOff`}
-                method={"post"}
-                data={dataReviewTimeOff}
-                onSuccess={handleSuccessApproveTimeOff}
-                headers={null}
-                submitButtonName={
-                    dataReviewTimeOff.STATUS == 0 ? "Approve" : null
-                }
-                cancelButtonName={"Close"}
-                classPanel={
-                    "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
-                }
-                actionDelete={actionDelete}
-                buttonAddOns={dataReviewTimeOff.STATUS == 0 ? "Reject" : null}
-                body={
-                    <>
-                        {dataReviewTimeOff.STATUS != 0 && (
-                            <div
-                                className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-4"
-                                role="alert"
-                            >
-                                <p>
-                                    This Request Time Off Has Been
-                                    {dataReviewTimeOff.STATUS == 1
-                                        ? " Rejected."
-                                        : " Approved."}
-                                </p>
-                            </div>
-                        )}
+            {dataReviewTimeOff && (
+                <ModalToAction
+                    show={modal.modalReviewTimeOff}
+                    onClose={() =>
+                        setModal({
+                            modalReviewTimeOff: false,
+                        })
+                    }
+                    title={"Review & Approve Time Off"}
+                    url={`/approveTimeOff`}
+                    method={"post"}
+                    data={dataReviewTimeOff}
+                    onSuccess={handleSuccessApproveTimeOff}
+                    headers={null}
+                    submitButtonName={
+                        dataReviewTimeOff.STATUS == 0 ? "Approve" : null
+                    }
+                    cancelButtonName={"Close"}
+                    classPanel={
+                        "relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl"
+                    }
+                    actionDelete={actionDelete}
+                    buttonAddOns={
+                        dataReviewTimeOff.STATUS == 0 ? "Reject" : null
+                    }
+                    body={
+                        <>
+                            {dataReviewTimeOff.STATUS != 0 && (
+                                <div
+                                    className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-4"
+                                    role="alert"
+                                >
+                                    <p>
+                                        This Request Time Off Has Been
+                                        {dataReviewTimeOff.STATUS == 1
+                                            ? " Rejected."
+                                            : " Approved."}
+                                    </p>
+                                </div>
+                            )}
 
-                        <div className="grid grid-cols-2 gap-2">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Name
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {getEmployeeById(
-                                        dataReviewTimeOff.EMPLOYEE_ID
-                                    ) &&
-                                        getEmployeeById(
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Name
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {getEmployeeById(
                                             dataReviewTimeOff.EMPLOYEE_ID
-                                        ).EMPLOYEE_FIRST_NAME}
+                                        ) &&
+                                            getEmployeeById(
+                                                dataReviewTimeOff.EMPLOYEE_ID
+                                            ).EMPLOYEE_FIRST_NAME}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Division
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {getEmployeeById(
-                                        dataReviewTimeOff.EMPLOYEE_ID
-                                    ) &&
-                                        getEmployeeById(
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Division
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {getEmployeeById(
                                             dataReviewTimeOff.EMPLOYEE_ID
-                                        ).division.COMPANY_DIVISION_NAME}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Time Off Available This Year
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {timeOffAvailable}
-                                </div>
-                            </div>
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Total Time Off Used
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {timeOffUsed}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Type of Request
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {getTimeOffById(
-                                        dataReviewTimeOff.TIME_OFF_TYPE_ID
-                                    ) &&
-                                        getTimeOffById(
-                                            dataReviewTimeOff.TIME_OFF_TYPE_ID
-                                        ).TIME_OFF_TYPE_NAME}
-                                </div>
-                            </div>
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    File Uploaded
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {dataReviewTimeOff.document && (
-                                        <div className="grid-cols-4 grid gap-4 mb-2">
-                                            <div
-                                                className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    window.open(
-                                                        window.location.origin +
-                                                            "/storage/" +
-                                                            dataReviewTimeOff
-                                                                .document
-                                                                ?.DOCUMENT_DIRNAME +
-                                                            dataReviewTimeOff
-                                                                .document
-                                                                ?.DOCUMENT_FILENAME,
-                                                        "_blank"
-                                                    );
-                                                }}
-                                            >
-                                                <span>
-                                                    {
-                                                        dataReviewTimeOff
-                                                            .document
-                                                            .DOCUMENT_ORIGINAL_NAME
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="flex">
-                                                <span>
-                                                    <ArrowDownTrayIcon
-                                                        className="w-5 text-blue-600 hover:cursor-pointer"
-                                                        title="Download Images"
-                                                        onClick={(e) =>
-                                                            handleFileDownload(
-                                                                dataReviewTimeOff.FILE_ID
-                                                            )
-                                                        }
-                                                    />
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Time Off Date
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    <div className="relative ">
-                                        <table className="table-fixed w-full mb-2">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th
-                                                        rowSpan={2}
-                                                        scope="col"
-                                                        className="w-10 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
-                                                    >
-                                                        No.
-                                                    </th>
-                                                    <th
-                                                        rowSpan={2}
-                                                        scope="col"
-                                                        className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
-                                                    >
-                                                        Date
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white">
-                                                {dataReviewTimeOff.request_time_off.map(
-                                                    (dO: any, i: number) => (
-                                                        <tr className="border-t border-gray-200">
-                                                            <td className="border text-sm border-[#eee] dark:border-strokedark">
-                                                                <div
-                                                                    className={
-                                                                        "block w-full mx-auto text-center"
-                                                                    }
-                                                                >
-                                                                    {1}
-                                                                </div>
-                                                            </td>
-                                                            <td className="border text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
-                                                                {dateFormat(
-                                                                    dO.DATE_OF_LEAVE,
-                                                                    "dd-mm-yyyy"
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                )}
-                                            </tbody>
-                                        </table>
+                                        ) &&
+                                            getEmployeeById(
+                                                dataReviewTimeOff.EMPLOYEE_ID
+                                            ).division.COMPANY_DIVISION_NAME}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Time Off Available This Year
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {timeOffAvailable}
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Total Time Off Used
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {timeOffUsed}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Type of Request
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {getTimeOffById(
+                                            dataReviewTimeOff.TIME_OFF_TYPE_ID
+                                        ) &&
+                                            getTimeOffById(
+                                                dataReviewTimeOff.TIME_OFF_TYPE_ID
+                                            ).TIME_OFF_TYPE_NAME}
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        File Uploaded
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {dataReviewTimeOff.document && (
+                                            <div className="grid-cols-4 grid gap-4 mb-2">
+                                                <div
+                                                    className="text-sm text-gray-500 font-semibold cursor-pointer hover:text-red-600 w-fit"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        window.open(
+                                                            window.location
+                                                                .origin +
+                                                                "/storage/" +
+                                                                dataReviewTimeOff
+                                                                    .document
+                                                                    ?.DOCUMENT_DIRNAME +
+                                                                dataReviewTimeOff
+                                                                    .document
+                                                                    ?.DOCUMENT_FILENAME,
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                >
+                                                    <span>
+                                                        {
+                                                            dataReviewTimeOff
+                                                                .document
+                                                                .DOCUMENT_ORIGINAL_NAME
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div className="flex">
+                                                    <span>
+                                                        <ArrowDownTrayIcon
+                                                            className="w-5 text-blue-600 hover:cursor-pointer"
+                                                            title="Download Images"
+                                                            onClick={(e) =>
+                                                                handleFileDownload(
+                                                                    dataReviewTimeOff.FILE_ID
+                                                                )
+                                                            }
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Time Off Date
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        <div className="relative ">
+                                            <table className="table-fixed w-full mb-2">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th
+                                                            rowSpan={2}
+                                                            scope="col"
+                                                            className="w-10 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                        >
+                                                            No.
+                                                        </th>
+                                                        <th
+                                                            rowSpan={2}
+                                                            scope="col"
+                                                            className="py-3.5 pl-4 pr-3 w-40 text-center text-sm font-semibold text-gray-900 sm:pl-3 border-[1px]"
+                                                        >
+                                                            Date
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white">
+                                                    {dataReviewTimeOff.request_time_off.map(
+                                                        (
+                                                            dO: any,
+                                                            i: number
+                                                        ) => (
+                                                            <tr className="border-t border-gray-200">
+                                                                <td className="border text-sm border-[#eee] dark:border-strokedark">
+                                                                    <div
+                                                                        className={
+                                                                            "block w-full mx-auto text-center"
+                                                                        }
+                                                                    >
+                                                                        {1}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="border text-sm border-[#eee] py-3 px-4 dark:border-strokedark">
+                                                                    {dateFormat(
+                                                                        dO.DATE_OF_LEAVE,
+                                                                        "dd-mm-yyyy"
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Subtitute PIC
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {getEmployeeById(
-                                        dataReviewTimeOff.SUBSTITUTE_PIC
-                                    ) &&
-                                        getEmployeeById(
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Subtitute PIC
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {getEmployeeById(
                                             dataReviewTimeOff.SUBSTITUTE_PIC
-                                        ).EMPLOYEE_FIRST_NAME}
+                                        ) &&
+                                            getEmployeeById(
+                                                dataReviewTimeOff.SUBSTITUTE_PIC
+                                            ).EMPLOYEE_FIRST_NAME}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Description
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {dataReviewTimeOff.DESCRIPTION}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Request Date
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    {dateFormat(
-                                        dataReviewTimeOff.REQUEST_DATE,
-                                        "dd-mm-yyyy"
-                                    )}
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Description
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {dataReviewTimeOff.DESCRIPTION}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Request To
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Request Date
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {dateFormat(
+                                            dataReviewTimeOff.REQUEST_DATE,
+                                            "dd-mm-yyyy"
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="text-sm  text-gray-500">
-                                    {getEmployeeById(
-                                        dataReviewTimeOff.REQUEST_TO
-                                    ) &&
-                                        getEmployeeById(
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Request To
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        {getEmployeeById(
                                             dataReviewTimeOff.REQUEST_TO
-                                        ).EMPLOYEE_FIRST_NAME}
+                                        ) &&
+                                            getEmployeeById(
+                                                dataReviewTimeOff.REQUEST_TO
+                                            ).EMPLOYEE_FIRST_NAME}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="grid grid-cols gap-2 mt-3">
-                            <div className="">
-                                <div className="text-sm font-semibold">
-                                    Note
-                                </div>
-                                <div className="text-sm  text-gray-500">
-                                    <textarea
-                                        id="NOTE"
-                                        name="NOTE"
-                                        value={dataReviewTimeOff.NOTE}
-                                        onChange={(e: any) => {
-                                            inputReviewTimeOff(
-                                                "NOTE",
-                                                e.target.value
-                                            );
-                                        }}
-                                        className="resize-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
-                                    />
+                            <div className="grid grid-cols gap-2 mt-3">
+                                <div className="">
+                                    <div className="text-sm font-semibold">
+                                        Note
+                                    </div>
+                                    <div className="text-sm  text-gray-500">
+                                        <textarea
+                                            id="NOTE"
+                                            name="NOTE"
+                                            value={dataReviewTimeOff.NOTE}
+                                            onChange={(e: any) => {
+                                                inputReviewTimeOff(
+                                                    "NOTE",
+                                                    e.target.value
+                                                );
+                                            }}
+                                            className="resize-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </>
-                }
-            />
+                        </>
+                    }
+                />
+            )}
 
             <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
                 <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
@@ -603,10 +612,10 @@ export default function Index({ auth }: PageProps) {
                                     if (params.data) {
                                         return (
                                             getEmployeeById(
-                                                dataReviewTimeOff.EMPLOYEE_ID
+                                                params.data.EMPLOYEE_ID
                                             ) &&
                                             getEmployeeById(
-                                                dataReviewTimeOff.EMPLOYEE_ID
+                                                params.data.EMPLOYEE_ID
                                             ).EMPLOYEE_FIRST_NAME
                                         );
                                     }
@@ -621,10 +630,10 @@ export default function Index({ auth }: PageProps) {
                                     if (params.data) {
                                         return (
                                             getTimeOffById(
-                                                dataReviewTimeOff.TIME_OFF_TYPE_ID
+                                                params.data.TIME_OFF_TYPE_ID
                                             ) &&
                                             getTimeOffById(
-                                                dataReviewTimeOff.TIME_OFF_TYPE_ID
+                                                params.data.TIME_OFF_TYPE_ID
                                             ).TIME_OFF_TYPE_NAME
                                         );
                                     }

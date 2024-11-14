@@ -134,6 +134,8 @@ export default function Index({ auth }: PageProps) {
             });
     };
 
+    console.log("dataPersonAttendance: ", dataPersonAttendance);
+
     const inputDataPersonAttendance = (name: string, value: any, i: number) => {
         const changeVal: any = [...dataPersonAttendance];
 

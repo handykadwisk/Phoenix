@@ -576,14 +576,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/editRequestTimeOff', [TimeOffController::class, 'editRequestTimeOff'])->name('timeOff.editRequestTimeOff');
     // Route::post('/reviewTimeOff', [TimeOffController::class, 'reviewTimeOff'])->name('timeOff.reviewTimeOff');
     Route::get('/listApproveTimeOff', [TimeOffController::class, 'listApproveTimeOff'])->name('listApproveTimeOff');
-    Route::get('/reviewTimeOff/{id}', [TimeOffController::class, 'reviewTimeOff'])->name('reviewTimeOff');
+    Route::get('/reviewTimeOff/{id?}', [TimeOffController::class, 'reviewTimeOff'])->name('reviewTimeOff');
     Route::post('/approveTimeOff', [TimeOffController::class, 'approveTimeOff'])->name('timeOff.approveTimeOff');
     Route::post('/rejectTimeOff', [TimeOffController::class, 'rejectTimeOff'])->name('timeOff.rejectTimeOff');
     Route::post('/cancelTimeOff', [TimeOffController::class, 'cancelTimeOff'])->name('timeOff.cancelTimeOff');
     Route::get('/sendLink', [TimeOffController::class, 'sendLink'])->name('timeOff.sendLink');
     Route::get('/downloadTimeOffDocument/{id}', [TimeOffController::class, 'time_off_document_download'])->name('downloadTimeOffDocument.time_off_document_download');
     Route::get('/agGridRequestTimeOffForHR', [TimeOffController::class, 'agGridRequestTimeOffForHR'])->name('timeOff.agGridRequestTimeOffForHR');
-    Route::get('/timeOffForHR', [TimeOffController::class, 'timeOffForHR'])->name('timeOffForHR');
+    Route::get('/hr/timeOffForHR', [TimeOffController::class, 'timeOffForHR'])->name('hr/timeOffForHR');
 
 
     // Collective Leave
