@@ -15,20 +15,48 @@ export default function AddReminder({
     modalReminder,
     setModalReminder,
     setIsSuccessChat,
-    handleSuccessAddReminder,
+    getTReminder,
 }: PropsWithChildren<{
     data: any;
     setData: any;
     modalReminder: any;
     setModalReminder: any;
     setIsSuccessChat?: any;
-    handleSuccessAddReminder?: any;
+    getTReminder: any;
 }>) {
     useEffect(() => {
         getDataParticipant();
         getReminderTier();
         getMethodNotification();
+        getReminderStart();
+        getReminderEnd();
     }, []);
+
+    // for r setting
+    const [reminderStart, setReminderStart] = useState<any>([]);
+    const getReminderStart = async () => {
+        await axios
+            .post(`/getReminderStart`)
+            .then((res) => {
+                setReminderStart(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // for r setting
+    const [reminderEnd, setReminderEnd] = useState<any>([]);
+    const getReminderEnd = async () => {
+        await axios
+            .post(`/getReminderEnd`)
+            .then((res) => {
+                setReminderEnd(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     // for tier Participant
     const [reminderTier, setReminderTier] = useState<any>([]);
@@ -136,51 +164,32 @@ export default function AddReminder({
         }
     };
 
-    // const handleSuccessAddReminder = async (message: any) => {
-    //     setIsSuccessChat("");
-    //     if (message !== "") {
-    //         setIsSuccessChat(message[0]);
-    //         setData({
-    //             REMINDER_TITLE: "",
-    //             REMINDER_TIMES: "",
-    //             REMINDER_DAYS: "",
-    //             REMINDER_START_DATE: "",
-    //             REMINDER_DESKRIPSI: "",
-    //             NOTIFICATION: [
-    //                 {
-    //                     NOTIFICATION_ID: 1,
-    //                 },
-    //             ],
-    //             PARTICIPANT: [
-    //                 {
-    //                     TIER: "",
-    //                     PARTICIPANT_ID: null,
-    //                 },
-    //             ],
-    //         });
-
-    //         setTimeout(() => {
-    //             setIsSuccessChat("");
-    //         }, 2000);
-    //     }
-    // };
-
-    // const checkboxes =
-    //     document.querySelectorAll<HTMLInputElement>(".checkParticipant");
-
-    // checkboxes.forEach((checkbox) => {
-    //     checkbox.addEventListener("change", () => {
-    //         // Jika checkbox yang diklik dicentang
-    //         if (checkbox.checked) {
-    //             // Matikan semua checkbox lainnya
-    //             checkboxes.forEach((cb) => {
-    //                 if (cb !== checkbox) {
-    //                     cb.checked = false; // Set checkbox lain menjadi tidak tercentang
-    //                 }
-    //             });
-    //         }
-    //     });
-    // });
+    const handleSuccessAddReminder = async (message: any) => {
+        setIsSuccessChat("");
+        if (message !== "") {
+            setIsSuccessChat(message[0]);
+            setData({
+                ...data,
+                REMINDER_TITLE: "",
+                REMINDER_TIMES: "",
+                REMINDER_DAYS: "",
+                REMINDER_START_DATE: "",
+                REMINDER_DESKRIPSI: "",
+                NOTIFICATION: [
+                    {
+                        NOTIFICATION_ID: 1,
+                    },
+                ],
+                PARTICIPANT: [
+                    {
+                        TIER: "",
+                        PARTICIPANT_ID: null,
+                    },
+                ],
+            });
+            getTReminder(message[1]);
+        }
+    };
 
     return (
         <>
@@ -190,14 +199,6 @@ export default function AddReminder({
                 onClose={() => {
                     setModalReminder({
                         modalAdd: false,
-                    });
-                    setData({
-                        ...data,
-                        NOTIFICATION: [
-                            {
-                                NOTIFICATION_ID: 1,
-                            },
-                        ],
                     });
                 }}
                 title={"Add Reminder"}
@@ -435,7 +436,7 @@ export default function AddReminder({
                                                 dropdownMode="select"
                                                 className="border-0 rounded-md shadow-md text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600 px-8"
                                                 dateFormat={"dd-MM-yyyy"}
-                                                placeholderText="Start Form"
+                                                placeholderText="Start From Date"
                                             />
                                         </div>
                                     </div>
@@ -511,6 +512,14 @@ export default function AddReminder({
                                     })
                                 }
                             />
+                        </div>
+                        <div className="text-red-600 text-sm italic mt-4 font-semibold">
+                            <span>
+                                {"NOTE: Reminder start from " +
+                                    reminderStart?.SETTING_VALUE +
+                                    " - " +
+                                    reminderEnd.SETTING_VALUE}
+                            </span>
                         </div>
                     </>
                 }

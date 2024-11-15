@@ -702,8 +702,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMethodNotification', [TReminderController::class, 'getMethodNotification'])->name('getMethodNotification.getMethodNotification');
     Route::post('/addReminder', [TReminderController::class, 'store'])->name('addReminder.addReminder');
     Route::post('/getTReminder', [TReminderController::class, 'get_reminder'])->name('getTReminder.getTReminder');
-    Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.getDetailReminder');
+    Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.get_detail_reminder');
     Route::patch('/editReminder/{id}', [TReminderController::class, 'edit'])->name('editReminder.edit');
+    Route::post('/getReminderStart', [TReminderController::class, 'get_reminder_start'])->name('getReminderStart.get_reminder_start');
+    Route::post('/getReminderEnd', [TReminderController::class, 'get_reminder_end'])->name('getReminderEnd.get_reminder_end');
+    Route::post('/getCekDetailReminder', [TReminderController::class, 'get_detail_reminder_new'])->name('getCekDetailReminder.get_detail_reminder_new');
 });
 
 require __DIR__ . '/auth.php';

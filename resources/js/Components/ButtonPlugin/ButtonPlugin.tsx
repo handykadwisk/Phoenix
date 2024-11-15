@@ -23,7 +23,9 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
     useEffect(() => {
         getDataPluginChat();
         connectWebSocket();
+        connectWebSocketReminder();
         cekDetailChatRead(auth.user.id);
+        cekDetailReminder(auth.user.id);
 
         return () => {
             window.Echo.leave(webSocketChannel);
@@ -47,6 +49,19 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
             .post(`/getCekDetailChatRead`, { userIdLogin })
             .then((res) => {
                 setCekMessage(res.data);
+                // setShow(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [cekReminder, setCekReminder] = useState<any>([]);
+    const cekDetailReminder = async (userIdLogin?: any) => {
+        await axios
+            .post(`/getCekDetailReminder`, { userIdLogin })
+            .then((res) => {
+                setCekReminder(res.data);
                 // setShow(false);
             })
             .catch((err) => {
@@ -119,6 +134,15 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
             setNotification(true);
         });
     };
+    const connectWebSocketReminder = () => {
+        window.Echo.channel(webSocketChannel).listen(
+            "ReminderMessage",
+            (e: any) => {
+                cekDetailReminder(auth.user.id);
+                setNotification(true);
+            }
+        );
+    };
 
     return (
         <>
@@ -188,6 +212,14 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                                             )}
                                         </>
                                     ) : null}
+                                    {items.PLUGIN_PROCESS_NAME ===
+                                    "Reminder" ? (
+                                        <>
+                                            {cekReminder.length !== 0 && (
+                                                <div className="absolute top-28 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg"></div>
+                                            )}
+                                        </>
+                                    ) : null}
                                     <span>
                                         {items.PLUGIN_PROCESS_NAME ===
                                         "Chat" ? (
@@ -212,11 +244,11 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                 className="fixed z-50 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
                 onClick={(e) => handleClickShow(e)}
             >
-                {cekMessage.length !== 0 && (
+                {cekMessage.length !== 0 || cekReminder.length !== 0 ? (
                     <div className="absolute top-0 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg">
                         {/* <span>a</span> */}
                     </div>
-                )}
+                ) : null}
 
                 <span>
                     <img src={iconGrid} className="w-5" />
