@@ -725,7 +725,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                 buttonOnAction={
                     <>
                         <Button
-                            className="text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                            className="text-sm font-semibold px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                             onClick={handleAddModal}
                         >
                             {"Add Exchange Rate BI"}
@@ -759,45 +759,64 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                         inputDataSearch("flag", "", 0);
                                     }
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        const title =
+                                            searchExchangeRateBI
+                                                .exchange_rate_bi_search[0]
+                                                .EXCHANGE_RATE_BI_DATE;
+                                        const id =
+                                            searchExchangeRateBI
+                                                .exchange_rate_bi_search[0]
+                                                .EXCHANGE_RATE_BI_ID;
+                                        if (title || id) {
+                                            inputDataSearch("flag", "", 0);
+                                            setRefreshSuccess("success");
+                                            setTimeout(() => {
+                                                setRefreshSuccess("");
+                                            });
+                                        } else {
+                                            inputDataSearch("flag", "flag", 0);
+                                        }
+                                    }
+                                }}
                                 dateFormat={"dd-MM-yyyy"}
                                 placeholderText="dd-mm-yyyyy (Start Date)"
                                 className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm focus:ring-red-600 placeholder:text-sm pl-10"
                                 autoComplete="off"
                             />
                         </div>
-                    </>
-                }
-                buttonSearch={
-                    <>
-                        <Button
-                            className="mb-4 w-full md:w-[35%] text-white text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                            onClick={() => {
-                                if (
-                                    searchExchangeRateBI
-                                        .exchange_rate_bi_search[0]
-                                        .EXCHANGE_RATE_BI_ID === "" &&
-                                    searchExchangeRateBI
-                                        .exchange_rate_bi_search[0]
-                                        .EXCHANGE_RATE_BI_DATE === ""
-                                ) {
-                                    inputDataSearch("flag", "", 0);
-                                } else {
-                                    inputDataSearch("flag", "", 0);
-                                }
-                                setRefreshSuccess("success");
-                                setTimeout(() => {
-                                    setRefreshSuccess("");
-                                }, 1000);
-                            }}
-                        >
-                            Search
-                        </Button>
-                        <Button
-                            className="mb-4 w-full md:w-[35%] text-white text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                            onClick={clearSearchExchangeRateBI}
-                        >
-                            Clear Search
-                        </Button>
+                        <div className="flex flex-col md:flex-row justify-end gap-2">
+                            <Button
+                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                onClick={() => {
+                                    if (
+                                        searchExchangeRateBI
+                                            .exchange_rate_bi_search[0]
+                                            .EXCHANGE_RATE_BI_ID === "" &&
+                                        searchExchangeRateBI
+                                            .exchange_rate_bi_search[0]
+                                            .EXCHANGE_RATE_BI_DATE === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshSuccess("success");
+                                    setTimeout(() => {
+                                        setRefreshSuccess("");
+                                    }, 1000);
+                                }}
+                            >
+                                Search
+                            </Button>
+                            <Button
+                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                onClick={clearSearchExchangeRateBI}
+                            >
+                                Clear Search
+                            </Button>
+                        </div>
                     </>
                 }
                 dataList={
@@ -812,6 +831,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             url={"getExchangeRateBI"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
+                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",

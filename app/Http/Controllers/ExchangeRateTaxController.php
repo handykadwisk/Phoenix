@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
+use function App\Helpers\user_log_create;
+
 class ExchangeRateTaxController extends Controller
 {
     public function getExchangeRateTaxData($request)
@@ -34,12 +36,12 @@ class ExchangeRateTaxController extends Controller
         if ($request->newFilter !== "") {
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('EXCHANGE_RATE_TAX_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-            }else{
-                foreach ($newSearch[0] as $keyId => $searchValue) {
-                    if ($keyId === 'EXCHANGE_RATE_TAX_DATE') {
-                        $query->where('EXCHANGE_RATE_TAX_START_DATE', '<=', $searchValue)
-                              ->where('EXCHANGE_RATE_TAX_END_DATE', '>=', $searchValue);
-                    }
+            }
+
+            foreach ($newSearch as $searchValue) {
+                if ($searchValue['EXCHANGE_RATE_TAX_DATE']) {
+                    $query->where('EXCHANGE_RATE_TAX_START_DATE', '<=', $searchValue['EXCHANGE_RATE_TAX_DATE'])
+                          ->where('EXCHANGE_RATE_TAX_END_DATE', '>=', $searchValue['EXCHANGE_RATE_TAX_DATE']);
                 }
             }
         }
@@ -101,8 +103,6 @@ class ExchangeRateTaxController extends Controller
 
             $exchange_rate_tax_detail = $request->exchange_rate_tax_detail;
 
-            // dd($exchange_rate_tax_detail);
-
             $exchange_rate_tax_start_date = $request->exchange_rate_tax_start_date;
             $exchange_rate_tax_end_date = $request->exchange_rate_tax_end_date;
             $exchange_rate_tax_created_by = $user_id;
@@ -117,16 +117,8 @@ class ExchangeRateTaxController extends Controller
                 'EXCHANGE_RATE_TAX_CREATED_AT' => $exchange_rate_tax_created_at
             ])->EXCHANGE_RATE_TAX_ID;
 
-            // Created Log CA
-            UserLog::create([
-                'created_by' => $user->id,
-                'action'     => json_encode([
-                    "description" => "Created (Exchange Rate Tax).",
-                    "module"      => "Exchange Rate Tax",
-                    "id"          => $exchange_rate_tax
-                ]),
-                'action_by'  => $user->user_login
-            ]);
+            // Created Log Exchange Rate Tax
+            user_log_create("Created (Exchange Rate Tax).", "Exchange Rate Tax", $exchange_rate_tax);
 
             foreach ($exchange_rate_tax_detail as $value) {
                 $exchange_rate_tax_detail_currency_id = isset($value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID']) ? $value['EXCHANGE_RATE_TAX_DETAIL_CURRENCY_ID'] : $value['CURRENCY_ID'];
@@ -147,16 +139,8 @@ class ExchangeRateTaxController extends Controller
                 ]
             );
 
-                // Created Log CA
-                UserLog::create([
-                    'created_by' => $user->id,
-                    'action'     => json_encode([
-                        "description" => "Created (Exchange Rate Tax Detail).",
-                        "module"      => "Exchange Rate Tax Detail",
-                        "id"          => $exchange_rate_tax
-                    ]),
-                    'action_by'  => $user->user_login
-                ]);
+                // Created Log Exchange Rate Tax Detail
+                user_log_create("Created (Exchange Rate Tax Detail).", "Exchange Rate Tax", $exchange_rate_tax);
             }
             
             return $exchange_rate_tax;
@@ -185,15 +169,7 @@ class ExchangeRateTaxController extends Controller
             ]);
 
             // Created Log Exchange Rate Tax
-            UserLog::create([
-                'created_by' => $user->id,
-                'action'     => json_encode([
-                    "description" => "Created (Exchange Rate Tax).",
-                    "module"      => "Exchange Rate Tax",
-                    "id"          => $exchange_rate_tax_id
-                ]),
-                'action_by'  => $user->user_login
-            ]);
+            user_log_create("Edit (Exchange Rate Tax).", "Exchange Rate Tax", $exchange_rate_tax_id);
 
             ExchangeRateTaxDetail::where('EXCHANGE_RATE_TAX_DETAIL_ID', $exchange_rate_tax_detail_id)->update([
                 'EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE' => $request->EXCHANGE_RATE_TAX_DETAIL_EXCHANGE_RATE,
@@ -202,15 +178,7 @@ class ExchangeRateTaxController extends Controller
             ]);
 
             // Created Log Exchange Rate Tax Detail
-            UserLog::create([
-                'created_by' => $user->id,
-                'action'     => json_encode([
-                    "description" => "Created (Exchange Rate Tax Detail).",
-                    "module"      => "Exchange Rate Tax Detail",
-                    "id"          => $exchange_rate_tax_detail_id
-                ]),
-                'action_by'  => $user->user_login
-            ]);
+            user_log_create("Edit (Exchange Rate Tax Detail).", "Exchange Rate Tax", $exchange_rate_tax_detail_id);
         });
 
         return new JsonResponse([

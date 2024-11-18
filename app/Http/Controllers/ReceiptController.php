@@ -4,38 +4,71 @@ namespace App\Http\Controllers;
 
 use App\Models\COA;
 use App\Models\Journal;
+use App\Models\JournalDeleted;
 use App\Models\JournalDetail;
+use App\Models\JournalDetailDeleted;
 use App\Models\RBankTransaction;
 use App\Models\RCurrency;
 use App\Models\Receipt;
 use App\Models\Relation;
-use App\Models\TCompany;
+use App\Models\RSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 use function App\Helpers\user_log_create;
 
 class ReceiptController extends Controller
 {
-    public function getReceiptData($dataPerPage = 2, $searchQuery = null)
+    public function getReceiptData($request)
     {
-        $data = Receipt::orderBy('RECEIPT_ID', 'desc');
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        if ($searchQuery) {
-            # code...
+        $query = Receipt::query();
+        $sortModel = $request->input('sort');
+        $newSearch = json_decode($request->newFilter, true);
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                
+                $query->orderBy($colId, $sortDirection); 
+            }
         }
 
-        return $data->paginate($dataPerPage);
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('RECEIPT_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }
+
+            foreach ($newSearch as $searchValue) {
+                if ($searchValue['CLIENT_NAME']) {
+                    $query->whereHas('relation_organization',
+                    function($data) use($searchValue)
+                    {
+                        $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'. $searchValue['CLIENT_NAME'] .'%');
+                    });
+                }
+            }
+        }
+
+        $query->whereNull('deleted_at')->orderBy('RECEIPT_ID', 'desc');
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
     }
 
     public function getReceipt(Request $request)
     {
-        $data = $this->getReceiptData(10, $request);
+        $data = $this->getReceiptData($request);
         return response()->json($data);
     }
 
@@ -84,7 +117,7 @@ class ReceiptController extends Controller
             $five_digit_number = '00001';
         }
 
-        $receipt_number = $y . '.' . $m . '.' .$five_digit_number . '/RCP';
+        $receipt_number = $y . '.' . $m . '.' . $five_digit_number . '/RCP';
 
         return $receipt_number;
     }
@@ -124,12 +157,203 @@ class ReceiptController extends Controller
         return RBankTransaction::where('BANK_TRANSACTION_ID', $bank_id)->value('BANK_TRANSACTION_COA_CODE') ?? '';
     }
 
+    public function check_existing_exchange_rate($receiptDate, $currencyId)
+    {
+        $rate = DB::select("SELECT f_check_existing_ex_rate(?, ?) AS result", [$receiptDate, $currencyId]);
+
+        return $rate[0]->result;
+    }
+
+    public function getExchangeRate($receiptDate, $currencyId)
+    {
+        $rate = DB::select("SELECT f_get_ex_rate(?, ?) AS exchange_rate", [$receiptDate, $currencyId]);
+
+        return $rate[0]->exchange_rate;
+    }
+
+    public function switch_currency($currency, $receipt_counted_as)
+    {
+        $currencies = [
+            1 => 'Rupiah',
+            2 => 'Dollar',
+            3 => 'Dollar',
+            4 => 'Dollar',
+            5 => 'Franc',
+            6 => 'Yuan',
+            7 => 'Yuan',
+            8 => 'Krona',
+            9 => 'Euro',
+            10 => 'Pound',
+            11 => 'Dollar',
+            12 => 'Yen',
+            13 => 'Won',
+            14 => 'Dinar',
+            15 => 'Kips',
+            16 => 'Ringgit',
+            17 => 'Krona',
+            18 => 'Dollar',
+            19 => 'Kina',
+            20 => 'Peso',
+            21 => 'Riyal',
+            22 => 'Krona',
+            23 => 'Dollar',
+            24 => 'Baht',
+            25 => 'Dollar',
+            26 => 'Dong',
+            27 => 'Kyat',
+            28 => 'Rupee',
+            29 => 'Rupee',
+            30 => 'Rupee'
+        ];
+
+        if (isset($currencies[$currency])) {
+            $receipt_counted_as .= ' ' . $currencies[$currency];
+        }
+
+        return $receipt_counted_as;
+    }
+    
+    public function auto_journal_add_receipt($receiptId)
+    {
+        $userId = Auth::user()->id;
+        $dateTime = now();
+
+        $getReceipt= $this->getReceiptAll($receiptId);
+
+        $journalTypeCode = 'PRJ';
+        $journalNumber = $this->generateJournalNumber($journalTypeCode);
+        $journalDate = $getReceipt->RECEIPT_DATE;
+        $journalMemo = "Receipt No. " . $getReceipt->RECEIPT_NUMBER;
+
+        $journalData = [
+            'JOURNAL_NUMBER' => $journalNumber,
+            'JOURNAL_TYPE_CODE' => $journalTypeCode,
+            'JOURNAL_DATE' => $journalDate,
+            'JOURNAL_MEMO' => $journalMemo,
+            'JOURNAL_IS_POSTED' => 1,
+            'JOURNAL_POSTED_BY' => $userId,
+            'JOURNAL_POSTED_AT' => $dateTime,
+            'JOURNAL_CREATED_BY' => $userId,
+            'JOURNAL_CREATED_AT' => $dateTime
+        ];
+
+        $checkJournalAddReceipt = $this->check_journal_add_receipt($receiptId);
+
+        // dd($checkJournalAddReceipt);
+
+        if ($checkJournalAddReceipt) {
+            // dd("Ada");
+           Journal::where('JOURNAL_ID', $checkJournalAddReceipt)->update($journalData);
+            $journalId = $checkJournalAddReceipt;
+        } else {
+            // dd("Gaada");
+            $journal = Journal::create($journalData)->JOURNAL_ID;
+            $journalId = $journal;
+        }
+
+        // Create log Journal
+        user_log_create("Created (Journal).", "Journal", $journalId);
+
+        // PRJ Bank
+        $journalDetailCoaCode = $this->getCoaBank($getReceipt->RECEIPT_BANK_ID);
+        $journalDetailDesc = $this->getCoaTitle($journalDetailCoaCode);
+        $journalDetailCurrencyId = $getReceipt->RECEIPT_CURRENCY_ID;
+        $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
+        $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
+        $journalDetailSum = abs($journalDetailOrig) * $journalDetailExchangeRate;
+        $journalDetailType = 1;
+
+        $journalDetailPrjBankData = [
+            'JOURNAL_ID' => $journalId,
+            'JOURNAL_DETAIL_COA_CODE' => $journalDetailCoaCode,
+            'JOURNAL_DETAIL_DESC' => $journalDetailDesc,
+            'JOURNAL_DETAIL_CURRENCY_ID' => $journalDetailCurrencyId,
+            'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
+            'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
+            'JOURNAL_DETAIL_SUM' => $journalDetailSum,
+            'JOURNAL_DETAIL_TYPE' => $journalDetailType,
+            'JOURNAL_DETAIL_CREATED_BY' => $userId,
+            'JOURNAL_DETAIL_CREATED_AT' => $dateTime
+        ];
+
+        if ($checkJournalAddReceipt) {
+            JournalDetail::where('JOURNAL_ID', $journalId)
+                    ->where('JOURNAL_DETAIL_COA_CODE', $journalDetailCoaCode)
+                    ->update($journalDetailPrjBankData);
+        } else {
+            JournalDetail::create($journalDetailPrjBankData);
+        }
+        
+        // Create log Journal Detail
+        user_log_create("Created (Journal Detail).", "Journal", $journalId);
+
+        // Bukan PRJ Bank
+        $journalDetailCoaCode = '21370';
+        $journalDetailDesc = $this->getCoaTitle($journalDetailCoaCode);
+        $journalDetailCurrencyId = $getReceipt->RECEIPT_CURRENCY_ID;
+        $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
+        $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
+        $journalDetailSum = abs($journalDetailOrig * $journalDetailExchangeRate);
+        $journalDetailType = 2;
+
+        $journalDetailNotPrjBank = [
+            'JOURNAL_ID' => $journalId,
+            'JOURNAL_DETAIL_COA_CODE' => $journalDetailCoaCode,
+            'JOURNAL_DETAIL_DESC' => $journalDetailDesc,
+            'JOURNAL_DETAIL_CURRENCY_ID' => $journalDetailCurrencyId,
+            'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
+            'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
+            'JOURNAL_DETAIL_SUM' => $journalDetailSum,
+            'JOURNAL_DETAIL_TYPE' => $journalDetailType,
+            'JOURNAL_DETAIL_CREATED_BY' => $userId,
+            'JOURNAL_DETAIL_CREATED_AT' => $dateTime
+        ];
+
+        if ($checkJournalAddReceipt) {
+            JournalDetail::where('JOURNAL_ID', $journalId)
+                    ->where('JOURNAL_DETAIL_COA_CODE', $journalDetailCoaCode)
+                    ->update($journalDetailNotPrjBank);
+        } else {
+            JournalDetail::create($journalDetailNotPrjBank);
+        }
+
+        // Create log Journal Detail
+        user_log_create("Created (Journal Detail).", "Journal", $journalId);
+
+        // Update receipt journal id add receipt
+        $this->set_journal_receipt($journalId, $receiptId);
+    }
+
+    public function set_journal_receipt($journalId, $receiptId)
+    {
+        Receipt::where('RECEIPT_ID', $receiptId)->update([
+            'RECEIPT_JOURNAL_ID_ADD_RECEIPT' => $journalId
+        ]);
+        
+        // Create log Receipt
+        user_log_create("Update (Receipt).", "Receipt", $receiptId);
+    }
+
+    public function check_journal_add_receipt($receiptId)
+    {
+        $row = DB::table('t_receipt')
+                ->select('RECEIPT_JOURNAL_ID_ADD_RECEIPT')
+                ->where('RECEIPT_ID', $receiptId)
+                ->first();
+
+        if ($row && !empty($row->RECEIPT_JOURNAL_ID_ADD_RECEIPT)) {
+            return $row->RECEIPT_JOURNAL_ID_ADD_RECEIPT;
+        }
+
+        return false;
+    }
+
     public function index()
     {
         return Inertia::render('Receipt/Receipt');
     }
 
-    public function receipt_add(Request $request)
+    public function add(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
@@ -141,7 +365,7 @@ class ReceiptController extends Controller
             'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
             'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
             'RECEIPT_BANK_ID.required' => 'The bank name field is required',
-            'RECEIPT_VALUE.required' => 'The receipt value field is required'
+            'RECEIPT_VALUE.required' => 'The value field is required'
         ]);
 
         if ($validator->fails()) {
@@ -152,12 +376,104 @@ class ReceiptController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($request) {
-            $user_id = Auth::user()->id;
-            $is_draft = $request->RECEIPT_IS_DRAFT;
+        $dataReceipt = DB::transaction(function () use ($request) {
+            $setting = RSetting::where('SETTING_VARIABLE', 'auto_journal_add_receipt')->first();
+            
+            $userId = Auth::user()->id;
+            $receiptStatus = $request->RECEIPT_STATUS;
             $dateTime = now();
 
-            if ($is_draft === 0) {
+            if ($receiptStatus === 2) {
+                $year = date('y', strtotime($request->RECEIPT_DATE));
+                $month = date('m', strtotime($request->RECEIPT_DATE));
+                
+                $receiptNumber = $this->generateReceiptNumber($year, $month);
+            } else {
+                $receiptNumber = null;
+            }
+
+            $currency = $request->RECEIPT_CURRENCY_ID['value'];
+            $receiptCountedAs = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
+            $receiptCountedAs = $this->switch_currency($currency, $receiptCountedAs);
+            $receiptExchangeRate = $this->getExchangeRate($request->RECEIPT_DATE, $currency);
+
+            $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+
+            if ($check_existing_exchange_rate === "Yes") {
+                // Create Receipt
+                $receipt = Receipt::create([
+                    'RECEIPT_CURRENCY_ID' => $currency,
+                    'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID['value'],
+                    'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID['value'],
+                    'RECEIPT_NUMBER' => $receiptNumber,
+                    'RECEIPT_NAME' => $request->RECEIPT_NAME,
+                    'RECEIPT_DATE' => $request->RECEIPT_DATE,
+                    'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
+                    'RECEIPT_COUNTED_AS' => $receiptCountedAs,
+                    'RECEIPT_EXCHANGE_RATE' => $receiptExchangeRate,
+                    'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
+                    'RECEIPT_STATUS' => $receiptStatus,
+                    'RECEIPT_CREATED_BY' => $userId,
+                    'RECEIPT_CREATED_AT' => $dateTime
+                ])->RECEIPT_ID;
+                
+                // Create log Receipt
+                user_log_create("Created (Receipt).", "Receipt", $receipt);
+    
+                // Create Journal
+                if ($receiptStatus === 2 && $setting->SETTING_VALUE == 1) {
+                    $this->auto_journal_add_receipt($receipt);
+                }
+            }
+
+            return $check_existing_exchange_rate;
+        });
+        
+        if ($dataReceipt === "No") {
+            return new JsonResponse([
+                'alert' => 'exchange_rate',
+                'msg' => 'Please create exchange rate tax'
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
+
+        return new JsonResponse([
+            'msg' => 'New receipt has been added.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function draft(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
+            'RECEIPT_CURRENCY_ID' => 'required',
+            'RECEIPT_BANK_ID' => 'required',
+            'RECEIPT_DATE' => 'required',
+            'RECEIPT_VALUE' => 'required',
+        ], [
+            'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
+            'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
+            'RECEIPT_BANK_ID.required' => 'The bank name field is required',
+            'RECEIPT_VALUE.required' => 'The value field is required'
+        ]);
+
+        if ($validator->fails()) {
+            return new JsonResponse([
+                $validator->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
+        
+        $dataReceipt = DB::transaction(function () use ($request) {
+            $setting = RSetting::where('SETTING_VARIABLE', 'auto_journal_add_receipt')->first();
+
+            $receipt_id = $request->RECEIPT_ID;
+            $receipt_status = $request->RECEIPT_STATUS;
+            if ($receipt_status === 2) {
                 $year = date('y', strtotime($request->RECEIPT_DATE));
                 $month = date('m', strtotime($request->RECEIPT_DATE));
                 
@@ -166,243 +482,226 @@ class ReceiptController extends Controller
                 $receipt_number = null;
             }
 
-            // Create Receipt
-            $receipt = Receipt::create([
-                'RECEIPT_CURRENCY_ID' => $request->RECEIPT_CURRENCY_ID['value'],
-                'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID['value'],
-                'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID['value'],
-                'RECEIPT_NUMBER' => $receipt_number,
-                'RECEIPT_NAME' => $request->RECEIPT_RELATION_ORGANIZATION_ID['label'],
-                'RECEIPT_DATE' => $request->RECEIPT_DATE,
-                'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
-                'RECEIPT_COUNTED_AS' => Number::spell($request->RECEIPT_VALUE, locale: 'id'),
-                'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
-                'RECEIPT_IS_DRAFT' => $is_draft,
-                'RECEIPT_CREATED_BY' => $user_id,
-                'RECEIPT_CREATED_AT' => $dateTime
-            ])->RECEIPT_ID;
-            
-            // Create log Receipt
-            user_log_create("Created (Receipt).", "Receipt", $receipt);
-            
-            // Create Journal
-            if ($is_draft === 0) {
-                $getReceipt= $this->getReceiptAll($receipt);
+            $currency = $request->RECEIPT_CURRENCY_ID;
+            $receipt_counted_as = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
+            $receipt_counted_as = $this->switch_currency($currency, $receipt_counted_as);
+            $receipt_exchange_rate = $this->getExchangeRate($request->RECEIPT_DATE, $currency);
 
-                $journal_type_code = 'PRJ';
-                $journal_number = $this->generateJournalNumber($journal_type_code);
-                $journal_date = $getReceipt->RECEIPT_DATE;
-                $journal_memo = "Receipt No. " . $getReceipt->RECEIPT_NUMBER;
+            $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
 
-                $journal = Journal::create([
-                    'JOURNAL_NUMBER' => $journal_number,
-                    'JOURNAL_TYPE_CODE' => $journal_type_code,
-                    'JOURNAL_DATE' => $journal_date,
-                    'JOURNAL_MEMO' => $journal_memo,
-                    'JOURNAL_IS_POSTED' => 1,
-                    'JOURNAL_POSTED_BY' => $user_id,
-                    'JOURNAL_POSTED_AT' => $dateTime,
-                    'JOURNAL_CREATED_BY' => $user_id,
-                    'JOURNAL_CREATED_AT' => $dateTime
-                ])->JOURNAL_ID;
-
-                // Create log Journal
-                user_log_create("Created (Journal).", "Journal", $journal);
-
-                // PRJ Bank
-                $journal_detail_coa_code = $this->getCoaBank($getReceipt->RECEIPT_BANK_ID);
-                $journal_detail_desc = $this->getCoaTitle($journal_detail_coa_code);
-                $journal_detail_currency_id = $getReceipt->RECEIPT_CURRENCY_ID;
-                $journal_detail_orig = $getReceipt->RECEIPT_VALUE;
-                $journal_detail_ex_rate = 1;
-                $journal_detail_sum = $journal_detail_orig * $journal_detail_ex_rate;
-                $journal_detail_type = 1;
-
-                $journal_detail_prj_bank = JournalDetail::create([
-                    'JOURNAL_ID' => $journal,
-                    'JOURNAL_DETAIL_COA_CODE' => $journal_detail_coa_code,
-                    'JOURNAL_DETAIL_DESC' => $journal_detail_desc,
-                    'JOURNAL_DETAIL_CURRENCY_ID' => $journal_detail_currency_id,
-                    'JOURNAL_DETAIL_ORIG' => $journal_detail_orig,
-                    'JOURNAL_DETAIL_EX_RATE' => $journal_detail_ex_rate,
-                    'JOURNAL_DETAIL_SUM' => $journal_detail_sum,
-                    'JOURNAL_DETAIL_TYPE' => $journal_detail_type,
-                    'JOURNAL_DETAIL_CREATED_BY' => $user_id,
-                    'JOURNAL_DETAIL_CREATED_AT' => $dateTime
-                ])->JOURNAL_DETAIL_ID;
+            if ($check_existing_exchange_rate === "Yes") {
+                // Create Receipt
+                Receipt::where('RECEIPT_ID', $receipt_id)->update([
+                    'RECEIPT_CURRENCY_ID' => $currency,
+                    'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID,
+                    'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
+                    'RECEIPT_NUMBER' => $receipt_number,
+                    'RECEIPT_NAME' => $request->RECEIPT_NAME,
+                    'RECEIPT_DATE' => $request->RECEIPT_DATE,
+                    'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
+                    'RECEIPT_COUNTED_AS' => $receipt_counted_as,
+                    'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
+                    'RECEIPT_STATUS' => $receipt_status
+                ]);
                 
-                // Create log Journal Detail
-                user_log_create("Created (Journal Detail).", "Journal", $journal_detail_prj_bank);
-
-                // Bukan PRJ Bank
-                $journal_detail_coa_code = '21370';
-                $journal_detail_desc = $this->getCoaTitle($journal_detail_coa_code);
-                $journal_detail_currency_id = $getReceipt->RECEIPT_CURRENCY_ID;
-                $journal_detail_orig = $getReceipt->RECEIPT_VALUE;
-                $journal_detail_ex_rate = 1;
-                $journal_detail_sum = $journal_detail_orig * $journal_detail_ex_rate;
-                $journal_detail_type = 2;
-
-                $journal_detail_not_prj_bank = JournalDetail::create([
-                    'JOURNAL_ID' => $journal,
-                    'JOURNAL_DETAIL_COA_CODE' => $journal_detail_coa_code,
-                    'JOURNAL_DETAIL_DESC' => $journal_detail_desc,
-                    'JOURNAL_DETAIL_CURRENCY_ID' => $journal_detail_currency_id,
-                    'JOURNAL_DETAIL_ORIG' => $journal_detail_orig,
-                    'JOURNAL_DETAIL_EX_RATE' => $journal_detail_ex_rate,
-                    'JOURNAL_DETAIL_SUM' => $journal_detail_sum,
-                    'JOURNAL_DETAIL_TYPE' => $journal_detail_type,
-                    'JOURNAL_DETAIL_CREATED_BY' => $user_id,
-                    'JOURNAL_DETAIL_CREATED_AT' => $dateTime
-                ])->JOURNAL_DETAIL_ID;
-
-                // Create log Journal Detail
-                user_log_create("Created (Journal Detail).", "Journal", $journal_detail_not_prj_bank);
+                // Create log Receipt
+                user_log_create("Created (Receipt).", "Receipt", $receipt_id);
+    
+                // Create Journal
+                if ($receipt_status === 2 && $setting->SETTING_VALUE == 1) {
+                    $this->auto_journal_add_receipt($receipt_id);
+                }
             }
+
+            return $check_existing_exchange_rate;
         });
 
+        if ($dataReceipt === "No") {
+            return new JsonResponse([
+                'alert' => 'exchange_rate',
+                'msg' => 'Please create exchange rate tax'
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
+
         return new JsonResponse([
-            'New receipt has been added.'
+            'msg' => 'New receipt has been added.'
         ], 201, [
             'X-Inertia' => true
         ]);
     }
 
-    public function receipt_draft(Request $request)
+    public function edit(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
-        //     'RECEIPT_CURRENCY_ID' => 'required',
-        //     'RECEIPT_BANK_ID' => 'required',
-        //     'RECEIPT_DATE' => 'required',
-        //     'RECEIPT_VALUE' => 'required',
-        // ], [
-        //     'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
-        //     'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
-        //     'RECEIPT_BANK_ID.required' => 'The bank name field is required',
-        //     'RECEIPT_VALUE.required' => 'The receipt value field is required'
-        // ]);
+        $validator = Validator::make($request->all(), [
+            'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
+            'RECEIPT_CURRENCY_ID' => 'required',
+            'RECEIPT_BANK_ID' => 'required',
+            'RECEIPT_DATE' => 'required',
+            'RECEIPT_VALUE' => 'required',
+        ], [
+            'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
+            'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
+            'RECEIPT_BANK_ID.required' => 'The bank name field is required',
+            'RECEIPT_VALUE.required' => 'The value field is required'
+        ]);
 
-        // if ($validator->fails()) {
-        //     return new JsonResponse([
-        //         $validator->errors()->all()
-        //     ], 422, [
-        //         'X-Inertia' => true
-        //     ]);
-        // }
-        
-        // DB::transaction(function () use ($request) {
-        //     $user_id = Auth::user()->id;
-        //     $dateTime = now();
+        if ($validator->fails()) {
+            return new JsonResponse([
+                $validator->errors()->all()
+            ], 422, [
+                'X-Inertia' => true
+            ]);
+        }
 
-        //     $receipt_id = $request->RECEIPT_ID;
-        //     $is_draft = $request->RECEIPT_IS_DRAFT;
-        //     if ($is_draft === 0) {
-        //         $year = date('y', strtotime($request->RECEIPT_DATE));
-        //         $month = date('m', strtotime($request->RECEIPT_DATE));
+        $dataReceipt = DB::transaction(function () use ($request) {
+            $setting = RSetting::where('SETTING_VARIABLE', 'auto_journal_add_receipt')->first();
+
+            $receipt_id = $request->RECEIPT_ID;
+            $receipt_status = $request->RECEIPT_STATUS;
+            if ($receipt_status === 2) {
+                $year = date('y', strtotime($request->RECEIPT_DATE));
+                $month = date('m', strtotime($request->RECEIPT_DATE));
                 
-        //         $receipt_number = $this->generateReceiptNumber($year, $month);
-        //     } else {
-        //         $receipt_number = null;
-        //     }
+                $receipt_number = $this->generateReceiptNumber($year, $month);
+            } else {
+                $receipt_number = null;
+            }
 
-        //     // Create Receipt
-        //     Receipt::where('RECEIPT_ID', $receipt_id)->update([
-        //         'RECEIPT_CURRENCY_ID' => $request->RECEIPT_CURRENCY_ID,
-        //         'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID,
-        //         'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
-        //         'RECEIPT_NUMBER' => $receipt_number,
-        //         'RECEIPT_NAME' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
-        //         'RECEIPT_DATE' => $request->RECEIPT_DATE,
-        //         'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
-        //         'RECEIPT_COUNTED_AS' => Number::spell($request->RECEIPT_VALUE, locale: 'id'),
-        //         'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
-        //         'RECEIPT_IS_DRAFT' => $is_draft
-        //     ]);
-            
-        //     // Create log Receipt
-        //     user_log_create("Created (Receipt).", "Receipt", $receipt_id);
+            $currency = $request->RECEIPT_CURRENCY_ID;
+            $receipt_counted_as = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
+            $receipt_counted_as = $this->switch_currency($currency, $receipt_counted_as);
+            $receipt_exchange_rate = $this->getExchangeRate($request->RECEIPT_DATE, $currency);
 
-        //     // Create Journal
-        //     if ($is_draft === 0) {
-        //         $getReceipt= $this->getReceiptAll($receipt_id);
+            $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
 
-        //         $journal_type_code = 'PRJ';
-        //         $journal_number = $this->generateJournalNumber($journal_type_code);
-        //         $journal_date = $getReceipt->RECEIPT_DATE;
-        //         $journal_memo = "Receipt No. " . $getReceipt->RECEIPT_NUMBER;
-
-        //         $journal = Journal::create([
-        //             'JOURNAL_NUMBER' => $journal_number,
-        //             'JOURNAL_TYPE_CODE' => $journal_type_code,
-        //             'JOURNAL_DATE' => $journal_date,
-        //             'JOURNAL_MEMO' => $journal_memo,
-        //             'JOURNAL_IS_POSTED' => 1,
-        //             'JOURNAL_POSTED_BY' => $user_id,
-        //             'JOURNAL_POSTED_AT' => $dateTime,
-        //             'JOURNAL_CREATED_BY' => $user_id,
-        //             'JOURNAL_CREATED_AT' => $dateTime
-        //         ])->JOURNAL_ID;
-
-        //         // Create log Journal
-        //         user_log_create("Created (Journal).", "Journal", $journal);
-
-        //         // PRJ Bank
-        //         $journal_detail_coa_code = $this->getCoaBank($getReceipt->RECEIPT_BANK_ID);
-        //         $journal_detail_desc = $this->getCoaTitle($journal_detail_coa_code);
-        //         $journal_detail_currency_id = $getReceipt->RECEIPT_CURRENCY_ID;
-        //         $journal_detail_orig = $getReceipt->RECEIPT_VALUE;
-        //         $journal_detail_ex_rate = 1;
-        //         $journal_detail_sum = $journal_detail_orig * $journal_detail_ex_rate;
-        //         $journal_detail_type = 1;
-
-        //         $journal_detail_prj_bank = JournalDetail::create([
-        //             'JOURNAL_ID' => $journal,
-        //             'JOURNAL_DETAIL_COA_CODE' => $journal_detail_coa_code,
-        //             'JOURNAL_DETAIL_DESC' => $journal_detail_desc,
-        //             'JOURNAL_DETAIL_CURRENCY_ID' => $journal_detail_currency_id,
-        //             'JOURNAL_DETAIL_ORIG' => $journal_detail_orig,
-        //             'JOURNAL_DETAIL_EX_RATE' => $journal_detail_ex_rate,
-        //             'JOURNAL_DETAIL_SUM' => $journal_detail_sum,
-        //             'JOURNAL_DETAIL_TYPE' => $journal_detail_type,
-        //             'JOURNAL_DETAIL_CREATED_BY' => $user_id,
-        //             'JOURNAL_DETAIL_CREATED_AT' => $dateTime
-        //         ])->JOURNAL_DETAIL_ID;
+            if ($check_existing_exchange_rate === "Yes") {
+                // Create Receipt
+                Receipt::where('RECEIPT_ID', $receipt_id)->update([
+                    'RECEIPT_CURRENCY_ID' => $currency,
+                    'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID,
+                    'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
+                    'RECEIPT_NUMBER' => $receipt_number,
+                    'RECEIPT_NAME' => $request->RECEIPT_NAME,
+                    'RECEIPT_DATE' => $request->RECEIPT_DATE,
+                    'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
+                    'RECEIPT_COUNTED_AS' => $receipt_counted_as,
+                    'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
+                    'RECEIPT_STATUS' => $receipt_status
+                ]);
                 
-        //         // Create log Journal Detail
-        //         user_log_create("Created (Journal Detail).", "Journal", $journal_detail_prj_bank);
+                // Create log Receipt
+                user_log_create("Created (Receipt).", "Receipt", $receipt_id);
+    
+                // Create Journal
+                if ($setting->SETTING_VALUE == 1) {
+                    $this->auto_journal_add_receipt($receipt_id);
+                }
+            }
 
-        //         // Bukan PRJ Bank
-        //         $journal_detail_coa_code = '21370';
-        //         $journal_detail_desc = $this->getCoaTitle($journal_detail_coa_code);
-        //         $journal_detail_currency_id = $getReceipt->RECEIPT_CURRENCY_ID;
-        //         $journal_detail_orig = $getReceipt->RECEIPT_VALUE;
-        //         $journal_detail_ex_rate = 1;
-        //         $journal_detail_sum = $journal_detail_orig * $journal_detail_ex_rate;
-        //         $journal_detail_type = 2;
+            return $check_existing_exchange_rate;
+        });
 
-        //         $journal_detail_not_prj_bank = JournalDetail::create([
-        //             'JOURNAL_ID' => $journal,
-        //             'JOURNAL_DETAIL_COA_CODE' => $journal_detail_coa_code,
-        //             'JOURNAL_DETAIL_DESC' => $journal_detail_desc,
-        //             'JOURNAL_DETAIL_CURRENCY_ID' => $journal_detail_currency_id,
-        //             'JOURNAL_DETAIL_ORIG' => $journal_detail_orig,
-        //             'JOURNAL_DETAIL_EX_RATE' => $journal_detail_ex_rate,
-        //             'JOURNAL_DETAIL_SUM' => $journal_detail_sum,
-        //             'JOURNAL_DETAIL_TYPE' => $journal_detail_type,
-        //             'JOURNAL_DETAIL_CREATED_BY' => $user_id,
-        //             'JOURNAL_DETAIL_CREATED_AT' => $dateTime
-        //         ])->JOURNAL_DETAIL_ID;
+        if ($dataReceipt === "No") {
+            return new JsonResponse([
+                'alert' => 'exchange_rate',
+                'msg' => 'Please create exchange rate tax'
+            ], 201, [
+                'X-Inertia' => true
+            ]);
+        }
 
-        //         // Create log Journal Detail
-        //         user_log_create("Created (Journal Detail).", "Journal", $journal_detail_not_prj_bank);
-        //     }
-        // });
+        return new JsonResponse([
+            'msg' => 'New receipt has been added.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
 
-        // return new JsonResponse([
-        //     'New receipt has been added.'
-        // ], 201, [
-        //     'X-Inertia' => true
-        // ]);
+    public function delete($receipt_id)
+    {
+        DB::transaction(function() use($receipt_id) {
+            $receipt = Receipt::findOrFail($receipt_id);
+
+            $journal_id = $receipt->RECEIPT_JOURNAL_ID_ADD_RECEIPT;
+
+            $journal = Journal::findOrFail($journal_id);
+
+            $journal_detail = JournalDetail::where('JOURNAL_ID', $journal_id)->get();
+
+            // Start Delete Receipt
+            $data = Receipt::findOrFail($receipt_id);
+
+            $data->update([
+                'RECEIPT_STATUS' => 4
+            ]);
+    
+            $data->delete();
+
+            user_log_create("Delete (Receipt).", "Receipt", $receipt_id);
+            // End Delete Receipt
+
+            // Start Delete Journal
+            if ($journal_id) {
+                JournalDeleted::create([
+                    'JOURNAL_NUMBER' => $journal->JOURNAL_NUMBER,
+                    'JOURNAL_TYPE_CODE' => $journal->JOURNAL_TYPE_CODE,
+                    'JOURNAL_DATE' => $journal->JOURNAL_DATE,
+                    'JOURNAL_MEMO' => $journal->JOURNAL_MEMO,
+                    'JOURNAL_IS_POSTED' => $journal->JOURNAL_IS_POSTED,
+                    'JOURNAL_POSTED_BY' => $journal->JOURNAL_POSTED_BY,
+                    'JOURNAL_POSTED_AT' => $journal->JOURNAL_POSTED_AT,
+                    'JOURNAL_CREATED_BY' => $journal->JOURNAL_CREATED_BY,
+                    'JOURNAL_CREATED_AT' => $journal->JOURNAL_CREATED_AT,
+                    'JOURNAL_UPDATED_BY' => $journal->JOURNAL_UPDATED_BY,
+                    'JOURNAL_UPDATED_AT' => $journal->JOURNAL_UPDATED_AT,
+                    'TEMP' => $journal->TEMP,
+                    'JOURNAL_NOTES' => $journal->JOURNAL_NOTES,
+                    'JOURNAL_IS_DELETED' => $journal->JOURNAL_IS_DELETED,
+                ]);
+    
+                Journal::find($journal_id)->delete();
+    
+                user_log_create("Delete (Journal).", "Journal", $journal_id);
+            }
+            // End Delete Journal
+
+            // Start Delete Journal Detail
+            if ($journal_id) {
+                foreach ($journal_detail as $value) {
+                    JournalDetailDeleted::create([
+                        'JOURNAL_ID' => $value->JOURNAL_ID,
+                        'JOURNAL_DETAIL_COA_CODE' => $value->JOURNAL_DETAIL_COA_CODE,
+                        'JOURNAL_DETAIL_DESC' => $value->JOURNAL_DETAIL_DESC,
+                        'JOURNAL_DETAIL_CURRENCY_ID' => $value->JOURNAL_DETAIL_CURRENCY_ID,
+                        'JOURNAL_DETAIL_ORIG' => $value->JOURNAL_DETAIL_ORIG,
+                        'JOURNAL_DETAIL_EX_RATE' => $value->JOURNAL_DETAIL_EX_RATE,
+                        'JOURNAL_DETAIL_SUM' => $value->JOURNAL_DETAIL_SUM,
+                        'JOURNAL_DETAIL_TYPE' => $value->JOURNAL_DETAIL_TYPE,
+                        'JOURNAL_DETAIL_CREATED_BY' => $value->JOURNAL_DETAIL_CREATED_BY,
+                        'JOURNAL_DETAIL_CREATED_AT' => $value->JOURNAL_DETAIL_CREATED_AT,
+                        'JOURNAL_DETAIL_UPDATED_BY' => $value->JOURNAL_DETAIL_UPDATED_BY,
+                        'JOURNAL_DETAIL_UPDATED_AT' => $value->JOURNAL_DETAIL_UPDATED_AT
+                    ]);
+                }
+    
+                JournalDetail::where('JOURNAL_ID', $journal_id)->delete();
+    
+                user_log_create("Delete (Journal Detail).", "Journal", $journal_id);
+            }
+            // End Delete Journal Detail
+        });
+
+        return new JsonResponse([
+            'msg' => 'Receipt has been deleted.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function print()
+    {
+        return Inertia::render('Receipt/Print');
     }
 }

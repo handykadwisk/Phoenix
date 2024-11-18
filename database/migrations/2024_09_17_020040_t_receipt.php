@@ -24,10 +24,9 @@ return new class extends Migration
             $table->date('RECEIPT_DATE')->nullable();
             $table->decimal('RECEIPT_VALUE', 16, 2)->nullable();
             $table->string('RECEIPT_COUNTED_AS')->nullable();
-            $table->decimal('RECEIPT_EXCHANGE_RATE', 6, 2)->nullable();
+            $table->decimal('RECEIPT_EXCHANGE_RATE', 16, 2)->nullable();
             $table->text('RECEIPT_MEMO')->nullable();
-            $table->tinyInteger('RECEIPT_STATUS')->nullable()->default(0);
-            $table->tinyInteger('RECEIPT_IS_DRAFT')->nullable();
+            $table->tinyInteger('RECEIPT_STATUS')->nullable();
             $table->integer('RECEIPT_CREATED_BY')->nullable();
             $table->dateTime('RECEIPT_CREATED_AT')->nullable();
             $table->integer('RECEIPT_UPDATED_BY')->nullable();

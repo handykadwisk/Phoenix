@@ -404,13 +404,15 @@ Route::middleware('auth')->group(function () {
 
     // Receipt
     Route::get('/getClient', [ReceiptController::class, 'getClient'])->name('getClient');
-    // Route::get('/getCurrency', [ReceiptController::class, 'getCurrency'])->name('getCurrency');
     Route::get('/getBankAccount', [ReceiptController::class, 'getBankAccount'])->name('getBankAccount');
-    Route::post('/getReceipt', [ReceiptController::class, 'getReceipt'])->name('receipt.getReceipt');
+    Route::get('/getReceipt', [ReceiptController::class, 'getReceipt'])->name('receipt.getReceipt');
     Route::get('/getReceiptById/{id}', [ReceiptController::class, 'getReceiptById'])->name('receipt.getReceiptById');
     Route::get('/receipt', [ReceiptController::class, 'index'])->name('receipt');
-    Route::post('/receiptAdd', [ReceiptController::class, 'receipt_add'])->name('receipt.add');
-    Route::patch('/receiptDraft', [ReceiptController::class, 'receipt_draft'])->name('receipt.draft');
+    Route::post('/receiptAdd', [ReceiptController::class, 'add'])->name('receipt.add');
+    Route::patch('/receiptDraft', [ReceiptController::class, 'draft'])->name('receipt.draft');
+    Route::patch('/receiptEdit', [ReceiptController::class, 'edit'])->name('receipt.edit');
+    Route::delete('/receiptDelete/{id}', [ReceiptController::class, 'delete'])->name('receipt.delete');
+    Route::get('/receiptPrint', [ReceiptController::class, 'print'])->name('receipt.print');
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');

@@ -23,6 +23,9 @@ import InputSearch from "@/Components/InputSearch";
 import dateFormat from "dateformat";
 import Dropdown from "@/Components/Dropdown";
 import BadgeFlat from "@/Components/BadgeFlat";
+import AGGrid from "@/Components/AgGrid";
+import TextInput from "@/Components/TextInput";
+import Swal from "sweetalert2";
 
 export default function Receipt({ auth }: PageProps) {
     useEffect(() => {
@@ -31,15 +34,56 @@ export default function Receipt({ auth }: PageProps) {
         getBankAccount();
     }, []);
 
+    const [modalAdd, setModalAdd] = useState<any>({
+        add: false,
+    });
+
+    const [modalEdit, setModalEdit] = useState<any>({
+        edit: false,
+    });
+
+    const [modalDraft, setModalDraft] = useState<any>({
+        draft: false,
+    });
+
+    const [dataById, setDataById] = useState<any>({});
+
+    const handleAddModal = () => {
+        setModalAdd({
+            add: true,
+        });
+    };
+
     const [data, setData] = useState<any>({
         RECEIPT_DATE: new Date().toLocaleDateString("en-CA"),
         RECEIPT_RELATION_ORGANIZATION_ID: "",
+        RECEIPT_NAME: "",
         RECEIPT_CURRENCY_ID: "",
         RECEIPT_BANK_ID: "",
         RECEIPT_VALUE: "",
         RECEIPT_MEMO: "",
-        RECEIPT_IS_DRAFT: "",
+        RECEIPT_STATUS: "",
     });
+
+    useEffect(() => {
+        if (data.RECEIPT_RELATION_ORGANIZATION_ID !== "") {
+            setData({
+                ...data,
+                RECEIPT_NAME: data.RECEIPT_RELATION_ORGANIZATION_ID["label"],
+            });
+        }
+    }, [data.RECEIPT_RELATION_ORGANIZATION_ID]);
+
+    useEffect(() => {
+        if (dataById.RECEIPT_RELATION_ORGANIZATION_ID !== "") {
+            setDataById({
+                ...dataById,
+                RECEIPT_NAME: getClientSelect(
+                    dataById.RECEIPT_RELATION_ORGANIZATION_ID
+                ),
+            });
+        }
+    }, [dataById.RECEIPT_RELATION_ORGANIZATION_ID]);
 
     // Handle Success Start
     const [isSuccess, setIsSuccess] = useState<string>("");
@@ -50,15 +94,31 @@ export default function Receipt({ auth }: PageProps) {
         setData({
             RECEIPT_DATE: new Date().toLocaleDateString("en-CA"),
             RECEIPT_RELATION_ORGANIZATION_ID: "",
+            RECEIPT_NAME: "",
             RECEIPT_CURRENCY_ID: "",
             RECEIPT_BANK_ID: "",
             RECEIPT_VALUE: "",
             RECEIPT_MEMO: "",
-            RECEIPT_IS_DRAFT: "",
+            RECEIPT_STATUS: "",
         });
 
-        setIsSuccess(message);
-        getReceipt();
+        if (message.alert === "exchange_rate") {
+            Swal.fire({
+                title: "Warning",
+                text: message.msg,
+                icon: "warning",
+            });
+        } else {
+            setIsSuccess(message.msg);
+            setTimeout(() => {
+                setIsSuccess("");
+            }, 5000);
+
+            setRefreshSuccess("success");
+            setTimeout(() => {
+                setRefreshSuccess("");
+            }, 1000);
+        }
     };
     // Handle Success End
 
@@ -146,26 +206,6 @@ export default function Receipt({ auth }: PageProps) {
         }
     };
 
-    const [modalAdd, setModalAdd] = useState<any>({
-        add: false,
-    });
-
-    const [modalEdit, setModalEdit] = useState<any>({
-        edit: false,
-    });
-
-    const [modalDraft, setModalDraft] = useState<any>({
-        draft: false,
-    });
-
-    const [dataById, setDataById] = useState<any>({});
-
-    const handleAddModal = () => {
-        setModalAdd({
-            add: true,
-        });
-    };
-
     const handleEditModal = async (e: any, id: number) => {
         e.preventDefault();
 
@@ -182,12 +222,12 @@ export default function Receipt({ auth }: PageProps) {
         });
     };
 
-    const handleDraftModal = async (id: number) => {
+    const handleDraftModal = async (data: any) => {
         await axios
-            .get(`/getReceiptById/${id}`)
+            .get(`/getReceiptById/${data.RECEIPT_ID}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -196,40 +236,118 @@ export default function Receipt({ auth }: PageProps) {
         });
     };
 
-    // Search Start
-    const [receipt, setReceipt] = useState<any>([]);
+    const handleDeleteModal = async (e: any, id: number) => {
+        e.preventDefault();
 
-    const [searchReceipt, setSearchReceipt] = useState<any>({
-        client_name: "",
-    });
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You want to delete the data!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await axios
+                    .delete(`/receiptDelete/${id}`)
+                    .then((res) => {
+                        setDataById(res.data);
+                        // console.log(res.data);
 
-    const getReceipt = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getReceipt?${pageNumber}`, {
-                client_name: searchReceipt.client_name,
-            })
-            .then((res) => {
-                setReceipt(res.data);
+                        setIsSuccess("Receipt has been deleted.");
+                        setTimeout(() => {
+                            setIsSuccess("");
+                        }, 5000);
+
+                        setRefreshSuccess("success");
+                        setTimeout(() => {
+                            setRefreshSuccess("");
+                        }, 1000);
+                    })
+                    .catch((err) => console.log(err));
+            }
+        });
+    };
+
+    const handlePrint = async (
+        expenses_detail_id: number,
+        document_id: number
+    ) => {
+        await axios({
+            url: `/expensesDownload/${expenses_detail_id}/${document_id}`,
+            method: "GET",
+            responseType: "blob",
+        })
+            .then((response) => {
+                // console.log(response);
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", response.headers.filename);
+                document.body.appendChild(link);
+                link.click();
             })
             .catch((err) => {
                 console.log(err);
+                if (err.response.status === 404) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "File not found!",
+                        timer: 1500,
+                        timerProgressBar: true,
+                    });
+                }
             });
     };
+
+    // For refresh AG Grid data
+    const [refreshSuccess, setRefreshSuccess] = useState<string>("");
+
+    // Search Start
+    const [searchReceipt, setSearchReceipt] = useState<any>({
+        receipt_search: [
+            {
+                RECEIPT_ID: "",
+                RECEIPT_NAME: "",
+                CLIENT_NAME: "",
+                flag: "flag",
+            },
+        ],
+    });
+
+    // console.log("Search", searchReceipt);
     // Search End
 
+    // OnChange Input Search Start
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchReceipt.receipt_search];
+        changeVal[i][name] = value;
+        setSearchReceipt({
+            ...searchReceipt,
+            receipt_search: changeVal,
+        });
+    };
+    // OnChange Input Search End
+
     // Clear Search Start
-    const clearSearchReceipt = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getReceipt?${pageNumber}`)
-            .then((res) => {
-                setReceipt(res.data);
-                setSearchReceipt({
-                    client_name: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchReceipt = () => {
+        inputDataSearch("RECEIPT_ID", "", 0);
+        inputDataSearch("RECEIPT_NAME", "", 0);
+        inputDataSearch("CLIENT_NAME", "", 0);
+        inputDataSearch("flag", "flag", 0);
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
     // Clear Search End
 
@@ -242,9 +360,22 @@ export default function Receipt({ auth }: PageProps) {
     });
     // End Function Format Currency
 
+    const handleSelectChange = (e: any, id: number) => {
+        const selectedValue = e.target.value;
+
+        if (selectedValue === "match") {
+            handleMatchModal(e, id);
+        } else if (selectedValue === "edit") {
+            handleEditModal(e, id);
+        } else if (selectedValue === "delete") {
+            handleDeleteModal(e, id);
+        } else if (selectedValue === "print") {
+            handlePrint(e, id);
+        }
+    };
+
     // console.log("Data", data);
-    // console.log("Receipt", receipt.data);
-    console.log("Receipt by id : ", dataById);
+    // console.log("Receipt by id : ", dataById);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Receipt"}>
@@ -273,7 +404,7 @@ export default function Receipt({ auth }: PageProps) {
                 method="post"
                 onSuccess={handleSuccess}
                 headers={null}
-                submitButtonName={""}
+                submitButtonName=""
                 body={
                     <div className="mt-4">
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
@@ -335,6 +466,27 @@ export default function Receipt({ auth }: PageProps) {
                                     })
                                 }
                                 primaryColor={"bg-red-500"}
+                            />
+                        </div>
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                            <InputLabel
+                                htmlFor="RECEIPT_NAME"
+                                className="w-full md:w-1/4 mb-2"
+                            >
+                                Payment From
+                            </InputLabel>
+                            <TextInput
+                                id="RECEIPT_NAME"
+                                name="RECEIPT_NAME"
+                                type="text"
+                                autoComplete="off"
+                                value={data.RECEIPT_NAME}
+                                onChange={(val: any) =>
+                                    setData({
+                                        ...data,
+                                        RECEIPT_NAME: val.target.value,
+                                    })
+                                }
                             />
                         </div>
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
@@ -420,7 +572,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-7 text-right`}
                                 placeholder="0.00"
                                 autoComplete="off"
-                                required
                             />
                         </div>
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
@@ -448,7 +599,7 @@ export default function Receipt({ auth }: PageProps) {
                                 onClick={() =>
                                     setData({
                                         ...data,
-                                        RECEIPT_IS_DRAFT: 1,
+                                        RECEIPT_STATUS: 1,
                                     })
                                 }
                             >
@@ -459,7 +610,7 @@ export default function Receipt({ auth }: PageProps) {
                                 onClick={() =>
                                     setData({
                                         ...data,
-                                        RECEIPT_IS_DRAFT: 0,
+                                        RECEIPT_STATUS: 2,
                                     })
                                 }
                             >
@@ -558,6 +709,27 @@ export default function Receipt({ auth }: PageProps) {
                         </div>
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
                             <InputLabel
+                                htmlFor="RECEIPT_NAME"
+                                className="w-full md:w-1/4 mb-2"
+                            >
+                                Payment From
+                            </InputLabel>
+                            <TextInput
+                                id="RECEIPT_NAME"
+                                name="RECEIPT_NAME"
+                                type="text"
+                                autoComplete="off"
+                                value={dataById.RECEIPT_NAME}
+                                onChange={(val: any) =>
+                                    setDataById({
+                                        ...dataById,
+                                        RECEIPT_NAME: val.target.value,
+                                    })
+                                }
+                            />
+                        </div>
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                            <InputLabel
                                 htmlFor="RECEIPT_CURRENCY_ID"
                                 className="w-full md:w-1/4 mb-2"
                             >
@@ -652,7 +824,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-7 text-right`}
                                 placeholder="0.00"
                                 autoComplete="off"
-                                required
                             />
                         </div>
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
@@ -680,7 +851,7 @@ export default function Receipt({ auth }: PageProps) {
                                 onClick={() =>
                                     setDataById({
                                         ...dataById,
-                                        RECEIPT_IS_DRAFT: 1,
+                                        RECEIPT_STATUS: 1,
                                     })
                                 }
                             >
@@ -691,7 +862,7 @@ export default function Receipt({ auth }: PageProps) {
                                 onClick={() =>
                                     setDataById({
                                         ...dataById,
-                                        RECEIPT_IS_DRAFT: 0,
+                                        RECEIPT_STATUS: 2,
                                     })
                                 }
                             >
@@ -713,10 +884,10 @@ export default function Receipt({ auth }: PageProps) {
                     })
                 }
                 title="Receipt Edit"
-                url=""
-                data=""
-                method=""
-                onSuccess=""
+                url={`/receiptEdit`}
+                data={dataById}
+                method="patch"
+                onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName="Save"
                 body={
@@ -732,10 +903,10 @@ export default function Receipt({ auth }: PageProps) {
                                 <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                                 <DatePicker
                                     name="RECEIPT_DATE"
-                                    selected={data.RECEIPT_DATE}
+                                    selected={dataById.RECEIPT_DATE}
                                     onChange={(date: any) =>
-                                        setData({
-                                            ...data,
+                                        setDataById({
+                                            ...dataById,
                                             RECEIPT_DATE:
                                                 date.toLocaleDateString(
                                                     "en-CA"
@@ -772,14 +943,41 @@ export default function Receipt({ auth }: PageProps) {
                                 options={selectClient}
                                 isSearchable={true}
                                 placeholder={"Choose Client Name"}
-                                value={data.RECEIPT_RELATION_ORGANIZATION_ID}
+                                value={{
+                                    label: getClientSelect(
+                                        dataById.RECEIPT_RELATION_ORGANIZATION_ID
+                                    ),
+                                    value: dataById.RECEIPT_RELATION_ORGANIZATION_ID,
+                                }}
                                 onChange={(val: any) =>
-                                    setData({
-                                        ...data,
-                                        RECEIPT_RELATION_ORGANIZATION_ID: val,
+                                    setDataById({
+                                        ...dataById,
+                                        RECEIPT_RELATION_ORGANIZATION_ID:
+                                            val.value,
                                     })
                                 }
                                 primaryColor={"bg-red-500"}
+                            />
+                        </div>
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                            <InputLabel
+                                htmlFor="RECEIPT_NAME"
+                                className="w-full md:w-1/4 mb-2"
+                            >
+                                Payment From
+                            </InputLabel>
+                            <TextInput
+                                id="RECEIPT_NAME"
+                                name="RECEIPT_NAME"
+                                type="text"
+                                autoComplete="off"
+                                value={dataById.RECEIPT_NAME}
+                                onChange={(val: any) =>
+                                    setDataById({
+                                        ...dataById,
+                                        RECEIPT_NAME: val.target.value,
+                                    })
+                                }
                             />
                         </div>
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
@@ -804,11 +1002,16 @@ export default function Receipt({ auth }: PageProps) {
                                 options={selectCurrency}
                                 isSearchable={true}
                                 placeholder={"Choose Currency"}
-                                value={data.RECEIPT_CURRENCY_ID}
+                                value={{
+                                    label: getCurrencySelect(
+                                        dataById.RECEIPT_CURRENCY_ID
+                                    ),
+                                    value: dataById.RECEIPT_CURRENCY_ID,
+                                }}
                                 onChange={(val: any) =>
-                                    setData({
-                                        ...data,
-                                        RECEIPT_CURRENCY_ID: val,
+                                    setDataById({
+                                        ...dataById,
+                                        RECEIPT_CURRENCY_ID: val.value,
                                     })
                                 }
                                 primaryColor={"bg-red-500"}
@@ -836,11 +1039,16 @@ export default function Receipt({ auth }: PageProps) {
                                 options={selectBankAccount}
                                 isSearchable={true}
                                 placeholder={"Choose Bank Name"}
-                                value={data.RECEIPT_BANK_ID}
+                                value={{
+                                    label: getBankAccountSelect(
+                                        dataById.RECEIPT_BANK_ID
+                                    ),
+                                    value: dataById.RECEIPT_BANK_ID,
+                                }}
                                 onChange={(val: any) =>
-                                    setData({
-                                        ...data,
-                                        RECEIPT_BANK_ID: val,
+                                    setDataById({
+                                        ...dataById,
+                                        RECEIPT_BANK_ID: val.value,
                                     })
                                 }
                                 primaryColor={"bg-red-500"}
@@ -854,18 +1062,20 @@ export default function Receipt({ auth }: PageProps) {
                                 Value
                             </InputLabel>
                             <CurrencyInput
-                                id="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
-                                name="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
+                                id="RECEIPT_VALUE"
+                                name="RECEIPT_VALUE"
                                 decimalScale={2}
                                 decimalsLimit={2}
-                                value={data.RECEIPT_VALUE}
+                                value={dataById.RECEIPT_VALUE}
                                 onValueChange={(val: any) =>
-                                    setData({ ...data, RECEIPT_VALUE: val })
+                                    setDataById({
+                                        ...dataById,
+                                        RECEIPT_VALUE: val,
+                                    })
                                 }
                                 className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 text-sm leading-7 text-right`}
                                 placeholder="0.00"
                                 autoComplete="off"
-                                required
                             />
                         </div>
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
@@ -878,10 +1088,10 @@ export default function Receipt({ auth }: PageProps) {
                             <TextArea
                                 rows="5"
                                 className="shadow-none ring-1 ring-inset ring-gray-300"
-                                value={data.RECEIPT_MEMO}
+                                value={dataById.RECEIPT_MEMO || ""}
                                 onChange={(e: any) =>
-                                    setData({
-                                        ...data,
+                                    setDataById({
+                                        ...dataById,
                                         RECEIPT_MEMO: e.target.value,
                                     })
                                 }
@@ -897,7 +1107,7 @@ export default function Receipt({ auth }: PageProps) {
                 buttonOnAction={
                     <>
                         <Button
-                            className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                            className="text-xs sm:text-sm font-semibold px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
                             onClick={handleAddModal}
                         >
                             {"Add Receipt"}
@@ -906,31 +1116,77 @@ export default function Receipt({ auth }: PageProps) {
                 }
                 search={
                     <>
-                        <div className="grid grid-cols-1 mb-5 relative">
+                        <div className="grid grid-cols-1 relative">
                             <InputSearch
                                 id="client_name"
                                 name="client_name"
                                 type="text"
-                                value={searchReceipt.client_name}
                                 placeholder="Client Name"
                                 autoComplete="off"
-                                onChange={(e: any) =>
-                                    setSearchReceipt({
-                                        ...searchReceipt,
-                                        client_name: e.target.value,
-                                    })
+                                value={
+                                    searchReceipt.receipt_search[0].CLIENT_NAME
                                 }
+                                onChange={(val: any) => {
+                                    inputDataSearch(
+                                        "CLIENT_NAME",
+                                        val.target.value,
+                                        0
+                                    );
+                                    if (
+                                        searchReceipt.receipt_search[0]
+                                            .CLIENT_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "flag", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        const title =
+                                            searchReceipt.receipt_search[0]
+                                                .CLIENT_NAME;
+                                        const id =
+                                            searchReceipt.receipt_search[0]
+                                                .RECEIPT_ID;
+                                        if (title || id) {
+                                            inputDataSearch("flag", "", 0);
+                                            setRefreshSuccess("success");
+                                            setTimeout(() => {
+                                                setRefreshSuccess("");
+                                            });
+                                        } else {
+                                            inputDataSearch("flag", "flag", 0);
+                                        }
+                                    }
+                                }}
                             />
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-2">
                             <Button
-                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                onClick={() => getReceipt()}
+                                className="w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                onClick={() => {
+                                    if (
+                                        searchReceipt.receipt_search[0]
+                                            .RECEIPT_ID === "" &&
+                                        searchReceipt.receipt_search[0]
+                                            .RECEIPT_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+
+                                    setRefreshSuccess("success");
+                                    setTimeout(() => {
+                                        setRefreshSuccess("");
+                                    }, 1000);
+                                }}
                             >
                                 Search
                             </Button>
                             <Button
-                                className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                className="w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
                                 onClick={() => clearSearchReceipt()}
                             >
                                 Clear Search
@@ -938,250 +1194,165 @@ export default function Receipt({ auth }: PageProps) {
                         </div>
                     </>
                 }
-                th={
-                    <tr className="text-center">
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"No"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Receipt Number"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Receipt Date"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Client Name"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Currency"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Value"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Bank Name"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Description"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Status"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                        <TableTH
-                            className="border whitespace-nowrap"
-                            label={"Action"}
-                            colSpan=""
-                            rowSpan=""
-                        />
-                    </tr>
-                }
-                td={
+                dataList={
                     <>
-                        {receipt.data === undefined && (
-                            <tr className="text-center">
-                                <TD
-                                    className="leading-10 font-medium text-gray-500"
-                                    colSpan="10"
-                                >
-                                    Please Search Receipt
-                                </TD>
-                            </tr>
-                        )}
-                        {receipt.data?.length === 0 ? (
-                            <tr className="text-center">
-                                <TD
-                                    className="leading-10 font-medium text-gray-500"
-                                    colSpan="10"
-                                >
-                                    Data not available
-                                </TD>
-                            </tr>
-                        ) : (
-                            <>
-                                {receipt.data?.map((data: any, i: number) => (
-                                    <tr
-                                        key={i}
-                                        className="text-center cursor-pointer"
-                                        onDoubleClick={
-                                            data.RECEIPT_NUMBER === null
-                                                ? () =>
-                                                      handleDraftModal(
-                                                          data.RECEIPT_ID
-                                                      )
-                                                : undefined
-                                        }
-                                    >
-                                        <TableTD
-                                            value={i + 1}
-                                            className="whitespace-nowrap w-px"
-                                        />
-                                        <TableTD
-                                            value={data.RECEIPT_NUMBER}
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={dateFormat(
-                                                data.RECEIPT_DATE,
-                                                "dd-mm-yyyy"
-                                            )}
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={
-                                                data.relation_organization
-                                                    .RELATION_ORGANIZATION_NAME
-                                            }
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={
-                                                data.currency.CURRENCY_SYMBOL
-                                            }
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={formatCurrency.format(
-                                                data.RECEIPT_VALUE
-                                            )}
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={
-                                                data.bank_account
-                                                    .BANK_TRANSACTION_NAME
-                                            }
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={
-                                                data.RECEIPT_MEMO
-                                                    ? data.RECEIPT_MEMO
-                                                    : "-"
-                                            }
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            value={
-                                                data.RECEIPT_IS_DRAFT === 1 ? (
-                                                    <BadgeFlat
-                                                        className=" bg-red-600 text-white"
-                                                        title="Draft"
-                                                        body="Draft"
-                                                    />
-                                                ) : (
-                                                    <BadgeFlat
-                                                        className=" bg-green-500 text-white"
-                                                        title="Open"
-                                                        body="Open"
-                                                    />
-                                                )
-                                            }
-                                            className="whitespace-nowrap"
-                                        />
-                                        <TableTD
-                                            className=""
-                                            value={
-                                                <Dropdown
-                                                    title="Actions"
-                                                    className=""
-                                                    children={
-                                                        <>
-                                                            <a
-                                                                href=""
-                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                // onClick={(e) =>
-                                                                //     handleMatchModal(
-                                                                //         e,
-                                                                //         data.RECEIPT_ID
-                                                                //     )
-                                                                // }
-                                                            >
-                                                                Match
-                                                            </a>
-                                                            <a
-                                                                href=""
-                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                onClick={(e) =>
-                                                                    handleEditModal(
-                                                                        e,
-                                                                        data.RECEIPT_ID
-                                                                    )
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </a>
-                                                            <a
-                                                                href=""
-                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                // onClick={(e) =>
-                                                                //     handleDeleteModal(
-                                                                //         e,
-                                                                //         data.RECEIPT_ID
-                                                                //     )
-                                                                // }
-                                                            >
-                                                                Delete
-                                                            </a>
-                                                            <a
-                                                                href=""
-                                                                className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                // onClick={(e) =>
-                                                                //     handlePrintModal(
-                                                                //         e,
-                                                                //         data.RECEIPT_ID
-                                                                //     )
-                                                                // }
-                                                            >
-                                                                Print
-                                                            </a>
-                                                        </>
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={searchReceipt.receipt_search}
+                            url={"getReceipt"}
+                            doubleClickEvent={handleDraftModal}
+                            triggeringRefreshData={refreshSuccess}
+                            cellHeight={undefined}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                    cellStyle: { textAlign: "center" },
+                                },
+                                {
+                                    headerName: "Receipt Number",
+                                    field: "RECEIPT_NUMBER",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                },
+                                {
+                                    headerName: "Receipt Date",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        return dateFormat(
+                                            params.RECEIPT_DATE,
+                                            "dd-mm-yyyy"
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Client Name",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        return params.data.relation_organization
+                                            .RELATION_ORGANIZATION_NAME
+                                            ? params.data.relation_organization
+                                                  .RELATION_ORGANIZATION_NAME
+                                            : "-";
+                                    },
+                                },
+                                {
+                                    headerName: "Currency",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        return params.data.currency
+                                            .CURRENCY_SYMBOL
+                                            ? params.data.currency
+                                                  .CURRENCY_SYMBOL
+                                            : "-";
+                                    },
+                                },
+                                {
+                                    headerName: "Value",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        return formatCurrency.format(
+                                            params.data.RECEIPT_VALUE
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Bank Name",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        return params.data.bank_account
+                                            .BANK_TRANSACTION_NAME
+                                            ? params.data.bank_account
+                                                  .BANK_TRANSACTION_NAME
+                                            : "-";
+                                    },
+                                },
+                                {
+                                    headerName: "Description",
+                                    field: "",
+                                    flex: 2,
+                                    cellRenderer: (params: any) => {
+                                        return params.data.RECEIPT_MEMO
+                                            ? params.data.RECEIPT_MEMO
+                                            : "-";
+                                    },
+                                },
+                                {
+                                    headerName: "Status",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        // console.log("Paraamss", params.data);
+                                        return params.data.RECEIPT_STATUS ===
+                                            1 ? (
+                                            <BadgeFlat
+                                                className=" bg-red-600 text-white"
+                                                title="Draft"
+                                                body="Draft"
+                                            />
+                                        ) : (
+                                            <BadgeFlat
+                                                className=" bg-green-500 text-white"
+                                                title="Open"
+                                                body="Open"
+                                            />
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Action",
+                                    field: "",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    autoHeight: true,
+                                    cellRenderer: (params: any) => {
+                                        return (
+                                            <>
+                                                <select
+                                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 cursor-pointer"
+                                                    onChange={(e) =>
+                                                        handleSelectChange(
+                                                            e,
+                                                            params.data
+                                                                .RECEIPT_ID
+                                                        )
                                                     }
-                                                />
-                                            }
-                                        />
-                                    </tr>
-                                ))}
-                            </>
-                        )}
-                    </>
-                }
-                pagination={
-                    <>
-                        <Pagination
-                            links={receipt.links}
-                            fromData={receipt.from}
-                            toData={receipt.to}
-                            totalData={receipt.totalAmount}
-                            clickHref={(url: string) =>
-                                getReceipt(url.split("?").pop())
-                            }
+                                                >
+                                                    <option value="">
+                                                        Actions
+                                                    </option>
+                                                    <option value="match">
+                                                        Match
+                                                    </option>
+                                                    <option value="edit">
+                                                        Edit
+                                                    </option>
+                                                    <option value="delete">
+                                                        Delete
+                                                    </option>
+                                                    <option value="print">
+                                                        Print
+                                                    </option>
+                                                </select>
+                                            </>
+                                        );
+                                    },
+                                },
+                            ]}
                         />
                     </>
                 }

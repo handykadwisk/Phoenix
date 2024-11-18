@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Receipt extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'RECEIPT_ID';
 
@@ -18,7 +19,9 @@ class Receipt extends Model
 
     public $timestamps = false;
 
-    protected $with = ['relation_organization','currency','bank_account'];
+    protected $dates = ['deleted_at'];
+
+    protected $with = ['relation_organization','currency','bank_account','status'];
 
     public function relation_organization(): BelongsTo
     {
@@ -33,5 +36,10 @@ class Receipt extends Model
     public function bank_account(): BelongsTo
     {
         return $this->belongsTo(RBankTransaction::class, 'RECEIPT_BANK_ID');
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(RReceiptStatus::class, 'RECEIPT_STATUS');
     }
 }
