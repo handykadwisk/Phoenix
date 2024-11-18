@@ -47,7 +47,8 @@ Schedule::call(function () {
                     ->first();
                 $emailUser = $dataUser->EMPLOYEE_EMAIL;
                 $data = [
-                    "view"  => "viewEmail.viewEmail"
+                    'subject'   => 'Reminder Email',
+                    'view'  => "viewEmail.viewEmail"
                 ];
 
                 Mail::to($emailUser)->send(new SendEmail($data));
