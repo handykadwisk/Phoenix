@@ -29,9 +29,12 @@ DROP TABLE IF EXISTS `t_collective_leave`;
 
 CREATE TABLE `t_collective_leave` (
   `COLLECTIVE_LEAVE_ID` int NOT NULL AUTO_INCREMENT,
-  `COLLECTIVE_LEAVE_DATE` date DEFAULT NULL,
+  `STATUS` tinyint DEFAULT '1' COMMENT '0:Reject/Cancel, 1:Approve',
+  `TITLE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `CREATED_BY` int DEFAULT NULL,
+  `CREATED_DATE` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`COLLECTIVE_LEAVE_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Table structure for table `t_request_time_off` */
 
@@ -42,7 +45,7 @@ CREATE TABLE `t_request_time_off` (
   `REQUEST_TIME_OFF_MASTER_ID` int DEFAULT NULL,
   `DATE_OF_LEAVE` date DEFAULT NULL,
   PRIMARY KEY (`REQUEST_TIME_OFF_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=512 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1334 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Table structure for table `t_request_time_off_master` */
 
@@ -69,8 +72,22 @@ CREATE TABLE `t_request_time_off_master` (
   `CREATED_DATE` timestamp NULL DEFAULT NULL,
   `UPDATED_BY` int DEFAULT NULL COMMENT 'USER_ID',
   `UPDATED_DATE` timestamp NULL DEFAULT NULL,
+  `IS_CANCELED` tinyint DEFAULT '0' COMMENT '0: NO, 1: YES (Cancel By Requester)',
+  `CANCELED_DATE` timestamp NULL DEFAULT NULL,
+  `CANCELED_BY` int DEFAULT NULL,
   PRIMARY KEY (`REQUEST_TIME_OFF_MASTER_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=882 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Table structure for table `t_collective_leave_detail` */
+
+DROP TABLE IF EXISTS `t_collective_leave_detail`;
+
+CREATE TABLE `t_collective_leave_detail` (
+  `COLLECTIVE_LEAVE_DETAIL_ID` int NOT NULL AUTO_INCREMENT,
+  `COLLECTIVE_LEAVE_ID` int DEFAULT NULL,
+  `COLLECTIVE_LEAVE_DETAIL_DATE` date DEFAULT NULL,
+  PRIMARY KEY (`COLLECTIVE_LEAVE_DETAIL_ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
