@@ -266,7 +266,7 @@ class TReminderController extends Controller
 
     public function get_detail_reminder_new(Request $request)
     {
-        $data = TDetailReminder::where('DETAIL_REMINDER_USER_TO', $request->userIdLogin)->where('DETAIL_REMINDER_USER_STATUS_READ', 0)->get();
+        $data = TDetailReminder::where('REMINDER_DETAIL_USER_TO', $request->userIdLogin)->where('REMINDER_DETAIL_USER_STATUS_READ', 0)->get();
 
         return response()->json($data);
     }

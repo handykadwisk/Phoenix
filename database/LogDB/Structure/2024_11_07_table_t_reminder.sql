@@ -1,6 +1,6 @@
 /*
 SQLyog Trial v13.1.9 (64 bit)
-MySQL - 8.2.0 : Database - phoenix
+MySQL - 5.7.36 : Database - phoenix
 *********************************************************************
 */
 
@@ -17,19 +17,19 @@ MySQL - 8.2.0 : Database - phoenix
 DROP TABLE IF EXISTS `t_reminder`;
 
 CREATE TABLE `t_reminder` (
-  `REMINDER_ID` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `REMINDER_TITLE` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `REMINDER_TIMES` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `REMINDER_DAYS` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `REMINDER_START_DATE` datetime DEFAULT NULL,
-  `REMINDER_STATUS` smallint DEFAULT '0' COMMENT '0 = Active, 1 = Inactive',
-  `REMINDER_DESKRIPSI` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `REMINDER_CREATED_BY` bigint DEFAULT NULL,
+  `REMINDER_ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `REMINDER_TITLE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `REMINDER_TIMES` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `REMINDER_DAYS` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `REMINDER_START_DATE` date DEFAULT NULL,
+  `REMINDER_STATUS` smallint(6) DEFAULT '0' COMMENT '0 = Active, 1 = Inactive',
+  `REMINDER_DESKRIPSI` text COLLATE utf8mb4_unicode_ci,
+  `REMINDER_CREATED_BY` bigint(20) DEFAULT NULL,
   `REMINDER_CREATED_DATE` datetime DEFAULT NULL,
-  `REMINDER_UPDATED_BY` bigint DEFAULT NULL,
+  `REMINDER_UPDATED_BY` bigint(20) DEFAULT NULL,
   `REMINDER_UPDATED_DATE` datetime DEFAULT NULL,
   PRIMARY KEY (`REMINDER_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

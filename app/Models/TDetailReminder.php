@@ -9,12 +9,12 @@ class TDetailReminder extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'DETAIL_REMINDER_ID';
+    protected $primaryKey = 'REMINDER_DETAIL_ID';
 
-    protected $table = 't_detail_reminder';
+    protected $table = 't_reminder_detail';
 
     protected $guarded = [
-        'DETAIL_REMINDER_ID',
+        'REMINDER_DETAIL_ID',
     ];
 
     public $timestamps = false;

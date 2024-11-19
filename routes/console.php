@@ -30,9 +30,9 @@ Schedule::call(function () {
             // create detail reminder
             $createDetailReminder = TDetailReminder::create([
                 "REMINDER_DATA_ID"                  => $value->REMINDER_DATA_ID,
-                "DETAIL_REMINDER_USER_FROM"         => $dataReminder->REMINDER_CREATED_BY,
-                "DETAIL_REMINDER_USER_TO"           => $userId,
-                "DETAIL_REMINDER_USER_STATUS_READ"  => 0,
+                "REMINDER_DETAIL_USER_FROM"         => $dataReminder->REMINDER_CREATED_BY,
+                "REMINDER_DETAIL_USER_TO"           => $userId,
+                "REMINDER_DETAIL_USER_STATUS_READ"  => 0,
             ]);
             // for 
             event(new ReminderMessage($createDetailReminder));
