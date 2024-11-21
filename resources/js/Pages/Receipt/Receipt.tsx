@@ -8,7 +8,7 @@ import { PageProps } from "@/types";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Head } from "@inertiajs/react";
 import ToastMessage from "@/Components/ToastMessage";
 import InputLabel from "@/Components/InputLabel";
@@ -26,6 +26,7 @@ import BadgeFlat from "@/Components/BadgeFlat";
 import AGGrid from "@/Components/AgGrid";
 import TextInput from "@/Components/TextInput";
 import Swal from "sweetalert2";
+import { generateReceiptPDF } from "@/Pages/Receipt/Print";
 
 export default function Receipt({ auth }: PageProps) {
     useEffect(() => {
@@ -44,6 +45,10 @@ export default function Receipt({ auth }: PageProps) {
 
     const [modalDraft, setModalDraft] = useState<any>({
         draft: false,
+    });
+
+    const [modalMatch, setModalMatch] = useState<any>({
+        match: false,
     });
 
     const [dataById, setDataById] = useState<any>({});
@@ -213,7 +218,7 @@ export default function Receipt({ auth }: PageProps) {
             .get(`/getReceiptById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -231,12 +236,14 @@ export default function Receipt({ auth }: PageProps) {
             })
             .catch((err) => console.log(err));
 
-        setModalDraft({
-            draft: true,
-        });
+        if (data.RECEIPT_STATUS === 1) {
+            setModalDraft({
+                draft: true,
+            });
+        }
     };
 
-    const handleDeleteModal = async (e: any, id: number) => {
+    const handleDelete = async (e: any, id: number) => {
         e.preventDefault();
 
         Swal.fire({
@@ -270,38 +277,38 @@ export default function Receipt({ auth }: PageProps) {
         });
     };
 
-    const handlePrint = async (
-        expenses_detail_id: number,
-        document_id: number
-    ) => {
-        await axios({
-            url: `/expensesDownload/${expenses_detail_id}/${document_id}`,
-            method: "GET",
-            responseType: "blob",
-        })
-            .then((response) => {
-                // console.log(response);
-                const url = window.URL.createObjectURL(
-                    new Blob([response.data])
-                );
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", response.headers.filename);
-                document.body.appendChild(link);
-                link.click();
+    const handlePrint = (receipt_id: number, e: FormEvent) => {
+        e.preventDefault();
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You want to print this data",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                generateReceiptPDF(receipt_id);
+            }
+        });
+    };
+
+    const handleMatchModal = async (e: any, id: number) => {
+        e.preventDefault();
+
+        await axios
+            .get(`/getReceiptById/${id}`)
+            .then((res) => {
+                setDataById(res.data);
+                // console.log(res.data);
             })
-            .catch((err) => {
-                console.log(err);
-                if (err.response.status === 404) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "File not found!",
-                        timer: 1500,
-                        timerProgressBar: true,
-                    });
-                }
-            });
+            .catch((err) => console.log(err));
+
+        setModalMatch({
+            match: true,
+        });
     };
 
     // For refresh AG Grid data
@@ -355,8 +362,8 @@ export default function Receipt({ auth }: PageProps) {
     const formatCurrency = new Intl.NumberFormat("default", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-        style: "currency",
-        currency: "IDR",
+        // style: "currency",
+        // currency: "IDR",
     });
     // End Function Format Currency
 
@@ -368,9 +375,9 @@ export default function Receipt({ auth }: PageProps) {
         } else if (selectedValue === "edit") {
             handleEditModal(e, id);
         } else if (selectedValue === "delete") {
-            handleDeleteModal(e, id);
+            handleDelete(e, id);
         } else if (selectedValue === "print") {
-            handlePrint(e, id);
+            handlePrint(id, e);
         }
     };
 
@@ -413,6 +420,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Date
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <div className="grid grid-cols-1 w-full relative">
                                 <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
@@ -442,6 +450,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Client Name
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -474,6 +483,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Payment From
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <TextInput
                                 id="RECEIPT_NAME"
@@ -495,6 +505,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Currency
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -527,6 +538,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Bank Name
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -559,6 +571,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Value
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <CurrencyInput
                                 id="EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE"
@@ -646,6 +659,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Date
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <div className="grid grid-cols-1 w-full relative">
                                 <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
@@ -675,6 +689,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Client Name
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -713,6 +728,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Payment From
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <TextInput
                                 id="RECEIPT_NAME"
@@ -734,6 +750,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Currency
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -771,6 +788,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Bank Name
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -808,6 +826,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Value
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <CurrencyInput
                                 id="RECEIPT_VALUE"
@@ -898,6 +917,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Date
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <div className="grid grid-cols-1 w-full relative">
                                 <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
@@ -927,6 +947,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Client Name
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -965,6 +986,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Payment From
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <TextInput
                                 id="RECEIPT_NAME"
@@ -986,6 +1008,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Currency
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -1023,6 +1046,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Bank Name
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -1060,6 +1084,7 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Value
+                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <CurrencyInput
                                 id="RECEIPT_VALUE"
@@ -1101,6 +1126,87 @@ export default function Receipt({ auth }: PageProps) {
                 }
             />
             {/* Modal Edit End */}
+
+            {/* Modal Match Start */}
+            <ModalToAction
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[50%]`}
+                show={modalMatch.match}
+                onClose={() =>
+                    setModalMatch({
+                        match: false,
+                    })
+                }
+                title="Receipt Match"
+                url={`/receiptMatch`}
+                data={dataById}
+                method="patch"
+                onSuccess={handleSuccess}
+                headers={null}
+                submitButtonName="Save"
+                body={
+                    <div className="mt-4">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                            <InputLabel
+                                htmlFor="RECEIPT_NAME"
+                                className="w-full md:w-1/4 mb-2"
+                            >
+                                Receipt Number
+                            </InputLabel>
+                            <TextInput
+                                id="RECEIPT_NAME"
+                                name="RECEIPT_NAME"
+                                type="text"
+                                className="bg-gray-100"
+                                autoComplete="off"
+                                value={dataById.RECEIPT_NUMBER}
+                                readOnly
+                            />
+                        </div>
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                            <InputLabel
+                                htmlFor="RECEIPT_VALUE"
+                                className="w-full md:w-1/4 mb-2"
+                            >
+                                Value
+                            </InputLabel>
+                            <TextInput
+                                id="RECEIPT_VALUE"
+                                name="RECEIPT_VALUE"
+                                type="text"
+                                className="bg-gray-100"
+                                autoComplete="off"
+                                value={`${
+                                    dataById.currency?.CURRENCY_SYMBOL
+                                } ${formatCurrency.format(
+                                    dataById.RECEIPT_VALUE
+                                )}`}
+                                readOnly
+                            />
+                        </div>
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                            <InputLabel
+                                htmlFor="RECEIPT_RELATION_ORGANIZATION_ID"
+                                className="w-full md:w-1/4 mb-2"
+                            >
+                                Client Name
+                            </InputLabel>
+                            <TextInput
+                                id="RECEIPT_RELATION_ORGANIZATION_ID"
+                                name="RECEIPT_RELATION_ORGANIZATION_ID"
+                                type="text"
+                                className="bg-gray-100"
+                                autoComplete="off"
+                                value={
+                                    dataById.relation_organization
+                                        ?.RELATION_ORGANIZATION_NAME
+                                }
+                                readOnly
+                            />
+                        </div>
+                    </div>
+                }
+            />
+            {/* Modal Match End */}
 
             {/* Content Start */}
             <Content
@@ -1260,7 +1366,7 @@ export default function Receipt({ auth }: PageProps) {
                                     headerName: "Value",
                                     field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: { textAlign: "right" },
                                     cellRenderer: (params: any) => {
                                         return formatCurrency.format(
                                             params.data.RECEIPT_VALUE
@@ -1335,17 +1441,23 @@ export default function Receipt({ auth }: PageProps) {
                                                     <option value="">
                                                         Actions
                                                     </option>
-                                                    <option value="match">
-                                                        Match
-                                                    </option>
-                                                    <option value="edit">
-                                                        Edit
-                                                    </option>
+                                                    {params.data
+                                                        .RECEIPT_STATUS ===
+                                                        2 && (
+                                                        <>
+                                                            <option value="match">
+                                                                Match
+                                                            </option>
+                                                            <option value="edit">
+                                                                Edit
+                                                            </option>
+                                                            <option value="print">
+                                                                Print
+                                                            </option>
+                                                        </>
+                                                    )}
                                                     <option value="delete">
                                                         Delete
-                                                    </option>
-                                                    <option value="print">
-                                                        Print
                                                     </option>
                                                 </select>
                                             </>

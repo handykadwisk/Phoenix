@@ -412,7 +412,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/receiptDraft', [ReceiptController::class, 'draft'])->name('receipt.draft');
     Route::patch('/receiptEdit', [ReceiptController::class, 'edit'])->name('receipt.edit');
     Route::delete('/receiptDelete/{id}', [ReceiptController::class, 'delete'])->name('receipt.delete');
-    Route::get('/receiptPrint', [ReceiptController::class, 'print'])->name('receipt.print');
 
     // Policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy');

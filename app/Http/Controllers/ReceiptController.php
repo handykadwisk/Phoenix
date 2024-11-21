@@ -95,7 +95,7 @@ class ReceiptController extends Controller
 
     public function getBankAccount()
     { 
-        $data = RBankTransaction::all();
+        $data = RBankTransaction::where('BANK_TRANSACTION_FOR_INVOICE', 1)->get();
 
         return response()->json($data);
     }
@@ -357,12 +357,14 @@ class ReceiptController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
+            'RECEIPT_NAME' => 'required',
             'RECEIPT_CURRENCY_ID' => 'required',
             'RECEIPT_BANK_ID' => 'required',
             'RECEIPT_DATE' => 'required',
             'RECEIPT_VALUE' => 'required',
         ], [
             'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
+            'RECEIPT_NAME.required' => 'The payment from field is required',
             'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
             'RECEIPT_BANK_ID.required' => 'The bank name field is required',
             'RECEIPT_VALUE.required' => 'The value field is required'
@@ -698,10 +700,5 @@ class ReceiptController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
-    }
-
-    public function print()
-    {
-        return Inertia::render('Receipt/Print');
     }
 }
