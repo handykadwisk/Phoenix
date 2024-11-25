@@ -355,7 +355,6 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Bank Name
-                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <Select
                                     classNames={{
@@ -629,7 +628,6 @@ export default function BankTransaction({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Bank Name
-                                    <span className="text-red-600">*</span>
                                 </InputLabel>
                                 <Select
                                     classNames={{
@@ -996,7 +994,6 @@ export default function BankTransaction({ auth }: PageProps) {
                                     width: 100,
                                     cellStyle: {
                                         display: "flex",
-                                        flexDirection: "column",
                                         justifyContent: "center",
                                         textAlign: "center",
                                     },
@@ -1005,22 +1002,10 @@ export default function BankTransaction({ auth }: PageProps) {
                                     headerName: "Title",
                                     field: "BANK_TRANSACTION_NAME",
                                     flex: 2,
-                                    cellStyle: {
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "center",
-                                        textAlign: "left",
-                                    },
                                 },
                                 {
                                     headerName: "Bank",
                                     flex: 2,
-                                    cellStyle: {
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "center",
-                                        textAlign: "left",
-                                    },
                                     cellRenderer: (params: any) => {
                                         const bank_name =
                                             params.data.bank?.BANK_NAME;
@@ -1041,27 +1026,22 @@ export default function BankTransaction({ auth }: PageProps) {
                                 {
                                     headerName: "Account",
                                     flex: 2,
-                                    cellStyle: {
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "center",
-                                    },
                                     cellRenderer: (params: any) => {
                                         return (
-                                            <>
+                                            <div className="flex flex-col">
                                                 <div>
                                                     {
                                                         params.data
                                                             .BANK_TRANSACTION_ACCOUNT_NUMBER
                                                     }
                                                 </div>
-                                                <div>
+                                                <div className="-mt-4">
                                                     {
                                                         params.data
                                                             .BANK_TRANSACTION_ACCOUNT_NAME
                                                     }
                                                 </div>
-                                            </>
+                                            </div>
                                         );
                                     },
                                 },

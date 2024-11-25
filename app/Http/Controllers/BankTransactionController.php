@@ -35,10 +35,6 @@ class BankTransactionController extends Controller
         }
 
         if ($request->newFilter !== "") {
-            if ($newSearch[0]["flag"] !== "") {
-                $query->where('BANK_TRANSACTION_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-            }
-
             foreach ($newSearch as $searchValue) {
                 if ($searchValue['BANK_TRANSACTION_NAME']) {
                     $query->where('BANK_TRANSACTION_NAME', 'LIKE', '%' . $searchValue['BANK_TRANSACTION_NAME'] . '%');
@@ -86,19 +82,17 @@ class BankTransactionController extends Controller
         return Inertia::render('BankTransaction/BankTransaction');
     }
 
-    public function bank_transaction_add(Request $request)
+    public function add(Request $request)
     {
         $validator = Validator::make($request->all(), 
             [
                 'BANK_TRANSACTION_NAME' => 'required',
-                'BANK_ID' => 'required',
                 'BANK_TRANSACTION_CURRENCY_ID' => 'required',
                 'BANK_TRANSACTION_ACCOUNT_NUMBER' => 'required',
                 'BANK_TRANSACTION_ACCOUNT_NAME' => 'required',
             ],
             [
                 'BANK_TRANSACTION_NAME.required' => 'The title field is required.',
-                'BANK_ID.required' => 'The bank name field is required.',
                 'BANK_TRANSACTION_CURRENCY_ID.required' => 'The currency field is required.',
                 'BANK_TRANSACTION_ACCOUNT_NUMBER.required' => 'The account number field is required.',
                 'BANK_TRANSACTION_ACCOUNT_NAME.required' => 'The account name field is required.',
@@ -114,11 +108,12 @@ class BankTransactionController extends Controller
         }
         
         DB::transaction(function () use ($request) {
+            $bank_id = isset($request->BANK_ID) ? $request->BANK_ID['code'] : $request->BANK_ID;
             $bank_transaction_coa_code = isset($request->BANK_TRANSACTION_COA_CODE) ? $request->BANK_TRANSACTION_COA_CODE['code'] : $request->BANK_TRANSACTION_COA_CODE;
             
             // Create Bank Transaction
             $bank_transaction = RBankTransaction::create([
-                'BANK_ID' => $request->BANK_ID['value'],
+                'BANK_ID' => $bank_id,
                 'BANK_TRANSACTION_NAME' => $request->BANK_TRANSACTION_NAME,
                 'BANK_TRANSACTION_COA_CODE' => $bank_transaction_coa_code,
                 'BANK_TRANSACTION_ACCOUNT_NUMBER' => $request->BANK_TRANSACTION_ACCOUNT_NUMBER,
@@ -143,19 +138,17 @@ class BankTransactionController extends Controller
         ]);
     }
 
-    public function bank_transaction_edit(Request $request)
+    public function edit(Request $request)
     {
         $validator = Validator::make($request->all(), 
             [
                 'BANK_TRANSACTION_NAME' => 'required',
-                'BANK_ID' => 'required',
                 'BANK_TRANSACTION_CURRENCY_ID' => 'required',
                 'BANK_TRANSACTION_ACCOUNT_NUMBER' => 'required',
                 'BANK_TRANSACTION_ACCOUNT_NAME' => 'required',
             ],
             [
                 'BANK_TRANSACTION_NAME.required' => 'The title field is required.',
-                'BANK_ID.required' => 'The bank name field is required.',
                 'BANK_TRANSACTION_CURRENCY_ID.required' => 'The currency field is required.',
                 'BANK_TRANSACTION_ACCOUNT_NUMBER.required' => 'The account number field is required.',
                 'BANK_TRANSACTION_ACCOUNT_NAME.required' => 'The account name field is required.',

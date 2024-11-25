@@ -27,6 +27,8 @@ import AGGrid from "@/Components/AgGrid";
 import TextInput from "@/Components/TextInput";
 import Swal from "sweetalert2";
 import { generateReceiptPDF } from "@/Pages/Receipt/Print";
+import TH from "@/Components/TH";
+import Checkbox from "@/Components/Checkbox";
 
 export default function Receipt({ auth }: PageProps) {
     useEffect(() => {
@@ -52,12 +54,6 @@ export default function Receipt({ auth }: PageProps) {
     });
 
     const [dataById, setDataById] = useState<any>({});
-
-    const handleAddModal = () => {
-        setModalAdd({
-            add: true,
-        });
-    };
 
     const [data, setData] = useState<any>({
         RECEIPT_DATE: new Date().toLocaleDateString("en-CA"),
@@ -127,88 +123,10 @@ export default function Receipt({ auth }: PageProps) {
     };
     // Handle Success End
 
-    const [clients, setClient] = useState<any>([]);
-    const getClient = async () => {
-        await axios
-            .get(`/getClient`)
-            .then((res) => {
-                setClient(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const selectClient = clients.map((client: any) => {
-        return {
-            value: client.RELATION_ORGANIZATION_ID,
-            label: client.RELATION_ORGANIZATION_NAME,
-        };
-    });
-
-    const getClientSelect = (value: any) => {
-        if (value) {
-            const selected = selectClient.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0].label;
-        }
-    };
-
-    const [currencies, setCurrency] = useState<any>([]);
-    const getCurrency = async () => {
-        await axios
-            .get(`/getCurrency`)
-            .then((res) => {
-                setCurrency(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const selectCurrency = currencies.map((currency: any) => {
-        return {
-            value: currency.CURRENCY_ID,
-            label: currency.CURRENCY_SYMBOL + " - " + currency.CURRENCY_NAME,
-        };
-    });
-
-    const getCurrencySelect = (value: any) => {
-        if (value) {
-            const selected = selectCurrency.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0].label;
-        }
-    };
-
-    const [BankAccount, setBankAccount] = useState<any>([]);
-    const getBankAccount = async () => {
-        await axios
-            .get(`/getBankAccount`)
-            .then((res) => {
-                setBankAccount(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const selectBankAccount = BankAccount.map((account: any) => {
-        return {
-            value: account.BANK_TRANSACTION_ID,
-            label: account.BANK_TRANSACTION_NAME,
-        };
-    });
-
-    const getBankAccountSelect = (value: any) => {
-        if (value) {
-            const selected = selectBankAccount.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0].label;
-        }
+    const handleAddModal = () => {
+        setModalAdd({
+            add: true,
+        });
     };
 
     const handleEditModal = async (e: any, id: number) => {
@@ -357,6 +275,90 @@ export default function Receipt({ auth }: PageProps) {
         }, 1000);
     };
     // Clear Search End
+
+    const [clients, setClient] = useState<any>([]);
+    const getClient = async () => {
+        await axios
+            .get(`/getClient`)
+            .then((res) => {
+                setClient(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const selectClient = clients.map((client: any) => {
+        return {
+            value: client.RELATION_ORGANIZATION_ID,
+            label: client.RELATION_ORGANIZATION_NAME,
+        };
+    });
+
+    const getClientSelect = (value: any) => {
+        if (value) {
+            const selected = selectClient.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+
+    const [currencies, setCurrency] = useState<any>([]);
+    const getCurrency = async () => {
+        await axios
+            .get(`/getCurrency`)
+            .then((res) => {
+                setCurrency(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const selectCurrency = currencies.map((currency: any) => {
+        return {
+            value: currency.CURRENCY_ID,
+            label: currency.CURRENCY_SYMBOL + " - " + currency.CURRENCY_NAME,
+        };
+    });
+
+    const getCurrencySelect = (value: any) => {
+        if (value) {
+            const selected = selectCurrency.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+
+    const [BankAccount, setBankAccount] = useState<any>([]);
+    const getBankAccount = async () => {
+        await axios
+            .get(`/getBankAccount`)
+            .then((res) => {
+                setBankAccount(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const selectBankAccount = BankAccount.map((account: any) => {
+        return {
+            value: account.BANK_TRANSACTION_ID,
+            label: account.BANK_TRANSACTION_NAME,
+        };
+    });
+
+    const getBankAccountSelect = (value: any) => {
+        if (value) {
+            const selected = selectBankAccount.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
 
     // Function Format Currency
     const formatCurrency = new Intl.NumberFormat("default", {
@@ -1129,7 +1131,7 @@ export default function Receipt({ auth }: PageProps) {
 
             {/* Modal Match Start */}
             <ModalToAction
-                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[50%]`}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 min-w-[60%]`}
                 show={modalMatch.match}
                 onClose={() =>
                     setModalMatch({
@@ -1148,7 +1150,7 @@ export default function Receipt({ auth }: PageProps) {
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_NAME"
-                                className="w-full md:w-1/4 mb-2"
+                                className="w-full md:w-2/12 mb-2"
                             >
                                 Receipt Number
                             </InputLabel>
@@ -1165,7 +1167,7 @@ export default function Receipt({ auth }: PageProps) {
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_VALUE"
-                                className="w-full md:w-1/4 mb-2"
+                                className="w-full md:w-2/12 mb-2"
                             >
                                 Value
                             </InputLabel>
@@ -1186,7 +1188,7 @@ export default function Receipt({ auth }: PageProps) {
                         <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_RELATION_ORGANIZATION_ID"
-                                className="w-full md:w-1/4 mb-2"
+                                className="w-full md:w-2/12 mb-2"
                             >
                                 Client Name
                             </InputLabel>
@@ -1203,6 +1205,89 @@ export default function Receipt({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
+
+                        {/* Table */}
+                        <div className="max-w-full overflow-x-auto overflow-visible mt-12">
+                            <div className="flex gap-x-4 mb-6">
+                                <InputLabel htmlFor="search" className="my-2">
+                                    Search
+                                </InputLabel>
+                                <TextInput
+                                    id="search"
+                                    name="search"
+                                    type="text"
+                                    className="w-full md:w-4/12"
+                                    autoComplete="off"
+                                    value=""
+                                />
+                            </div>
+                            <table className="w-full divide-y divide-gray-300">
+                                <thead>
+                                    <tr className="text-center">
+                                        <TH className="border py-2 px-3">
+                                            No.
+                                        </TH>
+                                        <TH
+                                            className="border py-2 px-3"
+                                            colSpan={2}
+                                        >
+                                            DN Number
+                                        </TH>
+                                        <TH className="border py-2 px-3">
+                                            DN Date
+                                        </TH>
+                                        <TH className="border py-2 px-3">
+                                            Client Name
+                                        </TH>
+                                        <TH className="border py-2 px-3">
+                                            Currency
+                                        </TH>
+                                        <TH className="border py-2 px-3">
+                                            Value
+                                        </TH>
+                                        <TH className="border py-2 px-3">
+                                            Plan
+                                        </TH>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="text-center">
+                                        <TD className="border py-2 px-3">1</TD>
+                                        <TD className="border py-2 px-3">
+                                            <Checkbox />
+                                        </TD>
+                                        <TD className="border py-2 px-3">
+                                            {dataById?.RECEIPT_NUMBER}
+                                        </TD>
+                                        <TD className="border py-2 px-3">
+                                            {dateFormat(
+                                                dataById?.RECEIPT_DATE,
+                                                "dd-mm-yyyy"
+                                            )}
+                                        </TD>
+                                        <TD className="border py-2 px-3">
+                                            {
+                                                dataById?.relation_organization
+                                                    ?.RELATION_ORGANIZATION_NAME
+                                            }
+                                        </TD>
+                                        <TD className="border py-2 px-3">
+                                            {
+                                                dataById?.currency
+                                                    ?.CURRENCY_SYMBOL
+                                            }
+                                        </TD>
+                                        <TD className="border py-2 px-3">
+                                            {formatCurrency.format(
+                                                dataById?.RECEIPT_VALUE
+                                            )}
+                                        </TD>
+                                        <TD className="border py-2 px-3"></TD>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {/* End Table */}
                     </div>
                 }
             />

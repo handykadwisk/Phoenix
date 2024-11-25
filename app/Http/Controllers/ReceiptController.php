@@ -11,6 +11,7 @@ use App\Models\RBankTransaction;
 use App\Models\RCurrency;
 use App\Models\Receipt;
 use App\Models\Relation;
+use App\Models\RJournalSetting;
 use App\Models\RSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -242,11 +243,9 @@ class ReceiptController extends Controller
         // dd($checkJournalAddReceipt);
 
         if ($checkJournalAddReceipt) {
-            // dd("Ada");
            Journal::where('JOURNAL_ID', $checkJournalAddReceipt)->update($journalData);
             $journalId = $checkJournalAddReceipt;
         } else {
-            // dd("Gaada");
             $journal = Journal::create($journalData)->JOURNAL_ID;
             $journalId = $journal;
         }
@@ -254,71 +253,81 @@ class ReceiptController extends Controller
         // Create log Journal
         user_log_create("Created (Journal).", "Journal", $journalId);
 
-        // PRJ Bank
-        $journalDetailCoaCode = $this->getCoaBank($getReceipt->RECEIPT_BANK_ID);
-        $journalDetailDesc = $this->getCoaTitle($journalDetailCoaCode);
-        $journalDetailCurrencyId = $getReceipt->RECEIPT_CURRENCY_ID;
-        $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
-        $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
-        $journalDetailSum = abs($journalDetailOrig) * $journalDetailExchangeRate;
-        $journalDetailType = 1;
+        $journal_setting = RJournalSetting::where('JOURNAL_SETTING_CODE', 'add_receipt')->first();
 
-        $journalDetailPrjBankData = [
-            'JOURNAL_ID' => $journalId,
-            'JOURNAL_DETAIL_COA_CODE' => $journalDetailCoaCode,
-            'JOURNAL_DETAIL_DESC' => $journalDetailDesc,
-            'JOURNAL_DETAIL_CURRENCY_ID' => $journalDetailCurrencyId,
-            'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
-            'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
-            'JOURNAL_DETAIL_SUM' => $journalDetailSum,
-            'JOURNAL_DETAIL_TYPE' => $journalDetailType,
-            'JOURNAL_DETAIL_CREATED_BY' => $userId,
-            'JOURNAL_DETAIL_CREATED_AT' => $dateTime
-        ];
+        // dd($journal_setting->journal_setting_detail);
 
-        if ($checkJournalAddReceipt) {
-            JournalDetail::where('JOURNAL_ID', $journalId)
-                    ->where('JOURNAL_DETAIL_COA_CODE', $journalDetailCoaCode)
-                    ->update($journalDetailPrjBankData);
-        } else {
-            JournalDetail::create($journalDetailPrjBankData);
+        foreach ($journal_setting->journal_setting_detail as $value) {
+            // PRJ Bank
+            if ($value['JOURNAL_SETTING_DETAIL_TITLE'] === 'PRJ Bank') {
+                $journalDetailCoaCode = $this->getCoaBank($getReceipt->RECEIPT_BANK_ID);
+                $journalDetailDesc = $this->getCoaTitle($journalDetailCoaCode);
+                $journalDetailCurrencyId = $getReceipt->RECEIPT_CURRENCY_ID;
+                $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
+                $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
+                $journalDetailSum = abs($journalDetailOrig) * $journalDetailExchangeRate;
+                $journalDetailType = 1;
+
+                $journalDetailPrjBankData = [
+                    'JOURNAL_ID' => $journalId,
+                    'JOURNAL_DETAIL_COA_CODE' => $journalDetailCoaCode,
+                    'JOURNAL_DETAIL_DESC' => $journalDetailDesc,
+                    'JOURNAL_DETAIL_CURRENCY_ID' => $journalDetailCurrencyId,
+                    'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
+                    'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
+                    'JOURNAL_DETAIL_SUM' => $journalDetailSum,
+                    'JOURNAL_DETAIL_TYPE' => $journalDetailType,
+                    'JOURNAL_DETAIL_CREATED_BY' => $userId,
+                    'JOURNAL_DETAIL_CREATED_AT' => $dateTime
+                ];
+
+                if ($checkJournalAddReceipt) {
+                    JournalDetail::where('JOURNAL_ID', $journalId)
+                            ->where('JOURNAL_DETAIL_COA_CODE', $journalDetailCoaCode)
+                            ->update($journalDetailPrjBankData);
+                } else {
+                    JournalDetail::create($journalDetailPrjBankData);
+                }
+                
+                // Create log Journal Detail
+                user_log_create("Created (Journal Detail).", "Journal", $journalId);
+            }
+
+            // Bukan PRJ Bank
+            if ($value['JOURNAL_SETTING_DETAIL_TITLE'] !== 'PRJ Bank') {
+                $journalDetailCoaCode = $value['JOURNAL_SETTING_DETAIL_COA'];
+                $journalDetailDesc = $this->getCoaTitle($journalDetailCoaCode);
+                $journalDetailCurrencyId = $getReceipt->RECEIPT_CURRENCY_ID;
+                $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
+                $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
+                $journalDetailSum = abs($journalDetailOrig * $journalDetailExchangeRate);
+                $journalDetailType = $value['JOURNAL_SETTING_DETAIL_SIDE'];
+
+                $journalDetailNotPrjBank = [
+                    'JOURNAL_ID' => $journalId,
+                    'JOURNAL_DETAIL_COA_CODE' => $journalDetailCoaCode,
+                    'JOURNAL_DETAIL_DESC' => $journalDetailDesc,
+                    'JOURNAL_DETAIL_CURRENCY_ID' => $journalDetailCurrencyId,
+                    'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
+                    'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
+                    'JOURNAL_DETAIL_SUM' => $journalDetailSum,
+                    'JOURNAL_DETAIL_TYPE' => $journalDetailType,
+                    'JOURNAL_DETAIL_CREATED_BY' => $userId,
+                    'JOURNAL_DETAIL_CREATED_AT' => $dateTime
+                ];
+
+                if ($checkJournalAddReceipt) {
+                    JournalDetail::where('JOURNAL_ID', $journalId)
+                            ->where('JOURNAL_DETAIL_COA_CODE', $journalDetailCoaCode)
+                            ->update($journalDetailNotPrjBank);
+                } else {
+                    JournalDetail::create($journalDetailNotPrjBank);
+                }
+
+                // Create log Journal Detail
+                user_log_create("Created (Journal Detail).", "Journal", $journalId);
+            }
         }
-        
-        // Create log Journal Detail
-        user_log_create("Created (Journal Detail).", "Journal", $journalId);
-
-        // Bukan PRJ Bank
-        $journalDetailCoaCode = '21370';
-        $journalDetailDesc = $this->getCoaTitle($journalDetailCoaCode);
-        $journalDetailCurrencyId = $getReceipt->RECEIPT_CURRENCY_ID;
-        $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
-        $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
-        $journalDetailSum = abs($journalDetailOrig * $journalDetailExchangeRate);
-        $journalDetailType = 2;
-
-        $journalDetailNotPrjBank = [
-            'JOURNAL_ID' => $journalId,
-            'JOURNAL_DETAIL_COA_CODE' => $journalDetailCoaCode,
-            'JOURNAL_DETAIL_DESC' => $journalDetailDesc,
-            'JOURNAL_DETAIL_CURRENCY_ID' => $journalDetailCurrencyId,
-            'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
-            'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
-            'JOURNAL_DETAIL_SUM' => $journalDetailSum,
-            'JOURNAL_DETAIL_TYPE' => $journalDetailType,
-            'JOURNAL_DETAIL_CREATED_BY' => $userId,
-            'JOURNAL_DETAIL_CREATED_AT' => $dateTime
-        ];
-
-        if ($checkJournalAddReceipt) {
-            JournalDetail::where('JOURNAL_ID', $journalId)
-                    ->where('JOURNAL_DETAIL_COA_CODE', $journalDetailCoaCode)
-                    ->update($journalDetailNotPrjBank);
-        } else {
-            JournalDetail::create($journalDetailNotPrjBank);
-        }
-
-        // Create log Journal Detail
-        user_log_create("Created (Journal Detail).", "Journal", $journalId);
 
         // Update receipt journal id add receipt
         $this->set_journal_receipt($journalId, $receiptId);
@@ -399,7 +408,11 @@ class ReceiptController extends Controller
             $receiptCountedAs = $this->switch_currency($currency, $receiptCountedAs);
             $receiptExchangeRate = $this->getExchangeRate($request->RECEIPT_DATE, $currency);
 
-            $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+            if ($currency === 1) {
+                $check_existing_exchange_rate = "Yes";
+            } else {
+                $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+            }
 
             if ($check_existing_exchange_rate === "Yes") {
                 // Create Receipt
@@ -487,9 +500,12 @@ class ReceiptController extends Controller
             $currency = $request->RECEIPT_CURRENCY_ID;
             $receipt_counted_as = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
             $receipt_counted_as = $this->switch_currency($currency, $receipt_counted_as);
-            $receipt_exchange_rate = $this->getExchangeRate($request->RECEIPT_DATE, $currency);
 
-            $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+            if ($currency === 1) {
+                $check_existing_exchange_rate = "Yes";
+            } else {
+                $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+            }
 
             if ($check_existing_exchange_rate === "Yes") {
                 // Create Receipt
@@ -561,22 +577,16 @@ class ReceiptController extends Controller
             $setting = RSetting::where('SETTING_VARIABLE', 'auto_journal_add_receipt')->first();
 
             $receipt_id = $request->RECEIPT_ID;
-            $receipt_status = $request->RECEIPT_STATUS;
-            if ($receipt_status === 2) {
-                $year = date('y', strtotime($request->RECEIPT_DATE));
-                $month = date('m', strtotime($request->RECEIPT_DATE));
-                
-                $receipt_number = $this->generateReceiptNumber($year, $month);
-            } else {
-                $receipt_number = null;
-            }
-
             $currency = $request->RECEIPT_CURRENCY_ID;
             $receipt_counted_as = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
             $receipt_counted_as = $this->switch_currency($currency, $receipt_counted_as);
-            $receipt_exchange_rate = $this->getExchangeRate($request->RECEIPT_DATE, $currency);
+            $receipt_status = $request->RECEIPT_STATUS;
 
-            $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+            if ($currency === 1) {
+                $check_existing_exchange_rate = "Yes";
+            } else {
+                $check_existing_exchange_rate = $this->check_existing_exchange_rate($request->RECEIPT_DATE, $currency);
+            }
 
             if ($check_existing_exchange_rate === "Yes") {
                 // Create Receipt
@@ -584,7 +594,6 @@ class ReceiptController extends Controller
                     'RECEIPT_CURRENCY_ID' => $currency,
                     'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID,
                     'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
-                    'RECEIPT_NUMBER' => $receipt_number,
                     'RECEIPT_NAME' => $request->RECEIPT_NAME,
                     'RECEIPT_DATE' => $request->RECEIPT_DATE,
                     'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
