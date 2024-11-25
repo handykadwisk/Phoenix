@@ -39,7 +39,8 @@ class SendEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.sendemail', // tambahkan ini
+            // view: 'emails.sendemail', // tambahkan ini
+            view: $this->data['view'], // tambahkan ini
         );
     }
 

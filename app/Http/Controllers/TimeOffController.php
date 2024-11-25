@@ -362,6 +362,7 @@ class TimeOffController extends Controller
         //     'title' => 'Testing Kirim Email',
         //     'body' => 'Ini adalah email uji coba dari Tutorial Laravel: Send Email Via SMTP GMAIL @ qadrLabs.com'
         // ];
+        $data['view'] = 'emails.sendemail';
 
         // Mail::to('apianbaru@gmail.com')->send(new SendEmail($data));
         Mail::to($data['email_to'])->send(new SendEmail($data));

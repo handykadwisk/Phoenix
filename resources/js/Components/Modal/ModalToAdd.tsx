@@ -138,6 +138,7 @@ export default function ModalAttendance({
                                                 <PrimaryButton
                                                     className="inline-flex w-full sm:ml-3 sm:w-auto"
                                                     disabled={isProcessing}
+                                                    id="buttonSubmitModalToAdd"
                                                 >
                                                     Submit
                                                 </PrimaryButton>

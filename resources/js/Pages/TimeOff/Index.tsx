@@ -152,9 +152,21 @@ export default function Index({ auth }: PageProps) {
                     ? 0
                     : type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY
             );
+
+            if (type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH != null) {
+                items["detail"] = [];
+            }
+
+            if (
+                type.TIME_OFF_TYPE_ID == 2
+            ) {
+                items["detail"] = [];
+                setRowDate(type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY);
+            }
             
             setSelectedType(getSelectedType(value) ? getSelectedType(value): {});
         }
+        setFieldTotalTimeOff(0);
         
         items[name] = value;
         setDataRequestTimeOff(items);
@@ -293,11 +305,28 @@ export default function Index({ auth }: PageProps) {
     };
     
     const [selectedTypeForEdit, setSelectedTypeForEdit] = useState<any>({});
+    const [rowDateForEdit, setRowDateForEdit] = useState<number>(0);
+
+    useEffect(() => {
+        if (rowDateForEdit != 0) {
+            const items = { ...editRequestTimeOff };
+            let arr: any = [];
+console.log('tems: ', items)
+            for (let i = 0; i < rowDateForEdit; i++) {
+                arr.push({
+                    DATE_OF_LEAVE: "",
+                });
+            }
+            items["request_time_off"] = arr;
+            setEditRequestTimeOff(items);
+        }
+    }, [rowDateForEdit]);
 
     const editTimeOff = (name: string, value: any) => {
         const items = { ...editRequestTimeOff };
         const details = [items.request_time_off];
-        
+
+               
         if (name == "TIME_OFF_TYPE_ID") {
             if (value) {
                 items["request_time_off"] = [
@@ -312,11 +341,31 @@ export default function Index({ auth }: PageProps) {
                     ? (items["IS_REDUCE_LEAVE"] = 1)
                     : (items["IS_REDUCE_LEAVE"] = 0)
                 : "";
+            
+            console.log("type: ", type);
+             setRowDateForEdit(
+                 type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY == null &&
+                     type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH == null
+                     ? 1
+                     : type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH != null
+                     ? 0
+                     : type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY
+             );
+
+             if (type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH != null) {
+                 items["request_time_off"] = [];
+             }
+
+             if (type.TIME_OFF_TYPE_ID == 2) {
+                 items["request_time_off"] = [];
+                 setRowDateForEdit(type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY);
+             }
 
             setSelectedTypeForEdit(
                 getSelectedType(value) ? getSelectedType(value) : {}
             );
         }
+        setFieldTotalTimeOff(0);
         
         items[name] = value;
         setEditRequestTimeOff(items);
@@ -656,6 +705,7 @@ export default function Index({ auth }: PageProps) {
                                                 setFieldTotalTimeOff(
                                                     e.target.value
                                                 );
+                                                setRowDate(e.target.value);
                                             }}
                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                         />
@@ -836,8 +886,7 @@ export default function Index({ auth }: PageProps) {
                                             )}
                                             {selectedType.TIME_OFF_TYPE_ID ==
                                                 "1" ||
-                                            (selectedType.TIME_OFF_TYPE_ID !=
-                                                "2" &&
+                                            (
                                                 selectedType.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
                                                     "1") ? (
                                                 ""
