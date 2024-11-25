@@ -9,6 +9,7 @@ use App\Http\Controllers\CollectiveLeaveController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\InsurancePanelController;
+use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
 use App\Http\Controllers\OtherExpensesController;
@@ -594,6 +595,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/cancelCollectiveLeave', [TimeOffController::class, 'cancelCollectiveLeave'])->name('timeOff.cancelCollectiveLeave');
 
 
+    // Medical
+    // Requester
+    Route::get('/medical', [MedicalController::class, 'index'])->name('medical');
+    Route::post('/requestMedical', [MedicalController::class, 'store'])->name('store');
+    Route::get('/getRequestMedicalAgGrid', [MedicalController::class, 'getRequestMedicalAgGrid'])->name('timeOff.getRequestMedicalAgGrid');
+    Route::get('/getRequestMedicalById/{id}', [MedicalController::class, 'getRequestMedicalById'])->name('timeOff.getRequestMedicalById');
+    Route::post('/editRequestMedical', [MedicalController::class, 'editRequestMedical'])->name('timeOff.editRequestMedical');
+    Route::get('/downloadMedicalDocument/{id}', [MedicalController::class, 'medical_document_download'])->name('downloadMedicalDocument.medical_document_download');
+    Route::post('/deleteMedicalDocument', [MedicalController::class, 'delete_medical_document'])->name('deleteMedicalDocument.delete_medical_document');
+    Route::get('/getSalaryByEmployee/{id}', [MedicalController::class, 'getSalaryByEmployee'])->name('getSalaryByEmployee');
+    Route::get('/getMedicalByEmployee/{id}', [MedicalController::class, 'getMedicalByEmployee'])->name('getMedicalByEmployee');
+    
+    //Approval
+    Route::get('/hr/medicalForApproval', [MedicalController::class, 'medicalForApproval'])->name('hr/medicalForApproval');
+    Route::get('/getMedicalAgGridForHR', [MedicalController::class, 'getMedicalAgGridForHR'])->name('getMedicalAgGridForHR');
+    Route::post('/approveMedical', [MedicalController::class, 'approveMedical'])->name('approveMedical');
+    Route::post('/rejectMedical', [MedicalController::class, 'rejectMedical'])->name('timeOff.rejectMedical');
 
 });
 

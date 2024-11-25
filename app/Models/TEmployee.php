@@ -20,7 +20,7 @@ class TEmployee extends Model
 
     public $timestamps = false;
 
-    protected $with = ['division'];
+    protected $with = ['division', 'structure'];
 
     public function division(): BelongsTo
     {
