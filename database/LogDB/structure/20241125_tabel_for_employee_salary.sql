@@ -20,7 +20,7 @@ CREATE TABLE `m_employee_basic_salary` (
   `employee_basic_salary_id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `employee_id` bigint unsigned DEFAULT NULL,
   `basic_salary_id` bigint unsigned DEFAULT NULL,
-  PRIMARY KEY (`employee_basic_salardy_id`)
+  PRIMARY KEY (`employee_basic_salary_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `m_employee_basic_salary` */
