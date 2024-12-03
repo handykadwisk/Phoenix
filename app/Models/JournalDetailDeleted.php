@@ -9,11 +9,9 @@ class JournalDetailDeleted extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'JOURNAL_DETAIL_ID';
-
     protected $table = 't_journal_detail_deleted';
 
-    protected $guarded = ['JOURNAL_DETAIL_ID'];
+    protected $guarded = ['JOURNAL_DETAIL_UPDATED_BY', 'JOURNAL_DETAIL_UPDATED_DATE'];
 
     public $timestamps = false;
 }

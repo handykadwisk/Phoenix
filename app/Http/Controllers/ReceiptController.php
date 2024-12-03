@@ -219,9 +219,11 @@ class ReceiptController extends Controller
         $userId = Auth::user()->id;
         $dateTime = now();
 
+        $journal_setting = RJournalSetting::where('JOURNAL_SETTING_CODE', 'add_receipt')->first();
+
         $getReceipt= $this->getReceiptAll($receiptId);
 
-        $journalTypeCode = 'PRJ';
+        $journalTypeCode = $journal_setting->JOURNAL_SETTING_TYPE;
         $journalNumber = $this->generateJournalNumber($journalTypeCode);
         $journalDate = $getReceipt->RECEIPT_DATE;
         $journalMemo = "Receipt No. " . $getReceipt->RECEIPT_NUMBER;
@@ -240,8 +242,6 @@ class ReceiptController extends Controller
 
         $checkJournalAddReceipt = $this->check_journal_add_receipt($receiptId);
 
-        // dd($checkJournalAddReceipt);
-
         if ($checkJournalAddReceipt) {
            Journal::where('JOURNAL_ID', $checkJournalAddReceipt)->update($journalData);
             $journalId = $checkJournalAddReceipt;
@@ -253,10 +253,6 @@ class ReceiptController extends Controller
         // Create log Journal
         user_log_create("Created (Journal).", "Journal", $journalId);
 
-        $journal_setting = RJournalSetting::where('JOURNAL_SETTING_CODE', 'add_receipt')->first();
-
-        // dd($journal_setting->journal_setting_detail);
-
         foreach ($journal_setting->journal_setting_detail as $value) {
             // PRJ Bank
             if ($value['JOURNAL_SETTING_DETAIL_TITLE'] === 'PRJ Bank') {
@@ -266,7 +262,7 @@ class ReceiptController extends Controller
                 $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
                 $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
                 $journalDetailSum = abs($journalDetailOrig) * $journalDetailExchangeRate;
-                $journalDetailType = 1;
+                $journalDetailSide = 1;
 
                 $journalDetailPrjBankData = [
                     'JOURNAL_ID' => $journalId,
@@ -276,7 +272,7 @@ class ReceiptController extends Controller
                     'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
                     'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
                     'JOURNAL_DETAIL_SUM' => $journalDetailSum,
-                    'JOURNAL_DETAIL_TYPE' => $journalDetailType,
+                    'JOURNAL_DETAIL_SIDE' => $journalDetailSide,
                     'JOURNAL_DETAIL_CREATED_BY' => $userId,
                     'JOURNAL_DETAIL_CREATED_AT' => $dateTime
                 ];
@@ -301,7 +297,7 @@ class ReceiptController extends Controller
                 $journalDetailOrig = $getReceipt->RECEIPT_VALUE;
                 $journalDetailExchangeRate = $this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID);
                 $journalDetailSum = abs($journalDetailOrig * $journalDetailExchangeRate);
-                $journalDetailType = $value['JOURNAL_SETTING_DETAIL_SIDE'];
+                $journalDetailSide = $value['JOURNAL_SETTING_DETAIL_SIDE'];
 
                 $journalDetailNotPrjBank = [
                     'JOURNAL_ID' => $journalId,
@@ -311,7 +307,7 @@ class ReceiptController extends Controller
                     'JOURNAL_DETAIL_ORIG' => $journalDetailOrig,
                     'JOURNAL_DETAIL_EX_RATE' => $journalDetailExchangeRate,
                     'JOURNAL_DETAIL_SUM' => $journalDetailSum,
-                    'JOURNAL_DETAIL_TYPE' => $journalDetailType,
+                    'JOURNAL_DETAIL_SIDE' => $journalDetailSide,
                     'JOURNAL_DETAIL_CREATED_BY' => $userId,
                     'JOURNAL_DETAIL_CREATED_AT' => $dateTime
                 ];
@@ -633,16 +629,19 @@ class ReceiptController extends Controller
     public function delete($receipt_id)
     {
         DB::transaction(function() use($receipt_id) {
-            $receipt = Receipt::findOrFail($receipt_id);
+            $userId = Auth::user()->id;
+            $dateTime = now();
+
+            $receipt = Receipt::find($receipt_id);
 
             $journal_id = $receipt->RECEIPT_JOURNAL_ID_ADD_RECEIPT;
 
-            $journal = Journal::findOrFail($journal_id);
+            $journal = Journal::find($journal_id);
 
             $journal_detail = JournalDetail::where('JOURNAL_ID', $journal_id)->get();
 
             // Start Delete Receipt
-            $data = Receipt::findOrFail($receipt_id);
+            $data = Receipt::find($receipt_id);
 
             $data->update([
                 'RECEIPT_STATUS' => 4
@@ -656,6 +655,7 @@ class ReceiptController extends Controller
             // Start Delete Journal
             if ($journal_id) {
                 JournalDeleted::create([
+                    'JOURNAL_ID' => $journal->JOURNAL_ID,
                     'JOURNAL_NUMBER' => $journal->JOURNAL_NUMBER,
                     'JOURNAL_TYPE_CODE' => $journal->JOURNAL_TYPE_CODE,
                     'JOURNAL_DATE' => $journal->JOURNAL_DATE,
@@ -669,7 +669,8 @@ class ReceiptController extends Controller
                     'JOURNAL_UPDATED_AT' => $journal->JOURNAL_UPDATED_AT,
                     'TEMP' => $journal->TEMP,
                     'JOURNAL_NOTES' => $journal->JOURNAL_NOTES,
-                    'JOURNAL_IS_DELETED' => $journal->JOURNAL_IS_DELETED,
+                    'JOURNAL_DELETED_BY' => $userId,
+                    'JOURNAL_DELETED_DATE' => $dateTime
                 ]);
     
                 Journal::find($journal_id)->delete();
@@ -682,6 +683,7 @@ class ReceiptController extends Controller
             if ($journal_id) {
                 foreach ($journal_detail as $value) {
                     JournalDetailDeleted::create([
+                        'JOURNAL_DETAIL_ID' => $value->JOURNAL_DETAIL_ID,
                         'JOURNAL_ID' => $value->JOURNAL_ID,
                         'JOURNAL_DETAIL_COA_CODE' => $value->JOURNAL_DETAIL_COA_CODE,
                         'JOURNAL_DETAIL_DESC' => $value->JOURNAL_DETAIL_DESC,
@@ -689,11 +691,13 @@ class ReceiptController extends Controller
                         'JOURNAL_DETAIL_ORIG' => $value->JOURNAL_DETAIL_ORIG,
                         'JOURNAL_DETAIL_EX_RATE' => $value->JOURNAL_DETAIL_EX_RATE,
                         'JOURNAL_DETAIL_SUM' => $value->JOURNAL_DETAIL_SUM,
-                        'JOURNAL_DETAIL_TYPE' => $value->JOURNAL_DETAIL_TYPE,
+                        'JOURNAL_DETAIL_SIDE' => $value->JOURNAL_DETAIL_SIDE,
                         'JOURNAL_DETAIL_CREATED_BY' => $value->JOURNAL_DETAIL_CREATED_BY,
                         'JOURNAL_DETAIL_CREATED_AT' => $value->JOURNAL_DETAIL_CREATED_AT,
                         'JOURNAL_DETAIL_UPDATED_BY' => $value->JOURNAL_DETAIL_UPDATED_BY,
-                        'JOURNAL_DETAIL_UPDATED_AT' => $value->JOURNAL_DETAIL_UPDATED_AT
+                        'JOURNAL_DETAIL_UPDATED_AT' => $value->JOURNAL_DETAIL_UPDATED_AT,
+                        'JOURNAL_DETAIL_DELETED_BY' => $userId,
+                        'JOURNAL_DETAIL_DELETED_DATE' => $dateTime
                     ]);
                 }
     
