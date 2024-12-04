@@ -228,6 +228,8 @@ class ReceiptController extends Controller
         $journalDate = $getReceipt->RECEIPT_DATE;
         $journalMemo = "Receipt No. " . $getReceipt->RECEIPT_NUMBER;
 
+        // dd($this->getExchangeRate($getReceipt->RECEIPT_DATE, $getReceipt->RECEIPT_CURRENCY_ID));
+
         $journalData = [
             'JOURNAL_NUMBER' => $journalNumber,
             'JOURNAL_TYPE_CODE' => $journalTypeCode,
