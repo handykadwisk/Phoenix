@@ -15,7 +15,7 @@ import DetailAttendanceSetting from "./DetailAttendanceSetting";
 import axios from "axios";
 
 export default function Index({ auth }: PageProps) {
-    const { companies, employees }: any = usePage().props;
+    const { companies, employees, arrTime }: any = usePage().props;
     const attendanceType = [
         { ID: "0", NAME: "Fix Work Schedule" },
         { ID: "1", NAME: "Shift Work Schedule" },
@@ -105,6 +105,8 @@ export default function Index({ auth }: PageProps) {
             modalCreateWorkAttendce: !modal.modalCreateWorkAttendce,
         });
     };
+
+    console.log("dataWorkAttendance: ", dataWorkAttendance);
 
     const handleSuccessAddWorkAttendance = (message: string) => {
         setIsSuccess("");
@@ -390,6 +392,7 @@ export default function Index({ auth }: PageProps) {
                                     </div>
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
                                     <InputLabel
@@ -399,21 +402,34 @@ export default function Index({ auth }: PageProps) {
                                     <div className="ml-[6.4rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataWorkAttendance.ATTENDANCE_CHECK_IN_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataWorkAttendance({
                                                     ...dataWorkAttendance,
                                                     ATTENDANCE_CHECK_IN_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="relative">
@@ -424,21 +440,34 @@ export default function Index({ auth }: PageProps) {
                                     <div className="ml-[7.2rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataWorkAttendance.ATTENDANCE_CHECK_OUT_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataWorkAttendance({
                                                     ...dataWorkAttendance,
                                                     ATTENDANCE_CHECK_OUT_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -500,21 +529,34 @@ export default function Index({ auth }: PageProps) {
                                         className=""
                                         value={"Break Time Start"}
                                     />
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataWorkAttendance.ATTENDANCE_BREAK_START_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataWorkAttendance({
                                                     ...dataWorkAttendance,
                                                     ATTENDANCE_BREAK_START_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="relative">
@@ -522,21 +564,34 @@ export default function Index({ auth }: PageProps) {
                                         className=""
                                         value={"Break Time End"}
                                     />
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataWorkAttendance.ATTENDANCE_BREAK_END_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataWorkAttendance({
                                                     ...dataWorkAttendance,
                                                     ATTENDANCE_BREAK_END_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -592,7 +647,6 @@ export default function Index({ auth }: PageProps) {
                                     />
                                 </div>
                             </div>
-                            
                         </div>
                     </>
                 }
@@ -630,6 +684,7 @@ export default function Index({ auth }: PageProps) {
                             setDetailCompanyNew={setDetailAttendanceSetting}
                             attendanceType={attendanceType}
                             companies={companies}
+                            arrTime={arrTime}
                         />
                     </>
                 }

@@ -66,17 +66,6 @@ class TimeOffController extends Controller
      */
     public function index()
     {
-        // $url= URL::to('reviewTimeOff/401');
-        // $emailForReject = [
-        //         'subject' => 'Request Time Off Status',
-        //         'title' => 'Your request time off on  has been rejected. ',
-        //         'note_approver' => '',
-        //         'time_off_type' => '',
-        //         'date' => '',
-        //         'email_to' => '',
-        //         'url' => $url
-        //     ];
-        // return view('emails/sendemail', ['data'=> $emailForReject]);
         return Inertia::render('TimeOff/Index', [
             'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->where('IS_SHOW', '<>', 0)->get()
         ]);
@@ -86,10 +75,8 @@ class TimeOffController extends Controller
         $data = TEmployee::where('DIVISION_ID', $request->divisionId)
                 ->where('EMPLOYEE_ID', "<>", $request->employeeId)
                 ->where('EMPLOYEE_IS_DELETED', '=', '0')
-                ->get();
-        
+                ->get();        
         return response()->json($data);
-
     }
 
     function getRequestTo(Request $request) {
@@ -356,12 +343,7 @@ class TimeOffController extends Controller
     }
 
     public function sendMail($data) {
-        // echo $data['email_to']. " | ";
-        // $data = [
-        //     'subject' => 'Testing Kirim Email',
-        //     'title' => 'Testing Kirim Email',
-        //     'body' => 'Ini adalah email uji coba dari Tutorial Laravel: Send Email Via SMTP GMAIL @ qadrLabs.com'
-        // ];
+        
         $data['view'] = 'emails.sendemail';
 
         // Mail::to('apianbaru@gmail.com')->send(new SendEmail($data));
@@ -376,11 +358,53 @@ class TimeOffController extends Controller
 
             $timeOffMasterId = $request->REQUEST_TIME_OFF_MASTER_ID;
 
+            $document_id = null;
+            $contentFile = $request->file();
+            if ($contentFile) {
+                $file = $contentFile["FILE_ID_new"];
+                // Create Folder For Person Document
+                $parentDir = ((floor(($request->EMPLOYEE_ID)/1000))*1000).'/';
+                $employeeId = $request->EMPLOYEE_ID . '/';
+                $typeDir = "";
+                $uploadPath = 'documents/' . 'TimeOff/'. $parentDir . $employeeId . $typeDir;
+
+                // get Data Document
+                $documentOriginalName = $this->RemoveSpecialChar($file->getClientOriginalName());
+                $documentFileName = $this->RemoveSpecialChar($file->getClientOriginalName());
+                $documentDirName = $uploadPath;
+                $documentFileType = $file->getClientMimeType();
+                $documentFileSize = $file->getSize();
+
+                // masukan data file ke database
+                $document_id = Document::create([
+                    'DOCUMENT_ORIGINAL_NAME'        => $documentOriginalName,
+                    'DOCUMENT_FILENAME'             => "",
+                    'DOCUMENT_DIRNAME'              => $documentDirName,
+                    'DOCUMENT_FILETYPE'             => $documentFileType,
+                    'DOCUMENT_FILESIZE'             => $documentFileSize,
+                    'DOCUMENT_CREATED_BY'           => Auth::user()->id
+                ])->DOCUMENT_ID;
+
+                if($document_id){
+                    // update file name "DOCUMENT_ID - FILENAME"
+                    Document::where('DOCUMENT_ID', $document_id)->update([
+                        'DOCUMENT_FILENAME'             => $document_id."-".$documentOriginalName,
+                    ]);
+
+                    // create folder in directory laravel
+                    Storage::makeDirectory($uploadPath, 0777, true, true);
+                    Storage::disk('public')->putFileAs($uploadPath, $file, $document_id . "-" . $this->RemoveSpecialChar($file->getClientOriginalName()));
+                }
+            } else {
+                $document_id = $request->FILE_ID;
+            }
+
             TimeOffMaster::where('REQUEST_TIME_OFF_MASTER_ID', $timeOffMasterId)
                 ->update([
                 'IS_REDUCE_LEAVE'           => $request->IS_REDUCE_LEAVE,
                 'TIME_OFF_TYPE_ID'          => $request->TIME_OFF_TYPE_ID,
                 'SUBSTITUTE_PIC'            => $request->SUBSTITUTE_PIC,
+                'FILE_ID'                   => $document_id,
                 'SECOND_SUBSTITUTE_PIC'     => $request->SECOND_SUBSTITUTE_PIC,
                 'DESCRIPTION'               => $request->DESCRIPTION,
                 'REQUEST_TO'                => $request->REQUEST_TO,
@@ -488,8 +512,7 @@ class TimeOffController extends Controller
 
 
     function reviewTimeOff($id= null) {
-        // dd($id);
-    // function reviewTimeOff(Request $request) {
+        
         return Inertia::render('TimeOff/ReviewTimeOff', [
             // 'data' => TimeOffMaster::find($request->id),
             'data' => TimeOffMaster::find($id),
@@ -509,11 +532,6 @@ class TimeOffController extends Controller
     function getRequestTimeOffById($id= null) {
         $data = TimeOffMaster::find($id);
         return response()->json($data);
-        // return Inertia::render('TimeOff/ReviewTimeOff', [
-        //     'data' => TimeOffMaster::find($id),
-        //     'employees' => TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get(),
-        //     'timeOffTipes' => RTimeOffType::where('TIME_OFF_TYPE_IS_ACTIVE', 0)->get()
-        // ]);
     }
 
     function approveTimeOff(Request $request) {
@@ -710,8 +728,9 @@ class TimeOffController extends Controller
             ->join('t_employee AS e', 'rtom.EMPLOYEE_ID', '=', 'e.EMPLOYEE_ID')
             ->where('STATUS', '=', '0')
             ->where('rtom.IS_CANCELED', '=', '0')
-            ->where('e.COMPANY_ID', '=', $newSearch['COMPANY_ID'])
-            ->where('e.DIVISION_ID', '=', $newSearch['DIVISION_ID'])
+            // ->where('e.COMPANY_ID', '=', $newSearch['COMPANY_ID'])
+            // ->where('e.DIVISION_ID', '=', $newSearch['DIVISION_ID'])
+            ->where('rtom.REQUEST_TO', '=', $newSearch['EMPLOYEE_ID'])
             ->orderBy('REQUEST_TIME_OFF_MASTER_ID', 'desc'); 
         
         $data = $query->paginate($perPage, ['*'], 'page', $page);
@@ -925,5 +944,48 @@ class TimeOffController extends Controller
         ]);
 
     }
+
+    
+    public function delete_time_off_document(Request $request){
+        // dd($request);
+        // Delete Document 
+        $idDocument = $request->idDocument;
+        $timeOffMasterId = $request->timeOffMasterId;
+        // delete MEmployeeDocument
+        if($idDocument){
+
+            $timeOffMaster = TimeOffMaster::where('REQUEST_TIME_OFF_MASTER_ID', $timeOffMasterId)
+                ->update([
+                'FILE_ID'           => null,
+            ]);
+
+            if($timeOffMaster){
+                // delete image from folder
+                $data = Document::find($request->idDocument);
+                Storage::disk('public')->delete($data->DOCUMENT_DIRNAME.$data->DOCUMENT_FILENAME);
+
+                // delete document from database
+                Document::where('DOCUMENT_ID', $request->idDocument)->delete();
+
+            }
+        }
+
+        UserLog::create([
+            "created_by" => Auth::user()->id,
+            "action"     => json_encode([
+            "description" => "Time Off Document Delete (Time Off).",
+            "module"      => "Time Off",
+            "id"          => $request->timeOffMasterId
+        ]),
+        'action_by'  => Auth::user()->user_login
+        ]);
+
+        return new JsonResponse([
+            $request->timeOffMasterId
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
 
 }

@@ -19,6 +19,7 @@ export default function DetailAttendanceSetting({
     setDetailCompanyNew,
     attendanceType,
     companies,
+    arrTime,
 }: PropsWithChildren<{
     attendanceSettingId: any;
     setIsSuccess: any | string | null;
@@ -26,6 +27,7 @@ export default function DetailAttendanceSetting({
     setDetailCompanyNew: any;
     attendanceType: any;
     companies: any;
+    arrTime: any;
 }>) {
     // load otomatis detail relation
     useEffect(() => {
@@ -36,7 +38,6 @@ export default function DetailAttendanceSetting({
         []
     );
 
-   
     // get Detail Attendance Setting
     const getDetailAttendanceSetting = async (attendanceSettingId: string) => {
         await axios
@@ -49,7 +50,6 @@ export default function DetailAttendanceSetting({
             });
     };
 
-    
     const [modalEdit, setModalEdit] = useState<any>({
         modalEditWorkAttendce: false,
     });
@@ -57,6 +57,8 @@ export default function DetailAttendanceSetting({
     const [dataEditAttendanceSetting, setDataEditAttendanceSetting] =
         useState<any>({});
 
+    console.log("dataEditAttendanceSetting: ", dataEditAttendanceSetting);
+    
     const handleClickEditAttendanceSetting = async (
         e: FormEvent,
         companyId: string
@@ -71,7 +73,7 @@ export default function DetailAttendanceSetting({
         setIsSuccess("");
         if (message != "") {
             getDetailAttendanceSetting(message["id"]);
-            
+
             setIsSuccess(message["msg"]);
             setTimeout(() => {
                 setIsSuccess("");
@@ -79,7 +81,6 @@ export default function DetailAttendanceSetting({
         }
     };
 
-    
     return (
         <>
             {/* Modal Edit work attendance */}
@@ -298,21 +299,34 @@ export default function DetailAttendanceSetting({
                                     <div className="ml-[6.4rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_CHECK_IN_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_CHECK_IN_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="relative">
@@ -323,21 +337,34 @@ export default function DetailAttendanceSetting({
                                     <div className="ml-[7.2rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_CHECK_OUT_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -399,21 +426,34 @@ export default function DetailAttendanceSetting({
                                         className=""
                                         value={"Break Time Start"}
                                     />
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_BREAK_START_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_BREAK_START_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="relative">
@@ -421,22 +461,36 @@ export default function DetailAttendanceSetting({
                                         className=""
                                         value={"Break Time End"}
                                     />
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_BREAK_END_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_BREAK_END_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
                                     </div>
+                                    
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
