@@ -1308,6 +1308,147 @@ export default function Receipt({ auth }: PageProps) {
                 search={
                     <>
                         <div className="grid grid-cols-1 relative">
+                            {/* <InputSearch
+                                id="receipt_number"
+                                name="receipt_number"
+                                type="text"
+                                placeholder="Receipt Number"
+                                autoComplete="off"
+                                value={
+                                    searchReceipt.receipt_search[0]
+                                        .RECEIPT_NUMBER
+                                }
+                                onChange={(val: any) => {
+                                    inputDataSearch(
+                                        "RECEIPT_NUMBER",
+                                        val.target.value,
+                                        0
+                                    );
+                                    if (
+                                        searchReceipt.receipt_search[0]
+                                            .RECEIPT_NUMBER === ""
+                                    ) {
+                                        inputDataSearch("flag", "flag", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        const title =
+                                            searchReceipt.receipt_search[0]
+                                                .RECEIPT_NUMBER;
+                                        const id =
+                                            searchReceipt.receipt_search[0]
+                                                .RECEIPT_ID;
+                                        if (title || id) {
+                                            inputDataSearch("flag", "", 0);
+                                            setRefreshSuccess("success");
+                                            setTimeout(() => {
+                                                setRefreshSuccess("");
+                                            });
+                                        } else {
+                                            inputDataSearch("flag", "flag", 0);
+                                        }
+                                    }
+                                }}
+                            />
+                            <div className="grid grid-cols-1 mb-5 relative">
+                                <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
+                                <DatePicker
+                                    name="EXPENSES_START_DATE"
+                                    selected={
+                                        searchReceipt.receipt_search[0]
+                                            .EXPENSES_START_DATE
+                                    }
+                                    onChange={(val: any) => {
+                                        inputDataSearch(
+                                            "EXPENSES_START_DATE",
+                                            val.toLocaleDateString("en-CA"),
+                                            0
+                                        );
+                                        if (
+                                            searchReceipt.receipt_search[0]
+                                                .EXPENSES_START_DATE === ""
+                                        ) {
+                                            inputDataSearch("flag", "flag", 0);
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const expensesStartDate =
+                                                searchReceipt.expenses_search[0]
+                                                    .EXPENSES_START_DATE;
+                                            if (expensesStartDate) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
+                                    dateFormat={"dd-MM-yyyy"}
+                                    placeholderText="dd-mm-yyyyy (Start Date)"
+                                    className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 mb-5 relative">
+                                <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
+                                <DatePicker
+                                    name="expenses_end_date"
+                                    selected={
+                                        searchReceipt.receipt_search[0]
+                                            .EXPENSES_END_DATE
+                                    }
+                                    onChange={(val: any) => {
+                                        inputDataSearch(
+                                            "EXPENSES_END_DATE",
+                                            val.toLocaleDateString("en-CA"),
+                                            0
+                                        );
+                                        if (
+                                            searchReceipt.receipt_search[0]
+                                                .EXPENSES_END_DATE === ""
+                                        ) {
+                                            inputDataSearch("flag", "flag", 0);
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const expensesEndDate =
+                                                searchReceipt.expenses_search[0]
+                                                    .EXPENSES_END_DATE;
+                                            if (expensesEndDate) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
+                                    dateFormat={"dd-MM-yyyy"}
+                                    placeholderText="dd-mm-yyyy (End Date)"
+                                    className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                />
+                            </div> */}
                             <InputSearch
                                 id="client_name"
                                 name="client_name"
@@ -1352,6 +1493,78 @@ export default function Receipt({ auth }: PageProps) {
                                     }
                                 }}
                             />
+                            {/* <Select
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex items-center text-xs sm:text-sm text-gray-400 mb-5 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-600`
+                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                        }`,
+                                }}
+                                options={selectCurrency}
+                                isSearchable={true}
+                                placeholder={"Currency"}
+                                value={
+                                    searchReceipt.receipt_search[0]
+                                        .EXPENSES_COST_CENTER
+                                }
+                                onChange={(val: any) => {
+                                    inputDataSearch(
+                                        "EXPENSES_COST_CENTER",
+                                        val,
+                                        0
+                                    );
+                                    if (
+                                        searchReceipt.receipt_search[0]
+                                            .EXPENSES_COST_CENTER === ""
+                                    ) {
+                                        inputDataSearch("flag", "flag", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                }}
+                                primaryColor={"bg-red-500"}
+                            />
+                            <Select
+                                classNames={{
+                                    menuButton: () =>
+                                        `flex items-center text-xs sm:text-sm text-gray-400 mb-5 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                    listItem: ({ isSelected }: any) =>
+                                        `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                            isSelected
+                                                ? `text-white bg-red-600`
+                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                        }`,
+                                }}
+                                options={selectBankAccount}
+                                isSearchable={true}
+                                placeholder={"Bank"}
+                                value={
+                                    searchReceipt.receipt_search[0]
+                                        .EXPENSES_COST_CENTER
+                                }
+                                onChange={(val: any) => {
+                                    inputDataSearch(
+                                        "EXPENSES_COST_CENTER",
+                                        val,
+                                        0
+                                    );
+                                    if (
+                                        searchReceipt.receipt_search[0]
+                                            .EXPENSES_COST_CENTER === ""
+                                    ) {
+                                        inputDataSearch("flag", "flag", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                }}
+                                primaryColor={"bg-red-500"}
+                            /> */}
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-2">
                             <Button

@@ -14,7 +14,7 @@ MySQL - 8.0.31 : Database - phoenix
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 /*Data for the table `r_payment_type` */
 
-insert  into `r_payment_type`(`PAYMENT_TYPE_ID`,`PAYMENT_TYPE_NAME`) values (1,'Client Refund'),(2,'Operational Payment'),(3,'Insurance Premium'),(4,'Agent Payment'),(5,'Cash Advance'),(6,'EB Claim Payment');
+insert  into `r_payment_type`(`PAYMENT_TYPE_ID`,`PAYMENT_TYPE_NAME`) values (1,'Client Refund'),(2,'Operational Payment'),(3,'Insurance Premium'),(4,'Agent Payment'),(5,'EB Claim Payment');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

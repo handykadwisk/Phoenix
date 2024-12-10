@@ -2035,7 +2035,11 @@ export default function CashAdvance({ auth }: PageProps) {
     }, [total_amount]);
 
     useEffect(() => {
-        setData("cash_advance_cash_amount", 0);
+        setData({
+            ...data,
+            cash_advance_transfer_amount: 0,
+            cash_advance_cash_amount: 0,
+        });
     }, []);
 
     let total_amount_report = 0;
@@ -2131,7 +2135,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 cash_advance_transfer_amount: 0,
             });
         }
-
         setCheckedTransfer(!checkedTransfer);
     };
 
@@ -2272,6 +2275,54 @@ export default function CashAdvance({ auth }: PageProps) {
         }
     };
 
+    const calculateBusinessDays = (startDate: any, endDate: any) => {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            // console.error(
+            //     "Invalid date in calculateBusinessDays:",
+            //     startDate,
+            //     endDate
+            // );
+            return 0;
+        }
+
+        let count = 0;
+        const current = new Date(start);
+        while (current <= end) {
+            const day = current.getDay();
+            if (day !== 0 && day !== 6) {
+                // Skip Sundays (0) and Saturdays (6)
+                count++;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        return count > 0 ? count - 1 : 0;
+    };
+
+    const calculateDate = (requestedDate: any) => {
+        if (!requestedDate) {
+            // console.error("Requested date is missing in params.data");
+            return { textAlign: "center" };
+        }
+
+        const days = calculateBusinessDays(requestedDate, new Date());
+        if (days > 3) {
+            return {
+                backgroundColor: "red",
+                textAlign: "center",
+            };
+        } else if (days > 1) {
+            return {
+                backgroundColor: "yellow",
+                textAlign: "center",
+            };
+        } else {
+            return { textAlign: "center" };
+        }
+    };
+
     const handleSelectChange = (
         e: any,
         id: number,
@@ -2361,7 +2412,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 data={data}
                 onSuccess={handleSuccess}
                 buttonAddOns={null}
-                // panelWidth={"65%"}
                 body={
                     <>
                         <ModalToDocument
@@ -2386,7 +2436,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     ]?.cash_advance_detail_document_id.map(
                                         (val: any, i: number) => (
                                             <div
-                                                className="grid grid-cols-12 my-5"
+                                                className="grid grid-cols-12 my-2"
                                                 key={i}
                                             >
                                                 <div
@@ -2446,7 +2496,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     )}
                                     <button
                                         type="button"
-                                        className="text-sm cursor-pointer hover:underline"
+                                        className="text-sm cursor-pointer hover:underline mt-3"
                                         onClick={(e) => handleAddRowFiles(e)}
                                     >
                                         + Add Row
@@ -2613,15 +2663,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="bg-gray-2 text-center dark:bg-meta-4">
                                         <TH
                                             label="No."
-                                            className="border"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
                                         />
                                         <TH
                                             label="Intended Activity"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             colSpan="2"
                                         />
-                                        <TH className="border" rowSpan="2">
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             Purpose{" "}
                                             <span className="text-red-600">
                                                 *
@@ -2629,16 +2682,22 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Relation"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             colSpan="3"
                                         />
-                                        <TH className="border" rowSpan="2">
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             Location{" "}
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border" rowSpan="2">
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             Amount{" "}
                                             <span className="text-red-600">
                                                 *
@@ -2646,35 +2705,47 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Document"
-                                            className="border"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
                                         />
                                         {data.CashAdvanceDetail?.length > 1 && (
                                             <TH
                                                 label="Action"
-                                                className="border"
+                                                className="border px-3 py-2"
                                                 rowSpan="2"
                                             />
                                         )}
                                     </tr>
                                     <tr className="text-center">
-                                        <TH className="border" rowSpan="2">
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             Start Date{" "}
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border" rowSpan="2">
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             End Date{" "}
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH label="Name" className="border" />
-                                        <TH label="Person" className="border" />
+                                        <TH
+                                            label="Name"
+                                            className="border px-3 py-2"
+                                        />
+                                        <TH
+                                            label="Person"
+                                            className="border px-3 py-2"
+                                        />
                                         <TH
                                             label="Position"
-                                            className="border"
+                                            className="border px-3 py-2"
                                         />
                                     </tr>
                                 </thead>
@@ -2880,7 +2951,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         autoComplete="off"
                                                     />
                                                 </TD>
-                                                <TD className="border px-2">
+                                                <TD className="border">
                                                     <div className="">
                                                         <button
                                                             type="button"
@@ -3009,7 +3080,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         val
                                                     )
                                                 }
-                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    checkedTransfer === false &&
+                                                    "bg-gray-100"
+                                                }`}
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={!checkedTransfer}
@@ -3024,7 +3098,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         e.target.value
                                                     )
                                                 }
-                                                required
+                                                required={
+                                                    data.cash_advance_delivery_method_transfer ===
+                                                        1 && true
+                                                }
                                             >
                                                 <option value="">
                                                     -- Choose Bank Account --
@@ -3088,7 +3165,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         val
                                                     )
                                                 }
-                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    checkedCash === false &&
+                                                    "bg-gray-100"
+                                                }`}
                                                 placeholder="0.00"
                                                 autoComplete="off"
                                                 disabled={!checkedCash}
@@ -3154,7 +3234,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess=""
                 headers={null}
                 submitButtonName=""
-                // panelWidth={"65%"}
                 body={
                     <>
                         <ModalToDocument
@@ -3633,7 +3712,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 id="account_number"
                                                 type="text"
                                                 name="account_number"
-                                                value={`${dataById.bank_account?.employee.EMPLOYEE_FIRST_NAME} - ${dataById.bank_account?.EMPLOYEE_BANK_ACCOUNT_NAME} - ${dataById.bank_account?.EMPLOYEE_BANK_ACCOUNT_NUMBER}`}
+                                                value={
+                                                    dataById.bank_account
+                                                        ? `${dataById.bank_account?.employee.EMPLOYEE_FIRST_NAME} - ${dataById.bank_account?.EMPLOYEE_BANK_ACCOUNT_NAME} - ${dataById.bank_account?.EMPLOYEE_BANK_ACCOUNT_NUMBER}`
+                                                        : "-"
+                                                }
                                                 className="w-full md:w-1/4 ml-3 mt-5 md:mt-0"
                                                 required
                                                 readOnly
@@ -4384,7 +4467,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className={`block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right`}
+                                                className={`block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        0 && "bg-gray-100"
+                                                }`}
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -4413,7 +4499,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             e.target.value,
                                                     })
                                                 }
-                                                required
+                                                required={
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
+                                                }
                                             >
                                                 <option value="">
                                                     -- Choose Bank Account --
@@ -4480,7 +4569,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        0 && "bg-gray-100"
+                                                }`}
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -4614,7 +4706,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={{ "Content-type": "multipart/form-data" }}
                 submitButtonName={"Save"}
-                // panelWidth={"70%"}
                 body={
                     <>
                         <ModalToDocument
@@ -4634,10 +4725,9 @@ export default function CashAdvance({ auth }: PageProps) {
                             onSuccess=""
                             headers={null}
                             submitButtonName=""
-                            // panelWidth=""
                             body={
                                 <>
-                                    <div className="grid grid-cols-12 my-3">
+                                    <div className="grid grid-cols-12">
                                         {dataById.cash_advance_detail[
                                             modalFiles.index_show_revised
                                         ]?.m_cash_advance_document && (
@@ -4649,7 +4739,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     (file: any, i: number) => (
                                                         <>
                                                             <div
-                                                                className={`w-full col-span-11 mb-4`}
+                                                                className={`w-full col-span-11 my-2`}
                                                                 key={i}
                                                             >
                                                                 <InputLabel
@@ -4705,7 +4795,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                 .CASH_ADVANCE_DETAIL_DOCUMENT
                                                                 ?.name ? (
                                                                 <div
-                                                                    className={`w-full col-span-11 mb-4`}
+                                                                    className={`w-full col-span-11 my-2`}
                                                                     key={i}
                                                                 >
                                                                     <InputLabel
@@ -4723,7 +4813,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                 </div>
                                                             ) : (
                                                                 <div
-                                                                    className={`w-full col-span-11 mb-4`}
+                                                                    className={`w-full col-span-11 my-2`}
                                                                 >
                                                                     <InputLabel
                                                                         htmlFor="files"
@@ -4764,7 +4854,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </div>
                                     <button
                                         type="button"
-                                        className="text-sm cursor-pointer hover:underline"
+                                        className="text-sm cursor-pointer hover:underline mt-3"
                                         onClick={() =>
                                             handleAddRowRevisedFiles(
                                                 dataById.cash_advance_detail[
@@ -5384,7 +5474,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        0 && "bg-gray-100"
+                                                }`}
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5413,7 +5506,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             e.target.value,
                                                     })
                                                 }
-                                                required
+                                                required={
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
+                                                }
                                             >
                                                 <option value="">
                                                     -- Choose Bank Account --
@@ -5480,7 +5576,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        0 && "bg-gray-100"
+                                                }`}
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -5551,7 +5650,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 onSuccess={handleSuccess}
                 headers={null}
                 submitButtonName={"Execute"}
-                // panelWidth={"70%"}
                 body={
                     <>
                         <ModalToDocument
@@ -5974,7 +6072,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        0 && "bg-gray-100"
+                                                }`}
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -6003,7 +6104,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             e.target.value,
                                                     })
                                                 }
-                                                required
+                                                required={
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_TRANSFER ===
+                                                        1 && true
+                                                }
                                             >
                                                 <option value="">
                                                     -- Choose Bank Account --
@@ -6150,7 +6254,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 }
                                                 decimalScale={2}
                                                 decimalsLimit={2}
-                                                className="block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                                className={`block w-full md:w-1/4 ml-3 md:ml-12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right ${
+                                                    dataById.CASH_ADVANCE_DELIVERY_METHOD_CASH ===
+                                                        0 && "bg-gray-100"
+                                                }`}
                                                 onValueChange={(val: any) =>
                                                     setDataById({
                                                         ...dataById,
@@ -10613,25 +10720,39 @@ export default function CashAdvance({ auth }: PageProps) {
                             url={"getCA"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={undefined}
+                            cellHeight={130}
                             colDefs={[
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 1,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return calculateDate(
+                                            params.data
+                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                        );
+                                    },
                                 },
                                 {
                                     headerName: "Cash Advance Number",
                                     field: "CASH_ADVANCE_NUMBER",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return calculateDate(
+                                            params.data
+                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                        );
+                                    },
                                 },
                                 {
                                     headerName: "Cash Advance Report Number",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return calculateDate(
+                                            params.data
+                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                        );
+                                    },
                                     cellRenderer: (params: any) => {
                                         const cashAdvanceReportNumber =
                                             params.data.cash_advance_report
@@ -10646,7 +10767,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     headerName: "Request Date",
                                     field: "CASH_ADVANCE_REQUESTED_DATE",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return calculateDate(
+                                            params.data
+                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                        );
+                                    },
                                     valueFormatter: (params: any) => {
                                         return dateFormat(
                                             params.value,
@@ -10658,7 +10784,12 @@ export default function CashAdvance({ auth }: PageProps) {
                                     headerName: "Amount",
                                     field: "CASH_ADVANCE_TOTAL_AMOUNT",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return calculateDate(
+                                            params.data
+                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                        );
+                                    },
                                     valueFormatter: (params: any) => {
                                         return formatCurrency.format(
                                             params.value
@@ -10669,15 +10800,23 @@ export default function CashAdvance({ auth }: PageProps) {
                                     headerName: "Cash Advance",
                                     children: [
                                         {
-                                            headerName: "Approve 1",
-                                            field: "CASH_ADVANCE_FIRST_APPROVAL_USER",
+                                            headerName: "Approve",
                                             flex: 2,
                                             cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
+                                            cellStyle: (params: any) => {
+                                                return calculateDate(
+                                                    params.data
+                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                );
+                                            },
                                             cellRenderer: (params: any) => {
                                                 const first_approval_status =
                                                     params.data
                                                         .CASH_ADVANCE_FIRST_APPROVAL_STATUS;
+
+                                                const first_approval_user =
+                                                    params.data
+                                                        .CASH_ADVANCE_FIRST_APPROVAL_USER;
 
                                                 let badgeClass =
                                                     "bg-gray-200 text-gray-700";
@@ -10709,138 +10848,180 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     title = "Reject";
                                                 }
 
-                                                return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={params.value}
-                                                        />
-                                                    </>
-                                                );
-                                            },
-                                        },
-                                        {
-                                            headerName: "Approve 2",
-                                            field: "CASH_ADVANCE_SECOND_APPROVAL_USER",
-                                            flex: 2,
-                                            cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
-                                            cellRenderer: (params: any) => {
                                                 const second_approval_status =
                                                     params.data
                                                         .CASH_ADVANCE_SECOND_APPROVAL_STATUS;
+                                                const second_approval_user =
+                                                    params.data
+                                                        .CASH_ADVANCE_SECOND_APPROVAL_USER;
 
-                                                let badgeClass = "";
-                                                let title = "";
+                                                let badgeClassSecond = "";
+                                                let titleSecond = "";
 
                                                 if (
                                                     second_approval_status === 2
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Approve";
+                                                    titleSecond = "Approve";
                                                 } else if (
                                                     second_approval_status === 3
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-yellow-300 text-white";
-                                                    title = "Need Revision";
+                                                    titleSecond =
+                                                        "Need Revision";
                                                 } else if (
                                                     second_approval_status === 4
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-red-100 text-red-700";
-                                                    title = "Reject";
+                                                    titleSecond = "Reject";
                                                 } else if (
                                                     second_approval_status === 5
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Execute";
+                                                    titleSecond = "Execute";
                                                 }
 
-                                                return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={
-                                                                params.value
-                                                                    ? params.value
-                                                                    : "-"
-                                                            }
-                                                        />
-                                                    </>
-                                                );
-                                            },
-                                        },
-                                        {
-                                            headerName: "Approve 3",
-                                            field: "CASH_ADVANCE_THIRD_APPROVAL_USER",
-                                            flex: 2,
-                                            cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
-                                            cellRenderer: (params: any) => {
                                                 const third_approval_status =
                                                     params.data
                                                         .CASH_ADVANCE_THIRD_APPROVAL_STATUS;
+                                                const third_approval_user =
+                                                    params.data
+                                                        .CASH_ADVANCE_THIRD_APPROVAL_USER;
 
-                                                let badgeClass = "";
-                                                let title = "";
+                                                let badgeClassThird = "";
+                                                let titleThird = "";
 
                                                 if (
                                                     third_approval_status === 2
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Approve";
+                                                    titleThird = "Approve";
                                                 } else if (
                                                     third_approval_status === 3
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-yellow-300 text-white";
-                                                    title = "Need Revision";
+                                                    titleThird =
+                                                        "Need Revision";
                                                 } else if (
                                                     third_approval_status === 4
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-red-100 text-red-700";
-                                                    title = "Reject";
+                                                    titleThird = "Reject";
                                                 }
 
                                                 return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={
-                                                                params.value
-                                                                    ? params.value
-                                                                    : "-"
-                                                            }
-                                                        />
-                                                    </>
+                                                    <div className="flex flex-col">
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClass
+                                                                }
+                                                                title={title}
+                                                                body={
+                                                                    first_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassSecond
+                                                                }
+                                                                title={
+                                                                    titleSecond
+                                                                }
+                                                                body={
+                                                                    second_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassThird
+                                                                }
+                                                                title={
+                                                                    titleThird
+                                                                }
+                                                                body={
+                                                                    third_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 );
+                                            },
+                                        },
+                                        {
+                                            headerName: "Status",
+                                            flex: 2,
+                                            filter: "agSetColumnFilter",
+                                            filterParams: {
+                                                values: ["Execute", "Pending"],
+                                            },
+                                            cellStyle: (params: any) => {
+                                                return calculateDate(
+                                                    params.data
+                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                );
+                                            },
+                                            cellRenderer: (params: any) => {
+                                                const paramsData = params.data;
+                                                const status =
+                                                    paramsData?.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                    5
+                                                        ? "Execute"
+                                                        : "Pending";
+
+                                                return (
+                                                    <BadgeFlat
+                                                        className={
+                                                            status === "Execute"
+                                                                ? "bg-green-100 text-green-700"
+                                                                : "bg-yellow-300 text-white"
+                                                        }
+                                                        title={status}
+                                                        body={status}
+                                                    />
+                                                );
+                                            },
+                                            valueGetter: (params: any) => {
+                                                const status =
+                                                    params.data
+                                                        ?.CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                    5
+                                                        ? "Execute"
+                                                        : "Pending";
+                                                console.log(
+                                                    "Value Getter Status:",
+                                                    status
+                                                );
+                                                return status;
                                             },
                                         },
                                     ],
                                 },
+
                                 {
                                     headerName: "Cash Advance Report",
                                     children: [
                                         {
-                                            headerName: "Approve 1",
-                                            field: "",
+                                            headerName: "Approve",
                                             flex: 2,
                                             cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
+                                            cellStyle: (params: any) => {
+                                                return calculateDate(
+                                                    params.data
+                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                );
+                                            },
                                             cellRenderer: (params: any) => {
                                                 const first_approval_status =
                                                     params.data
@@ -10880,30 +11061,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     title = "Reject";
                                                 }
 
-                                                return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={
-                                                                first_approval_user
-                                                                    ? first_approval_user
-                                                                    : "-"
-                                                            }
-                                                        />
-                                                    </>
-                                                );
-                                            },
-                                        },
-                                        {
-                                            headerName: "Approve 2",
-                                            field: "CASH_ADVANCE_SECOND_APPROVAL_USER",
-                                            flex: 2,
-                                            cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
-                                            cellRenderer: (params: any) => {
                                                 const second_approval_status =
                                                     params.data
                                                         .cash_advance_report
@@ -10913,59 +11070,36 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         .cash_advance_report
                                                         ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER;
 
-                                                let badgeClass = "";
-                                                let title = "";
+                                                let badgeClassSecond = "";
+                                                let titleSecond = "";
 
                                                 if (
                                                     second_approval_status === 2
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Approve";
+                                                    titleSecond = "Approve";
                                                 } else if (
                                                     second_approval_status === 3
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-yellow-300 text-white";
-                                                    title = "Need Revision";
+                                                    titleSecond =
+                                                        "Need Revision";
                                                 } else if (
                                                     second_approval_status === 4
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-red-100 text-red-700";
-                                                    title = "Reject";
+                                                    titleSecond = "Reject";
                                                 } else if (
                                                     second_approval_status === 6
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Complited";
+                                                    titleSecond = "Complited";
                                                 }
 
-                                                return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={
-                                                                second_approval_user
-                                                                    ? second_approval_user
-                                                                    : "-"
-                                                            }
-                                                        />
-                                                    </>
-                                                );
-                                            },
-                                        },
-                                        {
-                                            headerName: "Approve 3",
-                                            field: "CASH_ADVANCE_THIRD_APPROVAL_USER",
-                                            flex: 2,
-                                            cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
-                                            cellRenderer: (params: any) => {
                                                 const third_approval_status =
                                                     params.data
                                                         .cash_advance_report
@@ -10975,44 +11109,121 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         .cash_advance_report
                                                         ?.REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER;
 
-                                                let badgeClass = "";
-                                                let title = "";
+                                                let badgeClassThird = "";
+                                                let titleThird = "";
 
                                                 if (
                                                     third_approval_status === 2
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Approve";
+                                                    titleThird = "Approve";
                                                 } else if (
                                                     third_approval_status === 3
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-yellow-300 text-white";
-                                                    title = "Need Revision";
+                                                    titleThird =
+                                                        "Need Revision";
                                                 } else if (
                                                     third_approval_status === 4
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-red-100 text-red-700";
-                                                    title = "Reject";
+                                                    titleThird = "Reject";
                                                 }
+
+                                                return (
+                                                    <div className="flex flex-col">
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClass
+                                                                }
+                                                                title={title}
+                                                                body={
+                                                                    first_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassSecond
+                                                                }
+                                                                title={
+                                                                    titleSecond
+                                                                }
+                                                                body={
+                                                                    second_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassThird
+                                                                }
+                                                                title={
+                                                                    titleThird
+                                                                }
+                                                                body={
+                                                                    third_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            },
+                                        },
+                                        {
+                                            headerName: "Status",
+                                            flex: 2,
+                                            filter: "agSetColumnFilter",
+                                            filterParams: {
+                                                values: ["Execute", "Pending"],
+                                            },
+                                            cellStyle: (params: any) => {
+                                                return calculateDate(
+                                                    params.data
+                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                );
+                                            },
+                                            cellRenderer: (params: any) => {
+                                                const paramsData = params.data;
+                                                const status =
+                                                    paramsData
+                                                        .cash_advance_report
+                                                        ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                    6
+                                                        ? "Execute"
+                                                        : "Pending";
 
                                                 return (
                                                     <>
                                                         <BadgeFlat
                                                             className={
-                                                                badgeClass
+                                                                status ===
+                                                                "Execute"
+                                                                    ? "bg-green-100 text-green-700"
+                                                                    : "bg-yellow-300 text-white"
                                                             }
-                                                            title={title}
-                                                            body={
-                                                                third_approval_user
-                                                                    ? third_approval_user
-                                                                    : "-"
-                                                            }
+                                                            title={status}
+                                                            body={status}
                                                         />
                                                     </>
                                                 );
+                                            },
+                                            valueGetter: (params: any) => {
+                                                // Mengembalikan nilai status untuk digunakan dalam filter
+                                                const status =
+                                                    params.data
+                                                        ?.cash_advance_report
+                                                        ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
+                                                    6
+                                                        ? "Execute"
+                                                        : "Pending";
+                                                return status;
                                             },
                                         },
                                     ],
@@ -11022,8 +11233,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                     field: "",
                                     flex: 2,
                                     autoHeight: true,
+                                    cellStyle: (params: any) => {
+                                        return calculateDate(
+                                            params.data
+                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                        );
+                                    },
                                     cellRenderer: (params: any) => {
-                                        // console.log("Params", params);
                                         const paramsData = params.data;
                                         return (
                                             <>
