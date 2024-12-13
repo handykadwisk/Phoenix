@@ -68,7 +68,7 @@ class AttendanceController extends Controller
     public function getAttendanceByEmployeeIdAndDate(Request $request){
         // dd($request);
         $attendance = TEmployeeAttendance::where('EMPLOYEE_ID', $request->employeeId)
-        ->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', $request->date)
+        ->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', '=' , date($request->date))
         ->first();
         return response()->json($attendance);
     }
@@ -85,6 +85,69 @@ class AttendanceController extends Controller
         ->first();
         return response()->json($data);
     }
+
+    public function getAttendanceSettingByIdForClockIn(Request $request){
+        // dd($request);
+        if (!$request->attendanceSettingId) {
+            $data = TAttendanceSetting::get();
+        } else {
+            $data = TAttendanceSetting::where('ATTENDANCE_SETTING_ID', $request->attendanceSettingId)->get();
+        }
+        return response()->json($data);
+    }
+
+     public function getAttendanceType(Request $request){
+        $data = TAttendanceSetting::where('ATTENDANCE_TYPE', $request->attendanceType)->where('COMPANY_ID', $request->companyId)->get();
+        return response()->json($data);
+    }
+
+     public function getAttendaceById(Request $request){
+        $data = TEmployeeAttendance::find($request->attendanceId);
+        return response()->json($data);
+    }
+    
+    public function getAttendanceForEmployeeAgGrid(Request $request)
+    {
+        // dd($request);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+        $sortModel = $request->input('sort');
+
+        // $query = DB::table('t_policy as p')->leftJoin('t_relation as r', 'p.RELATION_ID', '=', 'r.RELATION_ORGANIZATION_ID');
+        $query = TEmployeeAttendance::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', '<>',date_format(now(),"Y-m-d"))->orderBy('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', 'desc');
+            // dd($query->toSql());
+        // $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);        
+        
+        // if ($sortModel) {
+        //     $sortModel = explode(';', $sortModel); 
+        //     foreach ($sortModel as $sortItem) {
+        //         list($colId, $sortDirection) = explode(',', $sortItem);
+        //         $query->orderBy($colId, $sortDirection); 
+        //     }
+        // } else {
+        //     $query->orderBy('POLICY_ID', 'DESC'); 
+        // }
+
+        // if ($request->newFilter != "") {
+        //     foreach ($newSearch[0] as $keyId => $searchValue) {
+        //         if ($keyId === 'DATE') {
+        //             if ($searchValue != "") {
+        //                 $query->where('REQUEST_DATE', '=', $searchValue);
+        //             }                        
+        //         // }elseif ($keyId === 'CLIENT_ID'){
+        //         //     if ($searchValue != "") {
+        //         //         $query->where('RELATION_ID', $searchValue);
+        //         //     }
+        //         }
+        //     }
+        // }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        return $data;
+    }
+
     function getOffSiteReason() {
         $query = ROffSiteReason::get();
         return response()->json($query);
@@ -112,6 +175,33 @@ class AttendanceController extends Controller
 
         return new JsonResponse([
             "msg" => "Clock Out Succeed"
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function editCheckOut(Request $request) {
+        // dd($request);  
+        $attendance = TEmployeeAttendance::where('EMPLOYEE_ATTENDANCE_ID', $request->EMPLOYEE_ATTENDANCE_ID)
+            ->update([
+                "EMPLOYEE_ATTENDANCE_CHECK_OUT_DATE" => $request->EMPLOYEE_ATTENDANCE_CHECK_OUT_DATE,
+                "EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME" => $request->EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME,
+                "EMPLOYEE_ATTENDANCE_MESSAGE_CHECK_OUT" => $request->EMPLOYEE_ATTENDANCE_MESSAGE_CHECK_OUT,
+            ]);
+
+        // Created Log
+        UserLog::create([
+            'created_by' => Auth::user()->id,
+            'action'     => json_encode([
+                "description" => "Edit Clock Out",
+                "module"      => "Attendance",
+                "id"          => $attendance
+            ]),
+            'action_by'  => Auth::user()->user_login
+        ]);
+
+        return new JsonResponse([
+            "msg" => "Edit Clock Out Succeed"
         ], 201, [
             'X-Inertia' => true
         ]);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdditionalAllowanceController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\CashAdvanceController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\CollectiveLeaveController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\InsurancePanelController;
+use App\Http\Controllers\LemburController;
 use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
@@ -544,7 +546,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/getAttendanceByEmployeeIdAndDate', [AttendanceController::class, 'getAttendanceByEmployeeIdAndDate'])->name('attendance.getAttendanceByEmployeeIdAndDate');
     Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
     Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
+    Route::post('/getAttendanceSettingByIdForClockIn', [AttendanceController::class, 'getAttendanceSettingByIdForClockIn'])->name('attendance.getAttendanceSettingByIdForClockIn');
+    Route::post('/getAttendanceType', [AttendanceController::class, 'getAttendanceType'])->name('attendance.getAttendanceType');
     Route::get('/getOffSiteReason', [AttendanceController::class, 'getOffSiteReason'])->name('attendance.getOffSiteReason');
+    Route::get('/getAttendanceForEmployeeAgGrid', [AttendanceController::class, 'getAttendanceForEmployeeAgGrid'])->name('timeOff.getAttendanceForEmployeeAgGrid');
+    Route::post('/editCheckOut', [AttendanceController::class, 'editCheckOut'])->name('attendance.editCheckOut');
+    Route::post('/getAttendaceById', [AttendanceController::class, 'getAttendaceById'])->name('attendance.getAttendaceById');
     
 
     // Attendance Setting
@@ -585,6 +592,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/downloadTimeOffDocument/{id}', [TimeOffController::class, 'time_off_document_download'])->name('downloadTimeOffDocument.time_off_document_download');
     Route::get('/agGridRequestTimeOffForHR', [TimeOffController::class, 'agGridRequestTimeOffForHR'])->name('timeOff.agGridRequestTimeOffForHR');
     Route::get('/hr/timeOffForHR', [TimeOffController::class, 'timeOffForHR'])->name('hr/timeOffForHR');
+    Route::post('/deleteTimeOffDocument', [TimeOffController::class, 'delete_time_off_document'])->name('deleteTimeOffDocument.delete_time_off_document');
 
 
     // Collective Leave
@@ -612,6 +620,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/getMedicalAgGridForHR', [MedicalController::class, 'getMedicalAgGridForHR'])->name('getMedicalAgGridForHR');
     Route::post('/approveMedical', [MedicalController::class, 'approveMedical'])->name('approveMedical');
     Route::post('/rejectMedical', [MedicalController::class, 'rejectMedical'])->name('timeOff.rejectMedical');
+
+    //lembur
+    Route::get('/hr/lembur', [LemburController::class, 'index'])->name('hr/lembur');
+    Route::get('/getRequestLemburAgGrid', [LemburController::class, 'getRequestLemburAgGrid'])->name('getRequestLemburAgGrid');
+    Route::post('/registerLembur', [LemburController::class, 'store'])->name('store');
+    Route::post('/setDetailLembur', [LemburController::class, 'setDetailLembur'])->name('setDetailLembur');
+    Route::get('/getLemburById/{id}', [LemburController::class, 'getLemburById'])->name('getLemburById');
+    Route::post('/editLembur', [LemburController::class, 'editLembur'])->name('editLembur');
+    Route::post('/deleteLembur', [LemburController::class, 'deleteLembur'])->name('deleteLembur');
+
+    //Additional Allowance
+    Route::get('/hr/additionalAllowance', [AdditionalAllowanceController::class, 'index'])->name('hr/additionalAllowance');
+    Route::get('/getAdditionalAllowanceAgGrid', [AdditionalAllowanceController::class, 'getAdditionalAllowanceAgGrid'])->name('getAdditionalAllowanceAgGrid');
+    Route::post('/addAdditionalAllowance', [AdditionalAllowanceController::class, 'store'])->name('store');
+    // Route::post('/setDetailLembur', [LemburController::class, 'setDetailLembur'])->name('setDetailLembur');
+    Route::get('/getAdditionalAllowanceById/{id}', [AdditionalAllowanceController::class, 'getAdditionalAllowanceById'])->name('getAdditionalAllowanceById');
+    Route::post('/editAdditionalAllowance', [AdditionalAllowanceController::class, 'editAdditionalAllowance'])->name('editAdditionalAllowance');
+    Route::post('/deleteAdditionalAllowance', [AdditionalAllowanceController::class, 'deleteAdditionalAllowance'])->name('deleteAdditionalAllowance');
 
 });
 

@@ -40,6 +40,69 @@ export default function Index({ auth }: PageProps) {
               null;
     };
 
+    // State to store selected hour and minute
+    const [hourTimeIn, setHourTimeIn] = useState("00");
+    const [hourTimeOut, setHourTimeOut] = useState("00");
+    const [hourBreakStart, setHourBreakStart] = useState("00");
+    const [hourBreakEnd, setHourBreakEnd] = useState("00");
+    const [minuteTimeIn, setMinuteTimeIn] = useState("00");
+    const [minuteTimeOut, setMinuteTimeOut] = useState("00");
+    const [minuteBreakStart, setMinuteBreakStart] = useState("00");
+    const [minuteBreakEnd, setMinuteBreakEnd] = useState("00");
+
+    // Generate the options for hours and minutes
+    const hours = Array.from({ length: 24 }, (_, i) =>
+        String(i).padStart(2, "0")
+    ); // 00 to 23
+    const minutes = Array.from({ length: 60 }, (_, i) =>
+        String(i).padStart(2, "0")
+    ); // 00 to 59
+
+    const handleTimeChange = (val: string, name:string, field:string) => {
+        // setHour(val);
+        const data = { ...dataWorkAttendance };
+        console.log("name: ", name, " value: ", val, " field: ", field);
+        let time = "";
+        if (name == "hourTimeIn") {
+            time = val + ":" + minuteTimeIn;
+            setHourTimeIn(val);
+        } else if (name == "minuteTimeIn") {
+            time = hourTimeIn + ":" + val;
+            setMinuteTimeIn(val);
+        } else if (name == "hourTimeOut") {
+            time = val + ":" + minuteTimeOut;
+            setHourTimeOut(val);
+        } else if (name == "minuteTimeOut") {
+            time = hourTimeOut + ":" + val;
+            setMinuteTimeOut(val);
+        } else if (name == "hourBreakStart") {
+            time = val + ":" + minuteBreakStart;
+            setHourBreakStart(val);
+        } else if (name == "minuteBreakStart") {
+            time = hourBreakStart + ":" + val;
+            setMinuteBreakStart(val);
+        } else if (name == "hourBreakEnd") {
+            time = val + ":" + minuteBreakEnd;
+            setHourBreakEnd(val);
+        } else if (name == "minuteBreakEnd") {
+            time = hourBreakEnd + ":" + val;
+            setMinuteBreakEnd(val);
+        }
+        console.log("time: ", time);
+
+        data[field] = time
+        setDataWorkAttendance(data);
+        
+    };
+
+    // const handleHourChange = (event:any) => {
+    //     setHour(event.target.value);
+    // };
+
+    // const handleMinuteChange = (event:any) => {
+    //     setMinute(event.target.value);
+    // };
+
     const handleSelectCompany = (idCompany: string) => {
         mappingEmployeeToSettingAttendance(idCompany);
     };
@@ -58,7 +121,6 @@ export default function Index({ auth }: PageProps) {
         axios
             .get(`/getAttendanceSetting`)
             .then((res) => {
-                
                 setDataAttendanceSetting(res.data.data);
             })
             .catch((err) => {
@@ -152,7 +214,7 @@ export default function Index({ auth }: PageProps) {
             modalSetPersonAttendce: !modal.modalSetPersonAttendce,
         });
     };
-    
+
     // End Set Person Attendance
 
     const [isSuccess, setIsSuccess] = useState<string>("");
@@ -206,6 +268,39 @@ export default function Index({ auth }: PageProps) {
                 body={
                     <>
                         <div className="mb-2">
+                            {/* <div>
+                                <label htmlFor="hour">Hour </label>
+                                <select
+                                    id="hour"
+                                    className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={hour}
+                                    onChange={handleHourChange}
+                                >
+                                    {hours.map((h) => (
+                                        <option key={h} value={h}>
+                                            {h}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <label htmlFor="minute">Minute </label>
+                                <select
+                                    id="minute"
+                                    className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    value={minute}
+                                    onChange={handleMinuteChange}
+                                >
+                                    {minutes.map((m) => (
+                                        <option key={m} value={m}>
+                                            {m}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <div>
+                                    Selected Time: {hour}:{minute}
+                                </div>
+                            </div> */}
                             <div className="grid grid-cols-1 gap-4 mt-2">
                                 <div className="relative">
                                     <InputLabel
@@ -402,7 +497,73 @@ export default function Index({ auth }: PageProps) {
                                     <div className="ml-[6.4rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="relative w-24">
+                                    <div>
+                                        {/* <label
+                                            htmlFor="hour"
+                                            className="text-sm"
+                                        >
+                                            Hour{" "}
+                                        </label> */}
+                                        <select
+                                            id="hourTimeIn"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            // value={hour}
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_CHECK_IN_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_CHECK_IN_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            // .split("/")[1]
+                                            // onChange={handleHourChange}
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourTimeIn",
+                                                    "ATTENDANCE_CHECK_IN_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* <label
+                                            htmlFor="minute"
+                                            className="ml-4 text-sm"
+                                        >
+                                            Minute{" "}
+                                        </label> */}
+                                        <select
+                                            id="minuteTimeIn"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            // value={minute}
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_CHECK_IN_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_CHECK_IN_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            // onChange={handleMinuteChange}
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteTimeIn",
+                                                    "ATTENDANCE_CHECK_IN_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
                                         <select
                                             className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
@@ -430,7 +591,7 @@ export default function Index({ auth }: PageProps) {
                                                 }
                                             )}
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="relative">
                                     <InputLabel
@@ -440,7 +601,56 @@ export default function Index({ auth }: PageProps) {
                                     <div className="ml-[7.2rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="relative w-24">
+                                    <div>
+                                        <select
+                                            id="hourTimeOut"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_CHECK_OUT_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_CHECK_OUT_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourTimeOut",
+                                                    "ATTENDANCE_CHECK_OUT_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteTimeOut"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_CHECK_OUT_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_CHECK_OUT_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteTimeOut",
+                                                    "ATTENDANCE_CHECK_OUT_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
                                         <select
                                             className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
@@ -468,7 +678,7 @@ export default function Index({ auth }: PageProps) {
                                                 }
                                             )}
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
@@ -529,7 +739,56 @@ export default function Index({ auth }: PageProps) {
                                         className=""
                                         value={"Break Time Start"}
                                     />
-                                    <div className="relative w-24">
+                                    <div>
+                                        <select
+                                            id="hourBreakStart"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_BREAK_START_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_BREAK_START_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourBreakStart",
+                                                    "ATTENDANCE_BREAK_START_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteBreakStart"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_BREAK_START_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_BREAK_START_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteBreakStart",
+                                                    "ATTENDANCE_BREAK_START_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
                                         <select
                                             className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
@@ -557,14 +816,63 @@ export default function Index({ auth }: PageProps) {
                                                 }
                                             )}
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="relative">
                                     <InputLabel
                                         className=""
                                         value={"Break Time End"}
                                     />
-                                    <div className="relative w-24">
+                                    <div>
+                                        <select
+                                            id="hourBreakEnd"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_BREAK_END_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_BREAK_END_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourBreakEnd",
+                                                    "ATTENDANCE_BREAK_END_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteBreakEnd"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataWorkAttendance.ATTENDANCE_BREAK_END_TIME &&
+                                                dataWorkAttendance.ATTENDANCE_BREAK_END_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteBreakEnd",
+                                                    "ATTENDANCE_BREAK_END_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
                                         <select
                                             className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
@@ -592,7 +900,7 @@ export default function Index({ auth }: PageProps) {
                                                 }
                                             )}
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
@@ -684,7 +992,7 @@ export default function Index({ auth }: PageProps) {
                             setDetailCompanyNew={setDetailAttendanceSetting}
                             attendanceType={attendanceType}
                             companies={companies}
-                            arrTime={arrTime}
+                            // arrTime={arrTime}
                         />
                     </>
                 }

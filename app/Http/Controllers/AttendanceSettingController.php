@@ -17,9 +17,21 @@ class AttendanceSettingController extends Controller
 {
    public function index()
     {   
+        $arrTime = [];
+        for($hours=0; $hours<24; $hours++){ // the interval for hours is '1'
+            for($mins=0; $mins<60; $mins+=30){ // the interval for mins is '30'
+                array_push($arrTime,
+                            [
+                                'id' => str_pad($hours,2,'0',STR_PAD_LEFT). ':' .str_pad($mins,2,'0',STR_PAD_LEFT),
+                                'name' => str_pad($hours,2,'0',STR_PAD_LEFT). ':' .str_pad($mins,2,'0',STR_PAD_LEFT)
+                            ]
+                );
+            }
+        }
         return Inertia::render('Company/AttendanceSetting/Index', [            
             'companies' => TCompany::get(),
-            'employees' => TEmployee::get()
+            'employees' => TEmployee::get(),
+            'arrTime' => $arrTime
         ]);
         // untuk memanggil controller lain
         //  $object = new CoBrokingController();
@@ -171,7 +183,7 @@ class AttendanceSettingController extends Controller
                     "module"      => "Attendance Setting",
                     "id"          => $request->ATTENDANCE_SETTING_ID
                 ]),
-                'action_by'  => Auth::user()->email
+                'action_by'  => Auth::user()->id
             ]);
         });
 
@@ -196,8 +208,8 @@ class AttendanceSettingController extends Controller
                 }
 
                 $id = MEmployeeAttendance::insertGetId([
-                    'ATTENDANCE_TYPE' => $value["ATTENDANCE_TYPE"],
-                    'ATTENDANCE_SETTING_ID' => $value["ATTENDANCE_SETTING_ID"],
+                    'ATTENDANCE_TYPE' => array_key_exists("ATTENDANCE_TYPE", $value) ? $value['ATTENDANCE_TYPE'] : null, //$value["ATTENDANCE_TYPE"],
+                    'ATTENDANCE_SETTING_ID' => array_key_exists("ATTENDANCE_SETTING_ID", $value) ? $value['ATTENDANCE_SETTING_ID'] : null,//$value["ATTENDANCE_SETTING_ID"],
                     'EMPLOYEE_ID' => $value["EMPLOYEE_ID"],
                 ]);
                 array_push($arrMEmployeeAttendanceId, $id);
